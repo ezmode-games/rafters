@@ -210,131 +210,6 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Semantic heading classes with font-display and responsive scaling */
-  .heading-hero {
-    font-family: var(--font-display);
-    font-size: var(--heading-hero-size);
-    line-height: var(--heading-hero-line-height);
-    letter-spacing: var(--heading-hero-letter-spacing);
-    font-weight: 800;
-    margin-bottom: var(--spacing-phi-2);
-
-    @media (min-width: 1024px) {
-      font-size: var(--heading-hero-size-lg);
-    }
-  }
-
-  .heading-display {
-    font-family: var(--font-display);
-    font-size: var(--heading-display-size);
-    line-height: var(--heading-display-line-height);
-    letter-spacing: var(--heading-display-letter-spacing);
-    font-weight: 700;
-    margin-top: var(--spacing-phi-3);
-    margin-bottom: var(--spacing-phi-2);
-
-    @media (min-width: 1024px) {
-      font-size: var(--heading-display-size-lg);
-    }
-  }
-
-  .heading-section {
-    font-family: var(--font-display);
-    font-size: var(--heading-section-size);
-    line-height: var(--heading-section-line-height);
-    letter-spacing: var(--heading-section-letter-spacing);
-    font-weight: 600;
-    margin-top: var(--spacing-phi-2);
-    margin-bottom: var(--spacing-phi-1);
-
-    @media (min-width: 1024px) {
-      font-size: var(--heading-section-size-lg);
-    }
-  }
-
-  .heading-subsection {
-    font-family: var(--font-display);
-    font-size: var(--heading-subsection-size);
-    line-height: var(--heading-subsection-line-height);
-    letter-spacing: var(--heading-subsection-letter-spacing);
-    font-weight: 600;
-    margin-top: var(--spacing-phi-1);
-    margin-bottom: var(--spacing-phi--1);
-
-    @media (min-width: 1024px) {
-      font-size: var(--heading-subsection-size-lg);
-    }
-  }
-
-  .heading-component {
-    font-family: var(--font-display);
-    font-size: var(--heading-component-size);
-    line-height: var(--heading-component-line-height);
-    letter-spacing: var(--heading-component-letter-spacing);
-    font-weight: 500;
-    margin-top: var(--spacing-phi-1);
-    margin-bottom: var(--spacing-phi--1);
-
-    @media (min-width: 1024px) {
-      font-size: var(--heading-component-size-lg);
-    }
-  }
-
-  .heading-subcomponent {
-    font-family: var(--font-sans);
-    font-size: var(--heading-subcomponent-size);
-    line-height: var(--heading-subcomponent-line-height);
-    letter-spacing: var(--heading-subcomponent-letter-spacing);
-    font-weight: 500;
-
-    @media (min-width: 1024px) {
-      font-size: var(--heading-subcomponent-size-lg);
-    }
-  }
-
-  .heading-label {
-    font-family: var(--font-sans);
-    font-size: var(--heading-label-size);
-    line-height: var(--heading-label-line-height);
-    letter-spacing: var(--heading-label-letter-spacing);
-    font-weight: 500;
-    text-transform: uppercase;
-
-    @media (min-width: 1024px) {
-      font-size: var(--heading-label-size-lg);
-    }
-  }
-
-  /* Semantic body text classes */
-  .text-body-large {
-    font-family: var(--font-sans);
-    font-size: var(--text-body-large);
-    line-height: var(--text-body-large-line-height);
-    margin-bottom: var(--spacing-phi-1);
-  }
-
-  .text-body {
-    font-family: var(--font-sans);
-    font-size: var(--text-body);
-    line-height: var(--text-body-line-height);
-    margin-bottom: var(--spacing-phi-1);
-  }
-
-  .text-body-small {
-    font-family: var(--font-sans);
-    font-size: var(--text-body-small);
-    line-height: var(--text-body-small-line-height);
-    margin-bottom: var(--spacing-phi--1);
-  }
-
-  .text-caption {
-    font-family: var(--font-sans);
-    font-size: var(--text-caption);
-    line-height: var(--text-caption-line-height);
-    letter-spacing: var(--text-caption-letter-spacing);
-    color: var(--color-muted-foreground);
-  }
-
   /* Font family utility classes */
   .font-display {
     font-family: var(--font-display);
@@ -353,27 +228,151 @@
   }
 }
 
-@layer utilities {
-  .opacity-hover {
-    opacity: var(--opacity-hover);
-  }
-
-  .opacity-active {
-    opacity: var(--opacity-active);
-  }
-
-  .opacity-disabled {
-    opacity: var(--opacity-disabled);
-  }
-
-  .opacity-loading {
-    opacity: var(--opacity-loading);
-  }
-
-  .scale-active {
-    transform: scale(var(--scale-active));
-  }
+/* Interaction State Utilities */
+@utility opacity-hover {
+  opacity: var(--opacity-hover);
 }
+
+@utility opacity-active {
+  opacity: var(--opacity-active);
+}
+
+@utility opacity-disabled {
+  opacity: var(--opacity-disabled);
+}
+
+@utility opacity-loading {
+  opacity: var(--opacity-loading);
+}
+
+@utility scale-active {
+  transform: scale(var(--scale-active));
+}
+
+/* Semantic heading classes with font-display and responsive scaling */
+  @utility heading-hero {
+    font-family: var(--font-display);
+    font-size: var(--heading-hero-size);
+    line-height: var(--heading-hero-line-height);
+    letter-spacing: var(--heading-hero-letter-spacing);
+    font-weight: 800;
+    margin-bottom: var(--spacing-phi-2);
+
+    @media (min-width: 1024px) {
+      font-size: var(--heading-hero-size-lg);
+    }
+  }
+
+  @utility heading-display {
+    font-family: var(--font-display);
+    font-size: var(--heading-display-size);
+    line-height: var(--heading-display-line-height);
+    letter-spacing: var(--heading-display-letter-spacing);
+    font-weight: 700;
+    margin-top: var(--spacing-phi-3);
+    margin-bottom: var(--spacing-phi-2);
+
+    @media (min-width: 1024px) {
+      font-size: var(--heading-display-size-lg);
+    }
+  }
+
+   @utility heading-section {
+    font-family: var(--font-display);
+    font-size: var(--heading-section-size);
+    line-height: var(--heading-section-line-height);
+    letter-spacing: var(--heading-section-letter-spacing);
+    font-weight: 600;
+    margin-top: var(--spacing-phi-2);
+    margin-bottom: var(--spacing-phi-1);
+
+    @media (min-width: 1024px) {
+      font-size: var(--heading-section-size-lg);
+    }
+  }
+
+  @utility heading-subsection {
+    font-family: var(--font-display);
+    font-size: var(--heading-subsection-size);
+    line-height: var(--heading-subsection-line-height);
+    letter-spacing: var(--heading-subsection-letter-spacing);
+    font-weight: 600;
+    margin-top: var(--spacing-phi-1);
+    margin-bottom: var(--spacing-phi--1);
+
+    @media (min-width: 1024px) {
+      font-size: var(--heading-subsection-size-lg);
+    }
+  }
+
+  @utility heading-component {
+    font-family: var(--font-display);
+    font-size: var(--heading-component-size);
+    line-height: var(--heading-component-line-height);
+    letter-spacing: var(--heading-component-letter-spacing);
+    font-weight: 500;
+    margin-top: var(--spacing-phi-1);
+    margin-bottom: var(--spacing-phi--1);
+
+    @media (min-width: 1024px) {
+      font-size: var(--heading-component-size-lg);
+    }
+  }
+
+  @utility heading-subcomponent {
+    font-family: var(--font-sans);
+    font-size: var(--heading-subcomponent-size);
+    line-height: var(--heading-subcomponent-line-height);
+    letter-spacing: var(--heading-subcomponent-letter-spacing);
+    font-weight: 500;
+
+    @media (min-width: 1024px) {
+      font-size: var(--heading-subcomponent-size-lg);
+    }
+  }
+
+  @utility heading-label {
+    font-family: var(--font-sans);
+    font-size: var(--heading-label-size);
+    line-height: var(--heading-label-line-height);
+    letter-spacing: var(--heading-label-letter-spacing);
+    font-weight: 500;
+    text-transform: uppercase;
+
+    @media (min-width: 1024px) {
+      font-size: var(--heading-label-size-lg);
+    }
+  }
+
+  /* Semantic body text classes */
+  @utility text-body-large {
+    font-family: var(--font-sans);
+    font-size: var(--text-body-large);
+    line-height: var(--text-body-large-line-height);
+    margin-bottom: var(--spacing-phi-1);
+  }
+
+  @utility text-body {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body-line-height);
+    margin-bottom: var(--spacing-phi-1);
+  }
+
+  @utility text-body-small {
+    font-family: var(--font-sans);
+    font-size: var(--text-body-small);
+    line-height: var(--text-body-small-line-height);
+    margin-bottom: var(--spacing-phi--1);
+  }
+
+  @utility text-caption {
+    font-family: var(--font-sans);
+    font-size: var(--text-caption);
+    line-height: var(--text-caption-line-height);
+    letter-spacing: var(--text-caption-letter-spacing);
+    color: var(--color-muted-foreground);
+  }
 
 /* Layout System Utilities - Using @utility directive at root level */
 
@@ -476,177 +475,4 @@
     grid-area: main;
     overflow: auto;
   }
-}
-
-/* MDX Typography Styling for Storybook Documentation */
-/* Apply our semantic typography styles to MDX-generated HTML elements */
-
-/* Target Storybook docs pages specifically */
-.sbdocs-content,
-.docs-story,
-[data-docs-story],
-#storybook-docs {
-  /* Remove any default Storybook constraints */
-  max-width: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-
-  /* Apply semantic typography to MDX headings */
-  & h1 {
-    font-family: var(--font-display);
-    font-size: var(--heading-hero-size);
-    line-height: var(--heading-hero-line-height);
-    letter-spacing: var(--heading-hero-letter-spacing);
-    font-weight: 800;
-    margin-bottom: var(--spacing-phi-2);
-
-    @media (min-width: 1024px) {
-      font-size: var(--heading-hero-size-lg);
-    }
-  }
-
-  & h2 {
-    font-family: var(--font-display);
-    font-size: var(--heading-display-size);
-    line-height: var(--heading-display-line-height);
-    letter-spacing: var(--heading-display-letter-spacing);
-    font-weight: 700;
-    margin-top: var(--spacing-phi-3);
-    margin-bottom: var(--spacing-phi-2);
-
-    @media (min-width: 1024px) {
-      font-size: var(--heading-display-size-lg);
-    }
-  }
-
-  & h3 {
-    font-family: var(--font-display);
-    font-size: var(--heading-section-size);
-    line-height: var(--heading-section-line-height);
-    letter-spacing: var(--heading-section-letter-spacing);
-    font-weight: 600;
-    margin-top: var(--spacing-phi-2);
-    margin-bottom: var(--spacing-phi-1);
-
-    @media (min-width: 1024px) {
-      font-size: var(--heading-section-size-lg);
-    }
-  }
-
-  & h4 {
-    font-family: var(--font-display);
-    font-size: var(--heading-subsection-size);
-    line-height: var(--heading-subsection-line-height);
-    letter-spacing: var(--heading-subsection-letter-spacing);
-    font-weight: 600;
-    margin-top: var(--spacing-phi-1);
-    margin-bottom: var(--spacing-phi--1);
-
-    @media (min-width: 1024px) {
-      font-size: var(--heading-subsection-size-lg);
-    }
-  }
-
-  & h5,
-  & h6 {
-    font-family: var(--font-display);
-    font-size: var(--heading-component-size);
-    line-height: var(--heading-component-line-height);
-    letter-spacing: var(--heading-component-letter-spacing);
-    font-weight: 500;
-    margin-top: var(--spacing-phi-1);
-    margin-bottom: var(--spacing-phi--1);
-
-    @media (min-width: 1024px) {
-      font-size: var(--heading-component-size-lg);
-    }
-  }
-
-  /* Apply semantic typography to MDX body text */
-  & p {
-    font-family: var(--font-sans);
-    font-size: var(--text-body);
-    line-height: var(--text-body-line-height);
-    margin-bottom: var(--spacing-phi-1);
-  }
-
-  /* Style MDX lists */
-  & ul,
-  & ol {
-    font-family: var(--font-sans);
-    font-size: var(--text-body);
-    line-height: var(--text-body-line-height);
-    margin-bottom: var(--spacing-phi-1);
-  }
-
-  & li {
-    font-family: var(--font-sans);
-    font-size: var(--text-body);
-    line-height: var(--text-body-line-height);
-    margin-bottom: var(--spacing-phi--2);
-  }
-
-  /* Style MDX code elements */
-  & code {
-    font-family: var(--font-mono);
-    font-size: 0.875rem;
-    background-color: var(--color-muted);
-    padding: 0.125rem 0.25rem;
-    border-radius: var(--radius);
-  }
-
-  & pre {
-    font-family: var(--font-mono);
-    font-size: 0.875rem;
-    background-color: var(--color-muted);
-    padding: var(--spacing-phi-1);
-    border-radius: var(--radius);
-    border: 1px solid var(--color-border);
-    overflow-x: auto;
-  }
-
-  /* Style MDX emphasis */
-  & strong {
-    font-weight: 600;
-  }
-
-  & em {
-    font-style: italic;
-  }
-
-  /* Style MDX links */
-  & a {
-    color: var(--color-primary);
-    transition: color 0.2s ease;
-
-    &:hover {
-      color: var(--color-primary);
-      opacity: var(--opacity-hover);
-    }
-  }
-
-  /* Style MDX horizontal rules */
-  & hr {
-    border-color: var(--color-border);
-    margin: var(--spacing-phi-2) 0;
-  }
-
-  /* Style MDX blockquotes */
-  & blockquote {
-    border-left: 4px solid var(--color-primary);
-    padding-left: var(--spacing-phi-1);
-    color: var(--color-muted-foreground);
-    font-style: italic;
-  }
-}
-
-/* Override Storybook's default story container constraints */
-.sbdocs .sbdocs-content {
-  max-width: none !important;
-  padding: 0 !important;
-}
-
-.docs-story > div {
-  width: 100% !important;
-  max-width: none !important;
 }

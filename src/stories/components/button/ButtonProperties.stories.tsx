@@ -153,13 +153,17 @@ export const AsChild: Story = {
       <div className="space-y-2">
         <h3 className="text-lg font-medium">Composition with asChild</h3>
         <p className="text-sm text-muted-foreground max-w-md">
-          Use asChild when you need button styling on other elements like links.
+          Use asChild to apply button styling and behavior to simple elements like icons.
         </p>
       </div>
-      <Button asChild variant="primary">
-        <a href="#example" className="inline-block">
-          Link as Button
-        </a>
+      <Button asChild variant="primary" size="sm">
+        <div 
+          onClick={() => console.log('Icon clicked')}
+          onKeyDown={(e) => e.key === 'Enter' && console.log('Icon activated')}
+          className="cursor-pointer flex items-center justify-center"
+        >
+          ✓
+        </div>
       </Button>
     </div>
   ),
@@ -167,7 +171,7 @@ export const AsChild: Story = {
     docs: {
       description: {
         story:
-          'The asChild property enables composition patterns, allowing button styles to be applied to other elements like links while maintaining proper semantics.',
+          'The asChild property enables composition patterns, allowing button styles and behavior to be applied to simple elements like icons.',
       },
     },
   },

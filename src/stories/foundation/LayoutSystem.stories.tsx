@@ -7,7 +7,7 @@ import {
   ContentSidebar,
   ContentStack,
   ReadingLayout,
-} from '../components';
+} from '../../components';
 
 const meta = {
   title: '01 Identity/Layout System',

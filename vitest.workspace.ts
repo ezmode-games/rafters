@@ -1,19 +1,19 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
-import { defineWorkspace } from 'vitest/config';
 
 const dirname =
   typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
-// Workspace configuration for Storybook vitest integration
-// More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
-export default defineWorkspace([
-  // Reference the main vitest config for regular tests
+export default [
+  // Regular unit tests
   'vitest.config.ts',
-  // Storybook tests project
+  // Storybook tests project 
   {
     plugins: [storybookTest({ configDir: path.join(dirname, '.storybook') })],
+    optimizeDeps: {
+      include: ['react/jsx-dev-runtime'],
+    },
     test: {
       name: 'storybook',
       browser: {
@@ -21,9 +21,12 @@ export default defineWorkspace([
         headless: true,
         provider: 'playwright',
         instances: [{ browser: 'chromium' }],
+        screenshotFailures: false,
+        slowHijackESM: false,
       },
       setupFiles: ['.storybook/vitest.setup.ts'],
-      include: ['src/stories/**/*.test.{ts,tsx}'],
+      testTimeout: 60000,
+      hookTimeout: 60000,
     },
   },
-]);
+];

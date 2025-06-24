@@ -145,10 +145,11 @@ const TabsBreadcrumb = ({ activeTab, tabs }: TabsBreadcrumbProps) => {
   const activeTabLabel = tabs[activeIndex]?.label;
   
   return (
-    <div className="text-xs text-muted-foreground mb-2" role="status" aria-live="polite">
+    <output className="text-xs text-muted-foreground mb-2" aria-live="polite">
       Tab {activeIndex + 1} of {tabs.length}: {activeTabLabel}
-    </div>
+    </output>
   );
 };
 
 export { Tabs, TabsList, TabsTrigger, TabsContent, TabsBreadcrumb };
+export type { TabsProps };
