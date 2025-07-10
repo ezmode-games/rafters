@@ -169,7 +169,7 @@ See [COMPONENT_DEVELOPMENT_BRIEFING.md](./COMPONENT_DEVELOPMENT_BRIEFING.md) for
 
 ## License
 
-MIT © Sean Poulter
+MIT © Sean Silvius 
 
 ---
 
