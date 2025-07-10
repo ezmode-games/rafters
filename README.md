@@ -49,21 +49,24 @@ function App() {
 }
 ```
 
-## Components
+## Component Development
 
-### Core Components
-- **Button**: Action triggers with attention economics
-- **Input**: Form fields with validation intelligence
-- **Card**: Content containers with cognitive load optimization
-- **Select**: Choice components with interaction intelligence
+### Current Status
+**Phase 1 Complete**: Core foundation components (Button, Input, Card, Select, Label, Slider, Tabs) with design intelligence patterns implemented.
 
-### Layout Components  
-- **Layout**: Grid systems with mathematical precision
-- **Tabs**: Navigation with wayfinding intelligence
+**Phase 2 In Progress**: See [GitHub Issues](https://github.com/real-handy/rafters/issues) for the complete roadmap of 33 components and patterns being developed.
 
-### Form Components
-- **Label**: Typography with semantic meaning
-- **Slider**: Range inputs with motor accessibility
+### Component Categories
+
+**Core Components**: Table, Badge, Avatar, Breadcrumb, Pagination, Skeleton, Alert, Accordion, Dropdown Menu, Form Components Suite
+
+**Layout Components**: Container, Grid, Sidebar, Header, Footer  
+
+**Specialized Components**: Search, Calendar, File Upload, Image, Code Block, Empty State, Loading Spinner
+
+**Interaction Components**: Dialog, Toast, Progress, Tooltip, Popover, Command Palette, Separator
+
+**Patterns**: Form Validation, Data Fetching States, Responsive Design, Theme System
 
 ---
 
@@ -154,16 +157,32 @@ We don't start with visual design. We start with human needs:
 
 ---
 
-## Contributing
+## Development
 
-We welcome contributions that advance design intelligence:
+### Getting Started
+```bash
+# Install dependencies
+pnpm install
 
-1. **Follow Design Intelligence Principles**
-2. **Include Accessibility Testing**
-3. **Document Design Reasoning**
-4. **Validate Cognitive Load Impact**
+# Start development server
+pnpm dev
 
-See [COMPONENT_DEVELOPMENT_BRIEFING.md](./COMPONENT_DEVELOPMENT_BRIEFING.md) for detailed guidelines.
+# Run Storybook
+pnpm storybook
+
+# Run tests
+pnpm test
+```
+
+### AI Development Approach
+This design system is built for AI development. Each component includes:
+- **Intelligence Patterns**: Design reasoning encoded for AI understanding
+- **Comprehensive Examples**: Storybook stories demonstrating proper usage
+- **Accessibility Excellence**: WCAG AAA compliance with motor, visual, cognitive, and auditory support
+- **Systematic Foundation**: Radix primitives with semantic tokens
+
+### Contributing
+See [GitHub Issues](https://github.com/real-handy/rafters/issues) for current development priorities. Each issue includes detailed technical requirements and intelligence patterns for implementation.
 
 ---
 
