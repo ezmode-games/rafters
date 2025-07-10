@@ -45,6 +45,27 @@ export { Slider } from './Slider';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
 
 export {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+  DialogPortal,
+  DialogOverlay,
+} from './Dialog';
+export type {
+  DialogProps,
+  DialogContentProps,
+  DialogHeaderProps,
+  DialogFooterProps,
+  DialogTitleProps,
+  DialogDescriptionProps,
+} from './Dialog';
+
+export {
   Container,
   ReadingLayout,
   ActionLayout,
