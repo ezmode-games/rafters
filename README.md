@@ -49,24 +49,59 @@ function App() {
 }
 ```
 
-## Component Development
+## How Rafters Works
 
-### Current Status
-**Phase 1 Complete**: Core foundation components (Button, Input, Card, Select, Label, Slider, Tabs) with design intelligence patterns implemented.
+Rafters follows the **shadcn model** but adds design intelligence patterns:
 
-**Phase 2 In Progress**: See [GitHub Issues](https://github.com/real-handy/rafters/issues) for the complete roadmap of 33 components and patterns being developed.
+### 🎨 **Web Configurator**
+Transform grayscale foundation components into your design system:
+- Configure colors, spacing, typography, borders
+- Real-time preview of your design system
+- Export Tailwind v4+ CSS custom properties
 
-### Component Categories
+### 🛠️ **CLI Installation**
+Install components as source code with embedded intelligence:
 
-**Core Components**: Table, Badge, Avatar, Breadcrumb, Pagination, Skeleton, Alert, Accordion, Dropdown Menu, Form Components Suite
+```bash
+# Initialize in your project
+npx rafters init
 
-**Layout Components**: Container, Grid, Sidebar, Header, Footer  
+# Install components with design intelligence
+npx rafters add button
+npx rafters add input
+npx rafters add dialog
+```
 
-**Specialized Components**: Search, Calendar, File Upload, Image, Code Block, Empty State, Loading Spinner
+### 🧠 **Design Intelligence Included**
+Each component includes three layers of intelligence:
 
-**Interaction Components**: Dialog, Toast, Progress, Tooltip, Popover, Command Palette, Separator
+**1. Component Comments** (Essential patterns)
+```tsx
+/**
+ * Button Intelligence: cognitiveLoad=3, size=attention hierarchy
+ * Destructive variant REQUIRES confirmation UX patterns
+ */
+```
 
-**Patterns**: Form Validation, Data Fetching States, Responsive Design, Theme System
+**2. Component Manifest** (Machine-readable data)
+```json
+{
+  "intelligence": {
+    "cognitiveLoad": 3,
+    "attentionEconomics": "Size hierarchy: sm=tertiary, md=secondary, lg=primary",
+    "accessibility": "44px touch targets, WCAG AAA contrast"
+  }
+}
+```
+
+**3. Intelligence Stories** (Complete education)
+Full Storybook stories demonstrating design reasoning and accessibility patterns.
+
+### ✨ **Source Code Ownership**
+- Components become **your code** to customize
+- No black box dependencies
+- Intelligence patterns travel with the code
+- Perfect for AI development
 
 ---
 
@@ -157,9 +192,30 @@ We don't start with visual design. We start with human needs:
 
 ---
 
+## Component Library
+
+### Current Status
+**Phase 1 Complete**: Core foundation components (Button, Input, Card, Select, Label, Slider, Tabs) with design intelligence patterns implemented.
+
+**In Development**: See [GitHub Issues](https://github.com/real-handy/rafters/issues) for the complete roadmap of 33+ components being developed.
+
+### Component Categories
+
+**Core Components**: Table, Badge, Avatar, Breadcrumb, Pagination, Skeleton, Alert, Accordion, Dropdown Menu, Form Components Suite
+
+**Layout Components**: Container, Grid, Sidebar, Header, Footer  
+
+**Specialized Components**: Search, Calendar, File Upload, Image, Code Block, Empty State, Loading Spinner
+
+**Interaction Components**: Dialog, Toast, Progress, Tooltip, Popover, Command Palette, Separator
+
+**Patterns**: Form Validation, Data Fetching States, Responsive Design, Theme System
+
+---
+
 ## Development
 
-### Getting Started
+### Repository Development
 ```bash
 # Install dependencies
 pnpm install
@@ -174,15 +230,10 @@ pnpm storybook
 pnpm test
 ```
 
-### AI Development Approach
-This design system is built for AI development. Each component includes:
-- **Intelligence Patterns**: Design reasoning encoded for AI understanding
-- **Comprehensive Examples**: Storybook stories demonstrating proper usage
-- **Accessibility Excellence**: WCAG AAA compliance with motor, visual, cognitive, and auditory support
-- **Systematic Foundation**: Radix primitives with semantic tokens
-
 ### Contributing
 See [GitHub Issues](https://github.com/real-handy/rafters/issues) for current development priorities. Each issue includes detailed technical requirements and intelligence patterns for implementation.
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) and [CLI_PLAN.md](./CLI_PLAN.md) for complete technical documentation.
 
 ---
 
