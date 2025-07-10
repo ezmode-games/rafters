@@ -26,24 +26,31 @@
 
 ## Installation
 
+Rafters uses the **shadcn approach** - components are installed as source code, not npm packages:
+
 ```bash
-pnpm add rafters
-# or
-npm install rafters
-# or
-yarn add rafters
+# Initialize Rafters in your project
+npx rafters init
+
+# Install components with design intelligence
+npx rafters add button
+npx rafters add input
+npx rafters add card
 ```
 
 ## Quick Start
 
 ```tsx
-import { Button, Card, Input } from 'rafters'
+// Components are now part of your codebase
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card' 
+import { Input } from '@/components/ui/input'
 
 function App() {
   return (
     <Card>
       <Input placeholder="Enter your email" />
-      <Button intent="primary">Sign Up</Button>
+      <Button variant="primary">Sign Up</Button>
     </Card>
   )
 }
@@ -233,7 +240,7 @@ pnpm test
 ### Contributing
 See [GitHub Issues](https://github.com/real-handy/rafters/issues) for current development priorities. Each issue includes detailed technical requirements and intelligence patterns for implementation.
 
-See [ARCHITECTURE.md](./ARCHITECTURE.md) and [CLI_PLAN.md](./CLI_PLAN.md) for complete technical documentation.
+See [ARCHITECTURE.md](./ARCHITECTURE.md), [CLI_PLAN.md](./CLI_PLAN.md), and [WEB_CONFIGURATOR_SPEC.md](./WEB_CONFIGURATOR_SPEC.md) for complete technical documentation.
 
 ---
 
