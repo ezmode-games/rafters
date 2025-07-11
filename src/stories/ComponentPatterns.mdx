@@ -1,0 +1,314 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="00 Introduction/Component Patterns" />
+
+# Component Patterns & Methodology
+
+Deep dive into the patterns and principles that make Rafters components trustworthy and intelligent.
+
+## The 7-File Architecture
+
+Based on our analysis of successful component libraries and user research, every Rafters component implements exactly seven story files. This ensures comprehensive coverage without overwhelming complexity.
+
+### Pattern Established By
+- **Button.mdx** ➜ **Dialog.mdx** (Template)
+- **Button.stories.tsx** ➜ **Dialog.stories.tsx** (Implementation)  
+- **ButtonAccessibility.stories.tsx** ➜ **DialogAccessibility.stories.tsx** (Universal Design)
+- **ButtonIntelligence.stories.tsx** ➜ **DialogIntelligence.stories.tsx** (Smart Behaviors)
+- **ButtonProperties.stories.tsx** ➜ **DialogProperties.stories.tsx** (States & Variants)
+- **ButtonSemantic.stories.tsx** ➜ **DialogSemantic.stories.tsx** (Meaning & Context)
+- **ButtonVariants.stories.tsx** ➜ **DialogVariants.stories.tsx** (Visual Treatments)
+
+## Trust-Building Intelligence
+
+### Layer 1: Visual Intelligence
+Components communicate consequence through progressive visual hierarchy:
+
+```tsx
+// Visual weight matches consequence level
+<Button variant="outline" size="sm">     // Low consequence
+<Button variant="primary" size="md">     // Medium consequence  
+<Button variant="destructive" size="lg"> // High consequence
+```
+
+**Evidence from Dialog Implementation:**
+- Low trust = minimal visual weight, quick confirmation
+- Medium trust = balanced presentation, clear context
+- High trust = enhanced prominence, detailed explanations
+- Critical trust = maximum weight, progressive confirmation
+
+### Layer 2: Behavioral Intelligence  
+Smart defaults and adaptive patterns reduce cognitive load:
+
+```tsx
+// Progressive confirmation for destructive actions
+<Dialog 
+  trustLevel="critical" 
+  destructive 
+  requireConfirmation 
+  cognitiveComplexity="complex"
+>
+  {/* Type-to-confirm, clear consequences, multiple escape routes */}
+</Dialog>
+```
+
+**Button Intelligence Patterns:**
+- Loading states with aria-busy communication
+- Destructive confirmation indicators
+- Size-appropriate touch targets
+- Attention hierarchy through visual weight
+
+### Layer 3: Accessibility Intelligence
+Universal design that enhances experience for everyone:
+
+```tsx
+// Enhanced context for screen readers
+<Button 
+  aria-label="Delete account permanently - this action cannot be undone"
+  aria-describedby="deletion-consequences"
+>
+  Delete Account
+</Button>
+```
+
+## Component Property Architecture
+
+### Core Props Pattern
+Every component implements these foundational properties:
+
+```tsx
+interface BaseComponentProps {
+  // Trust & Consequence
+  trustLevel?: 'low' | 'medium' | 'high' | 'critical'
+  destructive?: boolean
+  
+  // Cognitive Load
+  cognitiveComplexity?: 'simple' | 'moderate' | 'complex'
+  
+  // Visual Hierarchy  
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
+  variant?: SemanticVariant | VisualVariant
+  
+  // Accessibility
+  'aria-label'?: string
+  'aria-describedby'?: string
+  'aria-pressed'?: boolean
+}
+```
+
+### Trust Level Implementation
+
+#### Low Trust (Routine Actions)
+- **Visual**: Minimal weight, subtle styling
+- **Behavior**: Immediate action, simple confirmation
+- **Example**: Save draft, change preferences
+- **Dialog Size**: sm (compact)
+- **Button Variant**: outline, ghost
+
+#### Medium Trust (Moderate Consequence)  
+- **Visual**: Balanced prominence, clear context
+- **Behavior**: Brief confirmation, explanation provided
+- **Example**: Publish content, send email
+- **Dialog Size**: md (standard)
+- **Button Variant**: primary, secondary
+
+#### High Trust (Significant Impact)
+- **Visual**: Enhanced prominence, detailed information
+- **Behavior**: Deliberate confirmation, consequence explanation
+- **Example**: Process payment, change subscription
+- **Dialog Size**: md-lg (spacious)
+- **Button Variant**: primary with enhanced styling
+
+#### Critical Trust (Permanent Consequence)
+- **Visual**: Maximum weight, comprehensive information
+- **Behavior**: Progressive confirmation, type-to-confirm
+- **Example**: Delete account, permanent data loss
+- **Dialog Size**: lg (comprehensive)
+- **Button Variant**: destructive with confirmation patterns
+
+## Accessibility Implementation Standards
+
+### Foundation Requirements
+Every component must demonstrate:
+
+1. **Keyboard Navigation**
+   - Tab order follows logical flow
+   - Enter/Space activation for buttons
+   - Escape for dismissal/cancellation
+   - Focus trapping in modals
+
+2. **Screen Reader Support**
+   - Semantic markup with proper roles
+   - aria-label for context enhancement
+   - aria-describedby for relationship explanation
+   - Live region announcements for critical actions
+
+3. **Visual Accessibility**
+   - WCAG AAA contrast ratios (7:1)
+   - Color independence (never color-only communication)
+   - Sufficient touch target sizes (44px minimum)
+   - Focus indicators with clear visibility
+
+4. **Cognitive Accessibility**
+   - Clear, descriptive labels
+   - Consistent interaction patterns
+   - Progressive disclosure for complexity
+   - Clear escape routes and undo options
+
+### Dialog Accessibility Patterns
+
+```tsx
+// Comprehensive accessibility implementation
+<DialogContent 
+  role="dialog"
+  aria-labelledby="dialog-title"
+  aria-describedby="dialog-description"
+  aria-live="assertive" // For critical actions
+>
+  <DialogTitle id="dialog-title">
+    Delete Account Forever
+  </DialogTitle>
+  <DialogDescription id="dialog-description">
+    This action cannot be undone. All data will be permanently deleted.
+  </DialogDescription>
+</DialogContent>
+```
+
+## Semantic Meaning System
+
+### Color Semantics
+Colors communicate meaning, not just aesthetics:
+
+- **Primary** - Main actions, primary workflow
+- **Secondary** - Supporting actions, alternatives  
+- **Destructive** - Permanent actions, data loss
+- **Success** - Positive outcomes, completions
+- **Warning** - Caution required, potential issues
+- **Info** - Neutral information, help content
+
+### Context-Appropriate Usage
+
+```tsx
+// Content lifecycle with appropriate semantics
+<Button variant="outline">Save Draft</Button>      // Low stakes
+<Button variant="primary">Publish Now</Button>     // Medium stakes  
+<Button variant="destructive">Delete</Button>      // High stakes
+```
+
+## Story File Implementation Guide
+
+### 1. Overview Documentation (.mdx)
+**Purpose**: Primary introduction and usage guidance
+**Contents**:
+- Component philosophy and purpose
+- Usage guidelines (DOs/DON'Ts)
+- Real-world use cases
+- Trust level explanations
+
+**Template Structure**:
+```mdx
+<Meta title="03 Components/Category/ComponentName" of={Stories} name="Overview" />
+
+# ComponentName
+Purpose statement and design philosophy
+
+<Canvas of={Stories.Common} />
+
+## Usage Guidelines
+#### DOs / DON'Ts / Use Cases
+```
+
+### 2. Common Stories (.stories.tsx)
+**Purpose**: Primary story with all major variants
+**Contents**:
+- Single comprehensive "Common" story
+- All major variants in one view
+- Complete argTypes definition
+- Interactive controls
+
+**Example Pattern**:
+```tsx
+export const Common: Story = {
+  render: (args) => (
+    <div className="space-y-4">
+      {/* Show all trust levels / variants */}
+      <ComponentName {...args} trustLevel="low" />
+      <ComponentName {...args} trustLevel="medium" />
+      <ComponentName {...args} trustLevel="high" />
+      <ComponentName {...args} trustLevel="critical" />
+    </div>
+  ),
+};
+```
+
+### 3. Accessibility Stories
+**Purpose**: Universal design and inclusion patterns
+**Contents**:
+- Foundation accessibility principles
+- Keyboard navigation demos
+- Screen reader optimization
+- Color contrast demonstrations
+
+### 4. Intelligence Stories  
+**Purpose**: Smart behaviors and trust-building
+**Contents**:
+- Progressive confirmation patterns
+- Attention hierarchy demonstrations
+- Cognitive load optimization
+- Trust-building implementations
+
+### 5. Properties Stories
+**Purpose**: States, sizes, and variants
+**Contents**:
+- Size comparisons and scaling
+- State demonstrations (loading, disabled, error)
+- Property combinations
+- Interactive feedback patterns
+
+### 6. Semantic Stories
+**Purpose**: Meaning communication through design
+**Contents**:
+- Semantic variant demonstrations
+- Contextual usage examples
+- Trust level implementations
+- Real-world scenario applications
+
+### 7. Variants Stories
+**Purpose**: Visual treatments and styling
+**Contents**:
+- Visual variant comparisons
+- Emphasis level demonstrations
+- Layout adaptation examples
+- Style hierarchy explanations
+
+## Implementation Checklist
+
+### ✅ Component Completion Criteria
+
+#### Documentation
+- [ ] Complete .mdx overview with usage guidelines
+- [ ] All 7 story files implemented
+- [ ] Real-world examples and contexts
+- [ ] Trust level explanations and mappings
+
+#### Functionality  
+- [ ] Trust levels properly implemented
+- [ ] Progressive confirmation for destructive actions
+- [ ] Cognitive complexity considerations
+- [ ] Smart defaults and adaptive behaviors
+
+#### Accessibility
+- [ ] WCAG AAA compliance (7:1 contrast)
+- [ ] Complete keyboard navigation
+- [ ] Screen reader optimization
+- [ ] Focus management and trapping
+
+#### Testing
+- [ ] All variants and states covered
+- [ ] Interactive story controls working
+- [ ] Responsive behavior verified
+- [ ] Trust patterns validated with users
+
+---
+
+This methodology ensures every Rafters component achieves the same depth of implementation as Button and Dialog, creating a truly trustworthy and intelligent design system.

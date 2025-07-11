@@ -4,45 +4,45 @@
  * Trust-building patterns: clear consequences, escape hatches, familiar confirmation flows
  * Full patterns: .rafters/agent-instructions.md
  */
-import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { forwardRef } from 'react'
-import { cn } from '../lib/utils'
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { forwardRef } from 'react';
+import { cn } from '../lib/utils';
 
 export interface DialogProps {
   // Trust-building intelligence
-  trustLevel?: 'low' | 'medium' | 'high' | 'critical'
-  destructive?: boolean
-  requireConfirmation?: boolean
-  
+  trustLevel?: 'low' | 'medium' | 'high' | 'critical';
+  destructive?: boolean;
+  requireConfirmation?: boolean;
+
   // Cognitive load optimization
-  cognitiveComplexity?: 'simple' | 'moderate' | 'complex'
-  
+  cognitiveComplexity?: 'simple' | 'moderate' | 'complex';
+
   // Size variants for content hierarchy
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
 }
 
-export interface DialogContentProps 
-  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>, 
-          DialogProps {}
+export interface DialogContentProps
+  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>,
+    DialogProps {}
 
 export interface DialogHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export interface DialogFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export interface DialogTitleProps 
+export interface DialogTitleProps
   extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title> {}
 
-export interface DialogDescriptionProps 
+export interface DialogDescriptionProps
   extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description> {}
 
 // Root Dialog component
-export const Dialog = DialogPrimitive.Root
+export const Dialog = DialogPrimitive.Root;
 
 // Trigger component
-export const DialogTrigger = DialogPrimitive.Trigger
+export const DialogTrigger = DialogPrimitive.Trigger;
 
 // Portal component for z-index management
-export const DialogPortal = DialogPrimitive.Portal
+export const DialogPortal = DialogPrimitive.Portal;
 
 // Overlay with trust-building visual hierarchy
 export const DialogOverlay = forwardRef<
@@ -61,71 +61,76 @@ export const DialogOverlay = forwardRef<
     )}
     {...props}
   />
-))
-DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
+));
+DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 // Main Content component with intelligence patterns
 export const DialogContent = forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   DialogContentProps
->(({ 
-  className, 
-  children, 
-  trustLevel = 'medium',
-  destructive = false,
-  size = 'md',
-  cognitiveComplexity = 'moderate',
-  ...props 
-}, ref) => (
-  <DialogPortal>
-    <DialogOverlay />
-    <DialogPrimitive.Content
-      ref={ref}
-      className={cn(
-        // Base styles with trust-building visual hierarchy
-        'fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%]',
-        'bg-background border border-border rounded-lg shadow-lg',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-        
-        // Trust-building: Enhanced borders for high-trust operations
-        trustLevel === 'critical' && 'border-2 border-primary/20 shadow-xl',
-        trustLevel === 'high' && 'border-primary/10 shadow-lg',
-        
-        // Destructive actions get visual warning indicators
-        destructive && 'border-destructive/20 shadow-destructive/10',
-        
-        // Size variants for cognitive load management
-        {
-          'w-full max-w-sm': size === 'sm',
-          'w-full max-w-md': size === 'md', 
-          'w-full max-w-lg': size === 'lg',
-          'w-full max-w-2xl': size === 'xl',
-          'w-[95vw] max-w-none h-[95vh]': size === 'full',
-        },
-        
-        // Cognitive complexity affects spacing
-        {
-          'p-4 gap-3': cognitiveComplexity === 'simple',
-          'p-6 gap-4': cognitiveComplexity === 'moderate', 
-          'p-8 gap-6': cognitiveComplexity === 'complex',
-        },
-        
-        // Trust pattern: Smooth animations reduce cognitive jarring
-        'duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out',
-        'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-        'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-        'data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]',
-        'data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
-        
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </DialogPrimitive.Content>
-  </DialogPortal>
-))
-DialogContent.displayName = DialogPrimitive.Content.displayName
+>(
+  (
+    {
+      className,
+      children,
+      trustLevel = 'medium',
+      destructive = false,
+      size = 'md',
+      cognitiveComplexity = 'moderate',
+      ...props
+    },
+    ref
+  ) => (
+    <DialogPortal>
+      <DialogOverlay />
+      <DialogPrimitive.Content
+        ref={ref}
+        className={cn(
+          // Base styles with trust-building visual hierarchy
+          'fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%]',
+          'bg-background border border-border rounded-lg shadow-lg',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+
+          // Trust-building: Enhanced borders for high-trust operations
+          trustLevel === 'critical' && 'border-2 border-primary/20 shadow-xl',
+          trustLevel === 'high' && 'border-primary/10 shadow-lg',
+
+          // Destructive actions get visual warning indicators
+          destructive && 'border-destructive/20 shadow-destructive/10',
+
+          // Size variants for cognitive load management
+          {
+            'w-full max-w-sm': size === 'sm',
+            'w-full max-w-md': size === 'md',
+            'w-full max-w-lg': size === 'lg',
+            'w-full max-w-2xl': size === 'xl',
+            'w-[95vw] max-w-none h-[95vh]': size === 'full',
+          },
+
+          // Cognitive complexity affects spacing
+          {
+            'p-4 gap-3': cognitiveComplexity === 'simple',
+            'p-6 gap-4': cognitiveComplexity === 'moderate',
+            'p-8 gap-6': cognitiveComplexity === 'complex',
+          },
+
+          // Trust pattern: Smooth animations reduce cognitive jarring
+          'duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out',
+          'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+          'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+          'data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]',
+          'data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
+
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </DialogPrimitive.Content>
+    </DialogPortal>
+  )
+);
+DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 // Header with trust-building hierarchy
 export const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(
@@ -142,8 +147,8 @@ export const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(
       {...props}
     />
   )
-)
-DialogHeader.displayName = 'DialogHeader'
+);
+DialogHeader.displayName = 'DialogHeader';
 
 // Footer with action hierarchy and trust patterns
 export const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
@@ -162,8 +167,8 @@ export const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
       {...props}
     />
   )
-)
-DialogFooter.displayName = 'DialogFooter'
+);
+DialogFooter.displayName = 'DialogFooter';
 
 // Title with semantic hierarchy
 export const DialogTitle = forwardRef<
@@ -181,8 +186,8 @@ export const DialogTitle = forwardRef<
     )}
     {...props}
   />
-))
-DialogTitle.displayName = DialogPrimitive.Title.displayName
+));
+DialogTitle.displayName = DialogPrimitive.Title.displayName;
 
 // Description with trust-building clarity
 export const DialogDescription = forwardRef<
@@ -200,8 +205,8 @@ export const DialogDescription = forwardRef<
     )}
     {...props}
   />
-))
-DialogDescription.displayName = DialogPrimitive.Description.displayName
+));
+DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
 // Close button with escape hatch accessibility
-export const DialogClose = DialogPrimitive.Close
+export const DialogClose = DialogPrimitive.Close;

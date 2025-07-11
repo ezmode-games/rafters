@@ -1,18 +1,18 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { fn } from 'storybook/test'
-import { Button } from '../../../components/Button'
-import { Input } from '../../../components/Input'
-import { Label } from '../../../components/Label'
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
+import { Button } from '../../../components/Button';
 import {
   Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
   DialogClose,
-} from '../../../components/Dialog'
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '../../../components/Dialog';
+import { Input } from '../../../components/Input';
+import { Label } from '../../../components/Label';
 
 const meta = {
   title: '03 Components/Interaction/Dialog/Intelligence',
@@ -20,10 +20,10 @@ const meta = {
   parameters: {
     layout: 'centered',
   },
-} satisfies Meta<typeof Dialog>
+} satisfies Meta<typeof Dialog>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 /**
  * Progressive confirmation for destructive actions.
@@ -40,23 +40,19 @@ export const ProgressiveConfirmation: Story = {
         <DialogHeader>
           <DialogTitle>Delete Project "My App"</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete the project,
-            all its files, and remove it from all team members.
+            This action cannot be undone. This will permanently delete the project, all its files,
+            and remove it from all team members.
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           <div>
             <Label htmlFor="confirm-text">
               Type <strong>delete my app</strong> to confirm:
             </Label>
-            <Input 
-              id="confirm-text" 
-              placeholder="delete my app"
-              className="mt-2"
-            />
+            <Input id="confirm-text" placeholder="delete my app" className="mt-2" />
           </div>
-          
+
           <div className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-md">
             <strong>What will be deleted:</strong>
             <ul className="mt-2 space-y-1 list-disc list-inside">
@@ -79,7 +75,7 @@ export const ProgressiveConfirmation: Story = {
       </DialogContent>
     </Dialog>
   ),
-}
+};
 
 /**
  * Attention hierarchy demonstration shows proper visual priority.
@@ -101,9 +97,13 @@ export const AttentionHierarchy: Story = {
             </DialogHeader>
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="ghost" size="sm">Cancel</Button>
+                <Button variant="ghost" size="sm">
+                  Cancel
+                </Button>
               </DialogClose>
-              <Button size="sm" onClick={fn()}>Save Draft</Button>
+              <Button size="sm" onClick={fn()}>
+                Save Draft
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -124,7 +124,9 @@ export const AttentionHierarchy: Story = {
               <DialogClose asChild>
                 <Button variant="outline">Save as Draft</Button>
               </DialogClose>
-              <Button variant="primary" onClick={fn()}>Publish Now</Button>
+              <Button variant="primary" onClick={fn()}>
+                Publish Now
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -138,22 +140,24 @@ export const AttentionHierarchy: Story = {
             <DialogHeader>
               <DialogTitle>Cancel Subscription</DialogTitle>
               <DialogDescription>
-                Your subscription will end immediately. You'll lose access to premium
-                features and your data will be scheduled for deletion in 30 days.
+                Your subscription will end immediately. You'll lose access to premium features and
+                your data will be scheduled for deletion in 30 days.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
               <DialogClose asChild>
                 <Button variant="outline">Keep Subscription</Button>
               </DialogClose>
-              <Button variant="destructive" onClick={fn()}>Cancel Now</Button>
+              <Button variant="destructive" onClick={fn()}>
+                Cancel Now
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
     </div>
   ),
-}
+};
 
 /**
  * Trust-building patterns reduce user anxiety during critical decisions.
@@ -169,11 +173,11 @@ export const TrustBuilding: Story = {
         <DialogHeader>
           <DialogTitle>Connect Your Bank Account</DialogTitle>
           <DialogDescription>
-            We use bank-level security to protect your financial information.
-            Your login credentials are encrypted and never stored on our servers.
+            We use bank-level security to protect your financial information. Your login credentials
+            are encrypted and never stored on our servers.
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           <div className="bg-primary/5 border border-primary/20 p-4 rounded-md">
             <h4 className="font-medium text-sm mb-2">🔒 Your Security is Our Priority</h4>
@@ -184,10 +188,10 @@ export const TrustBuilding: Story = {
               <li>• Powered by Plaid, trusted by over 5,000 companies</li>
             </ul>
           </div>
-          
+
           <div className="text-sm text-muted-foreground">
-            <strong>What we'll access:</strong> Account balances, transaction history (last 90 days),
-            and account details for verification. You can disconnect anytime from Settings.
+            <strong>What we'll access:</strong> Account balances, transaction history (last 90
+            days), and account details for verification. You can disconnect anytime from Settings.
           </div>
         </div>
 
@@ -202,7 +206,7 @@ export const TrustBuilding: Story = {
       </DialogContent>
     </Dialog>
   ),
-}
+};
 
 /**
  * Cognitive load optimization through clear information hierarchy.
@@ -224,9 +228,13 @@ export const CognitiveLoad: Story = {
             </DialogHeader>
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="outline" size="sm">Cancel</Button>
+                <Button variant="outline" size="sm">
+                  Cancel
+                </Button>
               </DialogClose>
-              <Button variant="primary" size="sm" onClick={fn()}>Sign Out</Button>
+              <Button variant="primary" size="sm" onClick={fn()}>
+                Sign Out
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -240,11 +248,11 @@ export const CognitiveLoad: Story = {
             <DialogHeader>
               <DialogTitle>Export Project Data</DialogTitle>
               <DialogDescription>
-                Choose how you want to export your project data. This process may take
-                several minutes depending on the amount of data.
+                Choose how you want to export your project data. This process may take several
+                minutes depending on the amount of data.
               </DialogDescription>
             </DialogHeader>
-            
+
             <div className="space-y-6">
               <div className="space-y-4">
                 <h4 className="font-medium">Export Format</h4>
@@ -265,7 +273,7 @@ export const CognitiveLoad: Story = {
                   </label>
                 </div>
               </div>
-              
+
               <div className="space-y-3">
                 <h4 className="font-medium">Include Data</h4>
                 <div className="space-y-2">
@@ -289,11 +297,13 @@ export const CognitiveLoad: Story = {
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
-              <Button variant="primary" onClick={fn()}>Start Export</Button>
+              <Button variant="primary" onClick={fn()}>
+                Start Export
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
     </div>
   ),
-}
+};

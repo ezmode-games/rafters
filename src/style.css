@@ -33,12 +33,146 @@
   --color-info: oklch(0.456 0 0); /* Medium-dark gray for information */
   --color-info-foreground: oklch(0.985 0 0);
 
-  /* Interactive state modifiers */
-  --opacity-hover: 0.9; /* Hover state opacity */
-  --opacity-active: 0.8; /* Active/pressed state */
-  --opacity-disabled: 0.5; /* Disabled state */
-  --opacity-loading: 0.7; /* Loading state */
-  --scale-active: 0.95; /* Active scale transform */
+  /* ========================================
+   * STATE DESIGN TOKENS
+   * Foundational values for component state behavior
+   * Used with Tailwind arbitrary values: hover:opacity-[var(--opacity-hover)]
+   * ======================================== */
+
+  /* Base interaction opacities */
+  --opacity-hover: 0.9;
+  --opacity-hover-subtle: 0.95;
+  --opacity-hover-enhanced: 0.85;
+  --opacity-hover-critical: 0.8;
+  
+  --opacity-active: 0.95;
+  --opacity-disabled: 0.6;
+  --opacity-loading: 0.8;
+
+  /* Transition durations */
+  --duration-instant: 50ms;
+  --duration-fast: 150ms;
+  --duration-standard: 200ms;
+  --duration-deliberate: 300ms;
+  --duration-slow: 500ms;
+  
+  /* Confirmation delays */
+  --delay-none: 0ms;
+  --delay-brief: 200ms;
+  --delay-standard: 300ms;
+  --delay-deliberate: 500ms;
+  --delay-cautious: 1000ms;
+
+  /* Interactive scaling */
+  --scale-active: 0.98;
+  --scale-pressed: 0.96;
+  --scale-hover-subtle: 1.01;
+
+  /* Focus ring variations */
+  --ring-width-standard: 2px;
+  --ring-width-enhanced: 3px;
+  --ring-width-prominent: 4px;
+  
+  --ring-offset-standard: 2px;
+  --ring-offset-enhanced: 3px;
+  
+  --ring-opacity-standard: 0.5;
+  --ring-opacity-enhanced: 0.7;
+  --ring-opacity-prominent: 0.9;
+
+  /* Border emphasis levels */
+  --border-width-standard: 1px;
+  --border-width-enhanced: 2px;
+  --border-width-prominent: 3px;
+  
+  /* Border opacity modifiers */
+  --border-opacity-subtle: 0.2;
+  --border-opacity-standard: 0.3;
+  --border-opacity-enhanced: 0.5;
+  --border-opacity-prominent: 0.8;
+
+  /* Shadow emphasis for states */
+  --shadow-hover-subtle: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-hover-standard: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-hover-enhanced: 0 2px 4px rgba(0, 0, 0, 0.15);
+  --shadow-hover-prominent: 0 4px 8px rgba(0, 0, 0, 0.2);
+  
+  --shadow-focus-standard: 0 0 0 var(--ring-width-standard) rgb(var(--color-ring) / var(--ring-opacity-standard));
+  --shadow-focus-enhanced: 0 0 0 var(--ring-width-enhanced) rgb(var(--color-ring) / var(--ring-opacity-enhanced));
+  --shadow-focus-prominent: 0 0 0 var(--ring-width-prominent) rgb(var(--color-ring) / var(--ring-opacity-prominent));
+
+  /* Background alpha values for states */
+  --alpha-bg-subtle: 0.05;
+  --alpha-bg-standard: 0.1;
+  --alpha-bg-enhanced: 0.15;
+  --alpha-bg-prominent: 0.2;
+
+  /* ========================================
+   * SEMANTIC CONSEQUENCE MAPPINGS
+   * ======================================== */
+  
+  /* Reversible actions (low consequence) */
+  --consequence-reversible-opacity: var(--opacity-hover-subtle);
+  --consequence-reversible-timing: var(--duration-fast);
+  --consequence-reversible-delay: var(--delay-none);
+  --consequence-reversible-ring: var(--ring-width-standard);
+  
+  /* Significant actions (medium consequence) */
+  --consequence-significant-opacity: var(--opacity-hover);
+  --consequence-significant-timing: var(--duration-standard);
+  --consequence-significant-delay: var(--delay-none);
+  --consequence-significant-ring: var(--ring-width-standard);
+  
+  /* Permanent actions (high consequence) */
+  --consequence-permanent-opacity: var(--opacity-hover-enhanced);
+  --consequence-permanent-timing: var(--duration-deliberate);
+  --consequence-permanent-delay: var(--delay-brief);
+  --consequence-permanent-ring: var(--ring-width-enhanced);
+  
+  /* Destructive actions (critical consequence) */
+  --consequence-destructive-opacity: var(--opacity-hover-critical);
+  --consequence-destructive-timing: var(--duration-slow);
+  --consequence-destructive-delay: var(--delay-deliberate);
+  --consequence-destructive-ring: var(--ring-width-prominent);
+
+  /* ========================================
+   * SEMANTIC SENSITIVITY MAPPINGS
+   * ======================================== */
+  
+  /* Public data (no sensitivity) */
+  --sensitivity-public-border: var(--border-width-standard);
+  --sensitivity-public-shadow: none;
+  
+  /* Personal data (low sensitivity) */
+  --sensitivity-personal-border: var(--border-width-standard);
+  --sensitivity-personal-shadow: var(--shadow-hover-subtle);
+  
+  /* Financial data (high sensitivity) */
+  --sensitivity-financial-border: var(--border-width-enhanced);
+  --sensitivity-financial-shadow: var(--shadow-hover-enhanced);
+  
+  /* Critical data (maximum sensitivity) */
+  --sensitivity-critical-border: var(--border-width-prominent);
+  --sensitivity-critical-shadow: var(--shadow-hover-prominent);
+
+  /* ========================================
+   * VALIDATION STATE MAPPINGS
+   * ======================================== */
+  
+  /* Success state emphasis */
+  --validation-success-opacity: var(--opacity-hover-subtle);
+  --validation-success-timing: var(--duration-fast);
+  --validation-success-bg: rgb(var(--color-success) / var(--alpha-bg-subtle));
+  
+  /* Warning state emphasis */
+  --validation-warning-opacity: var(--opacity-hover);
+  --validation-warning-timing: var(--duration-standard);
+  --validation-warning-bg: rgb(var(--color-warning) / var(--alpha-bg-standard));
+  
+  /* Error state emphasis */
+  --validation-error-opacity: var(--opacity-hover-enhanced);
+  --validation-error-timing: var(--duration-deliberate);
+  --validation-error-bg: rgb(var(--color-destructive) / var(--alpha-bg-enhanced));
 
   /* Component-specific tokens */
   --color-sidebar: oklch(0.985 0 0); /* Sidebar background */
@@ -250,129 +384,129 @@
 }
 
 /* Semantic heading classes with font-display and responsive scaling */
-  @utility heading-hero {
-    font-family: var(--font-display);
-    font-size: var(--heading-hero-size);
-    line-height: var(--heading-hero-line-height);
-    letter-spacing: var(--heading-hero-letter-spacing);
-    font-weight: 800;
-    margin-bottom: var(--spacing-phi-2);
+@utility heading-hero {
+  font-family: var(--font-display);
+  font-size: var(--heading-hero-size);
+  line-height: var(--heading-hero-line-height);
+  letter-spacing: var(--heading-hero-letter-spacing);
+  font-weight: 800;
+  margin-bottom: var(--spacing-phi-2);
 
-    @media (min-width: 1024px) {
-      font-size: var(--heading-hero-size-lg);
-    }
+  @media (min-width: 1024px) {
+    font-size: var(--heading-hero-size-lg);
   }
+}
 
-  @utility heading-display {
-    font-family: var(--font-display);
-    font-size: var(--heading-display-size);
-    line-height: var(--heading-display-line-height);
-    letter-spacing: var(--heading-display-letter-spacing);
-    font-weight: 700;
-    margin-top: var(--spacing-phi-3);
-    margin-bottom: var(--spacing-phi-2);
+@utility heading-display {
+  font-family: var(--font-display);
+  font-size: var(--heading-display-size);
+  line-height: var(--heading-display-line-height);
+  letter-spacing: var(--heading-display-letter-spacing);
+  font-weight: 700;
+  margin-top: var(--spacing-phi-3);
+  margin-bottom: var(--spacing-phi-2);
 
-    @media (min-width: 1024px) {
-      font-size: var(--heading-display-size-lg);
-    }
+  @media (min-width: 1024px) {
+    font-size: var(--heading-display-size-lg);
   }
+}
 
-   @utility heading-section {
-    font-family: var(--font-display);
-    font-size: var(--heading-section-size);
-    line-height: var(--heading-section-line-height);
-    letter-spacing: var(--heading-section-letter-spacing);
-    font-weight: 600;
-    margin-top: var(--spacing-phi-2);
-    margin-bottom: var(--spacing-phi-1);
+@utility heading-section {
+  font-family: var(--font-display);
+  font-size: var(--heading-section-size);
+  line-height: var(--heading-section-line-height);
+  letter-spacing: var(--heading-section-letter-spacing);
+  font-weight: 600;
+  margin-top: var(--spacing-phi-2);
+  margin-bottom: var(--spacing-phi-1);
 
-    @media (min-width: 1024px) {
-      font-size: var(--heading-section-size-lg);
-    }
+  @media (min-width: 1024px) {
+    font-size: var(--heading-section-size-lg);
   }
+}
 
-  @utility heading-subsection {
-    font-family: var(--font-display);
-    font-size: var(--heading-subsection-size);
-    line-height: var(--heading-subsection-line-height);
-    letter-spacing: var(--heading-subsection-letter-spacing);
-    font-weight: 600;
-    margin-top: var(--spacing-phi-1);
-    margin-bottom: var(--spacing-phi--1);
+@utility heading-subsection {
+  font-family: var(--font-display);
+  font-size: var(--heading-subsection-size);
+  line-height: var(--heading-subsection-line-height);
+  letter-spacing: var(--heading-subsection-letter-spacing);
+  font-weight: 600;
+  margin-top: var(--spacing-phi-1);
+  margin-bottom: var(--spacing-phi--1);
 
-    @media (min-width: 1024px) {
-      font-size: var(--heading-subsection-size-lg);
-    }
+  @media (min-width: 1024px) {
+    font-size: var(--heading-subsection-size-lg);
   }
+}
 
-  @utility heading-component {
-    font-family: var(--font-display);
-    font-size: var(--heading-component-size);
-    line-height: var(--heading-component-line-height);
-    letter-spacing: var(--heading-component-letter-spacing);
-    font-weight: 500;
-    margin-top: var(--spacing-phi-1);
-    margin-bottom: var(--spacing-phi--1);
+@utility heading-component {
+  font-family: var(--font-display);
+  font-size: var(--heading-component-size);
+  line-height: var(--heading-component-line-height);
+  letter-spacing: var(--heading-component-letter-spacing);
+  font-weight: 500;
+  margin-top: var(--spacing-phi-1);
+  margin-bottom: var(--spacing-phi--1);
 
-    @media (min-width: 1024px) {
-      font-size: var(--heading-component-size-lg);
-    }
+  @media (min-width: 1024px) {
+    font-size: var(--heading-component-size-lg);
   }
+}
 
-  @utility heading-subcomponent {
-    font-family: var(--font-sans);
-    font-size: var(--heading-subcomponent-size);
-    line-height: var(--heading-subcomponent-line-height);
-    letter-spacing: var(--heading-subcomponent-letter-spacing);
-    font-weight: 500;
+@utility heading-subcomponent {
+  font-family: var(--font-sans);
+  font-size: var(--heading-subcomponent-size);
+  line-height: var(--heading-subcomponent-line-height);
+  letter-spacing: var(--heading-subcomponent-letter-spacing);
+  font-weight: 500;
 
-    @media (min-width: 1024px) {
-      font-size: var(--heading-subcomponent-size-lg);
-    }
+  @media (min-width: 1024px) {
+    font-size: var(--heading-subcomponent-size-lg);
   }
+}
 
-  @utility heading-label {
-    font-family: var(--font-sans);
-    font-size: var(--heading-label-size);
-    line-height: var(--heading-label-line-height);
-    letter-spacing: var(--heading-label-letter-spacing);
-    font-weight: 500;
-    text-transform: uppercase;
+@utility heading-label {
+  font-family: var(--font-sans);
+  font-size: var(--heading-label-size);
+  line-height: var(--heading-label-line-height);
+  letter-spacing: var(--heading-label-letter-spacing);
+  font-weight: 500;
+  text-transform: uppercase;
 
-    @media (min-width: 1024px) {
-      font-size: var(--heading-label-size-lg);
-    }
+  @media (min-width: 1024px) {
+    font-size: var(--heading-label-size-lg);
   }
+}
 
-  /* Semantic body text classes */
-  @utility text-body-large {
-    font-family: var(--font-sans);
-    font-size: var(--text-body-large);
-    line-height: var(--text-body-large-line-height);
-    margin-bottom: var(--spacing-phi-1);
-  }
+/* Semantic body text classes */
+@utility text-body-large {
+  font-family: var(--font-sans);
+  font-size: var(--text-body-large);
+  line-height: var(--text-body-large-line-height);
+  margin-bottom: var(--spacing-phi-1);
+}
 
-  @utility text-body {
-    font-family: var(--font-sans);
-    font-size: var(--text-body);
-    line-height: var(--text-body-line-height);
-    margin-bottom: var(--spacing-phi-1);
-  }
+@utility text-body {
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--text-body-line-height);
+  margin-bottom: var(--spacing-phi-1);
+}
 
-  @utility text-body-small {
-    font-family: var(--font-sans);
-    font-size: var(--text-body-small);
-    line-height: var(--text-body-small-line-height);
-    margin-bottom: var(--spacing-phi--1);
-  }
+@utility text-body-small {
+  font-family: var(--font-sans);
+  font-size: var(--text-body-small);
+  line-height: var(--text-body-small-line-height);
+  margin-bottom: var(--spacing-phi--1);
+}
 
-  @utility text-caption {
-    font-family: var(--font-sans);
-    font-size: var(--text-caption);
-    line-height: var(--text-caption-line-height);
-    letter-spacing: var(--text-caption-letter-spacing);
-    color: var(--color-muted-foreground);
-  }
+@utility text-caption {
+  font-family: var(--font-sans);
+  font-size: var(--text-caption);
+  line-height: var(--text-caption-line-height);
+  letter-spacing: var(--text-caption-letter-spacing);
+  color: var(--color-muted-foreground);
+}
 
 /* Layout System Utilities - Using @utility directive at root level */
 

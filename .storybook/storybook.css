@@ -115,7 +115,6 @@
 
 /* Override Storybook's default story container constraints */
 .sbdocs .sbdocs-content {
-
   @apply w-5/6 mx-auto;
 }
 

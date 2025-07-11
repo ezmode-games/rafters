@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue,
-  SelectLabel,
-  SelectGroup,
-  SelectSeparator 
-} from '../../../components/Select';
 import { useState } from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+} from '../../../components/Select';
 
 const meta = {
   title: '03 Components/Forms/Select/Intelligence',
@@ -27,10 +27,20 @@ type Story = StoryObj<typeof meta>;
 export const ChoiceArchitecture: Story = {
   render: () => {
     const [value, setValue] = useState('');
-    
+
     const countries = [
-      'United States', 'Canada', 'United Kingdom', 'Australia', 'Germany', 
-      'France', 'Japan', 'Brazil', 'India', 'China', 'Mexico', 'Spain'
+      'United States',
+      'Canada',
+      'United Kingdom',
+      'Australia',
+      'Germany',
+      'France',
+      'Japan',
+      'Brazil',
+      'India',
+      'China',
+      'Mexico',
+      'Spain',
     ];
 
     return (
@@ -41,14 +51,14 @@ export const ChoiceArchitecture: Story = {
             Cognitive load awareness through item counting and progressive disclosure
           </p>
         </div>
-        
+
         <div className="space-y-4">
           <div>
             <label htmlFor="country" className="block text-sm font-medium mb-2">
               Country
             </label>
             <Select value={value} onValueChange={setValue}>
-              <SelectTrigger 
+              <SelectTrigger
                 id="country"
                 showCount={true}
                 itemCount={countries.length}
@@ -79,20 +89,20 @@ export const ProgressiveDisclosure: Story = {
   render: () => {
     const [category, setCategory] = useState('');
     const [product, setProduct] = useState('');
-    
+
     const categories = {
-      'electronics': {
+      electronics: {
         label: 'Electronics',
-        items: ['Laptop', 'Phone', 'Tablet', 'Headphones', 'Camera', 'Smart Watch']
+        items: ['Laptop', 'Phone', 'Tablet', 'Headphones', 'Camera', 'Smart Watch'],
       },
-      'clothing': {
+      clothing: {
         label: 'Clothing',
-        items: ['T-Shirt', 'Jeans', 'Dress', 'Jacket', 'Shoes', 'Hat']
+        items: ['T-Shirt', 'Jeans', 'Dress', 'Jacket', 'Shoes', 'Hat'],
       },
-      'books': {
+      books: {
         label: 'Books',
-        items: ['Fiction', 'Non-Fiction', 'Science', 'History', 'Biography', 'Children']
-      }
+        items: ['Fiction', 'Non-Fiction', 'Science', 'History', 'Biography', 'Children'],
+      },
     };
 
     return (
@@ -103,7 +113,7 @@ export const ProgressiveDisclosure: Story = {
             Search functionality for large option sets reduces cognitive overhead
           </p>
         </div>
-        
+
         <div className="space-y-4">
           <div>
             <label htmlFor="category" className="block text-sm font-medium mb-2">
@@ -129,8 +139,8 @@ export const ProgressiveDisclosure: Story = {
                 Product
               </label>
               <Select value={product} onValueChange={setProduct}>
-                <SelectTrigger 
-                  id="product" 
+                <SelectTrigger
+                  id="product"
                   className="w-full"
                   showCount={true}
                   itemCount={categories[category as keyof typeof categories]?.items.length}
@@ -157,7 +167,7 @@ export const ProgressiveDisclosure: Story = {
 export const InteractionIntelligence: Story = {
   render: () => {
     const [action, setAction] = useState('');
-    
+
     return (
       <div className="space-y-6 p-6 max-w-md">
         <div>
@@ -166,62 +176,42 @@ export const InteractionIntelligence: Story = {
             Descriptions and shortcuts provide additional context for complex choices
           </p>
         </div>
-        
+
         <div className="space-y-4">
           <div>
             <label htmlFor="action" className="block text-sm font-medium mb-2">
               Choose Action
             </label>
             <Select value={action} onValueChange={setAction}>
-              <SelectTrigger 
-                id="action" 
-                size="large"
-                className="w-full"
-              >
+              <SelectTrigger id="action" size="large" className="w-full">
                 <SelectValue placeholder="Select an action" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>File Operations</SelectLabel>
-                  <SelectItem 
-                    value="save" 
+                  <SelectItem
+                    value="save"
                     description="Save current document to disk"
                     shortcut="⌘S"
                   >
                     Save File
                   </SelectItem>
-                  <SelectItem 
-                    value="open" 
-                    description="Open existing document"
-                    shortcut="⌘O"
-                  >
+                  <SelectItem value="open" description="Open existing document" shortcut="⌘O">
                     Open File
                   </SelectItem>
-                  <SelectItem 
-                    value="export" 
-                    description="Export in various formats"
-                    shortcut="⌘E"
-                  >
+                  <SelectItem value="export" description="Export in various formats" shortcut="⌘E">
                     Export
                   </SelectItem>
                 </SelectGroup>
-                
+
                 <SelectSeparator />
-                
+
                 <SelectGroup>
                   <SelectLabel>Edit Operations</SelectLabel>
-                  <SelectItem 
-                    value="copy" 
-                    description="Copy selection to clipboard"
-                    shortcut="⌘C"
-                  >
+                  <SelectItem value="copy" description="Copy selection to clipboard" shortcut="⌘C">
                     Copy
                   </SelectItem>
-                  <SelectItem 
-                    value="paste" 
-                    description="Paste from clipboard"
-                    shortcut="⌘V"
-                  >
+                  <SelectItem value="paste" description="Paste from clipboard" shortcut="⌘V">
                     Paste
                   </SelectItem>
                 </SelectGroup>

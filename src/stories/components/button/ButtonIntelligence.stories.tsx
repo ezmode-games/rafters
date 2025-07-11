@@ -30,9 +30,15 @@ export const DestructiveConfirm: Story = {
 export const AttentionHierarchy: Story = {
   render: () => (
     <div className="flex items-center gap-4">
-      <Button size="sm" variant="ghost">Cancel</Button>
-      <Button size="md" variant="secondary">Save Draft</Button>
-      <Button size="lg" variant="primary">Publish Now</Button>
+      <Button size="sm" variant="ghost">
+        Cancel
+      </Button>
+      <Button size="md" variant="secondary">
+        Save Draft
+      </Button>
+      <Button size="lg" variant="primary">
+        Publish Now
+      </Button>
     </div>
   ),
 };

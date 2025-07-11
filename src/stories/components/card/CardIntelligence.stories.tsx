@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { 
-  Card, 
-  CardHeader, 
-  CardTitle, 
-  CardDescription, 
-  CardContent, 
-  CardFooter 
-} from '../../../components/Card';
 import { Button } from '../../../components/Button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '../../../components/Card';
 
 const meta = {
   title: '03 Components/Layout/Card/Intelligence',
@@ -31,7 +31,7 @@ export const InformationHierarchy: Story = {
           Semantic heading levels and visual weight create clear content hierarchy
         </p>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card prominence="elevated">
           <CardHeader density="comfortable">
@@ -44,12 +44,14 @@ export const InformationHierarchy: Story = {
           </CardHeader>
           <CardContent density="comfortable">
             <p className="text-sm">
-              This card uses h2 heading with semibold weight and elevated prominence
-              to signal primary importance in the content hierarchy.
+              This card uses h2 heading with semibold weight and elevated prominence to signal
+              primary importance in the content hierarchy.
             </p>
           </CardContent>
           <CardFooter justify="end">
-            <Button variant="primary" size="sm">Learn More</Button>
+            <Button variant="primary" size="sm">
+              Learn More
+            </Button>
           </CardFooter>
         </Card>
 
@@ -64,12 +66,14 @@ export const InformationHierarchy: Story = {
           </CardHeader>
           <CardContent density="comfortable">
             <p className="text-sm">
-              This card uses h3 heading with medium weight to show it's
-              supporting the primary content.
+              This card uses h3 heading with medium weight to show it's supporting the primary
+              content.
             </p>
           </CardContent>
           <CardFooter justify="end">
-            <Button variant="outline" size="sm">Details</Button>
+            <Button variant="outline" size="sm">
+              Details
+            </Button>
           </CardFooter>
         </Card>
       </div>
@@ -87,13 +91,16 @@ export const CognitiveLoadDensity: Story = {
           Different density settings optimize cognitive load for various content types
         </p>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader density="compact">
-            <CardTitle level={4} weight="medium">Compact Density</CardTitle>
+            <CardTitle level={4} weight="medium">
+              Compact Density
+            </CardTitle>
             <CardDescription prominence="default" truncate>
-              High information density for dashboard widgets and summary views where space is limited
+              High information density for dashboard widgets and summary views where space is
+              limited
             </CardDescription>
           </CardHeader>
           <CardContent density="compact" layout="list">
@@ -104,45 +111,54 @@ export const CognitiveLoadDensity: Story = {
             </div>
           </CardContent>
           <CardFooter density="compact" justify="center">
-            <Button variant="ghost" size="sm">View</Button>
+            <Button variant="ghost" size="sm">
+              View
+            </Button>
           </CardFooter>
         </Card>
 
         <Card>
           <CardHeader density="comfortable">
-            <CardTitle level={4} weight="medium">Comfortable Density</CardTitle>
+            <CardTitle level={4} weight="medium">
+              Comfortable Density
+            </CardTitle>
             <CardDescription prominence="default">
               Balanced spacing for regular content cards and articles
             </CardDescription>
           </CardHeader>
           <CardContent density="comfortable">
             <p className="text-sm">
-              This is the default density setting that provides good balance
-              between information density and readability.
+              This is the default density setting that provides good balance between information
+              density and readability.
             </p>
           </CardContent>
           <CardFooter density="comfortable" justify="between">
             <span className="text-xs text-muted-foreground">Updated 2h ago</span>
-            <Button variant="outline" size="sm">Edit</Button>
+            <Button variant="outline" size="sm">
+              Edit
+            </Button>
           </CardFooter>
         </Card>
 
         <Card>
           <CardHeader density="spacious">
-            <CardTitle level={4} weight="medium">Spacious Density</CardTitle>
+            <CardTitle level={4} weight="medium">
+              Spacious Density
+            </CardTitle>
             <CardDescription prominence="default">
               Generous spacing for focus and detailed content
             </CardDescription>
           </CardHeader>
           <CardContent density="spacious">
             <p className="text-sm leading-relaxed">
-              Spacious density is ideal for important announcements,
-              featured content, or when you want to create a sense
-              of calm and focus.
+              Spacious density is ideal for important announcements, featured content, or when you
+              want to create a sense of calm and focus.
             </p>
           </CardContent>
           <CardFooter density="spacious" justify="end">
-            <Button variant="primary" size="md">Get Started</Button>
+            <Button variant="primary" size="md">
+              Get Started
+            </Button>
           </CardFooter>
         </Card>
       </div>
@@ -165,14 +181,12 @@ export const InteractionIntelligence: Story = {
             Clear visual and behavioral cues indicate interactive vs static content
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card prominence="default">
             <CardHeader>
               <CardTitle level={4}>Static Information Card</CardTitle>
-              <CardDescription>
-                This card displays information without interaction
-              </CardDescription>
+              <CardDescription>This card displays information without interaction</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-2 text-sm">
@@ -192,16 +206,10 @@ export const InteractionIntelligence: Story = {
             </CardContent>
           </Card>
 
-          <Card 
-            interactive 
-            prominence="elevated"
-            onClick={() => handleCardClick('Dashboard')}
-          >
+          <Card interactive prominence="elevated" onClick={() => handleCardClick('Dashboard')}>
             <CardHeader>
               <CardTitle level={4}>Interactive Dashboard Card</CardTitle>
-              <CardDescription>
-                Click anywhere on this card to interact
-              </CardDescription>
+              <CardDescription>Click anywhere on this card to interact</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-2 text-sm">
@@ -229,14 +237,16 @@ export const InteractionIntelligence: Story = {
           <h4 className="text-md font-medium mb-3">Interactive Card Collection</h4>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {['Analytics', 'Settings', 'Reports'].map((item) => (
-              <Card 
+              <Card
                 key={item}
-                interactive 
+                interactive
                 prominence="default"
                 onClick={() => handleCardClick(item)}
               >
                 <CardHeader density="compact">
-                  <CardTitle level={5} weight="medium">{item}</CardTitle>
+                  <CardTitle level={5} weight="medium">
+                    {item}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent density="compact">
                   <p className="text-xs text-muted-foreground">

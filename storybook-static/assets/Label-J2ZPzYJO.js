@@ -1,1 +1,149 @@
-import{j as t}from"./jsx-runtime-BjG_zV1W.js";import{r as o}from"./iframe-Cy2I62ob.js";import{P as v}from"./index-DoQPmrLJ.js";import{c as n}from"./utils-DuMXYCiK.js";var g="Label",u=o.forwardRef((a,s)=>t.jsx(v.label,{...a,ref:s,onMouseDown:r=>{var e;r.target.closest("button, input, select, textarea")||((e=a.onMouseDown)==null||e.call(a,r),!r.defaultPrevented&&r.detail>1&&r.preventDefault())}}));u.displayName=g;var d=u;const c=o.forwardRef(({className:a,required:s,importance:r="standard",context:l="form",validationState:e="default",helpText:i,semantic:m=!0,children:f,...p},x)=>t.jsxs("div",{className:n("space-y-1",m&&"semantic-label-container"),children:[t.jsxs(d,{ref:x,className:n("text-sm leading-none text-foreground","peer-disabled:cursor-not-allowed peer-disabled:opacity-disabled",{"font-semibold":r==="critical","font-medium":r==="standard","font-normal opacity-75":r==="optional"},{"cursor-pointer":l==="form","cursor-default":l==="descriptive","cursor-pointer hover:text-accent-foreground":l==="action"},{"text-destructive":e==="error","text-warning":e==="warning","text-success":e==="success"},a),...p,children:[f,s&&t.jsx("span",{className:n("ml-1","text-destructive"),"aria-label":"required field",children:"*"}),r==="optional"&&!s&&t.jsx("span",{className:"ml-1 text-muted-foreground text-xs font-normal",children:"(optional)"})]}),i&&t.jsx("p",{className:n("text-xs text-muted-foreground",{"text-destructive":e==="error","text-warning":e==="warning","text-success":e==="success"}),role:e==="error"?"alert":"status","aria-live":e==="error"?"assertive":"polite",children:i})]}));c.displayName=d.displayName;c.__docgenInfo={description:"",methods:[],props:{required:{required:!1,tsType:{name:"boolean"},description:""},importance:{required:!1,tsType:{name:"union",raw:"'critical' | 'standard' | 'optional'",elements:[{name:"literal",value:"'critical'"},{name:"literal",value:"'standard'"},{name:"literal",value:"'optional'"}]},description:"",defaultValue:{value:"'standard'",computed:!1}},context:{required:!1,tsType:{name:"union",raw:"'form' | 'descriptive' | 'action'",elements:[{name:"literal",value:"'form'"},{name:"literal",value:"'descriptive'"},{name:"literal",value:"'action'"}]},description:"",defaultValue:{value:"'form'",computed:!1}},validationState:{required:!1,tsType:{name:"union",raw:"'error' | 'warning' | 'success' | 'default'",elements:[{name:"literal",value:"'error'"},{name:"literal",value:"'warning'"},{name:"literal",value:"'success'"},{name:"literal",value:"'default'"}]},description:"",defaultValue:{value:"'default'",computed:!1}},helpText:{required:!1,tsType:{name:"string"},description:""},semantic:{required:!1,tsType:{name:"boolean"},description:"",defaultValue:{value:"true",computed:!1}}}};export{c as L};
+import { r as o } from './iframe-Cy2I62ob.js';
+import { P as v } from './index-DoQPmrLJ.js';
+import { j as t } from './jsx-runtime-BjG_zV1W.js';
+import { c as n } from './utils-DuMXYCiK.js';
+var g = 'Label',
+  u = o.forwardRef((a, s) =>
+    t.jsx(v.label, {
+      ...a,
+      ref: s,
+      onMouseDown: (r) => {
+        var e;
+        r.target.closest('button, input, select, textarea') ||
+          ((e = a.onMouseDown) == null || e.call(a, r),
+          !r.defaultPrevented && r.detail > 1 && r.preventDefault());
+      },
+    })
+  );
+u.displayName = g;
+var d = u;
+const c = o.forwardRef(
+  (
+    {
+      className: a,
+      required: s,
+      importance: r = 'standard',
+      context: l = 'form',
+      validationState: e = 'default',
+      helpText: i,
+      semantic: m = !0,
+      children: f,
+      ...p
+    },
+    x
+  ) =>
+    t.jsxs('div', {
+      className: n('space-y-1', m && 'semantic-label-container'),
+      children: [
+        t.jsxs(d, {
+          ref: x,
+          className: n(
+            'text-sm leading-none text-foreground',
+            'peer-disabled:cursor-not-allowed peer-disabled:opacity-disabled',
+            {
+              'font-semibold': r === 'critical',
+              'font-medium': r === 'standard',
+              'font-normal opacity-75': r === 'optional',
+            },
+            {
+              'cursor-pointer': l === 'form',
+              'cursor-default': l === 'descriptive',
+              'cursor-pointer hover:text-accent-foreground': l === 'action',
+            },
+            {
+              'text-destructive': e === 'error',
+              'text-warning': e === 'warning',
+              'text-success': e === 'success',
+            },
+            a
+          ),
+          ...p,
+          children: [
+            f,
+            s &&
+              t.jsx('span', {
+                className: n('ml-1', 'text-destructive'),
+                'aria-label': 'required field',
+                children: '*',
+              }),
+            r === 'optional' &&
+              !s &&
+              t.jsx('span', {
+                className: 'ml-1 text-muted-foreground text-xs font-normal',
+                children: '(optional)',
+              }),
+          ],
+        }),
+        i &&
+          t.jsx('p', {
+            className: n('text-xs text-muted-foreground', {
+              'text-destructive': e === 'error',
+              'text-warning': e === 'warning',
+              'text-success': e === 'success',
+            }),
+            role: e === 'error' ? 'alert' : 'status',
+            'aria-live': e === 'error' ? 'assertive' : 'polite',
+            children: i,
+          }),
+      ],
+    })
+);
+c.displayName = d.displayName;
+c.__docgenInfo = {
+  description: '',
+  methods: [],
+  props: {
+    required: { required: !1, tsType: { name: 'boolean' }, description: '' },
+    importance: {
+      required: !1,
+      tsType: {
+        name: 'union',
+        raw: "'critical' | 'standard' | 'optional'",
+        elements: [
+          { name: 'literal', value: "'critical'" },
+          { name: 'literal', value: "'standard'" },
+          { name: 'literal', value: "'optional'" },
+        ],
+      },
+      description: '',
+      defaultValue: { value: "'standard'", computed: !1 },
+    },
+    context: {
+      required: !1,
+      tsType: {
+        name: 'union',
+        raw: "'form' | 'descriptive' | 'action'",
+        elements: [
+          { name: 'literal', value: "'form'" },
+          { name: 'literal', value: "'descriptive'" },
+          { name: 'literal', value: "'action'" },
+        ],
+      },
+      description: '',
+      defaultValue: { value: "'form'", computed: !1 },
+    },
+    validationState: {
+      required: !1,
+      tsType: {
+        name: 'union',
+        raw: "'error' | 'warning' | 'success' | 'default'",
+        elements: [
+          { name: 'literal', value: "'error'" },
+          { name: 'literal', value: "'warning'" },
+          { name: 'literal', value: "'success'" },
+          { name: 'literal', value: "'default'" },
+        ],
+      },
+      description: '',
+      defaultValue: { value: "'default'", computed: !1 },
+    },
+    helpText: { required: !1, tsType: { name: 'string' }, description: '' },
+    semantic: {
+      required: !1,
+      tsType: { name: 'boolean' },
+      description: '',
+      defaultValue: { value: 'true', computed: !1 },
+    },
+  },
+};
+export { c as L };

@@ -13,10 +13,7 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": [
-    "dist",
-    "README.md"
-  ],
+  "files": ["dist", "README.md"],
   "scripts": {
     "dev": "vite",
     "build": "vite build && tsc --emitDeclarationOnly",

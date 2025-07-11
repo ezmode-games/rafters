@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Input } from '../../../components/Input';
 import { useState } from 'react';
+import { Input } from '../../../components/Input';
 
 const meta = {
   title: '03 Components/Forms/Input/Intelligence',
@@ -20,22 +20,22 @@ export const ValidationIntelligence: Story = {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [submitted, setSubmitted] = useState(false);
-    
+
     const validateEmail = (value: string) => {
       if (!value) return 'Email is required';
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(value) ? '' : 'Please enter a valid email address';
     };
-    
+
     const validatePassword = (value: string) => {
       if (!value) return 'Password is required';
       if (value.length < 8) return 'Password must be at least 8 characters';
       return '';
     };
-    
+
     const emailError = submitted ? validateEmail(email) : '';
     const passwordError = submitted ? validatePassword(password) : '';
-    
+
     return (
       <div className="space-y-6 p-6 max-w-md">
         <div>
@@ -44,7 +44,7 @@ export const ValidationIntelligence: Story = {
             Intelligence prevents errors before they occur, rather than just showing them after
           </p>
         </div>
-        
+
         <div className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium mb-2">
@@ -62,7 +62,7 @@ export const ValidationIntelligence: Story = {
               validationMessage={emailError}
             />
           </div>
-          
+
           <div>
             <label htmlFor="password" className="block text-sm font-medium mb-2">
               Password
@@ -80,7 +80,7 @@ export const ValidationIntelligence: Story = {
               validationMessage={passwordError}
             />
           </div>
-          
+
           <button
             type="button"
             onClick={() => setSubmitted(true)}
@@ -104,7 +104,7 @@ export const MotorAccessibility: Story = {
           44px minimum touch targets on mobile, 40px on desktop for motor accessibility
         </p>
       </div>
-      
+
       <div className="space-y-4">
         <div>
           <label htmlFor="mobile-input" className="block text-sm font-medium mb-2">
@@ -116,7 +116,7 @@ export const MotorAccessibility: Story = {
             className="w-full"
           />
         </div>
-        
+
         <div>
           <label htmlFor="search-input" className="block text-sm font-medium mb-2">
             Search Field
@@ -143,7 +143,7 @@ export const TrustBuilding: Story = {
           Visual indicators and enhanced styling for sensitive data inputs
         </p>
       </div>
-      
+
       <div className="space-y-4">
         <div>
           <label htmlFor="credit-card" className="block text-sm font-medium mb-2">
@@ -156,11 +156,9 @@ export const TrustBuilding: Story = {
             sensitive={true}
             className="w-full"
           />
-          <p className="text-xs text-gray-500 mt-1">
-            Enhanced border indicates secure field
-          </p>
+          <p className="text-xs text-gray-500 mt-1">Enhanced border indicates secure field</p>
         </div>
-        
+
         <div>
           <label htmlFor="ssn" className="block text-sm font-medium mb-2">
             Social Security Number
@@ -172,21 +170,14 @@ export const TrustBuilding: Story = {
             sensitive={true}
             className="w-full"
           />
-          <p className="text-xs text-gray-500 mt-1">
-            Visual trust indicators for sensitive data
-          </p>
+          <p className="text-xs text-gray-500 mt-1">Visual trust indicators for sensitive data</p>
         </div>
-        
+
         <div>
           <label htmlFor="regular" className="block text-sm font-medium mb-2">
             Regular Field (for comparison)
           </label>
-          <Input
-            id="regular"
-            type="text"
-            placeholder="Standard styling"
-            className="w-full"
-          />
+          <Input id="regular" type="text" placeholder="Standard styling" className="w-full" />
         </div>
       </div>
     </div>

@@ -8,7 +8,7 @@ const dirname =
 export default [
   // Regular unit tests
   'vitest.config.ts',
-  // Storybook tests project 
+  // Storybook tests project
   {
     plugins: [storybookTest({ configDir: path.join(dirname, '.storybook') })],
     optimizeDeps: {

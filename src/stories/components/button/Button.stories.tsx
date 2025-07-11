@@ -71,22 +71,39 @@ export const Common: Story = {
   render: (args) => {
     return (
       <div className="flex items-center gap-4">
-        <Button {...args} variant="primary">Primary</Button>
-        <Button {...args} variant="secondary">Secondary</Button>
-        <Button {...args} variant="destructive">Destructive</Button>
-        <Button {...args} variant="success">Success</Button>
-        <Button {...args} variant="warning">Warning</Button>
-        <Button {...args} variant="info">Info</Button>
-        <Button {...args} variant="outline">Outline</Button>
-        <Button {...args} variant="ghost">Ghost</Button>
+        <Button {...args} variant="primary">
+          Primary
+        </Button>
+        <Button {...args} variant="secondary">
+          Secondary
+        </Button>
+        <Button {...args} variant="destructive">
+          Destructive
+        </Button>
+        <Button {...args} variant="success">
+          Success
+        </Button>
+        <Button {...args} variant="warning">
+          Warning
+        </Button>
+        <Button {...args} variant="info">
+          Info
+        </Button>
+        <Button {...args} variant="outline">
+          Outline
+        </Button>
+        <Button {...args} variant="ghost">
+          Ghost
+        </Button>
       </div>
     );
   },
   parameters: {
     docs: {
       description: {
-        story: 'A collection of common button variants demonstrating visual hierarchy and semantic meaning.',
+        story:
+          'A collection of common button variants demonstrating visual hierarchy and semantic meaning.',
       },
     },
   },
-}
+};

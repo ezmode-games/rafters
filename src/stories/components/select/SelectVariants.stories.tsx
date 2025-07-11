@@ -1,6 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/Select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../components/Select';
 
 const meta = {
   title: '03 Components/Form/Select/Visual Variants',
@@ -186,7 +192,10 @@ export const ValidationStates: Story = {
         <div className="space-y-2">
           <label className="text-sm font-medium text-destructive">Error State</label>
           <Select>
-            <SelectTrigger className="border-destructive focus:ring-destructive" aria-invalid="true">
+            <SelectTrigger
+              className="border-destructive focus:ring-destructive"
+              aria-invalid="true"
+            >
               <SelectValue placeholder="Error appearance" />
             </SelectTrigger>
             <SelectContent>

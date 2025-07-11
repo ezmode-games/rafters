@@ -12,28 +12,28 @@ export interface LabelProps extends React.ComponentPropsWithoutRef<typeof LabelP
 }
 
 export const Label = forwardRef<React.ElementRef<typeof LabelPrimitive.Root>, LabelProps>(
-  ({ 
-    className, 
-    required, 
-    importance = 'standard', 
-    context = 'form',
-    validationState = 'default',
-    helpText,
-    semantic = true,
-    children, 
-    ...props 
-  }, ref) => (
-    <div className={cn(
-      'space-y-1',
-      semantic && 'semantic-label-container'
-    )}>
+  (
+    {
+      className,
+      required,
+      importance = 'standard',
+      context = 'form',
+      validationState = 'default',
+      helpText,
+      semantic = true,
+      children,
+      ...props
+    },
+    ref
+  ) => (
+    <div className={cn('space-y-1', semantic && 'semantic-label-container')}>
       <LabelPrimitive.Root
         ref={ref}
         className={cn(
           // Base label styling
           'text-sm leading-none text-foreground',
           'peer-disabled:cursor-not-allowed peer-disabled:opacity-disabled',
-          
+
           // Importance-based visual hierarchy
           {
             'font-semibold': importance === 'critical',
@@ -51,7 +51,7 @@ export const Label = forwardRef<React.ElementRef<typeof LabelPrimitive.Root>, La
           // Validation state colors
           {
             'text-destructive': validationState === 'error',
-            'text-warning': validationState === 'warning', 
+            'text-warning': validationState === 'warning',
             'text-success': validationState === 'success',
           },
 
@@ -61,7 +61,7 @@ export const Label = forwardRef<React.ElementRef<typeof LabelPrimitive.Root>, La
       >
         {children}
         {required && (
-          <span 
+          <span
             className={cn(
               'ml-1',
               validationState === 'error' ? 'text-destructive' : 'text-destructive'
@@ -72,22 +72,17 @@ export const Label = forwardRef<React.ElementRef<typeof LabelPrimitive.Root>, La
           </span>
         )}
         {importance === 'optional' && !required && (
-          <span className="ml-1 text-muted-foreground text-xs font-normal">
-            (optional)
-          </span>
+          <span className="ml-1 text-muted-foreground text-xs font-normal">(optional)</span>
         )}
       </LabelPrimitive.Root>
-      
+
       {helpText && (
-        <p 
-          className={cn(
-            'text-xs text-muted-foreground',
-            {
-              'text-destructive': validationState === 'error',
-              'text-warning': validationState === 'warning',
-              'text-success': validationState === 'success',
-            }
-          )}
+        <p
+          className={cn('text-xs text-muted-foreground', {
+            'text-destructive': validationState === 'error',
+            'text-warning': validationState === 'warning',
+            'text-success': validationState === 'success',
+          })}
           role={validationState === 'error' ? 'alert' : 'status'}
           aria-live={validationState === 'error' ? 'assertive' : 'polite'}
         >

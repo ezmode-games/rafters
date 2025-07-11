@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../../components/Tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/Tabs';
 
 const meta = {
   title: '03 Components/Navigation/Tabs/Properties',
@@ -74,7 +74,7 @@ export const CognitiveLoadLevels: Story = {
         <p className="text-body-small">
           Three options represent the sweet spot for quick decision making
         </p>
-        
+
         <div className="mt-phi-2">
           <Tabs defaultValue="create" cognitiveLoad="minimal">
             <TabsList>
@@ -100,7 +100,7 @@ export const CognitiveLoadLevels: Story = {
         <p className="text-body-small">
           Five to six options balance functionality with scanability
         </p>
-        
+
         <div className="mt-phi-2">
           <Tabs defaultValue="dashboard" cognitiveLoad="standard">
             <TabsList>
@@ -134,7 +134,7 @@ export const CognitiveLoadLevels: Story = {
         <p className="text-body-small">
           Seven or more options require careful organization and may benefit from grouping
         </p>
-        
+
         <div className="mt-phi-2">
           <Tabs defaultValue="general" cognitiveLoad="complex">
             <TabsList>
@@ -157,7 +157,7 @@ export const CognitiveLoadLevels: Story = {
             </TabsContent>
           </Tabs>
         </div>
-        
+
         <p className="text-body-small text-muted-foreground mt-phi-1">
           Consider hierarchical organization or progressive disclosure for complex navigation
         </p>
@@ -189,7 +189,7 @@ export const Orientation: Story = {
         <p className="text-body-small">
           Standard horizontal layout optimizes for scanning and quick navigation
         </p>
-        
+
         <div className="mt-phi-2">
           <Tabs defaultValue="home" orientation="horizontal">
             <TabsList>
@@ -219,7 +219,7 @@ export const Orientation: Story = {
         <p className="text-body-small">
           Vertical layout accommodates longer labels and complex hierarchies
         </p>
-        
+
         <div className="mt-phi-2">
           <Tabs defaultValue="account" orientation="vertical" className="w-full">
             <div className="flex gap-phi-2">
@@ -232,11 +232,15 @@ export const Orientation: Story = {
               <div className="flex-1">
                 <TabsContent value="account">
                   <h3 className="heading-component">Account Settings</h3>
-                  <p className="text-body">Vertical orientation supports longer, descriptive labels</p>
+                  <p className="text-body">
+                    Vertical orientation supports longer, descriptive labels
+                  </p>
                 </TabsContent>
                 <TabsContent value="notifications">
                   <h3 className="heading-component">Notification Preferences</h3>
-                  <p className="text-body">Better for complex settings with detailed descriptions</p>
+                  <p className="text-body">
+                    Better for complex settings with detailed descriptions
+                  </p>
                 </TabsContent>
                 <TabsContent value="privacy">
                   <h3 className="heading-component">Privacy Controls</h3>
@@ -277,32 +281,28 @@ export const DisabledStates: Story = {
       <p className="text-body-small">
         Disabled tabs communicate temporary unavailability while maintaining navigation structure
       </p>
-      
+
       <div className="mt-phi-2">
         <Tabs defaultValue="active">
           <TabsList>
             <TabsTrigger value="active">Active Content</TabsTrigger>
             <TabsTrigger value="pending">Pending Review</TabsTrigger>
-            <TabsTrigger value="disabled" disabled>Locked Feature</TabsTrigger>
+            <TabsTrigger value="disabled" disabled>
+              Locked Feature
+            </TabsTrigger>
             <TabsTrigger value="available">Available Soon</TabsTrigger>
           </TabsList>
           <TabsContent value="active">
-            <p className="text-body">
-              Currently available content with full interaction support
-            </p>
+            <p className="text-body">Currently available content with full interaction support</p>
           </TabsContent>
           <TabsContent value="pending">
-            <p className="text-body">
-              Content awaiting approval or processing before activation
-            </p>
+            <p className="text-body">Content awaiting approval or processing before activation</p>
           </TabsContent>
           <TabsContent value="available">
-            <p className="text-body">
-              Features in development or requiring specific permissions
-            </p>
+            <p className="text-body">Features in development or requiring specific permissions</p>
           </TabsContent>
         </Tabs>
-        
+
         <p className="text-body-small text-muted-foreground mt-phi-1">
           Disabled tabs are skipped in keyboard navigation and clearly marked for screen readers
         </p>
@@ -332,7 +332,7 @@ export const WayfindingFeatures: Story = {
       <p className="text-body-small">
         Wayfinding enhancements provide context for complex navigation hierarchies
       </p>
-      
+
       <div className="mt-phi-2">
         <Tabs defaultValue="dashboard" wayfinding={true}>
           <TabsList>

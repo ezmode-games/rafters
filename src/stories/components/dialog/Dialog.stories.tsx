@@ -1,16 +1,16 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { fn } from 'storybook/test'
-import { Button } from '../../../components/Button'
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
+import { Button } from '../../../components/Button';
 import {
   Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
   DialogClose,
-} from '../../../components/Dialog'
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '../../../components/Dialog';
 
 /**
  * Critical moments require trust. The dialog is where user confidence meets consequential decisions.
@@ -25,7 +25,8 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: 'Trust-building dialog system with progressive confirmation and cognitive load optimization.',
+        component:
+          'Trust-building dialog system with progressive confirmation and cognitive load optimization.',
       },
     },
   },
@@ -50,169 +51,112 @@ const meta = {
       description: 'Complexity level affects spacing and information density',
     },
   },
-} satisfies Meta<typeof Dialog>
+} satisfies Meta<typeof Dialog>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 /**
- * Basic confirmation dialog with trust-building patterns.
- * Uses medium trust level with clear action hierarchy.
+ * Common dialog demonstrations showing all trust levels and key variants.
+ * Trust-building patterns with clear action hierarchy and consequence explanation.
  */
-export const Basic: Story = {
+export const Common: Story = {
   render: (args) => (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">Open Dialog</Button>
-      </DialogTrigger>
-      <DialogContent trustLevel="medium" size="md" {...args}>
-        <DialogHeader>
-          <DialogTitle>Confirm Action</DialogTitle>
-          <DialogDescription>
-            This action will save your changes. You can always edit them later.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DialogClose>
-          <Button onClick={fn()}>Save Changes</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  ),
-}
+    <div className="space-y-4">
+      <div className="text-sm text-muted-foreground mb-6">
+        <strong>Dialog Trust Levels:</strong> Low → Medium → High → Critical with increasing visual hierarchy
+      </div>
+      
+      <div className="flex gap-4 flex-wrap">
+        {/* Low Trust */}
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm">Low Trust</Button>
+          </DialogTrigger>
+          <DialogContent trustLevel="low" size="sm" {...args}>
+            <DialogHeader>
+              <DialogTitle>Save Draft</DialogTitle>
+              <DialogDescription>Save your changes as a draft?</DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline" size="sm">Cancel</Button>
+              </DialogClose>
+              <Button size="sm" onClick={fn()}>Save Draft</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
-/**
- * High-trust dialog for sensitive operations.
- * Enhanced visual hierarchy and clear consequence explanation.
- */
-export const HighTrust: Story = {
-  render: (args) => (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="primary">Process Payment</Button>
-      </DialogTrigger>
-      <DialogContent trustLevel="high" size="md" {...args}>
-        <DialogHeader>
-          <DialogTitle>Confirm Payment</DialogTitle>
-          <DialogDescription>
-            You will be charged $49.99 for the Premium Plan. This will automatically 
-            renew monthly unless cancelled. You can manage your subscription anytime 
-            from your account settings.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DialogClose>
-          <Button variant="primary" onClick={fn()}>
-            Confirm Payment
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  ),
-}
+        {/* Medium Trust */}
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="secondary">Medium Trust</Button>
+          </DialogTrigger>
+          <DialogContent trustLevel="medium" size="md" {...args}>
+            <DialogHeader>
+              <DialogTitle>Publish Article</DialogTitle>
+              <DialogDescription>
+                Your article will be published immediately and visible to all subscribers.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Save as Draft</Button>
+              </DialogClose>
+              <Button variant="primary" onClick={fn()}>Publish Now</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
-/**
- * Critical trust dialog for destructive actions.
- * Maximum visual hierarchy and consequence explanation.
- */
-export const Critical: Story = {
-  render: (args) => (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="destructive">Delete Account</Button>
-      </DialogTrigger>
-      <DialogContent trustLevel="critical" destructive size="md" {...args}>
-        <DialogHeader>
-          <DialogTitle>Delete Account</DialogTitle>
-          <DialogDescription>
-            This action cannot be undone. This will permanently delete your account 
-            and remove all your data from our servers. All your projects, files, 
-            and settings will be lost forever.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">Keep Account</Button>
-          </DialogClose>
-          <Button variant="destructive" onClick={fn()}>
-            Delete Forever
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  ),
-}
+        {/* High Trust */}
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="primary">High Trust</Button>
+          </DialogTrigger>
+          <DialogContent trustLevel="high" size="md" {...args}>
+            <DialogHeader>
+              <DialogTitle>Process Payment</DialogTitle>
+              <DialogDescription>
+                You will be charged $49.99 for Premium Plan. This will automatically renew monthly unless cancelled.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
+              <Button variant="primary" onClick={fn()}>Confirm Payment</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
-/**
- * Size variants demonstrate content hierarchy and cognitive load management.
- * Different sizes handle different amounts of information appropriately.
- */
-export const Sizes: Story = {
-  render: () => (
-    <div className="flex gap-4 flex-wrap">
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline" size="sm">Small</Button>
-        </DialogTrigger>
-        <DialogContent size="sm">
-          <DialogHeader>
-            <DialogTitle>Quick Action</DialogTitle>
-            <DialogDescription>Simple confirmation needed.</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline" size="sm">Cancel</Button>
-            </DialogClose>
-            <Button size="sm" onClick={fn()}>Confirm</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline">Medium</Button>
-        </DialogTrigger>
-        <DialogContent size="md">
-          <DialogHeader>
-            <DialogTitle>Standard Dialog</DialogTitle>
-            <DialogDescription>
-              This is a standard dialog with moderate amount of content.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button onClick={fn()}>Continue</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline" size="lg">Large</Button>
-        </DialogTrigger>
-        <DialogContent size="lg">
-          <DialogHeader>
-            <DialogTitle>Detailed Information</DialogTitle>
-            <DialogDescription>
-              This larger dialog can handle more complex content and detailed explanations.
-              It provides more space for comprehensive information while maintaining
-              readability and trust-building patterns.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button onClick={fn()}>Proceed</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        {/* Critical Trust */}
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="destructive">Critical Trust</Button>
+          </DialogTrigger>
+          <DialogContent trustLevel="critical" destructive size="md" {...args}>
+            <DialogHeader>
+              <DialogTitle>Delete Account</DialogTitle>
+              <DialogDescription>
+                This action cannot be undone. This will permanently delete your account and remove all your data.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Keep Account</Button>
+              </DialogClose>
+              <Button variant="destructive" onClick={fn()}>Delete Forever</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   ),
-}
+  parameters: {
+    docs: {
+      description: {
+        story: 'Complete overview of dialog trust levels and their visual hierarchy. Each level provides appropriate visual weight and confirmation patterns for the sensitivity of the operation.',
+      },
+    },
+  },
+};

@@ -157,7 +157,7 @@ export const AsChild: Story = {
         </p>
       </div>
       <Button asChild variant="primary" size="sm">
-        <div 
+        <div
           onClick={() => console.log('Icon clicked')}
           onKeyDown={(e) => e.key === 'Enter' && console.log('Icon activated')}
           className="cursor-pointer flex items-center justify-center"

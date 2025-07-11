@@ -1,8 +1,159 @@
-import{j as t}from"./jsx-runtime-BjG_zV1W.js";import{S as g}from"./index-DuwuiYca.js";import{r as b}from"./iframe-Cy2I62ob.js";import{c as h}from"./utils-DuMXYCiK.js";const l=b.forwardRef(({variant:e="primary",size:a="md",asChild:i=!1,className:u,disabled:c,loading:r=!1,destructiveConfirm:d=!1,children:s,...m},f)=>{const p=i?g:"button",o=e==="destructive",n=o&&d,v=c||r;return t.jsxs(p,{ref:f,className:h("inline-flex items-center justify-center rounded-md text-sm font-medium","focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2","disabled:pointer-events-none disabled:opacity-disabled","transition-all duration-200","hover:opacity-hover active:scale-active",r&&"opacity-75 cursor-wait",o&&"font-semibold shadow-sm",{"bg-primary text-primary-foreground hover:bg-primary/90":e==="primary","bg-secondary text-secondary-foreground hover:bg-secondary/80":e==="secondary","bg-destructive text-destructive-foreground hover:bg-destructive/90":e==="destructive","bg-success text-success-foreground hover:bg-success/90":e==="success","bg-warning text-warning-foreground hover:bg-warning/90":e==="warning","bg-info text-info-foreground hover:bg-info/90":e==="info","border border-input bg-background hover:bg-accent hover:text-accent-foreground":e==="outline","hover:bg-accent hover:text-accent-foreground":e==="ghost"},{"h-8 px-3 text-xs":a==="sm","h-10 px-4":a==="md","h-12 px-6 text-base":a==="lg","h-12 px-6 text-base w-full":a==="full"},u),disabled:v,"aria-busy":r,"aria-label":n?`Confirm to ${s}`:void 0,...m,children:[r&&t.jsxs("svg",{className:"animate-spin -ml-1 mr-2 h-4 w-4",fill:"none",viewBox:"0 0 24 24","aria-hidden":"true",children:[t.jsx("circle",{className:"opacity-25",cx:"12",cy:"12",r:"10",stroke:"currentColor",strokeWidth:"4"}),t.jsx("path",{className:"opacity-75",fill:"currentColor",d:"M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"})]}),n&&!r&&t.jsx("span",{className:"mr-1 text-xs font-bold","aria-hidden":"true",children:"!"}),s]})});l.displayName="Button";l.__docgenInfo={description:"",methods:[],displayName:"Button",props:{variant:{required:!1,tsType:{name:"union",raw:`| 'primary'
+import { r as b } from './iframe-Cy2I62ob.js';
+import { S as g } from './index-DuwuiYca.js';
+import { j as t } from './jsx-runtime-BjG_zV1W.js';
+import { c as h } from './utils-DuMXYCiK.js';
+const l = b.forwardRef(
+  (
+    {
+      variant: e = 'primary',
+      size: a = 'md',
+      asChild: i = !1,
+      className: u,
+      disabled: c,
+      loading: r = !1,
+      destructiveConfirm: d = !1,
+      children: s,
+      ...m
+    },
+    f
+  ) => {
+    const p = i ? g : 'button',
+      o = e === 'destructive',
+      n = o && d,
+      v = c || r;
+    return t.jsxs(p, {
+      ref: f,
+      className: h(
+        'inline-flex items-center justify-center rounded-md text-sm font-medium',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        'disabled:pointer-events-none disabled:opacity-disabled',
+        'transition-all duration-200',
+        'hover:opacity-hover active:scale-active',
+        r && 'opacity-75 cursor-wait',
+        o && 'font-semibold shadow-sm',
+        {
+          'bg-primary text-primary-foreground hover:bg-primary/90': e === 'primary',
+          'bg-secondary text-secondary-foreground hover:bg-secondary/80': e === 'secondary',
+          'bg-destructive text-destructive-foreground hover:bg-destructive/90': e === 'destructive',
+          'bg-success text-success-foreground hover:bg-success/90': e === 'success',
+          'bg-warning text-warning-foreground hover:bg-warning/90': e === 'warning',
+          'bg-info text-info-foreground hover:bg-info/90': e === 'info',
+          'border border-input bg-background hover:bg-accent hover:text-accent-foreground':
+            e === 'outline',
+          'hover:bg-accent hover:text-accent-foreground': e === 'ghost',
+        },
+        {
+          'h-8 px-3 text-xs': a === 'sm',
+          'h-10 px-4': a === 'md',
+          'h-12 px-6 text-base': a === 'lg',
+          'h-12 px-6 text-base w-full': a === 'full',
+        },
+        u
+      ),
+      disabled: v,
+      'aria-busy': r,
+      'aria-label': n ? `Confirm to ${s}` : void 0,
+      ...m,
+      children: [
+        r &&
+          t.jsxs('svg', {
+            className: 'animate-spin -ml-1 mr-2 h-4 w-4',
+            fill: 'none',
+            viewBox: '0 0 24 24',
+            'aria-hidden': 'true',
+            children: [
+              t.jsx('circle', {
+                className: 'opacity-25',
+                cx: '12',
+                cy: '12',
+                r: '10',
+                stroke: 'currentColor',
+                strokeWidth: '4',
+              }),
+              t.jsx('path', {
+                className: 'opacity-75',
+                fill: 'currentColor',
+                d: 'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z',
+              }),
+            ],
+          }),
+        n &&
+          !r &&
+          t.jsx('span', {
+            className: 'mr-1 text-xs font-bold',
+            'aria-hidden': 'true',
+            children: '!',
+          }),
+        s,
+      ],
+    });
+  }
+);
+l.displayName = 'Button';
+l.__docgenInfo = {
+  description: '',
+  methods: [],
+  displayName: 'Button',
+  props: {
+    variant: {
+      required: !1,
+      tsType: {
+        name: 'union',
+        raw: `| 'primary'
 | 'secondary'
 | 'destructive'
 | 'success'
 | 'warning'
 | 'info'
 | 'outline'
-| 'ghost'`,elements:[{name:"literal",value:"'primary'"},{name:"literal",value:"'secondary'"},{name:"literal",value:"'destructive'"},{name:"literal",value:"'success'"},{name:"literal",value:"'warning'"},{name:"literal",value:"'info'"},{name:"literal",value:"'outline'"},{name:"literal",value:"'ghost'"}]},description:"",defaultValue:{value:"'primary'",computed:!1}},size:{required:!1,tsType:{name:"union",raw:"'sm' | 'md' | 'lg' | 'full'",elements:[{name:"literal",value:"'sm'"},{name:"literal",value:"'md'"},{name:"literal",value:"'lg'"},{name:"literal",value:"'full'"}]},description:"",defaultValue:{value:"'md'",computed:!1}},asChild:{required:!1,tsType:{name:"boolean"},description:"",defaultValue:{value:"false",computed:!1}},loading:{required:!1,tsType:{name:"boolean"},description:"",defaultValue:{value:"false",computed:!1}},destructiveConfirm:{required:!1,tsType:{name:"boolean"},description:"",defaultValue:{value:"false",computed:!1}}}};export{l as B};
+| 'ghost'`,
+        elements: [
+          { name: 'literal', value: "'primary'" },
+          { name: 'literal', value: "'secondary'" },
+          { name: 'literal', value: "'destructive'" },
+          { name: 'literal', value: "'success'" },
+          { name: 'literal', value: "'warning'" },
+          { name: 'literal', value: "'info'" },
+          { name: 'literal', value: "'outline'" },
+          { name: 'literal', value: "'ghost'" },
+        ],
+      },
+      description: '',
+      defaultValue: { value: "'primary'", computed: !1 },
+    },
+    size: {
+      required: !1,
+      tsType: {
+        name: 'union',
+        raw: "'sm' | 'md' | 'lg' | 'full'",
+        elements: [
+          { name: 'literal', value: "'sm'" },
+          { name: 'literal', value: "'md'" },
+          { name: 'literal', value: "'lg'" },
+          { name: 'literal', value: "'full'" },
+        ],
+      },
+      description: '',
+      defaultValue: { value: "'md'", computed: !1 },
+    },
+    asChild: {
+      required: !1,
+      tsType: { name: 'boolean' },
+      description: '',
+      defaultValue: { value: 'false', computed: !1 },
+    },
+    loading: {
+      required: !1,
+      tsType: { name: 'boolean' },
+      description: '',
+      defaultValue: { value: 'false', computed: !1 },
+    },
+    destructiveConfirm: {
+      required: !1,
+      tsType: { name: 'boolean' },
+      description: '',
+      defaultValue: { value: 'false', computed: !1 },
+    },
+  },
+};
+export { l as B };
