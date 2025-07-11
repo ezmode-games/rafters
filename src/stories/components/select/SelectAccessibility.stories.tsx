@@ -1,6 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/Select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../components/Select';
 
 const meta = {
   title: '03 Components/Form/Select/Accessibility',
@@ -88,11 +94,7 @@ export const ScreenReaderSupport: Story = {
         Priority <span className="text-destructive">*</span>
       </label>
       <Select required>
-        <SelectTrigger 
-          id="priority-select" 
-          aria-required="true"
-          aria-describedby="priority-error"
-        >
+        <SelectTrigger id="priority-select" aria-required="true" aria-describedby="priority-error">
           <SelectValue placeholder="Select priority level" />
         </SelectTrigger>
         <SelectContent>
@@ -101,7 +103,9 @@ export const ScreenReaderSupport: Story = {
           <SelectItem value="low">Low Priority</SelectItem>
         </SelectContent>
       </Select>
-      <p id="priority-error" role="alert">Priority selection is required</p>
+      <p id="priority-error" role="alert">
+        Priority selection is required
+      </p>
 
       <h3>Choice Count</h3>
       <label htmlFor="department-select">Department</label>
@@ -134,8 +138,8 @@ export const ErrorStates: Story = {
       <h3>Validation Error</h3>
       <label htmlFor="status-select">Status</label>
       <Select>
-        <SelectTrigger 
-          id="status-select" 
+        <SelectTrigger
+          id="status-select"
           className="border-destructive focus:ring-destructive"
           aria-invalid="true"
           aria-describedby="status-error"
@@ -148,7 +152,9 @@ export const ErrorStates: Story = {
           <SelectItem value="pending">Pending</SelectItem>
         </SelectContent>
       </Select>
-      <p id="status-error" role="alert">Please select a valid status from the list</p>
+      <p id="status-error" role="alert">
+        Please select a valid status from the list
+      </p>
 
       <h3>Disabled State</h3>
       <label htmlFor="locked-select">Locked Selection</label>

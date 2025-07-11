@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../../components/Tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/Tabs';
 
 const meta = {
   title: '03 Components/Navigation/Tabs/Variants',
@@ -25,7 +25,7 @@ export const StandardNavigation: Story = {
       <p className="text-body-small">
         Clean, semantic design for primary navigation and content organization
       </p>
-      
+
       <div className="mt-phi-2">
         <Tabs defaultValue="overview">
           <TabsList>
@@ -95,11 +95,11 @@ export const CompactOrganization: Story = {
         <p className="text-body-small">
           Space-efficient layout for dense interfaces while maintaining usability
         </p>
-        
+
         <div className="mt-phi-2 p-phi-2 border border-muted rounded">
           <div className="space-y-phi-1">
             <h3 className="heading-component">Dashboard Controls</h3>
-            
+
             <Tabs defaultValue="filters" className="w-full">
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="filters">Filters</TabsTrigger>
@@ -137,11 +137,11 @@ export const CompactOrganization: Story = {
         <p className="text-body-small">
           Seamlessly integrated tabs for content switching within larger interfaces
         </p>
-        
+
         <div className="mt-phi-2">
           <div className="space-y-phi-1">
             <h3 className="heading-component">Content Sections</h3>
-            
+
             <Tabs defaultValue="recent">
               <TabsList className="inline-flex">
                 <TabsTrigger value="recent">Recent</TabsTrigger>
@@ -150,16 +150,12 @@ export const CompactOrganization: Story = {
               </TabsList>
               <TabsContent value="recent">
                 <div className="mt-phi-1 p-phi-1 bg-muted/30 rounded">
-                  <p className="text-body-small">
-                    Recently accessed items with inline navigation
-                  </p>
+                  <p className="text-body-small">Recently accessed items with inline navigation</p>
                 </div>
               </TabsContent>
               <TabsContent value="popular">
                 <div className="mt-phi-1 p-phi-1 bg-muted/30 rounded">
-                  <p className="text-body-small">
-                    Popular content organized through compact tabs
-                  </p>
+                  <p className="text-body-small">Popular content organized through compact tabs</p>
                 </div>
               </TabsContent>
               <TabsContent value="saved">
@@ -199,7 +195,7 @@ export const HierarchicalNavigation: Story = {
       <p className="text-body-small">
         Hierarchical tabs organize complex content through progressive disclosure
       </p>
-      
+
       <div className="mt-phi-2">
         <Tabs defaultValue="workspace">
           <TabsList>
@@ -207,7 +203,7 @@ export const HierarchicalNavigation: Story = {
             <TabsTrigger value="workspace">Workspace</TabsTrigger>
             <TabsTrigger value="organization">Organization</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="personal">
             <div className="mt-phi-1">
               <Tabs defaultValue="profile">
@@ -227,23 +223,19 @@ export const HierarchicalNavigation: Story = {
                 <TabsContent value="preferences">
                   <div className="p-phi-2 border border-muted rounded mt-phi-1">
                     <h3 className="heading-component">User Preferences</h3>
-                    <p className="text-body">
-                      Interface customization and notification settings
-                    </p>
+                    <p className="text-body">Interface customization and notification settings</p>
                   </div>
                 </TabsContent>
                 <TabsContent value="security">
                   <div className="p-phi-2 border border-muted rounded mt-phi-1">
                     <h3 className="heading-component">Security Settings</h3>
-                    <p className="text-body">
-                      Password management and authentication preferences
-                    </p>
+                    <p className="text-body">Password management and authentication preferences</p>
                   </div>
                 </TabsContent>
               </Tabs>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="workspace">
             <div className="mt-phi-1">
               <Tabs defaultValue="projects">
@@ -255,31 +247,25 @@ export const HierarchicalNavigation: Story = {
                 <TabsContent value="projects">
                   <div className="p-phi-2 border border-muted rounded mt-phi-1">
                     <h3 className="heading-component">Project Management</h3>
-                    <p className="text-body">
-                      Active projects and collaboration workflows
-                    </p>
+                    <p className="text-body">Active projects and collaboration workflows</p>
                   </div>
                 </TabsContent>
                 <TabsContent value="team">
                   <div className="p-phi-2 border border-muted rounded mt-phi-1">
                     <h3 className="heading-component">Team Collaboration</h3>
-                    <p className="text-body">
-                      Member management and shared workspace settings
-                    </p>
+                    <p className="text-body">Member management and shared workspace settings</p>
                   </div>
                 </TabsContent>
                 <TabsContent value="resources">
                   <div className="p-phi-2 border border-muted rounded mt-phi-1">
                     <h3 className="heading-component">Shared Resources</h3>
-                    <p className="text-body">
-                      Documents, assets, and collaborative tools
-                    </p>
+                    <p className="text-body">Documents, assets, and collaborative tools</p>
                   </div>
                 </TabsContent>
               </Tabs>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="organization">
             <div className="mt-phi-1">
               <Tabs defaultValue="billing">
@@ -291,32 +277,26 @@ export const HierarchicalNavigation: Story = {
                 <TabsContent value="billing">
                   <div className="p-phi-2 border border-muted rounded mt-phi-1">
                     <h3 className="heading-component">Billing Management</h3>
-                    <p className="text-body">
-                      Subscription details and payment information
-                    </p>
+                    <p className="text-body">Subscription details and payment information</p>
                   </div>
                 </TabsContent>
                 <TabsContent value="users">
                   <div className="p-phi-2 border border-muted rounded mt-phi-1">
                     <h3 className="heading-component">User Administration</h3>
-                    <p className="text-body">
-                      Organization-wide user management and permissions
-                    </p>
+                    <p className="text-body">Organization-wide user management and permissions</p>
                   </div>
                 </TabsContent>
                 <TabsContent value="integrations">
                   <div className="p-phi-2 border border-muted rounded mt-phi-1">
                     <h3 className="heading-component">System Integrations</h3>
-                    <p className="text-body">
-                      Third-party services and API configurations
-                    </p>
+                    <p className="text-body">Third-party services and API configurations</p>
                   </div>
                 </TabsContent>
               </Tabs>
             </div>
           </TabsContent>
         </Tabs>
-        
+
         <p className="text-body-small text-muted-foreground mt-phi-2">
           Hierarchical organization builds clear mental models through consistent visual patterns
         </p>
@@ -348,7 +328,7 @@ export const StateIndicators: Story = {
         <p className="text-body-small">
           Clear state indicators provide context without visual decoration
         </p>
-        
+
         <div className="mt-phi-2">
           <Tabs defaultValue="active">
             <TabsList>
@@ -360,33 +340,25 @@ export const StateIndicators: Story = {
             <TabsContent value="active">
               <div className="p-phi-2 border border-muted rounded">
                 <h3 className="heading-component">Active Items</h3>
-                <p className="text-body">
-                  Count indicators provide context about content volume
-                </p>
+                <p className="text-body">Count indicators provide context about content volume</p>
               </div>
             </TabsContent>
             <TabsContent value="pending">
               <div className="p-phi-2 border border-muted rounded">
                 <h3 className="heading-component">Pending Review</h3>
-                <p className="text-body">
-                  Status labels communicate workflow state clearly
-                </p>
+                <p className="text-body">Status labels communicate workflow state clearly</p>
               </div>
             </TabsContent>
             <TabsContent value="draft">
               <div className="p-phi-2 border border-muted rounded">
                 <h3 className="heading-component">Draft Content</h3>
-                <p className="text-body">
-                  Semantic meaning takes precedence over visual styling
-                </p>
+                <p className="text-body">Semantic meaning takes precedence over visual styling</p>
               </div>
             </TabsContent>
             <TabsContent value="archived">
               <div className="p-phi-2 border border-muted rounded">
                 <h3 className="heading-component">Archived Items</h3>
-                <p className="text-body">
-                  Consistent labeling builds accurate mental models
-                </p>
+                <p className="text-body">Consistent labeling builds accurate mental models</p>
               </div>
             </TabsContent>
           </Tabs>
@@ -398,41 +370,37 @@ export const StateIndicators: Story = {
         <p className="text-body-small">
           Workflow progress communication through semantic structure
         </p>
-        
+
         <div className="mt-phi-2">
           <Tabs defaultValue="setup">
             <TabsList>
               <TabsTrigger value="setup">Setup Complete</TabsTrigger>
               <TabsTrigger value="config">Configuration</TabsTrigger>
               <TabsTrigger value="testing">Testing Required</TabsTrigger>
-              <TabsTrigger value="deploy" disabled>Deploy</TabsTrigger>
+              <TabsTrigger value="deploy" disabled>
+                Deploy
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="setup">
               <div className="p-phi-2 border border-muted rounded">
                 <h3 className="heading-component">Setup Complete</h3>
-                <p className="text-body">
-                  Completed steps provide progress context
-                </p>
+                <p className="text-body">Completed steps provide progress context</p>
               </div>
             </TabsContent>
             <TabsContent value="config">
               <div className="p-phi-2 border border-muted rounded">
                 <h3 className="heading-component">Configuration</h3>
-                <p className="text-body">
-                  Current step in workflow progression
-                </p>
+                <p className="text-body">Current step in workflow progression</p>
               </div>
             </TabsContent>
             <TabsContent value="testing">
               <div className="p-phi-2 border border-muted rounded">
                 <h3 className="heading-component">Testing Required</h3>
-                <p className="text-body">
-                  Action-oriented labels communicate next steps
-                </p>
+                <p className="text-body">Action-oriented labels communicate next steps</p>
               </div>
             </TabsContent>
           </Tabs>
-          
+
           <p className="text-body-small text-muted-foreground mt-phi-1">
             Disabled tabs show future workflow steps while maintaining structure
           </p>

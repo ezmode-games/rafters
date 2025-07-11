@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../../components/Tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/Tabs';
 
 /**
  * Tabs organize content sections while respecting cognitive limits and enabling efficient
@@ -57,7 +57,9 @@ export const UsageGuidelines: Story = {
             <TabsTrigger value="support">Support</TabsTrigger>
           </TabsList>
           <TabsContent value="general">
-            <p className="text-body-small text-muted-foreground">Too many choices create decision paralysis</p>
+            <p className="text-body-small text-muted-foreground">
+              Too many choices create decision paralysis
+            </p>
           </TabsContent>
         </Tabs>
       </TabsContent>
@@ -173,7 +175,9 @@ export const WithDisabledTabs: Story = {
       <TabsList>
         <TabsTrigger value="active">Active</TabsTrigger>
         <TabsTrigger value="pending">Pending</TabsTrigger>
-        <TabsTrigger value="disabled" disabled>Disabled</TabsTrigger>
+        <TabsTrigger value="disabled" disabled>
+          Disabled
+        </TabsTrigger>
         <TabsTrigger value="archived">Archived</TabsTrigger>
       </TabsList>
       <TabsContent value="active">

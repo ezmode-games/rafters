@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../../components/Tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/Tabs';
 
 const meta = {
   title: '03 Components/Navigation/Tabs/Accessibility',
@@ -23,8 +23,9 @@ export const FoundationAccessibility: Story = {
     <div className="container mx-auto max-w-4xl">
       <h1 className="heading-section">Foundation Accessibility Principles</h1>
       <p className="text-body max-w-3xl">
-        Tabs provide complete keyboard navigation, screen reader optimization, and motor accessibility
-        features that exceed baseline requirements while maintaining intuitive interaction patterns.
+        Tabs provide complete keyboard navigation, screen reader optimization, and motor
+        accessibility features that exceed baseline requirements while maintaining intuitive
+        interaction patterns.
       </p>
 
       <div className="mt-phi-3 space-y-phi-2">
@@ -33,7 +34,7 @@ export const FoundationAccessibility: Story = {
           <p className="text-body-small">
             Minimum 44px touch targets with generous spacing prevent accidental activation
           </p>
-          
+
           <div className="mt-phi-2">
             <Tabs defaultValue="dashboard">
               <TabsList>
@@ -44,7 +45,8 @@ export const FoundationAccessibility: Story = {
               </TabsList>
               <TabsContent value="dashboard">
                 <p className="text-body">
-                  Touch targets meet accessibility guidelines with enhanced padding for easier interaction
+                  Touch targets meet accessibility guidelines with enhanced padding for easier
+                  interaction
                 </p>
               </TabsContent>
               <TabsContent value="analytics">
@@ -71,13 +73,15 @@ export const FoundationAccessibility: Story = {
           <p className="text-body-small">
             Complete keyboard support with logical focus management and clear visual indicators
           </p>
-          
+
           <div className="mt-phi-2">
             <Tabs defaultValue="home">
               <TabsList>
                 <TabsTrigger value="home">Home</TabsTrigger>
                 <TabsTrigger value="products">Products</TabsTrigger>
-                <TabsTrigger value="disabled" disabled>Disabled</TabsTrigger>
+                <TabsTrigger value="disabled" disabled>
+                  Disabled
+                </TabsTrigger>
                 <TabsTrigger value="contact">Contact</TabsTrigger>
               </TabsList>
               <TabsContent value="home">
@@ -96,7 +100,7 @@ export const FoundationAccessibility: Story = {
                 </p>
               </TabsContent>
             </Tabs>
-            
+
             <p className="text-body-small text-muted-foreground mt-phi-1">
               Use arrow keys to navigate, Enter/Space to activate, Tab to move to content
             </p>
@@ -137,7 +141,7 @@ export const ScreenReaderOptimization: Story = {
           <p className="text-body-small">
             Proper tablist, tab, and tabpanel roles communicate structure clearly
           </p>
-          
+
           <div className="mt-phi-2">
             <Tabs defaultValue="overview">
               <TabsList aria-label="Content sections">
@@ -172,14 +176,16 @@ export const ScreenReaderOptimization: Story = {
           <p className="text-body-small">
             Dynamic state updates and context information enhance navigation clarity
           </p>
-          
+
           <div className="mt-phi-2">
             <Tabs defaultValue="active">
               <TabsList>
                 <TabsTrigger value="active">Active</TabsTrigger>
                 <TabsTrigger value="pending">Pending (3)</TabsTrigger>
                 <TabsTrigger value="archived">Archived</TabsTrigger>
-                <TabsTrigger value="unavailable" disabled>Unavailable</TabsTrigger>
+                <TabsTrigger value="unavailable" disabled>
+                  Unavailable
+                </TabsTrigger>
               </TabsList>
               <TabsContent value="active">
                 <p className="text-body">
@@ -197,7 +203,7 @@ export const ScreenReaderOptimization: Story = {
                 </p>
               </TabsContent>
             </Tabs>
-            
+
             <p className="text-body-small text-muted-foreground mt-phi-1">
               Screen readers announce state changes and provide count context naturally
             </p>

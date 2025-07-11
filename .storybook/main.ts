@@ -1,5 +1,4 @@
 import type { StorybookConfig } from '@storybook/react-vite';
-import tailwindcss from '@tailwindcss/vite';
 import remarkGfm from 'remark-gfm';
 
 const config: StorybookConfig = {
@@ -24,8 +23,6 @@ const config: StorybookConfig = {
     options: {},
   },
   viteFinal: async (config) => {
-    config.plugins = config.plugins || [];
-    config.plugins.push(tailwindcss());
     return config;
   },
 };

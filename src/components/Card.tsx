@@ -11,7 +11,10 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ className, density = 'comfortable', interactive = false, prominence = 'default', ...props }, ref) => (
+  (
+    { className, density = 'comfortable', interactive = false, prominence = 'default', ...props },
+    ref
+  ) => (
     <div
       ref={ref}
       className={cn(
@@ -19,11 +22,12 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
         // Cognitive load: Information density controls
         {
           'border-border shadow-sm': prominence === 'subtle',
-          'border-border shadow-md': prominence === 'default', 
+          'border-border shadow-md': prominence === 'default',
           'border-border shadow-lg': prominence === 'elevated',
         },
         // Interaction affordance: Clear hover states for interactive cards
-        interactive && 'cursor-pointer hover:shadow-md hover:border-accent-foreground/20 hover:scale-[1.02] active:scale-[0.98]',
+        interactive &&
+          'cursor-pointer hover:shadow-md hover:border-accent-foreground/20 hover:scale-[1.02] active:scale-[0.98]',
         // Motor accessibility: Ensure adequate touch targets for interactive cards
         interactive && 'min-h-[44px]',
         className
@@ -43,8 +47,8 @@ export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
   ({ className, density = 'comfortable', ...props }, ref) => (
-    <div 
-      ref={ref} 
+    <div
+      ref={ref}
       className={cn(
         'flex flex-col space-y-1.5',
         // Cognitive load: Adaptive spacing based on information density
@@ -54,8 +58,8 @@ export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
           'p-8': density === 'spacious',
         },
         className
-      )} 
-      {...props} 
+      )}
+      {...props}
     />
   )
 );
@@ -71,7 +75,7 @@ export interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement>
 export const CardTitle = forwardRef<HTMLHeadingElement, CardTitleProps>(
   ({ className, level = 3, weight = 'semibold', ...props }, ref) => {
     const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;
-    
+
     return (
       <HeadingTag
         ref={ref}
@@ -110,8 +114,8 @@ export interface CardDescriptionProps extends React.HTMLAttributes<HTMLParagraph
 
 export const CardDescription = forwardRef<HTMLParagraphElement, CardDescriptionProps>(
   ({ className, truncate = false, prominence = 'default', ...props }, ref) => (
-    <p 
-      ref={ref} 
+    <p
+      ref={ref}
       className={cn(
         'text-sm leading-relaxed',
         // Cognitive load: Truncation for long descriptions
@@ -122,8 +126,8 @@ export const CardDescription = forwardRef<HTMLParagraphElement, CardDescriptionP
           'text-muted-foreground': prominence === 'default',
         },
         className
-      )} 
-      {...props} 
+      )}
+      {...props}
     />
   )
 );
@@ -138,14 +142,14 @@ export interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
   ({ className, density = 'comfortable', layout = 'default', ...props }, ref) => (
-    <div 
-      ref={ref} 
+    <div
+      ref={ref}
       className={cn(
         'pt-0',
         // Cognitive load: Adaptive spacing
         {
           'p-4': density === 'compact',
-          'p-6': density === 'comfortable', 
+          'p-6': density === 'comfortable',
           'p-8': density === 'spacious',
         },
         // Scanability: Layout patterns
@@ -155,8 +159,8 @@ export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
           'space-y-3': layout === 'list',
         },
         className
-      )} 
-      {...props} 
+      )}
+      {...props}
     />
   )
 );
@@ -171,8 +175,8 @@ export interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
   ({ className, density = 'comfortable', justify = 'start', ...props }, ref) => (
-    <div 
-      ref={ref} 
+    <div
+      ref={ref}
       className={cn(
         'flex items-center pt-0',
         // Cognitive load: Adaptive spacing
@@ -184,13 +188,13 @@ export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
         // Scanability: Action layout
         {
           'justify-start': justify === 'start',
-          'justify-center': justify === 'center', 
+          'justify-center': justify === 'center',
           'justify-end': justify === 'end',
           'justify-between': justify === 'between',
         },
         className
-      )} 
-      {...props} 
+      )}
+      {...props}
     />
   )
 );

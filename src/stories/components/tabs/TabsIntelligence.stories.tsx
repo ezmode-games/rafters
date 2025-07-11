@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../../components/Tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/Tabs';
 
 const meta = {
   title: '03 Components/Navigation/Tabs/Intelligence',
@@ -34,8 +34,10 @@ export const CognitiveLoadOptimization: Story = {
 
       <div className="mt-phi-3">
         <h2 className="heading-component">Optimal Configuration</h2>
-        <p className="text-body-small">Five tabs represent the cognitive sweet spot for navigation</p>
-        
+        <p className="text-body-small">
+          Five tabs represent the cognitive sweet spot for navigation
+        </p>
+
         <Tabs defaultValue="overview" className="mt-phi-2">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -65,7 +67,7 @@ export const CognitiveLoadOptimization: Story = {
       <div className="mt-phi-3">
         <h2 className="heading-component">Complex Pattern</h2>
         <p className="text-body-small">Nine tabs exceed cognitive limits and require grouping</p>
-        
+
         <Tabs defaultValue="general" className="mt-phi-2">
           <TabsList>
             <TabsTrigger value="general">General</TabsTrigger>
@@ -79,13 +81,17 @@ export const CognitiveLoadOptimization: Story = {
             <TabsTrigger value="support">Support</TabsTrigger>
           </TabsList>
           <TabsContent value="general">
-            <p className="text-body">Decision paralysis occurs with too many simultaneous choices</p>
+            <p className="text-body">
+              Decision paralysis occurs with too many simultaneous choices
+            </p>
           </TabsContent>
           <TabsContent value="profile">
             <p className="text-body">Users struggle to scan this many options efficiently</p>
           </TabsContent>
           <TabsContent value="privacy">
-            <p className="text-body">Related settings should group together through progressive disclosure</p>
+            <p className="text-body">
+              Related settings should group together through progressive disclosure
+            </p>
           </TabsContent>
         </Tabs>
         <p className="text-body-small text-muted-foreground mt-phi-1">
@@ -109,7 +115,7 @@ export const WayfindingIntelligence: Story = {
       <p className="text-body">
         Clear visual feedback and consistent patterns build navigation confidence.
       </p>
-      
+
       <div className="mt-phi-3">
         <Tabs defaultValue="dashboard">
           <TabsList>
@@ -118,25 +124,31 @@ export const WayfindingIntelligence: Story = {
             <TabsTrigger value="reports">Reports</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="dashboard">
             <h2 className="heading-component">Dashboard Overview</h2>
-            <p className="text-body">Clear visual feedback shows current location in navigation hierarchy</p>
+            <p className="text-body">
+              Clear visual feedback shows current location in navigation hierarchy
+            </p>
           </TabsContent>
           <TabsContent value="analytics">
             <h2 className="heading-component">Analytics Data</h2>
-            <p className="text-body">Contextual information provides wayfinding without overwhelming</p>
+            <p className="text-body">
+              Contextual information provides wayfinding without overwhelming
+            </p>
           </TabsContent>
           <TabsContent value="reports">
             <h2 className="heading-component">Report Generation</h2>
-            <p className="text-body">Recognition patterns help navigation and reduce cognitive load</p>
+            <p className="text-body">
+              Recognition patterns help navigation and reduce cognitive load
+            </p>
           </TabsContent>
           <TabsContent value="settings">
             <h2 className="heading-component">System Settings</h2>
             <p className="text-body">Consistent patterns build user confidence</p>
           </TabsContent>
         </Tabs>
-        
+
         <p className="text-body-small text-muted-foreground mt-phi-2">
           Semantic structure provides context without visual decoration
         </p>
@@ -158,7 +170,7 @@ export const MentalModelBuilding: Story = {
       <p className="text-body">
         Progressive disclosure manages complexity without hiding functionality.
       </p>
-      
+
       <div className="mt-phi-3">
         <Tabs defaultValue="account">
           <TabsList>
@@ -166,10 +178,10 @@ export const MentalModelBuilding: Story = {
             <TabsTrigger value="workspace">Workspace</TabsTrigger>
             <TabsTrigger value="integration">Integrations</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="account">
             <h2 className="heading-component">Account Management</h2>
-            
+
             <div className="mt-phi-2">
               <Tabs defaultValue="profile">
                 <TabsList>
@@ -177,7 +189,7 @@ export const MentalModelBuilding: Story = {
                   <TabsTrigger value="security">Security</TabsTrigger>
                   <TabsTrigger value="preferences">Preferences</TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="profile">
                   <h3 className="heading-component">Profile Information</h3>
                   <p className="text-body">Personal details and public information settings</p>
@@ -193,18 +205,18 @@ export const MentalModelBuilding: Story = {
               </Tabs>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="workspace">
             <h2 className="heading-component">Workspace Settings</h2>
             <p className="text-body">Team management, project settings, and collaboration tools</p>
           </TabsContent>
-          
+
           <TabsContent value="integration">
             <h2 className="heading-component">Integration Management</h2>
             <p className="text-body">Connected services, API keys, and third-party applications</p>
           </TabsContent>
         </Tabs>
-        
+
         <p className="text-body-small text-muted-foreground mt-phi-2">
           Hierarchical organization builds clear mental models of system structure
         </p>
@@ -226,11 +238,11 @@ export const MotorAccessibilityFocus: Story = {
       <p className="text-body">
         Generous touch targets and keyboard support accommodate various interaction methods.
       </p>
-      
+
       <div className="mt-phi-3">
         <h2 className="heading-component">Large Touch Targets</h2>
         <p className="text-body-small">Minimum 44px targets meet accessibility guidelines</p>
-        
+
         <Tabs defaultValue="home" className="mt-phi-2">
           <TabsList>
             <TabsTrigger value="home">Home</TabsTrigger>
@@ -252,16 +264,18 @@ export const MotorAccessibilityFocus: Story = {
           </TabsContent>
         </Tabs>
       </div>
-        
+
       <div className="mt-phi-3">
         <h2 className="heading-component">Keyboard Navigation</h2>
         <p className="text-body-small">Arrow keys navigate, Enter and Space activate</p>
-        
+
         <Tabs defaultValue="tab1" className="mt-phi-2">
           <TabsList>
             <TabsTrigger value="tab1">Tab 1</TabsTrigger>
             <TabsTrigger value="tab2">Tab 2</TabsTrigger>
-            <TabsTrigger value="tab3" disabled>Disabled</TabsTrigger>
+            <TabsTrigger value="tab3" disabled>
+              Disabled
+            </TabsTrigger>
             <TabsTrigger value="tab4">Tab 4</TabsTrigger>
           </TabsList>
           <TabsContent value="tab1">
@@ -274,7 +288,7 @@ export const MotorAccessibilityFocus: Story = {
             <p className="text-body">Full keyboard support with proper tab order</p>
           </TabsContent>
         </Tabs>
-        
+
         <p className="text-body-small text-muted-foreground mt-phi-2">
           Complete keyboard accessibility with clear focus indicators
         </p>
@@ -294,13 +308,14 @@ export const ProgressiveDisclosureIntelligence: Story = {
     <div className="container mx-auto max-w-4xl">
       <h1 className="heading-section">Progressive Disclosure Strategy</h1>
       <p className="text-body">
-        Reveal complexity gradually to prevent cognitive overload while preserving access to advanced features.
+        Reveal complexity gradually to prevent cognitive overload while preserving access to
+        advanced features.
       </p>
-      
+
       <div className="mt-phi-3">
         <h2 className="heading-component">Tiered Information Architecture</h2>
         <p className="text-body-small">Essential → Detailed → Advanced progression</p>
-        
+
         <Tabs defaultValue="overview" className="mt-phi-2">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -308,7 +323,7 @@ export const ProgressiveDisclosureIntelligence: Story = {
             <TabsTrigger value="advanced">Advanced</TabsTrigger>
             <TabsTrigger value="developer">Developer</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="overview" className="space-y-phi-2">
             <h3 className="heading-component">Project Summary</h3>
             <div className="grid grid-cols-3 gap-phi-2">
@@ -326,13 +341,15 @@ export const ProgressiveDisclosureIntelligence: Story = {
               </div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="details" className="space-y-phi-2">
             <h3 className="heading-component">Project Details</h3>
             <div className="space-y-phi-1">
               <div>
                 <p className="text-caption font-medium">Description</p>
-                <p className="text-body">Comprehensive project management system with team collaboration features</p>
+                <p className="text-body">
+                  Comprehensive project management system with team collaboration features
+                </p>
               </div>
               <div>
                 <p className="text-caption font-medium">Team Members</p>
@@ -344,7 +361,7 @@ export const ProgressiveDisclosureIntelligence: Story = {
               </div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="advanced" className="space-y-phi-2">
             <h3 className="heading-component">Advanced Configuration</h3>
             <div className="space-y-phi-2">
@@ -358,7 +375,7 @@ export const ProgressiveDisclosureIntelligence: Story = {
               </div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="developer" className="space-y-phi-2">
             <h3 className="heading-component">Developer Tools</h3>
             <div className="bg-background-code p-phi-2 rounded-md">
@@ -369,7 +386,7 @@ export const ProgressiveDisclosureIntelligence: Story = {
             </div>
           </TabsContent>
         </Tabs>
-        
+
         <p className="text-body-small text-muted-foreground mt-phi-2">
           Each tab reveals appropriate detail level for different user needs and expertise
         </p>
@@ -389,13 +406,14 @@ export const ContextualRelationshipIntelligence: Story = {
     <div className="container mx-auto max-w-4xl">
       <h1 className="heading-section">Contextual Relationships</h1>
       <p className="text-body">
-        Clear visual and semantic connections help users understand how information relates across tabs.
+        Clear visual and semantic connections help users understand how information relates across
+        tabs.
       </p>
-      
+
       <div className="mt-phi-3">
         <h2 className="heading-component">Cross-Tab Data Relationships</h2>
         <p className="text-body-small">Visual indicators show how data connects between sections</p>
-        
+
         <Tabs defaultValue="customers" className="mt-phi-2">
           <TabsList>
             <TabsTrigger value="customers">Customers (247)</TabsTrigger>
@@ -403,7 +421,7 @@ export const ContextualRelationshipIntelligence: Story = {
             <TabsTrigger value="revenue">Revenue ($45K)</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="customers" className="space-y-phi-2">
             <div className="flex justify-between items-center">
               <h3 className="heading-component">Customer Overview</h3>
@@ -422,7 +440,7 @@ export const ContextualRelationshipIntelligence: Story = {
               </div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="orders" className="space-y-phi-2">
             <div className="flex justify-between items-center">
               <h3 className="heading-component">Order Management</h3>
@@ -445,7 +463,7 @@ export const ContextualRelationshipIntelligence: Story = {
               </div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="revenue" className="space-y-phi-2">
             <div className="flex justify-between items-center">
               <h3 className="heading-component">Revenue Tracking</h3>
@@ -469,7 +487,7 @@ export const ContextualRelationshipIntelligence: Story = {
               </div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="analytics" className="space-y-phi-2">
             <div className="flex justify-between items-center">
               <h3 className="heading-component">Performance Analytics</h3>
@@ -485,7 +503,7 @@ export const ContextualRelationshipIntelligence: Story = {
             </div>
           </TabsContent>
         </Tabs>
-        
+
         <p className="text-body-small text-muted-foreground mt-phi-2">
           Contextual hints and data connections help users understand system relationships
         </p>
@@ -505,13 +523,14 @@ export const TrustBuildingIntelligence: Story = {
     <div className="container mx-auto max-w-4xl">
       <h1 className="heading-section">Trust Building Patterns</h1>
       <p className="text-body">
-        Transparent communication and consistent behavior build user confidence in system reliability.
+        Transparent communication and consistent behavior build user confidence in system
+        reliability.
       </p>
-      
+
       <div className="mt-phi-3">
         <h2 className="heading-component">State Transparency</h2>
         <p className="text-body-small">Clear indicators show system status and data freshness</p>
-        
+
         <Tabs defaultValue="live" className="mt-phi-2">
           <TabsList>
             <TabsTrigger value="live">
@@ -527,7 +546,7 @@ export const TrustBuildingIntelligence: Story = {
               <span className="ml-phi-1 w-2 h-2 bg-semantic-warning rounded-full" />
             </TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="live" className="space-y-phi-2">
             <div className="flex items-center justify-between p-phi-2 bg-semantic-success-subtle rounded-md">
               <div>
@@ -543,14 +562,17 @@ export const TrustBuildingIntelligence: Story = {
               <p className="text-caption text-muted-foreground">Last update: Just now</p>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="cached" className="space-y-phi-2">
             <div className="flex items-center justify-between p-phi-2 bg-background-subtle rounded-md">
               <div>
                 <p className="text-body font-medium">Using Cached Data</p>
                 <p className="text-body-small">Data may be up to 5 minutes old</p>
               </div>
-              <button type="button" className="text-semantic-accent text-body-small hover:underline">
+              <button
+                type="button"
+                className="text-semantic-accent text-body-small hover:underline"
+              >
                 Refresh Now
               </button>
             </div>
@@ -559,7 +581,7 @@ export const TrustBuildingIntelligence: Story = {
               <p className="text-caption text-muted-foreground">Last update: 5 minutes ago</p>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="offline" className="space-y-phi-2">
             <div className="flex items-center justify-between p-phi-2 bg-semantic-warning-subtle rounded-md">
               <div>
@@ -576,7 +598,7 @@ export const TrustBuildingIntelligence: Story = {
             </div>
           </TabsContent>
         </Tabs>
-        
+
         <p className="text-body-small text-muted-foreground mt-phi-2">
           Clear state communication prevents uncertainty and builds system trust
         </p>
@@ -598,11 +620,11 @@ export const CognitiveEfficiencyIntelligence: Story = {
       <p className="text-body">
         Streamlined patterns and intelligent defaults reduce mental overhead for common tasks.
       </p>
-      
+
       <div className="mt-phi-3">
         <h2 className="heading-component">Smart Defaults & Shortcuts</h2>
         <p className="text-body-small">Anticipate needs and provide efficient pathways</p>
-        
+
         <Tabs defaultValue="dashboard" className="mt-phi-2">
           <TabsList>
             <TabsTrigger value="dashboard">
@@ -611,7 +633,9 @@ export const CognitiveEfficiencyIntelligence: Story = {
             </TabsTrigger>
             <TabsTrigger value="recent">
               Recent
-              <span className="ml-phi-1 px-1 py-0.5 bg-semantic-accent text-white text-caption rounded-sm">3</span>
+              <span className="ml-phi-1 px-1 py-0.5 bg-semantic-accent text-white text-caption rounded-sm">
+                3
+              </span>
             </TabsTrigger>
             <TabsTrigger value="favorites">
               Favorites
@@ -622,16 +646,22 @@ export const CognitiveEfficiencyIntelligence: Story = {
               <span className="ml-phi-1 text-caption text-muted-foreground">⌘K</span>
             </TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="dashboard" className="space-y-phi-2">
             <div className="grid grid-cols-2 gap-phi-2">
               <div className="p-phi-2 bg-background-subtle rounded-md">
                 <p className="text-body font-medium">Quick Actions</p>
                 <div className="mt-phi-1 space-y-phi-1">
-                  <button type="button" className="w-full text-left text-body-small hover:bg-background p-phi-1 rounded">
+                  <button
+                    type="button"
+                    className="w-full text-left text-body-small hover:bg-background p-phi-1 rounded"
+                  >
                     + New Project
                   </button>
-                  <button type="button" className="w-full text-left text-body-small hover:bg-background p-phi-1 rounded">
+                  <button
+                    type="button"
+                    className="w-full text-left text-body-small hover:bg-background p-phi-1 rounded"
+                  >
                     + Add Team Member
                   </button>
                 </div>
@@ -645,7 +675,7 @@ export const CognitiveEfficiencyIntelligence: Story = {
               </div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="recent" className="space-y-phi-2">
             <p className="text-body-small text-muted-foreground">Based on your activity</p>
             <div className="space-y-phi-1">
@@ -665,7 +695,7 @@ export const CognitiveEfficiencyIntelligence: Story = {
               </div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="favorites" className="space-y-phi-2">
             <p className="text-body-small text-muted-foreground">Your pinned items</p>
             <div className="space-y-phi-1">
@@ -683,12 +713,12 @@ export const CognitiveEfficiencyIntelligence: Story = {
               </div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="search" className="space-y-phi-2">
             <div className="p-phi-2 border border-border rounded-md">
-              <input 
-                type="text" 
-                placeholder="Search projects, files, people..." 
+              <input
+                type="text"
+                placeholder="Search projects, files, people..."
                 className="w-full text-body bg-transparent border-none outline-none"
               />
             </div>
@@ -697,7 +727,7 @@ export const CognitiveEfficiencyIntelligence: Story = {
             </div>
           </TabsContent>
         </Tabs>
-        
+
         <p className="text-body-small text-muted-foreground mt-phi-2">
           Intelligent shortcuts and contextual suggestions reduce cognitive overhead
         </p>

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Slider } from '../../../components/Slider';
 import { useState } from 'react';
+import { Slider } from '../../../components/Slider';
 
 const meta = {
   title: '03 Components/Forms/Slider/Intelligence',
@@ -19,7 +19,7 @@ export const MotorAccessibility: Story = {
   render: () => {
     const [volume, setVolume] = useState([75]);
     const [brightness, setBrightness] = useState([50]);
-    
+
     return (
       <div className="space-y-8 p-6 max-w-lg">
         <div>
@@ -28,12 +28,10 @@ export const MotorAccessibility: Story = {
             Larger thumb and track sizes improve manipulation for users with motor challenges
           </p>
         </div>
-        
+
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium mb-3">
-              Volume Control (Standard)
-            </label>
+            <label className="block text-sm font-medium mb-3">Volume Control (Standard)</label>
             <Slider
               value={volume}
               onValueChange={setVolume}
@@ -47,11 +45,9 @@ export const MotorAccessibility: Story = {
               Standard size with value display for precision
             </p>
           </div>
-          
+
           <div>
-            <label className="block text-sm font-medium mb-3">
-              Brightness Control (Enhanced)
-            </label>
+            <label className="block text-sm font-medium mb-3">Brightness Control (Enhanced)</label>
             <Slider
               value={brightness}
               onValueChange={setBrightness}
@@ -78,7 +74,7 @@ export const PrecisionControl: Story = {
   render: () => {
     const [temperature, setTemperature] = useState([72]);
     const [opacity, setOpacity] = useState([0.8]);
-    
+
     return (
       <div className="space-y-8 p-6 max-w-lg">
         <div>
@@ -87,12 +83,10 @@ export const PrecisionControl: Story = {
             Value labels and step indicators help users understand and control precise values
           </p>
         </div>
-        
+
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium mb-3">
-              Temperature Setting
-            </label>
+            <label className="block text-sm font-medium mb-3">Temperature Setting</label>
             <Slider
               value={temperature}
               onValueChange={setTemperature}
@@ -110,11 +104,9 @@ export const PrecisionControl: Story = {
               Step indicators show available values clearly
             </p>
           </div>
-          
+
           <div>
-            <label className="block text-sm font-medium mb-3">
-              Opacity Level
-            </label>
+            <label className="block text-sm font-medium mb-3">Opacity Level</label>
             <Slider
               value={opacity}
               onValueChange={setOpacity}
@@ -142,9 +134,9 @@ export const CognitiveLoadOptimization: Story = {
     const [budget, setBudget] = useState([2500]);
     const [duration, setDuration] = useState([30]);
     const [quality, setQuality] = useState([3]);
-    
+
     const qualityLabels = ['Low', 'Medium', 'High', 'Premium', 'Ultra'];
-    
+
     return (
       <div className="space-y-8 p-6 max-w-lg">
         <div>
@@ -153,12 +145,10 @@ export const CognitiveLoadOptimization: Story = {
             Clear labels, units, and ranges reduce cognitive load for complex settings
           </p>
         </div>
-        
+
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium mb-3">
-              Project Budget
-            </label>
+            <label className="block text-sm font-medium mb-3">Project Budget</label>
             <Slider
               value={budget}
               onValueChange={setBudget}
@@ -176,11 +166,9 @@ export const CognitiveLoadOptimization: Story = {
               <span>Maximum: $10,000</span>
             </div>
           </div>
-          
+
           <div>
-            <label className="block text-sm font-medium mb-3">
-              Project Duration
-            </label>
+            <label className="block text-sm font-medium mb-3">Project Duration</label>
             <Slider
               value={duration}
               onValueChange={setDuration}
@@ -197,11 +185,9 @@ export const CognitiveLoadOptimization: Story = {
               <span>~3 months</span>
             </div>
           </div>
-          
+
           <div>
-            <label className="block text-sm font-medium mb-3">
-              Quality Level
-            </label>
+            <label className="block text-sm font-medium mb-3">Quality Level</label>
             <Slider
               value={quality}
               onValueChange={setQuality}
@@ -215,17 +201,15 @@ export const CognitiveLoadOptimization: Story = {
             />
             <div className="flex justify-between text-xs text-gray-500 mt-2">
               {qualityLabels.map((label, index) => (
-                <span 
-                  key={label} 
+                <span
+                  key={label}
                   className={quality[0] === index ? 'font-medium text-gray-900' : ''}
                 >
                   {label}
                 </span>
               ))}
             </div>
-            <p className="text-xs text-gray-500 mt-2">
-              Current: {qualityLabels[quality[0]]}
-            </p>
+            <p className="text-xs text-gray-500 mt-2">Current: {qualityLabels[quality[0]]}</p>
           </div>
         </div>
       </div>

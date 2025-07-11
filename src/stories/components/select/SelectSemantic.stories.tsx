@@ -1,6 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/Select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../components/Select';
 
 /**
  * Semantic meaning creates understanding through context and purpose.
@@ -151,8 +157,7 @@ export const CategorySelection: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          'Category selections organize complex option sets into understandable groupings.',
+        story: 'Category selections organize complex option sets into understandable groupings.',
       },
     },
   },

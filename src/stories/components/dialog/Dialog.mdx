@@ -1,0 +1,59 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import * as Stories from './Dialog.stories.tsx';
+
+<Meta title="03 Components/Interaction/Dialog" of={Stories} name="Overview" />
+
+# Dialog
+Dialogs are used to display critical information, confirm user actions, or collect input while maintaining focus and context. A dialog creates a focused interaction space that temporarily overlays the main interface, demanding attention for important decisions or information. The component is built with trust-building patterns that reduce user anxiety during consequential moments.
+
+<Canvas of={Stories.Common} />
+
+## Usage Guidelines
+Dialogs should be used sparingly and only for truly important interactions that require user attention. The primary purpose is to create a focused space for critical decisions, confirmations, or essential information collection.
+
+#### DOs
+- **Dialog Purpose**
+  - Use for confirmations of destructive or irreversible actions
+  - Display critical information that requires immediate attention
+  - Collect essential information that blocks workflow continuation
+  - Provide progressive disclosure for complex multi-step processes
+- **Trust Building**
+  - Always include clear escape routes (close buttons, cancel options)
+  - Explain consequences of actions before confirmation
+  - Use appropriate trust levels for the sensitivity of the operation
+  - Provide visual hierarchy that matches the importance of the decision
+- **Content Structure**
+  - Use descriptive titles that clearly state the dialog's purpose
+  - Include helpful descriptions that explain what will happen
+  - Organize content to reduce cognitive load and decision fatigue
+  - Maintain consistent button placement and hierarchy
+
+#### DON'Ts
+- **Dialog Misuse**
+  - Don't use dialogs for non-critical information or notifications
+  - Avoid dialogs for simple confirmations that could be inline
+  - Don't stack multiple dialogs on top of each other
+  - Avoid dialogs that can be replaced with inline editing or immediate feedback
+- **Trust Violations**
+  - Never trap users without clear escape routes
+  - Don't use misleading or unclear action labels
+  - Avoid hiding important consequences or side effects
+  - Don't use destructive actions without appropriate confirmation patterns
+- **Accessibility Violations**
+  - Don't break keyboard navigation or focus management
+  - Avoid insufficient color contrast or touch target sizes
+  - Don't rely solely on color to convey important information
+  - Never ignore screen reader accessibility requirements
+
+#### Use Cases
+- **Confirmation Dialogs**: Delete account, cancel subscription, publish content
+- **Trust-Building Operations**: Payment processing, data export, account linking
+- **Progressive Disclosure**: Multi-step wizards, complex form sections
+- **Critical Alerts**: System errors, security warnings, data loss prevention
+- **Information Collection**: Settings configuration, preference updates, feedback forms
+
+#### Trust Levels
+- **Low**: Simple confirmations, non-destructive actions, preference changes
+- **Medium**: Content publishing, data modifications, account changes
+- **High**: Payment processing, sensitive data access, subscription changes
+- **Critical**: Account deletion, data destruction, security-sensitive operations

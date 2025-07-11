@@ -1,10 +1,14 @@
-# Storybook Coding Standards for Rafters
+# Storybook Standards for Rafters Design System
 
 ## Overview
 
-This document establishes the coding standards and rules for creating Storybook stories in the Rafters design system. We use a **multi-file story architecture** that separates concerns into focused, single-purpose story files for comprehensive component documentation.
+This document establishes the standards for creating Storybook stories in the Rafters design system. Stories serve **dual purposes**: comprehensive documentation AND automatic test cases via Vitest integration.
 
-**Critical Rule: Stories must dogfood our design system.** All documentation examples should demonstrate proper usage of our semantic color tokens, spacing scale, and typography system rather than arbitrary colors or outdated defaults.
+**Critical Requirements:**
+1. **Stories are Tests** - All stories run as tests via `@storybook/addon-vitest`
+2. **Intelligence Integration** - Every component includes design intelligence patterns
+3. **Semantic Token Usage** - All examples must use design system tokens, never arbitrary values
+4. **Accessibility Focus** - WCAG AAA compliance demonstrated in stories
 
 ## Design System Dogfooding Standards
 
@@ -65,48 +69,71 @@ className="text-muted-foreground bg-accent/10 border-warning"
 
 This approach ensures our documentation teaches proper design system habits while providing consistent, meaningful color usage throughout all examples.
 
-## Story Architecture Pattern
+## Current File Structure
 
-### Multi-File Component Stories
+### Story Organization
 
-Components with significant complexity use **five dedicated story files** to provide comprehensive documentation:
+Stories are organized by category with component-specific subdirectories:
 
-1. **`ComponentName.stories.tsx`** - Main story with core variants
-2. **`ComponentNameVariants.stories.tsx`** - Visual styling variants  
-3. **`ComponentNameProperties.stories.tsx`** - Interactive properties and states
-4. **`ComponentNameSemantic.stories.tsx`** - Semantic usage patterns
-5. **`ComponentNameAccessibility.stories.tsx`** - Accessibility demonstrations
-
-### File Organization Structure
 ```
 src/stories/
-├── Button.stories.tsx              # Main button story
-├── ButtonVariants.stories.tsx      # Visual variants (outline, ghost, etc)
-├── ButtonProperties.stories.tsx    # Interactive properties (size, disabled, etc)
-├── ButtonSemantic.stories.tsx      # Semantic variants (destructive, success, etc)
-└── ButtonAccessibility.stories.tsx # Accessibility patterns
+├── foundation/                          # Design system foundations
+│   ├── Colors.stories.tsx              # Color system documentation
+│   ├── Typography.stories.tsx          # Typography scale & patterns
+│   ├── LayoutSystem.stories.tsx        # Spacing & layout principles
+│   └── Tokens.stories.tsx              # Design token reference
+└── components/                          # Component documentation
+    ├── button/
+    │   ├── Button.stories.tsx           # Main component story
+    │   ├── ButtonIntelligence.stories.tsx  # 🧠 Design intelligence patterns
+    │   ├── ButtonVariants.stories.tsx   # Visual styling variants
+    │   ├── ButtonProperties.stories.tsx # Interactive properties/states
+    │   ├── ButtonSemantic.stories.tsx   # Semantic usage patterns
+    │   └── ButtonAccessibility.stories.tsx # Accessibility demonstrations
+    ├── select/
+    │   ├── SelectIntelligence.stories.tsx
+    │   ├── SelectVariants.stories.tsx
+    │   └── ...
+    └── ...
 ```
+
+### Intelligence-First Architecture
+
+Every component includes a dedicated **`ComponentIntelligence.stories.tsx`** file that demonstrates:
+- Cognitive load principles
+- Attention hierarchy patterns  
+- Trust-building interactions
+- Semantic meaning through design
 
 ### Title Hierarchy Convention
 
-All story files follow a consistent hierarchy pattern:
+Stories follow a three-tier hierarchy pattern:
 
 ```typescript
-// Main component story
-title: '03 Components/Category/ComponentName'
+// Foundation stories
+title: '01 Identity/Colors'
+title: '01 Identity/Typography'
+title: '01 Identity/Layout System'
 
-// Variant story files  
-title: '03 Components/Category/ComponentName/Visual Variants'
-title: '03 Components/Category/ComponentName/Properties & States'
-title: '03 Components/Category/ComponentName/Semantic Variants'
-title: '03 Components/Category/ComponentName/Accessibility'
+// Component main story  
+title: '03 Components/Action/Button'
+title: '03 Components/Input/Select'
+title: '03 Components/Display/Card'
+
+// Component substories
+title: '03 Components/Action/Button/Intelligence'
+title: '03 Components/Action/Button/Variants'
+title: '03 Components/Action/Button/Properties'
+title: '03 Components/Action/Button/Semantic'
+title: '03 Components/Action/Button/Accessibility'
 ```
 
-**Categories include:**
+**Component Categories:**
 - `Action` - Interactive elements (Button, Link)
 - `Input` - Form controls (Input, Select, Slider)
-- `Display` - Content presentation (Card, Badge)
+- `Display` - Content presentation (Card, Badge)  
 - `Layout` - Structural components (Container, Grid)
+- `Navigation` - Navigation components (Tabs, Breadcrumb)
 
 ## File Structure & Naming
 
@@ -116,150 +143,202 @@ title: '03 Components/Category/ComponentName/Accessibility'
 
 ### Import Standards
 ```typescript
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from 'storybook/test';
-import { ComponentName } from '../components/ComponentName';
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { fn } from 'storybook/test'
+import { Button } from '../../../components/Button'
 ```
+
+**Path Patterns:**
+- Foundation stories: No component imports needed
+- Component stories: Relative paths from story to component
+- Test functions: Always import `fn` from `storybook/test` for interactive props
 
 ## Story Configuration
 
 ### Meta Configuration Template
 
-#### Autodocs Warning
+#### Foundation Stories
 
-**IMPORTANT: Avoid using `tags: ['autodocs']` for Identity/Design System pages.** 
-
-Autodocs automatically generates documentation content that duplicates the custom educational content in our stories, creating poor UX with repeated information. Our Identity pages (Colors, Typography, Layout System, etc.) use carefully crafted custom content that should be the only documentation presented.
+Foundation stories document design system principles with custom educational content:
 
 ```typescript
-// ❌ DON'T USE - Creates duplicate content
+/**
+ * Colors communicate meaning before words are read. Our color system prioritizes
+ * accessibility and semantic clarity over decorative appeal.
+ */
 const meta = {
-  title: '01 Identity/Layout System',
-  parameters: { layout: 'fullscreen' },
-  tags: ['autodocs'], // This duplicates story content
-} satisfies Meta;
-
-// ✅ CORRECT - Clean educational content only
-const meta = {
-  title: '01 Identity/Layout System', 
-  parameters: { layout: 'fullscreen' },
-} satisfies Meta;
+  title: '01 Identity/Colors',
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        component: 'The foundational color system built on semantic tokens and accessibility-first principles.',
+      },
+    },
+  },
+} satisfies Meta
 ```
 
-#### Main Component Story
+#### Component Stories
+
+Main component stories include comprehensive documentation and testing setup:
+
 ```typescript
+/**
+ * Every interaction begins with intent. The button is where user intention meets interface response.
+ * Our button system is built on the principle that clarity of purpose should be immediately apparent.
+ */
 const meta = {
-  title: '03 Components/Category/ComponentName',
-  component: ComponentName,
+  title: '03 Components/Action/Button',
+  component: Button,
+  tags: ['!autodocs', '!dev', 'test'], // Vitest integration
   parameters: {
     layout: 'centered',
     docs: {
       description: {
-        component: 'The foundational description that establishes component purpose and design philosophy.',
+        component: 'The foundational interactive element with embedded design intelligence.',
       },
     },
   },
   argTypes: {
-    // Define controls for all public props
     variant: {
       control: 'select',
-      options: ['default', 'outline', 'ghost', 'link'],
-      description: 'Visual styling variant of the component',
+      options: ['primary', 'secondary', 'destructive', 'outline', 'ghost'],
+      description: 'Visual style variant using semantic tokens',
     },
-    size: {
-      control: 'select', 
-      options: ['default', 'sm', 'lg', 'icon'],
-      description: 'Size variant for different contexts',
-    },
-    disabled: {
-      control: 'boolean',
-      description: 'Whether the component is disabled',
+    onClick: {
+      description: 'Click handler - required for interactive testing',
     },
   },
-  args: { onClick: fn() }, // For interactive props
-} satisfies Meta<typeof ComponentName>;
+  args: { onClick: fn() }, // CRITICAL for Vitest story testing
+} satisfies Meta<typeof Button>
 ```
 
-#### Variant Story Files
+#### Substory Files
+
+Intelligence, Variant, Properties, Semantic, and Accessibility stories use simplified meta:
+
 ```typescript
 const meta = {
-  title: '03 Components/Category/ComponentName/Visual Variants',
-  component: ComponentName,
+  title: '03 Components/Action/Button/Intelligence',
+  component: Button,
   parameters: {
     layout: 'centered',
-    docs: {
-      description: {
-        component: 'Focused description of the specific aspect covered by this story file.',
-      },
-    },
   },
-  // Minimal argTypes - only relevant to this specific aspect
-  argTypes: {
-    variant: {
-      control: 'select',
-      options: ['default', 'outline', 'ghost', 'link'],
-    },
-  },
-} satisfies Meta<typeof ComponentName>;
+} satisfies Meta<typeof Button>
 ```
 
-## Story Purpose & Content
+#### Critical Tags Configuration
 
-### Main Component Story (`ComponentName.stories.tsx`)
-**Purpose:** Primary documentation and core use cases
+**Required tags for component stories:**
+- `['!autodocs', '!dev', 'test']` - Excludes autodocs, marks for Vitest testing
+
+**Required args for interactive components:**
+- `args: { onClick: fn() }` - Enables proper event testing in Vitest
+
+## Story Types & Content
+
+### Main Component Story (`Button.stories.tsx`)
+**Purpose:** Core component documentation with all variants
 **Content:**
-- Default/Primary story showcasing most common usage
-- Key variants that represent different use cases
-- Comprehensive argTypes for all component props
-- Design philosophy and usage principles in JSDoc
+- Philosophy JSDoc explaining design principles
+- Comprehensive argTypes for all props
+- Common variants demonstration
+- Complete testing setup with `fn()` handlers
 
-**Example stories:** Default, Primary, Secondary, Large, Small
+**Example stories:** `Common` - Shows all variants in one view
 
-### Visual Variants (`ComponentNameVariants.stories.tsx`)
-**Purpose:** Showcase all visual styling options
+### Intelligence Story (`ButtonIntelligence.stories.tsx`) 🧠
+**Purpose:** Design intelligence patterns and cognitive load principles
 **Content:**
-- All available `variant` prop values
-- Visual styling demonstrations
-- Style-focused argTypes only
-- Minimal interactivity
+- Loading states with proper UX patterns
+- Destructive confirmation patterns  
+- Attention hierarchy demonstrations
+- Trust-building interaction examples
 
-**Example stories:** Default, Outline, Ghost, Link, AllVariants
+**Example stories:** `LoadingState`, `DestructiveConfirm`, `AttentionHierarchy`
 
-### Properties & States (`ComponentNameProperties.stories.tsx`)
+### Variants Story (`ButtonVariants.stories.tsx`)
+**Purpose:** Visual styling variants and semantic meaning
+**Content:**
+- All `variant` prop values
+- Visual hierarchy demonstration
+- Semantic color token usage
+- Style-focused examples
+
+### Properties Story (`ButtonProperties.stories.tsx`)
 **Purpose:** Interactive properties and component states
 **Content:**
-- Size variations
+- Size variations (`sm`, `md`, `lg`)
 - Disabled states
-- Loading states
-- Interactive demonstrations
-- Property-focused argTypes
+- Interactive property demonstrations
+- State management examples
 
-**Example stories:** Sizes, Disabled, Loading, WithIcon, Interactive
-
-### Semantic Variants (`ComponentNameSemantic.stories.tsx`)
-**Purpose:** Semantic meaning and context-aware usage
+### Semantic Story (`ButtonSemantic.stories.tsx`) 
+**Purpose:** Semantic variants and contextual usage
 **Content:**
-- Destructive actions
-- Success states
-- Warning states
-- Contextual usage patterns
-- Semantic token integration
+- Success, Warning, Info, Destructive states
+- Context-appropriate usage examples
+- Semantic token demonstrations
+- Meaning-driven design patterns
 
-**Example stories:** Destructive, Success, Warning, Info
-
-### Accessibility (`ComponentNameAccessibility.stories.tsx`)
-**Purpose:** Accessibility patterns and WCAG compliance
+### Accessibility Story (`ButtonAccessibility.stories.tsx`)
+**Purpose:** WCAG AAA compliance and inclusive design
 **Content:**
-- ARIA properties demonstrations
-- Keyboard navigation examples
-- Screen reader considerations
-- Color contrast verification
+- ARIA properties and labels
+- Keyboard navigation patterns
+- Screen reader compatibility
 - Focus management
+- Color contrast demonstrations
 
-**Example stories:** AriaLabels, KeyboardNavigation, ScreenReader, ColorContrast
+## Testing Integration with Vitest
 
-## Required Documentation
-## Required Documentation
+### Automatic Story Testing
+
+**All stories are automatically tested** via `@storybook/addon-vitest`:
+
+```bash
+pnpm test              # Runs all tests including stories
+pnpm test-storybook    # Runs story-specific tests
+pnpm vitest run        # CI test runner
+```
+
+### Story Testing Requirements
+
+**Stories must be functional, not just documentation:**
+
+1. **Interactive props must work** - Use `fn()` for click handlers
+2. **Stories must render without errors** in browser environment  
+3. **No broken imports or missing dependencies**
+4. **Valid JSX and TypeScript** - stories are compiled and executed
+
+```typescript
+// ✅ CORRECT - Testable story
+export const Primary: Story = {
+  args: {
+    variant: 'primary',
+    children: 'Click me',
+    onClick: fn(), // Required for testing
+  },
+}
+
+// ❌ INCORRECT - Non-functional story
+export const Broken: Story = {
+  args: {
+    variant: 'primary',
+    onClick: undefined, // No handler - test will fail
+  },
+}
+```
+
+### Story Testing Benefits
+
+- **Quality assurance** - Stories that don't work break tests
+- **Regression prevention** - Component changes caught in story tests  
+- **Documentation accuracy** - Examples must actually function
+- **Accessibility verification** - A11y addon runs on all stories
+
+## Documentation Standards
 
 ### JSDoc Standards
 1. **Component-level JSDoc** with:
@@ -563,29 +642,49 @@ export const Default: Story = {
 
 ## Quality Checklist
 
-Before submitting a story, verify:
+Before committing story changes, verify:
 
-- [ ] Uses correct file extension (.tsx for JSX)
-- [ ] Imports from correct component path
-- [ ] Includes comprehensive JSDoc documentation
-- [ ] Covers all variants and states
-- [ ] Has descriptive story names and descriptions
-- [ ] Uses semantic token language in descriptions
-- [ ] Includes accessibility considerations and stories
-- [ ] Documents ARIA properties in argTypes
-- [ ] Includes AccessibilityBasics story
-- [ ] Includes KeyboardNavigation story  
-- [ ] Includes ColorContrastDemo story
-- [ ] Compiles without errors
-- [ ] Passes all tests
-- [ ] Passes a11y checks
-- [ ] Renders correctly in Storybook
-- [ ] Follows naming conventions
-- [ ] Uses `fn()` for interactive props
-- [ ] Meets WCAG 2.1 AA contrast requirements
-- [ ] Supports keyboard navigation
-- [ ] Has visible focus indicators
+### File Structure & Imports
+- [ ] Uses `.tsx` extension for JSX content
+- [ ] Correct relative import paths (`../../../components/Button`)
+- [ ] Imports `fn` from `storybook/test` for interactive props
+- [ ] Follows proper title hierarchy (`03 Components/Action/Button`)
 
-## Next Steps
+### Story Content & Testing
+- [ ] Includes comprehensive JSDoc with design philosophy
+- [ ] Uses semantic tokens (never arbitrary colors)
+- [ ] Interactive stories include `onClick: fn()` in args
+- [ ] Stories render without errors in Vitest
+- [ ] Covers intelligence patterns specific to component
+- [ ] Documents accessibility features and ARIA properties
 
-This Button story template establishes the foundation for all future component stories. When creating stories for Input, Select, Slider, Card, Label, and Tabs components, follow this exact pattern and structure.
+### Design System Compliance
+- [ ] Examples use semantic color tokens (`text-primary`, not `text-blue-500`)
+- [ ] Stories demonstrate proper semantic meaning
+- [ ] Accessibility patterns follow WCAG AAA standards
+- [ ] Intelligence stories show cognitive load considerations
+
+### Technical Requirements
+- [ ] Compiles without TypeScript errors
+- [ ] Passes Vitest story tests (`pnpm test-storybook`)
+- [ ] Passes accessibility addon checks
+- [ ] Uses proper component categories and naming conventions
+- [ ] Main story includes `tags: ['!autodocs', '!dev', 'test']`
+
+## Story Development Summary
+
+**Our Storybook serves dual purposes:**
+1. **Documentation** - Teaching design intelligence and proper component usage
+2. **Testing** - Automated quality assurance via Vitest integration
+
+**Key Principles:**
+- **Intelligence-First** - Every component includes dedicated intelligence patterns
+- **Semantic Tokens Only** - No arbitrary colors or values in examples
+- **Functional Stories** - All stories must work as tests, not just documentation
+- **Accessibility Focus** - WCAG AAA compliance demonstrated in dedicated stories
+
+**File Organization:**
+- Foundation stories document design system principles
+- Component stories organized by category and type
+- Intelligence stories show cognitive load and attention hierarchy
+- All stories contribute to the component's educational value for AI agents

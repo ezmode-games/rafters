@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Label } from '../../../components/Label';
 import { Input } from '../../../components/Input';
+import { Label } from '../../../components/Label';
 
 const meta = {
   title: '03 Components/Form/Label/Intelligence',
@@ -30,15 +30,19 @@ export const SemanticHierarchy: Story = {
   render: () => (
     <>
       <h3>Importance-Based Visual Hierarchy</h3>
-      
+
       <div className="space-y-4 w-80">
         <div>
-          <Label importance="critical" required>Critical Information</Label>
+          <Label importance="critical" required>
+            Critical Information
+          </Label>
           <Input placeholder="Required for account security" />
         </div>
 
         <div>
-          <Label importance="standard" required>Standard Field</Label>
+          <Label importance="standard" required>
+            Standard Field
+          </Label>
           <Input placeholder="Standard required field" />
         </div>
 
@@ -47,7 +51,7 @@ export const SemanticHierarchy: Story = {
           <Input placeholder="Nice to have information" />
         </div>
       </div>
-      
+
       <p>Visual weight matches functional importance, guiding user attention naturally</p>
     </>
   ),
@@ -63,12 +67,12 @@ export const FormGuidance: Story = {
   render: () => (
     <>
       <h3>Contextual Guidance Patterns</h3>
-      
+
       <div className="space-y-4 w-80">
         <div>
-          <Label 
-            importance="critical" 
-            required 
+          <Label
+            importance="critical"
+            required
             helpText="We use this to verify your identity and protect your account"
           >
             Email Address
@@ -77,38 +81,30 @@ export const FormGuidance: Story = {
         </div>
 
         <div>
-          <Label 
-            validationState="warning"
-            helpText="Password strength could be improved"
-          >
+          <Label validationState="warning" helpText="Password strength could be improved">
             Password
           </Label>
           <Input type="password" placeholder="Enter password" />
         </div>
 
         <div>
-          <Label 
-            validationState="success"
-            helpText="Perfect! This username is available"
-          >
+          <Label validationState="success" helpText="Perfect! This username is available">
             Username
           </Label>
           <Input placeholder="Choose a unique username" />
         </div>
 
         <div>
-          <Label 
-            validationState="error"
-            helpText="This field is required to continue"
-            required
-          >
+          <Label validationState="error" helpText="This field is required to continue" required>
             Confirmation
           </Label>
           <Input placeholder="Please confirm your choice" />
         </div>
       </div>
-      
-      <p>Guidance text adapts to validation states, providing helpful context without overwhelming</p>
+
+      <p>
+        Guidance text adapts to validation states, providing helpful context without overwhelming
+      </p>
     </>
   ),
 };
@@ -123,14 +119,18 @@ export const ContextAwareness: Story = {
   render: () => (
     <>
       <h3>Context-Specific Behavior</h3>
-      
+
       <div className="space-y-6">
         <div className="space-y-2">
           <h4>Form Context</h4>
           <div className="space-y-2 w-80">
-            <Label context="form" required>Form Field Label</Label>
+            <Label context="form" required>
+              Form Field Label
+            </Label>
             <Input placeholder="Interactive form input" />
-            <p className="text-xs text-muted-foreground">Optimized for form interaction and accessibility</p>
+            <p className="text-xs text-muted-foreground">
+              Optimized for form interaction and accessibility
+            </p>
           </div>
         </div>
 
@@ -139,7 +139,9 @@ export const ContextAwareness: Story = {
           <div className="space-y-2">
             <Label context="descriptive">Data Description</Label>
             <p className="text-sm">This label describes static content or read-only information</p>
-            <p className="text-xs text-muted-foreground">Used for content organization and information hierarchy</p>
+            <p className="text-xs text-muted-foreground">
+              Used for content organization and information hierarchy
+            </p>
           </div>
         </div>
 
@@ -148,7 +150,9 @@ export const ContextAwareness: Story = {
           <div className="space-y-2">
             <Label context="action">Interactive Label</Label>
             <p className="text-sm">This label can trigger actions or navigation</p>
-            <p className="text-xs text-muted-foreground">Includes hover states and interactive affordances</p>
+            <p className="text-xs text-muted-foreground">
+              Includes hover states and interactive affordances
+            </p>
           </div>
         </div>
       </div>
@@ -166,10 +170,10 @@ export const AccessibilityExcellence: Story = {
   render: () => (
     <>
       <h3>Comprehensive Accessibility</h3>
-      
+
       <div className="space-y-4 w-80">
         <div>
-          <Label 
+          <Label
             htmlFor="accessible-input"
             importance="critical"
             required
@@ -177,16 +181,16 @@ export const AccessibilityExcellence: Story = {
           >
             Email Address
           </Label>
-          <Input 
+          <Input
             id="accessible-input"
-            type="email" 
+            type="email"
             aria-describedby="email-help"
-            placeholder="your@email.com" 
+            placeholder="your@email.com"
           />
         </div>
 
         <div>
-          <Label 
+          <Label
             htmlFor="validation-input"
             validationState="error"
             helpText="Error state uses assertive aria-live for immediate announcement"
@@ -194,7 +198,7 @@ export const AccessibilityExcellence: Story = {
           >
             Password
           </Label>
-          <Input 
+          <Input
             id="validation-input"
             type="password"
             aria-invalid="true"
@@ -203,21 +207,17 @@ export const AccessibilityExcellence: Story = {
         </div>
 
         <div>
-          <Label 
+          <Label
             htmlFor="optional-input"
             importance="optional"
             helpText="Optional fields are clearly marked to reduce cognitive load"
           >
             Phone Number
           </Label>
-          <Input 
-            id="optional-input"
-            type="tel"
-            placeholder="Optional contact method"
-          />
+          <Input id="optional-input" type="tel" placeholder="Optional contact method" />
         </div>
       </div>
-      
+
       <p>Proper semantic markup and ARIA attributes ensure perfect screen reader support</p>
     </>
   ),
