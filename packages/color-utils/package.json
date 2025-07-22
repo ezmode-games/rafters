@@ -1,0 +1,33 @@
+{
+  "name": "@rafters/color-utils",
+  "version": "0.1.0",
+  "description": "OKLCH color utilities, accessibility calculations, and color vision simulation for Rafters",
+  "type": "module",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.2",
+    "vitest": "^3.2.3"
+  },
+  "dependencies": {
+    "@rafters/shared": "workspace:*"
+  }
+}

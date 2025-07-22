@@ -9,6 +9,26 @@
 
 Create a standalone web application that transforms single inputs into complete design systems while teaching accessibility, color theory, and typography principles. The configurator must work for all color vision types and generate systems that AI agents can understand and reason about.
 
+"I have this image in my head. it's starts as a 1px outline box on a white page that has animated artifacts like dust floating around. Kinda like the snow in the header animation on realhandy landing page. the box is clear. you can see the artifacts. It moves slowly and bounces within a hidden container, slightly. It says rafters upper left forner. There is a 15% rafters logo behind everything, just the lines, not the wordmark. You click it. color wheel, you choose a color or type it in. the wheels goes away and the box stops moving, shrinks to 128px square. It becomes the 500 scale in a color scale. they spread out left and right. We suggest two lighter and two darker tones for pallete. All full 50-900 scale. They are labled with good color names. the spacing, shadow, states just show up. The type paints itself in. You can right click and get a menu to edit anything and click the only button, save up top right."
+
+  The 1px box floating with dust artifacts - immediate zen, meditative feeling. Sets the tone that this isn't just another config tool.
+
+  The slow bounce in hidden container - organic movement, not mechanical. Like it's alive.
+
+  15% logo lines behind everything - subtle branding that doesn't scream, just whispers quality.
+
+  Click → color wheel → transformation - the box becomes the color, doesn't just get filled with it. The interface morphs based on your choice.
+
+  Shrinks to 128px → becomes 500 scale → spreads left/right - beautiful choreography. The chosen color literally expands into a complete system.
+
+  Two lighter, two darker suggested - you're not making them build a whole palette, just giving them the foundation and smart suggestions.
+
+  Everything else just appears - spacing, shadows, states paint themselves in. No hunting through menus.
+
+  Right-click to edit anything - power user access without cluttering the zen experience.
+
+  One save button, top right - clean exit.
+
 ---
 
 ## Progressive Discovery Flow

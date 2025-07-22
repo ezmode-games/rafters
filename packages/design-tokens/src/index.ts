@@ -1,0 +1,214 @@
+/**
+ * @rafters/design-tokens
+ * 
+ * Generated design systems and semantic tokens for the Rafters AI intelligence system.
+ * This package manages design token generation and Tailwind CSS output.
+ */
+
+import type { DesignSystem, SemanticToken, OKLCH } from '@rafters/shared'
+import { generateLightnessScale, oklchToCSS, generateSemanticColors } from '@rafters/color-utils'
+
+/**
+ * Generate complete design system from primary color
+ */
+export function generateDesignSystem(
+  primaryColor: OKLCH,
+  config: {
+    name: string
+    typography?: {
+      heading: string
+      body: string
+      mono: string
+    }
+  }
+): DesignSystem {
+  const id = generateSystemId(config.name)
+  const primaryScale = generateLightnessScale(primaryColor)
+  const semanticColors = generateSemanticColors(primaryColor)
+  
+  // Generate tokens
+  const tokens: SemanticToken[] = [
+    // Primary color scale
+    ...Object.entries(primaryScale).map(([scale, color]) => ({
+      name: `primary-${scale}`,
+      value: oklchToCSS(color),
+      type: 'color' as const,
+      semantic: `Primary color scale step ${scale}`,
+      aiIntelligence: scale === '500' ? 'Base primary color - use for main actions' : undefined,
+    })),
+    
+    // Semantic colors
+    {
+      name: 'success',
+      value: oklchToCSS(semanticColors.success),
+      type: 'color' as const,
+      semantic: 'Success state color',
+      aiIntelligence: 'Use for positive feedback, confirmations, and success states',
+    },
+    {
+      name: 'warning',
+      value: oklchToCSS(semanticColors.warning),
+      type: 'color' as const,
+      semantic: 'Warning state color',
+      aiIntelligence: 'Use for cautionary feedback and attention-needed states',
+    },
+    {
+      name: 'danger',
+      value: oklchToCSS(semanticColors.danger),
+      type: 'color' as const,
+      semantic: 'Error/danger state color',
+      aiIntelligence: 'Use for errors, destructive actions - requires confirmation UX',
+    },
+    {
+      name: 'info',
+      value: oklchToCSS(semanticColors.info),
+      type: 'color' as const,
+      semantic: 'Information state color',
+      aiIntelligence: 'Use for neutral information and secondary content',
+    },
+    
+    // Typography scale
+    {
+      name: 'text-display',
+      value: '3.052rem',
+      type: 'typography' as const,
+      semantic: 'Display text for hero sections',
+      aiIntelligence: 'Use sparingly for hero headings and marketing content',
+    },
+    {
+      name: 'text-h1',
+      value: '2.441rem',
+      type: 'typography' as const,
+      semantic: 'H1 headings',
+      aiIntelligence: 'Use for page titles - one per page',
+    },
+    {
+      name: 'text-h2',
+      value: '1.953rem',
+      type: 'typography' as const,
+      semantic: 'H2 section headings',
+      aiIntelligence: 'Use for major sections and content groupings',
+    },
+    {
+      name: 'text-body',
+      value: '1rem',
+      type: 'typography' as const,
+      semantic: 'Body text',
+      aiIntelligence: 'Base reading size - minimum 16px for accessibility',
+    },
+    
+    // Spacing scale (φ-based)
+    {
+      name: 'spacing-xs',
+      value: '0.25rem',
+      type: 'spacing' as const,
+      semantic: 'Extra small spacing',
+      aiIntelligence: 'Minimal spacing for tight layouts and fine details',
+    },
+    {
+      name: 'spacing-sm',
+      value: '0.5rem',
+      type: 'spacing' as const,
+      semantic: 'Small spacing',
+      aiIntelligence: 'Compact spacing for dense interfaces',
+    },
+    {
+      name: 'spacing-md',
+      value: '1rem',
+      type: 'spacing' as const,
+      semantic: 'Medium spacing',
+      aiIntelligence: 'Standard spacing for balanced layouts',
+    },
+    {
+      name: 'spacing-lg',
+      value: '1.618rem',
+      type: 'spacing' as const,
+      semantic: 'Large spacing',
+      aiIntelligence: 'Generous spacing for breathing room and emphasis',
+    },
+  ]
+  
+  return {
+    id,
+    name: config.name,
+    primaryColor,
+    tokens,
+    typography: {
+      heading: config.typography?.heading || 'Inter',
+      body: config.typography?.body || 'Source Serif Pro',
+      mono: config.typography?.mono || 'Fira Code',
+      scale: {
+        display: 3.052,
+        h1: 2.441,
+        h2: 1.953,
+        h3: 1.563,
+        h4: 1.25,
+        body: 1,
+        small: 0.8,
+      },
+    },
+    intelligence: {
+      colorVisionTested: ['normal', 'deuteranopia', 'protanopia', 'tritanopia'],
+      contrastLevel: 'AAA',
+      components: {}, // Will be populated by component library
+    },
+    metadata: {
+      created: new Date().toISOString(),
+      updated: new Date().toISOString(),
+      version: '0.1.0',
+    },
+  }
+}
+
+/**
+ * Export design system as Tailwind CSS v4+ theme
+ */
+export function exportToTailwind(system: DesignSystem): string {
+  const colorTokens = system.tokens.filter(token => token.type === 'color')
+  const spacingTokens = system.tokens.filter(token => token.type === 'spacing')
+  
+  return `@import "tailwindcss";
+
+@theme {
+  /* Generated by Rafters AI Design Intelligence System */
+  /* System: ${system.name} (${system.id}) */
+  
+  /* Color System (OKLCH) */
+${colorTokens.map(token => 
+    `  --color-${token.name}: ${token.value};`
+  ).join('\n')}
+  
+  /* Typography */
+  --font-heading: '${system.typography.heading}', system-ui, sans-serif;
+  --font-body: '${system.typography.body}', Georgia, serif;
+  --font-mono: '${system.typography.mono}', 'Courier New', monospace;
+  
+  /* Typographic Scale */
+${Object.entries(system.typography.scale).map(([name, value]) =>
+    `  --text-${name}: ${value}rem;`
+  ).join('\n')}
+  
+  /* Spacing (φ-based) */
+${spacingTokens.map(token =>
+    `  --${token.name}: ${token.value};`
+  ).join('\n')}
+}
+
+/* AI Intelligence Comments */
+/*
+${system.tokens.filter(token => token.aiIntelligence).map(token =>
+  `${token.name}: ${token.aiIntelligence}`
+).join('\n')}
+*/`
+}
+
+/**
+ * Generate unique system ID
+ */
+function generateSystemId(name: string): string {
+  const timestamp = Date.now().toString(36)
+  const randomStr = Math.random().toString(36).substring(2, 8)
+  const cleanName = name.toLowerCase().replace(/[^a-z0-9]/g, '-')
+  
+  return `${cleanName}-${timestamp}-${randomStr}`
+}

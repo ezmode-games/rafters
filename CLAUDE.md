@@ -1,14 +1,16 @@
 # Claude AI Assistant Instructions for Rafters
 
-## Project Overview
+## AI-First Design Intelligence System
 
-Rafters is a React component library with **embedded design intelligence** built for AI development. We use a **shadcn-style approach** where components are installed as source code with three layers of intelligence:
+**Rafters is a design intelligence system for AI agents.** Components are the delivery mechanism for encoded human design reasoning. This system exists to make AI agents better at design decisions through systematic constraints and machine-readable design knowledge.
 
-1. **Component Comments** - Essential patterns in JSX comments
-2. **Component Manifest** - Machine-readable intelligence data  
-3. **Intelligence Stories** - Complete design education in Storybook
+**This is NOT a human-facing component library.** This is an AI reasoning system that teaches design intelligence through:
 
-**Key Architecture**: Source code ownership, OKLCH color systems, accessibility-first design, and systematic constraints that prevent design violations.
+1. **Component Comments** - Design reasoning embedded in JSX comments for AI parsing
+2. **Component Manifest** - Machine-readable intelligence data for systematic decision-making  
+3. **Intelligence Stories** - Comprehensive training scenarios for AI design education
+
+**Core Purpose**: Prevent AI agents from making bad design choices by encoding human design judgment in consumable formats. Components use shadcn-style source code ownership with OKLCH color systems, accessibility-first design, and systematic constraints.
 
 ## Critical Development Standards
 
@@ -26,12 +28,12 @@ See [CODING_STANDARDS.md](./CODING_STANDARDS.md) for complete requirements.
 
 ### Testing Requirements with Vitest
 
-**All Storybook stories are tested with Vitest** through `@storybook/addon-vitest`. This means:
+**All Storybook stories are tested with Vitest** through `@storybook/addon-vitest`. Stories are AI training data that must function correctly:
 
-- **Stories MUST be complete and functional** - they're not just documentation
-- **Every story becomes a test case** automatically
-- **Stories must render without errors** in browser environment
-- **Interactive stories must work** with real event handlers
+- **Stories are AI training scenarios** - not just documentation but behavior examples
+- **Every story becomes a test case** - ensuring AI guidance actually works
+- **Stories must render without errors** - broken training data corrupts AI learning
+- **Interactive stories must work** - AI needs real behavior patterns to learn from
 
 **Test commands:**
 ```bash
@@ -76,37 +78,39 @@ pre-commit:
 - Code formatting must be consistent
 - No linting violations allowed
 
-## Storybook Standards
+## AI Training Standards (Storybook)
 
-### Multi-File Story Architecture
+### Multi-File Training Architecture
 
-**For complex components, use 5 dedicated story files:**
+**Complex components require 5 dedicated training files for comprehensive AI education:**
 
-1. `ComponentName.stories.tsx` - Main story with core variants
-2. `ComponentNameVariants.stories.tsx` - Visual styling variants
-3. `ComponentNameProperties.stories.tsx` - Interactive properties/states
-4. `ComponentNameSemantic.stories.tsx` - Semantic usage patterns
-5. `ComponentNameAccessibility.stories.tsx` - Accessibility demonstrations
+1. `ComponentName.stories.tsx` - Core behavioral patterns for AI learning
+2. `ComponentNameVariants.stories.tsx` - Visual decision training scenarios
+3. `ComponentNameProperties.stories.tsx` - Interactive state training examples
+4. `ComponentNameSemantic.stories.tsx` - Contextual usage pattern training
+5. `ComponentNameAccessibility.stories.tsx` - Accessibility constraint training
 
-### Story Requirements
+### AI Training Requirements
 
-**Every story MUST:**
-- Use `.tsx` extension (contains JSX)
-- Import `fn()` for interactive props: `import { fn } from 'storybook/test'`
-- Include comprehensive JSDoc documentation
-- Use semantic design tokens (not arbitrary colors)
-- Pass accessibility checks
-- Render and function as actual tests
+**Every training scenario (story) MUST:**
+- Use `.tsx` extension for JSX parsing by AI agents
+- Import `fn()` for interactive behavior training: `import { fn } from 'storybook/test'`
+- Include comprehensive JSDoc for AI context understanding
+- Use semantic design tokens exclusively (teaches proper token usage to AI)
+- Pass accessibility checks (ensures AI learns accessible patterns)
+- Function as executable tests (validates AI training data quality)
 
-**Example story structure:**
+**Example AI training scenario:**
 ```typescript
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { Button } from '../components/ui/button'
 
 /**
- * Button Intelligence: cognitiveLoad=3, size=attention hierarchy
+ * AI Training: Button Intelligence
+ * cognitiveLoad=3, size=attention hierarchy
  * Destructive variant REQUIRES confirmation UX patterns
+ * This trains AI agents on button hierarchy and safety patterns
  */
 const meta = {
   title: '03 Components/Action/Button',
@@ -115,7 +119,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: 'The foundational interactive element with embedded design intelligence.',
+        component: 'AI Training: Foundational interactive element with embedded design reasoning for systematic decision-making.',
       },
     },
   },
@@ -147,58 +151,60 @@ export const Primary: Story = {
 }
 ```
 
-### Design System Dogfooding
+### AI Token Training
 
-**ALWAYS use semantic tokens in stories:**
+**Training scenarios MUST use semantic tokens to teach AI agents proper design system usage:**
 
-❌ **Never use arbitrary colors:**
+❌ **Arbitrary colors corrupt AI training:**
 ```typescript
-className="text-green-600 bg-blue-500 border-red-400"
+className="text-green-600 bg-blue-500 border-red-400" // AI learns wrong patterns
 ```
 
-✅ **Always use semantic tokens:**
+✅ **Semantic tokens train correct AI behavior:**
 ```typescript
-className="text-success-foreground bg-primary border-destructive"
+className="text-success-foreground bg-primary border-destructive" // AI learns design system
 ```
 
-This teaches proper design system usage and ensures consistency.
+Every training scenario using semantic tokens teaches AI agents systematic design decision-making.
 
-## Design Intelligence Integration
+## AI Intelligence Consumption
 
-### Three-Layer Intelligence System
+### Three-Layer AI Training System
 
-**When working with components, understand the intelligence layers:**
+**AI agents consume design intelligence through structured layers:**
 
-1. **Comments in components:**
+1. **Component Intelligence Comments** - Direct AI parsing of design reasoning:
 ```tsx
 /**
- * Button Intelligence: cognitiveLoad=3, size=attention hierarchy
- * Destructive variant REQUIRES confirmation UX patterns
- * Full patterns: .rafters/agent-instructions.md
+ * AI Intelligence: Button cognitiveLoad=3, attention hierarchy system
+ * Destructive variant REQUIRES confirmation UX patterns - safety constraint
+ * Size mapping: sm=tertiary actions, md=secondary, lg=primary calls-to-action
+ * Full constraint patterns: .rafters/agent-instructions.md
  */
 export const Button = ({ variant, size, ...props }) => {
-  // Implementation with design reasoning
+  // Implementation follows AI-readable design constraints
 }
 ```
 
-2. **Manifest data** (`.rafters/component-manifest.json`):
+2. **Machine-Readable Manifest** (`.rafters/component-manifest.json`) - Structured data for AI decision-making:
 ```json
 {
   "Button": {
-    "intelligence": {
+    "aiIntelligence": {
       "cognitiveLoad": 3,
-      "attentionEconomics": "Size hierarchy: sm=tertiary, md=secondary, lg=primary",
-      "accessibility": "44px touch targets, WCAG AAA contrast"
+      "attentionHierarchy": "Size maps to action importance: sm=tertiary, md=secondary, lg=primary",
+      "safetyConstraints": "Destructive actions require confirmation patterns",
+      "accessibilityRules": "44px minimum touch targets, WCAG AAA contrast ratios"
     }
   }
 }
 ```
 
-3. **Intelligence stories** - Storybook documentation explaining design reasoning
+3. **Training Stories** - Complete behavioral examples for AI pattern learning
 
-### Registry Compatibility
+### AI-Enhanced Registry
 
-**We extend shadcn's registry spec** with intelligence metadata in the `meta` field:
+**Shadcn registry extended with AI intelligence metadata for systematic component selection:**
 
 ```json
 {
@@ -208,107 +214,111 @@ export const Button = ({ variant, size, ...props }) => {
   "files": [...],
   "meta": {
     "rafters": {
-      "cognitiveLoad": 3,
-      "attentionEconomics": "Size hierarchy patterns",
-      "accessibility": "WCAG AAA compliance details"
+      "aiIntelligence": {
+        "cognitiveLoad": 3,
+        "decisionConstraints": "Size hierarchy: sm=tertiary, md=secondary, lg=primary",
+        "safetyPatterns": "Destructive variant requires confirmation UX",
+        "accessibilityRules": "WCAG AAA compliance, 44px touch targets",
+        "usageContext": "Primary actions, form submissions, critical interactions"
+      }
     }
   }
 }
 ```
 
-## Component Development Workflow
+## AI Intelligence Development Workflow
 
-### When Creating New Components
+### Creating AI-Trainable Components
 
-1. **Read existing component patterns** in `src/components/ui/`
-2. **Follow TDD** - write tests first
-3. **Use Radix primitives** for accessibility foundation
-4. **Apply semantic tokens** for styling
-5. **Add intelligence comments** to component
-6. **Create complete story suite** (5 files if complex)
-7. **Update component manifest** with intelligence data
-8. **Ensure tests pass** before committing
+1. **Study existing AI intelligence patterns** in `src/components/ui/`
+2. **Follow TDD** - write tests that validate AI training data quality
+3. **Use Radix primitives** - accessibility foundation for AI constraint learning
+4. **Apply semantic tokens exclusively** - trains AI on design system usage
+5. **Embed AI intelligence comments** - direct design reasoning for AI parsing
+6. **Create comprehensive training suite** - 5 story files for complex component education
+7. **Update component manifest** - structured intelligence data for AI consumption
+8. **Validate AI training quality** - ensure all tests pass before committing
 
-### When Modifying Existing Components
+### Updating AI Training Data
 
-1. **Understand existing intelligence patterns** from comments and stories
-2. **Maintain design system consistency** 
-3. **Update tests first** (TDD)
-4. **Update stories** to reflect changes
-5. **Update manifest data** if intelligence changes
-6. **Verify all tests pass** including stories
+1. **Analyze existing AI intelligence patterns** - comments, stories, and manifest data
+2. **Maintain training consistency** - AI learns from systematic patterns
+3. **Update training scenarios first** - TDD approach for AI education
+4. **Update all training stories** - comprehensive AI pattern learning
+5. **Update manifest intelligence** - structured data for AI decision-making
+6. **Validate training integrity** - all stories must function as executable tests
 
-## File Structure Context
+## AI Intelligence System Architecture
 
 ```
-rafters/
-├── .rafters/                    # Hidden CLI config (future)
-│   ├── agent-instructions.md    # AI usage patterns
-│   ├── config.json             # CLI configuration
-│   └── component-manifest.json # Intelligence fallback
+rafters/                         # AI-First Design Intelligence System
+├── .rafters/                    # AI agent configuration and intelligence data
+│   ├── agent-instructions.md    # Complete AI usage patterns and constraints
+│   ├── config.json             # AI system configuration
+│   └── component-manifest.json # Structured intelligence data for AI consumption
 ├── src/
-│   ├── components/ui/          # Component source code
-│   ├── stories/               # Storybook stories (tested with Vitest)
-│   └── lib/                   # Utilities
-├── CODING_STANDARDS.md         # Complete coding requirements
-├── STORYBOOK_STANDARDS.md      # Story creation guidelines
-├── ARCHITECTURE.md             # Shadcn-style system architecture
-├── CLI_PLAN.md                # CLI implementation plan
-├── WEB_CONFIGURATOR_SPEC.md   # Web app specification
-└── lefthook.yml               # Pre-commit constraints
+│   ├── components/ui/          # Components with embedded AI intelligence comments
+│   ├── stories/               # AI training scenarios (executable via Vitest)
+│   └── lib/                   # Utilities with AI-readable patterns
+├── CODING_STANDARDS.md         # AI-compatible coding requirements
+├── STORYBOOK_STANDARDS.md      # AI training scenario standards
+├── ARCHITECTURE.md             # AI intelligence system architecture
+├── CLI_PLAN.md                # Human configuration interface plan
+├── WEB_CONFIGURATOR_SPEC.md   # Human web interface specification
+└── lefthook.yml               # Quality gates for AI training data integrity
 ```
 
-## Quality Gates
+## AI Training Data Quality Gates
 
-**Before any commit, ensure:**
+**Before any commit, validate AI training integrity:**
 
-1. **All tests pass** - `pnpm vitest run`
-2. **All stories render** - `pnpm test-storybook`
-3. **Biome check passes** - `pnpm biome check`
-4. **TypeScript compiles** - `pnpm type-check`
-5. **Stories use semantic tokens** - no arbitrary colors
-6. **Intelligence patterns documented** - comments + manifest
-7. **Accessibility verified** - WCAG AAA compliance
+1. **All tests pass** - `pnpm vitest run` - validates AI training scenarios function correctly
+2. **All training stories render** - `pnpm test-storybook` - ensures AI learning examples work
+3. **Code quality check** - `pnpm biome check` - maintains consistent AI-readable patterns
+4. **TypeScript validation** - `pnpm type-check` - ensures AI intelligence comments match types
+5. **Semantic token usage** - no arbitrary colors in training scenarios (corrupts AI learning)
+6. **AI intelligence documentation** - all components have comments + manifest entries
+7. **Accessibility compliance** - WCAG AAA verified (teaches AI accessible patterns)
 
-**Lefthook will enforce the first 3 automatically.**
+**Lefthook automatically enforces training data quality (items 1-3).**
 
-## Common Tasks
+## AI Intelligence System Tasks
 
-### Adding a New Component
+### Creating AI-Trainable Components
 
-1. Create component in `src/components/ui/ComponentName.tsx`
-2. Add intelligence comment header
-3. Write comprehensive test suite (TDD)
-4. Create main story: `ComponentName.stories.tsx`
-5. Add variant stories if complex
-6. Update component manifest
-7. Verify all tests pass
+1. Create component in `src/components/ui/ComponentName.tsx` with embedded AI intelligence
+2. Add comprehensive AI intelligence comment headers for direct AI parsing
+3. Write test suite validating AI training data quality (TDD)
+4. Create primary training story: `ComponentName.stories.tsx`
+5. Add comprehensive training scenarios for complex components (5 story files)
+6. Update component manifest with structured AI intelligence data
+7. Validate AI training integrity - all tests and stories must pass
 
-### Updating Stories
+### Updating AI Training Scenarios
 
-1. Ensure `.tsx` extension for JSX content
-2. Import `fn()` for interactive props
-3. Use semantic tokens in examples
-4. Include comprehensive JSDoc
-5. Test story functionality with Vitest
-6. Verify accessibility compliance
+1. Use `.tsx` extension - enables JSX parsing by AI agents
+2. Import `fn()` for interactive behavior training scenarios
+3. Use semantic tokens exclusively - trains AI on design system patterns
+4. Include comprehensive JSDoc - provides AI context understanding
+5. Test training scenario functionality with Vitest - validates AI learning data
+6. Verify accessibility compliance - teaches AI accessible pattern recognition
 
-### Registry Integration
+### AI-Enhanced Registry Integration
 
-1. Follow shadcn registry spec
-2. Add intelligence in `meta.rafters` field
-3. Maintain backward compatibility
-4. Document component intelligence
+1. Follow shadcn registry specification for compatibility
+2. Extend with AI intelligence in `meta.rafters.aiIntelligence` field
+3. Maintain backward compatibility with existing tooling
+4. Document complete AI intelligence patterns for systematic consumption
 
-## Success Criteria
+## AI Intelligence System Success Criteria
 
-**Your work should result in:**
+**Every contribution should enhance AI design decision-making capability:**
 
-- Components that teach design intelligence to AI agents
-- Stories that function as both documentation and tests
-- Clean, type-safe code that passes all quality gates
-- Consistent use of semantic design tokens
-- WCAG AAA accessible implementations
-- Systematic approach to component development
+- **AI-readable components** with embedded design reasoning that agents can parse and apply
+- **Training scenarios (stories)** that function as executable AI education and validation tests
+- **Clean, type-safe code** that passes quality gates and maintains AI training data integrity
+- **Systematic semantic token usage** that trains AI agents on design system patterns
+- **WCAG AAA accessible implementations** that teach AI agents accessible design constraints
+- **Structured intelligence data** that enables AI agents to make systematic design decisions
 
-**Remember**: This design system is built for AI development. Every component should help AI agents understand and apply design intelligence, not just provide functionality.
+**CRITICAL UNDERSTANDING**: This is an AI design intelligence system. Every component, story, and piece of documentation exists to make AI agents better at design decisions through systematic constraint learning and pattern recognition. Human usability is secondary to AI trainability.

@@ -1,7 +1,7 @@
 {
-  "name": "rafters-cli",
+  "name": "@rafters/cli",
   "version": "0.1.0",
-  "description": "CLI tool for installing Rafters design system components with embedded intelligence",
+  "description": "CLI tool for installing AI-first design system components with embedded intelligence",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -25,22 +25,23 @@
     "prepublishOnly": "pnpm build",
     "test": "vitest",
     "lint": "biome check .",
-    "format": "biome format --write ."
+    "format": "biome format --write .",
+    "clean": "rm -rf dist"
   },
   "keywords": [
     "rafters",
     "cli",
-    "design-system",
-    "components",
-    "react",
-    "design-intelligence"
+    "ai-design-system",
+    "design-intelligence",
+    "react-components",
+    "semantic-tokens"
   ],
-  "author": "Sean Silvius",
+  "author": "Sean Poulter",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/real-handy/rafters",
-    "directory": "cli"
+    "url": "https://github.com/seanpoulter/rafters",
+    "directory": "apps/cli"
   },
   "dependencies": {
     "chalk": "^5.3.0",

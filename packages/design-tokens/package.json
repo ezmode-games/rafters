@@ -1,0 +1,34 @@
+{
+  "name": "@rafters/design-tokens",
+  "version": "0.1.0",
+  "description": "Generated design systems and semantic tokens for Rafters AI intelligence system",
+  "type": "module",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist", "tokens", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.2",
+    "vitest": "^3.2.3"
+  },
+  "dependencies": {
+    "@rafters/shared": "workspace:*",
+    "@rafters/color-utils": "workspace:*"
+  }
+}
