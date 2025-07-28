@@ -1,8 +1,19 @@
 import type { ComponentManifest } from './registry.js';
 
 export function getComponentTemplate(manifest: ComponentManifest): string {
+  // First, try to get the actual component source from the registry files
+  const componentFile = manifest.files.find(
+    (f) => f.name.endsWith('.tsx') && f.type === 'component' && !f.name.includes('.stories.')
+  );
+
+  if (componentFile && componentFile.content && componentFile.content.trim() !== '') {
+    // Return the actual component source from the registry
+    return componentFile.content;
+  }
+
+  // Fallback to generated templates for development
   const componentName = manifest.name;
-  
+
   switch (componentName.toLowerCase()) {
     case 'button':
       return getButtonTemplate(manifest);

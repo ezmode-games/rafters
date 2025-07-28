@@ -37,10 +37,18 @@ export const ContentLifecycle: Story = {
       <h3 className="text-lg font-medium mb-4">Content Workflow</h3>
       <Tabs defaultValue="draft">
         <TabsList>
-          <TabsTrigger value="draft" badge="12">Draft</TabsTrigger>
-          <TabsTrigger value="review" badge="3">In Review</TabsTrigger>
-          <TabsTrigger value="published" badge="45">Published</TabsTrigger>
-          <TabsTrigger value="archived" badge="8">Archived</TabsTrigger>
+          <TabsTrigger value="draft" badge="12">
+            Draft
+          </TabsTrigger>
+          <TabsTrigger value="review" badge="3">
+            In Review
+          </TabsTrigger>
+          <TabsTrigger value="published" badge="45">
+            Published
+          </TabsTrigger>
+          <TabsTrigger value="archived" badge="8">
+            Archived
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="draft" className="space-y-3">
           <div className="p-4 bg-muted/30 rounded-md">
@@ -185,9 +193,7 @@ export const InformationHierarchy: Story = {
               <span className="text-lg">3.7%</span>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Detailed metrics for performance analysis
-          </p>
+          <p className="text-sm text-muted-foreground">Detailed metrics for performance analysis</p>
         </TabsContent>
         <TabsContent value="trends" className="space-y-4">
           <div className="p-4 bg-muted/20 rounded-md">
@@ -207,9 +213,7 @@ export const InformationHierarchy: Story = {
               </div>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Trend analysis for strategic planning
-          </p>
+          <p className="text-sm text-muted-foreground">Trend analysis for strategic planning</p>
         </TabsContent>
         <TabsContent value="details" className="space-y-4">
           <div className="p-3 bg-muted/10 rounded-md font-mono text-xs">
@@ -220,9 +224,7 @@ export const InformationHierarchy: Story = {
               <div>2024-01-15 14:29:18 | feature_click | button:export | user:7239</div>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Raw event data for detailed investigation
-          </p>
+          <p className="text-sm text-muted-foreground">Raw event data for detailed investigation</p>
         </TabsContent>
       </Tabs>
       <p className="text-xs text-muted-foreground mt-4">
@@ -341,9 +343,15 @@ export const TemporalContext: Story = {
       <h3 className="text-lg font-medium mb-4">Activity Timeline</h3>
       <Tabs defaultValue="today">
         <TabsList>
-          <TabsTrigger value="today" badge="8">Today</TabsTrigger>
-          <TabsTrigger value="week" badge="47">This Week</TabsTrigger>
-          <TabsTrigger value="month" badge="203">This Month</TabsTrigger>
+          <TabsTrigger value="today" badge="8">
+            Today
+          </TabsTrigger>
+          <TabsTrigger value="week" badge="47">
+            This Week
+          </TabsTrigger>
+          <TabsTrigger value="month" badge="203">
+            This Month
+          </TabsTrigger>
           <TabsTrigger value="all">All Time</TabsTrigger>
         </TabsList>
         <TabsContent value="today" className="space-y-3">
@@ -369,9 +377,7 @@ export const TemporalContext: Story = {
               </div>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Recent activity for immediate awareness
-          </p>
+          <p className="text-sm text-muted-foreground">Recent activity for immediate awareness</p>
         </TabsContent>
         <TabsContent value="week" className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
@@ -384,9 +390,7 @@ export const TemporalContext: Story = {
               <div className="text-xs text-muted-foreground">Meetings Held</div>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Weekly summary for progress tracking
-          </p>
+          <p className="text-sm text-muted-foreground">Weekly summary for progress tracking</p>
         </TabsContent>
         <TabsContent value="month" className="space-y-3">
           <div className="p-4 bg-muted/10 rounded">
@@ -420,9 +424,7 @@ export const TemporalContext: Story = {
               </div>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Complete history for strategic analysis
-          </p>
+          <p className="text-sm text-muted-foreground">Complete history for strategic analysis</p>
         </TabsContent>
       </Tabs>
       <p className="text-xs text-muted-foreground mt-4">
@@ -470,9 +472,15 @@ export const SemanticComparison: Story = {
           <h4 className="font-medium">Priority-Based Organization</h4>
           <Tabs defaultValue="high">
             <TabsList variant="pills" density="compact">
-              <TabsTrigger value="high" badge="5">High</TabsTrigger>
-              <TabsTrigger value="medium" badge="12">Medium</TabsTrigger>
-              <TabsTrigger value="low" badge="8">Low</TabsTrigger>
+              <TabsTrigger value="high" badge="5">
+                High
+              </TabsTrigger>
+              <TabsTrigger value="medium" badge="12">
+                Medium
+              </TabsTrigger>
+              <TabsTrigger value="low" badge="8">
+                Low
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="high">
               <p className="text-sm text-muted-foreground">Importance-based organization</p>
@@ -510,9 +518,10 @@ export const SemanticComparison: Story = {
           </Tabs>
         </div>
       </div>
-      
+
       <p className="text-xs text-muted-foreground">
-        Different semantic organization patterns serve different content types and user mental models
+        Different semantic organization patterns serve different content types and user mental
+        models
       </p>
     </div>
   ),

@@ -1,0 +1,29 @@
+{
+  "name": "@rafters/registry",
+  "version": "1.0.0",
+  "description": "Component registry API for Rafters AI design intelligence system",
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "type-check": "tsc --noEmit",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "hono": "^4.0.0",
+    "@rafters/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240512.0",
+    "tsx": "^4.7.1",
+    "typescript": "^5.4.3",
+    "vitest": "^3.2.3",
+    "wrangler": "^3.57.0"
+  },
+  "keywords": ["rafters", "ai", "design-system", "component-registry", "cloudflare-workers", "hono"]
+}

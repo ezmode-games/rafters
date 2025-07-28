@@ -34,7 +34,6 @@ export const Common: Story = {
     <div className="w-full max-w-4xl">
       <h3 className="text-lg font-medium mb-6">Card Pattern Evolution</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        
         {/* Simple Information Display */}
         <Card>
           <CardHeader density="comfortable">
@@ -71,7 +70,8 @@ export const Common: Story = {
           </CardHeader>
           <CardContent density="comfortable">
             <p className="text-sm text-muted-foreground">
-              Cards can include actions that relate to their content, providing clear paths for user interaction.
+              Cards can include actions that relate to their content, providing clear paths for user
+              interaction.
             </p>
           </CardContent>
           <CardFooter justify="end">
@@ -139,9 +139,11 @@ export const Common: Story = {
       <div className="mt-8 p-4 bg-muted/50 rounded-md">
         <h4 className="font-medium text-sm mb-2">Evolution Pattern</h4>
         <p className="text-xs text-muted-foreground">
-          <strong>Simple</strong> → <strong>Actionable</strong> → <strong>Interactive</strong> → <strong>Adaptive</strong>
+          <strong>Simple</strong> → <strong>Actionable</strong> → <strong>Interactive</strong> →{' '}
+          <strong>Adaptive</strong>
           <br />
-          Cards progressively enhance from basic containers to intelligent content organizers that adapt their presentation based on context and importance.
+          Cards progressively enhance from basic containers to intelligent content organizers that
+          adapt their presentation based on context and importance.
         </p>
       </div>
     </div>

@@ -53,7 +53,7 @@ export const SuccessCommunication: Story = {
                 className="bg-[var(--validation-success-bg)] hover:opacity-[var(--validation-success-opacity)] transition-all duration-[var(--validation-success-timing)]"
               />
             </div>
-            
+
             <div className="space-y-2">
               <label htmlFor="strong-password" className="text-sm font-medium">
                 Password Strength
@@ -69,7 +69,7 @@ export const SuccessCommunication: Story = {
                 className="bg-[var(--validation-success-bg)] hover:opacity-[var(--validation-success-opacity)] transition-all duration-[var(--validation-success-timing)] border-[var(--sensitivity-personal-border)]"
               />
             </div>
-            
+
             <div className="space-y-2">
               <label htmlFor="valid-phone" className="text-sm font-medium">
                 Phone Number
@@ -130,7 +130,7 @@ export const WarningGuidance: Story = {
                 className="bg-[var(--validation-warning-bg)] hover:opacity-[var(--validation-warning-opacity)] transition-all duration-[var(--validation-warning-timing)] border-[var(--sensitivity-personal-border)]"
               />
             </div>
-            
+
             <div className="space-y-2">
               <label htmlFor="informal-email" className="text-sm font-medium">
                 Professional Email
@@ -144,7 +144,7 @@ export const WarningGuidance: Story = {
                 validationMessage="⚠ Consider using a professional email for business"
               />
             </div>
-            
+
             <div className="space-y-2">
               <label htmlFor="incomplete-phone" className="text-sm font-medium">
                 Phone Number Format
@@ -204,7 +204,7 @@ export const ErrorRecovery: Story = {
                 className="bg-[var(--validation-error-bg)] hover:opacity-[var(--validation-error-opacity)] transition-all duration-[var(--validation-error-timing)]"
               />
             </div>
-            
+
             <div className="space-y-2">
               <label htmlFor="short-password" className="text-sm font-medium">
                 Password Requirements
@@ -220,7 +220,7 @@ export const ErrorRecovery: Story = {
                 className="bg-[var(--validation-error-bg)] hover:opacity-[var(--validation-error-opacity)] transition-all duration-[var(--validation-error-timing)] border-[var(--sensitivity-personal-border)]"
               />
             </div>
-            
+
             <div className="space-y-2">
               <label htmlFor="invalid-phone" className="text-sm font-medium">
                 Phone Number
@@ -234,7 +234,7 @@ export const ErrorRecovery: Story = {
                 validationMessage="Phone number should contain only numbers and standard formatting"
               />
             </div>
-            
+
             <div className="space-y-2">
               <label htmlFor="required-field" className="text-sm font-medium">
                 Required Field <span className="text-destructive">*</span>
@@ -293,7 +293,7 @@ export const ContextualUsage: Story = {
                 variant="default"
               />
             </div>
-            
+
             <div className="space-y-2">
               <label htmlFor="login-password" className="text-sm font-medium">
                 Password
@@ -330,30 +330,19 @@ export const ContextualUsage: Story = {
                 validationMessage="✓ Valid card number format"
               />
             </div>
-            
+
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <label htmlFor="expiry" className="text-sm font-medium">
                   Expiry Date
                 </label>
-                <Input
-                  id="expiry"
-                  type="text"
-                  placeholder="MM/YY"
-                  sensitive={true}
-                />
+                <Input id="expiry" type="text" placeholder="MM/YY" sensitive={true} />
               </div>
               <div className="space-y-2">
                 <label htmlFor="cvv" className="text-sm font-medium">
                   CVV
                 </label>
-                <Input
-                  id="cvv"
-                  type="password"
-                  placeholder="123"
-                  sensitive={true}
-                  maxLength={4}
-                />
+                <Input id="cvv" type="password" placeholder="123" sensitive={true} maxLength={4} />
               </div>
             </div>
           </div>
@@ -394,7 +383,7 @@ export const ContextualUsage: Story = {
                 />
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <label htmlFor="contact-email" className="text-sm font-medium">
                 Email Address
@@ -429,31 +418,19 @@ export const ContextualUsage: Story = {
                 variant="default"
               />
             </div>
-            
+
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <label htmlFor="min-price" className="text-sm font-medium">
                   Min Price
                 </label>
-                <Input
-                  id="min-price"
-                  type="number"
-                  placeholder="0.00"
-                  min="0"
-                  step="0.01"
-                />
+                <Input id="min-price" type="number" placeholder="0.00" min="0" step="0.01" />
               </div>
               <div className="space-y-2">
                 <label htmlFor="max-price" className="text-sm font-medium">
                   Max Price
                 </label>
-                <Input
-                  id="max-price"
-                  type="number"
-                  placeholder="1000.00"
-                  min="0"
-                  step="0.01"
-                />
+                <Input id="max-price" type="number" placeholder="1000.00" min="0" step="0.01" />
               </div>
             </div>
           </div>
@@ -543,18 +520,12 @@ export const SemanticComparison: Story = {
         <div className="space-y-3">
           <h4 className="font-medium">Neutral Ready</h4>
           <div className="space-y-2">
-            <Input
-              type="text"
-              variant="default"
-              placeholder="Ready for input"
-            />
-            <p className="text-xs text-muted-foreground">
-              Clean, approachable state for new input
-            </p>
+            <Input type="text" variant="default" placeholder="Ready for input" />
+            <p className="text-xs text-muted-foreground">Clean, approachable state for new input</p>
           </div>
         </div>
       </div>
-      
+
       <p className="text-xs text-muted-foreground">
         Different semantic states communicate meaning through color, iconography, and messaging tone
       </p>

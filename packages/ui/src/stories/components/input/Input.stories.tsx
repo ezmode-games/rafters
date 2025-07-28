@@ -67,21 +67,19 @@ export const Common: Story = {
   render: (args) => (
     <div className="space-y-8 max-w-2xl">
       <div className="text-sm text-muted-foreground mb-6">
-        <strong>Input Intelligence:</strong> Basic → Validated → Secure → Sensitive with progressive trust-building patterns
+        <strong>Input Intelligence:</strong> Basic → Validated → Secure → Sensitive with progressive
+        trust-building patterns
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Basic Input */}
         <div className="space-y-3">
           <h4 className="font-medium">Basic Text Input</h4>
           <div className="space-y-2">
-            <label htmlFor="basic" className="text-sm font-medium">Full Name</label>
-            <Input 
-              id="basic"
-              {...args} 
-              placeholder="Enter your full name"
-              variant="default"
-            />
+            <label htmlFor="basic" className="text-sm font-medium">
+              Full Name
+            </label>
+            <Input id="basic" {...args} placeholder="Enter your full name" variant="default" />
           </div>
           <p className="text-xs text-muted-foreground">
             Standard input with clean, accessible design
@@ -92,8 +90,10 @@ export const Common: Story = {
         <div className="space-y-3">
           <h4 className="font-medium">Email with Validation</h4>
           <div className="space-y-2">
-            <label htmlFor="email-validated" className="text-sm font-medium">Email Address</label>
-            <Input 
+            <label htmlFor="email-validated" className="text-sm font-medium">
+              Email Address
+            </label>
+            <Input
               id="email-validated"
               {...args}
               type="email"
@@ -113,8 +113,10 @@ export const Common: Story = {
         <div className="space-y-3">
           <h4 className="font-medium">Secure Password</h4>
           <div className="space-y-2">
-            <label htmlFor="password-secure" className="text-sm font-medium">Password</label>
-            <Input 
+            <label htmlFor="password-secure" className="text-sm font-medium">
+              Password
+            </label>
+            <Input
               id="password-secure"
               {...args}
               type="password"
@@ -132,8 +134,10 @@ export const Common: Story = {
         <div className="space-y-3">
           <h4 className="font-medium">Error Recovery</h4>
           <div className="space-y-2">
-            <label htmlFor="error-input" className="text-sm font-medium">Credit Card</label>
-            <Input 
+            <label htmlFor="error-input" className="text-sm font-medium">
+              Credit Card
+            </label>
+            <Input
               id="error-input"
               {...args}
               type="text"
@@ -157,15 +161,11 @@ export const Common: Story = {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="space-y-2">
             <label className="text-sm text-muted-foreground">Default</label>
-            <Input 
-              {...args}
-              placeholder="Default state"
-              variant="default"
-            />
+            <Input {...args} placeholder="Default state" variant="default" />
           </div>
           <div className="space-y-2">
             <label className="text-sm text-muted-foreground">Success</label>
-            <Input 
+            <Input
               {...args}
               placeholder="Valid input"
               variant="success"
@@ -175,7 +175,7 @@ export const Common: Story = {
           </div>
           <div className="space-y-2">
             <label className="text-sm text-muted-foreground">Warning</label>
-            <Input 
+            <Input
               {...args}
               placeholder="Needs attention"
               variant="warning"
@@ -185,7 +185,7 @@ export const Common: Story = {
           </div>
           <div className="space-y-2">
             <label className="text-sm text-muted-foreground">Error</label>
-            <Input 
+            <Input
               {...args}
               placeholder="Invalid input"
               variant="error"
@@ -205,37 +205,19 @@ export const Common: Story = {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Search</label>
-            <Input 
-              {...args}
-              type="search"
-              placeholder="Search for anything..."
-            />
+            <Input {...args} type="search" placeholder="Search for anything..." />
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Telephone</label>
-            <Input 
-              {...args}
-              type="tel"
-              placeholder="+1 (555) 123-4567"
-            />
+            <Input {...args} type="tel" placeholder="+1 (555) 123-4567" />
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">URL</label>
-            <Input 
-              {...args}
-              type="url"
-              placeholder="https://example.com"
-            />
+            <Input {...args} type="url" placeholder="https://example.com" />
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Number</label>
-            <Input 
-              {...args}
-              type="number"
-              placeholder="Enter amount"
-              min="0"
-              step="0.01"
-            />
+            <Input {...args} type="number" placeholder="Enter amount" min="0" step="0.01" />
           </div>
         </div>
         <p className="text-xs text-muted-foreground">
@@ -254,7 +236,7 @@ export const Common: Story = {
               <Input {...args} placeholder="Company (optional)" />
             </div>
           </div>
-          
+
           <div className="p-4 bg-warning/5 border border-warning/20 rounded-md">
             <h5 className="text-sm font-medium mb-3">Medium Trust - Contact Details</h5>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -262,7 +244,7 @@ export const Common: Story = {
               <Input {...args} type="tel" placeholder="+1 (555) 123-4567" />
             </div>
           </div>
-          
+
           <div className="p-4 bg-primary/5 border border-primary/20 rounded-md">
             <h5 className="text-sm font-medium mb-3">High Trust - Secure Information</h5>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -270,7 +252,7 @@ export const Common: Story = {
               <Input {...args} type="text" placeholder="1234 5678 9012 3456" sensitive={true} />
             </div>
           </div>
-          
+
           <div className="p-4 bg-destructive/5 border border-destructive/20 rounded-md">
             <h5 className="text-sm font-medium mb-3">Critical Trust - Sensitive Data</h5>
             <div className="grid grid-cols-1 gap-3">
@@ -309,7 +291,7 @@ export const Common: Story = {
   parameters: {
     docs: {
       description: {
-        story: 
+        story:
           'Complete overview of input intelligence patterns showing validation states, trust levels, and specialized input types for confident data entry.',
       },
     },

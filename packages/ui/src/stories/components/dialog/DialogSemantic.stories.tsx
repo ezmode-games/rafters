@@ -53,9 +53,13 @@ export const LowTrust: Story = {
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline" size="sm">Cancel</Button>
+            <Button variant="outline" size="sm">
+              Cancel
+            </Button>
           </DialogClose>
-          <Button size="sm" onClick={fn()}>Save Draft</Button>
+          <Button size="sm" onClick={fn()}>
+            Save Draft
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -86,15 +90,17 @@ export const MediumTrust: Story = {
         <DialogHeader>
           <DialogTitle>Publish Article</DialogTitle>
           <DialogDescription>
-            Your article will be published immediately and visible to all subscribers. 
-            You can edit or unpublish it later if needed.
+            Your article will be published immediately and visible to all subscribers. You can edit
+            or unpublish it later if needed.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Save as Draft</Button>
           </DialogClose>
-          <Button variant="primary" onClick={fn()}>Publish Now</Button>
+          <Button variant="primary" onClick={fn()}>
+            Publish Now
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -125,7 +131,7 @@ export const HighTrust: Story = {
         <DialogHeader>
           <DialogTitle>Process Payment</DialogTitle>
           <DialogDescription>
-            You will be charged $49.99 for Premium Plan. This will automatically renew monthly 
+            You will be charged $49.99 for Premium Plan. This will automatically renew monthly
             unless cancelled. You can manage your subscription in account settings.
           </DialogDescription>
         </DialogHeader>
@@ -133,7 +139,9 @@ export const HighTrust: Story = {
           <DialogClose asChild>
             <Button variant="outline">Review Plan</Button>
           </DialogClose>
-          <Button variant="primary" onClick={fn()}>Confirm Payment</Button>
+          <Button variant="primary" onClick={fn()}>
+            Confirm Payment
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -164,16 +172,17 @@ export const CriticalTrust: Story = {
         <DialogHeader>
           <DialogTitle>Delete Account</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete your account, 
-            remove all your data, and cancel any active subscriptions. All your content 
-            will be lost forever.
+            This action cannot be undone. This will permanently delete your account, remove all your
+            data, and cancel any active subscriptions. All your content will be lost forever.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Keep Account</Button>
           </DialogClose>
-          <Button variant="destructive" onClick={fn()}>Delete Forever</Button>
+          <Button variant="destructive" onClick={fn()}>
+            Delete Forever
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -206,7 +215,9 @@ export const TrustContexts: Story = {
           <div className="flex gap-3">
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm">Save Draft</Button>
+                <Button variant="outline" size="sm">
+                  Save Draft
+                </Button>
               </DialogTrigger>
               <DialogContent trustLevel="low" size="sm">
                 <DialogHeader>
@@ -215,13 +226,17 @@ export const TrustContexts: Story = {
                 </DialogHeader>
                 <DialogFooter>
                   <DialogClose asChild>
-                    <Button variant="outline" size="sm">Cancel</Button>
+                    <Button variant="outline" size="sm">
+                      Cancel
+                    </Button>
                   </DialogClose>
-                  <Button size="sm" onClick={fn()}>Save</Button>
+                  <Button size="sm" onClick={fn()}>
+                    Save
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            
+
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="secondary">Publish</Button>
@@ -235,11 +250,13 @@ export const TrustContexts: Story = {
                   <DialogClose asChild>
                     <Button variant="outline">Cancel</Button>
                   </DialogClose>
-                  <Button variant="primary" onClick={fn()}>Publish</Button>
+                  <Button variant="primary" onClick={fn()}>
+                    Publish
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            
+
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="destructive">Delete</Button>
@@ -247,13 +264,17 @@ export const TrustContexts: Story = {
               <DialogContent trustLevel="critical" destructive size="md">
                 <DialogHeader>
                   <DialogTitle>Delete Content</DialogTitle>
-                  <DialogDescription>This will permanently delete the content and cannot be undone.</DialogDescription>
+                  <DialogDescription>
+                    This will permanently delete the content and cannot be undone.
+                  </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
                   <DialogClose asChild>
                     <Button variant="outline">Keep Content</Button>
                   </DialogClose>
-                  <Button variant="destructive" onClick={fn()}>Delete Forever</Button>
+                  <Button variant="destructive" onClick={fn()}>
+                    Delete Forever
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -279,13 +300,17 @@ export const TrustContexts: Story = {
                 </DialogHeader>
                 <DialogFooter>
                   <DialogClose asChild>
-                    <Button variant="outline" size="sm">Cancel</Button>
+                    <Button variant="outline" size="sm">
+                      Cancel
+                    </Button>
                   </DialogClose>
-                  <Button size="sm" onClick={fn()}>Save</Button>
+                  <Button size="sm" onClick={fn()}>
+                    Save
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            
+
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="warning">Change Password</Button>
@@ -293,17 +318,21 @@ export const TrustContexts: Story = {
               <DialogContent trustLevel="high" size="md">
                 <DialogHeader>
                   <DialogTitle>Change Password</DialogTitle>
-                  <DialogDescription>This will log you out of all devices. Continue?</DialogDescription>
+                  <DialogDescription>
+                    This will log you out of all devices. Continue?
+                  </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
                   <DialogClose asChild>
                     <Button variant="outline">Cancel</Button>
                   </DialogClose>
-                  <Button variant="primary" onClick={fn()}>Change Password</Button>
+                  <Button variant="primary" onClick={fn()}>
+                    Change Password
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            
+
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="destructive">Delete Account</Button>
@@ -311,13 +340,17 @@ export const TrustContexts: Story = {
               <DialogContent trustLevel="critical" destructive size="md">
                 <DialogHeader>
                   <DialogTitle>Delete Account</DialogTitle>
-                  <DialogDescription>This permanently deletes your account and all data.</DialogDescription>
+                  <DialogDescription>
+                    This permanently deletes your account and all data.
+                  </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
                   <DialogClose asChild>
                     <Button variant="outline">Keep Account</Button>
                   </DialogClose>
-                  <Button variant="destructive" onClick={fn()}>Delete Forever</Button>
+                  <Button variant="destructive" onClick={fn()}>
+                    Delete Forever
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -348,7 +381,9 @@ export const TrustComparison: Story = {
     <div className="flex flex-wrap gap-4 p-4">
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="outline" size="sm">Low Trust</Button>
+          <Button variant="outline" size="sm">
+            Low Trust
+          </Button>
         </DialogTrigger>
         <DialogContent trustLevel="low" size="sm">
           <DialogHeader>
@@ -357,13 +392,17 @@ export const TrustComparison: Story = {
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline" size="sm">Cancel</Button>
+              <Button variant="outline" size="sm">
+                Cancel
+              </Button>
             </DialogClose>
-            <Button size="sm" onClick={fn()}>Confirm</Button>
+            <Button size="sm" onClick={fn()}>
+              Confirm
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       <Dialog>
         <DialogTrigger asChild>
           <Button variant="secondary">Medium Trust</Button>
@@ -377,11 +416,13 @@ export const TrustComparison: Story = {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button variant="primary" onClick={fn()}>Confirm</Button>
+            <Button variant="primary" onClick={fn()}>
+              Confirm
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       <Dialog>
         <DialogTrigger asChild>
           <Button variant="primary">High Trust</Button>
@@ -395,11 +436,13 @@ export const TrustComparison: Story = {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button variant="primary" onClick={fn()}>Confirm</Button>
+            <Button variant="primary" onClick={fn()}>
+              Confirm
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       <Dialog>
         <DialogTrigger asChild>
           <Button variant="destructive">Critical Trust</Button>
@@ -413,7 +456,9 @@ export const TrustComparison: Story = {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button variant="destructive" onClick={fn()}>Confirm</Button>
+            <Button variant="destructive" onClick={fn()}>
+              Confirm
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

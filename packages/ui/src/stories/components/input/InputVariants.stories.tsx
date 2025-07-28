@@ -37,19 +37,14 @@ export const Default: Story = {
             variant="default"
           />
         </div>
-        
+
         <div className="space-y-2">
           <label htmlFor="default-email" className="text-sm font-medium">
             Email Address
           </label>
-          <Input
-            id="default-email"
-            type="email"
-            placeholder="user@example.com"
-            variant="default"
-          />
+          <Input id="default-email" type="email" placeholder="user@example.com" variant="default" />
         </div>
-        
+
         <div className="space-y-2">
           <label htmlFor="default-search" className="text-sm font-medium">
             Search
@@ -100,7 +95,7 @@ export const SensitiveData: Story = {
             className="border-[var(--sensitivity-financial-border)] shadow-[var(--sensitivity-financial-shadow)] hover:opacity-[var(--opacity-hover)] transition-all duration-[var(--duration-standard)]"
           />
         </div>
-        
+
         <div className="space-y-2">
           <label htmlFor="sensitive-card" className="text-sm font-medium">
             Credit Card Number
@@ -113,7 +108,7 @@ export const SensitiveData: Story = {
             className="border-[var(--sensitivity-financial-border)] shadow-[var(--sensitivity-financial-shadow)] hover:opacity-[var(--opacity-hover)] transition-all duration-[var(--duration-standard)]"
           />
         </div>
-        
+
         <div className="space-y-2">
           <label htmlFor="sensitive-ssn" className="text-sm font-medium">
             Social Security Number
@@ -168,7 +163,7 @@ export const ValidationHierarchy: Story = {
               className="bg-[var(--validation-success-bg)] hover:opacity-[var(--validation-success-opacity)] transition-all duration-[var(--validation-success-timing)]"
             />
           </div>
-          
+
           <div className="space-y-2">
             <label htmlFor="warning-variant" className="text-sm font-medium">
               Warning State
@@ -185,7 +180,7 @@ export const ValidationHierarchy: Story = {
             />
           </div>
         </div>
-        
+
         <div className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="error-variant" className="text-sm font-medium">
@@ -201,7 +196,7 @@ export const ValidationHierarchy: Story = {
               className="bg-[var(--validation-error-bg)] hover:opacity-[var(--validation-error-opacity)] transition-all duration-[var(--validation-error-timing)]"
             />
           </div>
-          
+
           <div className="space-y-2">
             <label htmlFor="default-variant" className="text-sm font-medium">
               Default State
@@ -245,16 +240,8 @@ export const FormContextAdaptations: Story = {
         <div className="p-4 bg-muted/10 rounded-md">
           <h4 className="font-medium text-sm mb-3">Basic Contact Form</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              type="text"
-              placeholder="First Name"
-              variant="default"
-            />
-            <Input
-              type="text"
-              placeholder="Last Name"
-              variant="default"
-            />
+            <Input type="text" placeholder="First Name" variant="default" />
+            <Input type="text" placeholder="Last Name" variant="default" />
             <Input
               type="email"
               placeholder="Email Address"
@@ -271,27 +258,11 @@ export const FormContextAdaptations: Story = {
         <div className="p-4 bg-warning/5 border border-warning/20 rounded-md">
           <h4 className="font-medium text-sm mb-3">Payment Information</h4>
           <div className="space-y-3">
-            <Input
-              type="text"
-              placeholder="Cardholder Name"
-              sensitive={true}
-            />
-            <Input
-              type="text"
-              placeholder="1234 5678 9012 3456"
-              sensitive={true}
-            />
+            <Input type="text" placeholder="Cardholder Name" sensitive={true} />
+            <Input type="text" placeholder="1234 5678 9012 3456" sensitive={true} />
             <div className="grid grid-cols-2 gap-3">
-              <Input
-                type="text"
-                placeholder="MM/YY"
-                sensitive={true}
-              />
-              <Input
-                type="password"
-                placeholder="CVV"
-                sensitive={true}
-              />
+              <Input type="text" placeholder="MM/YY" sensitive={true} />
+              <Input type="password" placeholder="CVV" sensitive={true} />
             </div>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
@@ -342,22 +313,9 @@ export const FormContextAdaptations: Story = {
               variant="default"
             />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <Input
-                type="number"
-                placeholder="Min Price"
-                min="0"
-                step="0.01"
-              />
-              <Input
-                type="number"
-                placeholder="Max Price"
-                min="0"
-                step="0.01"
-              />
-              <Input
-                type="text"
-                placeholder="Brand"
-              />
+              <Input type="number" placeholder="Min Price" min="0" step="0.01" />
+              <Input type="number" placeholder="Max Price" min="0" step="0.01" />
+              <Input type="text" placeholder="Brand" />
             </div>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
@@ -391,11 +349,7 @@ export const SizeVariants: Story = {
         <div className="space-y-3">
           <h4 className="text-base font-medium">Mobile-Optimized (44px)</h4>
           <div className="space-y-2">
-            <Input
-              type="text"
-              placeholder="Enhanced for mobile touch"
-              className="min-h-[44px]"
-            />
+            <Input type="text" placeholder="Enhanced for mobile touch" className="min-h-[44px]" />
             <p className="text-xs text-muted-foreground">
               Meets accessibility guidelines for touch targets on mobile devices
             </p>
@@ -405,10 +359,7 @@ export const SizeVariants: Story = {
         <div className="space-y-3">
           <h4 className="text-base font-medium">Desktop Standard (40px)</h4>
           <div className="space-y-2">
-            <Input
-              type="text"
-              placeholder="Standard desktop sizing"
-            />
+            <Input type="text" placeholder="Standard desktop sizing" />
             <p className="text-xs text-muted-foreground">
               Optimal for desktop interfaces with mouse and keyboard interaction
             </p>
@@ -467,23 +418,13 @@ export const VisualComparison: Story = {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-3">
           <h4 className="font-medium">Standard Treatment</h4>
-          <Input
-            type="text"
-            placeholder="Clean, neutral styling"
-            variant="default"
-          />
-          <p className="text-xs text-muted-foreground">
-            Default styling for general use cases
-          </p>
+          <Input type="text" placeholder="Clean, neutral styling" variant="default" />
+          <p className="text-xs text-muted-foreground">Default styling for general use cases</p>
         </div>
 
         <div className="space-y-3">
           <h4 className="font-medium">Sensitive Data</h4>
-          <Input
-            type="password"
-            placeholder="Enhanced security styling"
-            sensitive={true}
-          />
+          <Input type="password" placeholder="Enhanced security styling" sensitive={true} />
           <p className="text-xs text-muted-foreground">
             Trust-building indicators for secure information
           </p>
@@ -498,9 +439,7 @@ export const VisualComparison: Story = {
             showValidation={true}
             validationMessage="✓ Valid format"
           />
-          <p className="text-xs text-muted-foreground">
-            Positive reinforcement for correct input
-          </p>
+          <p className="text-xs text-muted-foreground">Positive reinforcement for correct input</p>
         </div>
 
         <div className="space-y-3">
@@ -517,9 +456,10 @@ export const VisualComparison: Story = {
           </p>
         </div>
       </div>
-      
+
       <p className="text-xs text-muted-foreground">
-        Visual treatments communicate different states and data sensitivity levels through styling and indicators
+        Visual treatments communicate different states and data sensitivity levels through styling
+        and indicators
       </p>
     </div>
   ),

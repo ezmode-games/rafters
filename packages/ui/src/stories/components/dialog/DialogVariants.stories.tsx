@@ -40,14 +40,17 @@ export const Default: Story = {
         <DialogHeader>
           <DialogTitle>Information</DialogTitle>
           <DialogDescription>
-            This is a standard dialog with default styling for general information and confirmations.
+            This is a standard dialog with default styling for general information and
+            confirmations.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button variant="primary" onClick={fn()}>Continue</Button>
+          <Button variant="primary" onClick={fn()}>
+            Continue
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -78,15 +81,17 @@ export const Destructive: Story = {
         <DialogHeader>
           <DialogTitle>Delete Project</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete the project 
-            and remove all associated data, files, and configurations.
+            This action cannot be undone. This will permanently delete the project and remove all
+            associated data, files, and configurations.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Keep Project</Button>
           </DialogClose>
-          <Button variant="destructive" onClick={fn()}>Delete Forever</Button>
+          <Button variant="destructive" onClick={fn()}>
+            Delete Forever
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -117,15 +122,18 @@ export const FullSize: Story = {
         <DialogHeader>
           <DialogTitle>Advanced Configuration</DialogTitle>
           <DialogDescription>
-            This full-screen dialog provides maximum space for complex forms, detailed configuration panels,
-            or any content that requires extensive screen real estate for optimal user experience.
+            This full-screen dialog provides maximum space for complex forms, detailed configuration
+            panels, or any content that requires extensive screen real estate for optimal user
+            experience.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button variant="primary" onClick={fn()}>Save Configuration</Button>
+          <Button variant="primary" onClick={fn()}>
+            Save Configuration
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -159,7 +167,9 @@ export const ConfirmationPatterns: Story = {
             {/* Simple Confirmation */}
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm">Simple</Button>
+                <Button variant="outline" size="sm">
+                  Simple
+                </Button>
               </DialogTrigger>
               <DialogContent size="sm">
                 <DialogHeader>
@@ -168,13 +178,17 @@ export const ConfirmationPatterns: Story = {
                 </DialogHeader>
                 <DialogFooter>
                   <DialogClose asChild>
-                    <Button variant="outline" size="sm">Cancel</Button>
+                    <Button variant="outline" size="sm">
+                      Cancel
+                    </Button>
                   </DialogClose>
-                  <Button size="sm" onClick={fn()}>Save</Button>
+                  <Button size="sm" onClick={fn()}>
+                    Save
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            
+
             {/* Standard Confirmation */}
             <Dialog>
               <DialogTrigger asChild>
@@ -191,11 +205,13 @@ export const ConfirmationPatterns: Story = {
                   <DialogClose asChild>
                     <Button variant="outline">Cancel</Button>
                   </DialogClose>
-                  <Button variant="primary" onClick={fn()}>Publish</Button>
+                  <Button variant="primary" onClick={fn()}>
+                    Publish
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            
+
             {/* High-Stakes Confirmation */}
             <Dialog>
               <DialogTrigger asChild>
@@ -212,7 +228,9 @@ export const ConfirmationPatterns: Story = {
                   <DialogClose asChild>
                     <Button variant="outline">Cancel</Button>
                   </DialogClose>
-                  <Button variant="destructive" onClick={fn()}>Confirm</Button>
+                  <Button variant="destructive" onClick={fn()}>
+                    Confirm
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -230,7 +248,9 @@ export const ConfirmationPatterns: Story = {
             {/* Compact */}
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm">Compact</Button>
+                <Button variant="outline" size="sm">
+                  Compact
+                </Button>
               </DialogTrigger>
               <DialogContent size="sm">
                 <DialogHeader>
@@ -239,13 +259,17 @@ export const ConfirmationPatterns: Story = {
                 </DialogHeader>
                 <DialogFooter>
                   <DialogClose asChild>
-                    <Button variant="outline" size="sm">No</Button>
+                    <Button variant="outline" size="sm">
+                      No
+                    </Button>
                   </DialogClose>
-                  <Button size="sm" onClick={fn()}>Yes</Button>
+                  <Button size="sm" onClick={fn()}>
+                    Yes
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            
+
             {/* Balanced */}
             <Dialog>
               <DialogTrigger asChild>
@@ -262,11 +286,13 @@ export const ConfirmationPatterns: Story = {
                   <DialogClose asChild>
                     <Button variant="outline">Cancel</Button>
                   </DialogClose>
-                  <Button variant="primary" onClick={fn()}>Continue</Button>
+                  <Button variant="primary" onClick={fn()}>
+                    Continue
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            
+
             {/* Spacious */}
             <Dialog>
               <DialogTrigger asChild>
@@ -285,7 +311,9 @@ export const ConfirmationPatterns: Story = {
                   <DialogClose asChild>
                     <Button variant="outline">Cancel</Button>
                   </DialogClose>
-                  <Button variant="primary" onClick={fn()}>Apply</Button>
+                  <Button variant="primary" onClick={fn()}>
+                    Apply
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -327,11 +355,13 @@ export const VisualComparison: Story = {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button variant="primary" onClick={fn()}>Confirm</Button>
+            <Button variant="primary" onClick={fn()}>
+              Confirm
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       <Dialog>
         <DialogTrigger asChild>
           <Button variant="destructive">Destructive</Button>
@@ -345,11 +375,13 @@ export const VisualComparison: Story = {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button variant="destructive" onClick={fn()}>Confirm</Button>
+            <Button variant="destructive" onClick={fn()}>
+              Confirm
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       <Dialog>
         <DialogTrigger asChild>
           <Button variant="outline">Full Screen</Button>
@@ -357,13 +389,17 @@ export const VisualComparison: Story = {
         <DialogContent size="full">
           <DialogHeader>
             <DialogTitle>Full-Screen Dialog</DialogTitle>
-            <DialogDescription>Maximum space for complex content and interactions</DialogDescription>
+            <DialogDescription>
+              Maximum space for complex content and interactions
+            </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button variant="primary" onClick={fn()}>Confirm</Button>
+            <Button variant="primary" onClick={fn()}>
+              Confirm
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -35,7 +35,7 @@ const meta = {
       description: 'Disabled state prevents interaction',
     },
     required: {
-      control: 'boolean', 
+      control: 'boolean',
       description: 'Required field indicator',
     },
   },
@@ -53,9 +53,10 @@ export const Common: Story = {
   render: (args) => (
     <div className="space-y-8 max-w-2xl">
       <div className="text-sm text-muted-foreground mb-6">
-        <strong>Select Intelligence:</strong> Simple → Grouped → Searchable → Contextual with progressive cognitive load management
+        <strong>Select Intelligence:</strong> Simple → Grouped → Searchable → Contextual with
+        progressive cognitive load management
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Simple Selection */}
         <div className="space-y-3">
@@ -141,36 +142,20 @@ export const Common: Story = {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>File Operations</SelectLabel>
-                <SelectItem 
-                  value="save" 
-                  description="Save current document to disk"
-                  shortcut="⌘S"
-                >
+                <SelectItem value="save" description="Save current document to disk" shortcut="⌘S">
                   Save File
                 </SelectItem>
-                <SelectItem 
-                  value="export" 
-                  description="Export in various formats"
-                  shortcut="⌘E"
-                >
+                <SelectItem value="export" description="Export in various formats" shortcut="⌘E">
                   Export
                 </SelectItem>
               </SelectGroup>
               <SelectSeparator />
               <SelectGroup>
                 <SelectLabel>Edit Operations</SelectLabel>
-                <SelectItem 
-                  value="copy" 
-                  description="Copy selection to clipboard"
-                  shortcut="⌘C"
-                >
+                <SelectItem value="copy" description="Copy selection to clipboard" shortcut="⌘C">
                   Copy
                 </SelectItem>
-                <SelectItem 
-                  value="paste" 
-                  description="Paste from clipboard"
-                  shortcut="⌘V"
-                >
+                <SelectItem value="paste" description="Paste from clipboard" shortcut="⌘V">
                   Paste
                 </SelectItem>
               </SelectGroup>
@@ -266,7 +251,7 @@ export const Common: Story = {
   parameters: {
     docs: {
       description: {
-        story: 
+        story:
           'Complete overview of select intelligence patterns showing progressive complexity from simple selection to smart search and contextual information.',
       },
     },

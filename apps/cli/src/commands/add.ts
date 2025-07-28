@@ -1,13 +1,13 @@
+import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
 import chalk from 'chalk';
 import ora from 'ora';
-import { join } from 'path';
-import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { getRaftersTitle } from '../utils/logo.js';
-import { loadConfig } from '../utils/config.js';
-import { fetchComponent } from '../utils/registry.js';
-import { installDependencies } from '../utils/dependencies.js';
-import { createComponentPath, writeFile, fileExists } from '../utils/files.js';
 import { getComponentTemplate } from '../utils/component-templates.js';
+import { loadConfig } from '../utils/config.js';
+import { installDependencies } from '../utils/dependencies.js';
+import { createComponentPath, fileExists, writeFile } from '../utils/files.js';
+import { getRaftersTitle } from '../utils/logo.js';
+import { fetchComponent } from '../utils/registry.js';
 
 interface AddOptions {
   force?: boolean;
@@ -53,10 +53,12 @@ export async function addCommand(componentName: string, options: AddOptions = {}
     // Fetch component from registry
     const fetchSpinner = ora(`Fetching ${componentName} component...`).start();
     const componentManifest = await fetchComponent(componentName);
-    
+
     if (!componentManifest) {
       fetchSpinner.fail(`Component '${componentName}' not found in registry`);
-      console.log(chalk.gray('Available components: button, input, card, select, dialog, label, tabs'));
+      console.log(
+        chalk.gray('Available components: button, input, card, select, dialog, label, tabs')
+      );
       process.exit(1);
     }
     fetchSpinner.succeed(`${componentManifest.name} component fetched`);
@@ -64,7 +66,7 @@ export async function addCommand(componentName: string, options: AddOptions = {}
     // Check if component already exists
     const componentPath = createComponentPath(config.componentsDir, componentManifest.name);
     const absoluteComponentPath = join(cwd, componentPath);
-    
+
     if (fileExists(absoluteComponentPath) && !options.force) {
       console.log(chalk.red(`✗ Component already exists at ${componentPath}`));
       console.log(chalk.gray('  Run with --force to overwrite existing component'));
@@ -79,13 +81,19 @@ export async function addCommand(componentName: string, options: AddOptions = {}
 
     // Install dependencies
     if (componentManifest.dependencies.length > 0) {
-      const depsSpinner = ora(`Installing dependencies (${componentManifest.dependencies.join(', ')})...`).start();
+      const depsSpinner = ora(
+        `Installing dependencies (${componentManifest.dependencies.join(', ')})...`
+      ).start();
       try {
         await installDependencies(componentManifest.dependencies, config.packageManager, cwd);
         depsSpinner.succeed('Dependencies installed');
       } catch (error) {
         depsSpinner.warn('Failed to install dependencies automatically');
-        console.log(chalk.gray(`  Please install manually: ${config.packageManager} ${config.packageManager === 'npm' ? 'install' : 'add'} ${componentManifest.dependencies.join(' ')}`));
+        console.log(
+          chalk.gray(
+            `  Please install manually: ${config.packageManager} ${config.packageManager === 'npm' ? 'install' : 'add'} ${componentManifest.dependencies.join(' ')}`
+          )
+        );
       }
     }
 
@@ -103,9 +111,12 @@ export async function addCommand(componentName: string, options: AddOptions = {}
     // Write story file if Storybook is enabled
     if (config.hasStorybook && config.storiesDir) {
       const storySpinner = ora('Writing intelligence story...').start();
-      const storyPath = join(config.storiesDir, `${componentManifest.name.toLowerCase()}-intelligence.stories.tsx`);
+      const storyPath = join(
+        config.storiesDir,
+        `${componentManifest.name.toLowerCase()}-intelligence.stories.tsx`
+      );
       const absoluteStoryPath = join(cwd, storyPath);
-      
+
       // For now, create a basic story - in a real implementation this would come from the registry
       const storyContent = createBasicStory(componentManifest);
       writeFile(absoluteStoryPath, storyContent);
@@ -117,7 +128,12 @@ export async function addCommand(componentName: string, options: AddOptions = {}
     const manifest = loadComponentManifest(cwd);
     manifest.components[componentManifest.name] = {
       path: componentPath,
-      story: config.hasStorybook ? join(config.storiesDir!, `${componentManifest.name.toLowerCase()}-intelligence.stories.tsx`) : undefined,
+      story: config.hasStorybook
+        ? join(
+            config.storiesDir!,
+            `${componentManifest.name.toLowerCase()}-intelligence.stories.tsx`
+          )
+        : undefined,
       installed: new Date().toISOString(),
       version: componentManifest.version,
       intelligence: componentManifest.intelligence,
@@ -128,20 +144,40 @@ export async function addCommand(componentName: string, options: AddOptions = {}
 
     // Success message
     console.log();
-    console.log(chalk.green(`✅ ${componentManifest.name} installed successfully with design intelligence patterns.`));
+    console.log(
+      chalk.green(
+        `✅ ${componentManifest.name} installed successfully with design intelligence patterns.`
+      )
+    );
     console.log();
     console.log('Intelligence features:');
-    console.log(chalk.gray(`  • Cognitive Load: ${componentManifest.intelligence.cognitiveLoad}/10`));
-    console.log(chalk.gray(`  • Attention Economics: ${componentManifest.intelligence.attentionEconomics.split(':')[0]}`));
-    console.log(chalk.gray(`  • Trust Building: ${componentManifest.intelligence.trustBuilding.split('.')[0]}`));
+    console.log(
+      chalk.gray(`  • Cognitive Load: ${componentManifest.intelligence.cognitiveLoad}/10`)
+    );
+    console.log(
+      chalk.gray(
+        `  • Attention Economics: ${componentManifest.intelligence.attentionEconomics.split(':')[0]}`
+      )
+    );
+    console.log(
+      chalk.gray(
+        `  • Trust Building: ${componentManifest.intelligence.trustBuilding.split('.')[0]}`
+      )
+    );
     console.log();
     console.log('Next steps:');
-    console.log(chalk.gray('  • Import component: ') + chalk.blue(`import { ${componentManifest.name} } from '${componentPath.replace('.tsx', '')}';`));
+    console.log(
+      chalk.gray('  • Import component: ') +
+        chalk.blue(
+          `import { ${componentManifest.name} } from '${componentPath.replace('.tsx', '')}';`
+        )
+    );
     if (config.hasStorybook) {
       console.log(chalk.gray('  • View intelligence story: ') + chalk.blue('npm run storybook'));
     }
-    console.log(chalk.gray('  • Read full patterns: ') + chalk.blue('.rafters/agent-instructions.md'));
-
+    console.log(
+      chalk.gray('  • Read full patterns: ') + chalk.blue('.rafters/agent-instructions.md')
+    );
   } catch (error) {
     console.error(chalk.red('Error adding component:'), error);
     process.exit(1);
@@ -150,7 +186,7 @@ export async function addCommand(componentName: string, options: AddOptions = {}
 
 function createBasicStory(componentManifest: any): string {
   const componentName = componentManifest.name;
-  
+
   return `import type { Meta, StoryObj } from '@storybook/react';
 import { ${componentName} } from '../components/ui/${componentName.toLowerCase()}';
 

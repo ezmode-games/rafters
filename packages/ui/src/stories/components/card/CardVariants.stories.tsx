@@ -44,10 +44,9 @@ export const ProminenceVariants: Story = {
     <div className="w-full max-w-4xl">
       <h3 className="text-lg font-medium mb-6">Visual Prominence Hierarchy</h3>
       <div className="space-y-6">
-        
         {/* Elevated Prominence */}
-        <Card 
-          prominence="elevated" 
+        <Card
+          prominence="elevated"
           className="border-l-4 border-l-primary shadow-[var(--shadow-hover-prominent)] hover:opacity-[var(--opacity-hover)] transition-all duration-[var(--duration-standard)]"
         >
           <CardHeader density="spacious">
@@ -60,9 +59,7 @@ export const ProminenceVariants: Story = {
           </CardHeader>
           <CardContent density="spacious">
             <div className="bg-primary/10 p-4 rounded-md border border-primary/20">
-              <p className="text-sm font-medium text-primary mb-2">
-                Featured Announcement
-              </p>
+              <p className="text-sm font-medium text-primary mb-2">Featured Announcement</p>
               <p className="text-sm text-muted-foreground">
                 Elevated prominence creates the strongest visual presence through enhanced shadows,
                 borders, and generous spacing. Use sparingly for the most critical information.
@@ -70,8 +67,8 @@ export const ProminenceVariants: Story = {
             </div>
           </CardContent>
           <CardFooter density="spacious" justify="center">
-            <Button 
-              variant="primary" 
+            <Button
+              variant="primary"
               size="lg"
               className="hover:opacity-[var(--consequence-significant-opacity)] transition-all duration-[var(--consequence-significant-timing)]"
             >
@@ -82,7 +79,7 @@ export const ProminenceVariants: Story = {
 
         {/* Default and Subtle Comparison */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card 
+          <Card
             prominence="default"
             className="hover:opacity-[var(--opacity-hover)] transition-all duration-[var(--duration-standard)]"
           >
@@ -96,8 +93,8 @@ export const ProminenceVariants: Story = {
             </CardHeader>
             <CardContent density="comfortable">
               <p className="text-sm text-muted-foreground mb-3">
-                Default prominence provides clean, balanced presentation suitable for most
-                content scenarios. Neither competing for attention nor fading into background.
+                Default prominence provides clean, balanced presentation suitable for most content
+                scenarios. Neither competing for attention nor fading into background.
               </p>
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between">
@@ -111,8 +108,8 @@ export const ProminenceVariants: Story = {
               </div>
             </CardContent>
             <CardFooter justify="end">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 className="hover:opacity-[var(--opacity-hover)] transition-all duration-[var(--duration-standard)]"
               >
@@ -121,7 +118,7 @@ export const ProminenceVariants: Story = {
             </CardFooter>
           </Card>
 
-          <Card 
+          <Card
             prominence="subtle"
             className="hover:opacity-[var(--opacity-hover-subtle)] transition-all duration-[var(--duration-fast)]"
           >
@@ -135,8 +132,8 @@ export const ProminenceVariants: Story = {
             </CardHeader>
             <CardContent density="comfortable">
               <p className="text-sm text-muted-foreground mb-3">
-                Subtle prominence minimizes visual impact while maintaining readability.
-                Perfect for supplementary content that supports primary information.
+                Subtle prominence minimizes visual impact while maintaining readability. Perfect for
+                supplementary content that supports primary information.
               </p>
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between">
@@ -150,8 +147,8 @@ export const ProminenceVariants: Story = {
               </div>
             </CardContent>
             <CardFooter justify="end">
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="sm"
                 className="hover:opacity-[var(--opacity-hover-subtle)] transition-all duration-[var(--duration-fast)]"
               >
@@ -184,7 +181,6 @@ export const DensityVariants: Story = {
     <div className="w-full max-w-5xl">
       <h3 className="text-lg font-medium mb-6">Information Density Adaptation</h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
         <Card className="hover:opacity-[var(--opacity-hover)] transition-all duration-[var(--duration-standard)]">
           <CardHeader density="compact">
             <CardTitle level={5} weight="medium">
@@ -215,8 +211,8 @@ export const DensityVariants: Story = {
             </div>
           </CardContent>
           <CardFooter density="compact" justify="center">
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="sm"
               className="hover:opacity-[var(--opacity-hover)] transition-all duration-[var(--duration-fast)]"
             >
@@ -236,8 +232,8 @@ export const DensityVariants: Story = {
           </CardHeader>
           <CardContent density="comfortable">
             <p className="text-sm text-muted-foreground mb-3">
-              Comfortable density provides the ideal balance between information presentation
-              and visual breathing room. This is the default choice for most content scenarios.
+              Comfortable density provides the ideal balance between information presentation and
+              visual breathing room. This is the default choice for most content scenarios.
             </p>
             <div className="bg-muted/50 p-3 rounded-md">
               <div className="text-xs font-medium mb-1">Optimal For:</div>
@@ -250,8 +246,8 @@ export const DensityVariants: Story = {
           </CardContent>
           <CardFooter density="comfortable" justify="between">
             <span className="text-xs text-muted-foreground">Updated 2h ago</span>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               className="hover:opacity-[var(--opacity-hover)] transition-all duration-[var(--duration-standard)]"
             >
@@ -271,9 +267,7 @@ export const DensityVariants: Story = {
           </CardHeader>
           <CardContent density="spacious">
             <div className="bg-primary/10 p-4 rounded-md border border-primary/20">
-              <p className="text-sm font-medium text-primary mb-2">
-                Premium Experience
-              </p>
+              <p className="text-sm font-medium text-primary mb-2">Premium Experience</p>
               <p className="text-sm text-muted-foreground">
                 Spacious density creates a sense of luxury and importance through generous
                 whitespace and carefully considered proportions.
@@ -284,8 +278,8 @@ export const DensityVariants: Story = {
             </div>
           </CardContent>
           <CardFooter density="spacious" justify="center">
-            <Button 
-              variant="primary" 
+            <Button
+              variant="primary"
               size="md"
               className="hover:opacity-[var(--consequence-significant-opacity)] transition-all duration-[var(--consequence-significant-timing)]"
             >
@@ -300,11 +294,15 @@ export const DensityVariants: Story = {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
           <div>
             <div className="font-medium">Compact</div>
-            <div className="text-muted-foreground">High information density for space-constrained layouts</div>
+            <div className="text-muted-foreground">
+              High information density for space-constrained layouts
+            </div>
           </div>
           <div>
             <div className="font-medium">Comfortable</div>
-            <div className="text-muted-foreground">Balanced presentation for optimal readability</div>
+            <div className="text-muted-foreground">
+              Balanced presentation for optimal readability
+            </div>
           </div>
           <div>
             <div className="font-medium">Spacious</div>
@@ -335,14 +333,13 @@ export const InteractiveVariants: Story = {
     <div className="w-full max-w-4xl">
       <h3 className="text-lg font-medium mb-6">Interactive State Variants</h3>
       <div className="space-y-6">
-        
         {/* Interactive Cards */}
         <div>
           <h4 className="text-base font-medium mb-4">Interactive Cards</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card 
-              interactive 
-              prominence="elevated" 
+            <Card
+              interactive
+              prominence="elevated"
               onClick={() => alert('Primary interactive card activated!')}
               className="hover:opacity-[var(--opacity-hover)] hover:shadow-[var(--shadow-hover-enhanced)] transition-all duration-[var(--duration-standard)] cursor-pointer"
             >
@@ -371,13 +368,15 @@ export const InteractiveVariants: Story = {
                 </div>
               </CardContent>
               <CardFooter justify="end">
-                <span className="text-xs text-muted-foreground">Click anywhere to view dashboard →</span>
+                <span className="text-xs text-muted-foreground">
+                  Click anywhere to view dashboard →
+                </span>
               </CardFooter>
             </Card>
 
-            <Card 
-              interactive 
-              prominence="default" 
+            <Card
+              interactive
+              prominence="default"
               onClick={() => alert('Secondary interactive card activated!')}
               className="hover:opacity-[var(--opacity-hover-subtle)] hover:shadow-[var(--shadow-hover-standard)] transition-all duration-[var(--duration-fast)] cursor-pointer"
             >
@@ -391,8 +390,8 @@ export const InteractiveVariants: Story = {
               </CardHeader>
               <CardContent density="comfortable">
                 <p className="text-sm text-muted-foreground">
-                  Secondary interactive cards use more subtle hover effects to indicate
-                  interaction while maintaining visual hierarchy.
+                  Secondary interactive cards use more subtle hover effects to indicate interaction
+                  while maintaining visual hierarchy.
                 </p>
               </CardContent>
               <CardFooter justify="end">
@@ -426,7 +425,8 @@ export const InteractiveVariants: Story = {
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Static cards focus on clear information presentation without interactive distractions.
+                    Static cards focus on clear information presentation without interactive
+                    distractions.
                   </p>
                 </div>
               </CardContent>
@@ -446,20 +446,20 @@ export const InteractiveVariants: Story = {
               </CardHeader>
               <CardContent density="comfortable">
                 <p className="text-sm text-muted-foreground mb-3">
-                  This approach provides specific interaction points while keeping
-                  the overall card container neutral.
+                  This approach provides specific interaction points while keeping the overall card
+                  container neutral.
                 </p>
                 <div className="space-y-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="w-full hover:opacity-[var(--opacity-hover)] transition-all duration-[var(--duration-standard)]"
                   >
                     Primary Action
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className="w-full hover:opacity-[var(--opacity-hover-subtle)] transition-all duration-[var(--duration-fast)]"
                   >
                     Secondary Action
@@ -474,7 +474,7 @@ export const InteractiveVariants: Story = {
         <div>
           <h4 className="text-base font-medium mb-4">Card State Variations</h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card 
+            <Card
               prominence="default"
               className="hover:opacity-[var(--opacity-hover)] transition-all duration-[var(--duration-standard)]"
             >
@@ -493,17 +493,12 @@ export const InteractiveVariants: Story = {
               </CardContent>
             </Card>
 
-            <Card 
-              prominence="subtle" 
-              className="opacity-60"
-            >
+            <Card prominence="subtle" className="opacity-60">
               <CardHeader density="comfortable">
                 <CardTitle level={5} weight="medium">
                   Disabled State
                 </CardTitle>
-                <CardDescription prominence="muted">
-                  Content unavailable or loading
-                </CardDescription>
+                <CardDescription prominence="muted">Content unavailable or loading</CardDescription>
               </CardHeader>
               <CardContent density="comfortable">
                 <div className="space-y-2">
@@ -513,10 +508,7 @@ export const InteractiveVariants: Story = {
               </CardContent>
             </Card>
 
-            <Card 
-              prominence="elevated" 
-              className="border-2 border-primary"
-            >
+            <Card prominence="elevated" className="border-2 border-primary">
               <CardHeader density="comfortable">
                 <CardTitle level={5} weight="medium">
                   Selected State
@@ -557,17 +549,18 @@ export const VisualComparison: Story = {
     <div className="w-full max-w-6xl">
       <h3 className="text-lg font-medium mb-6">Visual Treatment Comparison</h3>
       <div className="space-y-8">
-        
         {/* Prominence Comparison */}
         <div>
           <h4 className="text-base font-medium mb-4">Prominence Levels</h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card 
+            <Card
               prominence="elevated"
               className="shadow-[var(--shadow-hover-prominent)] border-l-4 border-l-primary"
             >
               <CardHeader density="spacious">
-                <CardTitle level={3} weight="bold">Elevated</CardTitle>
+                <CardTitle level={3} weight="bold">
+                  Elevated
+                </CardTitle>
                 <CardDescription prominence="enhanced">
                   Maximum visual impact for primary content
                 </CardDescription>
@@ -581,7 +574,9 @@ export const VisualComparison: Story = {
 
             <Card prominence="default">
               <CardHeader density="comfortable">
-                <CardTitle level={4} weight="semibold">Default</CardTitle>
+                <CardTitle level={4} weight="semibold">
+                  Default
+                </CardTitle>
                 <CardDescription prominence="default">
                   Standard visual weight for regular content
                 </CardDescription>
@@ -595,7 +590,9 @@ export const VisualComparison: Story = {
 
             <Card prominence="subtle">
               <CardHeader density="comfortable">
-                <CardTitle level={5} weight="medium">Subtle</CardTitle>
+                <CardTitle level={5} weight="medium">
+                  Subtle
+                </CardTitle>
                 <CardDescription prominence="muted">
                   Minimal visual weight for supporting content
                 </CardDescription>
@@ -615,7 +612,9 @@ export const VisualComparison: Story = {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card>
               <CardHeader density="compact">
-                <CardTitle level={5} weight="medium">Compact</CardTitle>
+                <CardTitle level={5} weight="medium">
+                  Compact
+                </CardTitle>
               </CardHeader>
               <CardContent density="compact">
                 <div className="text-xs space-y-1">
@@ -625,13 +624,17 @@ export const VisualComparison: Story = {
                 </div>
               </CardContent>
               <CardFooter density="compact">
-                <Button variant="ghost" size="sm">Action</Button>
+                <Button variant="ghost" size="sm">
+                  Action
+                </Button>
               </CardFooter>
             </Card>
 
             <Card>
               <CardHeader density="comfortable">
-                <CardTitle level={4} weight="medium">Comfortable</CardTitle>
+                <CardTitle level={4} weight="medium">
+                  Comfortable
+                </CardTitle>
               </CardHeader>
               <CardContent density="comfortable">
                 <div className="text-sm space-y-2">
@@ -641,13 +644,17 @@ export const VisualComparison: Story = {
                 </div>
               </CardContent>
               <CardFooter density="comfortable">
-                <Button variant="outline" size="sm">Action</Button>
+                <Button variant="outline" size="sm">
+                  Action
+                </Button>
               </CardFooter>
             </Card>
 
             <Card>
               <CardHeader density="spacious">
-                <CardTitle level={3} weight="medium">Spacious</CardTitle>
+                <CardTitle level={3} weight="medium">
+                  Spacious
+                </CardTitle>
               </CardHeader>
               <CardContent density="spacious">
                 <div className="text-sm space-y-3">
@@ -657,7 +664,9 @@ export const VisualComparison: Story = {
                 </div>
               </CardContent>
               <CardFooter density="spacious">
-                <Button variant="primary" size="md">Action</Button>
+                <Button variant="primary" size="md">
+                  Action
+                </Button>
               </CardFooter>
             </Card>
           </div>
@@ -669,29 +678,31 @@ export const VisualComparison: Story = {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card className="hover:opacity-[var(--opacity-hover)] transition-all duration-[var(--duration-standard)]">
               <CardHeader density="compact">
-                <CardTitle level={5} weight="medium">Hover</CardTitle>
+                <CardTitle level={5} weight="medium">
+                  Hover
+                </CardTitle>
               </CardHeader>
               <CardContent density="compact">
-                <p className="text-xs text-muted-foreground">
-                  Hover over to see opacity change
-                </p>
+                <p className="text-xs text-muted-foreground">Hover over to see opacity change</p>
               </CardContent>
             </Card>
 
             <Card className="border-2 border-primary bg-primary/5">
               <CardHeader density="compact">
-                <CardTitle level={5} weight="medium">Selected</CardTitle>
+                <CardTitle level={5} weight="medium">
+                  Selected
+                </CardTitle>
               </CardHeader>
               <CardContent density="compact">
-                <p className="text-xs text-muted-foreground">
-                  Enhanced border indicates selection
-                </p>
+                <p className="text-xs text-muted-foreground">Enhanced border indicates selection</p>
               </CardContent>
             </Card>
 
             <Card className="opacity-60">
               <CardHeader density="compact">
-                <CardTitle level={5} weight="medium">Disabled</CardTitle>
+                <CardTitle level={5} weight="medium">
+                  Disabled
+                </CardTitle>
               </CardHeader>
               <CardContent density="compact">
                 <p className="text-xs text-muted-foreground">
@@ -702,12 +713,12 @@ export const VisualComparison: Story = {
 
             <Card className="border border-dashed border-muted-foreground/30">
               <CardHeader density="compact">
-                <CardTitle level={5} weight="medium">Placeholder</CardTitle>
+                <CardTitle level={5} weight="medium">
+                  Placeholder
+                </CardTitle>
               </CardHeader>
               <CardContent density="compact">
-                <p className="text-xs text-muted-foreground">
-                  Dashed border indicates empty state
-                </p>
+                <p className="text-xs text-muted-foreground">Dashed border indicates empty state</p>
               </CardContent>
             </Card>
           </div>

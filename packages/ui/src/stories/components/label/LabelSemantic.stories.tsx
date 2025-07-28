@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Input } from '../../../components/Input';
 import { Button } from '../../../components/Button';
+import { Input } from '../../../components/Input';
 
-const Label = ({ 
-  children, 
-  htmlFor, 
+const Label = ({
+  children,
+  htmlFor,
   variant = 'default',
   className = '',
-  ...props 
+  ...props
 }: {
   children: React.ReactNode;
   htmlFor?: string;
@@ -15,18 +15,18 @@ const Label = ({
   className?: string;
   [key: string]: any;
 }) => {
-  const baseClasses = "text-sm";
+  const baseClasses = 'text-sm';
   const variantClasses = {
-    field: "font-medium",
-    hint: "text-muted-foreground",
-    error: "text-destructive",
-    success: "text-green-600",
-    meta: "text-xs text-muted-foreground",
-    status: "text-xs font-medium"
+    field: 'font-medium',
+    hint: 'text-muted-foreground',
+    error: 'text-destructive',
+    success: 'text-green-600',
+    meta: 'text-xs text-muted-foreground',
+    status: 'text-xs font-medium',
   };
-  
+
   return (
-    <label 
+    <label
       htmlFor={htmlFor}
       className={`${baseClasses} ${variantClasses[variant]} ${className}`}
       {...props}
@@ -69,7 +69,6 @@ export const InformationHierarchy: Story = {
     <div className="w-full max-w-4xl">
       <h3 className="text-lg font-medium mb-6">Semantic Information Hierarchy</h3>
       <div className="space-y-8">
-        
         {/* Primary Information Layer */}
         <section>
           <h4 className="text-base font-medium mb-4">Primary Information Layer</h4>
@@ -78,11 +77,7 @@ export const InformationHierarchy: Story = {
               <Label htmlFor="primary-email" variant="field">
                 Email Address
               </Label>
-              <Input
-                id="primary-email"
-                type="email"
-                placeholder="user@example.com"
-              />
+              <Input id="primary-email" type="email" placeholder="user@example.com" />
               <p className="text-xs text-muted-foreground">
                 Essential field identification that users need for task completion
               </p>
@@ -93,9 +88,15 @@ export const InformationHierarchy: Story = {
                 Payment Method
               </Label>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm">Credit Card</Button>
-                <Button variant="outline" size="sm">PayPal</Button>
-                <Button variant="outline" size="sm">Bank Transfer</Button>
+                <Button variant="outline" size="sm">
+                  Credit Card
+                </Button>
+                <Button variant="outline" size="sm">
+                  PayPal
+                </Button>
+                <Button variant="outline" size="sm">
+                  Bank Transfer
+                </Button>
               </div>
               <p className="text-xs text-muted-foreground">
                 Critical decision points get primary label treatment
@@ -115,11 +116,7 @@ export const InformationHierarchy: Story = {
               <Label variant="hint">
                 We'll use this to help you recover your account if needed
               </Label>
-              <Input
-                id="context-recovery"
-                type="email"
-                placeholder="recovery@example.com"
-              />
+              <Input id="context-recovery" type="email" placeholder="recovery@example.com" />
               <p className="text-xs text-muted-foreground">
                 Contextual information helps users understand purpose and value
               </p>
@@ -129,14 +126,8 @@ export const InformationHierarchy: Story = {
               <Label htmlFor="context-phone" variant="field">
                 Phone Number
               </Label>
-              <Label variant="hint">
-                For important account security notifications only
-              </Label>
-              <Input
-                id="context-phone"
-                type="tel"
-                placeholder="+1 (555) 123-4567"
-              />
+              <Label variant="hint">For important account security notifications only</Label>
+              <Input id="context-phone" type="tel" placeholder="+1 (555) 123-4567" />
               <p className="text-xs text-muted-foreground">
                 Context reduces user anxiety about data usage
               </p>
@@ -153,23 +144,18 @@ export const InformationHierarchy: Story = {
                 <Label htmlFor="support-photo" variant="field">
                   Profile Photo
                 </Label>
-                <Label variant="meta">
-                  Optional • Max 5MB
-                </Label>
+                <Label variant="meta">Optional • Max 5MB</Label>
               </div>
               <div className="border-2 border-dashed border-muted rounded-md p-6 text-center">
                 <Button variant="outline" size="sm">
                   Choose Photo
                 </Button>
               </div>
-              <Label variant="hint">
-                JPG, PNG, or GIF format recommended
-              </Label>
-              <Label variant="meta">
-                Last updated: Never
-              </Label>
+              <Label variant="hint">JPG, PNG, or GIF format recommended</Label>
+              <Label variant="meta">Last updated: Never</Label>
               <p className="text-xs text-muted-foreground">
-                Supporting information provides additional context without overwhelming primary tasks
+                Supporting information provides additional context without overwhelming primary
+                tasks
               </p>
             </div>
           </div>
@@ -179,8 +165,10 @@ export const InformationHierarchy: Story = {
       <div className="mt-8 p-4 bg-muted/50 rounded-md">
         <h4 className="font-medium text-sm mb-2">Information Hierarchy</h4>
         <p className="text-xs text-muted-foreground">
-          <strong>Primary:</strong> Essential task completion information<br />
-          <strong>Secondary:</strong> Contextual guidance and purpose explanation<br />
+          <strong>Primary:</strong> Essential task completion information
+          <br />
+          <strong>Secondary:</strong> Contextual guidance and purpose explanation
+          <br />
           <strong>Tertiary:</strong> Supporting details and meta information
         </p>
       </div>
@@ -207,7 +195,6 @@ export const ContextualCommunication: Story = {
     <div className="w-full max-w-5xl">
       <h3 className="text-lg font-medium mb-6">Context-Adaptive Label Patterns</h3>
       <div className="space-y-8">
-        
         {/* Authentication Context */}
         <section>
           <h4 className="text-base font-medium mb-4">Authentication Context</h4>
@@ -219,24 +206,18 @@ export const ContextualCommunication: Story = {
                   <Label htmlFor="signin-email" variant="field">
                     Email or Username
                   </Label>
-                  <Input
-                    id="signin-email"
-                    type="text"
-                    placeholder="Enter your email or username"
-                  />
+                  <Input id="signin-email" type="text" placeholder="Enter your email or username" />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="signin-password" variant="field">
                     Password
                   </Label>
-                  <Input
-                    id="signin-password"
-                    type="password"
-                    placeholder="Enter your password"
-                  />
+                  <Input id="signin-password" type="password" placeholder="Enter your password" />
                   <Label variant="hint">
-                    <a href="#" className="text-primary hover:underline">Forgot your password?</a>
+                    <a href="#" className="text-primary hover:underline">
+                      Forgot your password?
+                    </a>
                   </Label>
                 </div>
               </div>
@@ -252,16 +233,10 @@ export const ContextualCommunication: Story = {
                   <Label htmlFor="create-email" variant="field">
                     Email Address
                   </Label>
-                  <Label variant="hint">
-                    We'll send a verification link to this address
-                  </Label>
-                  <Input
-                    id="create-email"
-                    type="email"
-                    placeholder="user@example.com"
-                  />
+                  <Label variant="hint">We'll send a verification link to this address</Label>
+                  <Input id="create-email" type="email" placeholder="user@example.com" />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="create-password" variant="field">
                     Create Password
@@ -269,11 +244,7 @@ export const ContextualCommunication: Story = {
                   <Label variant="hint">
                     Must be at least 8 characters with numbers and symbols
                   </Label>
-                  <Input
-                    id="create-password"
-                    type="password"
-                    placeholder="Enter secure password"
-                  />
+                  <Input id="create-password" type="password" placeholder="Enter secure password" />
                 </div>
               </div>
               <p className="text-xs text-muted-foreground mt-4">
@@ -293,42 +264,26 @@ export const ContextualCommunication: Story = {
                 <Label htmlFor="financial-card" variant="field">
                   Credit Card Number
                 </Label>
-                <Label variant="hint">
-                  Your payment information is encrypted and secure
-                </Label>
-                <Input
-                  id="financial-card"
-                  type="text"
-                  placeholder="1234 5678 9012 3456"
-                />
+                <Label variant="hint">Your payment information is encrypted and secure</Label>
+                <Input id="financial-card" type="text" placeholder="1234 5678 9012 3456" />
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="financial-expiry" variant="field">
                     Expiry Date
                   </Label>
-                  <Input
-                    id="financial-expiry"
-                    type="text"
-                    placeholder="MM/YY"
-                  />
+                  <Input id="financial-expiry" type="text" placeholder="MM/YY" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="financial-cvv" variant="field">
                     Security Code
                   </Label>
-                  <Label variant="hint">
-                    3 digits on back of card
-                  </Label>
-                  <Input
-                    id="financial-cvv"
-                    type="password"
-                    placeholder="123"
-                  />
+                  <Label variant="hint">3 digits on back of card</Label>
+                  <Input id="financial-cvv" type="password" placeholder="123" />
                 </div>
               </div>
-              
+
               <Label variant="meta">
                 🔒 SSL encrypted • Your information is never stored on our servers
               </Label>
@@ -349,19 +304,11 @@ export const ContextualCommunication: Story = {
                 <Label htmlFor="content-title" variant="field">
                   Article Title
                 </Label>
-                <Label variant="hint">
-                  Keep it under 60 characters for best SEO results
-                </Label>
-                <Input
-                  id="content-title"
-                  type="text"
-                  placeholder="Enter your article title"
-                />
-                <Label variant="meta">
-                  Character count: 0/60
-                </Label>
+                <Label variant="hint">Keep it under 60 characters for best SEO results</Label>
+                <Input id="content-title" type="text" placeholder="Enter your article title" />
+                <Label variant="meta">Character count: 0/60</Label>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="content-excerpt" variant="field">
                   Article Excerpt
@@ -375,15 +322,13 @@ export const ContextualCommunication: Story = {
                   placeholder="Write a compelling summary..."
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <Label htmlFor="content-featured" variant="field">
                     Featured Image
                   </Label>
-                  <Label variant="meta">
-                    Recommended: 1200×630px
-                  </Label>
+                  <Label variant="meta">Recommended: 1200×630px</Label>
                 </div>
                 <div className="border-2 border-dashed border-muted rounded-md p-6 text-center">
                   <Button variant="outline" size="sm">
@@ -411,47 +356,25 @@ export const ContextualCommunication: Story = {
                 <Label htmlFor="config-endpoint" variant="field">
                   API Endpoint URL
                 </Label>
-                <Label variant="hint">
-                  Must be HTTPS for production environments
-                </Label>
-                <Input
-                  id="config-endpoint"
-                  type="url"
-                  placeholder="https://api.example.com/v1"
-                />
+                <Label variant="hint">Must be HTTPS for production environments</Label>
+                <Input id="config-endpoint" type="url" placeholder="https://api.example.com/v1" />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="config-key" variant="field">
                   API Key
                 </Label>
-                <Label variant="hint">
-                  Generate new keys in your developer dashboard
-                </Label>
-                <Input
-                  id="config-key"
-                  type="password"
-                  placeholder="sk_live_..."
-                />
-                <Label variant="meta">
-                  Keys are encrypted and only visible to administrators
-                </Label>
+                <Label variant="hint">Generate new keys in your developer dashboard</Label>
+                <Input id="config-key" type="password" placeholder="sk_live_..." />
+                <Label variant="meta">Keys are encrypted and only visible to administrators</Label>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="config-timeout" variant="field">
                   Request Timeout (seconds)
                 </Label>
-                <Label variant="hint">
-                  Recommended: 30 seconds for external APIs
-                </Label>
-                <Input
-                  id="config-timeout"
-                  type="number"
-                  placeholder="30"
-                  min="1"
-                  max="300"
-                />
+                <Label variant="hint">Recommended: 30 seconds for external APIs</Label>
+                <Input id="config-timeout" type="number" placeholder="30" min="1" max="300" />
               </div>
             </div>
             <p className="text-xs text-muted-foreground mt-4">
@@ -483,22 +406,16 @@ export const ProgressiveDisclosure: Story = {
     <div className="w-full max-w-4xl">
       <h3 className="text-lg font-medium mb-6">Progressive Information Disclosure</h3>
       <div className="space-y-8">
-        
         {/* Basic → Enhanced Disclosure */}
         <section>
           <h4 className="text-base font-medium mb-4">Basic → Enhanced Information</h4>
           <div className="space-y-6">
-            
             {/* Level 1: Basic Identification */}
             <div className="space-y-2">
               <Label htmlFor="basic-username" variant="field">
                 Username
               </Label>
-              <Input
-                id="basic-username"
-                type="text"
-                placeholder="Choose a username"
-              />
+              <Input id="basic-username" type="text" placeholder="Choose a username" />
               <p className="text-xs text-muted-foreground">
                 <strong>Level 1:</strong> Basic field identification for immediate understanding
               </p>
@@ -509,14 +426,8 @@ export const ProgressiveDisclosure: Story = {
               <Label htmlFor="guided-username" variant="field">
                 Username
               </Label>
-              <Label variant="hint">
-                This will be your unique identifier on the platform
-              </Label>
-              <Input
-                id="guided-username"
-                type="text"
-                placeholder="Choose a username"
-              />
+              <Label variant="hint">This will be your unique identifier on the platform</Label>
+              <Input id="guided-username" type="text" placeholder="Choose a username" />
               <p className="text-xs text-muted-foreground">
                 <strong>Level 2:</strong> Adds context about purpose and importance
               </p>
@@ -527,17 +438,11 @@ export const ProgressiveDisclosure: Story = {
               <Label htmlFor="detailed-username" variant="field">
                 Username
               </Label>
-              <Label variant="hint">
-                This will be your unique identifier on the platform
-              </Label>
+              <Label variant="hint">This will be your unique identifier on the platform</Label>
               <Label variant="hint">
                 3-20 characters, letters and numbers only, cannot be changed later
               </Label>
-              <Input
-                id="detailed-username"
-                type="text"
-                placeholder="Choose a username"
-              />
+              <Input id="detailed-username" type="text" placeholder="Choose a username" />
               <p className="text-xs text-muted-foreground">
                 <strong>Level 3:</strong> Includes detailed requirements and constraints
               </p>
@@ -548,24 +453,13 @@ export const ProgressiveDisclosure: Story = {
               <Label htmlFor="interactive-username" variant="field">
                 Username
               </Label>
-              <Label variant="hint">
-                This will be your unique identifier on the platform
-              </Label>
+              <Label variant="hint">This will be your unique identifier on the platform</Label>
               <Label variant="hint">
                 3-20 characters, letters and numbers only, cannot be changed later
               </Label>
-              <Input
-                id="interactive-username"
-                type="text"
-                defaultValue="john"
-                variant="error"
-              />
-              <Label variant="error">
-                Username must be at least 3 characters long
-              </Label>
-              <Label variant="meta">
-                Suggestions: john123, johnsmith, johndoe2024
-              </Label>
+              <Input id="interactive-username" type="text" defaultValue="john" variant="error" />
+              <Label variant="error">Username must be at least 3 characters long</Label>
+              <Label variant="meta">Suggestions: john123, johnsmith, johndoe2024</Label>
               <p className="text-xs text-muted-foreground">
                 <strong>Level 4:</strong> Real-time feedback with helpful suggestions
               </p>
@@ -577,7 +471,6 @@ export const ProgressiveDisclosure: Story = {
         <section>
           <h4 className="text-base font-medium mb-4">Context-Sensitive Information Layers</h4>
           <div className="space-y-6">
-            
             {/* New User Experience */}
             <div className="p-4 border border-blue-200 bg-blue-50 rounded-md">
               <h5 className="text-sm font-medium mb-4 text-blue-800">New User Setup</h5>
@@ -592,11 +485,7 @@ export const ProgressiveDisclosure: Story = {
                   <Label variant="hint">
                     Use a mix of letters, numbers, and symbols for the best security
                   </Label>
-                  <Input
-                    id="new-password"
-                    type="password"
-                    placeholder="Enter a strong password"
-                  />
+                  <Input id="new-password" type="password" placeholder="Enter a strong password" />
                   <Label variant="meta">
                     💡 Tip: Consider using a password manager to generate and store secure passwords
                   </Label>
@@ -643,21 +532,13 @@ export const ProgressiveDisclosure: Story = {
         <section>
           <h4 className="text-base font-medium mb-4">Error Recovery Information Layers</h4>
           <div className="space-y-6">
-            
             {/* Initial Error State */}
             <div className="space-y-2">
               <Label htmlFor="error-email" variant="field">
                 Email Address
               </Label>
-              <Input
-                id="error-email"
-                type="email"
-                defaultValue="invalid-email"
-                variant="error"
-              />
-              <Label variant="error">
-                Please enter a valid email address
-              </Label>
+              <Input id="error-email" type="email" defaultValue="invalid-email" variant="error" />
+              <Label variant="error">Please enter a valid email address</Label>
               <p className="text-xs text-muted-foreground">
                 <strong>Initial:</strong> Basic error identification
               </p>
@@ -668,18 +549,11 @@ export const ProgressiveDisclosure: Story = {
               <Label htmlFor="enhanced-error-email" variant="field">
                 Email Address
               </Label>
-              <Input
-                id="enhanced-error-email"
-                type="email"
-                defaultValue="user@"
-                variant="error"
-              />
+              <Input id="enhanced-error-email" type="email" defaultValue="user@" variant="error" />
               <Label variant="error">
                 Email address is incomplete - please include the domain (e.g., @gmail.com)
               </Label>
-              <Label variant="hint">
-                Example: user@company.com or personal@gmail.com
-              </Label>
+              <Label variant="hint">Example: user@company.com or personal@gmail.com</Label>
               <p className="text-xs text-muted-foreground">
                 <strong>Enhanced:</strong> Specific problem identification with examples
               </p>
@@ -697,7 +571,9 @@ export const ProgressiveDisclosure: Story = {
                 variant="error"
               />
               <Label variant="error">
-                Did you mean <button className="text-primary hover:underline font-medium">user@gmail.com</button>?
+                Did you mean{' '}
+                <button className="text-primary hover:underline font-medium">user@gmail.com</button>
+                ?
               </Label>
               <Label variant="hint">
                 Click the suggestion above or continue typing your email address
@@ -713,9 +589,12 @@ export const ProgressiveDisclosure: Story = {
       <div className="mt-8 p-4 bg-muted/50 rounded-md">
         <h4 className="font-medium text-sm mb-2">Disclosure Principles</h4>
         <p className="text-xs text-muted-foreground">
-          <strong>Start Simple:</strong> Begin with essential information only<br />
-          <strong>Add Context:</strong> Provide purpose and guidance when helpful<br />
-          <strong>Show Details:</strong> Reveal constraints and requirements progressively<br />
+          <strong>Start Simple:</strong> Begin with essential information only
+          <br />
+          <strong>Add Context:</strong> Provide purpose and guidance when helpful
+          <br />
+          <strong>Show Details:</strong> Reveal constraints and requirements progressively
+          <br />
           <strong>Support Recovery:</strong> Offer specific help when problems occur
         </p>
       </div>

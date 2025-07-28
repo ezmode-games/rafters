@@ -18,9 +18,5 @@ export async function installDependencies(
 }
 
 export function getCoreDependencies(): string[] {
-  return [
-    '@radix-ui/react-slot',
-    'clsx',
-    'tailwind-merge',
-  ];
+  return ['@radix-ui/react-slot', 'clsx', 'tailwind-merge'];
 }

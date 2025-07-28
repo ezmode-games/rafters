@@ -1,6 +1,6 @@
-import { z } from 'zod';
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { z } from 'zod';
 
 export const ConfigSchema = z.object({
   version: z.string(),
@@ -32,7 +32,7 @@ export function configExists(cwd = process.cwd()): boolean {
 
 export function loadConfig(cwd = process.cwd()): Config {
   const configPath = getConfigPath(cwd);
-  
+
   if (!existsSync(configPath)) {
     throw new Error('Rafters not initialized. Run `rafters init` first.');
   }
@@ -63,9 +63,7 @@ export function isNodeProject(cwd = process.cwd()): boolean {
 
 export function hasReact(cwd = process.cwd()): boolean {
   try {
-    const packageJson = JSON.parse(
-      readFileSync(join(cwd, 'package.json'), 'utf-8')
-    );
+    const packageJson = JSON.parse(readFileSync(join(cwd, 'package.json'), 'utf-8'));
     const deps = {
       ...packageJson.dependencies,
       ...packageJson.devDependencies,

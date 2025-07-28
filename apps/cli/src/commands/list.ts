@@ -1,9 +1,9 @@
+import { existsSync, readFileSync } from 'fs';
+import { join } from 'path';
 import chalk from 'chalk';
 import { loadConfig } from '../utils/config.js';
-import { fetchComponentRegistry } from '../utils/registry.js';
 import { getRaftersTitle } from '../utils/logo.js';
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
+import { fetchComponentRegistry } from '../utils/registry.js';
 
 interface ListOptions {
   details?: boolean;
@@ -28,7 +28,7 @@ function loadInstalledComponents(cwd = process.cwd()): Record<string, InstalledC
   try {
     const manifestPath = join(cwd, '.rafters', 'component-manifest.json');
     if (!existsSync(manifestPath)) return {};
-    
+
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
     return manifest.components || {};
   } catch {
@@ -45,7 +45,7 @@ export async function listCommand(options: ListOptions = {}): Promise<void> {
       // If not initialized, just show available components
       config = null;
     }
-    
+
     const registry = await fetchComponentRegistry();
     const installed = config ? loadInstalledComponents() : {};
 
@@ -55,39 +55,42 @@ export async function listCommand(options: ListOptions = {}): Promise<void> {
     if (options.details) {
       // Show detailed view
       const installedComponents = Object.values(installed);
-      
+
       if (installedComponents.length > 0) {
         console.log(chalk.green('Installed Components:'));
         console.log();
-        
+
         for (const component of installedComponents) {
           console.log(chalk.bold(component.name) + chalk.gray(` (v${component.version})`));
           console.log(chalk.gray(`  Path: ${component.path}`));
           if (component.story) {
             console.log(chalk.gray(`  Story: ${component.story}`));
           }
-          console.log(chalk.gray(`  Intelligence: Cognitive load=${component.intelligence.cognitiveLoad}, ${component.intelligence.attentionEconomics.split(':')[0]}`));
+          console.log(
+            chalk.gray(
+              `  Intelligence: Cognitive load=${component.intelligence.cognitiveLoad}, ${component.intelligence.attentionEconomics.split(':')[0]}`
+            )
+          );
           console.log();
         }
       }
 
-      const availableComponents = registry.components.filter(
-        (c) => !installed[c.name]
-      );
+      const availableComponents = registry.components.filter((c) => !installed[c.name]);
 
       if (availableComponents.length > 0) {
         console.log(chalk.yellow(`Available Components: ${availableComponents.length} remaining`));
         console.log();
-        
+
         for (const component of availableComponents.slice(0, 5)) {
-          console.log(chalk.gray('  ') + component.name + chalk.gray(` - ${component.description}`));
+          console.log(
+            chalk.gray('  ') + component.name + chalk.gray(` - ${component.description}`)
+          );
         }
-        
+
         if (availableComponents.length > 5) {
           console.log(chalk.gray(`  ... and ${availableComponents.length - 5} more`));
         }
       }
-
     } else {
       // Show compact view
       console.log('Available Components:');
@@ -98,13 +101,13 @@ export async function listCommand(options: ListOptions = {}): Promise<void> {
         const icon = isInstalled ? chalk.green('✓') : chalk.gray(' ');
         const name = isInstalled ? chalk.green(component.name) : component.name;
         const description = chalk.gray(`- ${component.description}`);
-        
+
         console.log(`${icon} ${name.padEnd(12)} ${description}`);
       }
 
       const installedCount = Object.keys(installed).length;
       const totalCount = registry.components.length;
-      
+
       console.log();
       console.log(chalk.gray(`Installed: ${installedCount}/${totalCount} components`));
       console.log();
@@ -117,7 +120,6 @@ export async function listCommand(options: ListOptions = {}): Promise<void> {
         console.log(chalk.gray("Run 'rafters init' to initialize Rafters in your project."));
       }
     }
-
   } catch (error) {
     console.error(chalk.red('Error listing components:'), error);
     process.exit(1);

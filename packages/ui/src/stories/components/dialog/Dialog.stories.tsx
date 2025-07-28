@@ -64,14 +64,17 @@ export const Common: Story = {
   render: (args) => (
     <div className="space-y-4">
       <div className="text-sm text-muted-foreground mb-6">
-        <strong>Dialog Trust Levels:</strong> Low → Medium → High → Critical with increasing visual hierarchy
+        <strong>Dialog Trust Levels:</strong> Low → Medium → High → Critical with increasing visual
+        hierarchy
       </div>
-      
+
       <div className="flex gap-4 flex-wrap">
         {/* Low Trust */}
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="outline" size="sm">Low Trust</Button>
+            <Button variant="outline" size="sm">
+              Low Trust
+            </Button>
           </DialogTrigger>
           <DialogContent trustLevel="low" size="sm" {...args}>
             <DialogHeader>
@@ -80,9 +83,13 @@ export const Common: Story = {
             </DialogHeader>
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="outline" size="sm">Cancel</Button>
+                <Button variant="outline" size="sm">
+                  Cancel
+                </Button>
               </DialogClose>
-              <Button size="sm" onClick={fn()}>Save Draft</Button>
+              <Button size="sm" onClick={fn()}>
+                Save Draft
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -103,7 +110,9 @@ export const Common: Story = {
               <DialogClose asChild>
                 <Button variant="outline">Save as Draft</Button>
               </DialogClose>
-              <Button variant="primary" onClick={fn()}>Publish Now</Button>
+              <Button variant="primary" onClick={fn()}>
+                Publish Now
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -117,14 +126,17 @@ export const Common: Story = {
             <DialogHeader>
               <DialogTitle>Process Payment</DialogTitle>
               <DialogDescription>
-                You will be charged $49.99 for Premium Plan. This will automatically renew monthly unless cancelled.
+                You will be charged $49.99 for Premium Plan. This will automatically renew monthly
+                unless cancelled.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
-              <Button variant="primary" onClick={fn()}>Confirm Payment</Button>
+              <Button variant="primary" onClick={fn()}>
+                Confirm Payment
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -138,14 +150,17 @@ export const Common: Story = {
             <DialogHeader>
               <DialogTitle>Delete Account</DialogTitle>
               <DialogDescription>
-                This action cannot be undone. This will permanently delete your account and remove all your data.
+                This action cannot be undone. This will permanently delete your account and remove
+                all your data.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
               <DialogClose asChild>
                 <Button variant="outline">Keep Account</Button>
               </DialogClose>
-              <Button variant="destructive" onClick={fn()}>Delete Forever</Button>
+              <Button variant="destructive" onClick={fn()}>
+                Delete Forever
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -155,7 +170,8 @@ export const Common: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Complete overview of dialog trust levels and their visual hierarchy. Each level provides appropriate visual weight and confirmation patterns for the sensitivity of the operation.',
+        story:
+          'Complete overview of dialog trust levels and their visual hierarchy. Each level provides appropriate visual weight and confirmation patterns for the sensitivity of the operation.',
       },
     },
   },

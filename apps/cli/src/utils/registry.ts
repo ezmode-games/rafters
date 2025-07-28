@@ -1,5 +1,10 @@
+/**
+ * Registry API client for fetching components from rafters.realhandy.tech
+ */
+
 import { z } from 'zod';
 
+// Registry API response schemas
 export const IntelligenceSchema = z.object({
   cognitiveLoad: z.number().min(1).max(10),
   attentionEconomics: z.string(),
@@ -13,11 +18,13 @@ export const ComponentManifestSchema = z.object({
   version: z.string(),
   description: z.string(),
   intelligence: IntelligenceSchema,
-  files: z.object({
-    component: z.string(),
-    story: z.string().optional(),
-    types: z.string().optional(),
-  }),
+  files: z.array(
+    z.object({
+      name: z.string(),
+      type: z.string(),
+      content: z.string(),
+    })
+  ),
   dependencies: z.array(z.string()),
 });
 
@@ -29,10 +36,82 @@ export type Intelligence = z.infer<typeof IntelligenceSchema>;
 export type ComponentManifest = z.infer<typeof ComponentManifestSchema>;
 export type Registry = z.infer<typeof RegistrySchema>;
 
-// For now, we'll use local components from our main project
-// Later this would fetch from a real registry
+// Registry configuration
+const REGISTRY_BASE_URL =
+  process.env.RAFTERS_REGISTRY_URL || 'https://rafters.realhandy.tech/registry';
+const REGISTRY_TIMEOUT = 10000; // 10 seconds
+
+// HTTP client with error handling
+async function fetchFromRegistry(endpoint: string): Promise<any> {
+  const url = `${REGISTRY_BASE_URL}${endpoint}`;
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REGISTRY_TIMEOUT);
+
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        Accept: 'application/json',
+        'User-Agent': 'rafters-cli/1.0.0',
+      },
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Registry API error: ${response.status} ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        throw new Error(`Registry request timeout after ${REGISTRY_TIMEOUT}ms`);
+      }
+      throw new Error(`Failed to fetch from registry: ${error.message}`);
+    }
+    throw error;
+  }
+}
+
+/**
+ * Fetch complete component registry from the hosted API
+ */
 export async function fetchComponentRegistry(): Promise<Registry> {
-  // Mock registry data based on our actual components
+  try {
+    const data = await fetchFromRegistry('/components');
+    return RegistrySchema.parse(data);
+  } catch (error) {
+    // Fallback to mock data if registry is unavailable
+    console.warn('Registry API unavailable, using fallback data:', error);
+    return getFallbackRegistry();
+  }
+}
+
+/**
+ * Fetch a specific component by name from the hosted API
+ */
+export async function fetchComponent(componentName: string): Promise<ComponentManifest | null> {
+  try {
+    const data = await fetchFromRegistry(`/components/${encodeURIComponent(componentName)}`);
+    return ComponentManifestSchema.parse(data);
+  } catch (error) {
+    console.warn(`Component '${componentName}' not found in registry:`, error);
+
+    // Fallback to registry search
+    const registry = await fetchComponentRegistry();
+    return (
+      registry.components.find((c) => c.name.toLowerCase() === componentName.toLowerCase()) || null
+    );
+  }
+}
+
+/**
+ * Fallback registry data when API is unavailable
+ * This ensures the CLI continues to work during development/outages
+ */
+function getFallbackRegistry(): Registry {
   const components: ComponentManifest[] = [
     {
       name: 'Button',
@@ -43,12 +122,16 @@ export async function fetchComponentRegistry(): Promise<Registry> {
         attentionEconomics: 'Size hierarchy: sm=tertiary, md=secondary, lg=primary',
         accessibility: '44px touch targets, WCAG AAA contrast, keyboard navigation',
         trustBuilding: 'Destructive variant requires confirmation patterns',
-        semanticMeaning: 'Primary=main action, Secondary=optional, Destructive=careful consideration',
+        semanticMeaning:
+          'Primary=main action, Secondary=optional, Destructive=careful consideration',
       },
-      files: {
-        component: 'button.tsx',
-        story: 'button-intelligence.stories.tsx',
-      },
+      files: [
+        {
+          name: 'button.tsx',
+          type: 'component',
+          content: '// Button component will be fetched from registry',
+        },
+      ],
       dependencies: ['@radix-ui/react-slot'],
     },
     {
@@ -62,10 +145,13 @@ export async function fetchComponentRegistry(): Promise<Registry> {
         trustBuilding: 'Progressive validation feedback builds confidence',
         semanticMeaning: 'Validation states communicate system understanding',
       },
-      files: {
-        component: 'input.tsx',
-        story: 'input-intelligence.stories.tsx',
-      },
+      files: [
+        {
+          name: 'input.tsx',
+          type: 'component',
+          content: '// Input component will be fetched from registry',
+        },
+      ],
       dependencies: [],
     },
     {
@@ -79,88 +165,16 @@ export async function fetchComponentRegistry(): Promise<Registry> {
         trustBuilding: 'Consistent spacing builds visual reliability',
         semanticMeaning: 'Container intelligence communicates content relationships',
       },
-      files: {
-        component: 'card.tsx',
-        story: 'card-intelligence.stories.tsx',
-      },
+      files: [
+        {
+          name: 'card.tsx',
+          type: 'component',
+          content: '// Card component will be fetched from registry',
+        },
+      ],
       dependencies: [],
-    },
-    {
-      name: 'Select',
-      version: '1.0.0',
-      description: 'Choice components with interaction intelligence',
-      intelligence: {
-        cognitiveLoad: 5,
-        attentionEconomics: 'Clear focus states reduce choice anxiety',
-        accessibility: 'Full keyboard navigation, screen reader announcements',
-        trustBuilding: 'Predictable interaction patterns build user confidence',
-        semanticMeaning: 'Selection state clearly communicates user choices',
-      },
-      files: {
-        component: 'select.tsx',
-        story: 'select-intelligence.stories.tsx',
-      },
-      dependencies: ['@radix-ui/react-select'],
-    },
-    {
-      name: 'Dialog',
-      version: '1.0.0',
-      description: 'Modal interactions with trust-building confirmation patterns',
-      intelligence: {
-        cognitiveLoad: 7,
-        attentionEconomics: 'Focus trap and backdrop direct attention appropriately',
-        accessibility: 'Focus management, escape handling, ARIA modal patterns',
-        trustBuilding: 'Clear actions and consequences reduce modal anxiety',
-        semanticMeaning: 'Modal timing communicates action importance',
-      },
-      files: {
-        component: 'dialog.tsx',
-        story: 'dialog-intelligence.stories.tsx',
-      },
-      dependencies: ['@radix-ui/react-dialog'],
-    },
-    {
-      name: 'Label',
-      version: '1.0.0',
-      description: 'Information delivery with semantic clarity and context',
-      intelligence: {
-        cognitiveLoad: 1,
-        attentionEconomics: 'Typography hierarchy guides information processing',
-        accessibility: 'Semantic relationships via htmlFor and aria-describedby',
-        trustBuilding: 'Consistent language patterns build user confidence',
-        semanticMeaning: 'Information types mapped to appropriate visual treatments',
-      },
-      files: {
-        component: 'label.tsx',
-        story: 'label-intelligence.stories.tsx',
-      },
-      dependencies: [],
-    },
-    {
-      name: 'Tabs',
-      version: '1.0.0',
-      description: 'Navigation with cognitive load management and content organization',
-      intelligence: {
-        cognitiveLoad: 4,
-        attentionEconomics: 'Active state clearly communicates current context',
-        accessibility: 'Arrow key navigation, role=tablist, aria-selected',
-        trustBuilding: 'Predictable tab behavior reduces navigation uncertainty',
-        semanticMeaning: 'Tab grouping communicates related content relationships',
-      },
-      files: {
-        component: 'tabs.tsx',
-        story: 'tabs-intelligence.stories.tsx',
-      },
-      dependencies: ['@radix-ui/react-tabs'],
     },
   ];
 
   return { components };
-}
-
-export async function fetchComponent(componentName: string): Promise<ComponentManifest | null> {
-  const registry = await fetchComponentRegistry();
-  return registry.components.find(
-    (c) => c.name.toLowerCase() === componentName.toLowerCase()
-  ) || null;
 }
