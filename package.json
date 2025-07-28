@@ -4,10 +4,7 @@
   "description": "AI-first design intelligence system for systematic UI generation",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "dev": "pnpm --parallel dev",
     "build": "pnpm --recursive build",
@@ -15,12 +12,12 @@
     "test:run": "pnpm --recursive test:run",
     "lint": "pnpm --recursive lint",
     "format": "pnpm --recursive format",
+    "check": "pnpm biome check --write --unsafe",
     "type-check": "pnpm --recursive type-check",
-    "clean": "pnpm --recursive clean && rm -rf node_modules",
+    "clean": "find . -name 'node_modules' -type d -exec rm -rf {} + 2>/dev/null || true && find . -name 'dist' -type d -exec rm -rf {} + 2>/dev/null || true && find . -name 'build' -type d -exec rm -rf {} + 2>/dev/null || true && find . -name '.next' -type d -exec rm -rf {} + 2>/dev/null || true && find . -name 'storybook-static' -type d -exec rm -rf {} + 2>/dev/null || true && rm -f pnpm-lock.yaml",
     "ui:dev": "pnpm --filter @rafters/ui dev",
     "ui:storybook": "pnpm --filter @rafters/ui storybook",
     "ui:build-storybook": "pnpm --filter @rafters/ui build-storybook",
-    "cli:dev": "pnpm --filter @rafters/cli dev",
     "studio:dev": "pnpm --filter @rafters/studio dev"
   },
   "keywords": [
@@ -32,11 +29,11 @@
     "oklch",
     "design-reasoning"
   ],
-  "author": "Sean Poulter",
+  "author": "Sean Silvius",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/seanpoulter/rafters"
+    "url": "https://github.com/real-handy/rafters"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",

@@ -1,34 +1,34 @@
 import chalk from 'chalk';
-import ora from 'ora';
-import inquirer from 'inquirer';
 import fs from 'fs-extra';
+import inquirer from 'inquirer';
+import ora from 'ora';
 const { ensureDirSync, writeFileSync, existsSync } = fs;
-import { join } from 'path';
-import { getRaftersLogo } from '../utils/logo.js';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
-  defaultConfig,
-  saveConfig,
-  configExists,
-  isNodeProject,
-  hasReact,
-  detectPackageManager,
   type Config,
+  configExists,
+  defaultConfig,
+  detectPackageManager,
+  hasReact,
+  isNodeProject,
+  saveConfig,
 } from '../utils/config.js';
-import { installDependencies, getCoreDependencies } from '../utils/dependencies.js';
-import { readFileSync } from 'fs';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { getCoreDependencies, installDependencies } from '../utils/dependencies.js';
+import { getRaftersLogo } from '../utils/logo.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export async function initCommand(): Promise<void> {
   const cwd = process.cwd();
-  
+
   console.log(chalk.blue('🏗️  Initializing Rafters...'));
 
   // Check prerequisites
   const spinner = ora('Checking prerequisites...').start();
-  
+
   if (!isNodeProject(cwd)) {
     spinner.fail('No package.json found. Run this in a Node.js project.');
     process.exit(1);
@@ -70,7 +70,7 @@ export async function initCommand(): Promise<void> {
   ]);
 
   const packageManager = detectPackageManager(cwd);
-  
+
   const config: Config = {
     ...defaultConfig,
     hasStorybook: answers.hasStorybook,
@@ -113,13 +113,10 @@ export async function initCommand(): Promise<void> {
     // Create lib directory and utils
     const libDir = join(cwd, 'src/lib');
     ensureDirSync(libDir);
-    
+
     const utilsPath = join(libDir, 'utils.ts');
     if (!existsSync(utilsPath)) {
-      const utilsContent = readFileSync(
-        join(__dirname, '../templates/utils.ts'),
-        'utf-8'
-      );
+      const utilsContent = readFileSync(join(__dirname, '../templates/utils.ts'), 'utf-8');
       writeFileSync(utilsPath, utilsContent);
     }
 
@@ -133,13 +130,17 @@ export async function initCommand(): Promise<void> {
     // Install dependencies
     const depsSpinner = ora('Installing core dependencies...').start();
     const coreDeps = getCoreDependencies();
-    
+
     try {
       await installDependencies(coreDeps, packageManager, cwd);
       depsSpinner.succeed('Core dependencies installed');
     } catch (error) {
       depsSpinner.warn('Failed to install dependencies automatically. Please install manually:');
-      console.log(chalk.gray(`  ${packageManager} ${packageManager === 'npm' ? 'install' : 'add'} ${coreDeps.join(' ')}`));
+      console.log(
+        chalk.gray(
+          `  ${packageManager} ${packageManager === 'npm' ? 'install' : 'add'} ${coreDeps.join(' ')}`
+        )
+      );
     }
 
     // Success message
@@ -149,8 +150,9 @@ export async function initCommand(): Promise<void> {
     console.log('Next steps:');
     console.log(chalk.gray('  • Add components: ') + chalk.blue('rafters add button'));
     console.log(chalk.gray('  • List available: ') + chalk.blue('rafters list'));
-    console.log(chalk.gray('  • Read intelligence: ') + chalk.blue('.rafters/agent-instructions.md'));
-
+    console.log(
+      chalk.gray('  • Read intelligence: ') + chalk.blue('.rafters/agent-instructions.md')
+    );
   } catch (error) {
     setupSpinner.fail('Failed to setup Rafters');
     console.error(chalk.red(error));

@@ -322,3 +322,17 @@ rafters/                         # AI-First Design Intelligence System
 - **Structured intelligence data** that enables AI agents to make systematic design decisions
 
 **CRITICAL UNDERSTANDING**: This is an AI design intelligence system. Every component, story, and piece of documentation exists to make AI agents better at design decisions through systematic constraint learning and pattern recognition. Human usability is secondary to AI trainability.
+
+## Rafters Studio
+
+**Studio** is Rafters' design system generator - a standalone web application that transforms single inputs (like one color) into complete, AI-trainable design systems. See `TOKEN_STUDIO.md` for full specification.
+
+**Key Features:**
+- OKLCH color conversion for perceptual uniformity
+- Accessibility testing across all color vision types (deuteranopia, protanopia, tritanopia)
+- Semantic color assignment (primary, secondary, success, warning, danger, info)
+- Typography pairing based on project intent
+- Tailwind v4+ CSS export with semantic tokens
+- AI intelligence documentation generation
+
+**Purpose:** Generate the semantic design tokens and structured intelligence data that Rafters components need for AI training. Studio creates the "design-side infrastructure" for AI-trainable design systems.

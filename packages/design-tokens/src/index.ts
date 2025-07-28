@@ -1,12 +1,12 @@
 /**
  * @rafters/design-tokens
- * 
+ *
  * Generated design systems and semantic tokens for the Rafters AI intelligence system.
  * This package manages design token generation and Tailwind CSS output.
  */
 
-import type { DesignSystem, SemanticToken, OKLCH } from '@rafters/shared'
-import { generateLightnessScale, oklchToCSS, generateSemanticColors } from '@rafters/color-utils'
+import { generateLightnessScale, generateSemanticColors, oklchToCSS } from '@rafters/color-utils';
+import type { DesignSystem, OKLCH, SemanticToken } from '@rafters/shared';
 
 /**
  * Generate complete design system from primary color
@@ -14,18 +14,18 @@ import { generateLightnessScale, oklchToCSS, generateSemanticColors } from '@raf
 export function generateDesignSystem(
   primaryColor: OKLCH,
   config: {
-    name: string
+    name: string;
     typography?: {
-      heading: string
-      body: string
-      mono: string
-    }
+      heading: string;
+      body: string;
+      mono: string;
+    };
   }
 ): DesignSystem {
-  const id = generateSystemId(config.name)
-  const primaryScale = generateLightnessScale(primaryColor)
-  const semanticColors = generateSemanticColors(primaryColor)
-  
+  const id = generateSystemId(config.name);
+  const primaryScale = generateLightnessScale(primaryColor);
+  const semanticColors = generateSemanticColors(primaryColor);
+
   // Generate tokens
   const tokens: SemanticToken[] = [
     // Primary color scale
@@ -36,7 +36,7 @@ export function generateDesignSystem(
       semantic: `Primary color scale step ${scale}`,
       aiIntelligence: scale === '500' ? 'Base primary color - use for main actions' : undefined,
     })),
-    
+
     // Semantic colors
     {
       name: 'success',
@@ -66,7 +66,7 @@ export function generateDesignSystem(
       semantic: 'Information state color',
       aiIntelligence: 'Use for neutral information and secondary content',
     },
-    
+
     // Typography scale
     {
       name: 'text-display',
@@ -96,7 +96,7 @@ export function generateDesignSystem(
       semantic: 'Body text',
       aiIntelligence: 'Base reading size - minimum 16px for accessibility',
     },
-    
+
     // Spacing scale (φ-based)
     {
       name: 'spacing-xs',
@@ -126,8 +126,8 @@ export function generateDesignSystem(
       semantic: 'Large spacing',
       aiIntelligence: 'Generous spacing for breathing room and emphasis',
     },
-  ]
-  
+  ];
+
   return {
     id,
     name: config.name,
@@ -157,16 +157,16 @@ export function generateDesignSystem(
       updated: new Date().toISOString(),
       version: '0.1.0',
     },
-  }
+  };
 }
 
 /**
  * Export design system as Tailwind CSS v4+ theme
  */
 export function exportToTailwind(system: DesignSystem): string {
-  const colorTokens = system.tokens.filter(token => token.type === 'color')
-  const spacingTokens = system.tokens.filter(token => token.type === 'spacing')
-  
+  const colorTokens = system.tokens.filter((token) => token.type === 'color');
+  const spacingTokens = system.tokens.filter((token) => token.type === 'spacing');
+
   return `@import "tailwindcss";
 
 @theme {
@@ -174,9 +174,7 @@ export function exportToTailwind(system: DesignSystem): string {
   /* System: ${system.name} (${system.id}) */
   
   /* Color System (OKLCH) */
-${colorTokens.map(token => 
-    `  --color-${token.name}: ${token.value};`
-  ).join('\n')}
+${colorTokens.map((token) => `  --color-${token.name}: ${token.value};`).join('\n')}
   
   /* Typography */
   --font-heading: '${system.typography.heading}', system-ui, sans-serif;
@@ -184,31 +182,30 @@ ${colorTokens.map(token =>
   --font-mono: '${system.typography.mono}', 'Courier New', monospace;
   
   /* Typographic Scale */
-${Object.entries(system.typography.scale).map(([name, value]) =>
-    `  --text-${name}: ${value}rem;`
-  ).join('\n')}
+${Object.entries(system.typography.scale)
+  .map(([name, value]) => `  --text-${name}: ${value}rem;`)
+  .join('\n')}
   
   /* Spacing (φ-based) */
-${spacingTokens.map(token =>
-    `  --${token.name}: ${token.value};`
-  ).join('\n')}
+${spacingTokens.map((token) => `  --${token.name}: ${token.value};`).join('\n')}
 }
 
 /* AI Intelligence Comments */
 /*
-${system.tokens.filter(token => token.aiIntelligence).map(token =>
-  `${token.name}: ${token.aiIntelligence}`
-).join('\n')}
-*/`
+${system.tokens
+  .filter((token) => token.aiIntelligence)
+  .map((token) => `${token.name}: ${token.aiIntelligence}`)
+  .join('\n')}
+*/`;
 }
 
 /**
  * Generate unique system ID
  */
 function generateSystemId(name: string): string {
-  const timestamp = Date.now().toString(36)
-  const randomStr = Math.random().toString(36).substring(2, 8)
-  const cleanName = name.toLowerCase().replace(/[^a-z0-9]/g, '-')
-  
-  return `${cleanName}-${timestamp}-${randomStr}`
+  const timestamp = Date.now().toString(36);
+  const randomStr = Math.random().toString(36).substring(2, 8);
+  const cleanName = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+
+  return `${cleanName}-${timestamp}-${randomStr}`;
 }

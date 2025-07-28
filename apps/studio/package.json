@@ -1,0 +1,39 @@
+{
+  "name": "@rafters/studio",
+  "version": "0.1.0",
+  "description": "Rafters Studio - meditative design system generator that transforms single colors into complete AI-intelligible design systems",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && tsc --emitDeclarationOnly",
+    "preview": "vite preview",
+    "test": "vitest",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "tailwindcss": "catalog:"
+  },
+  "dependencies": {
+    "@rafters/shared": "workspace:*",
+    "@rafters/color-utils": "workspace:*",
+    "@rafters/design-tokens": "workspace:*",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "framer-motion": "catalog:",
+    "react-colorful": "catalog:",
+    "clsx": "catalog:",
+    "gsap": "catalog:"
+  }
+}

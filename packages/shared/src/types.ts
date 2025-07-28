@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod';
 
 /**
  * AI Intelligence Types
@@ -11,9 +11,9 @@ export const OKLCHSchema = z.object({
   c: z.number().min(0), // Chroma (0+)
   h: z.number().min(0).max(360), // Hue (0-360)
   alpha: z.number().min(0).max(1).optional(), // Alpha (0-1)
-})
+});
 
-export type OKLCH = z.infer<typeof OKLCHSchema>
+export type OKLCH = z.infer<typeof OKLCHSchema>;
 
 // Color Vision Types for accessibility
 export const ColorVisionTypeSchema = z.enum([
@@ -21,14 +21,14 @@ export const ColorVisionTypeSchema = z.enum([
   'deuteranopia', // Red-green (most common)
   'protanopia', // Red-green
   'tritanopia', // Blue-yellow (rare)
-])
+]);
 
-export type ColorVisionType = z.infer<typeof ColorVisionTypeSchema>
+export type ColorVisionType = z.infer<typeof ColorVisionTypeSchema>;
 
 // Accessibility Contrast Levels
-export const ContrastLevelSchema = z.enum(['AA', 'AAA'])
+export const ContrastLevelSchema = z.enum(['AA', 'AAA']);
 
-export type ContrastLevel = z.infer<typeof ContrastLevelSchema>
+export type ContrastLevel = z.infer<typeof ContrastLevelSchema>;
 
 // Component Intelligence for AI consumption
 export const ComponentIntelligenceSchema = z.object({
@@ -38,9 +38,9 @@ export const ComponentIntelligenceSchema = z.object({
   accessibilityRules: z.string(), // WCAG compliance requirements
   usageContext: z.string(), // When/where to use this component
   decisionConstraints: z.string().optional(), // AI decision-making constraints
-})
+});
 
-export type ComponentIntelligence = z.infer<typeof ComponentIntelligenceSchema>
+export type ComponentIntelligence = z.infer<typeof ComponentIntelligenceSchema>;
 
 // Design Token for AI systems
 export const SemanticTokenSchema = z.object({
@@ -49,9 +49,9 @@ export const SemanticTokenSchema = z.object({
   type: z.enum(['color', 'spacing', 'typography', 'shadow', 'border']),
   semantic: z.string(), // Semantic meaning for AI understanding
   aiIntelligence: z.string().optional(), // AI-specific usage guidance
-})
+});
 
-export type SemanticToken = z.infer<typeof SemanticTokenSchema>
+export type SemanticToken = z.infer<typeof SemanticTokenSchema>;
 
 // Design System Configuration
 export const DesignSystemSchema = z.object({
@@ -75,9 +75,9 @@ export const DesignSystemSchema = z.object({
     updated: z.string(),
     version: z.string(),
   }),
-})
+});
 
-export type DesignSystem = z.infer<typeof DesignSystemSchema>
+export type DesignSystem = z.infer<typeof DesignSystemSchema>;
 
 // Component Registry Entry (extends shadcn spec)
 export const ComponentRegistrySchema = z.object({
@@ -89,9 +89,9 @@ export const ComponentRegistrySchema = z.object({
       aiIntelligence: ComponentIntelligenceSchema,
     }),
   }),
-})
+});
 
-export type ComponentRegistry = z.infer<typeof ComponentRegistrySchema>
+export type ComponentRegistry = z.infer<typeof ComponentRegistrySchema>;
 
 // Public Design System for free tier
 export const PublicDesignSystemSchema = z.object({
@@ -104,6 +104,6 @@ export const PublicDesignSystemSchema = z.object({
   tags: z.array(z.string()).default([]),
   preview: z.string().optional(), // Preview image URL
   created: z.string(),
-})
+});
 
-export type PublicDesignSystem = z.infer<typeof PublicDesignSystemSchema>
+export type PublicDesignSystem = z.infer<typeof PublicDesignSystemSchema>;

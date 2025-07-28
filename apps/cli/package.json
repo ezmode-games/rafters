@@ -14,11 +14,7 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": [
-    "dist",
-    "templates",
-    "README.md"
-  ],
+  "files": ["dist", "templates", "README.md"],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
@@ -36,11 +32,11 @@
     "react-components",
     "semantic-tokens"
   ],
-  "author": "Sean Poulter",
+  "author": "Sean Silvius",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/seanpoulter/rafters",
+    "url": "https://github.com/real-handy/rafters",
     "directory": "apps/cli"
   },
   "dependencies": {
@@ -51,14 +47,14 @@
     "inquirer": "^12.1.0",
     "ora": "^8.1.0",
     "playwright": "^1.54.1",
-    "zod": "^3.23.8"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/inquirer": "^9.0.7",
-    "@types/node": "^20.19.0",
-    "typescript": "^5.5.2",
-    "vitest": "^3.2.3"
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "engines": {
     "node": ">=18.0.0"

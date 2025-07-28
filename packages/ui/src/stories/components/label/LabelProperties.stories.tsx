@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Input } from '../../../components/Input';
 import { Button } from '../../../components/Button';
+import { Input } from '../../../components/Input';
 
-const Label = ({ 
-  children, 
-  htmlFor, 
+const Label = ({
+  children,
+  htmlFor,
   variant = 'default',
   className = '',
-  ...props 
+  ...props
 }: {
   children: React.ReactNode;
   htmlFor?: string;
@@ -15,18 +15,18 @@ const Label = ({
   className?: string;
   [key: string]: any;
 }) => {
-  const baseClasses = "text-sm";
+  const baseClasses = 'text-sm';
   const variantClasses = {
-    field: "font-medium",
-    hint: "text-muted-foreground",
-    error: "text-destructive",
-    success: "text-green-600",
-    meta: "text-xs text-muted-foreground",
-    status: "text-xs font-medium"
+    field: 'font-medium',
+    hint: 'text-muted-foreground',
+    error: 'text-destructive',
+    success: 'text-green-600',
+    meta: 'text-xs text-muted-foreground',
+    status: 'text-xs font-medium',
   };
-  
+
   return (
-    <label 
+    <label
       htmlFor={htmlFor}
       className={`${baseClasses} ${variantClasses[variant]} ${className}`}
       {...props}
@@ -70,8 +70,8 @@ export const LabelVariants: Story = {
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Label Information Variants</h3>
         <p className="text-sm text-muted-foreground">
-          Different label variants optimize information delivery for specific contexts
-          and communication needs within interfaces.
+          Different label variants optimize information delivery for specific contexts and
+          communication needs within interfaces.
         </p>
       </div>
 
@@ -83,11 +83,7 @@ export const LabelVariants: Story = {
               <Label htmlFor="field-basic" variant="field">
                 Email Address
               </Label>
-              <Input
-                id="field-basic"
-                type="email"
-                placeholder="user@example.com"
-              />
+              <Input id="field-basic" type="email" placeholder="user@example.com" />
               <p className="text-xs text-muted-foreground">
                 Primary field identification with appropriate semantic weight
               </p>
@@ -95,7 +91,10 @@ export const LabelVariants: Story = {
 
             <div className="space-y-2">
               <Label htmlFor="field-required" variant="field">
-                Password <span className="text-destructive" aria-label="required">*</span>
+                Password{' '}
+                <span className="text-destructive" aria-label="required">
+                  *
+                </span>
               </Label>
               <Input
                 id="field-required"
@@ -110,13 +109,10 @@ export const LabelVariants: Story = {
 
             <div className="space-y-2">
               <Label htmlFor="field-optional" variant="field">
-                Company Name <span className="text-muted-foreground text-xs font-normal">(optional)</span>
+                Company Name{' '}
+                <span className="text-muted-foreground text-xs font-normal">(optional)</span>
               </Label>
-              <Input
-                id="field-optional"
-                type="text"
-                placeholder="Acme Corporation"
-              />
+              <Input id="field-optional" type="text" placeholder="Acme Corporation" />
               <p className="text-xs text-muted-foreground">
                 Optional field with clear indication of non-required status
               </p>
@@ -134,11 +130,7 @@ export const LabelVariants: Story = {
               <Label variant="hint">
                 We'll use this to help you recover your account if needed
               </Label>
-              <Input
-                id="hint-purpose"
-                type="email"
-                placeholder="recovery@example.com"
-              />
+              <Input id="hint-purpose" type="email" placeholder="recovery@example.com" />
               <p className="text-xs text-muted-foreground">
                 Contextual hint explaining purpose and value
               </p>
@@ -148,14 +140,8 @@ export const LabelVariants: Story = {
               <Label htmlFor="hint-format" variant="field">
                 Phone Number
               </Label>
-              <Label variant="hint">
-                Include area code for better delivery
-              </Label>
-              <Input
-                id="hint-format"
-                type="tel"
-                placeholder="+1 (555) 123-4567"
-              />
+              <Label variant="hint">Include area code for better delivery</Label>
+              <Input id="hint-format" type="tel" placeholder="+1 (555) 123-4567" />
               <p className="text-xs text-muted-foreground">
                 Format guidance that helps prevent errors
               </p>
@@ -165,14 +151,8 @@ export const LabelVariants: Story = {
               <Label htmlFor="hint-constraint" variant="field">
                 Username
               </Label>
-              <Label variant="hint">
-                3-20 characters, letters and numbers only
-              </Label>
-              <Input
-                id="hint-constraint"
-                type="text"
-                placeholder="johndoe123"
-              />
+              <Label variant="hint">3-20 characters, letters and numbers only</Label>
+              <Input id="hint-constraint" type="text" placeholder="johndoe123" />
               <p className="text-xs text-muted-foreground">
                 Clear constraint communication to set expectations
               </p>
@@ -194,9 +174,7 @@ export const LabelVariants: Story = {
                   defaultValue="user@example.com"
                   variant="success"
                 />
-                <Label variant="success">
-                  ✓ Email format is valid
-                </Label>
+                <Label variant="success">✓ Email format is valid</Label>
                 <p className="text-xs text-muted-foreground">
                   Success state with positive reinforcement
                 </p>
@@ -206,15 +184,8 @@ export const LabelVariants: Story = {
                 <Label htmlFor="error-password" variant="field">
                   Password
                 </Label>
-                <Input
-                  id="error-password"
-                  type="password"
-                  defaultValue="123"
-                  variant="error"
-                />
-                <Label variant="error">
-                  Password must be at least 8 characters
-                </Label>
+                <Input id="error-password" type="password" defaultValue="123" variant="error" />
+                <Label variant="error">Password must be at least 8 characters</Label>
                 <p className="text-xs text-muted-foreground">
                   Error state with specific guidance for resolution
                 </p>
@@ -231,9 +202,7 @@ export const LabelVariants: Story = {
                     Uploading...
                   </Button>
                 </div>
-                <Label variant="status">
-                  Upload in progress: 67% complete
-                </Label>
+                <Label variant="status">Upload in progress: 67% complete</Label>
                 <p className="text-xs text-muted-foreground">
                   Status updates for ongoing processes
                 </p>
@@ -248,9 +217,7 @@ export const LabelVariants: Story = {
                     Choose File
                   </Button>
                 </div>
-                <Label variant="meta">
-                  Max 10MB • PDF, DOC, or TXT format
-                </Label>
+                <Label variant="meta">Max 10MB • PDF, DOC, or TXT format</Label>
                 <p className="text-xs text-muted-foreground">
                   Meta information about constraints and formats
                 </p>
@@ -266,10 +233,18 @@ export const LabelVariants: Story = {
           <div>
             <div className="font-medium">Information Types</div>
             <div className="text-muted-foreground space-y-1">
-              <div>• <strong>Field:</strong> Primary identification</div>
-              <div>• <strong>Hint:</strong> Contextual guidance</div>
-              <div>• <strong>Error/Success:</strong> State feedback</div>
-              <div>• <strong>Meta:</strong> Supplementary information</div>
+              <div>
+                • <strong>Field:</strong> Primary identification
+              </div>
+              <div>
+                • <strong>Hint:</strong> Contextual guidance
+              </div>
+              <div>
+                • <strong>Error/Success:</strong> State feedback
+              </div>
+              <div>
+                • <strong>Meta:</strong> Supplementary information
+              </div>
             </div>
           </div>
           <div>
@@ -307,8 +282,8 @@ export const SemanticRelationships: Story = {
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Label Relationship Properties</h3>
         <p className="text-sm text-muted-foreground">
-          Properties that create semantic connections between labels and interface elements
-          for accessibility and clear information relationships.
+          Properties that create semantic connections between labels and interface elements for
+          accessibility and clear information relationships.
         </p>
       </div>
 
@@ -320,11 +295,7 @@ export const SemanticRelationships: Story = {
               <Label htmlFor="direct-name" variant="field">
                 Full Name
               </Label>
-              <Input
-                id="direct-name"
-                type="text"
-                placeholder="Enter your full name"
-              />
+              <Input id="direct-name" type="text" placeholder="Enter your full name" />
               <div className="bg-muted/50 p-3 rounded-md text-xs">
                 <div className="font-medium mb-1">HTML Relationship:</div>
                 <code>htmlFor="direct-name"</code> connects label directly to input
@@ -336,18 +307,14 @@ export const SemanticRelationships: Story = {
                 <Label htmlFor="with-meta" variant="field">
                   Profile Picture
                 </Label>
-                <Label variant="meta">
-                  Optional • Max 5MB
-                </Label>
+                <Label variant="meta">Optional • Max 5MB</Label>
               </div>
               <div className="border-2 border-dashed border-muted rounded-md p-6 text-center">
                 <Button variant="outline" size="sm">
                   Choose Image
                 </Button>
               </div>
-              <Label variant="hint">
-                JPG, PNG, or GIF format recommended
-              </Label>
+              <Label variant="hint">JPG, PNG, or GIF format recommended</Label>
               <div className="bg-muted/50 p-3 rounded-md text-xs">
                 <div className="font-medium mb-1">Multiple Labels:</div>
                 Different label types can relate to the same interface element
@@ -377,7 +344,8 @@ export const SemanticRelationships: Story = {
               </div>
               <div className="bg-muted/50 p-3 rounded-md text-xs">
                 <div className="font-medium mb-1">ARIA Described By:</div>
-                <code>aria-describedby="password-requirements password-strength"</code><br />
+                <code>aria-describedby="password-requirements password-strength"</code>
+                <br />
                 Connects multiple descriptive elements to one input
               </div>
             </div>
@@ -408,45 +376,34 @@ export const SemanticRelationships: Story = {
           <h4 className="text-base font-medium mb-4">Group Relationships</h4>
           <fieldset className="space-y-4 border border-border rounded-md p-4">
             <legend className="text-sm font-medium px-2">Billing Address</legend>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="billing-first" variant="field">
                   First Name
                 </Label>
-                <Input
-                  id="billing-first"
-                  type="text"
-                  placeholder="John"
-                />
+                <Input id="billing-first" type="text" placeholder="John" />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="billing-last" variant="field">
                   Last Name
                 </Label>
-                <Input
-                  id="billing-last"
-                  type="text"
-                  placeholder="Doe"
-                />
+                <Input id="billing-last" type="text" placeholder="Doe" />
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="billing-address" variant="field">
                 Street Address
               </Label>
-              <Input
-                id="billing-address"
-                type="text"
-                placeholder="123 Main Street"
-              />
+              <Input id="billing-address" type="text" placeholder="123 Main Street" />
             </div>
-            
+
             <div className="bg-muted/50 p-3 rounded-md text-xs">
               <div className="font-medium mb-1">Fieldset Grouping:</div>
-              <code>&lt;fieldset&gt;</code> and <code>&lt;legend&gt;</code> create semantic grouping<br />
+              <code>&lt;fieldset&gt;</code> and <code>&lt;legend&gt;</code> create semantic grouping
+              <br />
               All labels within inherit the group context
             </div>
           </fieldset>
@@ -496,15 +453,23 @@ export const SemanticRelationships: Story = {
           <div>
             <div className="font-medium">HTML Relationships</div>
             <div className="text-muted-foreground space-y-1">
-              <div>• Use <code>htmlFor</code> for direct label-input connections</div>
-              <div>• Use <code>aria-describedby</code> for additional context</div>
-              <div>• Use <code>fieldset/legend</code> for group relationships</div>
+              <div>
+                • Use <code>htmlFor</code> for direct label-input connections
+              </div>
+              <div>
+                • Use <code>aria-describedby</code> for additional context
+              </div>
+              <div>
+                • Use <code>fieldset/legend</code> for group relationships
+              </div>
             </div>
           </div>
           <div>
             <div className="font-medium">Accessibility Features</div>
             <div className="text-muted-foreground space-y-1">
-              <div>• Use <code>aria-live</code> for dynamic updates</div>
+              <div>
+                • Use <code>aria-live</code> for dynamic updates
+              </div>
               <div>• Provide complete context for screen readers</div>
               <div>• Connect related information semantically</div>
             </div>
@@ -535,8 +500,8 @@ export const ContentPatterns: Story = {
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Consistent Content Patterns</h3>
         <p className="text-sm text-muted-foreground">
-          Standardized language patterns that create trustworthy, helpful information
-          delivery across different interface contexts and situations.
+          Standardized language patterns that create trustworthy, helpful information delivery
+          across different interface contexts and situations.
         </p>
       </div>
 
@@ -561,7 +526,9 @@ export const ContentPatterns: Story = {
                 </div>
                 <div className="space-y-1">
                   <Label variant="field">Street Address</Label>
-                  <div className="text-xs text-muted-foreground">Not "Address" when there are multiple types</div>
+                  <div className="text-xs text-muted-foreground">
+                    Not "Address" when there are multiple types
+                  </div>
                 </div>
               </div>
             </div>
@@ -579,11 +546,15 @@ export const ContentPatterns: Story = {
                 </div>
                 <div className="space-y-1">
                   <Label variant="field">Current Password</Label>
-                  <div className="text-xs text-muted-foreground">When distinguishing from new password</div>
+                  <div className="text-xs text-muted-foreground">
+                    When distinguishing from new password
+                  </div>
                 </div>
                 <div className="space-y-1">
                   <Label variant="field">Billing ZIP Code</Label>
-                  <div className="text-xs text-muted-foreground">When there are multiple ZIP codes</div>
+                  <div className="text-xs text-muted-foreground">
+                    When there are multiple ZIP codes
+                  </div>
                 </div>
               </div>
             </div>
@@ -599,7 +570,9 @@ export const ContentPatterns: Story = {
                 <div className="space-y-3">
                   <div className="space-y-1">
                     <Label variant="error">Invalid input</Label>
-                    <div className="text-xs text-muted-foreground">Doesn't explain what's wrong</div>
+                    <div className="text-xs text-muted-foreground">
+                      Doesn't explain what's wrong
+                    </div>
                   </div>
                   <div className="space-y-1">
                     <Label variant="error">Error</Label>
@@ -607,7 +580,9 @@ export const ContentPatterns: Story = {
                   </div>
                   <div className="space-y-1">
                     <Label variant="error">Please try again</Label>
-                    <div className="text-xs text-muted-foreground">No guidance on what to change</div>
+                    <div className="text-xs text-muted-foreground">
+                      No guidance on what to change
+                    </div>
                   </div>
                 </div>
               </div>

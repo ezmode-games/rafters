@@ -2,7 +2,7 @@ import type { ComponentManifest } from './registry.js';
 
 export function getComponentTemplate(manifest: ComponentManifest): string {
   const componentName = manifest.name;
-  
+
   switch (componentName.toLowerCase()) {
     case 'button':
       return getButtonTemplate(manifest);

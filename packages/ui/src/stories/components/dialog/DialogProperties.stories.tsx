@@ -44,7 +44,9 @@ export const Small: Story = {
   render: () => (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">Small Dialog</Button>
+        <Button variant="outline" size="sm">
+          Small Dialog
+        </Button>
       </DialogTrigger>
       <DialogContent size="sm">
         <DialogHeader>
@@ -53,9 +55,13 @@ export const Small: Story = {
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline" size="sm">Cancel</Button>
+            <Button variant="outline" size="sm">
+              Cancel
+            </Button>
           </DialogClose>
-          <Button size="sm" onClick={fn()}>Save</Button>
+          <Button size="sm" onClick={fn()}>
+            Save
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -86,15 +92,17 @@ export const Medium: Story = {
         <DialogHeader>
           <DialogTitle>Standard Action</DialogTitle>
           <DialogDescription>
-            This dialog provides enough space for detailed descriptions and multiple actions
-            while maintaining a comfortable reading experience.
+            This dialog provides enough space for detailed descriptions and multiple actions while
+            maintaining a comfortable reading experience.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button variant="primary" onClick={fn()}>Confirm</Button>
+          <Button variant="primary" onClick={fn()}>
+            Confirm
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -125,17 +133,18 @@ export const Large: Story = {
         <DialogHeader>
           <DialogTitle>Detailed Configuration</DialogTitle>
           <DialogDescription>
-            Large dialogs provide extensive space for complex forms, detailed explanations,
-            and multiple sections of content. They work best on desktop interfaces where
-            screen real estate allows for comprehensive interactions without overwhelming
-            the user experience.
+            Large dialogs provide extensive space for complex forms, detailed explanations, and
+            multiple sections of content. They work best on desktop interfaces where screen real
+            estate allows for comprehensive interactions without overwhelming the user experience.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button variant="primary" onClick={fn()}>Apply Settings</Button>
+          <Button variant="primary" onClick={fn()}>
+            Apply Settings
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -160,14 +169,17 @@ export const CognitiveComplexity: Story = {
   render: () => (
     <div className="space-y-4">
       <div className="text-sm text-muted-foreground mb-6">
-        <strong>Complexity Levels:</strong> Simple → Moderate → Complex with increasing cognitive load consideration
+        <strong>Complexity Levels:</strong> Simple → Moderate → Complex with increasing cognitive
+        load consideration
       </div>
-      
+
       <div className="flex gap-4 flex-wrap">
         {/* Simple */}
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="outline" size="sm">Simple</Button>
+            <Button variant="outline" size="sm">
+              Simple
+            </Button>
           </DialogTrigger>
           <DialogContent cognitiveComplexity="simple" size="sm">
             <DialogHeader>
@@ -176,9 +188,13 @@ export const CognitiveComplexity: Story = {
             </DialogHeader>
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="outline" size="sm">No</Button>
+                <Button variant="outline" size="sm">
+                  No
+                </Button>
               </DialogClose>
-              <Button size="sm" onClick={fn()}>Yes</Button>
+              <Button size="sm" onClick={fn()}>
+                Yes
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -199,7 +215,9 @@ export const CognitiveComplexity: Story = {
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
-              <Button variant="primary" onClick={fn()}>Save Settings</Button>
+              <Button variant="primary" onClick={fn()}>
+                Save Settings
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -213,16 +231,18 @@ export const CognitiveComplexity: Story = {
             <DialogHeader>
               <DialogTitle>Advanced Configuration</DialogTitle>
               <DialogDescription>
-                This complex operation involves multiple systems and dependencies. 
-                Please review all options carefully before proceeding. Changes may 
-                affect data integrity and system performance.
+                This complex operation involves multiple systems and dependencies. Please review all
+                options carefully before proceeding. Changes may affect data integrity and system
+                performance.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
-              <Button variant="primary" onClick={fn()}>Execute Configuration</Button>
+              <Button variant="primary" onClick={fn()}>
+                Execute Configuration
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -259,12 +279,14 @@ export const SizeComparison: Story = {
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline" size="sm">Close</Button>
+              <Button variant="outline" size="sm">
+                Close
+              </Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       <Dialog>
         <DialogTrigger asChild>
           <Button size="md">Medium</Button>
@@ -281,7 +303,7 @@ export const SizeComparison: Story = {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       <Dialog>
         <DialogTrigger asChild>
           <Button size="lg">Large</Button>
@@ -289,7 +311,9 @@ export const SizeComparison: Story = {
         <DialogContent size="lg">
           <DialogHeader>
             <DialogTitle>Large</DialogTitle>
-            <DialogDescription>Spacious dialog for complex content and detailed interactions</DialogDescription>
+            <DialogDescription>
+              Spacious dialog for complex content and detailed interactions
+            </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>

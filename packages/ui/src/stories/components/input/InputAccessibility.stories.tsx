@@ -37,8 +37,8 @@ export const AccessibilityBasics: Story = {
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Foundation Principles</h3>
         <p className="text-sm text-muted-foreground">
-          Accessible inputs benefit everyone by providing clear context, proper labeling,
-          and meaningful feedback during data entry.
+          Accessible inputs benefit everyone by providing clear context, proper labeling, and
+          meaningful feedback during data entry.
         </p>
       </div>
 
@@ -91,7 +91,10 @@ export const AccessibilityBasics: Story = {
           <h4 className="text-base font-medium">Required Field Communication</h4>
           <div className="space-y-2">
             <label htmlFor="required-input" className="text-sm font-medium">
-              Full Name <span className="text-destructive" aria-label="required">*</span>
+              Full Name{' '}
+              <span className="text-destructive" aria-label="required">
+                *
+              </span>
             </label>
             <Input
               id="required-input"
@@ -131,50 +134,42 @@ export const KeyboardNavigation: Story = {
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Keyboard Navigation</h3>
         <p className="text-sm text-muted-foreground">
-          Use Tab to navigate between inputs, Enter to submit forms. Clear focus indicators
-          show current position and state.
+          Use Tab to navigate between inputs, Enter to submit forms. Clear focus indicators show
+          current position and state.
         </p>
       </div>
 
       <div className="space-y-4">
         <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
           <div className="space-y-2">
-            <label htmlFor="first-name" className="text-sm font-medium">First Name</label>
-            <Input
-              id="first-name"
-              type="text"
-              placeholder="Enter first name"
-            />
+            <label htmlFor="first-name" className="text-sm font-medium">
+              First Name
+            </label>
+            <Input id="first-name" type="text" placeholder="Enter first name" />
           </div>
-          
+
           <div className="space-y-2">
-            <label htmlFor="last-name" className="text-sm font-medium">Last Name</label>
-            <Input
-              id="last-name"
-              type="text"
-              placeholder="Enter last name"
-            />
+            <label htmlFor="last-name" className="text-sm font-medium">
+              Last Name
+            </label>
+            <Input id="last-name" type="text" placeholder="Enter last name" />
           </div>
-          
+
           <div className="space-y-2">
-            <label htmlFor="email-nav" className="text-sm font-medium">Email</label>
-            <Input
-              id="email-nav"
-              type="email"
-              placeholder="user@example.com"
-            />
+            <label htmlFor="email-nav" className="text-sm font-medium">
+              Email
+            </label>
+            <Input id="email-nav" type="email" placeholder="user@example.com" />
           </div>
-          
+
           <div className="space-y-2">
-            <label htmlFor="phone-nav" className="text-sm font-medium">Phone</label>
-            <Input
-              id="phone-nav"
-              type="tel"
-              placeholder="+1 (555) 123-4567"
-            />
+            <label htmlFor="phone-nav" className="text-sm font-medium">
+              Phone
+            </label>
+            <Input id="phone-nav" type="tel" placeholder="+1 (555) 123-4567" />
           </div>
-          
-          <button 
+
+          <button
             type="submit"
             className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
@@ -184,10 +179,12 @@ export const KeyboardNavigation: Story = {
 
         <div className="text-xs text-muted-foreground space-y-1">
           <div>
-            • <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Tab</kbd> to navigate between inputs
+            • <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Tab</kbd> to navigate between
+            inputs
           </div>
           <div>
-            • <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Shift + Tab</kbd> to navigate backwards
+            • <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Shift + Tab</kbd> to navigate
+            backwards
           </div>
           <div>
             • <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Enter</kbd> to submit forms
@@ -220,8 +217,8 @@ export const MotorAccessibility: Story = {
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Enhanced Touch Targets</h3>
         <p className="text-sm text-muted-foreground">
-          Minimum 44px touch targets on mobile, 40px on desktop meet accessibility guidelines
-          and improve usability for everyone.
+          Minimum 44px touch targets on mobile, 40px on desktop meet accessibility guidelines and
+          improve usability for everyone.
         </p>
       </div>
 
@@ -230,7 +227,9 @@ export const MotorAccessibility: Story = {
           <h4 className="text-base font-medium">Mobile Optimized (44px)</h4>
           <div className="space-y-3">
             <div className="space-y-2">
-              <label htmlFor="mobile-input-1" className="text-sm font-medium">Full Name</label>
+              <label htmlFor="mobile-input-1" className="text-sm font-medium">
+                Full Name
+              </label>
               <Input
                 id="mobile-input-1"
                 type="text"
@@ -238,9 +237,11 @@ export const MotorAccessibility: Story = {
                 className="min-h-[44px]"
               />
             </div>
-            
+
             <div className="space-y-2">
-              <label htmlFor="mobile-input-2" className="text-sm font-medium">Email Address</label>
+              <label htmlFor="mobile-input-2" className="text-sm font-medium">
+                Email Address
+              </label>
               <Input
                 id="mobile-input-2"
                 type="email"
@@ -248,9 +249,11 @@ export const MotorAccessibility: Story = {
                 className="min-h-[44px]"
               />
             </div>
-            
+
             <div className="space-y-2">
-              <label htmlFor="mobile-input-3" className="text-sm font-medium">Phone Number</label>
+              <label htmlFor="mobile-input-3" className="text-sm font-medium">
+                Phone Number
+              </label>
               <Input
                 id="mobile-input-3"
                 type="tel"
@@ -268,32 +271,24 @@ export const MotorAccessibility: Story = {
           <h4 className="text-base font-medium">Desktop Optimized (40px)</h4>
           <div className="space-y-3">
             <div className="space-y-2">
-              <label htmlFor="desktop-input-1" className="text-sm font-medium">Search Query</label>
-              <Input
-                id="desktop-input-1"
-                type="search"
-                placeholder="Search for anything..."
-              />
+              <label htmlFor="desktop-input-1" className="text-sm font-medium">
+                Search Query
+              </label>
+              <Input id="desktop-input-1" type="search" placeholder="Search for anything..." />
             </div>
-            
+
             <div className="space-y-2">
-              <label htmlFor="desktop-input-2" className="text-sm font-medium">Website URL</label>
-              <Input
-                id="desktop-input-2"
-                type="url"
-                placeholder="https://example.com"
-              />
+              <label htmlFor="desktop-input-2" className="text-sm font-medium">
+                Website URL
+              </label>
+              <Input id="desktop-input-2" type="url" placeholder="https://example.com" />
             </div>
-            
+
             <div className="space-y-2">
-              <label htmlFor="desktop-input-3" className="text-sm font-medium">Amount</label>
-              <Input
-                id="desktop-input-3"
-                type="number"
-                placeholder="0.00"
-                step="0.01"
-                min="0"
-              />
+              <label htmlFor="desktop-input-3" className="text-sm font-medium">
+                Amount
+              </label>
+              <Input id="desktop-input-3" type="number" placeholder="0.00" step="0.01" min="0" />
             </div>
           </div>
           <p className="text-xs text-muted-foreground">
@@ -306,31 +301,24 @@ export const MotorAccessibility: Story = {
         <h4 className="text-base font-medium">Hover and Focus States</h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <label htmlFor="hover-demo" className="text-sm font-medium">Hover to Test</label>
-            <Input
-              id="hover-demo"
-              type="text"
-              placeholder="Hover over this input"
-            />
+            <label htmlFor="hover-demo" className="text-sm font-medium">
+              Hover to Test
+            </label>
+            <Input id="hover-demo" type="text" placeholder="Hover over this input" />
           </div>
-          
+
           <div className="space-y-2">
-            <label htmlFor="focus-demo" className="text-sm font-medium">Click to Focus</label>
-            <Input
-              id="focus-demo"
-              type="text"
-              placeholder="Focus creates visible ring"
-            />
+            <label htmlFor="focus-demo" className="text-sm font-medium">
+              Click to Focus
+            </label>
+            <Input id="focus-demo" type="text" placeholder="Focus creates visible ring" />
           </div>
-          
+
           <div className="space-y-2">
-            <label htmlFor="disabled-demo" className="text-sm font-medium">Disabled State</label>
-            <Input
-              id="disabled-demo"
-              type="text"
-              placeholder="Cannot interact"
-              disabled
-            />
+            <label htmlFor="disabled-demo" className="text-sm font-medium">
+              Disabled State
+            </label>
+            <Input id="disabled-demo" type="text" placeholder="Cannot interact" disabled />
           </div>
         </div>
         <p className="text-xs text-muted-foreground">
@@ -362,8 +350,8 @@ export const ScreenReaderOptimization: Story = {
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Screen Reader Optimization</h3>
         <p className="text-sm text-muted-foreground">
-          Semantic markup and ARIA attributes create clear, navigable input experiences
-          for screen reader users while maintaining intuitive interaction patterns.
+          Semantic markup and ARIA attributes create clear, navigable input experiences for screen
+          reader users while maintaining intuitive interaction patterns.
         </p>
       </div>
 
@@ -425,11 +413,14 @@ export const ScreenReaderOptimization: Story = {
           <h4 className="text-base font-medium">Form Group Context</h4>
           <fieldset className="space-y-3 border border-border rounded-md p-4">
             <legend className="text-sm font-medium px-2">Billing Address</legend>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="space-y-2">
                 <label htmlFor="billing-first" className="text-sm font-medium">
-                  First Name <span className="text-destructive" aria-label="required">*</span>
+                  First Name{' '}
+                  <span className="text-destructive" aria-label="required">
+                    *
+                  </span>
                 </label>
                 <Input
                   id="billing-first"
@@ -439,10 +430,13 @@ export const ScreenReaderOptimization: Story = {
                   aria-required="true"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <label htmlFor="billing-last" className="text-sm font-medium">
-                  Last Name <span className="text-destructive" aria-label="required">*</span>
+                  Last Name{' '}
+                  <span className="text-destructive" aria-label="required">
+                    *
+                  </span>
                 </label>
                 <Input
                   id="billing-last"
@@ -453,10 +447,13 @@ export const ScreenReaderOptimization: Story = {
                 />
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <label htmlFor="billing-address" className="text-sm font-medium">
-                Street Address <span className="text-destructive" aria-label="required">*</span>
+                Street Address{' '}
+                <span className="text-destructive" aria-label="required">
+                  *
+                </span>
               </label>
               <Input
                 id="billing-address"
@@ -466,11 +463,14 @@ export const ScreenReaderOptimization: Story = {
                 aria-required="true"
               />
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div className="space-y-2">
                 <label htmlFor="billing-city" className="text-sm font-medium">
-                  City <span className="text-destructive" aria-label="required">*</span>
+                  City{' '}
+                  <span className="text-destructive" aria-label="required">
+                    *
+                  </span>
                 </label>
                 <Input
                   id="billing-city"
@@ -480,10 +480,13 @@ export const ScreenReaderOptimization: Story = {
                   aria-required="true"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <label htmlFor="billing-state" className="text-sm font-medium">
-                  State <span className="text-destructive" aria-label="required">*</span>
+                  State{' '}
+                  <span className="text-destructive" aria-label="required">
+                    *
+                  </span>
                 </label>
                 <Input
                   id="billing-state"
@@ -493,10 +496,13 @@ export const ScreenReaderOptimization: Story = {
                   aria-required="true"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <label htmlFor="billing-zip" className="text-sm font-medium">
-                  ZIP Code <span className="text-destructive" aria-label="required">*</span>
+                  ZIP Code{' '}
+                  <span className="text-destructive" aria-label="required">
+                    *
+                  </span>
                 </label>
                 <Input
                   id="billing-zip"

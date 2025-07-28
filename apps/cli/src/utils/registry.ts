@@ -43,7 +43,8 @@ export async function fetchComponentRegistry(): Promise<Registry> {
         attentionEconomics: 'Size hierarchy: sm=tertiary, md=secondary, lg=primary',
         accessibility: '44px touch targets, WCAG AAA contrast, keyboard navigation',
         trustBuilding: 'Destructive variant requires confirmation patterns',
-        semanticMeaning: 'Primary=main action, Secondary=optional, Destructive=careful consideration',
+        semanticMeaning:
+          'Primary=main action, Secondary=optional, Destructive=careful consideration',
       },
       files: {
         component: 'button.tsx',
@@ -160,7 +161,7 @@ export async function fetchComponentRegistry(): Promise<Registry> {
 
 export async function fetchComponent(componentName: string): Promise<ComponentManifest | null> {
   const registry = await fetchComponentRegistry();
-  return registry.components.find(
-    (c) => c.name.toLowerCase() === componentName.toLowerCase()
-  ) || null;
+  return (
+    registry.components.find((c) => c.name.toLowerCase() === componentName.toLowerCase()) || null
+  );
 }
