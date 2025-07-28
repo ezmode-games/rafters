@@ -1,19 +1,17 @@
 import chalk from 'chalk';
-import ora from 'ora';
-import inquirer from 'inquirer';
 import fs from 'fs-extra';
+import inquirer from 'inquirer';
+import ora from 'ora';
 const { ensureDirSync, writeFileSync, existsSync } = fs;
-import { join } from 'path';
-import { getRaftersLogo } from '../utils/logo.js';
-import { defaultConfig, saveConfig, configExists, isNodeProject, hasReact, detectPackageManager, } from '../utils/config.js';
-import { installDependencies, getCoreDependencies } from '../utils/dependencies.js';
-import { readFileSync } from 'fs';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { configExists, defaultConfig, detectPackageManager, hasReact, isNodeProject, saveConfig, } from '../utils/config.js';
+import { getCoreDependencies, installDependencies } from '../utils/dependencies.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 export async function initCommand() {
     const cwd = process.cwd();
-    console.log(getRaftersLogo());
     console.log(chalk.blue('🏗️  Initializing Rafters...'));
     // Check prerequisites
     const spinner = ora('Checking prerequisites...').start();

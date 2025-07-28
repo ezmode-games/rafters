@@ -8,201 +8,202 @@ import './index-DuwuiYca.js';
 import './index-DoQPmrLJ.js';
 import './index-LIN26vHB.js';
 import './utils-DuMXYCiK.js';
-const { fn: C } = __STORYBOOK_MODULE_TEST__,
-  q = {
-    title: '03 Components/Form/Select/Accessibility',
-    component: r,
-    parameters: {
-      layout: 'centered',
-      docs: {
-        description: {
-          component:
-            'Accessibility is design quality, not compliance. Every accessibility feature improves the experience for all users. Accessibility features that enhance usability for all users while ensuring inclusive design principles are met.',
-        },
+const { fn: C } = __STORYBOOK_MODULE_TEST__;
+const q = {
+  title: '03 Components/Form/Select/Accessibility',
+  component: r,
+  parameters: {
+    layout: 'centered',
+    docs: {
+      description: {
+        component:
+          'Accessibility is design quality, not compliance. Every accessibility feature improves the experience for all users. Accessibility features that enhance usability for all users while ensuring inclusive design principles are met.',
       },
     },
-    tags: ['autodocs'],
-    args: { onValueChange: C() },
   },
-  c = {
-    render: () =>
-      e.jsxs(e.Fragment, {
-        children: [
-          e.jsx('h3', { children: 'Clear Labeling' }),
-          e.jsx('label', { htmlFor: 'country-select', children: 'Country' }),
-          e.jsxs(r, {
-            children: [
-              e.jsx(l, {
-                id: 'country-select',
-                'aria-describedby': 'country-help',
-                children: e.jsx(n, { placeholder: 'Select your country' }),
-              }),
-              e.jsxs(i, {
-                children: [
-                  e.jsx(t, { value: 'us', children: 'United States' }),
-                  e.jsx(t, { value: 'ca', children: 'Canada' }),
-                  e.jsx(t, { value: 'uk', children: 'United Kingdom' }),
-                ],
-              }),
-            ],
-          }),
-          e.jsx('p', { id: 'country-help', children: 'Required for shipping calculation' }),
-          e.jsx('h3', { children: 'Keyboard Navigation' }),
-          e.jsxs(r, {
-            children: [
-              e.jsx(l, { children: e.jsx(n, { placeholder: 'Navigate with arrow keys' }) }),
-              e.jsxs(i, {
-                children: [
-                  e.jsx(t, { value: 'option1', children: 'First Option' }),
-                  e.jsx(t, { value: 'option2', children: 'Second Option' }),
-                  e.jsx(t, { value: 'option3', children: 'Third Option' }),
-                  e.jsx(t, { value: 'option4', children: 'Fourth Option' }),
-                ],
-              }),
-            ],
-          }),
-          e.jsx('p', {
-            children: 'Use Tab to focus, Enter/Space to open, arrows to navigate, Enter to select',
-          }),
-          e.jsx('h3', { children: 'Motor Accessibility' }),
-          e.jsxs(r, {
-            children: [
-              e.jsx(l, {
-                size: 'large',
-                children: e.jsx(n, { placeholder: 'Enhanced touch targets' }),
-              }),
-              e.jsxs(i, {
-                children: [
-                  e.jsx(t, { value: 'large1', children: 'Larger Touch Target 1' }),
-                  e.jsx(t, { value: 'large2', children: 'Larger Touch Target 2' }),
-                  e.jsx(t, { value: 'large3', children: 'Larger Touch Target 3' }),
-                ],
-              }),
-            ],
-          }),
-          e.jsx('p', {
-            children: '44px minimum touch targets improve usability for all interaction methods',
-          }),
-        ],
-      }),
-  },
-  s = {
-    render: () =>
-      e.jsxs(e.Fragment, {
-        children: [
-          e.jsx('h3', { children: 'Required Field' }),
-          e.jsxs('label', {
-            htmlFor: 'priority-select',
-            children: [
-              'Priority ',
-              e.jsx('span', { className: 'text-destructive', children: '*' }),
-            ],
-          }),
-          e.jsxs(r, {
-            required: !0,
-            children: [
-              e.jsx(l, {
-                id: 'priority-select',
-                'aria-required': 'true',
-                'aria-describedby': 'priority-error',
-                children: e.jsx(n, { placeholder: 'Select priority level' }),
-              }),
-              e.jsxs(i, {
-                children: [
-                  e.jsx(t, { value: 'high', children: 'High Priority' }),
-                  e.jsx(t, { value: 'medium', children: 'Medium Priority' }),
-                  e.jsx(t, { value: 'low', children: 'Low Priority' }),
-                ],
-              }),
-            ],
-          }),
-          e.jsx('p', {
-            id: 'priority-error',
-            role: 'alert',
-            children: 'Priority selection is required',
-          }),
-          e.jsx('h3', { children: 'Choice Count' }),
-          e.jsx('label', { htmlFor: 'department-select', children: 'Department' }),
-          e.jsxs(r, {
-            children: [
-              e.jsx(l, {
-                id: 'department-select',
-                showCount: !0,
-                itemCount: 5,
-                children: e.jsx(n, { placeholder: 'Choose department' }),
-              }),
-              e.jsxs(i, {
-                children: [
-                  e.jsx(t, { value: 'engineering', children: 'Engineering' }),
-                  e.jsx(t, { value: 'design', children: 'Design' }),
-                  e.jsx(t, { value: 'marketing', children: 'Marketing' }),
-                  e.jsx(t, { value: 'sales', children: 'Sales' }),
-                  e.jsx(t, { value: 'support', children: 'Support' }),
-                ],
-              }),
-            ],
-          }),
-          e.jsx('p', {
-            children: 'Item count helps users understand the scope of available choices',
-          }),
-        ],
-      }),
-  },
-  a = {
-    render: () =>
-      e.jsxs(e.Fragment, {
-        children: [
-          e.jsx('h3', { children: 'Validation Error' }),
-          e.jsx('label', { htmlFor: 'status-select', children: 'Status' }),
-          e.jsxs(r, {
-            children: [
-              e.jsx(l, {
-                id: 'status-select',
-                className: 'border-destructive focus:ring-destructive',
-                'aria-invalid': 'true',
-                'aria-describedby': 'status-error',
-                children: e.jsx(n, { placeholder: 'Select status' }),
-              }),
-              e.jsxs(i, {
-                children: [
-                  e.jsx(t, { value: 'active', children: 'Active' }),
-                  e.jsx(t, { value: 'inactive', children: 'Inactive' }),
-                  e.jsx(t, { value: 'pending', children: 'Pending' }),
-                ],
-              }),
-            ],
-          }),
-          e.jsx('p', {
-            id: 'status-error',
-            role: 'alert',
-            children: 'Please select a valid status from the list',
-          }),
-          e.jsx('h3', { children: 'Disabled State' }),
-          e.jsx('label', { htmlFor: 'locked-select', children: 'Locked Selection' }),
-          e.jsxs(r, {
-            disabled: !0,
-            children: [
-              e.jsx(l, {
-                id: 'locked-select',
-                'aria-describedby': 'locked-help',
-                children: e.jsx(n, { placeholder: 'Not available' }),
-              }),
-              e.jsxs(i, {
-                children: [
-                  e.jsx(t, { value: 'option1', children: 'Option 1' }),
-                  e.jsx(t, { value: 'option2', children: 'Option 2' }),
-                ],
-              }),
-            ],
-          }),
-          e.jsx('p', {
-            id: 'locked-help',
-            children: 'This selection is locked until previous steps are completed',
-          }),
-        ],
-      }),
-  };
-var o, d, u, p, h;
+  tags: ['autodocs'],
+  args: { onValueChange: C() },
+};
+const c = {
+  render: () =>
+    e.jsxs(e.Fragment, {
+      children: [
+        e.jsx('h3', { children: 'Clear Labeling' }),
+        e.jsx('label', { htmlFor: 'country-select', children: 'Country' }),
+        e.jsxs(r, {
+          children: [
+            e.jsx(l, {
+              id: 'country-select',
+              'aria-describedby': 'country-help',
+              children: e.jsx(n, { placeholder: 'Select your country' }),
+            }),
+            e.jsxs(i, {
+              children: [
+                e.jsx(t, { value: 'us', children: 'United States' }),
+                e.jsx(t, { value: 'ca', children: 'Canada' }),
+                e.jsx(t, { value: 'uk', children: 'United Kingdom' }),
+              ],
+            }),
+          ],
+        }),
+        e.jsx('p', { id: 'country-help', children: 'Required for shipping calculation' }),
+        e.jsx('h3', { children: 'Keyboard Navigation' }),
+        e.jsxs(r, {
+          children: [
+            e.jsx(l, { children: e.jsx(n, { placeholder: 'Navigate with arrow keys' }) }),
+            e.jsxs(i, {
+              children: [
+                e.jsx(t, { value: 'option1', children: 'First Option' }),
+                e.jsx(t, { value: 'option2', children: 'Second Option' }),
+                e.jsx(t, { value: 'option3', children: 'Third Option' }),
+                e.jsx(t, { value: 'option4', children: 'Fourth Option' }),
+              ],
+            }),
+          ],
+        }),
+        e.jsx('p', {
+          children: 'Use Tab to focus, Enter/Space to open, arrows to navigate, Enter to select',
+        }),
+        e.jsx('h3', { children: 'Motor Accessibility' }),
+        e.jsxs(r, {
+          children: [
+            e.jsx(l, {
+              size: 'large',
+              children: e.jsx(n, { placeholder: 'Enhanced touch targets' }),
+            }),
+            e.jsxs(i, {
+              children: [
+                e.jsx(t, { value: 'large1', children: 'Larger Touch Target 1' }),
+                e.jsx(t, { value: 'large2', children: 'Larger Touch Target 2' }),
+                e.jsx(t, { value: 'large3', children: 'Larger Touch Target 3' }),
+              ],
+            }),
+          ],
+        }),
+        e.jsx('p', {
+          children: '44px minimum touch targets improve usability for all interaction methods',
+        }),
+      ],
+    }),
+};
+const s = {
+  render: () =>
+    e.jsxs(e.Fragment, {
+      children: [
+        e.jsx('h3', { children: 'Required Field' }),
+        e.jsxs('label', {
+          htmlFor: 'priority-select',
+          children: ['Priority ', e.jsx('span', { className: 'text-destructive', children: '*' })],
+        }),
+        e.jsxs(r, {
+          required: !0,
+          children: [
+            e.jsx(l, {
+              id: 'priority-select',
+              'aria-required': 'true',
+              'aria-describedby': 'priority-error',
+              children: e.jsx(n, { placeholder: 'Select priority level' }),
+            }),
+            e.jsxs(i, {
+              children: [
+                e.jsx(t, { value: 'high', children: 'High Priority' }),
+                e.jsx(t, { value: 'medium', children: 'Medium Priority' }),
+                e.jsx(t, { value: 'low', children: 'Low Priority' }),
+              ],
+            }),
+          ],
+        }),
+        e.jsx('p', {
+          id: 'priority-error',
+          role: 'alert',
+          children: 'Priority selection is required',
+        }),
+        e.jsx('h3', { children: 'Choice Count' }),
+        e.jsx('label', { htmlFor: 'department-select', children: 'Department' }),
+        e.jsxs(r, {
+          children: [
+            e.jsx(l, {
+              id: 'department-select',
+              showCount: !0,
+              itemCount: 5,
+              children: e.jsx(n, { placeholder: 'Choose department' }),
+            }),
+            e.jsxs(i, {
+              children: [
+                e.jsx(t, { value: 'engineering', children: 'Engineering' }),
+                e.jsx(t, { value: 'design', children: 'Design' }),
+                e.jsx(t, { value: 'marketing', children: 'Marketing' }),
+                e.jsx(t, { value: 'sales', children: 'Sales' }),
+                e.jsx(t, { value: 'support', children: 'Support' }),
+              ],
+            }),
+          ],
+        }),
+        e.jsx('p', {
+          children: 'Item count helps users understand the scope of available choices',
+        }),
+      ],
+    }),
+};
+const a = {
+  render: () =>
+    e.jsxs(e.Fragment, {
+      children: [
+        e.jsx('h3', { children: 'Validation Error' }),
+        e.jsx('label', { htmlFor: 'status-select', children: 'Status' }),
+        e.jsxs(r, {
+          children: [
+            e.jsx(l, {
+              id: 'status-select',
+              className: 'border-destructive focus:ring-destructive',
+              'aria-invalid': 'true',
+              'aria-describedby': 'status-error',
+              children: e.jsx(n, { placeholder: 'Select status' }),
+            }),
+            e.jsxs(i, {
+              children: [
+                e.jsx(t, { value: 'active', children: 'Active' }),
+                e.jsx(t, { value: 'inactive', children: 'Inactive' }),
+                e.jsx(t, { value: 'pending', children: 'Pending' }),
+              ],
+            }),
+          ],
+        }),
+        e.jsx('p', {
+          id: 'status-error',
+          role: 'alert',
+          children: 'Please select a valid status from the list',
+        }),
+        e.jsx('h3', { children: 'Disabled State' }),
+        e.jsx('label', { htmlFor: 'locked-select', children: 'Locked Selection' }),
+        e.jsxs(r, {
+          disabled: !0,
+          children: [
+            e.jsx(l, {
+              id: 'locked-select',
+              'aria-describedby': 'locked-help',
+              children: e.jsx(n, { placeholder: 'Not available' }),
+            }),
+            e.jsxs(i, {
+              children: [
+                e.jsx(t, { value: 'option1', children: 'Option 1' }),
+                e.jsx(t, { value: 'option2', children: 'Option 2' }),
+              ],
+            }),
+          ],
+        }),
+        e.jsx('p', {
+          id: 'locked-help',
+          children: 'This selection is locked until previous steps are completed',
+        }),
+      ],
+    }),
+};
+let o;
+let d;
+let u;
+let p;
+let h;
 c.parameters = {
   ...c.parameters,
   docs: {
@@ -263,7 +264,11 @@ They provide clear context, proper semantics, and predictable behavior.`,
     },
   },
 };
-var m, S, g, v, x;
+let m;
+let S;
+let g;
+let v;
+let x;
 s.parameters = {
   ...s.parameters,
   docs: {
@@ -315,7 +320,11 @@ These patterns enhance understanding for all users.`,
     },
   },
 };
-var j, y, b, I, T;
+let j;
+let y;
+let b;
+let I;
+let T;
 a.parameters = {
   ...a.parameters,
   docs: {

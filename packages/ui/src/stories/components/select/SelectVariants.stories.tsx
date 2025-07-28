@@ -177,9 +177,14 @@ export const ValidationStates: Story = {
 
       <div className="grid gap-6 max-w-sm">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">Default State</label>
+          <label
+            htmlFor="select-default-state"
+            className="text-sm font-medium text-muted-foreground"
+          >
+            Default State
+          </label>
           <Select>
-            <SelectTrigger>
+            <SelectTrigger id="select-default-state">
               <SelectValue placeholder="Default appearance" />
             </SelectTrigger>
             <SelectContent>
@@ -190,9 +195,12 @@ export const ValidationStates: Story = {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-destructive">Error State</label>
+          <label htmlFor="select-error-state" className="text-sm font-medium text-destructive">
+            Error State
+          </label>
           <Select>
             <SelectTrigger
+              id="select-error-state"
               className="border-destructive focus:ring-destructive"
               aria-invalid="true"
             >
@@ -207,9 +215,11 @@ export const ValidationStates: Story = {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium opacity-disabled">Disabled State</label>
+          <label htmlFor="select-disabled-state" className="text-sm font-medium opacity-disabled">
+            Disabled State
+          </label>
           <Select disabled>
-            <SelectTrigger>
+            <SelectTrigger id="select-disabled-state">
               <SelectValue placeholder="Disabled appearance" />
             </SelectTrigger>
             <SelectContent>

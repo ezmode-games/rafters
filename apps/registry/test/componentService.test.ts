@@ -16,19 +16,19 @@ describe('Component Service', () => {
     // Test first component structure
     const firstComponent = registry.components[0];
     expect(firstComponent.name).toBeDefined();
-    expect(firstComponent.version).toBeDefined();
+    expect(firstComponent.meta?.rafters?.version).toBeDefined();
     expect(firstComponent.description).toBeDefined();
-    expect(firstComponent.intelligence).toBeDefined();
+    expect(firstComponent.meta?.rafters?.intelligence).toBeDefined();
     expect(firstComponent.files).toBeDefined();
     expect(firstComponent.dependencies).toBeDefined();
   });
 
   it('should return specific component by name', async () => {
-    const component = await getComponent('Button');
+    const component = await getComponent('button');
 
     expect(component).not.toBeNull();
-    expect(component?.name).toBe('Button');
-    expect(component?.intelligence.cognitiveLoad).toBeGreaterThan(0);
+    expect(component?.name).toBe('button');
+    expect(component?.meta?.rafters?.intelligence.cognitiveLoad).toBeGreaterThan(0);
     expect(component?.files.length).toBeGreaterThan(0);
   });
 
@@ -42,23 +42,25 @@ describe('Component Service', () => {
     const component2 = await getComponent('BUTTON');
     const component3 = await getComponent('Button');
 
-    expect(component1?.name).toBe('Button');
-    expect(component2?.name).toBe('Button');
-    expect(component3?.name).toBe('Button');
+    expect(component1?.name).toBe('button');
+    expect(component2?.name).toBe('button');
+    expect(component3?.name).toBe('button');
   });
 
   it('should include all required intelligence fields', async () => {
     const registry = await getComponentRegistry();
 
     for (const component of registry.components) {
-      expect(component.intelligence.cognitiveLoad).toBeTypeOf('number');
-      expect(component.intelligence.cognitiveLoad).toBeGreaterThan(0);
-      expect(component.intelligence.cognitiveLoad).toBeLessThanOrEqual(10);
+      const intelligence = component.meta?.rafters?.intelligence;
+      expect(intelligence).toBeDefined();
+      expect(intelligence?.cognitiveLoad).toBeTypeOf('number');
+      expect(intelligence?.cognitiveLoad).toBeGreaterThan(0);
+      expect(intelligence?.cognitiveLoad).toBeLessThanOrEqual(10);
 
-      expect(component.intelligence.attentionEconomics).toBeTypeOf('string');
-      expect(component.intelligence.accessibility).toBeTypeOf('string');
-      expect(component.intelligence.trustBuilding).toBeTypeOf('string');
-      expect(component.intelligence.semanticMeaning).toBeTypeOf('string');
+      expect(intelligence?.attentionEconomics).toBeTypeOf('string');
+      expect(intelligence?.accessibility).toBeTypeOf('string');
+      expect(intelligence?.trustBuilding).toBeTypeOf('string');
+      expect(intelligence?.semanticMeaning).toBeTypeOf('string');
     }
   });
 
@@ -69,7 +71,7 @@ describe('Component Service', () => {
       expect(Array.isArray(component.files)).toBe(true);
 
       for (const file of component.files) {
-        expect(file.name).toBeTypeOf('string');
+        expect(file.path).toBeTypeOf('string');
         expect(file.type).toBeTypeOf('string');
         expect(file.content).toBeTypeOf('string');
       }

@@ -58,7 +58,7 @@ export function generateLightnessScale(baseColor: OKLCH): Record<number, OKLCH> 
   // Generate 50-950 scale with perceptually uniform steps
   const steps = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
 
-  steps.forEach((step) => {
+  for (const step of steps) {
     // Map step to lightness (50 = lightest, 950 = darkest)
     const lightness = 1 - (step - 50) / 900; // 0.94 to 0.05
 
@@ -67,7 +67,7 @@ export function generateLightnessScale(baseColor: OKLCH): Record<number, OKLCH> 
       c: c * (step === 50 || step === 950 ? 0.1 : 1), // Reduce chroma at extremes
       h,
     };
-  });
+  }
 
   return scale;
 }

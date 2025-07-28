@@ -172,9 +172,11 @@ export const Common: Story = {
         <h4 className="font-medium">Size Variants</h4>
         <div className="flex gap-4 items-end">
           <div className="space-y-2">
-            <label className="text-sm text-muted-foreground">Default</label>
+            <label htmlFor="select-default-size" className="text-sm text-muted-foreground">
+              Default
+            </label>
             <Select {...args}>
-              <SelectTrigger className="w-40">
+              <SelectTrigger id="select-default-size" className="w-40">
                 <SelectValue placeholder="Default size" />
               </SelectTrigger>
               <SelectContent>
@@ -184,9 +186,11 @@ export const Common: Story = {
             </Select>
           </div>
           <div className="space-y-2">
-            <label className="text-sm text-muted-foreground">Large</label>
+            <label htmlFor="select-large-size" className="text-sm text-muted-foreground">
+              Large
+            </label>
             <Select {...args}>
-              <SelectTrigger className="w-40" size="large">
+              <SelectTrigger id="select-large-size" className="w-40" size="large">
                 <SelectValue placeholder="Large size" />
               </SelectTrigger>
               <SelectContent>
@@ -206,9 +210,11 @@ export const Common: Story = {
         <h4 className="font-medium">States</h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <label className="text-sm text-muted-foreground">Default</label>
+            <label htmlFor="select-state-default" className="text-sm text-muted-foreground">
+              Default
+            </label>
             <Select {...args}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger id="select-state-default" className="w-full">
                 <SelectValue placeholder="Select option" />
               </SelectTrigger>
               <SelectContent>
@@ -218,9 +224,11 @@ export const Common: Story = {
             </Select>
           </div>
           <div className="space-y-2">
-            <label className="text-sm text-muted-foreground">With Selection</label>
+            <label htmlFor="select-with-selection" className="text-sm text-muted-foreground">
+              With Selection
+            </label>
             <Select {...args} defaultValue="option1">
-              <SelectTrigger className="w-full">
+              <SelectTrigger id="select-with-selection" className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -230,9 +238,11 @@ export const Common: Story = {
             </Select>
           </div>
           <div className="space-y-2">
-            <label className="text-sm text-muted-foreground">Disabled</label>
+            <label htmlFor="select-disabled" className="text-sm text-muted-foreground">
+              Disabled
+            </label>
             <Select {...args} disabled>
-              <SelectTrigger className="w-full">
+              <SelectTrigger id="select-disabled" className="w-full">
                 <SelectValue placeholder="Disabled" />
               </SelectTrigger>
               <SelectContent>

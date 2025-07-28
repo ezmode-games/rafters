@@ -7,254 +7,257 @@ import './index-Cox8WoOv.js';
 import './index-DuwuiYca.js';
 import './utils-DuMXYCiK.js';
 const D = {
-    title: '03 Components/Form/Label/Intelligence',
-    component: i,
-    parameters: {
-      layout: 'centered',
-      docs: {
-        description: {
-          component:
-            'Semantic-first label intelligence that guides users through forms with clarity and accessibility. Labels communicate importance, provide context, and reduce cognitive load through intelligent hierarchy.',
-        },
+  title: '03 Components/Form/Label/Intelligence',
+  component: i,
+  parameters: {
+    layout: 'centered',
+    docs: {
+      description: {
+        component:
+          'Semantic-first label intelligence that guides users through forms with clarity and accessibility. Labels communicate importance, provide context, and reduce cognitive load through intelligent hierarchy.',
       },
     },
-    tags: ['autodocs'],
   },
-  a = {
-    render: () =>
-      e.jsxs(e.Fragment, {
-        children: [
-          e.jsx('h3', { children: 'Importance-Based Visual Hierarchy' }),
-          e.jsxs('div', {
-            className: 'space-y-4 w-80',
-            children: [
-              e.jsxs('div', {
-                children: [
-                  e.jsx(i, {
-                    importance: 'critical',
-                    required: !0,
-                    children: 'Critical Information',
-                  }),
-                  e.jsx(r, { placeholder: 'Required for account security' }),
-                ],
-              }),
-              e.jsxs('div', {
-                children: [
-                  e.jsx(i, { importance: 'standard', required: !0, children: 'Standard Field' }),
-                  e.jsx(r, { placeholder: 'Standard required field' }),
-                ],
-              }),
-              e.jsxs('div', {
-                children: [
-                  e.jsx(i, { importance: 'optional', children: 'Optional Enhancement' }),
-                  e.jsx(r, { placeholder: 'Nice to have information' }),
-                ],
-              }),
-            ],
-          }),
-          e.jsx('p', {
-            children:
-              'Visual weight matches functional importance, guiding user attention naturally',
-          }),
-        ],
-      }),
-  },
-  t = {
-    render: () =>
-      e.jsxs(e.Fragment, {
-        children: [
-          e.jsx('h3', { children: 'Contextual Guidance Patterns' }),
-          e.jsxs('div', {
-            className: 'space-y-4 w-80',
-            children: [
-              e.jsxs('div', {
-                children: [
-                  e.jsx(i, {
-                    importance: 'critical',
-                    required: !0,
-                    helpText: 'We use this to verify your identity and protect your account',
-                    children: 'Email Address',
-                  }),
-                  e.jsx(r, { type: 'email', placeholder: 'your@email.com' }),
-                ],
-              }),
-              e.jsxs('div', {
-                children: [
-                  e.jsx(i, {
-                    validationState: 'warning',
-                    helpText: 'Password strength could be improved',
-                    children: 'Password',
-                  }),
-                  e.jsx(r, { type: 'password', placeholder: 'Enter password' }),
-                ],
-              }),
-              e.jsxs('div', {
-                children: [
-                  e.jsx(i, {
-                    validationState: 'success',
-                    helpText: 'Perfect! This username is available',
-                    children: 'Username',
-                  }),
-                  e.jsx(r, { placeholder: 'Choose a unique username' }),
-                ],
-              }),
-              e.jsxs('div', {
-                children: [
-                  e.jsx(i, {
-                    validationState: 'error',
-                    helpText: 'This field is required to continue',
-                    required: !0,
-                    children: 'Confirmation',
-                  }),
-                  e.jsx(r, { placeholder: 'Please confirm your choice' }),
-                ],
-              }),
-            ],
-          }),
-          e.jsx('p', {
-            children:
-              'Guidance text adapts to validation states, providing helpful context without overwhelming',
-          }),
-        ],
-      }),
-  },
-  n = {
-    render: () =>
-      e.jsxs(e.Fragment, {
-        children: [
-          e.jsx('h3', { children: 'Context-Specific Behavior' }),
-          e.jsxs('div', {
-            className: 'space-y-6',
-            children: [
-              e.jsxs('div', {
-                className: 'space-y-2',
-                children: [
-                  e.jsx('h4', { children: 'Form Context' }),
-                  e.jsxs('div', {
-                    className: 'space-y-2 w-80',
-                    children: [
-                      e.jsx(i, { context: 'form', required: !0, children: 'Form Field Label' }),
-                      e.jsx(r, { placeholder: 'Interactive form input' }),
-                      e.jsx('p', {
-                        className: 'text-xs text-muted-foreground',
-                        children: 'Optimized for form interaction and accessibility',
-                      }),
-                    ],
-                  }),
-                ],
-              }),
-              e.jsxs('div', {
-                className: 'space-y-2',
-                children: [
-                  e.jsx('h4', { children: 'Descriptive Context' }),
-                  e.jsxs('div', {
-                    className: 'space-y-2',
-                    children: [
-                      e.jsx(i, { context: 'descriptive', children: 'Data Description' }),
-                      e.jsx('p', {
-                        className: 'text-sm',
-                        children: 'This label describes static content or read-only information',
-                      }),
-                      e.jsx('p', {
-                        className: 'text-xs text-muted-foreground',
-                        children: 'Used for content organization and information hierarchy',
-                      }),
-                    ],
-                  }),
-                ],
-              }),
-              e.jsxs('div', {
-                className: 'space-y-2',
-                children: [
-                  e.jsx('h4', { children: 'Action Context' }),
-                  e.jsxs('div', {
-                    className: 'space-y-2',
-                    children: [
-                      e.jsx(i, { context: 'action', children: 'Interactive Label' }),
-                      e.jsx('p', {
-                        className: 'text-sm',
-                        children: 'This label can trigger actions or navigation',
-                      }),
-                      e.jsx('p', {
-                        className: 'text-xs text-muted-foreground',
-                        children: 'Includes hover states and interactive affordances',
-                      }),
-                    ],
-                  }),
-                ],
-              }),
-            ],
-          }),
-        ],
-      }),
-  },
-  s = {
-    render: () =>
-      e.jsxs(e.Fragment, {
-        children: [
-          e.jsx('h3', { children: 'Comprehensive Accessibility' }),
-          e.jsxs('div', {
-            className: 'space-y-4 w-80',
-            children: [
-              e.jsxs('div', {
-                children: [
-                  e.jsx(i, {
-                    htmlFor: 'accessible-input',
-                    importance: 'critical',
-                    required: !0,
-                    helpText: "Screen readers announce: 'Email Address, required field, edit text'",
-                    children: 'Email Address',
-                  }),
-                  e.jsx(r, {
-                    id: 'accessible-input',
-                    type: 'email',
-                    'aria-describedby': 'email-help',
-                    placeholder: 'your@email.com',
-                  }),
-                ],
-              }),
-              e.jsxs('div', {
-                children: [
-                  e.jsx(i, {
-                    htmlFor: 'validation-input',
-                    validationState: 'error',
-                    helpText: 'Error state uses assertive aria-live for immediate announcement',
-                    required: !0,
-                    children: 'Password',
-                  }),
-                  e.jsx(r, {
-                    id: 'validation-input',
-                    type: 'password',
-                    'aria-invalid': 'true',
-                    'aria-describedby': 'password-error',
-                  }),
-                ],
-              }),
-              e.jsxs('div', {
-                children: [
-                  e.jsx(i, {
-                    htmlFor: 'optional-input',
-                    importance: 'optional',
-                    helpText: 'Optional fields are clearly marked to reduce cognitive load',
-                    children: 'Phone Number',
-                  }),
-                  e.jsx(r, {
-                    id: 'optional-input',
-                    type: 'tel',
-                    placeholder: 'Optional contact method',
-                  }),
-                ],
-              }),
-            ],
-          }),
-          e.jsx('p', {
-            children:
-              'Proper semantic markup and ARIA attributes ensure perfect screen reader support',
-          }),
-        ],
-      }),
-  };
-var c, o, d, l, p;
+  tags: ['autodocs'],
+};
+const a = {
+  render: () =>
+    e.jsxs(e.Fragment, {
+      children: [
+        e.jsx('h3', { children: 'Importance-Based Visual Hierarchy' }),
+        e.jsxs('div', {
+          className: 'space-y-4 w-80',
+          children: [
+            e.jsxs('div', {
+              children: [
+                e.jsx(i, {
+                  importance: 'critical',
+                  required: !0,
+                  children: 'Critical Information',
+                }),
+                e.jsx(r, { placeholder: 'Required for account security' }),
+              ],
+            }),
+            e.jsxs('div', {
+              children: [
+                e.jsx(i, { importance: 'standard', required: !0, children: 'Standard Field' }),
+                e.jsx(r, { placeholder: 'Standard required field' }),
+              ],
+            }),
+            e.jsxs('div', {
+              children: [
+                e.jsx(i, { importance: 'optional', children: 'Optional Enhancement' }),
+                e.jsx(r, { placeholder: 'Nice to have information' }),
+              ],
+            }),
+          ],
+        }),
+        e.jsx('p', {
+          children: 'Visual weight matches functional importance, guiding user attention naturally',
+        }),
+      ],
+    }),
+};
+const t = {
+  render: () =>
+    e.jsxs(e.Fragment, {
+      children: [
+        e.jsx('h3', { children: 'Contextual Guidance Patterns' }),
+        e.jsxs('div', {
+          className: 'space-y-4 w-80',
+          children: [
+            e.jsxs('div', {
+              children: [
+                e.jsx(i, {
+                  importance: 'critical',
+                  required: !0,
+                  helpText: 'We use this to verify your identity and protect your account',
+                  children: 'Email Address',
+                }),
+                e.jsx(r, { type: 'email', placeholder: 'your@email.com' }),
+              ],
+            }),
+            e.jsxs('div', {
+              children: [
+                e.jsx(i, {
+                  validationState: 'warning',
+                  helpText: 'Password strength could be improved',
+                  children: 'Password',
+                }),
+                e.jsx(r, { type: 'password', placeholder: 'Enter password' }),
+              ],
+            }),
+            e.jsxs('div', {
+              children: [
+                e.jsx(i, {
+                  validationState: 'success',
+                  helpText: 'Perfect! This username is available',
+                  children: 'Username',
+                }),
+                e.jsx(r, { placeholder: 'Choose a unique username' }),
+              ],
+            }),
+            e.jsxs('div', {
+              children: [
+                e.jsx(i, {
+                  validationState: 'error',
+                  helpText: 'This field is required to continue',
+                  required: !0,
+                  children: 'Confirmation',
+                }),
+                e.jsx(r, { placeholder: 'Please confirm your choice' }),
+              ],
+            }),
+          ],
+        }),
+        e.jsx('p', {
+          children:
+            'Guidance text adapts to validation states, providing helpful context without overwhelming',
+        }),
+      ],
+    }),
+};
+const n = {
+  render: () =>
+    e.jsxs(e.Fragment, {
+      children: [
+        e.jsx('h3', { children: 'Context-Specific Behavior' }),
+        e.jsxs('div', {
+          className: 'space-y-6',
+          children: [
+            e.jsxs('div', {
+              className: 'space-y-2',
+              children: [
+                e.jsx('h4', { children: 'Form Context' }),
+                e.jsxs('div', {
+                  className: 'space-y-2 w-80',
+                  children: [
+                    e.jsx(i, { context: 'form', required: !0, children: 'Form Field Label' }),
+                    e.jsx(r, { placeholder: 'Interactive form input' }),
+                    e.jsx('p', {
+                      className: 'text-xs text-muted-foreground',
+                      children: 'Optimized for form interaction and accessibility',
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            e.jsxs('div', {
+              className: 'space-y-2',
+              children: [
+                e.jsx('h4', { children: 'Descriptive Context' }),
+                e.jsxs('div', {
+                  className: 'space-y-2',
+                  children: [
+                    e.jsx(i, { context: 'descriptive', children: 'Data Description' }),
+                    e.jsx('p', {
+                      className: 'text-sm',
+                      children: 'This label describes static content or read-only information',
+                    }),
+                    e.jsx('p', {
+                      className: 'text-xs text-muted-foreground',
+                      children: 'Used for content organization and information hierarchy',
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            e.jsxs('div', {
+              className: 'space-y-2',
+              children: [
+                e.jsx('h4', { children: 'Action Context' }),
+                e.jsxs('div', {
+                  className: 'space-y-2',
+                  children: [
+                    e.jsx(i, { context: 'action', children: 'Interactive Label' }),
+                    e.jsx('p', {
+                      className: 'text-sm',
+                      children: 'This label can trigger actions or navigation',
+                    }),
+                    e.jsx('p', {
+                      className: 'text-xs text-muted-foreground',
+                      children: 'Includes hover states and interactive affordances',
+                    }),
+                  ],
+                }),
+              ],
+            }),
+          ],
+        }),
+      ],
+    }),
+};
+const s = {
+  render: () =>
+    e.jsxs(e.Fragment, {
+      children: [
+        e.jsx('h3', { children: 'Comprehensive Accessibility' }),
+        e.jsxs('div', {
+          className: 'space-y-4 w-80',
+          children: [
+            e.jsxs('div', {
+              children: [
+                e.jsx(i, {
+                  htmlFor: 'accessible-input',
+                  importance: 'critical',
+                  required: !0,
+                  helpText: "Screen readers announce: 'Email Address, required field, edit text'",
+                  children: 'Email Address',
+                }),
+                e.jsx(r, {
+                  id: 'accessible-input',
+                  type: 'email',
+                  'aria-describedby': 'email-help',
+                  placeholder: 'your@email.com',
+                }),
+              ],
+            }),
+            e.jsxs('div', {
+              children: [
+                e.jsx(i, {
+                  htmlFor: 'validation-input',
+                  validationState: 'error',
+                  helpText: 'Error state uses assertive aria-live for immediate announcement',
+                  required: !0,
+                  children: 'Password',
+                }),
+                e.jsx(r, {
+                  id: 'validation-input',
+                  type: 'password',
+                  'aria-invalid': 'true',
+                  'aria-describedby': 'password-error',
+                }),
+              ],
+            }),
+            e.jsxs('div', {
+              children: [
+                e.jsx(i, {
+                  htmlFor: 'optional-input',
+                  importance: 'optional',
+                  helpText: 'Optional fields are clearly marked to reduce cognitive load',
+                  children: 'Phone Number',
+                }),
+                e.jsx(r, {
+                  id: 'optional-input',
+                  type: 'tel',
+                  placeholder: 'Optional contact method',
+                }),
+              ],
+            }),
+          ],
+        }),
+        e.jsx('p', {
+          children:
+            'Proper semantic markup and ARIA attributes ensure perfect screen reader support',
+        }),
+      ],
+    }),
+};
+let c;
+let o;
+let d;
+let l;
+let p;
 a.parameters = {
   ...a.parameters,
   docs: {
@@ -295,7 +298,11 @@ This reduces cognitive load by helping users prioritize their attention.`,
     },
   },
 };
-var m, h, u, x, v;
+let m;
+let h;
+let u;
+let x;
+let v;
 t.parameters = {
   ...t.parameters,
   docs: {
@@ -349,7 +356,11 @@ Smart validation states give immediate feedback.`,
     },
   },
 };
-var y, b, f, j, g;
+let y;
+let b;
+let f;
+let j;
+let g;
 n.parameters = {
   ...n.parameters,
   docs: {
@@ -400,7 +411,11 @@ Each context has appropriate styling and behavior patterns.`,
     },
   },
 };
-var L, w, N, I, S;
+let L;
+let w;
+let N;
+let I;
+let S;
 s.parameters = {
   ...s.parameters,
   docs: {

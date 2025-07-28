@@ -19,7 +19,7 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "prepublishOnly": "pnpm build",
-    "test": "vitest",
+    "test": "vitest run --passWithNoTests",
     "lint": "biome check .",
     "format": "biome format --write .",
     "clean": "rm -rf dist"

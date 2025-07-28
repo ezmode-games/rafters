@@ -502,8 +502,8 @@ export const InteractiveVariants: Story = {
               </CardHeader>
               <CardContent density="comfortable">
                 <div className="space-y-2">
-                  <div className="h-3 bg-muted rounded animate-pulse"></div>
-                  <div className="h-3 bg-muted rounded animate-pulse w-3/4"></div>
+                  <div className="h-3 bg-muted rounded animate-pulse" />
+                  <div className="h-3 bg-muted rounded animate-pulse w-3/4" />
                 </div>
               </CardContent>
             </Card>

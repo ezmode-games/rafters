@@ -13,7 +13,7 @@ const Label = ({
   htmlFor?: string;
   variant?: 'field' | 'hint' | 'error' | 'success' | 'meta' | 'status';
   className?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }) => {
   const baseClasses = 'text-sm';
   const variantClasses = {
@@ -215,7 +215,7 @@ export const ContextualCommunication: Story = {
                   </Label>
                   <Input id="signin-password" type="password" placeholder="Enter your password" />
                   <Label variant="hint">
-                    <a href="#" className="text-primary hover:underline">
+                    <a href="/forgot-password" className="text-primary hover:underline">
                       Forgot your password?
                     </a>
                   </Label>
@@ -572,7 +572,9 @@ export const ProgressiveDisclosure: Story = {
               />
               <Label variant="error">
                 Did you mean{' '}
-                <button className="text-primary hover:underline font-medium">user@gmail.com</button>
+                <button type="button" className="text-primary hover:underline font-medium">
+                  user@gmail.com
+                </button>
                 ?
               </Label>
               <Label variant="hint">

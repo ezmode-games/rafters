@@ -12,7 +12,7 @@ export const DEFAULT_COGNITIVE_LOADS = {
     simple: 1, // Basic elements like dividers, spacers
     moderate: 2, // Simple interactive elements like buttons
     complex: 3, // Form elements, basic patterns
-    challenging: 4, // Complex patterns like modals, multi-step forms  
+    challenging: 4, // Complex patterns like modals, multi-step forms
     expert: 5, // Advanced patterns like data tables, complex workflows
 };
 // Semantic token categories for AI understanding
@@ -25,7 +25,7 @@ export const SEMANTIC_CATEGORIES = {
     warning: 'Cautionary feedback and attention states',
     danger: 'Error states and destructive actions',
     info: 'Informational content and neutral states',
-    // Typography semantics  
+    // Typography semantics
     display: 'Hero headings and marketing content',
     heading: 'Page and section titles',
     body: 'Main content and reading text',

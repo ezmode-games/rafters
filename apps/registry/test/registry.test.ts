@@ -50,7 +50,7 @@ describe('Registry Metadata API', () => {
     const categories = Object.keys(data.categories);
 
     expect(categories.length).toBeGreaterThan(0);
-    expect(categories).toContain('interaction'); // Button should be interaction
+    expect(categories).toContain('registry:component'); // All components should be this type
 
     // Verify category counts add up to total
     const totalFromCategories = Object.values(data.categories).reduce(

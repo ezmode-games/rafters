@@ -357,7 +357,7 @@ export const TemporalContext: Story = {
         <TabsContent value="today" className="space-y-3">
           <div className="space-y-2">
             <div className="flex items-start gap-3 p-3 bg-muted/20 rounded">
-              <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
+              <div className="w-2 h-2 rounded-full bg-primary mt-2" />
               <div className="flex-1">
                 <div className="flex justify-between items-start">
                   <span className="text-sm font-medium">Project milestone completed</span>
@@ -367,7 +367,7 @@ export const TemporalContext: Story = {
               </div>
             </div>
             <div className="flex items-start gap-3 p-3 bg-muted/20 rounded">
-              <div className="w-2 h-2 rounded-full bg-success mt-2"></div>
+              <div className="w-2 h-2 rounded-full bg-success mt-2" />
               <div className="flex-1">
                 <div className="flex justify-between items-start">
                   <span className="text-sm font-medium">Team member joined</span>

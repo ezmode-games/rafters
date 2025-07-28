@@ -25,7 +25,7 @@ describe('Health Check API', () => {
     const timestamp = new Date(data.timestamp);
 
     expect(timestamp instanceof Date).toBe(true);
-    expect(isNaN(timestamp.getTime())).toBe(false);
+    expect(Number.isNaN(timestamp.getTime())).toBe(false);
 
     // Should be within the last minute
     const now = new Date();

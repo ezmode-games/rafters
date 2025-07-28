@@ -15,7 +15,7 @@ const Label = ({
   htmlFor?: string;
   variant?: 'field' | 'hint' | 'error' | 'success' | 'meta' | 'status';
   className?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }) => {
   const baseClasses = 'text-sm';
   const variantClasses = {

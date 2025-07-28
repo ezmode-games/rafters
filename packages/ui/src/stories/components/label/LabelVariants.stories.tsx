@@ -13,7 +13,7 @@ const Label = ({
   htmlFor?: string;
   variant?: 'field' | 'hint' | 'error' | 'success' | 'meta' | 'status';
   className?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }) => {
   const baseClasses = 'text-sm';
   const variantClasses = {
@@ -506,7 +506,9 @@ export const StateResponsive: Story = {
               />
               <Label variant="error">
                 Did you mean{' '}
-                <button className="text-primary hover:underline font-medium">user@gmail.com</button>
+                <button type="button" className="text-primary hover:underline font-medium">
+                  user@gmail.com
+                </button>
                 ?
               </Label>
               <Label variant="hint">Common domains: gmail.com, outlook.com, yahoo.com</Label>
@@ -529,7 +531,10 @@ export const StateResponsive: Story = {
               <Label variant="error">Email must include a valid domain (like @gmail.com)</Label>
               <Label variant="hint">Example: yourname@gmail.com or work@company.com</Label>
               <div className="text-xs text-muted-foreground">
-                Need help? <button className="text-primary hover:underline">Contact support</button>
+                Need help?{' '}
+                <button type="button" className="text-primary hover:underline">
+                  Contact support
+                </button>
               </div>
               <p className="text-xs text-muted-foreground">
                 <strong>Persistent Error:</strong> Escalated assistance with support options

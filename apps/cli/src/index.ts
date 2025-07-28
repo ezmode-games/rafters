@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import { readFileSync } from 'fs';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Command } from 'commander';
 import { addCommand } from './commands/add.js';
 import { initCommand } from './commands/init.js';

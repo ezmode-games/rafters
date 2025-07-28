@@ -24,12 +24,11 @@ registry.get('/', async (c) => {
       components: registryData.components.map((component) => ({
         name: component.name,
         description: component.description,
-        version: component.version,
+        version: component.meta?.rafters?.version || '1.0.0',
         type: component.type,
-        category: component.category,
-        cognitiveLoad: component.intelligence.cognitiveLoad,
-        dependencies: component.dependencies,
-        files: component.files.map((f) => f.name),
+        cognitiveLoad: component.meta?.rafters?.intelligence.cognitiveLoad || 0,
+        dependencies: component.dependencies || [],
+        files: component.files.map((f) => f.path),
       })),
       totalComponents: registryData.components.length,
       lastUpdated: new Date().toISOString(),
@@ -62,14 +61,17 @@ registry.get('/stats', async (c) => {
     const allDependencies = new Set<string>();
 
     for (const component of registryData.components) {
-      // Count by category
-      stats.categories[component.category] = (stats.categories[component.category] || 0) + 1;
+      // Count by type (since we removed category from new schema)
+      const componentType = component.type || 'unknown';
+      stats.categories[componentType] = (stats.categories[componentType] || 0) + 1;
 
       // Calculate average cognitive load
-      totalCognitiveLoad += component.intelligence.cognitiveLoad;
+      const cognitiveLoad = component.meta?.rafters?.intelligence.cognitiveLoad || 0;
+      totalCognitiveLoad += cognitiveLoad;
 
       // Track unique dependencies
-      for (const dep of component.dependencies) {
+      const dependencies = component.dependencies || [];
+      for (const dep of dependencies) {
         allDependencies.add(dep);
       }
     }

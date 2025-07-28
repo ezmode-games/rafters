@@ -127,7 +127,7 @@ export const SemanticStructure: Story = {
 
         <div>
           <h4 className="text-base font-medium mb-4">ARIA Landmarks and Relationships</h4>
-          <Card role="article" aria-labelledby="main-content-title">
+          <article aria-labelledby="main-content-title">
             <CardHeader>
               <CardTitle level={4} weight="medium" id="main-content-title">
                 Content with ARIA Enhancement
@@ -150,7 +150,7 @@ export const SemanticStructure: Story = {
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </article>
         </div>
       </section>
     </div>
@@ -443,7 +443,7 @@ export const ScreenReaderOptimization: Story = {
             Dashboard Cards with Live Regions
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card role="region" aria-labelledby="metrics-title" aria-describedby="metrics-desc">
+            <section aria-labelledby="metrics-title" aria-describedby="metrics-desc">
               <CardHeader>
                 <CardTitle level={4} weight="medium" id="metrics-title">
                   Key Metrics
@@ -454,27 +454,27 @@ export const ScreenReaderOptimization: Story = {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="flex justify-between" role="group" aria-label="Revenue metric">
+                  <fieldset className="flex justify-between" aria-label="Revenue metric">
                     <span>Revenue:</span>
                     <span aria-live="polite" className="font-medium text-green-600">
                       $45,678 (+12%)
                     </span>
-                  </div>
-                  <div className="flex justify-between" role="group" aria-label="Users metric">
+                  </fieldset>
+                  <fieldset className="flex justify-between" aria-label="Users metric">
                     <span>Active Users:</span>
                     <span aria-live="polite" className="font-medium">
                       2,547
                     </span>
-                  </div>
-                  <div className="flex justify-between" role="group" aria-label="Conversion metric">
+                  </fieldset>
+                  <fieldset className="flex justify-between" aria-label="Conversion metric">
                     <span>Conversion Rate:</span>
                     <span aria-live="polite" className="font-medium">
                       3.4%
                     </span>
-                  </div>
+                  </fieldset>
                 </div>
               </CardContent>
-            </Card>
+            </section>
 
             <Card role="alert" aria-labelledby="alert-title">
               <CardHeader>
@@ -506,7 +506,7 @@ export const ScreenReaderOptimization: Story = {
           <h4 id="content-section" className="text-base font-medium mb-4">
             Content Cards with Relationships
           </h4>
-          <Card role="article" aria-labelledby="article-title" aria-describedby="article-summary">
+          <article aria-labelledby="article-title" aria-describedby="article-summary">
             <CardHeader>
               <CardTitle level={4} weight="medium" id="article-title">
                 Design System Guidelines
@@ -540,7 +540,7 @@ export const ScreenReaderOptimization: Story = {
                 Read Full Article
               </Button>
             </CardFooter>
-          </Card>
+          </article>
         </section>
       </div>
     </div>

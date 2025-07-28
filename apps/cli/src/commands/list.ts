@@ -1,9 +1,19 @@
-import { existsSync, readFileSync } from 'fs';
-import { join } from 'path';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import chalk from 'chalk';
+import { z } from 'zod';
 import { loadConfig } from '../utils/config.js';
 import { getRaftersTitle } from '../utils/logo.js';
 import { fetchComponentRegistry } from '../utils/registry.js';
+
+const ConfigSchema = z
+  .object({
+    componentsDir: z.string(),
+    packageManager: z.string(),
+    hasStorybook: z.boolean(),
+    storiesDir: z.string().optional(),
+  })
+  .nullable();
 
 interface ListOptions {
   details?: boolean;
@@ -38,9 +48,9 @@ function loadInstalledComponents(cwd = process.cwd()): Record<string, InstalledC
 
 export async function listCommand(options: ListOptions = {}): Promise<void> {
   try {
-    let config;
+    let config: z.infer<typeof ConfigSchema>;
     try {
-      config = loadConfig();
+      config = ConfigSchema.parse(loadConfig());
     } catch {
       // If not initialized, just show available components
       config = null;

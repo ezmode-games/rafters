@@ -12,16 +12,18 @@ function v(r) {
         const f = new ResizeObserver((i) => {
           if (!Array.isArray(i) || !i.length) return;
           const c = i[0];
-          let o, s;
+          let o;
+          let s;
           if ('borderBoxSize' in c) {
-            const u = c.borderBoxSize,
-              a = Array.isArray(u) ? u[0] : u;
+            const u = c.borderBoxSize;
+            const a = Array.isArray(u) ? u[0] : u;
             (o = a.inlineSize), (s = a.blockSize);
           } else (o = r.offsetWidth), (s = r.offsetHeight);
           t({ width: o, height: s });
         });
         return f.observe(r, { box: 'border-box' }), () => f.unobserve(r);
-      } else t(void 0);
+      }
+      t(void 0);
     }, [r]),
     e
   );

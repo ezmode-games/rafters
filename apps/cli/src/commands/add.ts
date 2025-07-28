@@ -1,25 +1,44 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import chalk from 'chalk';
 import ora from 'ora';
+import { z } from 'zod';
 import { getComponentTemplate } from '../utils/component-templates.js';
 import { loadConfig } from '../utils/config.js';
 import { installDependencies } from '../utils/dependencies.js';
 import { createComponentPath, fileExists, writeFile } from '../utils/files.js';
 import { getRaftersTitle } from '../utils/logo.js';
-import { fetchComponent } from '../utils/registry.js';
+import { type ComponentManifestSchema, fetchComponent } from '../utils/registry.js';
 
 interface AddOptions {
   force?: boolean;
 }
 
-interface ComponentManifest {
-  version: string;
-  initialized: string;
-  components: Record<string, any>;
-}
+const ComponentManifestFileSchema = z.object({
+  version: z.string(),
+  initialized: z.string(),
+  components: z.record(
+    z.string(),
+    z.object({
+      path: z.string(),
+      story: z.string().optional(),
+      installed: z.string(),
+      version: z.string(),
+      intelligence: z.object({
+        cognitiveLoad: z.number(),
+        attentionEconomics: z.string(),
+        accessibility: z.string(),
+        trustBuilding: z.string(),
+        semanticMeaning: z.string(),
+      }),
+      dependencies: z.array(z.string()),
+    })
+  ),
+});
 
-function loadComponentManifest(cwd = process.cwd()): ComponentManifest {
+type ComponentManifestFile = z.infer<typeof ComponentManifestFileSchema>;
+
+function loadComponentManifest(cwd = process.cwd()): ComponentManifestFile {
   const manifestPath = join(cwd, '.rafters', 'component-manifest.json');
   try {
     const content = readFileSync(manifestPath, 'utf-8');
@@ -33,7 +52,7 @@ function loadComponentManifest(cwd = process.cwd()): ComponentManifest {
   }
 }
 
-function saveComponentManifest(manifest: ComponentManifest, cwd = process.cwd()): void {
+function saveComponentManifest(manifest: ComponentManifestFile, cwd = process.cwd()): void {
   const manifestPath = join(cwd, '.rafters', 'component-manifest.json');
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
 }
@@ -126,6 +145,13 @@ export async function addCommand(componentName: string, options: AddOptions = {}
     // Update component manifest
     const manifestSpinner = ora('Updating component manifest...').start();
     const manifest = loadComponentManifest(cwd);
+    const intelligence = componentManifest.meta?.rafters?.intelligence;
+    const version = componentManifest.meta?.rafters?.version || '1.0.0';
+
+    if (!intelligence) {
+      throw new Error('Component manifest missing rafters intelligence metadata');
+    }
+
     manifest.components[componentManifest.name] = {
       path: componentPath,
       story: config.hasStorybook
@@ -135,9 +161,9 @@ export async function addCommand(componentName: string, options: AddOptions = {}
           )
         : undefined,
       installed: new Date().toISOString(),
-      version: componentManifest.version,
-      intelligence: componentManifest.intelligence,
-      dependencies: componentManifest.dependencies,
+      version,
+      intelligence,
+      dependencies: componentManifest.dependencies || [],
     };
     saveComponentManifest(manifest, cwd);
     manifestSpinner.succeed('Component manifest updated');
@@ -151,19 +177,11 @@ export async function addCommand(componentName: string, options: AddOptions = {}
     );
     console.log();
     console.log('Intelligence features:');
+    console.log(chalk.gray(`  • Cognitive Load: ${intelligence.cognitiveLoad}/10`));
     console.log(
-      chalk.gray(`  • Cognitive Load: ${componentManifest.intelligence.cognitiveLoad}/10`)
+      chalk.gray(`  • Attention Economics: ${intelligence.attentionEconomics.split(':')[0]}`)
     );
-    console.log(
-      chalk.gray(
-        `  • Attention Economics: ${componentManifest.intelligence.attentionEconomics.split(':')[0]}`
-      )
-    );
-    console.log(
-      chalk.gray(
-        `  • Trust Building: ${componentManifest.intelligence.trustBuilding.split('.')[0]}`
-      )
-    );
+    console.log(chalk.gray(`  • Trust Building: ${intelligence.trustBuilding.split('.')[0]}`));
     console.log();
     console.log('Next steps:');
     console.log(
@@ -184,8 +202,13 @@ export async function addCommand(componentName: string, options: AddOptions = {}
   }
 }
 
-function createBasicStory(componentManifest: any): string {
+function createBasicStory(componentManifest: z.infer<typeof ComponentManifestSchema>): string {
   const componentName = componentManifest.name;
+  const intelligence = componentManifest.meta?.rafters?.intelligence;
+
+  if (!intelligence) {
+    throw new Error('Component manifest missing rafters intelligence metadata');
+  }
 
   return `import type { Meta, StoryObj } from '@storybook/react';
 import { ${componentName} } from '../components/ui/${componentName.toLowerCase()}';
@@ -193,11 +216,11 @@ import { ${componentName} } from '../components/ui/${componentName.toLowerCase()
 /**
  * ${componentName} Intelligence Story
  * 
- * Cognitive Load: ${componentManifest.intelligence.cognitiveLoad}/10
- * ${componentManifest.intelligence.attentionEconomics}
- * ${componentManifest.intelligence.accessibility}
- * ${componentManifest.intelligence.trustBuilding}
- * ${componentManifest.intelligence.semanticMeaning}
+ * Cognitive Load: ${intelligence.cognitiveLoad}/10
+ * ${intelligence.attentionEconomics}
+ * ${intelligence.accessibility}
+ * ${intelligence.trustBuilding}
+ * ${intelligence.semanticMeaning}
  */
 const meta = {
   title: 'Components/${componentName}/Intelligence',
@@ -225,7 +248,7 @@ export const CognitiveLoadAnalysis: Story = {
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Cognitive Load Analysis</h3>
       <p className="text-sm text-muted-foreground">
-        This component has a cognitive load rating of ${componentManifest.intelligence.cognitiveLoad}/10.
+        This component has a cognitive load rating of ${intelligence.cognitiveLoad}/10.
       </p>
       <${componentName} />
     </div>
@@ -237,7 +260,7 @@ export const AttentionEconomics: Story = {
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Attention Economics</h3>
       <p className="text-sm text-muted-foreground">
-        ${componentManifest.intelligence.attentionEconomics}
+        ${intelligence.attentionEconomics}
       </p>
       <${componentName} />
     </div>
@@ -249,7 +272,7 @@ export const TrustBuilding: Story = {
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Trust Building Patterns</h3>
       <p className="text-sm text-muted-foreground">
-        ${componentManifest.intelligence.trustBuilding}
+        ${intelligence.trustBuilding}
       </p>
       <${componentName} />
     </div>

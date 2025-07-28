@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 const { ensureDirSync, writeFileSync, existsSync, readFileSync } = fs;
-import { dirname, join } from 'path';
+import { dirname, join } from 'node:path';
 export function ensureDir(path) {
     ensureDirSync(dirname(path));
 }

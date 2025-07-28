@@ -1,6 +1,6 @@
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { z } from 'zod';
-import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { join } from 'path';
 export const ConfigSchema = z.object({
     version: z.string(),
     componentsDir: z.string(),

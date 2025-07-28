@@ -264,103 +264,94 @@ export declare const DesignSystemSchema: z.ZodObject<{
 export type DesignSystem = z.infer<typeof DesignSystemSchema>;
 export declare const ComponentRegistrySchema: z.ZodObject<{
     name: z.ZodString;
-    type: z.ZodLiteral<"registry:component">;
+    type: z.ZodEnum<["registry:component", "registry:lib", "registry:style", "registry:block", "registry:page", "registry:hook"]>;
     files: z.ZodArray<z.ZodString, "many">;
     meta: z.ZodObject<{
         rafters: z.ZodObject<{
-            aiIntelligence: z.ZodObject<{
+            intelligence: z.ZodObject<{
                 cognitiveLoad: z.ZodNumber;
-                attentionHierarchy: z.ZodString;
-                safetyConstraints: z.ZodOptional<z.ZodString>;
-                accessibilityRules: z.ZodString;
-                usageContext: z.ZodString;
-                decisionConstraints: z.ZodOptional<z.ZodString>;
+                attentionEconomics: z.ZodString;
+                accessibility: z.ZodString;
+                trustBuilding: z.ZodString;
+                semanticMeaning: z.ZodString;
             }, "strip", z.ZodTypeAny, {
                 cognitiveLoad: number;
-                attentionHierarchy: string;
-                accessibilityRules: string;
-                usageContext: string;
-                safetyConstraints?: string | undefined;
-                decisionConstraints?: string | undefined;
+                attentionEconomics: string;
+                accessibility: string;
+                trustBuilding: string;
+                semanticMeaning: string;
             }, {
                 cognitiveLoad: number;
-                attentionHierarchy: string;
-                accessibilityRules: string;
-                usageContext: string;
-                safetyConstraints?: string | undefined;
-                decisionConstraints?: string | undefined;
+                attentionEconomics: string;
+                accessibility: string;
+                trustBuilding: string;
+                semanticMeaning: string;
             }>;
         }, "strip", z.ZodTypeAny, {
-            aiIntelligence: {
+            intelligence: {
                 cognitiveLoad: number;
-                attentionHierarchy: string;
-                accessibilityRules: string;
-                usageContext: string;
-                safetyConstraints?: string | undefined;
-                decisionConstraints?: string | undefined;
+                attentionEconomics: string;
+                accessibility: string;
+                trustBuilding: string;
+                semanticMeaning: string;
             };
         }, {
-            aiIntelligence: {
+            intelligence: {
                 cognitiveLoad: number;
-                attentionHierarchy: string;
-                accessibilityRules: string;
-                usageContext: string;
-                safetyConstraints?: string | undefined;
-                decisionConstraints?: string | undefined;
+                attentionEconomics: string;
+                accessibility: string;
+                trustBuilding: string;
+                semanticMeaning: string;
             };
         }>;
     }, "strip", z.ZodTypeAny, {
         rafters: {
-            aiIntelligence: {
+            intelligence: {
                 cognitiveLoad: number;
-                attentionHierarchy: string;
-                accessibilityRules: string;
-                usageContext: string;
-                safetyConstraints?: string | undefined;
-                decisionConstraints?: string | undefined;
+                attentionEconomics: string;
+                accessibility: string;
+                trustBuilding: string;
+                semanticMeaning: string;
             };
         };
     }, {
         rafters: {
-            aiIntelligence: {
+            intelligence: {
                 cognitiveLoad: number;
-                attentionHierarchy: string;
-                accessibilityRules: string;
-                usageContext: string;
-                safetyConstraints?: string | undefined;
-                decisionConstraints?: string | undefined;
+                attentionEconomics: string;
+                accessibility: string;
+                trustBuilding: string;
+                semanticMeaning: string;
             };
         };
     }>;
 }, "strip", z.ZodTypeAny, {
-    type: "registry:component";
+    type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
     name: string;
     files: string[];
     meta: {
         rafters: {
-            aiIntelligence: {
+            intelligence: {
                 cognitiveLoad: number;
-                attentionHierarchy: string;
-                accessibilityRules: string;
-                usageContext: string;
-                safetyConstraints?: string | undefined;
-                decisionConstraints?: string | undefined;
+                attentionEconomics: string;
+                accessibility: string;
+                trustBuilding: string;
+                semanticMeaning: string;
             };
         };
     };
 }, {
-    type: "registry:component";
+    type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
     name: string;
     files: string[];
     meta: {
         rafters: {
-            aiIntelligence: {
+            intelligence: {
                 cognitiveLoad: number;
-                attentionHierarchy: string;
-                accessibilityRules: string;
-                usageContext: string;
-                safetyConstraints?: string | undefined;
-                decisionConstraints?: string | undefined;
+                attentionEconomics: string;
+                accessibility: string;
+                trustBuilding: string;
+                semanticMeaning: string;
             };
         };
     };
@@ -401,85 +392,650 @@ export type PublicDesignSystem = z.infer<typeof PublicDesignSystemSchema>;
 export declare const ComponentManifestSchema: z.ZodObject<{
     $schema: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
-    version: z.ZodString;
-    description: z.ZodString;
-    type: z.ZodLiteral<"registry:component">;
-    category: z.ZodString;
-    dependencies: z.ZodArray<z.ZodString, "many">;
-    intelligence: z.ZodObject<{
-        cognitiveLoad: z.ZodNumber;
-        attentionEconomics: z.ZodString;
-        accessibility: z.ZodString;
-        trustBuilding: z.ZodString;
-        semanticMeaning: z.ZodString;
-    }, "strip", z.ZodTypeAny, {
-        cognitiveLoad: number;
-        attentionEconomics: string;
-        accessibility: string;
-        trustBuilding: string;
-        semanticMeaning: string;
-    }, {
-        cognitiveLoad: number;
-        attentionEconomics: string;
-        accessibility: string;
-        trustBuilding: string;
-        semanticMeaning: string;
-    }>;
+    type: z.ZodEnum<["registry:component", "registry:lib", "registry:style", "registry:block", "registry:page", "registry:hook"]>;
+    description: z.ZodOptional<z.ZodString>;
+    title: z.ZodOptional<z.ZodString>;
+    author: z.ZodOptional<z.ZodString>;
+    dependencies: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodString, "many">>>;
+    devDependencies: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    registryDependencies: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     files: z.ZodArray<z.ZodObject<{
-        name: z.ZodString;
-        type: z.ZodString;
+        path: z.ZodString;
         content: z.ZodString;
+        type: z.ZodString;
+        target: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
+        path: string;
         type: string;
-        name: string;
         content: string;
+        target?: string | undefined;
     }, {
+        path: string;
         type: string;
-        name: string;
         content: string;
+        target?: string | undefined;
     }>, "many">;
-    lastUpdated: z.ZodString;
+    tailwind: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+    cssVars: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+    css: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    envVars: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
+    categories: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    docs: z.ZodOptional<z.ZodString>;
+    meta: z.ZodOptional<z.ZodObject<{
+        rafters: z.ZodOptional<z.ZodObject<{
+            intelligence: z.ZodObject<{
+                cognitiveLoad: z.ZodNumber;
+                attentionEconomics: z.ZodString;
+                accessibility: z.ZodString;
+                trustBuilding: z.ZodString;
+                semanticMeaning: z.ZodString;
+            }, "strip", z.ZodTypeAny, {
+                cognitiveLoad: number;
+                attentionEconomics: string;
+                accessibility: string;
+                trustBuilding: string;
+                semanticMeaning: string;
+            }, {
+                cognitiveLoad: number;
+                attentionEconomics: string;
+                accessibility: string;
+                trustBuilding: string;
+                semanticMeaning: string;
+            }>;
+            version: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            intelligence: {
+                cognitiveLoad: number;
+                attentionEconomics: string;
+                accessibility: string;
+                trustBuilding: string;
+                semanticMeaning: string;
+            };
+            version?: string | undefined;
+        }, {
+            intelligence: {
+                cognitiveLoad: number;
+                attentionEconomics: string;
+                accessibility: string;
+                trustBuilding: string;
+                semanticMeaning: string;
+            };
+            version?: string | undefined;
+        }>>;
+    }, "strip", z.ZodTypeAny, {
+        rafters?: {
+            intelligence: {
+                cognitiveLoad: number;
+                attentionEconomics: string;
+                accessibility: string;
+                trustBuilding: string;
+                semanticMeaning: string;
+            };
+            version?: string | undefined;
+        } | undefined;
+    }, {
+        rafters?: {
+            intelligence: {
+                cognitiveLoad: number;
+                attentionEconomics: string;
+                accessibility: string;
+                trustBuilding: string;
+                semanticMeaning: string;
+            };
+            version?: string | undefined;
+        } | undefined;
+    }>>;
 }, "strip", z.ZodTypeAny, {
-    type: "registry:component";
+    type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
     name: string;
-    intelligence: {
-        cognitiveLoad: number;
-        attentionEconomics: string;
-        accessibility: string;
-        trustBuilding: string;
-        semanticMeaning: string;
-    };
-    version: string;
     files: {
+        path: string;
         type: string;
-        name: string;
         content: string;
+        target?: string | undefined;
     }[];
-    description: string;
-    category: string;
     dependencies: string[];
-    lastUpdated: string;
+    meta?: {
+        rafters?: {
+            intelligence: {
+                cognitiveLoad: number;
+                attentionEconomics: string;
+                accessibility: string;
+                trustBuilding: string;
+                semanticMeaning: string;
+            };
+            version?: string | undefined;
+        } | undefined;
+    } | undefined;
+    author?: string | undefined;
     $schema?: string | undefined;
+    description?: string | undefined;
+    title?: string | undefined;
+    devDependencies?: string[] | undefined;
+    registryDependencies?: string[] | undefined;
+    tailwind?: Record<string, unknown> | undefined;
+    cssVars?: Record<string, unknown> | undefined;
+    css?: string[] | undefined;
+    envVars?: Record<string, string> | undefined;
+    categories?: string[] | undefined;
+    docs?: string | undefined;
 }, {
-    type: "registry:component";
+    type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
     name: string;
-    intelligence: {
-        cognitiveLoad: number;
-        attentionEconomics: string;
-        accessibility: string;
-        trustBuilding: string;
-        semanticMeaning: string;
-    };
-    version: string;
     files: {
+        path: string;
         type: string;
-        name: string;
         content: string;
+        target?: string | undefined;
     }[];
-    description: string;
-    category: string;
-    dependencies: string[];
-    lastUpdated: string;
+    meta?: {
+        rafters?: {
+            intelligence: {
+                cognitiveLoad: number;
+                attentionEconomics: string;
+                accessibility: string;
+                trustBuilding: string;
+                semanticMeaning: string;
+            };
+            version?: string | undefined;
+        } | undefined;
+    } | undefined;
+    author?: string | undefined;
     $schema?: string | undefined;
+    description?: string | undefined;
+    title?: string | undefined;
+    dependencies?: string[] | undefined;
+    devDependencies?: string[] | undefined;
+    registryDependencies?: string[] | undefined;
+    tailwind?: Record<string, unknown> | undefined;
+    cssVars?: Record<string, unknown> | undefined;
+    css?: string[] | undefined;
+    envVars?: Record<string, string> | undefined;
+    categories?: string[] | undefined;
+    docs?: string | undefined;
 }>;
 export type ComponentManifest = z.infer<typeof ComponentManifestSchema>;
+export declare const RegistryResponseSchema: z.ZodObject<{
+    $schema: z.ZodOptional<z.ZodString>;
+    name: z.ZodOptional<z.ZodString>;
+    homepage: z.ZodOptional<z.ZodString>;
+    components: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        $schema: z.ZodOptional<z.ZodString>;
+        name: z.ZodString;
+        type: z.ZodEnum<["registry:component", "registry:lib", "registry:style", "registry:block", "registry:page", "registry:hook"]>;
+        description: z.ZodOptional<z.ZodString>;
+        title: z.ZodOptional<z.ZodString>;
+        author: z.ZodOptional<z.ZodString>;
+        dependencies: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodString, "many">>>;
+        devDependencies: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        registryDependencies: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        files: z.ZodArray<z.ZodObject<{
+            path: z.ZodString;
+            content: z.ZodString;
+            type: z.ZodString;
+            target: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            path: string;
+            type: string;
+            content: string;
+            target?: string | undefined;
+        }, {
+            path: string;
+            type: string;
+            content: string;
+            target?: string | undefined;
+        }>, "many">;
+        tailwind: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+        cssVars: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+        css: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        envVars: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
+        categories: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        docs: z.ZodOptional<z.ZodString>;
+        meta: z.ZodOptional<z.ZodObject<{
+            rafters: z.ZodOptional<z.ZodObject<{
+                intelligence: z.ZodObject<{
+                    cognitiveLoad: z.ZodNumber;
+                    attentionEconomics: z.ZodString;
+                    accessibility: z.ZodString;
+                    trustBuilding: z.ZodString;
+                    semanticMeaning: z.ZodString;
+                }, "strip", z.ZodTypeAny, {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                }, {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                }>;
+                version: z.ZodOptional<z.ZodString>;
+            }, "strip", z.ZodTypeAny, {
+                intelligence: {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                };
+                version?: string | undefined;
+            }, {
+                intelligence: {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                };
+                version?: string | undefined;
+            }>>;
+        }, "strip", z.ZodTypeAny, {
+            rafters?: {
+                intelligence: {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                };
+                version?: string | undefined;
+            } | undefined;
+        }, {
+            rafters?: {
+                intelligence: {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                };
+                version?: string | undefined;
+            } | undefined;
+        }>>;
+    }, "strip", z.ZodTypeAny, {
+        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
+        name: string;
+        files: {
+            path: string;
+            type: string;
+            content: string;
+            target?: string | undefined;
+        }[];
+        dependencies: string[];
+        meta?: {
+            rafters?: {
+                intelligence: {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                };
+                version?: string | undefined;
+            } | undefined;
+        } | undefined;
+        author?: string | undefined;
+        $schema?: string | undefined;
+        description?: string | undefined;
+        title?: string | undefined;
+        devDependencies?: string[] | undefined;
+        registryDependencies?: string[] | undefined;
+        tailwind?: Record<string, unknown> | undefined;
+        cssVars?: Record<string, unknown> | undefined;
+        css?: string[] | undefined;
+        envVars?: Record<string, string> | undefined;
+        categories?: string[] | undefined;
+        docs?: string | undefined;
+    }, {
+        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
+        name: string;
+        files: {
+            path: string;
+            type: string;
+            content: string;
+            target?: string | undefined;
+        }[];
+        meta?: {
+            rafters?: {
+                intelligence: {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                };
+                version?: string | undefined;
+            } | undefined;
+        } | undefined;
+        author?: string | undefined;
+        $schema?: string | undefined;
+        description?: string | undefined;
+        title?: string | undefined;
+        dependencies?: string[] | undefined;
+        devDependencies?: string[] | undefined;
+        registryDependencies?: string[] | undefined;
+        tailwind?: Record<string, unknown> | undefined;
+        cssVars?: Record<string, unknown> | undefined;
+        css?: string[] | undefined;
+        envVars?: Record<string, string> | undefined;
+        categories?: string[] | undefined;
+        docs?: string | undefined;
+    }>, "many">>;
+    items: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        $schema: z.ZodOptional<z.ZodString>;
+        name: z.ZodString;
+        type: z.ZodEnum<["registry:component", "registry:lib", "registry:style", "registry:block", "registry:page", "registry:hook"]>;
+        description: z.ZodOptional<z.ZodString>;
+        title: z.ZodOptional<z.ZodString>;
+        author: z.ZodOptional<z.ZodString>;
+        dependencies: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodString, "many">>>;
+        devDependencies: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        registryDependencies: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        files: z.ZodArray<z.ZodObject<{
+            path: z.ZodString;
+            content: z.ZodString;
+            type: z.ZodString;
+            target: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            path: string;
+            type: string;
+            content: string;
+            target?: string | undefined;
+        }, {
+            path: string;
+            type: string;
+            content: string;
+            target?: string | undefined;
+        }>, "many">;
+        tailwind: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+        cssVars: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+        css: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        envVars: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
+        categories: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        docs: z.ZodOptional<z.ZodString>;
+        meta: z.ZodOptional<z.ZodObject<{
+            rafters: z.ZodOptional<z.ZodObject<{
+                intelligence: z.ZodObject<{
+                    cognitiveLoad: z.ZodNumber;
+                    attentionEconomics: z.ZodString;
+                    accessibility: z.ZodString;
+                    trustBuilding: z.ZodString;
+                    semanticMeaning: z.ZodString;
+                }, "strip", z.ZodTypeAny, {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                }, {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                }>;
+                version: z.ZodOptional<z.ZodString>;
+            }, "strip", z.ZodTypeAny, {
+                intelligence: {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                };
+                version?: string | undefined;
+            }, {
+                intelligence: {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                };
+                version?: string | undefined;
+            }>>;
+        }, "strip", z.ZodTypeAny, {
+            rafters?: {
+                intelligence: {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                };
+                version?: string | undefined;
+            } | undefined;
+        }, {
+            rafters?: {
+                intelligence: {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                };
+                version?: string | undefined;
+            } | undefined;
+        }>>;
+    }, "strip", z.ZodTypeAny, {
+        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
+        name: string;
+        files: {
+            path: string;
+            type: string;
+            content: string;
+            target?: string | undefined;
+        }[];
+        dependencies: string[];
+        meta?: {
+            rafters?: {
+                intelligence: {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                };
+                version?: string | undefined;
+            } | undefined;
+        } | undefined;
+        author?: string | undefined;
+        $schema?: string | undefined;
+        description?: string | undefined;
+        title?: string | undefined;
+        devDependencies?: string[] | undefined;
+        registryDependencies?: string[] | undefined;
+        tailwind?: Record<string, unknown> | undefined;
+        cssVars?: Record<string, unknown> | undefined;
+        css?: string[] | undefined;
+        envVars?: Record<string, string> | undefined;
+        categories?: string[] | undefined;
+        docs?: string | undefined;
+    }, {
+        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
+        name: string;
+        files: {
+            path: string;
+            type: string;
+            content: string;
+            target?: string | undefined;
+        }[];
+        meta?: {
+            rafters?: {
+                intelligence: {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                };
+                version?: string | undefined;
+            } | undefined;
+        } | undefined;
+        author?: string | undefined;
+        $schema?: string | undefined;
+        description?: string | undefined;
+        title?: string | undefined;
+        dependencies?: string[] | undefined;
+        devDependencies?: string[] | undefined;
+        registryDependencies?: string[] | undefined;
+        tailwind?: Record<string, unknown> | undefined;
+        cssVars?: Record<string, unknown> | undefined;
+        css?: string[] | undefined;
+        envVars?: Record<string, string> | undefined;
+        categories?: string[] | undefined;
+        docs?: string | undefined;
+    }>, "many">>;
+}, "strip", z.ZodTypeAny, {
+    name?: string | undefined;
+    components?: {
+        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
+        name: string;
+        files: {
+            path: string;
+            type: string;
+            content: string;
+            target?: string | undefined;
+        }[];
+        dependencies: string[];
+        meta?: {
+            rafters?: {
+                intelligence: {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                };
+                version?: string | undefined;
+            } | undefined;
+        } | undefined;
+        author?: string | undefined;
+        $schema?: string | undefined;
+        description?: string | undefined;
+        title?: string | undefined;
+        devDependencies?: string[] | undefined;
+        registryDependencies?: string[] | undefined;
+        tailwind?: Record<string, unknown> | undefined;
+        cssVars?: Record<string, unknown> | undefined;
+        css?: string[] | undefined;
+        envVars?: Record<string, string> | undefined;
+        categories?: string[] | undefined;
+        docs?: string | undefined;
+    }[] | undefined;
+    $schema?: string | undefined;
+    homepage?: string | undefined;
+    items?: {
+        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
+        name: string;
+        files: {
+            path: string;
+            type: string;
+            content: string;
+            target?: string | undefined;
+        }[];
+        dependencies: string[];
+        meta?: {
+            rafters?: {
+                intelligence: {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                };
+                version?: string | undefined;
+            } | undefined;
+        } | undefined;
+        author?: string | undefined;
+        $schema?: string | undefined;
+        description?: string | undefined;
+        title?: string | undefined;
+        devDependencies?: string[] | undefined;
+        registryDependencies?: string[] | undefined;
+        tailwind?: Record<string, unknown> | undefined;
+        cssVars?: Record<string, unknown> | undefined;
+        css?: string[] | undefined;
+        envVars?: Record<string, string> | undefined;
+        categories?: string[] | undefined;
+        docs?: string | undefined;
+    }[] | undefined;
+}, {
+    name?: string | undefined;
+    components?: {
+        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
+        name: string;
+        files: {
+            path: string;
+            type: string;
+            content: string;
+            target?: string | undefined;
+        }[];
+        meta?: {
+            rafters?: {
+                intelligence: {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                };
+                version?: string | undefined;
+            } | undefined;
+        } | undefined;
+        author?: string | undefined;
+        $schema?: string | undefined;
+        description?: string | undefined;
+        title?: string | undefined;
+        dependencies?: string[] | undefined;
+        devDependencies?: string[] | undefined;
+        registryDependencies?: string[] | undefined;
+        tailwind?: Record<string, unknown> | undefined;
+        cssVars?: Record<string, unknown> | undefined;
+        css?: string[] | undefined;
+        envVars?: Record<string, string> | undefined;
+        categories?: string[] | undefined;
+        docs?: string | undefined;
+    }[] | undefined;
+    $schema?: string | undefined;
+    homepage?: string | undefined;
+    items?: {
+        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
+        name: string;
+        files: {
+            path: string;
+            type: string;
+            content: string;
+            target?: string | undefined;
+        }[];
+        meta?: {
+            rafters?: {
+                intelligence: {
+                    cognitiveLoad: number;
+                    attentionEconomics: string;
+                    accessibility: string;
+                    trustBuilding: string;
+                    semanticMeaning: string;
+                };
+                version?: string | undefined;
+            } | undefined;
+        } | undefined;
+        author?: string | undefined;
+        $schema?: string | undefined;
+        description?: string | undefined;
+        title?: string | undefined;
+        dependencies?: string[] | undefined;
+        devDependencies?: string[] | undefined;
+        registryDependencies?: string[] | undefined;
+        tailwind?: Record<string, unknown> | undefined;
+        cssVars?: Record<string, unknown> | undefined;
+        css?: string[] | undefined;
+        envVars?: Record<string, string> | undefined;
+        categories?: string[] | undefined;
+        docs?: string | undefined;
+    }[] | undefined;
+}>;
+export type RegistryResponse = z.infer<typeof RegistryResponseSchema>;

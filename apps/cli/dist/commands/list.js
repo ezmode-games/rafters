@@ -1,9 +1,18 @@
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import chalk from 'chalk';
+import { z } from 'zod';
 import { loadConfig } from '../utils/config.js';
-import { fetchComponentRegistry } from '../utils/registry.js';
 import { getRaftersTitle } from '../utils/logo.js';
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
+import { fetchComponentRegistry } from '../utils/registry.js';
+const ConfigSchema = z
+    .object({
+    componentsDir: z.string(),
+    packageManager: z.string(),
+    hasStorybook: z.boolean(),
+    storiesDir: z.string().optional(),
+})
+    .nullable();
 function loadInstalledComponents(cwd = process.cwd()) {
     try {
         const manifestPath = join(cwd, '.rafters', 'component-manifest.json');
@@ -20,7 +29,7 @@ export async function listCommand(options = {}) {
     try {
         let config;
         try {
-            config = loadConfig();
+            config = ConfigSchema.parse(loadConfig());
         }
         catch {
             // If not initialized, just show available components

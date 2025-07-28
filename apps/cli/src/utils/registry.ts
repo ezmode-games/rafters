@@ -4,7 +4,7 @@
 
 import { z } from 'zod';
 
-// Registry API response schemas
+// Shadcn-compatible registry schemas with AI intelligence
 export const IntelligenceSchema = z.object({
   cognitiveLoad: z.number().min(1).max(10),
   attentionEconomics: z.string(),
@@ -13,23 +13,59 @@ export const IntelligenceSchema = z.object({
   semanticMeaning: z.string(),
 });
 
-export const ComponentManifestSchema = z.object({
-  name: z.string(),
-  version: z.string(),
-  description: z.string(),
-  intelligence: IntelligenceSchema,
-  files: z.array(
-    z.object({
-      name: z.string(),
-      type: z.string(),
-      content: z.string(),
-    })
-  ),
-  dependencies: z.array(z.string()),
+// Shadcn registry file schema
+const RegistryFileSchema = z.object({
+  path: z.string(),
+  content: z.string(),
+  type: z.string(),
+  target: z.string().optional(),
 });
 
+// Main component manifest schema - matches shadcn registry-item.json
+export const ComponentManifestSchema = z.object({
+  $schema: z.string().optional(),
+  name: z.string(),
+  type: z.enum([
+    'registry:component',
+    'registry:lib',
+    'registry:style',
+    'registry:block',
+    'registry:page',
+    'registry:hook',
+  ]),
+  description: z.string().optional(),
+  title: z.string().optional(),
+  author: z.string().optional(),
+  dependencies: z.array(z.string()).optional().default([]),
+  devDependencies: z.array(z.string()).optional(),
+  registryDependencies: z.array(z.string()).optional(),
+  files: z.array(RegistryFileSchema),
+  tailwind: z.record(z.unknown()).optional(),
+  cssVars: z.record(z.unknown()).optional(),
+  css: z.array(z.string()).optional(),
+  envVars: z.record(z.string()).optional(),
+  categories: z.array(z.string()).optional(),
+  docs: z.string().optional(),
+  // Our AI intelligence metadata in the meta field
+  meta: z
+    .object({
+      rafters: z
+        .object({
+          intelligence: IntelligenceSchema,
+          version: z.string().optional(),
+        })
+        .optional(),
+    })
+    .optional(),
+});
+
+// Registry response schema - matches shadcn format
 export const RegistrySchema = z.object({
-  components: z.array(ComponentManifestSchema),
+  $schema: z.string().optional(),
+  name: z.string().optional(),
+  homepage: z.string().optional(),
+  components: z.array(ComponentManifestSchema).optional(),
+  items: z.array(ComponentManifestSchema).optional(),
 });
 
 export type Intelligence = z.infer<typeof IntelligenceSchema>;
@@ -41,8 +77,13 @@ const REGISTRY_BASE_URL =
   process.env.RAFTERS_REGISTRY_URL || 'https://rafters.realhandy.tech/registry';
 const REGISTRY_TIMEOUT = 10000; // 10 seconds
 
+// HTTP client response schema
+const RegistryResponseSchema = z.unknown();
+
 // HTTP client with error handling
-async function fetchFromRegistry(endpoint: string): Promise<any> {
+async function fetchFromRegistry(
+  endpoint: string
+): Promise<z.infer<typeof RegistryResponseSchema>> {
   const url = `${REGISTRY_BASE_URL}${endpoint}`;
 
   try {
@@ -63,7 +104,8 @@ async function fetchFromRegistry(endpoint: string): Promise<any> {
       throw new Error(`Registry API error: ${response.status} ${response.statusText}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    return RegistryResponseSchema.parse(data);
   } catch (error) {
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
@@ -110,69 +152,88 @@ export async function fetchComponent(componentName: string): Promise<ComponentMa
 /**
  * Fallback registry data when API is unavailable
  * This ensures the CLI continues to work during development/outages
+ * Uses shadcn-compatible format with rafters intelligence in meta
  */
 function getFallbackRegistry(): Registry {
   const components: ComponentManifest[] = [
     {
-      name: 'Button',
-      version: '1.0.0',
+      $schema: 'https://ui.shadcn.com/schema/registry-item.json',
+      name: 'button',
+      type: 'registry:component',
       description: 'Action triggers with attention economics and trust-building patterns',
-      intelligence: {
-        cognitiveLoad: 3,
-        attentionEconomics: 'Size hierarchy: sm=tertiary, md=secondary, lg=primary',
-        accessibility: '44px touch targets, WCAG AAA contrast, keyboard navigation',
-        trustBuilding: 'Destructive variant requires confirmation patterns',
-        semanticMeaning:
-          'Primary=main action, Secondary=optional, Destructive=careful consideration',
-      },
+      dependencies: ['@radix-ui/react-slot'],
       files: [
         {
-          name: 'button.tsx',
-          type: 'component',
+          path: 'components/ui/button.tsx',
+          type: 'registry:component',
           content: '// Button component will be fetched from registry',
         },
       ],
-      dependencies: ['@radix-ui/react-slot'],
+      meta: {
+        rafters: {
+          intelligence: {
+            cognitiveLoad: 3,
+            attentionEconomics: 'Size hierarchy: sm=tertiary, md=secondary, lg=primary',
+            accessibility: '44px touch targets, WCAG AAA contrast, keyboard navigation',
+            trustBuilding: 'Destructive variant requires confirmation patterns',
+            semanticMeaning:
+              'Primary=main action, Secondary=optional, Destructive=careful consideration',
+          },
+          version: '1.0.0',
+        },
+      },
     },
     {
-      name: 'Input',
-      version: '1.0.0',
+      $schema: 'https://ui.shadcn.com/schema/registry-item.json',
+      name: 'input',
+      type: 'registry:component',
       description: 'Form fields with validation intelligence and state feedback',
-      intelligence: {
-        cognitiveLoad: 4,
-        attentionEconomics: 'Clear validation states guide attention to errors',
-        accessibility: 'ARIA labels, error announcements, 44px touch targets',
-        trustBuilding: 'Progressive validation feedback builds confidence',
-        semanticMeaning: 'Validation states communicate system understanding',
-      },
+      dependencies: [],
       files: [
         {
-          name: 'input.tsx',
-          type: 'component',
+          path: 'components/ui/input.tsx',
+          type: 'registry:component',
           content: '// Input component will be fetched from registry',
         },
       ],
-      dependencies: [],
+      meta: {
+        rafters: {
+          intelligence: {
+            cognitiveLoad: 4,
+            attentionEconomics: 'Clear validation states guide attention to errors',
+            accessibility: 'ARIA labels, error announcements, 44px touch targets',
+            trustBuilding: 'Progressive validation feedback builds confidence',
+            semanticMeaning: 'Validation states communicate system understanding',
+          },
+          version: '1.0.0',
+        },
+      },
     },
     {
-      name: 'Card',
-      version: '1.0.0',
+      $schema: 'https://ui.shadcn.com/schema/registry-item.json',
+      name: 'card',
+      type: 'registry:component',
       description: 'Content containers with cognitive load optimization',
-      intelligence: {
-        cognitiveLoad: 2,
-        attentionEconomics: 'Subtle elevation guides content hierarchy',
-        accessibility: 'Semantic landmarks, focus management for interactive cards',
-        trustBuilding: 'Consistent spacing builds visual reliability',
-        semanticMeaning: 'Container intelligence communicates content relationships',
-      },
+      dependencies: [],
       files: [
         {
-          name: 'card.tsx',
-          type: 'component',
+          path: 'components/ui/card.tsx',
+          type: 'registry:component',
           content: '// Card component will be fetched from registry',
         },
       ],
-      dependencies: [],
+      meta: {
+        rafters: {
+          intelligence: {
+            cognitiveLoad: 2,
+            attentionEconomics: 'Subtle elevation guides content hierarchy',
+            accessibility: 'Semantic landmarks, focus management for interactive cards',
+            trustBuilding: 'Consistent spacing builds visual reliability',
+            semanticMeaning: 'Container intelligence communicates content relationships',
+          },
+          version: '1.0.0',
+        },
+      },
     },
   ];
 

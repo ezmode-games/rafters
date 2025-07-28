@@ -3,10 +3,11 @@ import type { ComponentManifest } from './registry.js';
 export function getComponentTemplate(manifest: ComponentManifest): string {
   // First, try to get the actual component source from the registry files
   const componentFile = manifest.files.find(
-    (f) => f.name.endsWith('.tsx') && f.type === 'component' && !f.name.includes('.stories.')
+    (f) =>
+      f.path.endsWith('.tsx') && f.type === 'registry:component' && !f.path.includes('.stories.')
   );
 
-  if (componentFile && componentFile.content && componentFile.content.trim() !== '') {
+  if (componentFile?.content && componentFile.content.trim() !== '') {
     // Return the actual component source from the registry
     return componentFile.content;
   }
@@ -35,10 +36,15 @@ export function getComponentTemplate(manifest: ComponentManifest): string {
 }
 
 function getButtonTemplate(manifest: ComponentManifest): string {
+  const intelligence = manifest.meta?.rafters?.intelligence;
+  if (!intelligence) {
+    throw new Error('Component manifest missing rafters intelligence metadata');
+  }
+
   return `/**
- * Button Intelligence: cognitiveLoad=${manifest.intelligence.cognitiveLoad}
- * ${manifest.intelligence.attentionEconomics}
- * ${manifest.intelligence.trustBuilding}
+ * Button Intelligence: cognitiveLoad=${intelligence.cognitiveLoad}
+ * ${intelligence.attentionEconomics}
+ * ${intelligence.trustBuilding}
  * Full patterns: .rafters/agent-instructions.md
  */
 import { Slot } from '@radix-ui/react-slot';
@@ -173,10 +179,15 @@ Button.displayName = 'Button';
 }
 
 function getInputTemplate(manifest: ComponentManifest): string {
+  const intelligence = manifest.meta?.rafters?.intelligence;
+  if (!intelligence) {
+    throw new Error('Component manifest missing rafters intelligence metadata');
+  }
+
   return `/**
- * Input Intelligence: cognitiveLoad=${manifest.intelligence.cognitiveLoad}
- * ${manifest.intelligence.attentionEconomics}
- * ${manifest.intelligence.accessibility}
+ * Input Intelligence: cognitiveLoad=${intelligence.cognitiveLoad}
+ * ${intelligence.attentionEconomics}
+ * ${intelligence.accessibility}
  * Full patterns: .rafters/agent-instructions.md
  */
 import { forwardRef } from 'react';
@@ -244,10 +255,15 @@ Input.displayName = 'Input';
 }
 
 function getCardTemplate(manifest: ComponentManifest): string {
+  const intelligence = manifest.meta?.rafters?.intelligence;
+  if (!intelligence) {
+    throw new Error('Component manifest missing rafters intelligence metadata');
+  }
+
   return `/**
- * Card Intelligence: cognitiveLoad=${manifest.intelligence.cognitiveLoad}
- * ${manifest.intelligence.attentionEconomics}
- * ${manifest.intelligence.semanticMeaning}
+ * Card Intelligence: cognitiveLoad=${intelligence.cognitiveLoad}
+ * ${intelligence.attentionEconomics}
+ * ${intelligence.semanticMeaning}
  * Full patterns: .rafters/agent-instructions.md
  */
 import { forwardRef } from 'react';
@@ -344,9 +360,14 @@ CardFooter.displayName = 'CardFooter';
 
 // Simplified templates for other components
 function getSelectTemplate(manifest: ComponentManifest): string {
+  const intelligence = manifest.meta?.rafters?.intelligence;
+  if (!intelligence) {
+    throw new Error('Component manifest missing rafters intelligence metadata');
+  }
+
   return `/**
- * Select Intelligence: cognitiveLoad=${manifest.intelligence.cognitiveLoad}
- * ${manifest.intelligence.accessibility}
+ * Select Intelligence: cognitiveLoad=${intelligence.cognitiveLoad}
+ * ${intelligence.accessibility}
  * Full patterns: .rafters/agent-instructions.md
  */
 import * as React from 'react';
@@ -501,10 +522,15 @@ export {
 }
 
 function getDialogTemplate(manifest: ComponentManifest): string {
+  const intelligence = manifest.meta?.rafters?.intelligence;
+  if (!intelligence) {
+    throw new Error('Component manifest missing rafters intelligence metadata');
+  }
+
   return `/**
- * Dialog Intelligence: cognitiveLoad=${manifest.intelligence.cognitiveLoad}
- * ${manifest.intelligence.trustBuilding}
- * ${manifest.intelligence.accessibility}
+ * Dialog Intelligence: cognitiveLoad=${intelligence.cognitiveLoad}
+ * ${intelligence.trustBuilding}
+ * ${intelligence.accessibility}
  * Full patterns: .rafters/agent-instructions.md
  */
 import * as React from 'react';
@@ -618,10 +644,15 @@ export {
 }
 
 function getLabelTemplate(manifest: ComponentManifest): string {
+  const intelligence = manifest.meta?.rafters?.intelligence;
+  if (!intelligence) {
+    throw new Error('Component manifest missing rafters intelligence metadata');
+  }
+
   return `/**
- * Label Intelligence: cognitiveLoad=${manifest.intelligence.cognitiveLoad}
- * ${manifest.intelligence.semanticMeaning}
- * ${manifest.intelligence.accessibility}
+ * Label Intelligence: cognitiveLoad=${intelligence.cognitiveLoad}
+ * ${intelligence.semanticMeaning}
+ * ${intelligence.accessibility}
  * Full patterns: .rafters/agent-instructions.md
  */
 import * as React from 'react';
@@ -665,10 +696,15 @@ export { Label };
 }
 
 function getTabsTemplate(manifest: ComponentManifest): string {
+  const intelligence = manifest.meta?.rafters?.intelligence;
+  if (!intelligence) {
+    throw new Error('Component manifest missing rafters intelligence metadata');
+  }
+
   return `/**
- * Tabs Intelligence: cognitiveLoad=${manifest.intelligence.cognitiveLoad}
- * ${manifest.intelligence.attentionEconomics}
- * ${manifest.intelligence.accessibility}
+ * Tabs Intelligence: cognitiveLoad=${intelligence.cognitiveLoad}
+ * ${intelligence.attentionEconomics}
+ * ${intelligence.accessibility}
  * Full patterns: .rafters/agent-instructions.md
  */
 import * as React from 'react';

@@ -19,16 +19,15 @@ components.get('/', async (c) => {
       components: registryData.components.map((component) => ({
         name: component.name,
         description: component.description,
-        version: component.version,
-        category: component.category,
+        version: component.meta?.rafters?.version || '1.0.0',
+        type: component.type,
         intelligence: {
-          cognitiveLoad: component.intelligence.cognitiveLoad,
-          attentionEconomics: component.intelligence.attentionEconomics,
-          accessibility: component.intelligence.accessibility,
+          cognitiveLoad: component.meta?.rafters?.intelligence.cognitiveLoad || 0,
+          attentionEconomics: component.meta?.rafters?.intelligence.attentionEconomics || '',
+          accessibility: component.meta?.rafters?.intelligence.accessibility || '',
         },
-        files: component.files.map((f) => f.name),
-        dependencies: component.dependencies,
-        lastUpdated: component.lastUpdated,
+        files: component.files.map((f) => f.path),
+        dependencies: component.dependencies || [],
       })),
       total: registryData.components.length,
     });
@@ -61,7 +60,20 @@ components.get('/:name', async (c) => {
       );
     }
 
-    return c.json(component);
+    // Transform component to match expected API format
+    const transformedComponent = {
+      ...component,
+      version: component.meta?.rafters?.version || '1.0.0',
+      intelligence: {
+        cognitiveLoad: component.meta?.rafters?.intelligence.cognitiveLoad || 0,
+        attentionEconomics: component.meta?.rafters?.intelligence.attentionEconomics || '',
+        accessibility: component.meta?.rafters?.intelligence.accessibility || '',
+        trustBuilding: component.meta?.rafters?.intelligence.trustBuilding || '',
+        semanticMeaning: component.meta?.rafters?.intelligence.semanticMeaning || '',
+      },
+    };
+
+    return c.json(transformedComponent);
   } catch (error) {
     console.error('Error fetching component:', error);
     return c.json(
@@ -91,7 +103,7 @@ components.get('/:name/source', async (c) => {
     }
 
     const sourceFile = component.files.find(
-      (f) => f.name.endsWith('.tsx') && !f.name.includes('.stories.')
+      (f) => f.path.endsWith('.tsx') && !f.path.includes('.stories.')
     );
 
     if (!sourceFile) {
@@ -107,7 +119,7 @@ components.get('/:name/source', async (c) => {
     return c.text(sourceFile.content, 200, {
       'Content-Type': 'text/plain; charset=utf-8',
       'X-Component-Name': componentName,
-      'X-Component-Version': component.version,
+      'X-Component-Version': component.meta?.rafters?.version || '1.0.0',
     });
   } catch (error) {
     console.error('Error fetching component source:', error);
@@ -137,12 +149,12 @@ components.get('/:name/stories', async (c) => {
       );
     }
 
-    const storyFiles = component.files.filter((f) => f.name.includes('.stories.'));
+    const storyFiles = component.files.filter((f) => f.path.includes('.stories.'));
 
     return c.json({
       component: componentName,
       stories: storyFiles.map((story) => ({
-        name: story.name,
+        name: story.path,
         type: story.type,
         content: story.content,
       })),

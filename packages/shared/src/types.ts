@@ -79,14 +79,27 @@ export const DesignSystemSchema = z.object({
 
 export type DesignSystem = z.infer<typeof DesignSystemSchema>;
 
-// Component Registry Entry (extends shadcn spec)
+// Component Registry Entry (matches shadcn spec with rafters intelligence)
 export const ComponentRegistrySchema = z.object({
   name: z.string(),
-  type: z.literal('registry:component'),
+  type: z.enum([
+    'registry:component',
+    'registry:lib',
+    'registry:style',
+    'registry:block',
+    'registry:page',
+    'registry:hook',
+  ]),
   files: z.array(z.string()),
   meta: z.object({
     rafters: z.object({
-      aiIntelligence: ComponentIntelligenceSchema,
+      intelligence: z.object({
+        cognitiveLoad: z.number().min(1).max(10),
+        attentionEconomics: z.string(),
+        accessibility: z.string(),
+        trustBuilding: z.string(),
+        semanticMeaning: z.string(),
+      }),
     }),
   }),
 });
@@ -108,30 +121,66 @@ export const PublicDesignSystemSchema = z.object({
 
 export type PublicDesignSystem = z.infer<typeof PublicDesignSystemSchema>;
 
-// Component Manifest for Registry API
+// Shadcn-compatible Component Manifest for Registry API
 export const ComponentManifestSchema = z.object({
   $schema: z.string().optional(),
   name: z.string(),
-  version: z.string(),
-  description: z.string(),
-  type: z.literal('registry:component'),
-  category: z.string(),
-  dependencies: z.array(z.string()),
-  intelligence: z.object({
-    cognitiveLoad: z.number().min(1).max(10),
-    attentionEconomics: z.string(),
-    accessibility: z.string(),
-    trustBuilding: z.string(),
-    semanticMeaning: z.string(),
-  }),
+  type: z.enum([
+    'registry:component',
+    'registry:lib',
+    'registry:style',
+    'registry:block',
+    'registry:page',
+    'registry:hook',
+  ]),
+  description: z.string().optional(),
+  title: z.string().optional(),
+  author: z.string().optional(),
+  dependencies: z.array(z.string()).optional().default([]),
+  devDependencies: z.array(z.string()).optional(),
+  registryDependencies: z.array(z.string()).optional(),
   files: z.array(
     z.object({
-      name: z.string(),
-      type: z.string(),
+      path: z.string(),
       content: z.string(),
+      type: z.string(),
+      target: z.string().optional(),
     })
   ),
-  lastUpdated: z.string(),
+  tailwind: z.record(z.unknown()).optional(),
+  cssVars: z.record(z.unknown()).optional(),
+  css: z.array(z.string()).optional(),
+  envVars: z.record(z.string()).optional(),
+  categories: z.array(z.string()).optional(),
+  docs: z.string().optional(),
+  // Our AI intelligence metadata in the meta field
+  meta: z
+    .object({
+      rafters: z
+        .object({
+          intelligence: z.object({
+            cognitiveLoad: z.number().min(1).max(10),
+            attentionEconomics: z.string(),
+            accessibility: z.string(),
+            trustBuilding: z.string(),
+            semanticMeaning: z.string(),
+          }),
+          version: z.string().optional(),
+        })
+        .optional(),
+    })
+    .optional(),
 });
 
 export type ComponentManifest = z.infer<typeof ComponentManifestSchema>;
+
+// Registry response schema - matches shadcn format
+export const RegistryResponseSchema = z.object({
+  $schema: z.string().optional(),
+  name: z.string().optional(),
+  homepage: z.string().optional(),
+  components: z.array(ComponentManifestSchema).optional(),
+  items: z.array(ComponentManifestSchema).optional(),
+});
+
+export type RegistryResponse = z.infer<typeof RegistryResponseSchema>;

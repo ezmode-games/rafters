@@ -31,8 +31,11 @@ export const MotorAccessibility: Story = {
 
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium mb-3">Volume Control (Standard)</label>
+            <label htmlFor="volume-slider" className="block text-sm font-medium mb-3">
+              Volume Control (Standard)
+            </label>
             <Slider
+              id="volume-slider"
               value={volume}
               onValueChange={setVolume}
               max={100}
@@ -47,8 +50,11 @@ export const MotorAccessibility: Story = {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-3">Brightness Control (Enhanced)</label>
+            <label htmlFor="brightness-slider" className="block text-sm font-medium mb-3">
+              Brightness Control (Enhanced)
+            </label>
             <Slider
+              id="brightness-slider"
               value={brightness}
               onValueChange={setBrightness}
               max={100}
@@ -86,8 +92,11 @@ export const PrecisionControl: Story = {
 
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium mb-3">Temperature Setting</label>
+            <label htmlFor="temperature-slider" className="block text-sm font-medium mb-3">
+              Temperature Setting
+            </label>
             <Slider
+              id="temperature-slider"
               value={temperature}
               onValueChange={setTemperature}
               min={60}
@@ -106,8 +115,11 @@ export const PrecisionControl: Story = {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-3">Opacity Level</label>
+            <label htmlFor="opacity-slider" className="block text-sm font-medium mb-3">
+              Opacity Level
+            </label>
             <Slider
+              id="opacity-slider"
               value={opacity}
               onValueChange={setOpacity}
               min={0}
@@ -148,8 +160,11 @@ export const CognitiveLoadOptimization: Story = {
 
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium mb-3">Project Budget</label>
+            <label htmlFor="budget-slider" className="block text-sm font-medium mb-3">
+              Project Budget
+            </label>
             <Slider
+              id="budget-slider"
               value={budget}
               onValueChange={setBudget}
               min={1000}
@@ -168,8 +183,11 @@ export const CognitiveLoadOptimization: Story = {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-3">Project Duration</label>
+            <label htmlFor="duration-slider" className="block text-sm font-medium mb-3">
+              Project Duration
+            </label>
             <Slider
+              id="duration-slider"
               value={duration}
               onValueChange={setDuration}
               min={7}
@@ -187,8 +205,11 @@ export const CognitiveLoadOptimization: Story = {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-3">Quality Level</label>
+            <label htmlFor="quality-slider" className="block text-sm font-medium mb-3">
+              Quality Level
+            </label>
             <Slider
+              id="quality-slider"
               value={quality}
               onValueChange={setQuality}
               min={0}

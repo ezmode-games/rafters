@@ -88,7 +88,7 @@ export const ContentHierarchy: Story = {
               <CardContent density="comfortable">
                 <div className="space-y-3 text-sm">
                   <div className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0" />
                     <div>
                       <div className="font-medium">Button Component</div>
                       <div className="text-muted-foreground text-xs">
@@ -97,7 +97,7 @@ export const ContentHierarchy: Story = {
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
                     <div>
                       <div className="font-medium">Input Component</div>
                       <div className="text-muted-foreground text-xs">
@@ -106,7 +106,7 @@ export const ContentHierarchy: Story = {
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0" />
                     <div>
                       <div className="font-medium">Card Component</div>
                       <div className="text-muted-foreground text-xs">

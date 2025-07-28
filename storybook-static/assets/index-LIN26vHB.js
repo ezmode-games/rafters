@@ -9,15 +9,15 @@ function d(e) {
     u.useMemo(
       () =>
         (...s) => {
-          var r;
+          let r;
           return (r = t.current) == null ? void 0 : r.call(t, ...s);
         },
       []
     )
   );
 }
-var a = o[' useId '.trim().toString()] || (() => {}),
-  f = 0;
+const a = o[' useId '.trim().toString()] || (() => {});
+let f = 0;
 function m(e) {
   const [t, s] = u.useState(a());
   return (
