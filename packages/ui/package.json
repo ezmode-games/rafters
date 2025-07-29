@@ -39,11 +39,11 @@
     "ai-first",
     "semantic-tokens"
   ],
-  "author": "Sean Poulter",
+  "author": "Sean Silvius",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/seanpoulter/rafters",
+    "url": "https://github.com/real-handy/rafters",
     "directory": "packages/ui"
   },
   "devDependencies": {
