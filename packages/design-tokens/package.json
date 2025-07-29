@@ -33,5 +33,12 @@
     "@rafters/shared": "workspace:*",
     "@rafters/color-utils": "workspace:*",
     "fs-extra": "catalog:"
+  },
+  "author": "Sean Silvius",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/real-handy/rafters",
+    "directory": "packages/design-tokens"
   }
 }

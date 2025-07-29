@@ -33,11 +33,11 @@
     "oklch",
     "design-reasoning"
   ],
-  "author": "Sean Poulter",
+  "author": "Sean Silvius",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/seanpoulter/rafters"
+    "url": "https://github.com/real-handy/rafters"
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",

@@ -29,5 +29,12 @@
   },
   "dependencies": {
     "zod": "catalog:"
+  },
+  "author": "Sean Silvius",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/real-handy/rafters",
+    "directory": "packages/shared"
   }
 }
