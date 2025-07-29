@@ -86,241 +86,67 @@ N.__docgenInfo = {
     },
   },
 };
-const O = { title: '01 Identity/Layout System', parameters: { layout: 'fullscreen' } },
-  r = {
-    render: () =>
-      e.jsx(t, {
-        variant: 'wide',
-        children: e.jsxs('div', {
-          className: 'py-phi-3 text-center',
-          children: [
-            e.jsx('h1', { className: 'heading-hero', children: 'Layout System' }),
-            e.jsx('p', {
-              className: 'text-body-large max-w-3xl mx-auto',
-              children:
-                'Spatial relationships that create order without constraint. Our layout system establishes foundations for content organization while preserving creative freedom and responsive adaptability.',
-            }),
-            e.jsxs('div', {
-              className:
-                'mt-phi-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-phi-2 max-w-6xl mx-auto',
-              children: [
-                e.jsxs('div', {
-                  className: 'p-phi-2 border border-muted rounded-lg text-left',
-                  children: [
-                    e.jsx('h3', { className: 'heading-component', children: 'Content First' }),
-                    e.jsx('p', {
-                      className: 'text-body',
-                      children: 'Grid serves content needs, not design convenience',
-                    }),
-                  ],
-                }),
-                e.jsxs('div', {
-                  className: 'p-phi-2 border border-muted rounded-lg text-left',
-                  children: [
-                    e.jsx('h3', {
-                      className: 'heading-component',
-                      children: 'Mathematical Harmony',
-                    }),
-                    e.jsx('p', {
-                      className: 'text-body',
-                      children: 'Golden ratio proportions create inherently pleasing relationships',
-                    }),
-                  ],
-                }),
-                e.jsxs('div', {
-                  className: 'p-phi-2 border border-muted rounded-lg text-left',
-                  children: [
-                    e.jsx('h3', { className: 'heading-component', children: 'Cognitive Respect' }),
-                    e.jsx('p', {
-                      className: 'text-body',
-                      children: 'Patterns based on eye-tracking research and memory limits',
-                    }),
-                  ],
-                }),
-                e.jsxs('div', {
-                  className: 'p-phi-2 border border-muted rounded-lg text-left',
-                  children: [
-                    e.jsx('h3', {
-                      className: 'heading-component',
-                      children: 'Flexible Foundation',
-                    }),
-                    e.jsx('p', {
-                      className: 'text-body',
-                      children: 'Consistent structure that adapts to content variety',
-                    }),
-                  ],
-                }),
-              ],
-            }),
-          ],
-        }),
-      }),
-  },
-  d = {
-    render: () =>
-      e.jsx(t, {
-        variant: 'golden',
-        children: e.jsxs(N, {
-          children: [
-            e.jsx('h1', { className: 'heading-display', children: 'Golden Ratio Spacing' }),
-            e.jsx('p', {
-              className: 'text-body',
-              children: 'Typography classes have built-in phi spacing automatically.',
-            }),
-            e.jsx('h3', {
-              className: 'heading-component',
-              children: 'Utility Classes (for edge cases)',
-            }),
-            e.jsxs('div', {
-              className: 'grid grid-cols-4 gap-phi-1',
-              children: [
-                e.jsx('div', { className: 'p-phi--2 bg-muted rounded', children: 'φ⁻² spacing' }),
-                e.jsx('div', { className: 'p-phi--1 bg-muted rounded', children: 'φ⁻¹ spacing' }),
-                e.jsx('div', { className: 'p-phi-1 bg-muted rounded', children: 'φ¹ spacing' }),
-                e.jsx('div', { className: 'p-phi-2 bg-muted rounded', children: 'φ² spacing' }),
-              ],
-            }),
-            e.jsx('p', {
-              className: 'text-body-small',
-              children: 'Use utilities only when you need to override defaults.',
-            }),
-          ],
-        }),
-      }),
-  },
-  l = {
-    render: () =>
-      e.jsxs('div', {
-        className: 'space-y-phi-3',
+const O = { title: '01 Identity/Layout System', parameters: { layout: 'fullscreen' } };
+const r = {
+  render: () =>
+    e.jsx(t, {
+      variant: 'wide',
+      children: e.jsxs('div', {
+        className: 'py-phi-3 text-center',
         children: [
-          e.jsx(t, {
-            variant: 'reading',
-            children: e.jsxs(g, {
-              children: [
-                e.jsx('h2', { className: 'heading-section', children: 'Reading Layout' }),
-                e.jsxs('div', {
-                  children: [
-                    e.jsx('p', {
-                      className: 'text-body',
-                      children:
-                        'Main content flows in scannable pattern optimized for text consumption...',
-                    }),
-                    e.jsx('p', {
-                      className: 'text-body',
-                      children: 'Second paragraph continues reading flow with proper spacing...',
-                    }),
-                  ],
-                }),
-                e.jsx('aside', {
-                  className: 'text-body-small border-l-2 border-border pl-4',
-                  children:
-                    'Sidebar content for metadata, navigation, or supplementary information',
-                }),
-              ],
-            }),
+          e.jsx('h1', { className: 'heading-hero', children: 'Layout System' }),
+          e.jsx('p', {
+            className: 'text-body-large max-w-3xl mx-auto',
+            children:
+              'Spatial relationships that create order without constraint. Our layout system establishes foundations for content organization while preserving creative freedom and responsive adaptability.',
           }),
-          e.jsx(t, {
-            variant: 'golden',
-            children: e.jsxs(u, {
-              children: [
-                e.jsx('div', { className: 'brand font-semibold', children: 'Logo' }),
-                e.jsx('button', {
-                  type: 'button',
-                  className: 'bg-primary text-primary-foreground px-4 py-2 rounded',
-                  children: 'Action',
-                }),
-                e.jsxs('div', {
-                  className: 'hero text-center',
-                  children: [
-                    e.jsx('h1', { className: 'heading-hero', children: 'Hero Content' }),
-                    e.jsx('p', {
-                      className: 'text-body-large',
-                      children: 'Conversion-focused layout for landing pages',
-                    }),
-                  ],
-                }),
-                e.jsx('button', {
-                  type: 'button',
-                  className: 'bg-secondary text-secondary-foreground px-6 py-3 rounded',
-                  children: 'Call to Action',
-                }),
-              ],
-            }),
-          }),
-        ],
-      }),
-  },
-  c = {
-    render: () =>
-      e.jsx(t, {
-        variant: 'golden',
-        children: e.jsxs('div', {
-          className: 'space-y-phi-2',
-          children: [
-            e.jsxs(x, {
-              children: [
-                e.jsxs('main', {
-                  children: [
-                    e.jsx('h2', { className: 'heading-section', children: 'Content (61.8%)' }),
-                    e.jsx('p', {
-                      className: 'text-body',
-                      children:
-                        'Primary content area gets the larger portion following golden ratio proportions.',
-                    }),
-                  ],
-                }),
-                e.jsxs('aside', {
-                  className: 'bg-muted p-phi-1 rounded',
-                  children: [
-                    e.jsx('h3', { className: 'heading-component', children: 'Sidebar (38.2%)' }),
-                    e.jsx('p', {
-                      className: 'text-body-small',
-                      children: 'Secondary content in complementary proportion.',
-                    }),
-                  ],
-                }),
-              ],
-            }),
-            e.jsxs('div', {
-              className: 'hero-golden bg-muted rounded',
-              children: [
-                e.jsx('h1', { className: 'heading-hero', children: 'Hero Section' }),
-                e.jsx('p', {
-                  className: 'text-body-large',
-                  children: '61.8vh height feels natural and draws attention',
-                }),
-              ],
-            }),
-          ],
-        }),
-      }),
-  },
-  p = {
-    render: () =>
-      e.jsxs('div', {
-        className: 'space-y-phi-3',
-        children: [
-          e.jsx('h2', { className: 'heading-section px-4', children: 'Dashboard/App Layout' }),
-          e.jsxs(y, {
+          e.jsxs('div', {
+            className:
+              'mt-phi-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-phi-2 max-w-6xl mx-auto',
             children: [
-              e.jsx('header', {
-                className: 'bg-muted p-phi-1 border-b border-border',
-                children: e.jsx('h3', { className: 'heading-component', children: 'App Header' }),
-              }),
-              e.jsx('nav', {
-                className: 'bg-muted/50 p-phi-1 border-r border-border',
-                children: e.jsx('p', {
-                  className: 'text-body-small',
-                  children: 'Navigation sidebar',
-                }),
-              }),
-              e.jsxs('main', {
-                className: 'p-phi-2',
+              e.jsxs('div', {
+                className: 'p-phi-2 border border-muted rounded-lg text-left',
                 children: [
-                  e.jsx('h1', { className: 'heading-display', children: 'Main Content' }),
+                  e.jsx('h3', { className: 'heading-component', children: 'Content First' }),
                   e.jsx('p', {
                     className: 'text-body',
-                    children: 'Dashboard content, forms, data views, and application features.',
+                    children: 'Grid serves content needs, not design convenience',
+                  }),
+                ],
+              }),
+              e.jsxs('div', {
+                className: 'p-phi-2 border border-muted rounded-lg text-left',
+                children: [
+                  e.jsx('h3', {
+                    className: 'heading-component',
+                    children: 'Mathematical Harmony',
+                  }),
+                  e.jsx('p', {
+                    className: 'text-body',
+                    children: 'Golden ratio proportions create inherently pleasing relationships',
+                  }),
+                ],
+              }),
+              e.jsxs('div', {
+                className: 'p-phi-2 border border-muted rounded-lg text-left',
+                children: [
+                  e.jsx('h3', { className: 'heading-component', children: 'Cognitive Respect' }),
+                  e.jsx('p', {
+                    className: 'text-body',
+                    children: 'Patterns based on eye-tracking research and memory limits',
+                  }),
+                ],
+              }),
+              e.jsxs('div', {
+                className: 'p-phi-2 border border-muted rounded-lg text-left',
+                children: [
+                  e.jsx('h3', {
+                    className: 'heading-component',
+                    children: 'Flexible Foundation',
+                  }),
+                  e.jsx('p', {
+                    className: 'text-body',
+                    children: 'Consistent structure that adapts to content variety',
                   }),
                 ],
               }),
@@ -328,69 +154,244 @@ const O = { title: '01 Identity/Layout System', parameters: { layout: 'fullscree
           }),
         ],
       }),
-  },
-  m = {
-    render: () =>
-      e.jsxs('div', {
-        className: 'space-y-phi-3',
+    }),
+};
+const d = {
+  render: () =>
+    e.jsx(t, {
+      variant: 'golden',
+      children: e.jsxs(N, {
         children: [
-          e.jsx(t, {
-            variant: 'reading',
-            children: e.jsxs('div', {
-              className: 'bg-muted p-phi-1 rounded',
-              children: [
-                e.jsx('h3', { className: 'heading-component', children: 'Reading Container' }),
-                e.jsx('p', {
-                  className: 'text-body',
-                  children:
-                    'Optimized for 45-75 characters per line, perfect for articles and documentation.',
-                }),
-              ],
-            }),
+          e.jsx('h1', { className: 'heading-display', children: 'Golden Ratio Spacing' }),
+          e.jsx('p', {
+            className: 'text-body',
+            children: 'Typography classes have built-in phi spacing automatically.',
           }),
-          e.jsx(t, {
-            variant: 'golden',
-            children: e.jsxs('div', {
-              className: 'bg-muted p-phi-1 rounded',
-              children: [
-                e.jsx('h3', { className: 'heading-component', children: 'Golden Container' }),
-                e.jsx('p', {
-                  className: 'text-body',
-                  children: 'Golden ratio width for balanced content and whitespace.',
-                }),
-              ],
-            }),
+          e.jsx('h3', {
+            className: 'heading-component',
+            children: 'Utility Classes (for edge cases)',
           }),
-          e.jsx(t, {
-            variant: 'wide',
-            children: e.jsxs('div', {
-              className: 'bg-muted p-phi-1 rounded',
-              children: [
-                e.jsx('h3', { className: 'heading-component', children: 'Wide Container' }),
-                e.jsx('p', {
-                  className: 'text-body',
-                  children: 'Maximum 7xl width for dashboards and data-heavy interfaces.',
-                }),
-              ],
-            }),
+          e.jsxs('div', {
+            className: 'grid grid-cols-4 gap-phi-1',
+            children: [
+              e.jsx('div', { className: 'p-phi--2 bg-muted rounded', children: 'φ⁻² spacing' }),
+              e.jsx('div', { className: 'p-phi--1 bg-muted rounded', children: 'φ⁻¹ spacing' }),
+              e.jsx('div', { className: 'p-phi-1 bg-muted rounded', children: 'φ¹ spacing' }),
+              e.jsx('div', { className: 'p-phi-2 bg-muted rounded', children: 'φ² spacing' }),
+            ],
           }),
-          e.jsx(t, {
-            variant: 'full',
-            children: e.jsxs('div', {
-              className: 'bg-muted p-phi-1 rounded',
-              children: [
-                e.jsx('h3', { className: 'heading-component', children: 'Full Container' }),
-                e.jsx('p', {
-                  className: 'text-body',
-                  children: 'Full width with padding for edge-to-edge layouts.',
-                }),
-              ],
-            }),
+          e.jsx('p', {
+            className: 'text-body-small',
+            children: 'Use utilities only when you need to override defaults.',
           }),
         ],
       }),
-  };
-var b, v, f;
+    }),
+};
+const l = {
+  render: () =>
+    e.jsxs('div', {
+      className: 'space-y-phi-3',
+      children: [
+        e.jsx(t, {
+          variant: 'reading',
+          children: e.jsxs(g, {
+            children: [
+              e.jsx('h2', { className: 'heading-section', children: 'Reading Layout' }),
+              e.jsxs('div', {
+                children: [
+                  e.jsx('p', {
+                    className: 'text-body',
+                    children:
+                      'Main content flows in scannable pattern optimized for text consumption...',
+                  }),
+                  e.jsx('p', {
+                    className: 'text-body',
+                    children: 'Second paragraph continues reading flow with proper spacing...',
+                  }),
+                ],
+              }),
+              e.jsx('aside', {
+                className: 'text-body-small border-l-2 border-border pl-4',
+                children: 'Sidebar content for metadata, navigation, or supplementary information',
+              }),
+            ],
+          }),
+        }),
+        e.jsx(t, {
+          variant: 'golden',
+          children: e.jsxs(u, {
+            children: [
+              e.jsx('div', { className: 'brand font-semibold', children: 'Logo' }),
+              e.jsx('button', {
+                type: 'button',
+                className: 'bg-primary text-primary-foreground px-4 py-2 rounded',
+                children: 'Action',
+              }),
+              e.jsxs('div', {
+                className: 'hero text-center',
+                children: [
+                  e.jsx('h1', { className: 'heading-hero', children: 'Hero Content' }),
+                  e.jsx('p', {
+                    className: 'text-body-large',
+                    children: 'Conversion-focused layout for landing pages',
+                  }),
+                ],
+              }),
+              e.jsx('button', {
+                type: 'button',
+                className: 'bg-secondary text-secondary-foreground px-6 py-3 rounded',
+                children: 'Call to Action',
+              }),
+            ],
+          }),
+        }),
+      ],
+    }),
+};
+const c = {
+  render: () =>
+    e.jsx(t, {
+      variant: 'golden',
+      children: e.jsxs('div', {
+        className: 'space-y-phi-2',
+        children: [
+          e.jsxs(x, {
+            children: [
+              e.jsxs('main', {
+                children: [
+                  e.jsx('h2', { className: 'heading-section', children: 'Content (61.8%)' }),
+                  e.jsx('p', {
+                    className: 'text-body',
+                    children:
+                      'Primary content area gets the larger portion following golden ratio proportions.',
+                  }),
+                ],
+              }),
+              e.jsxs('aside', {
+                className: 'bg-muted p-phi-1 rounded',
+                children: [
+                  e.jsx('h3', { className: 'heading-component', children: 'Sidebar (38.2%)' }),
+                  e.jsx('p', {
+                    className: 'text-body-small',
+                    children: 'Secondary content in complementary proportion.',
+                  }),
+                ],
+              }),
+            ],
+          }),
+          e.jsxs('div', {
+            className: 'hero-golden bg-muted rounded',
+            children: [
+              e.jsx('h1', { className: 'heading-hero', children: 'Hero Section' }),
+              e.jsx('p', {
+                className: 'text-body-large',
+                children: '61.8vh height feels natural and draws attention',
+              }),
+            ],
+          }),
+        ],
+      }),
+    }),
+};
+const p = {
+  render: () =>
+    e.jsxs('div', {
+      className: 'space-y-phi-3',
+      children: [
+        e.jsx('h2', { className: 'heading-section px-4', children: 'Dashboard/App Layout' }),
+        e.jsxs(y, {
+          children: [
+            e.jsx('header', {
+              className: 'bg-muted p-phi-1 border-b border-border',
+              children: e.jsx('h3', { className: 'heading-component', children: 'App Header' }),
+            }),
+            e.jsx('nav', {
+              className: 'bg-muted/50 p-phi-1 border-r border-border',
+              children: e.jsx('p', {
+                className: 'text-body-small',
+                children: 'Navigation sidebar',
+              }),
+            }),
+            e.jsxs('main', {
+              className: 'p-phi-2',
+              children: [
+                e.jsx('h1', { className: 'heading-display', children: 'Main Content' }),
+                e.jsx('p', {
+                  className: 'text-body',
+                  children: 'Dashboard content, forms, data views, and application features.',
+                }),
+              ],
+            }),
+          ],
+        }),
+      ],
+    }),
+};
+const m = {
+  render: () =>
+    e.jsxs('div', {
+      className: 'space-y-phi-3',
+      children: [
+        e.jsx(t, {
+          variant: 'reading',
+          children: e.jsxs('div', {
+            className: 'bg-muted p-phi-1 rounded',
+            children: [
+              e.jsx('h3', { className: 'heading-component', children: 'Reading Container' }),
+              e.jsx('p', {
+                className: 'text-body',
+                children:
+                  'Optimized for 45-75 characters per line, perfect for articles and documentation.',
+              }),
+            ],
+          }),
+        }),
+        e.jsx(t, {
+          variant: 'golden',
+          children: e.jsxs('div', {
+            className: 'bg-muted p-phi-1 rounded',
+            children: [
+              e.jsx('h3', { className: 'heading-component', children: 'Golden Container' }),
+              e.jsx('p', {
+                className: 'text-body',
+                children: 'Golden ratio width for balanced content and whitespace.',
+              }),
+            ],
+          }),
+        }),
+        e.jsx(t, {
+          variant: 'wide',
+          children: e.jsxs('div', {
+            className: 'bg-muted p-phi-1 rounded',
+            children: [
+              e.jsx('h3', { className: 'heading-component', children: 'Wide Container' }),
+              e.jsx('p', {
+                className: 'text-body',
+                children: 'Maximum 7xl width for dashboards and data-heavy interfaces.',
+              }),
+            ],
+          }),
+        }),
+        e.jsx(t, {
+          variant: 'full',
+          children: e.jsxs('div', {
+            className: 'bg-muted p-phi-1 rounded',
+            children: [
+              e.jsx('h3', { className: 'heading-component', children: 'Full Container' }),
+              e.jsx('p', {
+                className: 'text-body',
+                children: 'Full width with padding for edge-to-edge layouts.',
+              }),
+            ],
+          }),
+        }),
+      ],
+    }),
+};
+let b;
+let v;
+let f;
 r.parameters = {
   ...r.parameters,
   docs: {
@@ -433,7 +434,9 @@ r.parameters = {
     },
   },
 };
-var j, C, w;
+let j;
+let C;
+let w;
 d.parameters = {
   ...d.parameters,
   docs: {
@@ -461,7 +464,9 @@ d.parameters = {
     },
   },
 };
-var S, L, R;
+let S;
+let L;
+let R;
 l.parameters = {
   ...l.parameters,
   docs: {
@@ -507,7 +512,9 @@ l.parameters = {
     },
   },
 };
-var A, _, G;
+let A;
+let _;
+let G;
 c.parameters = {
   ...c.parameters,
   docs: {
@@ -540,7 +547,9 @@ c.parameters = {
     },
   },
 };
-var F, I, M;
+let F;
+let I;
+let M;
 p.parameters = {
   ...p.parameters,
   docs: {
@@ -569,7 +578,9 @@ p.parameters = {
     },
   },
 };
-var P, k, H;
+let P;
+let k;
+let H;
 m.parameters = {
   ...m.parameters,
   docs: {
@@ -613,28 +624,28 @@ m.parameters = {
   },
 };
 const T = [
-    'Introduction',
-    'GoldenRatioSpacing',
-    'LayoutPatterns',
-    'GoldenProportions',
-    'ApplicationLayout',
-    'ContainerVariants',
-  ],
-  Q = Object.freeze(
-    Object.defineProperty(
-      {
-        __proto__: null,
-        ApplicationLayout: p,
-        ContainerVariants: m,
-        GoldenProportions: c,
-        GoldenRatioSpacing: d,
-        Introduction: r,
-        LayoutPatterns: l,
-        __namedExportsOrder: T,
-        default: O,
-      },
-      Symbol.toStringTag,
-      { value: 'Module' }
-    )
-  );
+  'Introduction',
+  'GoldenRatioSpacing',
+  'LayoutPatterns',
+  'GoldenProportions',
+  'ApplicationLayout',
+  'ContainerVariants',
+];
+const Q = Object.freeze(
+  Object.defineProperty(
+    {
+      __proto__: null,
+      ApplicationLayout: p,
+      ContainerVariants: m,
+      GoldenProportions: c,
+      GoldenRatioSpacing: d,
+      Introduction: r,
+      LayoutPatterns: l,
+      __namedExportsOrder: T,
+      default: O,
+    },
+    Symbol.toStringTag,
+    { value: 'Module' }
+  )
+);
 export { m as C, c as G, l as L, Q as S };

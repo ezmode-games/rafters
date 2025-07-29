@@ -1,3 +1,18 @@
+## Component Status Flag
+
+Every main component story (`<Component>.stories.tsx`) MUST include a `status` field in the meta object:
+
+```typescript
+const meta = {
+  ...
+  status: 'published', // 'published', 'draft', or 'depreciated'
+  ...
+}
+```
+
+- Only components with `status: 'published'` are included in the registry and available for production use.
+- Components with `status: 'draft'` or `status: 'depreciated'` are excluded from the registry build and not published.
+- This flag is required for all main component stories and is used for automated registry publishing and release management.
 # Storybook Standards for Rafters Design System
 
 ## Overview

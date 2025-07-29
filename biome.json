@@ -1,7 +1,12 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
   "files": {
-    "ignore": ["**/node_modules/**", "**/dist/**"]
+    "ignore": ["apps/registry/worker-configuration.d.ts"]
   },
   "organizeImports": {
     "enabled": true

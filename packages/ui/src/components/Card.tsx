@@ -1,3 +1,6 @@
+/**
+ * AI Intelligence: Token knowledge in .rafters/tokens/registry.json
+ */
 import { forwardRef } from 'react';
 import { cn } from '../lib/utils';
 
@@ -74,7 +77,7 @@ export interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement>
 
 export const CardTitle = forwardRef<HTMLHeadingElement, CardTitleProps>(
   ({ className, level = 3, weight = 'semibold', ...props }, ref) => {
-    const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;
+    const HeadingTag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
     return (
       <HeadingTag

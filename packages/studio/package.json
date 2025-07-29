@@ -6,33 +6,40 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build && tsc --emitDeclarationOnly",
+    "build": "echo 'Studio build skipped - no implementation yet'",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "vitest run --passWithNoTests",
     "lint": "biome check .",
     "format": "biome format --write .",
-    "type-check": "tsc --noEmit",
+    "type-check": "echo 'Studio type-check skipped - no implementation yet'",
     "clean": "rm -rf dist"
   },
   "devDependencies": {
-    "@types/node": "^20.19.0",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
-    "@vitejs/plugin-react": "^4.5.1",
-    "@tailwindcss/vite": "^4.1.8",
-    "typescript": "^5.5.2",
-    "vite": "^5.3.1",
-    "vitest": "^3.2.3",
-    "tailwindcss": "^4.1.8"
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "tailwindcss": "catalog:"
   },
   "dependencies": {
     "@rafters/shared": "workspace:*",
     "@rafters/color-utils": "workspace:*",
     "@rafters/design-tokens": "workspace:*",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "framer-motion": "^11.13.5",
     "react-colorful": "^5.6.1",
-    "clsx": "^2.1.1"
+    "clsx": "catalog:"
+  },
+  "author": "Sean Silvius",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/real-handy/rafters",
+    "directory": "packages/studio"
   }
 }

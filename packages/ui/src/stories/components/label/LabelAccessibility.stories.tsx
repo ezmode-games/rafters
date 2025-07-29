@@ -1,32 +1,32 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Input } from '../../../components/Input';
 import { Button } from '../../../components/Button';
+import { Input } from '../../../components/Input';
 
-const Label = ({ 
-  children, 
-  htmlFor, 
-  variant = 'default',
+const Label = ({
+  children,
+  htmlFor,
+  variant = 'field',
   className = '',
-  ...props 
+  ...props
 }: {
   children: React.ReactNode;
   htmlFor?: string;
   variant?: 'field' | 'hint' | 'error' | 'success' | 'meta' | 'status';
   className?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }) => {
-  const baseClasses = "text-sm";
+  const baseClasses = 'text-sm';
   const variantClasses = {
-    field: "font-medium",
-    hint: "text-muted-foreground",
-    error: "text-destructive",
-    success: "text-green-600",
-    meta: "text-xs text-muted-foreground",
-    status: "text-xs font-medium"
+    field: 'font-medium',
+    hint: 'text-muted-foreground',
+    error: 'text-destructive',
+    success: 'text-green-600',
+    meta: 'text-xs text-muted-foreground',
+    status: 'text-xs font-medium',
   };
-  
+
   return (
-    <label 
+    <label
       htmlFor={htmlFor}
       className={`${baseClasses} ${variantClasses[variant]} ${className}`}
       {...props}
@@ -65,13 +65,18 @@ type Story = StoryObj<typeof meta>;
  * through proper HTML relationships and ARIA attributes.
  */
 export const SemanticRelationships: Story = {
+  args: {
+    children: 'Label Text',
+    htmlFor: 'example-input',
+    variant: 'field',
+  },
   render: () => (
     <div className="space-y-6 p-4 max-w-3xl">
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Semantic Label Relationships</h3>
         <p className="text-sm text-muted-foreground">
-          Proper semantic relationships help assistive technologies understand
-          how descriptive text connects to interface elements.
+          Proper semantic relationships help assistive technologies understand how descriptive text
+          connects to interface elements.
         </p>
       </div>
 
@@ -83,11 +88,7 @@ export const SemanticRelationships: Story = {
               <Label htmlFor="basic-name" variant="field">
                 Full Name
               </Label>
-              <Input
-                id="basic-name"
-                type="text"
-                placeholder="Enter your full name"
-              />
+              <Input id="basic-name" type="text" placeholder="Enter your full name" />
               <p className="text-xs text-muted-foreground">
                 <code>htmlFor</code> creates direct relationship between label and input
               </p>
@@ -95,7 +96,10 @@ export const SemanticRelationships: Story = {
 
             <div className="space-y-2">
               <Label htmlFor="basic-email" variant="field">
-                Email Address <span className="text-destructive" aria-label="required">*</span>
+                Email Address{' '}
+                <span className="text-destructive" aria-label="required">
+                  *
+                </span>
               </Label>
               <Input
                 id="basic-email"
@@ -160,11 +164,14 @@ export const SemanticRelationships: Story = {
           <h4 className="text-base font-medium mb-4">Grouped Form Relationships</h4>
           <fieldset className="space-y-4 border border-border rounded-md p-4">
             <legend className="text-sm font-medium px-2">Contact Information</legend>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="contact-first" variant="field">
-                  First Name <span className="text-destructive" aria-label="required">*</span>
+                  First Name{' '}
+                  <span className="text-destructive" aria-label="required">
+                    *
+                  </span>
                 </Label>
                 <Input
                   id="contact-first"
@@ -174,10 +181,13 @@ export const SemanticRelationships: Story = {
                   aria-required="true"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="contact-last" variant="field">
-                  Last Name <span className="text-destructive" aria-label="required">*</span>
+                  Last Name{' '}
+                  <span className="text-destructive" aria-label="required">
+                    *
+                  </span>
                 </Label>
                 <Input
                   id="contact-last"
@@ -188,7 +198,7 @@ export const SemanticRelationships: Story = {
                 />
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="contact-phone" variant="field">
                 Phone Number
@@ -203,7 +213,7 @@ export const SemanticRelationships: Story = {
                 aria-describedby="phone-help"
               />
             </div>
-            
+
             <p className="text-xs text-muted-foreground">
               <code>fieldset</code> and <code>legend</code> provide semantic grouping context
             </p>
@@ -230,13 +240,18 @@ export const SemanticRelationships: Story = {
  * when read aloud without visual context.
  */
 export const ScreenReaderOptimization: Story = {
+  args: {
+    children: 'Label Text',
+    htmlFor: 'example-input',
+    variant: 'field',
+  },
   render: () => (
     <div className="space-y-6 p-4 max-w-3xl">
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Screen Reader Label Optimization</h3>
         <p className="text-sm text-muted-foreground">
-          Labels optimized for screen readers provide complete context and meaning
-          when visual information isn't available.
+          Labels optimized for screen readers provide complete context and meaning when visual
+          information isn't available.
         </p>
       </div>
 
@@ -346,7 +361,8 @@ export const ScreenReaderOptimization: Story = {
                 aria-invalid="true"
               />
               <Label variant="error" id="card-error" aria-live="assertive">
-                Credit card number is incomplete. Please enter all 16 digits without spaces or dashes.
+                Credit card number is incomplete. Please enter all 16 digits without spaces or
+                dashes.
               </Label>
               <Label variant="hint" id="card-format">
                 Example format: 1234567890123456
@@ -420,6 +436,11 @@ export const ScreenReaderOptimization: Story = {
  * and non-native speakers while improving comprehension for everyone.
  */
 export const LanguageClarity: Story = {
+  args: {
+    children: 'Label Text',
+    htmlFor: 'example-input',
+    variant: 'field',
+  },
   render: () => (
     <div className="space-y-6 p-4 max-w-3xl">
       <div className="space-y-4">
@@ -437,21 +458,18 @@ export const LanguageClarity: Story = {
             <div className="space-y-4">
               <div className="text-sm font-medium text-red-600">❌ Complex Language</div>
               <div className="space-y-2">
-                <Label variant="field">
-                  Electronic Mail Address Designation
-                </Label>
+                <Label variant="field">Electronic Mail Address Designation</Label>
                 <Input type="email" placeholder="Specify your electronic correspondence address" />
                 <Label variant="hint">
                   This field necessitates the provision of a valid electronic mail address format
                 </Label>
               </div>
               <div className="space-y-2">
-                <Label variant="field">
-                  Telephonic Communication Device Number
-                </Label>
+                <Label variant="field">Telephonic Communication Device Number</Label>
                 <Input type="tel" placeholder="Input your telecommunications identifier" />
                 <Label variant="error">
-                  The telephonic identifier you have provided does not conform to acceptable formatting parameters
+                  The telephonic identifier you have provided does not conform to acceptable
+                  formatting parameters
                 </Label>
               </div>
             </div>
@@ -459,22 +477,14 @@ export const LanguageClarity: Story = {
             <div className="space-y-4">
               <div className="text-sm font-medium text-green-600">✓ Clear Language</div>
               <div className="space-y-2">
-                <Label variant="field">
-                  Email Address
-                </Label>
+                <Label variant="field">Email Address</Label>
                 <Input type="email" placeholder="user@example.com" />
-                <Label variant="hint">
-                  We'll use this to send you updates
-                </Label>
+                <Label variant="hint">We'll use this to send you updates</Label>
               </div>
               <div className="space-y-2">
-                <Label variant="field">
-                  Phone Number
-                </Label>
+                <Label variant="field">Phone Number</Label>
                 <Input type="tel" placeholder="+1 (555) 123-4567" />
-                <Label variant="error">
-                  Please include your area code
-                </Label>
+                <Label variant="error">Please include your area code</Label>
               </div>
             </div>
           </div>
@@ -486,50 +496,36 @@ export const LanguageClarity: Story = {
             <div className="space-y-4">
               <div className="text-sm font-medium text-red-600">❌ Confusing Guidance</div>
               <div className="space-y-2">
-                <Label variant="field">
-                  Password
-                </Label>
+                <Label variant="field">Password</Label>
                 <Input type="password" variant="error" defaultValue="weak" />
-                <Label variant="error">
-                  Invalid password parameters detected
-                </Label>
+                <Label variant="error">Invalid password parameters detected</Label>
                 <Label variant="hint">
                   Implement cryptographically secure authentication credentials
                 </Label>
               </div>
               <div className="space-y-2">
-                <Label variant="field">
-                  Profile Image
-                </Label>
-                <Button variant="outline" size="sm">Select File</Button>
-                <Label variant="error">
-                  File upload process encountered an error condition
-                </Label>
+                <Label variant="field">Profile Image</Label>
+                <Button variant="outline" size="sm">
+                  Select File
+                </Button>
+                <Label variant="error">File upload process encountered an error condition</Label>
               </div>
             </div>
 
             <div className="space-y-4">
               <div className="text-sm font-medium text-green-600">✓ Helpful Guidance</div>
               <div className="space-y-2">
-                <Label variant="field">
-                  Password
-                </Label>
+                <Label variant="field">Password</Label>
                 <Input type="password" variant="error" defaultValue="weak" />
-                <Label variant="error">
-                  Password must be at least 8 characters
-                </Label>
-                <Label variant="hint">
-                  Try adding numbers and symbols for security
-                </Label>
+                <Label variant="error">Password must be at least 8 characters</Label>
+                <Label variant="hint">Try adding numbers and symbols for security</Label>
               </div>
               <div className="space-y-2">
-                <Label variant="field">
-                  Profile Photo
-                </Label>
-                <Button variant="outline" size="sm">Choose Photo</Button>
-                <Label variant="error">
-                  Photo must be smaller than 5MB
-                </Label>
+                <Label variant="field">Profile Photo</Label>
+                <Button variant="outline" size="sm">
+                  Choose Photo
+                </Button>
+                <Label variant="error">Photo must be smaller than 5MB</Label>
               </div>
             </div>
           </div>
@@ -541,44 +537,28 @@ export const LanguageClarity: Story = {
             <div className="space-y-4">
               <div className="text-sm font-medium text-red-600">❌ Negative Communication</div>
               <div className="space-y-2">
-                <Label variant="field">
-                  Username
-                </Label>
+                <Label variant="field">Username</Label>
                 <Input type="text" defaultValue="user123" variant="error" />
-                <Label variant="error">
-                  Username failed validation
-                </Label>
+                <Label variant="error">Username failed validation</Label>
               </div>
               <div className="space-y-2">
-                <Label variant="field">
-                  Email Address
-                </Label>
+                <Label variant="field">Email Address</Label>
                 <Input type="email" defaultValue="user@example.com" variant="success" />
-                <Label variant="success">
-                  Email address not rejected
-                </Label>
+                <Label variant="success">Email address not rejected</Label>
               </div>
             </div>
 
             <div className="space-y-4">
               <div className="text-sm font-medium text-green-600">✓ Positive Communication</div>
               <div className="space-y-2">
-                <Label variant="field">
-                  Username
-                </Label>
+                <Label variant="field">Username</Label>
                 <Input type="text" defaultValue="user123" variant="error" />
-                <Label variant="error">
-                  Please choose a username with 5+ characters
-                </Label>
+                <Label variant="error">Please choose a username with 5+ characters</Label>
               </div>
               <div className="space-y-2">
-                <Label variant="field">
-                  Email Address
-                </Label>
+                <Label variant="field">Email Address</Label>
                 <Input type="email" defaultValue="user@example.com" variant="success" />
-                <Label variant="success">
-                  Email address looks good
-                </Label>
+                <Label variant="success">Email address looks good</Label>
               </div>
             </div>
           </div>

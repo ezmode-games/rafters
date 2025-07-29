@@ -2,21 +2,21 @@ import { r as o } from './iframe-Cy2I62ob.js';
 import { P as v } from './index-DoQPmrLJ.js';
 import { j as t } from './jsx-runtime-BjG_zV1W.js';
 import { c as n } from './utils-DuMXYCiK.js';
-var g = 'Label',
-  u = o.forwardRef((a, s) =>
-    t.jsx(v.label, {
-      ...a,
-      ref: s,
-      onMouseDown: (r) => {
-        var e;
-        r.target.closest('button, input, select, textarea') ||
-          ((e = a.onMouseDown) == null || e.call(a, r),
-          !r.defaultPrevented && r.detail > 1 && r.preventDefault());
-      },
-    })
-  );
+const g = 'Label';
+const u = o.forwardRef((a, s) =>
+  t.jsx(v.label, {
+    ...a,
+    ref: s,
+    onMouseDown: (r) => {
+      let e;
+      r.target.closest('button, input, select, textarea') ||
+        ((e = a.onMouseDown) == null || e.call(a, r),
+        !r.defaultPrevented && r.detail > 1 && r.preventDefault());
+    },
+  })
+);
 u.displayName = g;
-var d = u;
+const d = u;
 const c = o.forwardRef(
   (
     {

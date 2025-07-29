@@ -1,6 +1,6 @@
 {
   "name": "@rafters/shared",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Shared types, schemas, and utilities for the Rafters AI design intelligence system",
   "type": "module",
   "private": true,
@@ -17,17 +17,24 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "test": "vitest",
+    "test": "vitest run --passWithNoTests",
     "lint": "biome check .",
     "format": "biome format --write .",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
   "devDependencies": {
-    "typescript": "^5.5.2",
-    "vitest": "^3.2.3"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "dependencies": {
-    "zod": "^3.23.8"
+    "zod": "catalog:"
+  },
+  "author": "Sean Silvius",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/real-handy/rafters",
+    "directory": "packages/shared"
   }
 }

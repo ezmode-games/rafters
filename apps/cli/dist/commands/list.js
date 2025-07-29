@@ -1,9 +1,18 @@
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import chalk from 'chalk';
+import { z } from 'zod';
 import { loadConfig } from '../utils/config.js';
-import { fetchComponentRegistry } from '../utils/registry.js';
 import { getRaftersTitle } from '../utils/logo.js';
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
+import { fetchComponentRegistry } from '../utils/registry.js';
+const ConfigSchema = z
+    .object({
+    componentsDir: z.string(),
+    packageManager: z.string(),
+    hasStorybook: z.boolean(),
+    storiesDir: z.string().optional(),
+})
+    .nullable();
 function loadInstalledComponents(cwd = process.cwd()) {
     try {
         const manifestPath = join(cwd, '.rafters', 'component-manifest.json');
@@ -20,7 +29,7 @@ export async function listCommand(options = {}) {
     try {
         let config;
         try {
-            config = loadConfig();
+            config = ConfigSchema.parse(loadConfig());
         }
         catch {
             // If not initialized, just show available components
@@ -46,7 +55,7 @@ export async function listCommand(options = {}) {
                     console.log();
                 }
             }
-            const availableComponents = registry.components.filter((c) => !installed[c.name]);
+            const availableComponents = (registry.components || []).filter((c) => !installed[c.name]);
             if (availableComponents.length > 0) {
                 console.log(chalk.yellow(`Available Components: ${availableComponents.length} remaining`));
                 console.log();
@@ -62,7 +71,7 @@ export async function listCommand(options = {}) {
             // Show compact view
             console.log('Available Components:');
             console.log();
-            for (const component of registry.components) {
+            for (const component of registry.components || []) {
                 const isInstalled = installed[component.name];
                 const icon = isInstalled ? chalk.green('✓') : chalk.gray(' ');
                 const name = isInstalled ? chalk.green(component.name) : component.name;
@@ -70,7 +79,7 @@ export async function listCommand(options = {}) {
                 console.log(`${icon} ${name.padEnd(12)} ${description}`);
             }
             const installedCount = Object.keys(installed).length;
-            const totalCount = registry.components.length;
+            const totalCount = registry.components?.length || 0;
             console.log();
             console.log(chalk.gray(`Installed: ${installedCount}/${totalCount} components`));
             console.log();

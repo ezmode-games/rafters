@@ -44,26 +44,24 @@ export const ContentHierarchy: Story = {
     <div className="w-full max-w-4xl">
       <h3 className="text-lg font-medium mb-6">Semantic Content Hierarchy</h3>
       <div className="space-y-6">
-        
         {/* Primary Content Section */}
         <section>
           <Card prominence="elevated" className="border-l-4 border-l-primary">
             <CardHeader density="spacious">
-              <CardTitle level={2} weight="bold">
+              <CardTitle level={2} weight="semibold">
                 Primary Feature Announcement
               </CardTitle>
-              <CardDescription prominence="enhanced">
+              <CardDescription prominence="default">
                 Most important information with highest semantic priority and visual emphasis
               </CardDescription>
             </CardHeader>
             <CardContent density="spacious">
               <div className="bg-primary/10 p-4 rounded-md">
-                <p className="text-sm font-medium text-primary mb-2">
-                  New Design System Release
-                </p>
+                <p className="text-sm font-medium text-primary mb-2">New Design System Release</p>
                 <p className="text-sm text-muted-foreground">
                   Our comprehensive design system now includes enhanced accessibility features,
-                  expanded component library, and improved developer experience with better documentation.
+                  expanded component library, and improved developer experience with better
+                  documentation.
                 </p>
               </div>
             </CardContent>
@@ -90,24 +88,30 @@ export const ContentHierarchy: Story = {
               <CardContent density="comfortable">
                 <div className="space-y-3 text-sm">
                   <div className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0" />
                     <div>
                       <div className="font-medium">Button Component</div>
-                      <div className="text-muted-foreground text-xs">New size variants and loading states</div>
+                      <div className="text-muted-foreground text-xs">
+                        New size variants and loading states
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
                     <div>
                       <div className="font-medium">Input Component</div>
-                      <div className="text-muted-foreground text-xs">Improved validation patterns</div>
+                      <div className="text-muted-foreground text-xs">
+                        Improved validation patterns
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0" />
                     <div>
                       <div className="font-medium">Card Component</div>
-                      <div className="text-muted-foreground text-xs">Adaptive density and interaction patterns</div>
+                      <div className="text-muted-foreground text-xs">
+                        Adaptive density and interaction patterns
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -158,13 +162,14 @@ export const ContentHierarchy: Story = {
                 <CardTitle level={4} weight="medium">
                   Migration Guide
                 </CardTitle>
-                <CardDescription prominence="muted">
+                <CardDescription prominence="subtle">
                   Step-by-step upgrade instructions
                 </CardDescription>
               </CardHeader>
               <CardContent density="compact">
                 <p className="text-xs text-muted-foreground">
-                  Detailed instructions for upgrading from previous versions with minimal breaking changes.
+                  Detailed instructions for upgrading from previous versions with minimal breaking
+                  changes.
                 </p>
               </CardContent>
               <CardFooter density="compact" justify="end">
@@ -179,7 +184,7 @@ export const ContentHierarchy: Story = {
                 <CardTitle level={4} weight="medium">
                   Release Notes
                 </CardTitle>
-                <CardDescription prominence="muted">
+                <CardDescription prominence="subtle">
                   Complete changelog and updates
                 </CardDescription>
               </CardHeader>
@@ -200,9 +205,7 @@ export const ContentHierarchy: Story = {
                 <CardTitle level={4} weight="medium">
                   Community
                 </CardTitle>
-                <CardDescription prominence="muted">
-                  Connect with other users
-                </CardDescription>
+                <CardDescription prominence="subtle">Connect with other users</CardDescription>
               </CardHeader>
               <CardContent density="compact">
                 <p className="text-xs text-muted-foreground">
@@ -222,8 +225,10 @@ export const ContentHierarchy: Story = {
       <div className="mt-8 p-4 bg-muted/50 rounded-md">
         <h4 className="font-medium text-sm mb-2">Hierarchy Principles</h4>
         <p className="text-xs text-muted-foreground">
-          <strong>H2 (Primary):</strong> Main announcement with elevated prominence<br />
-          <strong>H3 (Supporting):</strong> Related features with default prominence<br />
+          <strong>H2 (Primary):</strong> Main announcement with elevated prominence
+          <br />
+          <strong>H3 (Supporting):</strong> Related features with default prominence
+          <br />
           <strong>H4 (Details):</strong> Supplementary information with subtle prominence
         </p>
       </div>
@@ -250,7 +255,6 @@ export const ContextualPurpose: Story = {
     <div className="w-full max-w-5xl">
       <h3 className="text-lg font-medium mb-6">Contextual Purpose Patterns</h3>
       <div className="space-y-8">
-        
         {/* Dashboard Context */}
         <section>
           <h4 className="text-base font-medium mb-4">Dashboard Metrics Context</h4>
@@ -260,7 +264,7 @@ export const ContextualPurpose: Story = {
                 <CardTitle level={5} weight="medium">
                   Revenue
                 </CardTitle>
-                <CardDescription prominence="muted" className="text-xs">
+                <CardDescription prominence="subtle" className="text-xs">
                   Total monthly earnings
                 </CardDescription>
               </CardHeader>
@@ -275,7 +279,7 @@ export const ContextualPurpose: Story = {
                 <CardTitle level={5} weight="medium">
                   Users
                 </CardTitle>
-                <CardDescription prominence="muted" className="text-xs">
+                <CardDescription prominence="subtle" className="text-xs">
                   Active this month
                 </CardDescription>
               </CardHeader>
@@ -290,7 +294,7 @@ export const ContextualPurpose: Story = {
                 <CardTitle level={5} weight="medium">
                   Conversion
                 </CardTitle>
-                <CardDescription prominence="muted" className="text-xs">
+                <CardDescription prominence="subtle" className="text-xs">
                   Rate this month
                 </CardDescription>
               </CardHeader>
@@ -305,7 +309,7 @@ export const ContextualPurpose: Story = {
                 <CardTitle level={5} weight="medium">
                   Orders
                 </CardTitle>
-                <CardDescription prominence="muted" className="text-xs">
+                <CardDescription prominence="subtle" className="text-xs">
                   Completed this month
                 </CardDescription>
               </CardHeader>
@@ -326,14 +330,12 @@ export const ContextualPurpose: Story = {
                 <CardTitle level={4} weight="semibold">
                   Featured Article
                 </CardTitle>
-                <CardDescription prominence="enhanced">
-                  Editor's pick for this week
-                </CardDescription>
+                <CardDescription prominence="default">Editor's pick for this week</CardDescription>
               </CardHeader>
               <CardContent density="comfortable">
                 <p className="text-sm text-muted-foreground mb-3">
-                  Deep dive into modern design patterns and their impact on user experience
-                  across different platforms and devices.
+                  Deep dive into modern design patterns and their impact on user experience across
+                  different platforms and devices.
                 </p>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span>12 min read</span>
@@ -359,8 +361,8 @@ export const ContextualPurpose: Story = {
               </CardHeader>
               <CardContent density="comfortable">
                 <p className="text-sm text-muted-foreground mb-3">
-                  Best practices for creating maintainable and consistent component libraries
-                  that scale with your product needs.
+                  Best practices for creating maintainable and consistent component libraries that
+                  scale with your product needs.
                 </p>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span>8 min read</span>
@@ -380,14 +382,12 @@ export const ContextualPurpose: Story = {
                 <CardTitle level={4} weight="medium">
                   Accessibility Guidelines
                 </CardTitle>
-                <CardDescription prominence="default">
-                  Inclusive design principles
-                </CardDescription>
+                <CardDescription prominence="default">Inclusive design principles</CardDescription>
               </CardHeader>
               <CardContent density="comfortable">
                 <p className="text-sm text-muted-foreground mb-3">
-                  Comprehensive guide to building accessible interfaces that work for
-                  everyone, regardless of ability or device.
+                  Comprehensive guide to building accessible interfaces that work for everyone,
+                  regardless of ability or device.
                 </p>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span>15 min read</span>
@@ -413,7 +413,7 @@ export const ContextualPurpose: Story = {
                 <CardTitle level={4} weight="semibold">
                   Quick Setup
                 </CardTitle>
-                <CardDescription prominence="enhanced">
+                <CardDescription prominence="default">
                   Get started in under 5 minutes
                 </CardDescription>
               </CardHeader>
@@ -449,19 +449,15 @@ export const ContextualPurpose: Story = {
                 <CardTitle level={4} weight="medium">
                   Advanced Configuration
                 </CardTitle>
-                <CardDescription prominence="default">
-                  Customize for specific needs
-                </CardDescription>
+                <CardDescription prominence="default">Customize for specific needs</CardDescription>
               </CardHeader>
               <CardContent density="comfortable">
                 <p className="text-sm text-muted-foreground mb-4">
-                  Detailed configuration options for teams with specific requirements
-                  and complex integration needs.
+                  Detailed configuration options for teams with specific requirements and complex
+                  integration needs.
                 </p>
                 <div className="space-y-2">
-                  <div className="text-xs text-muted-foreground">
-                    ✓ Custom theme configuration
-                  </div>
+                  <div className="text-xs text-muted-foreground">✓ Custom theme configuration</div>
                   <div className="text-xs text-muted-foreground">
                     ✓ Advanced component customization
                   </div>
@@ -505,19 +501,17 @@ export const ProgressiveDisclosure: Story = {
     <div className="w-full max-w-4xl">
       <h3 className="text-lg font-medium mb-6">Progressive Information Disclosure</h3>
       <div className="space-y-8">
-        
         {/* Summary to Detail Progression */}
         <section>
           <h4 className="text-base font-medium mb-4">Summary → Detail Progression</h4>
           <div className="space-y-4">
-            
             {/* High-level Summary */}
             <Card prominence="elevated">
               <CardHeader density="comfortable">
                 <CardTitle level={3} weight="semibold">
                   Project Status Overview
                 </CardTitle>
-                <CardDescription prominence="enhanced">
+                <CardDescription prominence="default">
                   High-level summary of all active projects
                 </CardDescription>
               </CardHeader>
@@ -618,7 +612,7 @@ export const ProgressiveDisclosure: Story = {
                   <CardTitle level={5} weight="medium">
                     Mobile App Redesign
                   </CardTitle>
-                  <CardDescription prominence="muted" className="text-xs">
+                  <CardDescription prominence="subtle" className="text-xs">
                     Due: March 30, 2024
                   </CardDescription>
                 </CardHeader>
@@ -650,7 +644,7 @@ export const ProgressiveDisclosure: Story = {
                   <CardTitle level={5} weight="medium">
                     API Integration
                   </CardTitle>
-                  <CardDescription prominence="muted" className="text-xs">
+                  <CardDescription prominence="subtle" className="text-xs">
                     Due: April 15, 2024
                   </CardDescription>
                 </CardHeader>
@@ -682,7 +676,7 @@ export const ProgressiveDisclosure: Story = {
                   <CardTitle level={5} weight="medium">
                     Performance Optimization
                   </CardTitle>
-                  <CardDescription prominence="muted" className="text-xs">
+                  <CardDescription prominence="subtle" className="text-xs">
                     Due: May 1, 2024
                   </CardDescription>
                 </CardHeader>
@@ -716,8 +710,10 @@ export const ProgressiveDisclosure: Story = {
       <div className="mt-8 p-4 bg-muted/50 rounded-md">
         <h4 className="font-medium text-sm mb-2">Disclosure Patterns</h4>
         <p className="text-xs text-muted-foreground">
-          <strong>Overview Level:</strong> High-level metrics and summaries<br />
-          <strong>Category Level:</strong> Grouped information with moderate detail<br />
+          <strong>Overview Level:</strong> High-level metrics and summaries
+          <br />
+          <strong>Category Level:</strong> Grouped information with moderate detail
+          <br />
           <strong>Item Level:</strong> Specific details and actionable information
         </p>
       </div>

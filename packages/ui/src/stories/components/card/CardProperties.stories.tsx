@@ -45,8 +45,8 @@ export const DensityManagement: Story = {
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Adaptive Information Density</h3>
         <p className="text-sm text-muted-foreground">
-          Density properties optimize cognitive load by matching information presentation
-          to content importance and available space.
+          Density properties optimize cognitive load by matching information presentation to content
+          importance and available space.
         </p>
       </div>
 
@@ -94,8 +94,8 @@ export const DensityManagement: Story = {
           </CardHeader>
           <CardContent density="comfortable">
             <p className="text-sm text-muted-foreground">
-              This is the default density setting that provides optimal balance between
-              information presentation and readability for most use cases.
+              This is the default density setting that provides optimal balance between information
+              presentation and readability for most use cases.
             </p>
             <div className="mt-3 text-xs space-y-1">
               <div>• Optimal for content consumption</div>
@@ -122,12 +122,10 @@ export const DensityManagement: Story = {
           </CardHeader>
           <CardContent density="spacious">
             <div className="bg-primary/10 p-4 rounded-md">
-              <p className="text-sm font-medium text-primary mb-2">
-                Premium Content
-              </p>
+              <p className="text-sm font-medium text-primary mb-2">Premium Content</p>
               <p className="text-sm text-muted-foreground">
-                Spacious density creates a sense of importance and allows for careful
-                consideration of content. Ideal for featured items and call-to-action contexts.
+                Spacious density creates a sense of importance and allows for careful consideration
+                of content. Ideal for featured items and call-to-action contexts.
               </p>
             </div>
           </CardContent>
@@ -180,8 +178,8 @@ export const VisualProminence: Story = {
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Visual Prominence Hierarchy</h3>
         <p className="text-sm text-muted-foreground">
-          Prominence properties create appropriate visual weight that matches content
-          importance and guides user attention effectively.
+          Prominence properties create appropriate visual weight that matches content importance and
+          guides user attention effectively.
         </p>
       </div>
 
@@ -191,18 +189,16 @@ export const VisualProminence: Story = {
             <CardTitle level={2} weight="semibold">
               Elevated Prominence
             </CardTitle>
-            <CardDescription prominence="enhanced">
+            <CardDescription prominence="default">
               Highest visual weight for primary content and featured information
             </CardDescription>
           </CardHeader>
           <CardContent density="spacious">
             <div className="bg-primary/10 p-4 rounded-md">
-              <p className="text-sm font-medium text-primary mb-2">
-                Primary Featured Content
-              </p>
+              <p className="text-sm font-medium text-primary mb-2">Primary Featured Content</p>
               <p className="text-sm text-muted-foreground">
-                Elevated prominence uses enhanced shadows, borders, and spacing to create
-                the strongest visual presence. Use sparingly for the most important content.
+                Elevated prominence uses enhanced shadows, borders, and spacing to create the
+                strongest visual presence. Use sparingly for the most important content.
               </p>
             </div>
           </CardContent>
@@ -225,8 +221,8 @@ export const VisualProminence: Story = {
             </CardHeader>
             <CardContent density="comfortable">
               <p className="text-sm text-muted-foreground">
-                Default prominence provides clean, readable presentation without competing
-                for attention. This is appropriate for most content cards and informational displays.
+                Default prominence provides clean, readable presentation without competing for
+                attention. This is appropriate for most content cards and informational displays.
               </p>
             </CardContent>
             <CardFooter justify="end">
@@ -241,14 +237,14 @@ export const VisualProminence: Story = {
               <CardTitle level={4} weight="normal">
                 Subtle Prominence
               </CardTitle>
-              <CardDescription prominence="muted">
+              <CardDescription prominence="subtle">
                 Reduced visual weight for supporting or background information
               </CardDescription>
             </CardHeader>
             <CardContent density="comfortable">
               <p className="text-sm text-muted-foreground">
-                Subtle prominence minimizes visual impact while maintaining readability.
-                Useful for supporting content that shouldn't compete with primary information.
+                Subtle prominence minimizes visual impact while maintaining readability. Useful for
+                supporting content that shouldn't compete with primary information.
               </p>
             </CardContent>
             <CardFooter justify="end">
@@ -263,9 +259,15 @@ export const VisualProminence: Story = {
       <div className="mt-6 p-4 bg-muted/50 rounded-md">
         <h4 className="font-medium text-sm mb-2">Prominence Usage</h4>
         <div className="space-y-2 text-xs">
-          <div><strong>Elevated:</strong> Featured content, announcements, primary CTAs</div>
-          <div><strong>Default:</strong> Regular content cards, articles, standard information</div>
-          <div><strong>Subtle:</strong> Supporting content, metadata, background information</div>
+          <div>
+            <strong>Elevated:</strong> Featured content, announcements, primary CTAs
+          </div>
+          <div>
+            <strong>Default:</strong> Regular content cards, articles, standard information
+          </div>
+          <div>
+            <strong>Subtle:</strong> Supporting content, metadata, background information
+          </div>
         </div>
       </div>
     </div>
@@ -292,8 +294,8 @@ export const InteractiveStates: Story = {
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Interactive Card States</h3>
         <p className="text-sm text-muted-foreground">
-          Interactive properties provide clear affordances and appropriate feedback
-          for different interaction patterns.
+          Interactive properties provide clear affordances and appropriate feedback for different
+          interaction patterns.
         </p>
       </div>
 
@@ -330,9 +332,9 @@ export const InteractiveStates: Story = {
         </Card>
 
         {/* Interactive Card */}
-        <Card 
-          interactive 
-          prominence="elevated" 
+        <Card
+          interactive
+          prominence="elevated"
           onClick={() => alert('Interactive card activated!')}
           className="hover:opacity-[var(--opacity-hover)] transition-all duration-[var(--duration-standard)] cursor-pointer"
         >
@@ -377,20 +379,20 @@ export const InteractiveStates: Story = {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-3">
-              The card container is static, but individual elements within can be interactive.
-              This pattern works well for complex content with multiple action points.
+              The card container is static, but individual elements within can be interactive. This
+              pattern works well for complex content with multiple action points.
             </p>
           </CardContent>
           <CardFooter justify="between" className="gap-2">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               className="hover:opacity-[var(--opacity-hover)] transition-all duration-[var(--duration-standard)]"
             >
               Secondary
             </Button>
-            <Button 
-              variant="primary" 
+            <Button
+              variant="primary"
               size="sm"
               className="hover:opacity-[var(--consequence-significant-opacity)] transition-all duration-[var(--consequence-significant-timing)]"
             >
@@ -405,15 +407,15 @@ export const InteractiveStates: Story = {
             <CardTitle level={4} weight="medium">
               Loading State
             </CardTitle>
-            <CardDescription prominence="muted">
+            <CardDescription prominence="subtle">
               Content is being loaded or unavailable
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <div className="h-4 bg-muted rounded animate-pulse"></div>
-              <div className="h-4 bg-muted rounded animate-pulse w-3/4"></div>
-              <div className="h-4 bg-muted rounded animate-pulse w-1/2"></div>
+              <div className="h-4 bg-muted rounded animate-pulse" />
+              <div className="h-4 bg-muted rounded animate-pulse w-3/4" />
+              <div className="h-4 bg-muted rounded animate-pulse w-1/2" />
             </div>
           </CardContent>
           <CardFooter>
@@ -469,8 +471,8 @@ export const LayoutAdaptation: Story = {
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Adaptive Layout Patterns</h3>
         <p className="text-sm text-muted-foreground">
-          Layout properties help cards adapt their internal organization based on
-          content type, available space, and user needs.
+          Layout properties help cards adapt their internal organization based on content type,
+          available space, and user needs.
         </p>
       </div>
 
@@ -489,8 +491,8 @@ export const LayoutAdaptation: Story = {
               </CardHeader>
               <CardContent layout="default">
                 <p className="text-sm text-muted-foreground">
-                  The default layout stacks content vertically with appropriate spacing
-                  between elements. This works well for most text-based content.
+                  The default layout stacks content vertically with appropriate spacing between
+                  elements. This works well for most text-based content.
                 </p>
               </CardContent>
             </Card>
@@ -560,7 +562,9 @@ export const LayoutAdaptation: Story = {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card>
               <CardHeader density="compact">
-                <CardTitle level={5} weight="medium">Start Alignment</CardTitle>
+                <CardTitle level={5} weight="medium">
+                  Start Alignment
+                </CardTitle>
               </CardHeader>
               <CardContent density="compact">
                 <p className="text-sm text-muted-foreground">
@@ -576,7 +580,9 @@ export const LayoutAdaptation: Story = {
 
             <Card>
               <CardHeader density="compact">
-                <CardTitle level={5} weight="medium">Center Alignment</CardTitle>
+                <CardTitle level={5} weight="medium">
+                  Center Alignment
+                </CardTitle>
               </CardHeader>
               <CardContent density="compact">
                 <p className="text-sm text-muted-foreground">
@@ -592,7 +598,9 @@ export const LayoutAdaptation: Story = {
 
             <Card>
               <CardHeader density="compact">
-                <CardTitle level={5} weight="medium">Between Alignment</CardTitle>
+                <CardTitle level={5} weight="medium">
+                  Between Alignment
+                </CardTitle>
               </CardHeader>
               <CardContent density="compact">
                 <p className="text-sm text-muted-foreground">
@@ -600,8 +608,12 @@ export const LayoutAdaptation: Story = {
                 </p>
               </CardContent>
               <CardFooter justify="between">
-                <Button variant="ghost" size="sm">Cancel</Button>
-                <Button variant="primary" size="sm">Confirm</Button>
+                <Button variant="ghost" size="sm">
+                  Cancel
+                </Button>
+                <Button variant="primary" size="sm">
+                  Confirm
+                </Button>
               </CardFooter>
             </Card>
           </div>

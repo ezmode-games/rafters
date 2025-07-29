@@ -1,3 +1,6 @@
+/**
+ * AI Intelligence: Token knowledge in .rafters/tokens/registry.json
+ */
 import * as SliderPrimitive from '@radix-ui/react-slider';
 import { forwardRef } from 'react';
 import { cn } from '../lib/utils';

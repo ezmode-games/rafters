@@ -1,34 +1,44 @@
 import chalk from 'chalk';
-import ora from 'ora';
-import inquirer from 'inquirer';
 import fs from 'fs-extra';
+import inquirer from 'inquirer';
+import ora from 'ora';
 const { ensureDirSync, writeFileSync, existsSync } = fs;
-import { join } from 'path';
-import { getRaftersLogo } from '../utils/logo.js';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
-  defaultConfig,
-  saveConfig,
-  configExists,
-  isNodeProject,
-  hasReact,
-  detectPackageManager,
+  checkTailwindVersion,
+  createDefaultRegistry,
+  fetchStudioTokens,
+  injectCSSImport,
+  writeTokenFiles,
+} from '@rafters/design-tokens';
+import {
   type Config,
+  configExists,
+  defaultConfig,
+  detectPackageManager,
+  hasReact,
+  isNodeProject,
+  saveConfig,
 } from '../utils/config.js';
-import { installDependencies, getCoreDependencies } from '../utils/dependencies.js';
-import { readFileSync } from 'fs';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { getCoreDependencies, installDependencies } from '../utils/dependencies.js';
+import { getRaftersLogo, getRaftersTitle } from '../utils/logo.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export async function initCommand(): Promise<void> {
   const cwd = process.cwd();
-  
-  console.log(chalk.blue('🏗️  Initializing Rafters...'));
+
+  // Display ASCII logo
+  console.log(getRaftersLogo());
+  console.log(`\n${getRaftersTitle()}`);
+  console.log(chalk.blue('\n🏗️  Initializing Rafters...'));
 
   // Check prerequisites
   const spinner = ora('Checking prerequisites...').start();
-  
+
   if (!isNodeProject(cwd)) {
     spinner.fail('No package.json found. Run this in a Node.js project.');
     process.exit(1);
@@ -45,6 +55,18 @@ export async function initCommand(): Promise<void> {
   }
 
   spinner.succeed('Prerequisites checked');
+
+  // Check Tailwind version and warn about v3
+  const tailwindVersion = await checkTailwindVersion(cwd);
+  if (tailwindVersion === 'v3') {
+    console.log();
+    console.log(chalk.red.bold('🚨 TAILWIND V3 DETECTED! 🚨'));
+    console.log(chalk.yellow('YAH NHO V3! UPGRADE BITCHES!'));
+    console.log(chalk.gray('Rafters requires Tailwind CSS v4 for @theme support.'));
+    console.log(chalk.blue('Run: npm install tailwindcss@next'));
+    console.log();
+    process.exit(1);
+  }
 
   // Interactive setup
   const answers = await inquirer.prompt([
@@ -67,10 +89,33 @@ export async function initCommand(): Promise<void> {
       default: './src/stories',
       when: (answers) => answers.hasStorybook,
     },
+    {
+      type: 'input',
+      name: 'studioShortcode',
+      message: 'Studio shortcode (leave blank for default grayscale):',
+      validate: (input) => {
+        if (!input) return true; // Allow blank for default
+        if (!/^[A-Z0-9]{6,8}$/i.test(input)) {
+          return 'Shortcode must be 6-8 characters (letters and numbers only)';
+        }
+        return true;
+      },
+    },
+    {
+      type: 'list',
+      name: 'tokenFormat',
+      message: 'Design token format:',
+      choices: [
+        { name: 'Vanilla CSS', value: 'css' },
+        { name: 'Tailwind CSS v4', value: 'tailwind' },
+        { name: 'React Native', value: 'react-native' },
+      ],
+      default: 'css',
+    },
   ]);
 
   const packageManager = detectPackageManager(cwd);
-  
+
   const config: Config = {
     ...defaultConfig,
     hasStorybook: answers.hasStorybook,
@@ -78,6 +123,24 @@ export async function initCommand(): Promise<void> {
     storiesDir: answers.storiesDir || defaultConfig.storiesDir,
     packageManager,
   };
+
+  // Get design tokens from Studio or create default
+  let tokenSet: Awaited<ReturnType<typeof fetchStudioTokens>>;
+  if (answers.studioShortcode) {
+    const tokenSpinner = ora('Fetching tokens from Studio...').start();
+    try {
+      tokenSet = await fetchStudioTokens(answers.studioShortcode);
+      tokenSpinner.succeed('Studio tokens loaded');
+    } catch (error) {
+      tokenSpinner.warn(
+        `Failed to fetch Studio tokens: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+      console.log(chalk.gray('  Falling back to default grayscale theme'));
+      tokenSet = createDefaultRegistry();
+    }
+  } else {
+    tokenSet = createDefaultRegistry();
+  }
 
   // Create directories and files
   const setupSpinner = ora('Setting up Rafters...').start();
@@ -113,13 +176,10 @@ export async function initCommand(): Promise<void> {
     // Create lib directory and utils
     const libDir = join(cwd, 'src/lib');
     ensureDirSync(libDir);
-    
+
     const utilsPath = join(libDir, 'utils.ts');
     if (!existsSync(utilsPath)) {
-      const utilsContent = readFileSync(
-        join(__dirname, '../templates/utils.ts'),
-        'utf-8'
-      );
+      const utilsContent = readFileSync(join(__dirname, '../templates/utils.ts'), 'utf-8');
       writeFileSync(utilsPath, utilsContent);
     }
 
@@ -128,18 +188,30 @@ export async function initCommand(): Promise<void> {
       ensureDirSync(join(cwd, config.storiesDir));
     }
 
+    // Write design tokens and registry
+    await writeTokenFiles(tokenSet, answers.tokenFormat, cwd);
+
+    // Inject CSS import if needed
+    if (answers.tokenFormat === 'css' || answers.tokenFormat === 'tailwind') {
+      await injectCSSImport(answers.tokenFormat, cwd);
+    }
+
     setupSpinner.succeed('Rafters setup complete');
 
     // Install dependencies
     const depsSpinner = ora('Installing core dependencies...').start();
     const coreDeps = getCoreDependencies();
-    
+
     try {
       await installDependencies(coreDeps, packageManager, cwd);
       depsSpinner.succeed('Core dependencies installed');
     } catch (error) {
       depsSpinner.warn('Failed to install dependencies automatically. Please install manually:');
-      console.log(chalk.gray(`  ${packageManager} ${packageManager === 'npm' ? 'install' : 'add'} ${coreDeps.join(' ')}`));
+      console.log(
+        chalk.gray(
+          `  ${packageManager} ${packageManager === 'npm' ? 'install' : 'add'} ${coreDeps.join(' ')}`
+        )
+      );
     }
 
     // Success message
@@ -149,8 +221,14 @@ export async function initCommand(): Promise<void> {
     console.log('Next steps:');
     console.log(chalk.gray('  • Add components: ') + chalk.blue('rafters add button'));
     console.log(chalk.gray('  • List available: ') + chalk.blue('rafters list'));
-    console.log(chalk.gray('  • Read intelligence: ') + chalk.blue('.rafters/agent-instructions.md'));
-
+    console.log(
+      chalk.gray('  • Design tokens: ') +
+        chalk.blue(`src/design-tokens.${answers.tokenFormat === 'react-native' ? 'ts' : 'css'}`)
+    );
+    console.log(
+      chalk.gray('  • Token intelligence: ') + chalk.blue('.rafters/tokens/registry.json')
+    );
+    console.log(chalk.gray('  • AI instructions: ') + chalk.blue('.rafters/agent-instructions.md'));
   } catch (error) {
     setupSpinner.fail('Failed to setup Rafters');
     console.error(chalk.red(error));

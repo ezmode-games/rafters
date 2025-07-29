@@ -15,8 +15,8 @@ const d = p.forwardRef(
     },
     m
   ) => {
-    const t = c || i === 'password' || i === 'email',
-      n = e === 'error' && o === 'live';
+    const t = c || i === 'password' || i === 'email';
+    const n = e === 'error' && o === 'live';
     return s.jsxs('div', {
       className: 'relative',
       children: [

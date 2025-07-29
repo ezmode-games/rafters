@@ -18,281 +18,281 @@ import './index-DoQPmrLJ.js';
 import './index-LIN26vHB.js';
 import './utils-DuMXYCiK.js';
 const J = {
-    title: '03 Components/Forms/Select/Intelligence',
-    component: l,
-    parameters: { layout: 'centered' },
-    tags: ['autodocs'],
-  },
-  i = {
-    render: () => {
-      const [t, c] = p.useState(''),
-        o = [
-          'United States',
-          'Canada',
-          'United Kingdom',
-          'Australia',
-          'Germany',
-          'France',
-          'Japan',
-          'Brazil',
-          'India',
-          'China',
-          'Mexico',
-          'Spain',
-        ];
-      return e.jsxs('div', {
-        className: 'space-y-6 p-6 max-w-md',
-        children: [
-          e.jsxs('div', {
+  title: '03 Components/Forms/Select/Intelligence',
+  component: l,
+  parameters: { layout: 'centered' },
+  tags: ['autodocs'],
+};
+const i = {
+  render: () => {
+    const [t, c] = p.useState('');
+    const o = [
+      'United States',
+      'Canada',
+      'United Kingdom',
+      'Australia',
+      'Germany',
+      'France',
+      'Japan',
+      'Brazil',
+      'India',
+      'China',
+      'Mexico',
+      'Spain',
+    ];
+    return e.jsxs('div', {
+      className: 'space-y-6 p-6 max-w-md',
+      children: [
+        e.jsxs('div', {
+          children: [
+            e.jsx('h3', {
+              className: 'text-lg font-semibold mb-4',
+              children: 'Choice Architecture Optimization',
+            }),
+            e.jsx('p', {
+              className: 'text-sm text-gray-600 mb-6',
+              children: 'Cognitive load awareness through item counting and progressive disclosure',
+            }),
+          ],
+        }),
+        e.jsx('div', {
+          className: 'space-y-4',
+          children: e.jsxs('div', {
             children: [
-              e.jsx('h3', {
-                className: 'text-lg font-semibold mb-4',
-                children: 'Choice Architecture Optimization',
+              e.jsx('label', {
+                htmlFor: 'country',
+                className: 'block text-sm font-medium mb-2',
+                children: 'Country',
+              }),
+              e.jsxs(l, {
+                value: t,
+                onValueChange: c,
+                children: [
+                  e.jsx(m, {
+                    id: 'country',
+                    showCount: !0,
+                    itemCount: o.length,
+                    className: 'w-full',
+                    children: e.jsx(u, { placeholder: 'Select your country' }),
+                  }),
+                  e.jsx(h, {
+                    searchable: o.length > 8,
+                    children: o.map((r) => e.jsx(s, { value: r.toLowerCase(), children: r }, r)),
+                  }),
+                ],
               }),
               e.jsx('p', {
-                className: 'text-sm text-gray-600 mb-6',
-                children:
-                  'Cognitive load awareness through item counting and progressive disclosure',
+                className: 'text-xs text-gray-500 mt-1',
+                children: 'Shows item count to set expectations and enables search for large lists',
               }),
             ],
           }),
-          e.jsx('div', {
-            className: 'space-y-4',
-            children: e.jsxs('div', {
+        }),
+      ],
+    });
+  },
+};
+const n = {
+  render: () => {
+    let g;
+    let S;
+    const [t, c] = p.useState('');
+    const [o, r] = p.useState('');
+    const x = {
+      electronics: {
+        label: 'Electronics',
+        items: ['Laptop', 'Phone', 'Tablet', 'Headphones', 'Camera', 'Smart Watch'],
+      },
+      clothing: {
+        label: 'Clothing',
+        items: ['T-Shirt', 'Jeans', 'Dress', 'Jacket', 'Shoes', 'Hat'],
+      },
+      books: {
+        label: 'Books',
+        items: ['Fiction', 'Non-Fiction', 'Science', 'History', 'Biography', 'Children'],
+      },
+    };
+    return e.jsxs('div', {
+      className: 'space-y-6 p-6 max-w-md',
+      children: [
+        e.jsxs('div', {
+          children: [
+            e.jsx('h3', {
+              className: 'text-lg font-semibold mb-4',
+              children: 'Progressive Disclosure',
+            }),
+            e.jsx('p', {
+              className: 'text-sm text-gray-600 mb-6',
+              children: 'Search functionality for large option sets reduces cognitive overhead',
+            }),
+          ],
+        }),
+        e.jsxs('div', {
+          className: 'space-y-4',
+          children: [
+            e.jsxs('div', {
               children: [
                 e.jsx('label', {
-                  htmlFor: 'country',
+                  htmlFor: 'category',
                   className: 'block text-sm font-medium mb-2',
-                  children: 'Country',
+                  children: 'Category',
                 }),
                 e.jsxs(l, {
                   value: t,
                   onValueChange: c,
                   children: [
                     e.jsx(m, {
-                      id: 'country',
-                      showCount: !0,
-                      itemCount: o.length,
+                      id: 'category',
                       className: 'w-full',
-                      children: e.jsx(u, { placeholder: 'Select your country' }),
+                      children: e.jsx(u, { placeholder: 'Choose category' }),
                     }),
                     e.jsx(h, {
-                      searchable: o.length > 8,
-                      children: o.map((r) => e.jsx(s, { value: r.toLowerCase(), children: r }, r)),
+                      children: Object.entries(x).map(([a, V]) =>
+                        e.jsx(s, { value: a, children: V.label }, a)
+                      ),
                     }),
                   ],
                 }),
-                e.jsx('p', {
-                  className: 'text-xs text-gray-500 mt-1',
-                  children:
-                    'Shows item count to set expectations and enables search for large lists',
-                }),
               ],
             }),
-          }),
-        ],
-      });
-    },
-  },
-  n = {
-    render: () => {
-      var g, S;
-      const [t, c] = p.useState(''),
-        [o, r] = p.useState(''),
-        x = {
-          electronics: {
-            label: 'Electronics',
-            items: ['Laptop', 'Phone', 'Tablet', 'Headphones', 'Camera', 'Smart Watch'],
-          },
-          clothing: {
-            label: 'Clothing',
-            items: ['T-Shirt', 'Jeans', 'Dress', 'Jacket', 'Shoes', 'Hat'],
-          },
-          books: {
-            label: 'Books',
-            items: ['Fiction', 'Non-Fiction', 'Science', 'History', 'Biography', 'Children'],
-          },
-        };
-      return e.jsxs('div', {
-        className: 'space-y-6 p-6 max-w-md',
-        children: [
-          e.jsxs('div', {
-            children: [
-              e.jsx('h3', {
-                className: 'text-lg font-semibold mb-4',
-                children: 'Progressive Disclosure',
-              }),
-              e.jsx('p', {
-                className: 'text-sm text-gray-600 mb-6',
-                children: 'Search functionality for large option sets reduces cognitive overhead',
-              }),
-            ],
-          }),
-          e.jsxs('div', {
-            className: 'space-y-4',
-            children: [
+            t &&
               e.jsxs('div', {
                 children: [
                   e.jsx('label', {
-                    htmlFor: 'category',
+                    htmlFor: 'product',
                     className: 'block text-sm font-medium mb-2',
-                    children: 'Category',
+                    children: 'Product',
                   }),
                   e.jsxs(l, {
-                    value: t,
-                    onValueChange: c,
+                    value: o,
+                    onValueChange: r,
                     children: [
                       e.jsx(m, {
-                        id: 'category',
+                        id: 'product',
                         className: 'w-full',
-                        children: e.jsx(u, { placeholder: 'Choose category' }),
+                        showCount: !0,
+                        itemCount: (g = x[t]) == null ? void 0 : g.items.length,
+                        children: e.jsx(u, { placeholder: 'Choose product' }),
                       }),
                       e.jsx(h, {
-                        children: Object.entries(x).map(([a, V]) =>
-                          e.jsx(s, { value: a, children: V.label }, a)
-                        ),
+                        searchable: !0,
+                        searchPlaceholder: 'Search products...',
+                        children:
+                          (S = x[t]) == null
+                            ? void 0
+                            : S.items.map((a) =>
+                                e.jsx(s, { value: a.toLowerCase(), children: a }, a)
+                              ),
                       }),
                     ],
                   }),
                 ],
               }),
-              t &&
-                e.jsxs('div', {
-                  children: [
-                    e.jsx('label', {
-                      htmlFor: 'product',
-                      className: 'block text-sm font-medium mb-2',
-                      children: 'Product',
-                    }),
-                    e.jsxs(l, {
-                      value: o,
-                      onValueChange: r,
-                      children: [
-                        e.jsx(m, {
-                          id: 'product',
-                          className: 'w-full',
-                          showCount: !0,
-                          itemCount: (g = x[t]) == null ? void 0 : g.items.length,
-                          children: e.jsx(u, { placeholder: 'Choose product' }),
-                        }),
-                        e.jsx(h, {
-                          searchable: !0,
-                          searchPlaceholder: 'Search products...',
-                          children:
-                            (S = x[t]) == null
-                              ? void 0
-                              : S.items.map((a) =>
-                                  e.jsx(s, { value: a.toLowerCase(), children: a }, a)
-                                ),
-                        }),
-                      ],
-                    }),
-                  ],
-                }),
-            ],
-          }),
-        ],
-      });
-    },
+          ],
+        }),
+      ],
+    });
   },
-  d = {
-    render: () => {
-      const [t, c] = p.useState('');
-      return e.jsxs('div', {
-        className: 'space-y-6 p-6 max-w-md',
-        children: [
-          e.jsxs('div', {
+};
+const d = {
+  render: () => {
+    const [t, c] = p.useState('');
+    return e.jsxs('div', {
+      className: 'space-y-6 p-6 max-w-md',
+      children: [
+        e.jsxs('div', {
+          children: [
+            e.jsx('h3', {
+              className: 'text-lg font-semibold mb-4',
+              children: 'Enhanced Item Context',
+            }),
+            e.jsx('p', {
+              className: 'text-sm text-gray-600 mb-6',
+              children: 'Descriptions and shortcuts provide additional context for complex choices',
+            }),
+          ],
+        }),
+        e.jsx('div', {
+          className: 'space-y-4',
+          children: e.jsxs('div', {
             children: [
-              e.jsx('h3', {
-                className: 'text-lg font-semibold mb-4',
-                children: 'Enhanced Item Context',
+              e.jsx('label', {
+                htmlFor: 'action',
+                className: 'block text-sm font-medium mb-2',
+                children: 'Choose Action',
+              }),
+              e.jsxs(l, {
+                value: t,
+                onValueChange: c,
+                children: [
+                  e.jsx(m, {
+                    id: 'action',
+                    size: 'large',
+                    className: 'w-full',
+                    children: e.jsx(u, { placeholder: 'Select an action' }),
+                  }),
+                  e.jsxs(h, {
+                    children: [
+                      e.jsxs(v, {
+                        children: [
+                          e.jsx(b, { children: 'File Operations' }),
+                          e.jsx(s, {
+                            value: 'save',
+                            description: 'Save current document to disk',
+                            shortcut: '⌘S',
+                            children: 'Save File',
+                          }),
+                          e.jsx(s, {
+                            value: 'open',
+                            description: 'Open existing document',
+                            shortcut: '⌘O',
+                            children: 'Open File',
+                          }),
+                          e.jsx(s, {
+                            value: 'export',
+                            description: 'Export in various formats',
+                            shortcut: '⌘E',
+                            children: 'Export',
+                          }),
+                        ],
+                      }),
+                      e.jsx(E, {}),
+                      e.jsxs(v, {
+                        children: [
+                          e.jsx(b, { children: 'Edit Operations' }),
+                          e.jsx(s, {
+                            value: 'copy',
+                            description: 'Copy selection to clipboard',
+                            shortcut: '⌘C',
+                            children: 'Copy',
+                          }),
+                          e.jsx(s, {
+                            value: 'paste',
+                            description: 'Paste from clipboard',
+                            shortcut: '⌘V',
+                            children: 'Paste',
+                          }),
+                        ],
+                      }),
+                    ],
+                  }),
+                ],
               }),
               e.jsx('p', {
-                className: 'text-sm text-gray-600 mb-6',
+                className: 'text-xs text-gray-500 mt-1',
                 children:
-                  'Descriptions and shortcuts provide additional context for complex choices',
+                  'Enhanced touch targets and contextual information for better decision making',
               }),
             ],
           }),
-          e.jsx('div', {
-            className: 'space-y-4',
-            children: e.jsxs('div', {
-              children: [
-                e.jsx('label', {
-                  htmlFor: 'action',
-                  className: 'block text-sm font-medium mb-2',
-                  children: 'Choose Action',
-                }),
-                e.jsxs(l, {
-                  value: t,
-                  onValueChange: c,
-                  children: [
-                    e.jsx(m, {
-                      id: 'action',
-                      size: 'large',
-                      className: 'w-full',
-                      children: e.jsx(u, { placeholder: 'Select an action' }),
-                    }),
-                    e.jsxs(h, {
-                      children: [
-                        e.jsxs(v, {
-                          children: [
-                            e.jsx(b, { children: 'File Operations' }),
-                            e.jsx(s, {
-                              value: 'save',
-                              description: 'Save current document to disk',
-                              shortcut: '⌘S',
-                              children: 'Save File',
-                            }),
-                            e.jsx(s, {
-                              value: 'open',
-                              description: 'Open existing document',
-                              shortcut: '⌘O',
-                              children: 'Open File',
-                            }),
-                            e.jsx(s, {
-                              value: 'export',
-                              description: 'Export in various formats',
-                              shortcut: '⌘E',
-                              children: 'Export',
-                            }),
-                          ],
-                        }),
-                        e.jsx(E, {}),
-                        e.jsxs(v, {
-                          children: [
-                            e.jsx(b, { children: 'Edit Operations' }),
-                            e.jsx(s, {
-                              value: 'copy',
-                              description: 'Copy selection to clipboard',
-                              shortcut: '⌘C',
-                              children: 'Copy',
-                            }),
-                            e.jsx(s, {
-                              value: 'paste',
-                              description: 'Paste from clipboard',
-                              shortcut: '⌘V',
-                              children: 'Paste',
-                            }),
-                          ],
-                        }),
-                      ],
-                    }),
-                  ],
-                }),
-                e.jsx('p', {
-                  className: 'text-xs text-gray-500 mt-1',
-                  children:
-                    'Enhanced touch targets and contextual information for better decision making',
-                }),
-              ],
-            }),
-          }),
-        ],
-      });
-    },
-  };
-var y, C, j;
+        }),
+      ],
+    });
+  },
+};
+let y;
+let C;
+let j;
 i.parameters = {
   ...i.parameters,
   docs: {
@@ -337,7 +337,9 @@ i.parameters = {
     },
   },
 };
-var f, N, w;
+let f;
+let N;
+let w;
 n.parameters = {
   ...n.parameters,
   docs: {
@@ -409,7 +411,9 @@ n.parameters = {
     },
   },
 };
-var I, k, F;
+let I;
+let k;
+let F;
 d.parameters = {
   ...d.parameters,
   docs: {

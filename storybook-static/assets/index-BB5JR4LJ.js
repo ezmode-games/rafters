@@ -9,21 +9,21 @@ function U(e, o, { checkForDefaultPrevented: c = !0 } = {}) {
 function A(e, o = []) {
   let c = [];
   function m(r, n) {
-    const t = l.createContext(n),
-      C = c.length;
+    const t = l.createContext(n);
+    const C = c.length;
     c = [...c, n];
     const p = (i) => {
-      var x;
-      const { scope: f, children: v, ...I } = i,
-        a = ((x = f == null ? void 0 : f[e]) == null ? void 0 : x[C]) || t,
-        d = l.useMemo(() => I, Object.values(I));
+      let x;
+      const { scope: f, children: v, ...I } = i;
+      const a = ((x = f == null ? void 0 : f[e]) == null ? void 0 : x[C]) || t;
+      const d = l.useMemo(() => I, Object.values(I));
       return h.jsx(a.Provider, { value: d, children: v });
     };
-    p.displayName = r + 'Provider';
+    p.displayName = `${r}Provider`;
     function u(i, f) {
-      var a;
-      const v = ((a = f == null ? void 0 : f[e]) == null ? void 0 : a[C]) || t,
-        I = l.useContext(v);
+      let a;
+      const v = ((a = f == null ? void 0 : f[e]) == null ? void 0 : a[C]) || t;
+      const I = l.useContext(v);
       if (I) return I;
       if (n !== void 0) return n;
       throw new Error(`\`${i}\` must be used within \`${r}\``);
@@ -55,41 +55,41 @@ function T(...e) {
   return (c.scopeName = o.scopeName), c;
 }
 function q(e) {
-  const o = e + 'CollectionProvider',
-    [c, m] = A(o),
-    [s, r] = c(o, { collectionRef: { current: null }, itemMap: new Map() }),
-    n = (a) => {
-      const { scope: d, children: x } = a,
-        S = P.useRef(null),
-        R = P.useRef(new Map()).current;
-      return h.jsx(s, { scope: d, itemMap: R, collectionRef: S, children: x });
-    };
+  const o = `${e}CollectionProvider`;
+  const [c, m] = A(o);
+  const [s, r] = c(o, { collectionRef: { current: null }, itemMap: new Map() });
+  const n = (a) => {
+    const { scope: d, children: x } = a;
+    const S = P.useRef(null);
+    const R = P.useRef(new Map()).current;
+    return h.jsx(s, { scope: d, itemMap: R, collectionRef: S, children: x });
+  };
   n.displayName = o;
-  const t = e + 'CollectionSlot',
-    C = b(t),
-    p = P.forwardRef((a, d) => {
-      const { scope: x, children: S } = a,
-        R = r(t, x),
-        M = E(d, R.collectionRef);
-      return h.jsx(C, { ref: M, children: S });
-    });
+  const t = `${e}CollectionSlot`;
+  const C = b(t);
+  const p = P.forwardRef((a, d) => {
+    const { scope: x, children: S } = a;
+    const R = r(t, x);
+    const M = E(d, R.collectionRef);
+    return h.jsx(C, { ref: M, children: S });
+  });
   p.displayName = t;
-  const u = e + 'CollectionItemSlot',
-    i = 'data-radix-collection-item',
-    f = b(u),
-    v = P.forwardRef((a, d) => {
-      const { scope: x, children: S, ...R } = a,
-        M = P.useRef(null),
-        w = E(d, M),
-        _ = r(u, x);
-      return (
-        P.useEffect(() => (_.itemMap.set(M, { ref: M, ...R }), () => void _.itemMap.delete(M))),
-        h.jsx(f, { [i]: '', ref: w, children: S })
-      );
-    });
+  const u = `${e}CollectionItemSlot`;
+  const i = 'data-radix-collection-item';
+  const f = b(u);
+  const v = P.forwardRef((a, d) => {
+    const { scope: x, children: S, ...R } = a;
+    const M = P.useRef(null);
+    const w = E(d, M);
+    const _ = r(u, x);
+    return (
+      P.useEffect(() => (_.itemMap.set(M, { ref: M, ...R }), () => void _.itemMap.delete(M))),
+      h.jsx(f, { [i]: '', ref: w, children: S })
+    );
+  });
   v.displayName = u;
   function I(a) {
-    const d = r(e + 'CollectionConsumer', a);
+    const d = r(`${e}CollectionConsumer`, a);
     return P.useCallback(() => {
       const S = d.collectionRef.current;
       if (!S) return [];
@@ -101,17 +101,17 @@ function q(e) {
   }
   return [{ Provider: n, Slot: p, ItemSlot: v }, I, m];
 }
-var $ = l.createContext(void 0);
+const $ = l.createContext(void 0);
 function B(e) {
   const o = l.useContext($);
   return e || o || 'ltr';
 }
-var O = globalThis != null && globalThis.document ? l.useLayoutEffect : () => {},
-  j = N[' useInsertionEffect '.trim().toString()] || O;
+const O = globalThis?.document ? l.useLayoutEffect : () => {};
+const j = N[' useInsertionEffect '.trim().toString()] || O;
 function F({ prop: e, defaultProp: o, onChange: c = () => {}, caller: m }) {
-  const [s, r, n] = D({ defaultProp: o, onChange: c }),
-    t = e !== void 0,
-    C = t ? e : s;
+  const [s, r, n] = D({ defaultProp: o, onChange: c });
+  const t = e !== void 0;
+  const C = t ? e : s;
   {
     const u = l.useRef(e !== void 0);
     l.useEffect(() => {
@@ -125,7 +125,7 @@ function F({ prop: e, defaultProp: o, onChange: c = () => {}, caller: m }) {
   }
   const p = l.useCallback(
     (u) => {
-      var i;
+      let i;
       if (t) {
         const f = L(u) ? u(e) : u;
         f !== e && ((i = n.current) == null || i.call(n, f));
@@ -136,21 +136,21 @@ function F({ prop: e, defaultProp: o, onChange: c = () => {}, caller: m }) {
   return [C, p];
 }
 function D({ defaultProp: e, onChange: o }) {
-  const [c, m] = l.useState(e),
-    s = l.useRef(c),
-    r = l.useRef(o);
+  const [c, m] = l.useState(e);
+  const s = l.useRef(c);
+  const r = l.useRef(o);
   return (
     j(() => {
       r.current = o;
     }, [o]),
     l.useEffect(() => {
-      var n;
+      let n;
       s.current !== c && ((n = r.current) == null || n.call(r, c), (s.current = c));
     }, [c, s]),
     [c, m, r]
   );
 }
 function L(e) {
-  return typeof e == 'function';
+  return typeof e === 'function';
 }
 export { q as a, U as b, A as c, B as d, O as e, F as u };

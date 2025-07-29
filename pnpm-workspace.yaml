@@ -1,0 +1,47 @@
+packages:
+  - apps/*
+  - packages/*
+
+onlyBuiltDependencies:
+  - esbuild
+  - workerd
+
+catalog:
+  # Build Tools - Latest versions
+  typescript: ^5.7.3
+  vite: ^7.0.6
+  "@vitejs/plugin-react": ^4.7.0
+  
+  # Testing - Latest versions
+  vitest: ^3.2.4
+  "@vitest/coverage-v8": ^3.2.4
+  "@vitest/browser": ^3.2.4
+  
+  # React Ecosystem - Latest versions
+  react: ^19.1.1
+  react-dom: ^19.1.1
+  "@types/react": ^19.1.9
+  "@types/react-dom": ^19.1.7
+  
+  # Styling - Latest versions
+  tailwindcss: ^4.1.11
+  "@tailwindcss/vite": ^4.1.11
+  clsx: ^2.1.1
+  tailwind-merge: ^3.3.1
+  
+  # Utilities - Keep Zod v3 for stability (v4 is major breaking change)
+  zod: ^3.25.76
+  fs-extra: ^11.2.0
+  "@types/fs-extra": ^11.0.4
+  
+  # Node Types - Stay on LTS Node 20 types for now
+  "@types/node": ^20.19.1
+  
+  # Testing Libraries
+  "@testing-library/jest-dom": ^6.6.4
+  "@testing-library/react": ^16.3.0
+  "@testing-library/user-event": ^14.6.1
+  jsdom: ^26.1.0
+  
+  # Code Quality - Keep Biome v1 for stability (v2 is major change)
+  "@biomejs/biome": ^1.9.4

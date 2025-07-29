@@ -1,7 +1,7 @@
 import { r as i } from './iframe-Cy2I62ob.js';
 import { j as p } from './jsx-runtime-BjG_zV1W.js';
 function d(e, t) {
-  if (typeof e == 'function') return e(t);
+  if (typeof e === 'function') return e(t);
   e != null && (e.current = t);
 }
 function m(...e) {
@@ -9,13 +9,13 @@ function m(...e) {
     let o = !1;
     const r = e.map((n) => {
       const l = d(n, t);
-      return !o && typeof l == 'function' && (o = !0), l;
+      return !o && typeof l === 'function' && (o = !0), l;
     });
     if (o)
       return () => {
         for (let n = 0; n < r.length; n++) {
           const l = r[n];
-          typeof l == 'function' ? l() : d(e[n], null);
+          typeof l === 'function' ? l() : d(e[n], null);
         }
       };
   };
@@ -24,50 +24,50 @@ function j(...e) {
   return i.useCallback(m(...e), e);
 }
 function C(e) {
-  const t = E(e),
-    o = i.forwardRef((r, n) => {
-      const { children: l, ...c } = r,
-        s = i.Children.toArray(l),
-        u = s.find(g);
-      if (u) {
-        const a = u.props.children,
-          y = s.map((f) =>
-            f === u
-              ? i.Children.count(a) > 1
-                ? i.Children.only(null)
-                : i.isValidElement(a)
-                  ? a.props.children
-                  : null
-              : f
-          );
-        return p.jsx(t, {
-          ...c,
-          ref: n,
-          children: i.isValidElement(a) ? i.cloneElement(a, void 0, y) : null,
-        });
-      }
-      return p.jsx(t, { ...c, ref: n, children: l });
-    });
+  const t = E(e);
+  const o = i.forwardRef((r, n) => {
+    const { children: l, ...c } = r;
+    const s = i.Children.toArray(l);
+    const u = s.find(g);
+    if (u) {
+      const a = u.props.children;
+      const y = s.map((f) =>
+        f === u
+          ? i.Children.count(a) > 1
+            ? i.Children.only(null)
+            : i.isValidElement(a)
+              ? a.props.children
+              : null
+          : f
+      );
+      return p.jsx(t, {
+        ...c,
+        ref: n,
+        children: i.isValidElement(a) ? i.cloneElement(a, void 0, y) : null,
+      });
+    }
+    return p.jsx(t, { ...c, ref: n, children: l });
+  });
   return (o.displayName = `${e}.Slot`), o;
 }
-var V = C('Slot');
+const V = C('Slot');
 function E(e) {
   const t = i.forwardRef((o, r) => {
     const { children: n, ...l } = o;
     if (i.isValidElement(n)) {
-      const c = h(n),
-        s = R(l, n.props);
+      const c = h(n);
+      const s = R(l, n.props);
       return n.type !== i.Fragment && (s.ref = r ? m(r, c) : c), i.cloneElement(n, s);
     }
     return i.Children.count(n) > 1 ? i.Children.only(null) : null;
   });
   return (t.displayName = `${e}.SlotClone`), t;
 }
-var S = Symbol('radix.slottable');
+const S = Symbol('radix.slottable');
 function g(e) {
   return (
     i.isValidElement(e) &&
-    typeof e.type == 'function' &&
+    typeof e.type === 'function' &&
     '__radixId' in e.type &&
     e.type.__radixId === S
   );
@@ -75,8 +75,8 @@ function g(e) {
 function R(e, t) {
   const o = { ...t };
   for (const r in t) {
-    const n = e[r],
-      l = t[r];
+    const n = e[r];
+    const l = t[r];
     /^on[A-Z]/.test(r)
       ? n && l
         ? (o[r] = (...s) => {
@@ -91,9 +91,10 @@ function R(e, t) {
   return { ...e, ...o };
 }
 function h(e) {
-  var r, n;
-  let t = (r = Object.getOwnPropertyDescriptor(e.props, 'ref')) == null ? void 0 : r.get,
-    o = t && 'isReactWarning' in t && t.isReactWarning;
+  let r;
+  let n;
+  let t = (r = Object.getOwnPropertyDescriptor(e.props, 'ref')) == null ? void 0 : r.get;
+  let o = t && 'isReactWarning' in t && t.isReactWarning;
   return o
     ? e.ref
     : ((t = (n = Object.getOwnPropertyDescriptor(e, 'ref')) == null ? void 0 : n.get),

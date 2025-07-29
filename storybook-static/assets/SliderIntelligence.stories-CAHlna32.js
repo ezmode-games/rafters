@@ -8,279 +8,281 @@ import './index-DoQPmrLJ.js';
 import './index-Cox8WoOv.js';
 import './utils-DuMXYCiK.js';
 const T = {
-    title: '03 Components/Forms/Slider/Intelligence',
-    component: a,
-    parameters: { layout: 'centered' },
-    tags: ['autodocs'],
+  title: '03 Components/Forms/Slider/Intelligence',
+  component: a,
+  parameters: { layout: 'centered' },
+  tags: ['autodocs'],
+};
+const r = {
+  render: () => {
+    const [s, l] = t.useState([75]);
+    const [n, i] = t.useState([50]);
+    return e.jsxs('div', {
+      className: 'space-y-8 p-6 max-w-lg',
+      children: [
+        e.jsxs('div', {
+          children: [
+            e.jsx('h3', {
+              className: 'text-lg font-semibold mb-4',
+              children: 'Enhanced Touch Targets',
+            }),
+            e.jsx('p', {
+              className: 'text-sm text-gray-600 mb-6',
+              children:
+                'Larger thumb and track sizes improve manipulation for users with motor challenges',
+            }),
+          ],
+        }),
+        e.jsxs('div', {
+          className: 'space-y-6',
+          children: [
+            e.jsxs('div', {
+              children: [
+                e.jsx('label', {
+                  className: 'block text-sm font-medium mb-3',
+                  children: 'Volume Control (Standard)',
+                }),
+                e.jsx(a, {
+                  value: s,
+                  onValueChange: l,
+                  max: 100,
+                  step: 5,
+                  showValue: !0,
+                  unit: '%',
+                  className: 'w-full',
+                }),
+                e.jsx('p', {
+                  className: 'text-xs text-gray-500 mt-2',
+                  children: 'Standard size with value display for precision',
+                }),
+              ],
+            }),
+            e.jsxs('div', {
+              children: [
+                e.jsx('label', {
+                  className: 'block text-sm font-medium mb-3',
+                  children: 'Brightness Control (Enhanced)',
+                }),
+                e.jsx(a, {
+                  value: n,
+                  onValueChange: i,
+                  max: 100,
+                  step: 10,
+                  thumbSize: 'large',
+                  trackSize: 'large',
+                  showValue: !0,
+                  unit: '%',
+                  className: 'w-full',
+                }),
+                e.jsx('p', {
+                  className: 'text-xs text-gray-500 mt-2',
+                  children: 'Larger thumb and track for easier manipulation',
+                }),
+              ],
+            }),
+          ],
+        }),
+      ],
+    });
   },
-  r = {
-    render: () => {
-      const [s, l] = t.useState([75]),
-        [n, i] = t.useState([50]);
-      return e.jsxs('div', {
-        className: 'space-y-8 p-6 max-w-lg',
-        children: [
-          e.jsxs('div', {
-            children: [
-              e.jsx('h3', {
-                className: 'text-lg font-semibold mb-4',
-                children: 'Enhanced Touch Targets',
-              }),
-              e.jsx('p', {
-                className: 'text-sm text-gray-600 mb-6',
-                children:
-                  'Larger thumb and track sizes improve manipulation for users with motor challenges',
-              }),
-            ],
-          }),
-          e.jsxs('div', {
-            className: 'space-y-6',
-            children: [
-              e.jsxs('div', {
-                children: [
-                  e.jsx('label', {
-                    className: 'block text-sm font-medium mb-3',
-                    children: 'Volume Control (Standard)',
-                  }),
-                  e.jsx(a, {
-                    value: s,
-                    onValueChange: l,
-                    max: 100,
-                    step: 5,
-                    showValue: !0,
-                    unit: '%',
-                    className: 'w-full',
-                  }),
-                  e.jsx('p', {
-                    className: 'text-xs text-gray-500 mt-2',
-                    children: 'Standard size with value display for precision',
-                  }),
-                ],
-              }),
-              e.jsxs('div', {
-                children: [
-                  e.jsx('label', {
-                    className: 'block text-sm font-medium mb-3',
-                    children: 'Brightness Control (Enhanced)',
-                  }),
-                  e.jsx(a, {
-                    value: n,
-                    onValueChange: i,
-                    max: 100,
-                    step: 10,
-                    thumbSize: 'large',
-                    trackSize: 'large',
-                    showValue: !0,
-                    unit: '%',
-                    className: 'w-full',
-                  }),
-                  e.jsx('p', {
-                    className: 'text-xs text-gray-500 mt-2',
-                    children: 'Larger thumb and track for easier manipulation',
-                  }),
-                ],
-              }),
-            ],
-          }),
-        ],
-      });
-    },
+};
+const m = {
+  render: () => {
+    const [s, l] = t.useState([72]);
+    const [n, i] = t.useState([0.8]);
+    return e.jsxs('div', {
+      className: 'space-y-8 p-6 max-w-lg',
+      children: [
+        e.jsxs('div', {
+          children: [
+            e.jsx('h3', {
+              className: 'text-lg font-semibold mb-4',
+              children: 'Precision and Context',
+            }),
+            e.jsx('p', {
+              className: 'text-sm text-gray-600 mb-6',
+              children:
+                'Value labels and step indicators help users understand and control precise values',
+            }),
+          ],
+        }),
+        e.jsxs('div', {
+          className: 'space-y-6',
+          children: [
+            e.jsxs('div', {
+              children: [
+                e.jsx('label', {
+                  className: 'block text-sm font-medium mb-3',
+                  children: 'Temperature Setting',
+                }),
+                e.jsx(a, {
+                  value: s,
+                  onValueChange: l,
+                  min: 60,
+                  max: 85,
+                  step: 1,
+                  showValue: !0,
+                  showSteps: !0,
+                  unit: '°F',
+                  thumbSize: 'large',
+                  trackSize: 'large',
+                  className: 'w-full',
+                }),
+                e.jsx('p', {
+                  className: 'text-xs text-gray-500 mt-2',
+                  children: 'Step indicators show available values clearly',
+                }),
+              ],
+            }),
+            e.jsxs('div', {
+              children: [
+                e.jsx('label', {
+                  className: 'block text-sm font-medium mb-3',
+                  children: 'Opacity Level',
+                }),
+                e.jsx(a, {
+                  value: n,
+                  onValueChange: i,
+                  min: 0,
+                  max: 1,
+                  step: 0.1,
+                  showValue: !0,
+                  unit: '',
+                  thumbSize: 'large',
+                  className: 'w-full',
+                }),
+                e.jsx('p', {
+                  className: 'text-xs text-gray-500 mt-2',
+                  children: 'Decimal precision with clear value feedback',
+                }),
+              ],
+            }),
+          ],
+        }),
+      ],
+    });
   },
-  m = {
-    render: () => {
-      const [s, l] = t.useState([72]),
-        [n, i] = t.useState([0.8]);
-      return e.jsxs('div', {
-        className: 'space-y-8 p-6 max-w-lg',
-        children: [
-          e.jsxs('div', {
-            children: [
-              e.jsx('h3', {
-                className: 'text-lg font-semibold mb-4',
-                children: 'Precision and Context',
-              }),
-              e.jsx('p', {
-                className: 'text-sm text-gray-600 mb-6',
-                children:
-                  'Value labels and step indicators help users understand and control precise values',
-              }),
-            ],
-          }),
-          e.jsxs('div', {
-            className: 'space-y-6',
-            children: [
-              e.jsxs('div', {
-                children: [
-                  e.jsx('label', {
-                    className: 'block text-sm font-medium mb-3',
-                    children: 'Temperature Setting',
-                  }),
-                  e.jsx(a, {
-                    value: s,
-                    onValueChange: l,
-                    min: 60,
-                    max: 85,
-                    step: 1,
-                    showValue: !0,
-                    showSteps: !0,
-                    unit: '°F',
-                    thumbSize: 'large',
-                    trackSize: 'large',
-                    className: 'w-full',
-                  }),
-                  e.jsx('p', {
-                    className: 'text-xs text-gray-500 mt-2',
-                    children: 'Step indicators show available values clearly',
-                  }),
-                ],
-              }),
-              e.jsxs('div', {
-                children: [
-                  e.jsx('label', {
-                    className: 'block text-sm font-medium mb-3',
-                    children: 'Opacity Level',
-                  }),
-                  e.jsx(a, {
-                    value: n,
-                    onValueChange: i,
-                    min: 0,
-                    max: 1,
-                    step: 0.1,
-                    showValue: !0,
-                    unit: '',
-                    thumbSize: 'large',
-                    className: 'w-full',
-                  }),
-                  e.jsx('p', {
-                    className: 'text-xs text-gray-500 mt-2',
-                    children: 'Decimal precision with clear value feedback',
-                  }),
-                ],
-              }),
-            ],
-          }),
-        ],
-      });
-    },
+};
+const c = {
+  render: () => {
+    const [s, l] = t.useState([2500]);
+    const [n, i] = t.useState([30]);
+    const [o, j] = t.useState([3]);
+    const u = ['Low', 'Medium', 'High', 'Premium', 'Ultra'];
+    return e.jsxs('div', {
+      className: 'space-y-8 p-6 max-w-lg',
+      children: [
+        e.jsxs('div', {
+          children: [
+            e.jsx('h3', {
+              className: 'text-lg font-semibold mb-4',
+              children: 'Context-Rich Controls',
+            }),
+            e.jsx('p', {
+              className: 'text-sm text-gray-600 mb-6',
+              children:
+                'Clear labels, units, and ranges reduce cognitive load for complex settings',
+            }),
+          ],
+        }),
+        e.jsxs('div', {
+          className: 'space-y-6',
+          children: [
+            e.jsxs('div', {
+              children: [
+                e.jsx('label', {
+                  className: 'block text-sm font-medium mb-3',
+                  children: 'Project Budget',
+                }),
+                e.jsx(a, {
+                  value: s,
+                  onValueChange: l,
+                  min: 1e3,
+                  max: 1e4,
+                  step: 250,
+                  showValue: !0,
+                  unit: '$',
+                  thumbSize: 'large',
+                  trackSize: 'large',
+                  className: 'w-full',
+                }),
+                e.jsxs('div', {
+                  className: 'flex justify-between text-xs text-gray-500 mt-1',
+                  children: [
+                    e.jsx('span', { children: 'Minimum: $1,000' }),
+                    e.jsx('span', { children: 'Maximum: $10,000' }),
+                  ],
+                }),
+              ],
+            }),
+            e.jsxs('div', {
+              children: [
+                e.jsx('label', {
+                  className: 'block text-sm font-medium mb-3',
+                  children: 'Project Duration',
+                }),
+                e.jsx(a, {
+                  value: n,
+                  onValueChange: i,
+                  min: 7,
+                  max: 90,
+                  step: 7,
+                  showValue: !0,
+                  unit: ' days',
+                  thumbSize: 'large',
+                  className: 'w-full',
+                }),
+                e.jsxs('div', {
+                  className: 'flex justify-between text-xs text-gray-500 mt-1',
+                  children: [
+                    e.jsx('span', { children: '1 week' }),
+                    e.jsx('span', { children: '~3 months' }),
+                  ],
+                }),
+              ],
+            }),
+            e.jsxs('div', {
+              children: [
+                e.jsx('label', {
+                  className: 'block text-sm font-medium mb-3',
+                  children: 'Quality Level',
+                }),
+                e.jsx(a, {
+                  value: o,
+                  onValueChange: j,
+                  min: 0,
+                  max: 4,
+                  step: 1,
+                  showValue: !1,
+                  thumbSize: 'large',
+                  trackSize: 'large',
+                  className: 'w-full',
+                }),
+                e.jsx('div', {
+                  className: 'flex justify-between text-xs text-gray-500 mt-2',
+                  children: u.map((d, S) =>
+                    e.jsx(
+                      'span',
+                      { className: o[0] === S ? 'font-medium text-gray-900' : '', children: d },
+                      d
+                    )
+                  ),
+                }),
+                e.jsxs('p', {
+                  className: 'text-xs text-gray-500 mt-2',
+                  children: ['Current: ', u[o[0]]],
+                }),
+              ],
+            }),
+          ],
+        }),
+      ],
+    });
   },
-  c = {
-    render: () => {
-      const [s, l] = t.useState([2500]),
-        [n, i] = t.useState([30]),
-        [o, j] = t.useState([3]),
-        u = ['Low', 'Medium', 'High', 'Premium', 'Ultra'];
-      return e.jsxs('div', {
-        className: 'space-y-8 p-6 max-w-lg',
-        children: [
-          e.jsxs('div', {
-            children: [
-              e.jsx('h3', {
-                className: 'text-lg font-semibold mb-4',
-                children: 'Context-Rich Controls',
-              }),
-              e.jsx('p', {
-                className: 'text-sm text-gray-600 mb-6',
-                children:
-                  'Clear labels, units, and ranges reduce cognitive load for complex settings',
-              }),
-            ],
-          }),
-          e.jsxs('div', {
-            className: 'space-y-6',
-            children: [
-              e.jsxs('div', {
-                children: [
-                  e.jsx('label', {
-                    className: 'block text-sm font-medium mb-3',
-                    children: 'Project Budget',
-                  }),
-                  e.jsx(a, {
-                    value: s,
-                    onValueChange: l,
-                    min: 1e3,
-                    max: 1e4,
-                    step: 250,
-                    showValue: !0,
-                    unit: '$',
-                    thumbSize: 'large',
-                    trackSize: 'large',
-                    className: 'w-full',
-                  }),
-                  e.jsxs('div', {
-                    className: 'flex justify-between text-xs text-gray-500 mt-1',
-                    children: [
-                      e.jsx('span', { children: 'Minimum: $1,000' }),
-                      e.jsx('span', { children: 'Maximum: $10,000' }),
-                    ],
-                  }),
-                ],
-              }),
-              e.jsxs('div', {
-                children: [
-                  e.jsx('label', {
-                    className: 'block text-sm font-medium mb-3',
-                    children: 'Project Duration',
-                  }),
-                  e.jsx(a, {
-                    value: n,
-                    onValueChange: i,
-                    min: 7,
-                    max: 90,
-                    step: 7,
-                    showValue: !0,
-                    unit: ' days',
-                    thumbSize: 'large',
-                    className: 'w-full',
-                  }),
-                  e.jsxs('div', {
-                    className: 'flex justify-between text-xs text-gray-500 mt-1',
-                    children: [
-                      e.jsx('span', { children: '1 week' }),
-                      e.jsx('span', { children: '~3 months' }),
-                    ],
-                  }),
-                ],
-              }),
-              e.jsxs('div', {
-                children: [
-                  e.jsx('label', {
-                    className: 'block text-sm font-medium mb-3',
-                    children: 'Quality Level',
-                  }),
-                  e.jsx(a, {
-                    value: o,
-                    onValueChange: j,
-                    min: 0,
-                    max: 4,
-                    step: 1,
-                    showValue: !1,
-                    thumbSize: 'large',
-                    trackSize: 'large',
-                    className: 'w-full',
-                  }),
-                  e.jsx('div', {
-                    className: 'flex justify-between text-xs text-gray-500 mt-2',
-                    children: u.map((d, S) =>
-                      e.jsx(
-                        'span',
-                        { className: o[0] === S ? 'font-medium text-gray-900' : '', children: d },
-                        d
-                      )
-                    ),
-                  }),
-                  e.jsxs('p', {
-                    className: 'text-xs text-gray-500 mt-2',
-                    children: ['Current: ', u[o[0]]],
-                  }),
-                ],
-              }),
-            ],
-          }),
-        ],
-      });
-    },
-  };
-var x, p, h;
+};
+let x;
+let p;
+let h;
 r.parameters = {
   ...r.parameters,
   docs: {
@@ -326,7 +328,9 @@ r.parameters = {
     },
   },
 };
-var b, g, v;
+let b;
+let g;
+let v;
 m.parameters = {
   ...m.parameters,
   docs: {
@@ -372,7 +376,9 @@ m.parameters = {
     },
   },
 };
-var y, N, f;
+let y;
+let N;
+let f;
 c.parameters = {
   ...c.parameters,
   docs: {

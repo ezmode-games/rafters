@@ -131,7 +131,9 @@ export const ValidationStates: Story = {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="default-state" className="text-sm font-medium">Default State</label>
+            <label htmlFor="default-state" className="text-sm font-medium">
+              Default State
+            </label>
             <Input
               id="default-state"
               type="text"
@@ -144,7 +146,9 @@ export const ValidationStates: Story = {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="error-state" className="text-sm font-medium">Error State</label>
+            <label htmlFor="error-state" className="text-sm font-medium">
+              Error State
+            </label>
             <Input
               id="error-state"
               type="email"
@@ -161,7 +165,9 @@ export const ValidationStates: Story = {
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="success-state" className="text-sm font-medium">Success State</label>
+            <label htmlFor="success-state" className="text-sm font-medium">
+              Success State
+            </label>
             <Input
               id="success-state"
               type="email"
@@ -176,7 +182,9 @@ export const ValidationStates: Story = {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="warning-state" className="text-sm font-medium">Warning State</label>
+            <label htmlFor="warning-state" className="text-sm font-medium">
+              Warning State
+            </label>
             <Input
               id="warning-state"
               type="password"
@@ -343,32 +351,31 @@ export const InputTypes: Story = {
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Specialized Input Types</h3>
         <p className="text-sm text-muted-foreground">
-          Different input types provide appropriate keyboards and validation for specific data formats
+          Different input types provide appropriate keyboards and validation for specific data
+          formats
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="text-input" className="text-sm font-medium">Text</label>
-            <Input
-              id="text-input"
-              type="text"
-              placeholder="Any text content"
-            />
+            <label htmlFor="text-input" className="text-sm font-medium">
+              Text
+            </label>
+            <Input id="text-input" type="text" placeholder="Any text content" />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="email-input" className="text-sm font-medium">Email</label>
-            <Input
-              id="email-input"
-              type="email"
-              placeholder="user@example.com"
-            />
+            <label htmlFor="email-input" className="text-sm font-medium">
+              Email
+            </label>
+            <Input id="email-input" type="email" placeholder="user@example.com" />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="password-input" className="text-sm font-medium">Password</label>
+            <label htmlFor="password-input" className="text-sm font-medium">
+              Password
+            </label>
             <Input
               id="password-input"
               type="password"
@@ -378,51 +385,40 @@ export const InputTypes: Story = {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="search-input" className="text-sm font-medium">Search</label>
-            <Input
-              id="search-input"
-              type="search"
-              placeholder="Search for anything..."
-            />
+            <label htmlFor="search-input" className="text-sm font-medium">
+              Search
+            </label>
+            <Input id="search-input" type="search" placeholder="Search for anything..." />
           </div>
         </div>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="tel-input" className="text-sm font-medium">Telephone</label>
-            <Input
-              id="tel-input"
-              type="tel"
-              placeholder="+1 (555) 123-4567"
-            />
+            <label htmlFor="tel-input" className="text-sm font-medium">
+              Telephone
+            </label>
+            <Input id="tel-input" type="tel" placeholder="+1 (555) 123-4567" />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="url-input" className="text-sm font-medium">URL</label>
-            <Input
-              id="url-input"
-              type="url"
-              placeholder="https://example.com"
-            />
+            <label htmlFor="url-input" className="text-sm font-medium">
+              URL
+            </label>
+            <Input id="url-input" type="url" placeholder="https://example.com" />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="number-input" className="text-sm font-medium">Number</label>
-            <Input
-              id="number-input"
-              type="number"
-              placeholder="42"
-              min="0"
-              step="1"
-            />
+            <label htmlFor="number-input" className="text-sm font-medium">
+              Number
+            </label>
+            <Input id="number-input" type="number" placeholder="42" min="0" step="1" />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="date-input" className="text-sm font-medium">Date</label>
-            <Input
-              id="date-input"
-              type="date"
-            />
+            <label htmlFor="date-input" className="text-sm font-medium">
+              Date
+            </label>
+            <Input id="date-input" type="date" />
           </div>
         </div>
       </div>
@@ -463,17 +459,17 @@ export const InteractiveStates: Story = {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="empty-state" className="text-sm font-medium">Empty</label>
-            <Input
-              id="empty-state"
-              type="text"
-              placeholder="Ready for input"
-            />
+            <label htmlFor="empty-state" className="text-sm font-medium">
+              Empty
+            </label>
+            <Input id="empty-state" type="text" placeholder="Ready for input" />
             <p className="text-xs text-muted-foreground">Ready for user input</p>
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="hover-state" className="text-sm font-medium">Hover</label>
+            <label htmlFor="hover-state" className="text-sm font-medium">
+              Hover
+            </label>
             <Input
               id="hover-state"
               type="text"
@@ -486,47 +482,36 @@ export const InteractiveStates: Story = {
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="filled-state" className="text-sm font-medium">Filled</label>
-            <Input
-              id="filled-state"
-              type="text"
-              defaultValue="User content"
-            />
+            <label htmlFor="filled-state" className="text-sm font-medium">
+              Filled
+            </label>
+            <Input id="filled-state" type="text" defaultValue="User content" />
             <p className="text-xs text-muted-foreground">Contains user input</p>
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="focus-state" className="text-sm font-medium">Focus</label>
-            <Input
-              id="focus-state"
-              type="text"
-              placeholder="Click to focus"
-              autoFocus
-            />
+            <label htmlFor="focus-state" className="text-sm font-medium">
+              Focus
+            </label>
+            <Input id="focus-state" type="text" placeholder="Click to focus" autoFocus />
             <p className="text-xs text-muted-foreground">Active focus with ring</p>
           </div>
         </div>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="disabled-state" className="text-sm font-medium">Disabled</label>
-            <Input
-              id="disabled-state"
-              type="text"
-              placeholder="Cannot interact"
-              disabled
-            />
+            <label htmlFor="disabled-state" className="text-sm font-medium">
+              Disabled
+            </label>
+            <Input id="disabled-state" type="text" placeholder="Cannot interact" disabled />
             <p className="text-xs text-muted-foreground">Interaction not available</p>
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="readonly-state" className="text-sm font-medium">Read Only</label>
-            <Input
-              id="readonly-state"
-              type="text"
-              value="Read-only content"
-              readOnly
-            />
+            <label htmlFor="readonly-state" className="text-sm font-medium">
+              Read Only
+            </label>
+            <Input id="readonly-state" type="text" value="Read-only content" readOnly />
             <p className="text-xs text-muted-foreground">Display only, no editing</p>
           </div>
         </div>

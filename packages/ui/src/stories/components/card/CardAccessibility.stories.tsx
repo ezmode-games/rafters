@@ -45,8 +45,8 @@ export const SemanticStructure: Story = {
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Semantic Card Structure</h3>
         <p className="text-sm text-muted-foreground">
-          Proper heading hierarchy and semantic markup create clear content organization
-          that benefits all users, especially those using assistive technologies.
+          Proper heading hierarchy and semantic markup create clear content organization that
+          benefits all users, especially those using assistive technologies.
         </p>
       </div>
 
@@ -60,14 +60,14 @@ export const SemanticStructure: Story = {
                 <CardTitle level={2} weight="semibold">
                   Featured Article
                 </CardTitle>
-                <CardDescription prominence="enhanced">
+                <CardDescription prominence="default">
                   Primary content with highest semantic importance and visual prominence
                 </CardDescription>
               </CardHeader>
               <CardContent density="comfortable">
                 <p className="text-sm text-muted-foreground">
-                  This card uses an H2 heading to establish it as a main section of content.
-                  The visual prominence matches its semantic importance.
+                  This card uses an H2 heading to establish it as a main section of content. The
+                  visual prominence matches its semantic importance.
                 </p>
               </CardContent>
               <CardFooter justify="between">
@@ -127,7 +127,7 @@ export const SemanticStructure: Story = {
 
         <div>
           <h4 className="text-base font-medium mb-4">ARIA Landmarks and Relationships</h4>
-          <Card role="article" aria-labelledby="main-content-title">
+          <article aria-labelledby="main-content-title">
             <CardHeader>
               <CardTitle level={4} weight="medium" id="main-content-title">
                 Content with ARIA Enhancement
@@ -139,8 +139,8 @@ export const SemanticStructure: Story = {
             <CardContent>
               <div id="content-description" className="space-y-3 text-sm">
                 <p>
-                  This card uses <code>role="article"</code> to establish its purpose
-                  and <code>aria-labelledby</code> to connect the title with the container.
+                  This card uses <code>role="article"</code> to establish its purpose and{' '}
+                  <code>aria-labelledby</code> to connect the title with the container.
                 </p>
                 <div className="bg-muted/50 p-3 rounded-md">
                   <div className="font-medium text-xs mb-1">Screen Reader Announcement:</div>
@@ -150,7 +150,7 @@ export const SemanticStructure: Story = {
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </article>
         </div>
       </section>
     </div>
@@ -178,8 +178,8 @@ export const KeyboardNavigation: Story = {
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Keyboard Navigation</h3>
         <p className="text-sm text-muted-foreground">
-          Use Tab to navigate between interactive elements. Interactive cards become
-          focusable and show clear focus indicators.
+          Use Tab to navigate between interactive elements. Interactive cards become focusable and
+          show clear focus indicators.
         </p>
       </div>
 
@@ -187,9 +187,9 @@ export const KeyboardNavigation: Story = {
         <div>
           <h4 className="text-base font-medium mb-4">Interactive Card Focus</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card 
-              interactive 
-              prominence="default" 
+            <Card
+              interactive
+              prominence="default"
               onClick={() => alert('Navigation card clicked!')}
               className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               tabIndex={0}
@@ -204,7 +204,8 @@ export const KeyboardNavigation: Story = {
               </CardHeader>
               <CardContent density="comfortable">
                 <p className="text-sm text-muted-foreground">
-                  This entire card is focusable and interactive. Focus ring indicates current position.
+                  This entire card is focusable and interactive. Focus ring indicates current
+                  position.
                 </p>
               </CardContent>
               <CardFooter justify="end">
@@ -248,10 +249,12 @@ export const KeyboardNavigation: Story = {
                     <div className="font-medium mb-2">Navigation</div>
                     <div className="space-y-1 text-xs">
                       <div>
-                        <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Tab</kbd> - Next element
+                        <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Tab</kbd> - Next
+                        element
                       </div>
                       <div>
-                        <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Shift + Tab</kbd> - Previous element
+                        <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Shift + Tab</kbd> -
+                        Previous element
                       </div>
                     </div>
                   </div>
@@ -259,10 +262,12 @@ export const KeyboardNavigation: Story = {
                     <div className="font-medium mb-2">Activation</div>
                     <div className="space-y-1 text-xs">
                       <div>
-                        <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Enter</kbd> - Activate card or button
+                        <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Enter</kbd> -
+                        Activate card or button
                       </div>
                       <div>
-                        <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Space</kbd> - Activate focused element
+                        <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">Space</kbd> -
+                        Activate focused element
                       </div>
                     </div>
                   </div>
@@ -297,8 +302,8 @@ export const TouchAccessibility: Story = {
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Touch-Friendly Design</h3>
         <p className="text-sm text-muted-foreground">
-          Cards provide appropriate touch targets and clear interaction feedback
-          for mobile and tablet users.
+          Cards provide appropriate touch targets and clear interaction feedback for mobile and
+          tablet users.
         </p>
       </div>
 
@@ -357,9 +362,9 @@ export const TouchAccessibility: Story = {
           </CardHeader>
           <CardContent density="comfortable">
             <div className="space-y-3">
-              <Button 
-                variant="outline" 
-                size="md" 
+              <Button
+                variant="outline"
+                size="md"
                 className="w-full min-h-[44px] active:scale-95 transition-transform"
                 onClick={() => alert('Button with touch feedback!')}
               >
@@ -427,8 +432,8 @@ export const ScreenReaderOptimization: Story = {
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Screen Reader Enhancement</h3>
         <p className="text-sm text-muted-foreground">
-          Enhanced markup and descriptions that create clear, navigable card experiences
-          for screen reader users.
+          Enhanced markup and descriptions that create clear, navigable card experiences for screen
+          reader users.
         </p>
       </div>
 
@@ -438,7 +443,7 @@ export const ScreenReaderOptimization: Story = {
             Dashboard Cards with Live Regions
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card role="region" aria-labelledby="metrics-title" aria-describedby="metrics-desc">
+            <section aria-labelledby="metrics-title" aria-describedby="metrics-desc">
               <CardHeader>
                 <CardTitle level={4} weight="medium" id="metrics-title">
                   Key Metrics
@@ -449,42 +454,40 @@ export const ScreenReaderOptimization: Story = {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="flex justify-between" role="group" aria-label="Revenue metric">
+                  <fieldset className="flex justify-between" aria-label="Revenue metric">
                     <span>Revenue:</span>
                     <span aria-live="polite" className="font-medium text-green-600">
                       $45,678 (+12%)
                     </span>
-                  </div>
-                  <div className="flex justify-between" role="group" aria-label="Users metric">
+                  </fieldset>
+                  <fieldset className="flex justify-between" aria-label="Users metric">
                     <span>Active Users:</span>
                     <span aria-live="polite" className="font-medium">
                       2,547
                     </span>
-                  </div>
-                  <div className="flex justify-between" role="group" aria-label="Conversion metric">
+                  </fieldset>
+                  <fieldset className="flex justify-between" aria-label="Conversion metric">
                     <span>Conversion Rate:</span>
                     <span aria-live="polite" className="font-medium">
                       3.4%
                     </span>
-                  </div>
+                  </fieldset>
                 </div>
               </CardContent>
-            </Card>
+            </section>
 
             <Card role="alert" aria-labelledby="alert-title">
               <CardHeader>
                 <CardTitle level={4} weight="medium" id="alert-title">
                   System Alert
                 </CardTitle>
-                <CardDescription prominence="enhanced">
+                <CardDescription prominence="default">
                   Important notification requiring attention
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="bg-warning/10 border border-warning/20 p-3 rounded-md">
-                  <div className="text-sm font-medium text-warning">
-                    Scheduled Maintenance
-                  </div>
+                  <div className="text-sm font-medium text-warning">Scheduled Maintenance</div>
                   <div className="text-xs text-muted-foreground mt-1">
                     System will be unavailable from 2:00 AM to 4:00 AM EST for maintenance
                   </div>
@@ -503,7 +506,7 @@ export const ScreenReaderOptimization: Story = {
           <h4 id="content-section" className="text-base font-medium mb-4">
             Content Cards with Relationships
           </h4>
-          <Card role="article" aria-labelledby="article-title" aria-describedby="article-summary">
+          <article aria-labelledby="article-title" aria-describedby="article-summary">
             <CardHeader>
               <CardTitle level={4} weight="medium" id="article-title">
                 Design System Guidelines
@@ -515,13 +518,14 @@ export const ScreenReaderOptimization: Story = {
             <CardContent>
               <div className="space-y-3 text-sm">
                 <p>
-                  This article provides detailed information about implementing accessible
-                  design patterns across web applications.
+                  This article provides detailed information about implementing accessible design
+                  patterns across web applications.
                 </p>
                 <div className="bg-muted/50 p-3 rounded-md">
                   <div className="font-medium text-xs mb-1">Screen Reader Context:</div>
                   <div className="text-xs italic text-muted-foreground">
-                    "Article: Design System Guidelines - Comprehensive guide to component usage and best practices"
+                    "Article: Design System Guidelines - Comprehensive guide to component usage and
+                    best practices"
                   </div>
                 </div>
               </div>
@@ -536,7 +540,7 @@ export const ScreenReaderOptimization: Story = {
                 Read Full Article
               </Button>
             </CardFooter>
-          </Card>
+          </article>
         </section>
       </div>
     </div>
