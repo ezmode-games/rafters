@@ -11,20 +11,21 @@
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "typegen": "wrangler types",
-    "deploy": "wrangler deploy --minify",
-    "deploy:preview": "wrangler deploy --minify --preview",
-    "deploy:build": "wrangler deploy --dry-run"
+    "cf:deploy": "wrangler deploy --minify",
+    "cf:deploy:preview": "wrangler deploy --minify --preview",
+    "cf:deploy:build": "wrangler deploy --dry-run"
   },
   "dependencies": {
-    "hono": "^4.0.0",
-    "@rafters/shared": "workspace:*"
+    "@rafters/shared": "workspace:*",
+    "hono": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.19.0",
     "tsx": "^4.7.1",
     "typescript": "^5.4.3",
     "vitest": "^3.2.3",
-    "wrangler": "^4.26.0"
+    "wrangler": "^4.26.0",
+    "zod": "^3.25.76"
   },
   "keywords": ["rafters", "ai", "design-system", "component-registry", "cloudflare-workers", "hono"]
 }

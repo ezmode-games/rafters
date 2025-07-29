@@ -1,3 +1,6 @@
+// @componentStatus published
+// @version 0.1.0
+
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { Button } from '../../../components/Button';
@@ -30,27 +33,7 @@ const meta = {
       },
     },
   },
-  argTypes: {
-    trustLevel: {
-      control: 'select',
-      options: ['low', 'medium', 'high', 'critical'],
-      description: 'Trust level affects visual hierarchy and confirmation patterns',
-    },
-    destructive: {
-      control: 'boolean',
-      description: 'Destructive actions require enhanced confirmation patterns',
-    },
-    size: {
-      control: 'select',
-      options: ['sm', 'md', 'lg', 'xl', 'full'],
-      description: 'Size variant for content hierarchy and cognitive load',
-    },
-    cognitiveComplexity: {
-      control: 'select',
-      options: ['simple', 'moderate', 'complex'],
-      description: 'Complexity level affects spacing and information density',
-    },
-  },
+  argTypes: {},
 } satisfies Meta<typeof Dialog>;
 
 export default meta;

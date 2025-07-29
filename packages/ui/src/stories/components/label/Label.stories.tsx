@@ -1,5 +1,7 @@
+// @componentStatus published
+// @version 0.1.0
+
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from 'storybook/test';
 import { Button } from '../../../components/Button';
 import { Input } from '../../../components/Input';
 
@@ -7,7 +9,7 @@ import { Input } from '../../../components/Input';
 const Label = ({
   children,
   htmlFor,
-  variant = 'default',
+  variant = 'field',
   className = '',
   ...props
 }: {
@@ -57,6 +59,9 @@ type Story = StoryObj<typeof meta>;
  * that guide users through successful interface interactions.
  */
 export const Common: Story = {
+  args: {
+    children: 'Label',
+  },
   render: () => (
     <div className="w-full max-w-2xl">
       <h3 className="text-lg font-medium mb-6">Label Information Patterns</h3>

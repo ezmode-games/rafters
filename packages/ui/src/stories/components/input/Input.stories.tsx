@@ -10,6 +10,7 @@ import { Input } from '../../../components/Input';
 const meta = {
   title: '03 Components/Forms/Input',
   component: Input,
+  // status removed
   tags: ['!autodocs', '!dev', 'test'],
   parameters: {
     layout: 'centered',

@@ -1,3 +1,5 @@
+// @componentStatus published
+// @version 0.1.0
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { Button } from '../../../components/Button';
@@ -114,7 +116,7 @@ export const Common: Story = {
             <CardTitle level={3} weight="semibold">
               Adaptive
             </CardTitle>
-            <CardDescription prominence="enhanced">
+            <CardDescription prominence="default">
               Intelligent density and prominence based on content importance
             </CardDescription>
           </CardHeader>

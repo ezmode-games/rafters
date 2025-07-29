@@ -13,8 +13,9 @@
   },
   "routes": [
     {
-      "pattern": "rafters.realhaandy.tech/registry/*",
-      "zone_id": "bad23610704adb1dc65b05bc22d6fb6f"
+      "pattern": "rafters-registry.realhandy.tech",
+      "zone_id": "bad23610704adb1dc65b05bc22d6fb6f",
+      "custom_domain": true
     }
   ],
   "dev": {

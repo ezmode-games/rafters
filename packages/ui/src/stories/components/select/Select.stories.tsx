@@ -1,3 +1,6 @@
+// @componentStatus published
+// @version 0.1.0
+
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import {
@@ -11,6 +14,8 @@ import {
   SelectValue,
 } from '../../../components/Select';
 
+// @componentStatus published
+// @version 0.1.0
 /**
  * Choice architecture meets decision confidence. The select component transforms
  * complex option sets into organized, searchable, and contextually rich interfaces
