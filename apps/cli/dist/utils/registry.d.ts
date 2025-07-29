@@ -521,8 +521,8 @@ export declare const RegistrySchema: z.ZodObject<{
         } | undefined;
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
-    $schema?: string | undefined;
     name?: string | undefined;
+    $schema?: string | undefined;
     homepage?: string | undefined;
     components?: {
         type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
@@ -595,8 +595,8 @@ export declare const RegistrySchema: z.ZodObject<{
         } | undefined;
     }[] | undefined;
 }, {
-    $schema?: string | undefined;
     name?: string | undefined;
+    $schema?: string | undefined;
     homepage?: string | undefined;
     components?: {
         type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";

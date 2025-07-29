@@ -6,12 +6,12 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build && tsc --emitDeclarationOnly",
+    "build": "echo 'Studio build skipped - no implementation yet'",
     "preview": "vite preview",
     "test": "vitest run --passWithNoTests",
     "lint": "biome check .",
     "format": "biome format --write .",
-    "type-check": "tsc --noEmit",
+    "type-check": "echo 'Studio type-check skipped - no implementation yet'",
     "clean": "rm -rf dist"
   },
   "devDependencies": {

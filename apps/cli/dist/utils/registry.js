@@ -126,7 +126,8 @@ export async function fetchComponent(componentName) {
         // Try searching the full registry if direct fetch fails
         try {
             const registry = await fetchComponentRegistry();
-            return (registry.components?.find((c) => c.name.toLowerCase() === componentName.toLowerCase()) || null);
+            return (registry.components?.find((c) => c.name.toLowerCase() === componentName.toLowerCase()) ||
+                null);
         }
         catch (registryError) {
             throw new Error(`Component '${componentName}' not found: ${error instanceof Error ? error.message : 'Unknown error'}`);
