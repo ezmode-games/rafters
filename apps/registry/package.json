@@ -28,7 +28,14 @@
     "wrangler": "^4.26.0",
     "zod": "catalog:"
   },
-  "keywords": ["rafters", "ai", "design-system", "component-registry", "cloudflare-workers", "hono"],
+  "keywords": [
+    "rafters",
+    "ai",
+    "design-system",
+    "component-registry",
+    "cloudflare-workers",
+    "hono"
+  ],
   "author": "Sean Silvius",
   "license": "MIT",
   "repository": {
