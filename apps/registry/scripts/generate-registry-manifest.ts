@@ -67,5 +67,5 @@ const manifest = {
 };
 
 const validatedManifest = ManifestSchema.parse(manifest);
-fs.writeFileSync(manifestPath, JSON.stringify(validatedManifest, null, 2));
+fs.writeFileSync(manifestPath, `${JSON.stringify(validatedManifest, null, 2)}\n`);
 console.log('Registry manifest generated:', manifestPath);

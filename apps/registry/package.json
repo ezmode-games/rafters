@@ -11,6 +11,7 @@
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "typegen": "wrangler types",
+    "manifest:generate": "node scripts/generate-registry-manifest.js",
     "cf:deploy": "wrangler deploy --minify",
     "cf:deploy:preview": "wrangler deploy --minify --preview",
     "cf:deploy:build": "wrangler deploy --dry-run"
