@@ -1,3 +1,6 @@
+// @componentStatus published
+// @version 0.1.0
+
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import {
@@ -11,6 +14,8 @@ import {
   SelectValue,
 } from '../../../components/Select';
 
+// @componentStatus published
+// @version 0.1.0
 /**
  * Choice architecture meets decision confidence. The select component transforms
  * complex option sets into organized, searchable, and contextually rich interfaces
@@ -35,7 +40,7 @@ const meta = {
       description: 'Disabled state prevents interaction',
     },
     required: {
-      control: 'boolean', 
+      control: 'boolean',
       description: 'Required field indicator',
     },
   },
@@ -53,9 +58,10 @@ export const Common: Story = {
   render: (args) => (
     <div className="space-y-8 max-w-2xl">
       <div className="text-sm text-muted-foreground mb-6">
-        <strong>Select Intelligence:</strong> Simple → Grouped → Searchable → Contextual with progressive cognitive load management
+        <strong>Select Intelligence:</strong> Simple → Grouped → Searchable → Contextual with
+        progressive cognitive load management
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Simple Selection */}
         <div className="space-y-3">
@@ -141,36 +147,20 @@ export const Common: Story = {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>File Operations</SelectLabel>
-                <SelectItem 
-                  value="save" 
-                  description="Save current document to disk"
-                  shortcut="⌘S"
-                >
+                <SelectItem value="save" description="Save current document to disk" shortcut="⌘S">
                   Save File
                 </SelectItem>
-                <SelectItem 
-                  value="export" 
-                  description="Export in various formats"
-                  shortcut="⌘E"
-                >
+                <SelectItem value="export" description="Export in various formats" shortcut="⌘E">
                   Export
                 </SelectItem>
               </SelectGroup>
               <SelectSeparator />
               <SelectGroup>
                 <SelectLabel>Edit Operations</SelectLabel>
-                <SelectItem 
-                  value="copy" 
-                  description="Copy selection to clipboard"
-                  shortcut="⌘C"
-                >
+                <SelectItem value="copy" description="Copy selection to clipboard" shortcut="⌘C">
                   Copy
                 </SelectItem>
-                <SelectItem 
-                  value="paste" 
-                  description="Paste from clipboard"
-                  shortcut="⌘V"
-                >
+                <SelectItem value="paste" description="Paste from clipboard" shortcut="⌘V">
                   Paste
                 </SelectItem>
               </SelectGroup>
@@ -187,9 +177,11 @@ export const Common: Story = {
         <h4 className="font-medium">Size Variants</h4>
         <div className="flex gap-4 items-end">
           <div className="space-y-2">
-            <label className="text-sm text-muted-foreground">Default</label>
+            <label htmlFor="select-default-size" className="text-sm text-muted-foreground">
+              Default
+            </label>
             <Select {...args}>
-              <SelectTrigger className="w-40">
+              <SelectTrigger id="select-default-size" className="w-40">
                 <SelectValue placeholder="Default size" />
               </SelectTrigger>
               <SelectContent>
@@ -199,9 +191,11 @@ export const Common: Story = {
             </Select>
           </div>
           <div className="space-y-2">
-            <label className="text-sm text-muted-foreground">Large</label>
+            <label htmlFor="select-large-size" className="text-sm text-muted-foreground">
+              Large
+            </label>
             <Select {...args}>
-              <SelectTrigger className="w-40" size="large">
+              <SelectTrigger id="select-large-size" className="w-40" size="large">
                 <SelectValue placeholder="Large size" />
               </SelectTrigger>
               <SelectContent>
@@ -221,9 +215,11 @@ export const Common: Story = {
         <h4 className="font-medium">States</h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <label className="text-sm text-muted-foreground">Default</label>
+            <label htmlFor="select-state-default" className="text-sm text-muted-foreground">
+              Default
+            </label>
             <Select {...args}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger id="select-state-default" className="w-full">
                 <SelectValue placeholder="Select option" />
               </SelectTrigger>
               <SelectContent>
@@ -233,9 +229,11 @@ export const Common: Story = {
             </Select>
           </div>
           <div className="space-y-2">
-            <label className="text-sm text-muted-foreground">With Selection</label>
+            <label htmlFor="select-with-selection" className="text-sm text-muted-foreground">
+              With Selection
+            </label>
             <Select {...args} defaultValue="option1">
-              <SelectTrigger className="w-full">
+              <SelectTrigger id="select-with-selection" className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -245,9 +243,11 @@ export const Common: Story = {
             </Select>
           </div>
           <div className="space-y-2">
-            <label className="text-sm text-muted-foreground">Disabled</label>
+            <label htmlFor="select-disabled" className="text-sm text-muted-foreground">
+              Disabled
+            </label>
             <Select {...args} disabled>
-              <SelectTrigger className="w-full">
+              <SelectTrigger id="select-disabled" className="w-full">
                 <SelectValue placeholder="Disabled" />
               </SelectTrigger>
               <SelectContent>
@@ -266,7 +266,7 @@ export const Common: Story = {
   parameters: {
     docs: {
       description: {
-        story: 
+        story:
           'Complete overview of select intelligence patterns showing progressive complexity from simple selection to smart search and contextual information.',
       },
     },

@@ -205,15 +205,9 @@ export const ScreenReader: Story = {
           </section>
 
           {/* Status region for live updates */}
-          <div
-            role="status"
-            aria-live="polite"
-            aria-atomic="true"
-            className="sr-only"
-            id="payment-status"
-          >
+          <output aria-live="polite" aria-atomic="true" className="sr-only" id="payment-status">
             Payment form ready for submission
-          </div>
+          </output>
         </div>
 
         <DialogFooter>

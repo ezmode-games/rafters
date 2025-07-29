@@ -17,10 +17,10 @@ const l = b.forwardRef(
     },
     f
   ) => {
-    const p = i ? g : 'button',
-      o = e === 'destructive',
-      n = o && d,
-      v = c || r;
+    const p = i ? g : 'button';
+    const o = e === 'destructive';
+    const n = o && d;
+    const v = c || r;
     return t.jsxs(p, {
       ref: f,
       className: h(

@@ -8,473 +8,475 @@ import './index-DoQPmrLJ.js';
 import './index-Cox8WoOv.js';
 import './utils-DuMXYCiK.js';
 const U = {
-    title: '03 Components/Navigation/Tabs/Intelligence',
-    component: t,
-    parameters: {
-      layout: 'centered',
-      docs: {
-        description: {
-          component:
-            'Cognitive load optimized tabs that prevent user confusion through wayfinding intelligence, mental model building, and smart navigation patterns. Designed to reduce cognitive overhead while maintaining clear navigation paths.',
-        },
+  title: '03 Components/Navigation/Tabs/Intelligence',
+  component: t,
+  parameters: {
+    layout: 'centered',
+    docs: {
+      description: {
+        component:
+          'Cognitive load optimized tabs that prevent user confusion through wayfinding intelligence, mental model building, and smart navigation patterns. Designed to reduce cognitive overhead while maintaining clear navigation paths.',
       },
     },
-    tags: ['autodocs'],
   },
-  r = {
-    render: () => {
-      const [i, d] = u.useState('overview');
-      return e.jsxs(e.Fragment, {
-        children: [
-          e.jsx('h3', { children: 'Optimal Tab Count and Grouping' }),
-          e.jsxs('div', {
-            className: 'w-full max-w-2xl space-y-6',
-            children: [
-              e.jsxs('div', {
-                className: 'space-y-2',
-                children: [
-                  e.jsx('h4', {
-                    className: 'text-sm font-medium',
-                    children: 'Optimal Tab Group (5 tabs)',
-                  }),
-                  e.jsxs(t, {
-                    defaultValue: 'overview',
-                    cognitiveLoad: 'minimal',
-                    children: [
-                      e.jsxs(n, {
-                        children: [
-                          e.jsx(a, { value: 'overview', children: 'Overview' }),
-                          e.jsx(a, { value: 'details', children: 'Details' }),
-                          e.jsx(a, { value: 'settings', children: 'Settings' }),
-                          e.jsx(a, { value: 'security', children: 'Security' }),
-                          e.jsx(a, { value: 'billing', children: 'Billing' }),
-                        ],
-                      }),
-                      e.jsx(s, {
-                        value: 'overview',
-                        className: 'p-4',
-                        children: e.jsx('p', {
-                          children: 'Overview content - easy to find and understand',
-                        }),
-                      }),
-                      e.jsx(s, {
-                        value: 'details',
-                        className: 'p-4',
-                        children: e.jsx('p', {
-                          children: 'Details content - clearly grouped information',
-                        }),
-                      }),
-                      e.jsx(s, {
-                        value: 'settings',
-                        className: 'p-4',
-                        children: e.jsx('p', {
-                          children: 'Settings content - logical organization',
-                        }),
-                      }),
-                      e.jsx(s, {
-                        value: 'security',
-                        className: 'p-4',
-                        children: e.jsx('p', {
-                          children: 'Security content - important but not overwhelming',
-                        }),
-                      }),
-                      e.jsx(s, {
-                        value: 'billing',
-                        className: 'p-4',
-                        children: e.jsx('p', {
-                          children: 'Billing content - separate concern, clearly labeled',
-                        }),
-                      }),
-                    ],
-                  }),
-                  e.jsx('p', {
-                    className: 'text-xs text-muted-foreground',
-                    children: 'Perfect cognitive load - users can scan and choose easily',
-                  }),
-                ],
-              }),
-              e.jsxs('div', {
-                className: 'space-y-2',
-                children: [
-                  e.jsx('h4', {
-                    className: 'text-sm font-medium',
-                    children: 'Complex Tab Group (needs grouping)',
-                  }),
-                  e.jsxs(t, {
-                    defaultValue: 'general',
-                    cognitiveLoad: 'complex',
-                    children: [
-                      e.jsxs(n, {
-                        density: 'compact',
-                        children: [
-                          e.jsx(a, { value: 'general', children: 'General' }),
-                          e.jsx(a, { value: 'profile', children: 'Profile' }),
-                          e.jsx(a, { value: 'privacy', children: 'Privacy' }),
-                          e.jsx(a, { value: 'notifications', children: 'Notifications' }),
-                          e.jsx(a, { value: 'integrations', children: 'Integrations' }),
-                          e.jsx(a, { value: 'api', children: 'API' }),
-                          e.jsx(a, { value: 'billing', children: 'Billing' }),
-                          e.jsx(a, { value: 'usage', children: 'Usage' }),
-                          e.jsx(a, { value: 'support', children: 'Support' }),
-                        ],
-                      }),
-                      e.jsx(s, {
-                        value: 'general',
-                        className: 'p-4',
-                        children: e.jsx('p', {
-                          children: 'Too many options create decision paralysis',
-                        }),
-                      }),
-                      e.jsx(s, {
-                        value: 'profile',
-                        className: 'p-4',
-                        children: e.jsx('p', {
-                          children: 'Users struggle to scan this many options',
-                        }),
-                      }),
-                      e.jsx(s, {
-                        value: 'privacy',
-                        className: 'p-4',
-                        children: e.jsx('p', {
-                          children: 'Related settings should be grouped together',
-                        }),
-                      }),
-                    ],
-                  }),
-                  e.jsx('p', {
-                    className: 'text-xs text-muted-foreground',
-                    children: 'High cognitive load - consider grouping or progressive disclosure',
-                  }),
-                ],
-              }),
-            ],
-          }),
-        ],
-      });
-    },
-  },
-  o = {
-    render: () => {
-      const [i, d] = u.useState('dashboard'),
-        p = [
-          { value: 'dashboard', label: 'Dashboard' },
-          { value: 'analytics', label: 'Analytics' },
-          { value: 'reports', label: 'Reports' },
-          { value: 'settings', label: 'Settings' },
-        ];
-      return e.jsxs(e.Fragment, {
-        children: [
-          e.jsx('h3', { children: 'Navigation Context and Wayfinding' }),
-          e.jsxs('div', {
-            className: 'w-full max-w-2xl space-y-4',
-            children: [
-              e.jsxs(t, {
-                value: i,
-                onValueChange: d,
-                wayfinding: !0,
-                children: [
-                  e.jsx(B, { activeTab: i, tabs: p }),
-                  e.jsxs(n, {
-                    variant: 'underline',
-                    children: [
-                      e.jsx(a, { value: 'dashboard', icon: '📊', children: 'Dashboard' }),
-                      e.jsx(a, {
-                        value: 'analytics',
-                        icon: '📈',
-                        badge: '3',
-                        children: 'Analytics',
-                      }),
-                      e.jsx(a, { value: 'reports', icon: '📋', children: 'Reports' }),
-                      e.jsx(a, { value: 'settings', icon: '⚙️', children: 'Settings' }),
-                    ],
-                  }),
-                  e.jsxs(s, {
-                    value: 'dashboard',
-                    className: 'p-4 border rounded',
-                    children: [
-                      e.jsx('h4', {
-                        className: 'font-medium mb-2',
-                        children: 'Dashboard Overview',
-                      }),
-                      e.jsx('p', {
-                        children:
-                          'Clear visual feedback shows current location in navigation hierarchy',
-                      }),
-                    ],
-                  }),
-                  e.jsxs(s, {
-                    value: 'analytics',
-                    className: 'p-4 border rounded',
-                    children: [
-                      e.jsx('h4', { className: 'font-medium mb-2', children: 'Analytics Data' }),
-                      e.jsx('p', {
-                        children: 'Badge notifications provide context without overwhelming',
-                      }),
-                    ],
-                  }),
-                  e.jsxs(s, {
-                    value: 'reports',
-                    className: 'p-4 border rounded',
-                    children: [
-                      e.jsx('h4', { className: 'font-medium mb-2', children: 'Report Generation' }),
-                      e.jsx('p', {
-                        children: 'Icons help with recognition and reduce cognitive load',
-                      }),
-                    ],
-                  }),
-                  e.jsxs(s, {
-                    value: 'settings',
-                    className: 'p-4 border rounded',
-                    children: [
-                      e.jsx('h4', { className: 'font-medium mb-2', children: 'System Settings' }),
-                      e.jsx('p', { children: 'Consistent patterns build user confidence' }),
-                    ],
-                  }),
-                ],
-              }),
-              e.jsx('p', {
-                className: 'text-xs text-muted-foreground',
-                children:
-                  'Breadcrumb shows location, icons aid recognition, badges provide context',
-              }),
-            ],
-          }),
-        ],
-      });
-    },
-  },
-  l = {
-    render: () => {
-      const [i, d] = u.useState('account'),
-        [p, D] = u.useState('profile');
-      return e.jsxs(e.Fragment, {
-        children: [
-          e.jsx('h3', { children: 'Hierarchical Mental Models' }),
-          e.jsxs('div', {
-            className: 'w-full max-w-3xl space-y-4',
-            children: [
-              e.jsxs(t, {
-                value: i,
-                onValueChange: d,
-                children: [
-                  e.jsxs(n, {
-                    variant: 'pills',
-                    density: 'spacious',
-                    children: [
-                      e.jsx(a, { value: 'account', children: 'Account' }),
-                      e.jsx(a, { value: 'workspace', children: 'Workspace' }),
-                      e.jsx(a, { value: 'integration', children: 'Integrations' }),
-                    ],
-                  }),
-                  e.jsx(s, {
-                    value: 'account',
-                    className: 'mt-4',
-                    children: e.jsxs(t, {
-                      value: p,
-                      onValueChange: D,
-                      orientation: 'horizontal',
+  tags: ['autodocs'],
+};
+const r = {
+  render: () => {
+    const [i, d] = u.useState('overview');
+    return e.jsxs(e.Fragment, {
+      children: [
+        e.jsx('h3', { children: 'Optimal Tab Count and Grouping' }),
+        e.jsxs('div', {
+          className: 'w-full max-w-2xl space-y-6',
+          children: [
+            e.jsxs('div', {
+              className: 'space-y-2',
+              children: [
+                e.jsx('h4', {
+                  className: 'text-sm font-medium',
+                  children: 'Optimal Tab Group (5 tabs)',
+                }),
+                e.jsxs(t, {
+                  defaultValue: 'overview',
+                  cognitiveLoad: 'minimal',
+                  children: [
+                    e.jsxs(n, {
                       children: [
-                        e.jsxs(n, {
-                          variant: 'underline',
-                          density: 'comfortable',
-                          children: [
-                            e.jsx(a, { value: 'profile', children: 'Profile' }),
-                            e.jsx(a, { value: 'security', children: 'Security' }),
-                            e.jsx(a, { value: 'preferences', children: 'Preferences' }),
-                          ],
-                        }),
-                        e.jsxs(s, {
-                          value: 'profile',
-                          className: 'p-4 bg-muted/30 rounded mt-2',
-                          children: [
-                            e.jsx('h4', {
-                              className: 'font-medium mb-2',
-                              children: 'Profile Information',
-                            }),
-                            e.jsx('p', {
-                              children: 'Personal details and public information settings',
-                            }),
-                          ],
-                        }),
-                        e.jsxs(s, {
-                          value: 'security',
-                          className: 'p-4 bg-muted/30 rounded mt-2',
-                          children: [
-                            e.jsx('h4', {
-                              className: 'font-medium mb-2',
-                              children: 'Security Settings',
-                            }),
-                            e.jsx('p', {
-                              children: 'Password, two-factor authentication, and login history',
-                            }),
-                          ],
-                        }),
-                        e.jsxs(s, {
-                          value: 'preferences',
-                          className: 'p-4 bg-muted/30 rounded mt-2',
-                          children: [
-                            e.jsx('h4', {
-                              className: 'font-medium mb-2',
-                              children: 'User Preferences',
-                            }),
-                            e.jsx('p', { children: 'Theme, language, and notification settings' }),
-                          ],
-                        }),
+                        e.jsx(a, { value: 'overview', children: 'Overview' }),
+                        e.jsx(a, { value: 'details', children: 'Details' }),
+                        e.jsx(a, { value: 'settings', children: 'Settings' }),
+                        e.jsx(a, { value: 'security', children: 'Security' }),
+                        e.jsx(a, { value: 'billing', children: 'Billing' }),
                       ],
                     }),
-                  }),
-                  e.jsxs(s, {
-                    value: 'workspace',
-                    className: 'p-4 bg-muted/30 rounded',
-                    children: [
-                      e.jsx('h4', {
-                        className: 'font-medium mb-2',
-                        children: 'Workspace Settings',
+                    e.jsx(s, {
+                      value: 'overview',
+                      className: 'p-4',
+                      children: e.jsx('p', {
+                        children: 'Overview content - easy to find and understand',
                       }),
-                      e.jsx('p', {
-                        children: 'Team management, project settings, and collaboration tools',
+                    }),
+                    e.jsx(s, {
+                      value: 'details',
+                      className: 'p-4',
+                      children: e.jsx('p', {
+                        children: 'Details content - clearly grouped information',
                       }),
-                    ],
-                  }),
-                  e.jsxs(s, {
-                    value: 'integration',
-                    className: 'p-4 bg-muted/30 rounded',
-                    children: [
-                      e.jsx('h4', {
-                        className: 'font-medium mb-2',
-                        children: 'Integration Management',
+                    }),
+                    e.jsx(s, {
+                      value: 'settings',
+                      className: 'p-4',
+                      children: e.jsx('p', {
+                        children: 'Settings content - logical organization',
                       }),
-                      e.jsx('p', {
-                        children: 'Connected services, API keys, and third-party applications',
+                    }),
+                    e.jsx(s, {
+                      value: 'security',
+                      className: 'p-4',
+                      children: e.jsx('p', {
+                        children: 'Security content - important but not overwhelming',
                       }),
-                    ],
-                  }),
-                ],
-              }),
-              e.jsx('p', {
-                className: 'text-xs text-muted-foreground',
-                children:
-                  'Hierarchical organization builds clear mental models of system structure',
-              }),
-            ],
-          }),
-        ],
-      });
-    },
+                    }),
+                    e.jsx(s, {
+                      value: 'billing',
+                      className: 'p-4',
+                      children: e.jsx('p', {
+                        children: 'Billing content - separate concern, clearly labeled',
+                      }),
+                    }),
+                  ],
+                }),
+                e.jsx('p', {
+                  className: 'text-xs text-muted-foreground',
+                  children: 'Perfect cognitive load - users can scan and choose easily',
+                }),
+              ],
+            }),
+            e.jsxs('div', {
+              className: 'space-y-2',
+              children: [
+                e.jsx('h4', {
+                  className: 'text-sm font-medium',
+                  children: 'Complex Tab Group (needs grouping)',
+                }),
+                e.jsxs(t, {
+                  defaultValue: 'general',
+                  cognitiveLoad: 'complex',
+                  children: [
+                    e.jsxs(n, {
+                      density: 'compact',
+                      children: [
+                        e.jsx(a, { value: 'general', children: 'General' }),
+                        e.jsx(a, { value: 'profile', children: 'Profile' }),
+                        e.jsx(a, { value: 'privacy', children: 'Privacy' }),
+                        e.jsx(a, { value: 'notifications', children: 'Notifications' }),
+                        e.jsx(a, { value: 'integrations', children: 'Integrations' }),
+                        e.jsx(a, { value: 'api', children: 'API' }),
+                        e.jsx(a, { value: 'billing', children: 'Billing' }),
+                        e.jsx(a, { value: 'usage', children: 'Usage' }),
+                        e.jsx(a, { value: 'support', children: 'Support' }),
+                      ],
+                    }),
+                    e.jsx(s, {
+                      value: 'general',
+                      className: 'p-4',
+                      children: e.jsx('p', {
+                        children: 'Too many options create decision paralysis',
+                      }),
+                    }),
+                    e.jsx(s, {
+                      value: 'profile',
+                      className: 'p-4',
+                      children: e.jsx('p', {
+                        children: 'Users struggle to scan this many options',
+                      }),
+                    }),
+                    e.jsx(s, {
+                      value: 'privacy',
+                      className: 'p-4',
+                      children: e.jsx('p', {
+                        children: 'Related settings should be grouped together',
+                      }),
+                    }),
+                  ],
+                }),
+                e.jsx('p', {
+                  className: 'text-xs text-muted-foreground',
+                  children: 'High cognitive load - consider grouping or progressive disclosure',
+                }),
+              ],
+            }),
+          ],
+        }),
+      ],
+    });
   },
-  c = {
-    render: () =>
-      e.jsxs(e.Fragment, {
-        children: [
-          e.jsx('h3', { children: 'Enhanced Motor Accessibility' }),
-          e.jsxs('div', {
-            className: 'w-full max-w-2xl space-y-6',
-            children: [
-              e.jsxs('div', {
-                className: 'space-y-2',
-                children: [
-                  e.jsx('h4', {
-                    className: 'text-sm font-medium',
-                    children: 'Large Touch Targets',
-                  }),
-                  e.jsxs(t, {
-                    defaultValue: 'home',
+};
+const o = {
+  render: () => {
+    const [i, d] = u.useState('dashboard');
+    const p = [
+      { value: 'dashboard', label: 'Dashboard' },
+      { value: 'analytics', label: 'Analytics' },
+      { value: 'reports', label: 'Reports' },
+      { value: 'settings', label: 'Settings' },
+    ];
+    return e.jsxs(e.Fragment, {
+      children: [
+        e.jsx('h3', { children: 'Navigation Context and Wayfinding' }),
+        e.jsxs('div', {
+          className: 'w-full max-w-2xl space-y-4',
+          children: [
+            e.jsxs(t, {
+              value: i,
+              onValueChange: d,
+              wayfinding: !0,
+              children: [
+                e.jsx(B, { activeTab: i, tabs: p }),
+                e.jsxs(n, {
+                  variant: 'underline',
+                  children: [
+                    e.jsx(a, { value: 'dashboard', icon: '📊', children: 'Dashboard' }),
+                    e.jsx(a, {
+                      value: 'analytics',
+                      icon: '📈',
+                      badge: '3',
+                      children: 'Analytics',
+                    }),
+                    e.jsx(a, { value: 'reports', icon: '📋', children: 'Reports' }),
+                    e.jsx(a, { value: 'settings', icon: '⚙️', children: 'Settings' }),
+                  ],
+                }),
+                e.jsxs(s, {
+                  value: 'dashboard',
+                  className: 'p-4 border rounded',
+                  children: [
+                    e.jsx('h4', {
+                      className: 'font-medium mb-2',
+                      children: 'Dashboard Overview',
+                    }),
+                    e.jsx('p', {
+                      children:
+                        'Clear visual feedback shows current location in navigation hierarchy',
+                    }),
+                  ],
+                }),
+                e.jsxs(s, {
+                  value: 'analytics',
+                  className: 'p-4 border rounded',
+                  children: [
+                    e.jsx('h4', { className: 'font-medium mb-2', children: 'Analytics Data' }),
+                    e.jsx('p', {
+                      children: 'Badge notifications provide context without overwhelming',
+                    }),
+                  ],
+                }),
+                e.jsxs(s, {
+                  value: 'reports',
+                  className: 'p-4 border rounded',
+                  children: [
+                    e.jsx('h4', { className: 'font-medium mb-2', children: 'Report Generation' }),
+                    e.jsx('p', {
+                      children: 'Icons help with recognition and reduce cognitive load',
+                    }),
+                  ],
+                }),
+                e.jsxs(s, {
+                  value: 'settings',
+                  className: 'p-4 border rounded',
+                  children: [
+                    e.jsx('h4', { className: 'font-medium mb-2', children: 'System Settings' }),
+                    e.jsx('p', { children: 'Consistent patterns build user confidence' }),
+                  ],
+                }),
+              ],
+            }),
+            e.jsx('p', {
+              className: 'text-xs text-muted-foreground',
+              children: 'Breadcrumb shows location, icons aid recognition, badges provide context',
+            }),
+          ],
+        }),
+      ],
+    });
+  },
+};
+const l = {
+  render: () => {
+    const [i, d] = u.useState('account');
+    const [p, D] = u.useState('profile');
+    return e.jsxs(e.Fragment, {
+      children: [
+        e.jsx('h3', { children: 'Hierarchical Mental Models' }),
+        e.jsxs('div', {
+          className: 'w-full max-w-3xl space-y-4',
+          children: [
+            e.jsxs(t, {
+              value: i,
+              onValueChange: d,
+              children: [
+                e.jsxs(n, {
+                  variant: 'pills',
+                  density: 'spacious',
+                  children: [
+                    e.jsx(a, { value: 'account', children: 'Account' }),
+                    e.jsx(a, { value: 'workspace', children: 'Workspace' }),
+                    e.jsx(a, { value: 'integration', children: 'Integrations' }),
+                  ],
+                }),
+                e.jsx(s, {
+                  value: 'account',
+                  className: 'mt-4',
+                  children: e.jsxs(t, {
+                    value: p,
+                    onValueChange: D,
+                    orientation: 'horizontal',
                     children: [
                       e.jsxs(n, {
-                        density: 'spacious',
+                        variant: 'underline',
+                        density: 'comfortable',
                         children: [
-                          e.jsx(a, { value: 'home', children: 'Home' }),
-                          e.jsx(a, { value: 'products', children: 'Products' }),
-                          e.jsx(a, { value: 'services', children: 'Services' }),
-                          e.jsx(a, { value: 'contact', children: 'Contact' }),
+                          e.jsx(a, { value: 'profile', children: 'Profile' }),
+                          e.jsx(a, { value: 'security', children: 'Security' }),
+                          e.jsx(a, { value: 'preferences', children: 'Preferences' }),
                         ],
                       }),
-                      e.jsx(s, {
-                        value: 'home',
-                        className: 'p-4',
-                        children: e.jsx('p', {
-                          children: '44px minimum touch targets meet accessibility guidelines',
-                        }),
+                      e.jsxs(s, {
+                        value: 'profile',
+                        className: 'p-4 bg-muted/30 rounded mt-2',
+                        children: [
+                          e.jsx('h4', {
+                            className: 'font-medium mb-2',
+                            children: 'Profile Information',
+                          }),
+                          e.jsx('p', {
+                            children: 'Personal details and public information settings',
+                          }),
+                        ],
                       }),
-                      e.jsx(s, {
-                        value: 'products',
-                        className: 'p-4',
-                        children: e.jsx('p', {
-                          children: 'Enhanced spacing prevents accidental activation',
-                        }),
+                      e.jsxs(s, {
+                        value: 'security',
+                        className: 'p-4 bg-muted/30 rounded mt-2',
+                        children: [
+                          e.jsx('h4', {
+                            className: 'font-medium mb-2',
+                            children: 'Security Settings',
+                          }),
+                          e.jsx('p', {
+                            children: 'Password, two-factor authentication, and login history',
+                          }),
+                        ],
                       }),
-                      e.jsx(s, {
-                        value: 'services',
-                        className: 'p-4',
-                        children: e.jsx('p', {
-                          children: 'Consistent hit areas reduce motor precision requirements',
-                        }),
-                      }),
-                      e.jsx(s, {
-                        value: 'contact',
-                        className: 'p-4',
-                        children: e.jsx('p', {
-                          children: 'Generous padding accommodates various interaction methods',
-                        }),
+                      e.jsxs(s, {
+                        value: 'preferences',
+                        className: 'p-4 bg-muted/30 rounded mt-2',
+                        children: [
+                          e.jsx('h4', {
+                            className: 'font-medium mb-2',
+                            children: 'User Preferences',
+                          }),
+                          e.jsx('p', { children: 'Theme, language, and notification settings' }),
+                        ],
                       }),
                     ],
                   }),
-                ],
-              }),
-              e.jsxs('div', {
-                className: 'space-y-2',
-                children: [
-                  e.jsx('h4', {
-                    className: 'text-sm font-medium',
-                    children: 'Keyboard Navigation Support',
-                  }),
-                  e.jsxs(t, {
-                    defaultValue: 'tab1',
-                    children: [
-                      e.jsxs(n, {
-                        children: [
-                          e.jsx(a, { value: 'tab1', children: 'Tab 1' }),
-                          e.jsx(a, { value: 'tab2', children: 'Tab 2' }),
-                          e.jsx(a, { value: 'tab3', disabled: !0, children: 'Disabled' }),
-                          e.jsx(a, { value: 'tab4', children: 'Tab 4' }),
-                        ],
+                }),
+                e.jsxs(s, {
+                  value: 'workspace',
+                  className: 'p-4 bg-muted/30 rounded',
+                  children: [
+                    e.jsx('h4', {
+                      className: 'font-medium mb-2',
+                      children: 'Workspace Settings',
+                    }),
+                    e.jsx('p', {
+                      children: 'Team management, project settings, and collaboration tools',
+                    }),
+                  ],
+                }),
+                e.jsxs(s, {
+                  value: 'integration',
+                  className: 'p-4 bg-muted/30 rounded',
+                  children: [
+                    e.jsx('h4', {
+                      className: 'font-medium mb-2',
+                      children: 'Integration Management',
+                    }),
+                    e.jsx('p', {
+                      children: 'Connected services, API keys, and third-party applications',
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            e.jsx('p', {
+              className: 'text-xs text-muted-foreground',
+              children: 'Hierarchical organization builds clear mental models of system structure',
+            }),
+          ],
+        }),
+      ],
+    });
+  },
+};
+const c = {
+  render: () =>
+    e.jsxs(e.Fragment, {
+      children: [
+        e.jsx('h3', { children: 'Enhanced Motor Accessibility' }),
+        e.jsxs('div', {
+          className: 'w-full max-w-2xl space-y-6',
+          children: [
+            e.jsxs('div', {
+              className: 'space-y-2',
+              children: [
+                e.jsx('h4', {
+                  className: 'text-sm font-medium',
+                  children: 'Large Touch Targets',
+                }),
+                e.jsxs(t, {
+                  defaultValue: 'home',
+                  children: [
+                    e.jsxs(n, {
+                      density: 'spacious',
+                      children: [
+                        e.jsx(a, { value: 'home', children: 'Home' }),
+                        e.jsx(a, { value: 'products', children: 'Products' }),
+                        e.jsx(a, { value: 'services', children: 'Services' }),
+                        e.jsx(a, { value: 'contact', children: 'Contact' }),
+                      ],
+                    }),
+                    e.jsx(s, {
+                      value: 'home',
+                      className: 'p-4',
+                      children: e.jsx('p', {
+                        children: '44px minimum touch targets meet accessibility guidelines',
                       }),
-                      e.jsx(s, {
-                        value: 'tab1',
-                        className: 'p-4',
-                        children: e.jsx('p', {
-                          children: 'Arrow keys navigate between tabs, Enter/Space activates',
-                        }),
+                    }),
+                    e.jsx(s, {
+                      value: 'products',
+                      className: 'p-4',
+                      children: e.jsx('p', {
+                        children: 'Enhanced spacing prevents accidental activation',
                       }),
-                      e.jsx(s, {
-                        value: 'tab2',
-                        className: 'p-4',
-                        children: e.jsx('p', {
-                          children: 'Focus indicators clearly show current position',
-                        }),
+                    }),
+                    e.jsx(s, {
+                      value: 'services',
+                      className: 'p-4',
+                      children: e.jsx('p', {
+                        children: 'Consistent hit areas reduce motor precision requirements',
                       }),
-                      e.jsx(s, {
-                        value: 'tab4',
-                        className: 'p-4',
-                        children: e.jsx('p', {
-                          children: 'Disabled tabs are properly skipped in navigation',
-                        }),
+                    }),
+                    e.jsx(s, {
+                      value: 'contact',
+                      className: 'p-4',
+                      children: e.jsx('p', {
+                        children: 'Generous padding accommodates various interaction methods',
                       }),
-                    ],
-                  }),
-                  e.jsx('p', {
-                    className: 'text-xs text-muted-foreground',
-                    children:
-                      'Full keyboard support with clear focus indicators and proper tab order',
-                  }),
-                ],
-              }),
-            ],
-          }),
-        ],
-      }),
-  };
-var g, m, b, v, h;
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            e.jsxs('div', {
+              className: 'space-y-2',
+              children: [
+                e.jsx('h4', {
+                  className: 'text-sm font-medium',
+                  children: 'Keyboard Navigation Support',
+                }),
+                e.jsxs(t, {
+                  defaultValue: 'tab1',
+                  children: [
+                    e.jsxs(n, {
+                      children: [
+                        e.jsx(a, { value: 'tab1', children: 'Tab 1' }),
+                        e.jsx(a, { value: 'tab2', children: 'Tab 2' }),
+                        e.jsx(a, { value: 'tab3', disabled: !0, children: 'Disabled' }),
+                        e.jsx(a, { value: 'tab4', children: 'Tab 4' }),
+                      ],
+                    }),
+                    e.jsx(s, {
+                      value: 'tab1',
+                      className: 'p-4',
+                      children: e.jsx('p', {
+                        children: 'Arrow keys navigate between tabs, Enter/Space activates',
+                      }),
+                    }),
+                    e.jsx(s, {
+                      value: 'tab2',
+                      className: 'p-4',
+                      children: e.jsx('p', {
+                        children: 'Focus indicators clearly show current position',
+                      }),
+                    }),
+                    e.jsx(s, {
+                      value: 'tab4',
+                      className: 'p-4',
+                      children: e.jsx('p', {
+                        children: 'Disabled tabs are properly skipped in navigation',
+                      }),
+                    }),
+                  ],
+                }),
+                e.jsx('p', {
+                  className: 'text-xs text-muted-foreground',
+                  children:
+                    'Full keyboard support with clear focus indicators and proper tab order',
+                }),
+              ],
+            }),
+          ],
+        }),
+      ],
+    }),
+};
+let g;
+let m;
+let b;
+let v;
+let h;
 r.parameters = {
   ...r.parameters,
   docs: {
@@ -559,7 +561,11 @@ Miller's 7±2 rule applied with visual hierarchy for scanning.`,
     },
   },
 };
-var T, x, j, f, y;
+let T;
+let x;
+let j;
+let f;
+let y;
 o.parameters = {
   ...o.parameters,
   docs: {
@@ -630,7 +636,11 @@ Breadcrumb patterns show location within complex tab structures.`,
     },
   },
 };
-var N, C, w, S, A;
+let N;
+let C;
+let w;
+let S;
+let A;
 l.parameters = {
   ...l.parameters,
   docs: {
@@ -705,7 +715,11 @@ Progressive disclosure manages complexity without hiding functionality.`,
     },
   },
 };
-var P, L, k, I, M;
+let P;
+let L;
+let k;
+let I;
+let M;
 c.parameters = {
   ...c.parameters,
   docs: {

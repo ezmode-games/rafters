@@ -1,3 +1,6 @@
+/**
+ * AI Intelligence: Token knowledge in .rafters/tokens/registry.json
+ */
 import {
   CheckIcon,
   ChevronDownIcon,

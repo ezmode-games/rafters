@@ -3,385 +3,389 @@ import { j as e } from './jsx-runtime-BjG_zV1W.js';
 import './index-DuwuiYca.js';
 import './iframe-Cy2I62ob.js';
 import './utils-DuMXYCiK.js';
-const { fn: w } = __STORYBOOK_MODULE_TEST__,
-  P = {
-    title: '03 Components/Action/Button/Accessibility',
-    component: a,
-    parameters: {
-      layout: 'centered',
-      docs: {
-        description: {
-          component:
-            'Accessibility features that enhance usability for all users while ensuring inclusive design principles are met.',
-        },
+const { fn: w } = __STORYBOOK_MODULE_TEST__;
+const P = {
+  title: '03 Components/Action/Button/Accessibility',
+  component: a,
+  parameters: {
+    layout: 'centered',
+    docs: {
+      description: {
+        component:
+          'Accessibility features that enhance usability for all users while ensuring inclusive design principles are met.',
       },
     },
-    tags: ['autodocs'],
-    args: { onClick: w() },
   },
-  s = {
-    render: () =>
-      e.jsxs('div', {
-        className: 'space-y-6 p-4 max-w-2xl',
-        children: [
-          e.jsxs('div', {
-            className: 'space-y-4',
-            children: [
-              e.jsx('h3', { className: 'text-lg font-medium', children: 'Foundation Principles' }),
-              e.jsx('p', {
-                className: 'text-sm text-muted-foreground',
-                children:
-                  'Accessible buttons benefit everyone by providing clear context and predictable interaction patterns.',
-              }),
-            ],
-          }),
-          e.jsxs('div', {
-            className: 'space-y-6',
-            children: [
-              e.jsxs('div', {
-                className: 'space-y-3',
-                children: [
-                  e.jsx('h4', { className: 'text-base font-medium', children: 'Clear Purpose' }),
-                  e.jsxs('div', {
-                    className: 'space-y-2',
-                    children: [
-                      e.jsx(a, { children: 'Save Document' }),
-                      e.jsx('p', {
-                        className: 'text-xs text-muted-foreground',
-                        children: 'Descriptive text eliminates guesswork about button function',
-                      }),
-                    ],
-                  }),
-                ],
-              }),
-              e.jsxs('div', {
-                className: 'space-y-3',
-                children: [
-                  e.jsx('h4', { className: 'text-base font-medium', children: 'Enhanced Context' }),
-                  e.jsxs('div', {
-                    className: 'space-y-2',
-                    children: [
-                      e.jsx(a, {
-                        'aria-label': 'Save the current document to your account',
-                        children: 'Save',
-                      }),
-                      e.jsx('p', {
-                        className: 'text-xs text-muted-foreground',
-                        children:
-                          'aria-label provides additional context when button text is minimal',
-                      }),
-                    ],
-                  }),
-                ],
-              }),
-              e.jsxs('div', {
-                className: 'space-y-3',
-                children: [
-                  e.jsx('h4', {
-                    className: 'text-base font-medium',
-                    children: 'State Communication',
-                  }),
-                  e.jsxs('div', {
-                    className: 'space-y-2',
-                    children: [
-                      e.jsx(a, { 'aria-pressed': !0, variant: 'secondary', children: 'Starred' }),
-                      e.jsx('p', {
-                        className: 'text-xs text-muted-foreground',
-                        children: 'aria-pressed communicates toggle state to all users',
-                      }),
-                    ],
-                  }),
-                ],
-              }),
-            ],
-          }),
-        ],
-      }),
-    parameters: {
-      docs: {
-        description: {
-          story:
-            'Foundation accessibility principles that improve usability for everyone while ensuring inclusive design standards.',
-        },
-      },
-      layout: 'fullscreen',
-    },
-  },
-  t = {
-    render: () =>
-      e.jsxs('div', {
-        className: 'space-y-6 p-4 max-w-2xl',
-        children: [
-          e.jsxs('div', {
-            className: 'space-y-4',
-            children: [
-              e.jsx('h3', { className: 'text-lg font-medium', children: 'Keyboard Navigation' }),
-              e.jsx('p', {
-                className: 'text-sm text-muted-foreground',
-                children:
-                  'Use Tab to navigate, Space or Enter to activate. Focus indicators show current position clearly.',
-              }),
-            ],
-          }),
-          e.jsxs('div', {
-            className: 'space-y-4',
-            children: [
-              e.jsxs('div', {
-                className: 'flex gap-3',
-                children: [
-                  e.jsx(a, { variant: 'primary', children: 'First Action' }),
-                  e.jsx(a, { variant: 'secondary', children: 'Second Action' }),
-                  e.jsx(a, { variant: 'outline', children: 'Third Action' }),
-                ],
-              }),
-              e.jsxs('div', {
-                className: 'text-xs text-muted-foreground space-y-1',
-                children: [
-                  e.jsxs('div', {
-                    children: [
-                      '• ',
-                      e.jsx('kbd', {
-                        className: 'px-1.5 py-0.5 bg-muted rounded text-xs',
-                        children: 'Tab',
-                      }),
-                      ' to navigate between buttons',
-                    ],
-                  }),
-                  e.jsxs('div', {
-                    children: [
-                      '• ',
-                      e.jsx('kbd', {
-                        className: 'px-1.5 py-0.5 bg-muted rounded text-xs',
-                        children: 'Space',
-                      }),
-                      ' or',
-                      ' ',
-                      e.jsx('kbd', {
-                        className: 'px-1.5 py-0.5 bg-muted rounded text-xs',
-                        children: 'Enter',
-                      }),
-                      ' to activate',
-                    ],
-                  }),
-                  e.jsx('div', { children: '• Focus ring provides clear visual indication' }),
-                ],
-              }),
-            ],
-          }),
-        ],
-      }),
-    parameters: {
-      docs: {
-        description: {
-          story:
-            'Keyboard navigation patterns that create intuitive, predictable interaction flows for all users.',
-        },
-      },
-      layout: 'fullscreen',
-    },
-  },
-  i = {
-    render: () =>
-      e.jsxs('div', {
-        className: 'space-y-8 p-4 max-w-3xl',
-        children: [
-          e.jsxs('div', {
-            className: 'space-y-4',
-            children: [
-              e.jsx('h3', {
-                className: 'text-lg font-medium',
-                children: 'Universal Design Through Contrast',
-              }),
-              e.jsx('p', {
-                className: 'text-sm text-muted-foreground',
-                children:
-                  'High contrast benefits everyone: users with low vision, people in bright sunlight, and anyone using older displays.',
-              }),
-            ],
-          }),
-          e.jsxs('div', {
-            className: 'grid grid-cols-1 md:grid-cols-2 gap-6',
-            children: [
-              e.jsxs('div', {
-                className: 'space-y-4',
-                children: [
-                  e.jsx('h4', {
-                    className: 'text-base font-medium',
-                    children: 'Standard Lighting',
-                  }),
-                  e.jsx('div', {
-                    className: 'p-4 bg-background border rounded',
-                    children: e.jsxs('div', {
-                      className: 'space-y-3',
-                      children: [
-                        e.jsx(a, { variant: 'primary', children: 'Primary Action' }),
-                        e.jsx(a, { variant: 'secondary', children: 'Secondary Action' }),
-                        e.jsx(a, { variant: 'outline', children: 'Outline Action' }),
-                        e.jsx(a, { variant: 'ghost', children: 'Ghost Action' }),
-                      ],
-                    }),
-                  }),
-                ],
-              }),
-              e.jsxs('div', {
-                className: 'space-y-4',
-                children: [
-                  e.jsx('h4', {
-                    className: 'text-base font-medium',
-                    children: 'High Contrast Simulation',
-                  }),
-                  e.jsx('div', {
-                    className: 'p-4 bg-white border rounded',
-                    children: e.jsxs('div', {
-                      className: 'space-y-3',
-                      children: [
-                        e.jsx(a, {
-                          variant: 'primary',
-                          className: 'contrast-more:bg-black contrast-more:text-white',
-                          children: 'Primary Action',
-                        }),
-                        e.jsx(a, {
-                          variant: 'secondary',
-                          className: 'contrast-more:border-black contrast-more:text-black',
-                          children: 'Secondary Action',
-                        }),
-                        e.jsx(a, {
-                          variant: 'outline',
-                          className: 'contrast-more:border-black contrast-more:text-black',
-                          children: 'Outline Action',
-                        }),
-                        e.jsx(a, {
-                          variant: 'ghost',
-                          className: 'contrast-more:text-black hover:contrast-more:bg-gray-200',
-                          children: 'Ghost Action',
-                        }),
-                      ],
-                    }),
-                  }),
-                ],
-              }),
-            ],
-          }),
-          e.jsx('div', {
-            className: 'text-xs text-muted-foreground',
-            children: e.jsx('div', {
+  tags: ['autodocs'],
+  args: { onClick: w() },
+};
+const s = {
+  render: () =>
+    e.jsxs('div', {
+      className: 'space-y-6 p-4 max-w-2xl',
+      children: [
+        e.jsxs('div', {
+          className: 'space-y-4',
+          children: [
+            e.jsx('h3', { className: 'text-lg font-medium', children: 'Foundation Principles' }),
+            e.jsx('p', {
+              className: 'text-sm text-muted-foreground',
               children:
-                'All button variants maintain WCAG AA contrast ratios (4.5:1) for optimal readability',
+                'Accessible buttons benefit everyone by providing clear context and predictable interaction patterns.',
             }),
-          }),
-        ],
-      }),
-    parameters: {
-      docs: {
-        description: {
-          story:
-            'Color contrast demonstration showing how proper contrast ratios benefit all users across different viewing conditions.',
-        },
+          ],
+        }),
+        e.jsxs('div', {
+          className: 'space-y-6',
+          children: [
+            e.jsxs('div', {
+              className: 'space-y-3',
+              children: [
+                e.jsx('h4', { className: 'text-base font-medium', children: 'Clear Purpose' }),
+                e.jsxs('div', {
+                  className: 'space-y-2',
+                  children: [
+                    e.jsx(a, { children: 'Save Document' }),
+                    e.jsx('p', {
+                      className: 'text-xs text-muted-foreground',
+                      children: 'Descriptive text eliminates guesswork about button function',
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            e.jsxs('div', {
+              className: 'space-y-3',
+              children: [
+                e.jsx('h4', { className: 'text-base font-medium', children: 'Enhanced Context' }),
+                e.jsxs('div', {
+                  className: 'space-y-2',
+                  children: [
+                    e.jsx(a, {
+                      'aria-label': 'Save the current document to your account',
+                      children: 'Save',
+                    }),
+                    e.jsx('p', {
+                      className: 'text-xs text-muted-foreground',
+                      children:
+                        'aria-label provides additional context when button text is minimal',
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            e.jsxs('div', {
+              className: 'space-y-3',
+              children: [
+                e.jsx('h4', {
+                  className: 'text-base font-medium',
+                  children: 'State Communication',
+                }),
+                e.jsxs('div', {
+                  className: 'space-y-2',
+                  children: [
+                    e.jsx(a, { 'aria-pressed': !0, variant: 'secondary', children: 'Starred' }),
+                    e.jsx('p', {
+                      className: 'text-xs text-muted-foreground',
+                      children: 'aria-pressed communicates toggle state to all users',
+                    }),
+                  ],
+                }),
+              ],
+            }),
+          ],
+        }),
+      ],
+    }),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Foundation accessibility principles that improve usability for everyone while ensuring inclusive design standards.',
       },
-      layout: 'fullscreen',
     },
+    layout: 'fullscreen',
   },
-  r = {
-    render: () =>
-      e.jsxs('div', {
-        className: 'space-y-6 p-4 max-w-2xl',
-        children: [
-          e.jsxs('div', {
-            className: 'space-y-4',
-            children: [
-              e.jsx('h3', {
-                className: 'text-lg font-medium',
-                children: 'Screen Reader Optimization',
-              }),
-              e.jsx('p', {
-                className: 'text-sm text-muted-foreground',
-                children:
-                  'Semantic markup and ARIA attributes create clear, navigable experiences for screen reader users.',
-              }),
-            ],
-          }),
-          e.jsxs('div', {
-            className: 'space-y-6',
-            children: [
-              e.jsxs('div', {
-                className: 'space-y-3',
-                children: [
-                  e.jsx('h4', { className: 'text-base font-medium', children: 'Action Context' }),
-                  e.jsxs('div', {
-                    className: 'space-y-2',
+};
+const t = {
+  render: () =>
+    e.jsxs('div', {
+      className: 'space-y-6 p-4 max-w-2xl',
+      children: [
+        e.jsxs('div', {
+          className: 'space-y-4',
+          children: [
+            e.jsx('h3', { className: 'text-lg font-medium', children: 'Keyboard Navigation' }),
+            e.jsx('p', {
+              className: 'text-sm text-muted-foreground',
+              children:
+                'Use Tab to navigate, Space or Enter to activate. Focus indicators show current position clearly.',
+            }),
+          ],
+        }),
+        e.jsxs('div', {
+          className: 'space-y-4',
+          children: [
+            e.jsxs('div', {
+              className: 'flex gap-3',
+              children: [
+                e.jsx(a, { variant: 'primary', children: 'First Action' }),
+                e.jsx(a, { variant: 'secondary', children: 'Second Action' }),
+                e.jsx(a, { variant: 'outline', children: 'Third Action' }),
+              ],
+            }),
+            e.jsxs('div', {
+              className: 'text-xs text-muted-foreground space-y-1',
+              children: [
+                e.jsxs('div', {
+                  children: [
+                    '• ',
+                    e.jsx('kbd', {
+                      className: 'px-1.5 py-0.5 bg-muted rounded text-xs',
+                      children: 'Tab',
+                    }),
+                    ' to navigate between buttons',
+                  ],
+                }),
+                e.jsxs('div', {
+                  children: [
+                    '• ',
+                    e.jsx('kbd', {
+                      className: 'px-1.5 py-0.5 bg-muted rounded text-xs',
+                      children: 'Space',
+                    }),
+                    ' or',
+                    ' ',
+                    e.jsx('kbd', {
+                      className: 'px-1.5 py-0.5 bg-muted rounded text-xs',
+                      children: 'Enter',
+                    }),
+                    ' to activate',
+                  ],
+                }),
+                e.jsx('div', { children: '• Focus ring provides clear visual indication' }),
+              ],
+            }),
+          ],
+        }),
+      ],
+    }),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Keyboard navigation patterns that create intuitive, predictable interaction flows for all users.',
+      },
+    },
+    layout: 'fullscreen',
+  },
+};
+const i = {
+  render: () =>
+    e.jsxs('div', {
+      className: 'space-y-8 p-4 max-w-3xl',
+      children: [
+        e.jsxs('div', {
+          className: 'space-y-4',
+          children: [
+            e.jsx('h3', {
+              className: 'text-lg font-medium',
+              children: 'Universal Design Through Contrast',
+            }),
+            e.jsx('p', {
+              className: 'text-sm text-muted-foreground',
+              children:
+                'High contrast benefits everyone: users with low vision, people in bright sunlight, and anyone using older displays.',
+            }),
+          ],
+        }),
+        e.jsxs('div', {
+          className: 'grid grid-cols-1 md:grid-cols-2 gap-6',
+          children: [
+            e.jsxs('div', {
+              className: 'space-y-4',
+              children: [
+                e.jsx('h4', {
+                  className: 'text-base font-medium',
+                  children: 'Standard Lighting',
+                }),
+                e.jsx('div', {
+                  className: 'p-4 bg-background border rounded',
+                  children: e.jsxs('div', {
+                    className: 'space-y-3',
+                    children: [
+                      e.jsx(a, { variant: 'primary', children: 'Primary Action' }),
+                      e.jsx(a, { variant: 'secondary', children: 'Secondary Action' }),
+                      e.jsx(a, { variant: 'outline', children: 'Outline Action' }),
+                      e.jsx(a, { variant: 'ghost', children: 'Ghost Action' }),
+                    ],
+                  }),
+                }),
+              ],
+            }),
+            e.jsxs('div', {
+              className: 'space-y-4',
+              children: [
+                e.jsx('h4', {
+                  className: 'text-base font-medium',
+                  children: 'High Contrast Simulation',
+                }),
+                e.jsx('div', {
+                  className: 'p-4 bg-white border rounded',
+                  children: e.jsxs('div', {
+                    className: 'space-y-3',
                     children: [
                       e.jsx(a, {
-                        'aria-describedby': 'save-description',
                         variant: 'primary',
-                        children: 'Save Changes',
+                        className: 'contrast-more:bg-black contrast-more:text-white',
+                        children: 'Primary Action',
                       }),
-                      e.jsx('div', {
-                        id: 'save-description',
-                        className: 'text-xs text-muted-foreground',
-                        children: 'Saves your current document progress to the cloud',
-                      }),
-                    ],
-                  }),
-                ],
-              }),
-              e.jsxs('div', {
-                className: 'space-y-3',
-                children: [
-                  e.jsx('h4', { className: 'text-base font-medium', children: 'Loading State' }),
-                  e.jsxs('div', {
-                    className: 'space-y-2',
-                    children: [
-                      e.jsx(a, {
-                        disabled: !0,
-                        'aria-live': 'polite',
-                        'aria-busy': 'true',
-                        children: 'Processing...',
-                      }),
-                      e.jsx('div', {
-                        className: 'text-xs text-muted-foreground',
-                        children:
-                          'aria-live and aria-busy communicate loading state to screen readers',
-                      }),
-                    ],
-                  }),
-                ],
-              }),
-              e.jsxs('div', {
-                className: 'space-y-3',
-                children: [
-                  e.jsx('h4', { className: 'text-base font-medium', children: 'Toggle State' }),
-                  e.jsxs('div', {
-                    className: 'space-y-2',
-                    children: [
                       e.jsx(a, {
                         variant: 'secondary',
-                        'aria-pressed': !1,
-                        'aria-label': 'Add item to favorites',
-                        children: 'Favorite',
+                        className: 'contrast-more:border-black contrast-more:text-black',
+                        children: 'Secondary Action',
                       }),
-                      e.jsx('div', {
-                        className: 'text-xs text-muted-foreground',
-                        children: 'aria-pressed indicates current toggle state clearly',
+                      e.jsx(a, {
+                        variant: 'outline',
+                        className: 'contrast-more:border-black contrast-more:text-black',
+                        children: 'Outline Action',
+                      }),
+                      e.jsx(a, {
+                        variant: 'ghost',
+                        className: 'contrast-more:text-black hover:contrast-more:bg-gray-200',
+                        children: 'Ghost Action',
                       }),
                     ],
                   }),
-                ],
-              }),
-            ],
+                }),
+              ],
+            }),
+          ],
+        }),
+        e.jsx('div', {
+          className: 'text-xs text-muted-foreground',
+          children: e.jsx('div', {
+            children:
+              'All button variants maintain WCAG AA contrast ratios (4.5:1) for optimal readability',
           }),
-        ],
-      }),
-    parameters: {
-      docs: {
-        description: {
-          story:
-            'Screen reader optimization techniques that create clear, navigable experiences through semantic markup and ARIA attributes.',
-        },
+        }),
+      ],
+    }),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Color contrast demonstration showing how proper contrast ratios benefit all users across different viewing conditions.',
       },
-      layout: 'fullscreen',
     },
-  };
-var n, o, c, d, l;
+    layout: 'fullscreen',
+  },
+};
+const r = {
+  render: () =>
+    e.jsxs('div', {
+      className: 'space-y-6 p-4 max-w-2xl',
+      children: [
+        e.jsxs('div', {
+          className: 'space-y-4',
+          children: [
+            e.jsx('h3', {
+              className: 'text-lg font-medium',
+              children: 'Screen Reader Optimization',
+            }),
+            e.jsx('p', {
+              className: 'text-sm text-muted-foreground',
+              children:
+                'Semantic markup and ARIA attributes create clear, navigable experiences for screen reader users.',
+            }),
+          ],
+        }),
+        e.jsxs('div', {
+          className: 'space-y-6',
+          children: [
+            e.jsxs('div', {
+              className: 'space-y-3',
+              children: [
+                e.jsx('h4', { className: 'text-base font-medium', children: 'Action Context' }),
+                e.jsxs('div', {
+                  className: 'space-y-2',
+                  children: [
+                    e.jsx(a, {
+                      'aria-describedby': 'save-description',
+                      variant: 'primary',
+                      children: 'Save Changes',
+                    }),
+                    e.jsx('div', {
+                      id: 'save-description',
+                      className: 'text-xs text-muted-foreground',
+                      children: 'Saves your current document progress to the cloud',
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            e.jsxs('div', {
+              className: 'space-y-3',
+              children: [
+                e.jsx('h4', { className: 'text-base font-medium', children: 'Loading State' }),
+                e.jsxs('div', {
+                  className: 'space-y-2',
+                  children: [
+                    e.jsx(a, {
+                      disabled: !0,
+                      'aria-live': 'polite',
+                      'aria-busy': 'true',
+                      children: 'Processing...',
+                    }),
+                    e.jsx('div', {
+                      className: 'text-xs text-muted-foreground',
+                      children:
+                        'aria-live and aria-busy communicate loading state to screen readers',
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            e.jsxs('div', {
+              className: 'space-y-3',
+              children: [
+                e.jsx('h4', { className: 'text-base font-medium', children: 'Toggle State' }),
+                e.jsxs('div', {
+                  className: 'space-y-2',
+                  children: [
+                    e.jsx(a, {
+                      variant: 'secondary',
+                      'aria-pressed': !1,
+                      'aria-label': 'Add item to favorites',
+                      children: 'Favorite',
+                    }),
+                    e.jsx('div', {
+                      className: 'text-xs text-muted-foreground',
+                      children: 'aria-pressed indicates current toggle state clearly',
+                    }),
+                  ],
+                }),
+              ],
+            }),
+          ],
+        }),
+      ],
+    }),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Screen reader optimization techniques that create clear, navigable experiences through semantic markup and ARIA attributes.',
+      },
+    },
+    layout: 'fullscreen',
+  },
+};
+let n;
+let o;
+let c;
+let d;
+let l;
 s.parameters = {
   ...s.parameters,
   docs: {
@@ -451,7 +455,11 @@ They provide clear context, proper semantics, and predictable behavior.`,
     },
   },
 };
-var m, u, p, v, x;
+let m;
+let u;
+let p;
+let v;
+let x;
 t.parameters = {
   ...t.parameters,
   docs: {
@@ -507,7 +515,11 @@ Focus management creates smooth, logical interaction flows.`,
     },
   },
 };
-var h, y, g, b, N;
+let h;
+let y;
+let g;
+let b;
+let N;
 i.parameters = {
   ...i.parameters,
   docs: {
@@ -583,7 +595,11 @@ High contrast improves readability in all lighting conditions.`,
     },
   },
 };
-var f, j, A, S, B;
+let f;
+let j;
+let A;
+let S;
+let B;
 r.parameters = {
   ...r.parameters,
   docs: {

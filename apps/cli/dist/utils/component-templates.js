@@ -1,4 +1,11 @@
 export function getComponentTemplate(manifest) {
+    // First, try to get the actual component source from the registry files
+    const componentFile = manifest.files.find((f) => f.path.endsWith('.tsx') && f.type === 'registry:component' && !f.path.includes('.stories.'));
+    if (componentFile?.content && componentFile.content.trim() !== '') {
+        // Return the actual component source from the registry
+        return componentFile.content;
+    }
+    // Fallback to generated templates for development
     const componentName = manifest.name;
     switch (componentName.toLowerCase()) {
         case 'button':
@@ -20,10 +27,15 @@ export function getComponentTemplate(manifest) {
     }
 }
 function getButtonTemplate(manifest) {
+    const intelligence = manifest.meta?.rafters?.intelligence;
+    if (!intelligence) {
+        throw new Error('Component manifest missing rafters intelligence metadata');
+    }
     return `/**
- * Button Intelligence: cognitiveLoad=${manifest.intelligence.cognitiveLoad}
- * ${manifest.intelligence.attentionEconomics}
- * ${manifest.intelligence.trustBuilding}
+ * Button Intelligence: cognitiveLoad=${intelligence.cognitiveLoad}
+ * ${intelligence.attentionEconomics}
+ * ${intelligence.accessibility}
+ * ${intelligence.trustBuilding}
  * Full patterns: .rafters/agent-instructions.md
  */
 import { Slot } from '@radix-ui/react-slot';
@@ -111,7 +123,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         disabled={isInteractionDisabled}
         aria-busy={loading}
-        aria-label={shouldShowConfirmation ? \`Confirm to \${children}\` : undefined}
+        {...(shouldShowConfirmation && { 'aria-label': \`Confirm to \${children}\` })}
         {...props}
       >
         {asChild ? (
@@ -157,10 +169,14 @@ Button.displayName = 'Button';
 `;
 }
 function getInputTemplate(manifest) {
+    const intelligence = manifest.meta?.rafters?.intelligence;
+    if (!intelligence) {
+        throw new Error('Component manifest missing rafters intelligence metadata');
+    }
     return `/**
- * Input Intelligence: cognitiveLoad=${manifest.intelligence.cognitiveLoad}
- * ${manifest.intelligence.attentionEconomics}
- * ${manifest.intelligence.accessibility}
+ * Input Intelligence: cognitiveLoad=${intelligence.cognitiveLoad}
+ * ${intelligence.attentionEconomics}
+ * ${intelligence.accessibility}
  * Full patterns: .rafters/agent-instructions.md
  */
 import { forwardRef } from 'react';
@@ -217,6 +233,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           className
         )}
         ref={ref}
+        aria-invalid={variant === 'error'}
+        aria-describedby={variant === 'error' ? 'error-message' : undefined}
         {...props}
       />
     );
@@ -227,10 +245,14 @@ Input.displayName = 'Input';
 `;
 }
 function getCardTemplate(manifest) {
+    const intelligence = manifest.meta?.rafters?.intelligence;
+    if (!intelligence) {
+        throw new Error('Component manifest missing rafters intelligence metadata');
+    }
     return `/**
- * Card Intelligence: cognitiveLoad=${manifest.intelligence.cognitiveLoad}
- * ${manifest.intelligence.attentionEconomics}
- * ${manifest.intelligence.semanticMeaning}
+ * Card Intelligence: cognitiveLoad=${intelligence.cognitiveLoad}
+ * ${intelligence.attentionEconomics}
+ * ${intelligence.semanticMeaning}
  * Full patterns: .rafters/agent-instructions.md
  */
 import { forwardRef } from 'react';
@@ -326,9 +348,13 @@ CardFooter.displayName = 'CardFooter';
 }
 // Simplified templates for other components
 function getSelectTemplate(manifest) {
+    const intelligence = manifest.meta?.rafters?.intelligence;
+    if (!intelligence) {
+        throw new Error('Component manifest missing rafters intelligence metadata');
+    }
     return `/**
- * Select Intelligence: cognitiveLoad=${manifest.intelligence.cognitiveLoad}
- * ${manifest.intelligence.accessibility}
+ * Select Intelligence: cognitiveLoad=${intelligence.cognitiveLoad}
+ * ${intelligence.accessibility}
  * Full patterns: .rafters/agent-instructions.md
  */
 import * as React from 'react';
@@ -482,10 +508,14 @@ export {
 `;
 }
 function getDialogTemplate(manifest) {
+    const intelligence = manifest.meta?.rafters?.intelligence;
+    if (!intelligence) {
+        throw new Error('Component manifest missing rafters intelligence metadata');
+    }
     return `/**
- * Dialog Intelligence: cognitiveLoad=${manifest.intelligence.cognitiveLoad}
- * ${manifest.intelligence.trustBuilding}
- * ${manifest.intelligence.accessibility}
+ * Dialog Intelligence: cognitiveLoad=${intelligence.cognitiveLoad}
+ * ${intelligence.trustBuilding}
+ * ${intelligence.accessibility}
  * Full patterns: .rafters/agent-instructions.md
  */
 import * as React from 'react';
@@ -598,10 +628,14 @@ export {
 `;
 }
 function getLabelTemplate(manifest) {
+    const intelligence = manifest.meta?.rafters?.intelligence;
+    if (!intelligence) {
+        throw new Error('Component manifest missing rafters intelligence metadata');
+    }
     return `/**
- * Label Intelligence: cognitiveLoad=${manifest.intelligence.cognitiveLoad}
- * ${manifest.intelligence.semanticMeaning}
- * ${manifest.intelligence.accessibility}
+ * Label Intelligence: cognitiveLoad=${intelligence.cognitiveLoad}
+ * ${intelligence.semanticMeaning}
+ * ${intelligence.accessibility}
  * Full patterns: .rafters/agent-instructions.md
  */
 import * as React from 'react';
@@ -644,10 +678,14 @@ export { Label };
 `;
 }
 function getTabsTemplate(manifest) {
+    const intelligence = manifest.meta?.rafters?.intelligence;
+    if (!intelligence) {
+        throw new Error('Component manifest missing rafters intelligence metadata');
+    }
     return `/**
- * Tabs Intelligence: cognitiveLoad=${manifest.intelligence.cognitiveLoad}
- * ${manifest.intelligence.attentionEconomics}
- * ${manifest.intelligence.accessibility}
+ * Tabs Intelligence: cognitiveLoad=${intelligence.cognitiveLoad}
+ * ${intelligence.attentionEconomics}
+ * ${intelligence.accessibility}
  * Full patterns: .rafters/agent-instructions.md
  */
 import * as React from 'react';

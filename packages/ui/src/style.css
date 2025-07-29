@@ -44,7 +44,7 @@
   --opacity-hover-subtle: 0.95;
   --opacity-hover-enhanced: 0.85;
   --opacity-hover-critical: 0.8;
-  
+
   --opacity-active: 0.95;
   --opacity-disabled: 0.6;
   --opacity-loading: 0.8;
@@ -55,7 +55,7 @@
   --duration-standard: 200ms;
   --duration-deliberate: 300ms;
   --duration-slow: 500ms;
-  
+
   /* Confirmation delays */
   --delay-none: 0ms;
   --delay-brief: 200ms;
@@ -72,10 +72,10 @@
   --ring-width-standard: 2px;
   --ring-width-enhanced: 3px;
   --ring-width-prominent: 4px;
-  
+
   --ring-offset-standard: 2px;
   --ring-offset-enhanced: 3px;
-  
+
   --ring-opacity-standard: 0.5;
   --ring-opacity-enhanced: 0.7;
   --ring-opacity-prominent: 0.9;
@@ -84,7 +84,7 @@
   --border-width-standard: 1px;
   --border-width-enhanced: 2px;
   --border-width-prominent: 3px;
-  
+
   /* Border opacity modifiers */
   --border-opacity-subtle: 0.2;
   --border-opacity-standard: 0.3;
@@ -96,10 +96,13 @@
   --shadow-hover-standard: 0 1px 3px rgba(0, 0, 0, 0.1);
   --shadow-hover-enhanced: 0 2px 4px rgba(0, 0, 0, 0.15);
   --shadow-hover-prominent: 0 4px 8px rgba(0, 0, 0, 0.2);
-  
-  --shadow-focus-standard: 0 0 0 var(--ring-width-standard) rgb(var(--color-ring) / var(--ring-opacity-standard));
-  --shadow-focus-enhanced: 0 0 0 var(--ring-width-enhanced) rgb(var(--color-ring) / var(--ring-opacity-enhanced));
-  --shadow-focus-prominent: 0 0 0 var(--ring-width-prominent) rgb(var(--color-ring) / var(--ring-opacity-prominent));
+
+  --shadow-focus-standard: 0 0 0 var(--ring-width-standard)
+    rgb(var(--color-ring) / var(--ring-opacity-standard));
+  --shadow-focus-enhanced: 0 0 0 var(--ring-width-enhanced)
+    rgb(var(--color-ring) / var(--ring-opacity-enhanced));
+  --shadow-focus-prominent: 0 0 0 var(--ring-width-prominent)
+    rgb(var(--color-ring) / var(--ring-opacity-prominent));
 
   /* Background alpha values for states */
   --alpha-bg-subtle: 0.05;
@@ -110,25 +113,25 @@
   /* ========================================
    * SEMANTIC CONSEQUENCE MAPPINGS
    * ======================================== */
-  
+
   /* Reversible actions (low consequence) */
   --consequence-reversible-opacity: var(--opacity-hover-subtle);
   --consequence-reversible-timing: var(--duration-fast);
   --consequence-reversible-delay: var(--delay-none);
   --consequence-reversible-ring: var(--ring-width-standard);
-  
+
   /* Significant actions (medium consequence) */
   --consequence-significant-opacity: var(--opacity-hover);
   --consequence-significant-timing: var(--duration-standard);
   --consequence-significant-delay: var(--delay-none);
   --consequence-significant-ring: var(--ring-width-standard);
-  
+
   /* Permanent actions (high consequence) */
   --consequence-permanent-opacity: var(--opacity-hover-enhanced);
   --consequence-permanent-timing: var(--duration-deliberate);
   --consequence-permanent-delay: var(--delay-brief);
   --consequence-permanent-ring: var(--ring-width-enhanced);
-  
+
   /* Destructive actions (critical consequence) */
   --consequence-destructive-opacity: var(--opacity-hover-critical);
   --consequence-destructive-timing: var(--duration-slow);
@@ -138,19 +141,19 @@
   /* ========================================
    * SEMANTIC SENSITIVITY MAPPINGS
    * ======================================== */
-  
+
   /* Public data (no sensitivity) */
   --sensitivity-public-border: var(--border-width-standard);
   --sensitivity-public-shadow: none;
-  
+
   /* Personal data (low sensitivity) */
   --sensitivity-personal-border: var(--border-width-standard);
   --sensitivity-personal-shadow: var(--shadow-hover-subtle);
-  
+
   /* Financial data (high sensitivity) */
   --sensitivity-financial-border: var(--border-width-enhanced);
   --sensitivity-financial-shadow: var(--shadow-hover-enhanced);
-  
+
   /* Critical data (maximum sensitivity) */
   --sensitivity-critical-border: var(--border-width-prominent);
   --sensitivity-critical-shadow: var(--shadow-hover-prominent);
@@ -158,17 +161,17 @@
   /* ========================================
    * VALIDATION STATE MAPPINGS
    * ======================================== */
-  
+
   /* Success state emphasis */
   --validation-success-opacity: var(--opacity-hover-subtle);
   --validation-success-timing: var(--duration-fast);
   --validation-success-bg: rgb(var(--color-success) / var(--alpha-bg-subtle));
-  
+
   /* Warning state emphasis */
   --validation-warning-opacity: var(--opacity-hover);
   --validation-warning-timing: var(--duration-standard);
   --validation-warning-bg: rgb(var(--color-warning) / var(--alpha-bg-standard));
-  
+
   /* Error state emphasis */
   --validation-error-opacity: var(--opacity-hover-enhanced);
   --validation-error-timing: var(--duration-deliberate);

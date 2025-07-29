@@ -4,17 +4,9 @@
 
 # Rafters CLI
 
-> CLI tool for installing Rafters design system components with embedded design intelligence
+> CLI tool for installing Rafters design system components with embedded design intelligence for AI agents
 
-Rafters CLI helps you add React components with built-in design intelligence patterns including cognitive load optimization, attention economics, accessibility features, and trust-building patterns.
-
-## Installation
-
-```bash
-npm install -g rafters-cli
-# or
-npx rafters-cli
-```
+Rafters CLI helps you add React components with built-in AI agent design intelligence patterns including cognitive load optimization, attention economics, accessibility features, and trust-building patterns.
 
 ## Quick Start
 
@@ -41,12 +33,12 @@ npx rafters-cli
 
 Initialize Rafters in your existing React project. This command:
 
-- ✅ Checks for React dependencies
-- ✅ Detects your package manager (pnpm/yarn/npm)
-- ✅ Creates `.rafters/` configuration directory
-- ✅ Installs core dependencies
-- ✅ Sets up AI agent instructions
-- ✅ Configures component and story directories
+- Checks for React dependencies
+- Detects your package manager (pnpm/yarn/npm)
+- Creates `.rafters/` configuration directory
+- Installs core dependencies
+- Sets up AI agent instructions
+- Configures component and story directories
 
 **Interactive setup:**
 ```bash
@@ -65,13 +57,13 @@ npx rafters add input --force  # Overwrite existing
 ```
 
 **What gets installed:**
-- ✨ Component with intelligence comments
-- 📊 Cognitive load analysis (1-10 scale)
-- 🎯 Attention economics patterns
-- ♿ Accessibility features (WCAG AAA)
-- 🔒 Trust-building patterns
-- 📝 Storybook intelligence story (if enabled)
-- 📋 Updated component manifest
+- Component with intelligence comments
+- Cognitive load analysis (1-10 scale)
+- Attention economics patterns
+- Accessibility features (WCAG AAA)
+- Trust-building patterns
+- Storybook intelligence story (if enabled)
+- Updated component manifest
 
 ### `rafters list`
 
@@ -98,19 +90,19 @@ npx rafters list --details    # Detailed view with intelligence
 
 Every Rafters component includes embedded intelligence about:
 
-### 🧠 **Cognitive Load** (1-10 scale)
+### **Cognitive Load** (1-10 scale)
 Mental overhead assessment helps you balance interface complexity.
 
-### 🎯 **Attention Economics**
+### **Attention Economics**
 Visual hierarchy patterns that guide user attention effectively.
 
-### ♿ **Accessibility**
+### **Accessibility**
 WCAG AAA compliance with motor, visual, cognitive, and auditory support.
 
-### 🔒 **Trust Building**
+### **Trust Building**
 Patterns for secure interactions and sensitive data handling.
 
-### 🎨 **Semantic Meaning**
+### **Semantic Meaning**
 How design communicates meaning beyond just aesthetics.
 
 ## Project Structure
@@ -147,11 +139,11 @@ your-project/
 
 Rafters creates `.rafters/agent-instructions.md` with guidance for AI coding assistants:
 
-- 🎯 How to use component intelligence patterns
-- 📊 Cognitive load optimization guidelines  
-- ♿ Accessibility-first development approach
-- 🔒 Trust-building interaction patterns
-- 📋 Quick reference to component manifest
+- How to use component intelligence patterns
+- Cognitive load optimization guidelines  
+- Accessibility-first development approach
+- Trust-building interaction patterns
+- Quick reference to component manifest
 
 ## Requirements
 

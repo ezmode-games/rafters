@@ -1,25 +1,43 @@
+import { readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import chalk from 'chalk';
 import ora from 'ora';
-import { join } from 'path';
-import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { getRaftersTitle } from '../utils/logo.js';
+import { z } from 'zod';
 import { loadConfig } from '../utils/config.js';
-import { fetchComponent } from '../utils/registry.js';
 import { installDependencies } from '../utils/dependencies.js';
-import { createComponentPath, writeFile, fileExists } from '../utils/files.js';
-import { getComponentTemplate } from '../utils/component-templates.js';
+import { createComponentPath, fileExists, writeFile } from '../utils/files.js';
+import { getRaftersTitle } from '../utils/logo.js';
+import { type ComponentManifestSchema, fetchComponent } from '../utils/registry.js';
 
 interface AddOptions {
   force?: boolean;
 }
 
-interface ComponentManifest {
-  version: string;
-  initialized: string;
-  components: Record<string, any>;
-}
+const ComponentManifestFileSchema = z.object({
+  version: z.string(),
+  initialized: z.string(),
+  components: z.record(
+    z.string(),
+    z.object({
+      path: z.string(),
+      story: z.string().optional(),
+      installed: z.string(),
+      version: z.string(),
+      intelligence: z.object({
+        cognitiveLoad: z.number(),
+        attentionEconomics: z.string(),
+        accessibility: z.string(),
+        trustBuilding: z.string(),
+        semanticMeaning: z.string(),
+      }),
+      dependencies: z.array(z.string()),
+    })
+  ),
+});
 
-function loadComponentManifest(cwd = process.cwd()): ComponentManifest {
+type ComponentManifestFile = z.infer<typeof ComponentManifestFileSchema>;
+
+function loadComponentManifest(cwd = process.cwd()): ComponentManifestFile {
   const manifestPath = join(cwd, '.rafters', 'component-manifest.json');
   try {
     const content = readFileSync(manifestPath, 'utf-8');
@@ -33,7 +51,7 @@ function loadComponentManifest(cwd = process.cwd()): ComponentManifest {
   }
 }
 
-function saveComponentManifest(manifest: ComponentManifest, cwd = process.cwd()): void {
+function saveComponentManifest(manifest: ComponentManifestFile, cwd = process.cwd()): void {
   const manifestPath = join(cwd, '.rafters', 'component-manifest.json');
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
 }
@@ -53,10 +71,12 @@ export async function addCommand(componentName: string, options: AddOptions = {}
     // Fetch component from registry
     const fetchSpinner = ora(`Fetching ${componentName} component...`).start();
     const componentManifest = await fetchComponent(componentName);
-    
+
     if (!componentManifest) {
       fetchSpinner.fail(`Component '${componentName}' not found in registry`);
-      console.log(chalk.gray('Available components: button, input, card, select, dialog, label, tabs'));
+      console.log(
+        chalk.gray('Available components: button, input, card, select, dialog, label, tabs')
+      );
       process.exit(1);
     }
     fetchSpinner.succeed(`${componentManifest.name} component fetched`);
@@ -64,7 +84,7 @@ export async function addCommand(componentName: string, options: AddOptions = {}
     // Check if component already exists
     const componentPath = createComponentPath(config.componentsDir, componentManifest.name);
     const absoluteComponentPath = join(cwd, componentPath);
-    
+
     if (fileExists(absoluteComponentPath) && !options.force) {
       console.log(chalk.red(`✗ Component already exists at ${componentPath}`));
       console.log(chalk.gray('  Run with --force to overwrite existing component'));
@@ -79,20 +99,40 @@ export async function addCommand(componentName: string, options: AddOptions = {}
 
     // Install dependencies
     if (componentManifest.dependencies.length > 0) {
-      const depsSpinner = ora(`Installing dependencies (${componentManifest.dependencies.join(', ')})...`).start();
+      const depsSpinner = ora(
+        `Installing dependencies (${componentManifest.dependencies.join(', ')})...`
+      ).start();
       try {
         await installDependencies(componentManifest.dependencies, config.packageManager, cwd);
         depsSpinner.succeed('Dependencies installed');
       } catch (error) {
         depsSpinner.warn('Failed to install dependencies automatically');
-        console.log(chalk.gray(`  Please install manually: ${config.packageManager} ${config.packageManager === 'npm' ? 'install' : 'add'} ${componentManifest.dependencies.join(' ')}`));
+        console.log(
+          chalk.gray(
+            `  Please install manually: ${config.packageManager} ${config.packageManager === 'npm' ? 'install' : 'add'} ${componentManifest.dependencies.join(' ')}`
+          )
+        );
       }
     }
 
     // Write component file
     const componentSpinner = ora(`Writing component to ${componentPath}...`).start();
-    const componentContent = getComponentTemplate(componentManifest);
-    writeFile(absoluteComponentPath, componentContent);
+
+    // First try to get actual component source from registry files
+    const componentFile = componentManifest.files.find(
+      (f) =>
+        f.path.endsWith('.tsx') && f.type === 'registry:component' && !f.path.includes('.stories.')
+    );
+
+    if (!componentFile?.content || componentFile.content.trim() === '') {
+      componentSpinner.fail(`No component source available for ${componentManifest.name}`);
+      console.log(
+        chalk.gray('Component source should be available from the registry or packages/shared')
+      );
+      process.exit(1);
+    }
+
+    writeFile(absoluteComponentPath, componentFile.content);
     componentSpinner.succeed(`Component written to ${componentPath}`);
 
     // Add intelligence patterns comment
@@ -103,9 +143,12 @@ export async function addCommand(componentName: string, options: AddOptions = {}
     // Write story file if Storybook is enabled
     if (config.hasStorybook && config.storiesDir) {
       const storySpinner = ora('Writing intelligence story...').start();
-      const storyPath = join(config.storiesDir, `${componentManifest.name.toLowerCase()}-intelligence.stories.tsx`);
+      const storyPath = join(
+        config.storiesDir,
+        `${componentManifest.name.toLowerCase()}-intelligence.stories.tsx`
+      );
       const absoluteStoryPath = join(cwd, storyPath);
-      
+
       // For now, create a basic story - in a real implementation this would come from the registry
       const storyContent = createBasicStory(componentManifest);
       writeFile(absoluteStoryPath, storyContent);
@@ -115,53 +158,82 @@ export async function addCommand(componentName: string, options: AddOptions = {}
     // Update component manifest
     const manifestSpinner = ora('Updating component manifest...').start();
     const manifest = loadComponentManifest(cwd);
+    const intelligence = componentManifest.meta?.rafters?.intelligence;
+    const version = componentManifest.meta?.rafters?.version || '1.0.0';
+
+    if (!intelligence) {
+      throw new Error('Component manifest missing rafters intelligence metadata');
+    }
+
     manifest.components[componentManifest.name] = {
       path: componentPath,
-      story: config.hasStorybook ? join(config.storiesDir!, `${componentManifest.name.toLowerCase()}-intelligence.stories.tsx`) : undefined,
+      story: config.hasStorybook
+        ? join(
+            config.storiesDir!,
+            `${componentManifest.name.toLowerCase()}-intelligence.stories.tsx`
+          )
+        : undefined,
       installed: new Date().toISOString(),
-      version: componentManifest.version,
-      intelligence: componentManifest.intelligence,
-      dependencies: componentManifest.dependencies,
+      version,
+      intelligence,
+      dependencies: componentManifest.dependencies || [],
     };
     saveComponentManifest(manifest, cwd);
     manifestSpinner.succeed('Component manifest updated');
 
     // Success message
     console.log();
-    console.log(chalk.green(`✅ ${componentManifest.name} installed successfully with design intelligence patterns.`));
+    console.log(
+      chalk.green(
+        `✅ ${componentManifest.name} installed successfully with design intelligence patterns.`
+      )
+    );
     console.log();
     console.log('Intelligence features:');
-    console.log(chalk.gray(`  • Cognitive Load: ${componentManifest.intelligence.cognitiveLoad}/10`));
-    console.log(chalk.gray(`  • Attention Economics: ${componentManifest.intelligence.attentionEconomics.split(':')[0]}`));
-    console.log(chalk.gray(`  • Trust Building: ${componentManifest.intelligence.trustBuilding.split('.')[0]}`));
+    console.log(chalk.gray(`  • Cognitive Load: ${intelligence.cognitiveLoad}/10`));
+    console.log(
+      chalk.gray(`  • Attention Economics: ${intelligence.attentionEconomics.split(':')[0]}`)
+    );
+    console.log(chalk.gray(`  • Trust Building: ${intelligence.trustBuilding.split('.')[0]}`));
     console.log();
     console.log('Next steps:');
-    console.log(chalk.gray('  • Import component: ') + chalk.blue(`import { ${componentManifest.name} } from '${componentPath.replace('.tsx', '')}';`));
+    console.log(
+      chalk.gray('  • Import component: ') +
+        chalk.blue(
+          `import { ${componentManifest.name} } from '${componentPath.replace('.tsx', '')}';`
+        )
+    );
     if (config.hasStorybook) {
       console.log(chalk.gray('  • View intelligence story: ') + chalk.blue('npm run storybook'));
     }
-    console.log(chalk.gray('  • Read full patterns: ') + chalk.blue('.rafters/agent-instructions.md'));
-
+    console.log(
+      chalk.gray('  • Read full patterns: ') + chalk.blue('.rafters/agent-instructions.md')
+    );
   } catch (error) {
     console.error(chalk.red('Error adding component:'), error);
     process.exit(1);
   }
 }
 
-function createBasicStory(componentManifest: any): string {
+function createBasicStory(componentManifest: z.infer<typeof ComponentManifestSchema>): string {
   const componentName = componentManifest.name;
-  
+  const intelligence = componentManifest.meta?.rafters?.intelligence;
+
+  if (!intelligence) {
+    throw new Error('Component manifest missing rafters intelligence metadata');
+  }
+
   return `import type { Meta, StoryObj } from '@storybook/react';
 import { ${componentName} } from '../components/ui/${componentName.toLowerCase()}';
 
 /**
  * ${componentName} Intelligence Story
  * 
- * Cognitive Load: ${componentManifest.intelligence.cognitiveLoad}/10
- * ${componentManifest.intelligence.attentionEconomics}
- * ${componentManifest.intelligence.accessibility}
- * ${componentManifest.intelligence.trustBuilding}
- * ${componentManifest.intelligence.semanticMeaning}
+ * Cognitive Load: ${intelligence.cognitiveLoad}/10
+ * ${intelligence.attentionEconomics}
+ * ${intelligence.accessibility}
+ * ${intelligence.trustBuilding}
+ * ${intelligence.semanticMeaning}
  */
 const meta = {
   title: 'Components/${componentName}/Intelligence',
@@ -189,7 +261,7 @@ export const CognitiveLoadAnalysis: Story = {
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Cognitive Load Analysis</h3>
       <p className="text-sm text-muted-foreground">
-        This component has a cognitive load rating of ${componentManifest.intelligence.cognitiveLoad}/10.
+        This component has a cognitive load rating of ${intelligence.cognitiveLoad}/10.
       </p>
       <${componentName} />
     </div>
@@ -201,7 +273,7 @@ export const AttentionEconomics: Story = {
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Attention Economics</h3>
       <p className="text-sm text-muted-foreground">
-        ${componentManifest.intelligence.attentionEconomics}
+        ${intelligence.attentionEconomics}
       </p>
       <${componentName} />
     </div>
@@ -213,7 +285,7 @@ export const TrustBuilding: Story = {
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Trust Building Patterns</h3>
       <p className="text-sm text-muted-foreground">
-        ${componentManifest.intelligence.trustBuilding}
+        ${intelligence.trustBuilding}
       </p>
       <${componentName} />
     </div>
