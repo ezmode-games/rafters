@@ -1,8 +1,10 @@
-import fs from 'fs-extra';
-const { ensureDirSync, writeFileSync, existsSync, readFileSync } = fs;
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 export function ensureDir(path) {
-    ensureDirSync(dirname(path));
+    const dir = dirname(path);
+    if (!existsSync(dir)) {
+        mkdirSync(dir, { recursive: true });
+    }
 }
 export function writeFile(path, content) {
     ensureDir(path);
@@ -15,7 +17,7 @@ export function readFile(path) {
     return readFileSync(path, 'utf-8');
 }
 export function createComponentPath(componentsDir, componentName) {
-    return join(componentsDir, `${componentName.toLowerCase()}.tsx`);
+    return join(componentsDir, 'ui', `${componentName}.tsx`);
 }
 export function createStoryPath(storiesDir, componentName) {
     return join(storiesDir, `${componentName.toLowerCase()}-intelligence.stories.tsx`);

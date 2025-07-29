@@ -34,6 +34,7 @@ function getButtonTemplate(manifest) {
     return `/**
  * Button Intelligence: cognitiveLoad=${intelligence.cognitiveLoad}
  * ${intelligence.attentionEconomics}
+ * ${intelligence.accessibility}
  * ${intelligence.trustBuilding}
  * Full patterns: .rafters/agent-instructions.md
  */
@@ -122,7 +123,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         disabled={isInteractionDisabled}
         aria-busy={loading}
-        aria-label={shouldShowConfirmation ? \`Confirm to \${children}\` : undefined}
+        {...(shouldShowConfirmation && { 'aria-label': \`Confirm to \${children}\` })}
         {...props}
       >
         {asChild ? (
@@ -232,6 +233,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           className
         )}
         ref={ref}
+        aria-invalid={variant === 'error'}
+        aria-describedby={variant === 'error' ? 'error-message' : undefined}
         {...props}
       />
     );

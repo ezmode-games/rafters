@@ -5,7 +5,7 @@ import { Input } from '../../../components/Input';
 const Label = ({
   children,
   htmlFor,
-  variant = 'default',
+  variant = 'field',
   className = '',
   ...props
 }: {
@@ -65,6 +65,11 @@ type Story = StoryObj<typeof meta>;
  * and contextual layering that guides user understanding.
  */
 export const InformationHierarchy: Story = {
+  args: {
+    children: 'Label Text',
+    htmlFor: 'example-input',
+    variant: 'field',
+  },
   render: () => (
     <div className="w-full max-w-4xl">
       <h3 className="text-lg font-medium mb-6">Semantic Information Hierarchy</h3>
@@ -191,6 +196,11 @@ export const InformationHierarchy: Story = {
  * interface contexts and user task requirements.
  */
 export const ContextualCommunication: Story = {
+  args: {
+    children: 'Label Text',
+    htmlFor: 'example-input',
+    variant: 'field',
+  },
   render: () => (
     <div className="w-full max-w-5xl">
       <h3 className="text-lg font-medium mb-6">Context-Adaptive Label Patterns</h3>
@@ -402,6 +412,11 @@ export const ContextualCommunication: Story = {
  * building user understanding through layered communication patterns.
  */
 export const ProgressiveDisclosure: Story = {
+  args: {
+    children: 'Label Text',
+    htmlFor: 'example-input',
+    variant: 'field',
+  },
   render: () => (
     <div className="w-full max-w-4xl">
       <h3 className="text-lg font-medium mb-6">Progressive Information Disclosure</h3>

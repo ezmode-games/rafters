@@ -50,10 +50,10 @@ export const ProminenceVariants: Story = {
           className="border-l-4 border-l-primary shadow-[var(--shadow-hover-prominent)] hover:opacity-[var(--opacity-hover)] transition-all duration-[var(--duration-standard)]"
         >
           <CardHeader density="spacious">
-            <CardTitle level={2} weight="bold">
+            <CardTitle level={2} weight="semibold">
               Elevated Prominence
             </CardTitle>
-            <CardDescription prominence="enhanced">
+            <CardDescription prominence="default">
               Highest visual weight for featured content and primary announcements
             </CardDescription>
           </CardHeader>
@@ -126,7 +126,7 @@ export const ProminenceVariants: Story = {
               <CardTitle level={4} weight="medium">
                 Subtle Prominence
               </CardTitle>
-              <CardDescription prominence="muted">
+              <CardDescription prominence="subtle">
                 Reduced visual weight for supporting and background information
               </CardDescription>
             </CardHeader>
@@ -261,7 +261,7 @@ export const DensityVariants: Story = {
             <CardTitle level={3} weight="semibold">
               Spacious Density
             </CardTitle>
-            <CardDescription prominence="enhanced">
+            <CardDescription prominence="default">
               Generous spacing that creates focus and importance
             </CardDescription>
           </CardHeader>
@@ -498,7 +498,9 @@ export const InteractiveVariants: Story = {
                 <CardTitle level={5} weight="medium">
                   Disabled State
                 </CardTitle>
-                <CardDescription prominence="muted">Content unavailable or loading</CardDescription>
+                <CardDescription prominence="subtle">
+                  Content unavailable or loading
+                </CardDescription>
               </CardHeader>
               <CardContent density="comfortable">
                 <div className="space-y-2">
@@ -513,7 +515,7 @@ export const InteractiveVariants: Story = {
                 <CardTitle level={5} weight="medium">
                   Selected State
                 </CardTitle>
-                <CardDescription prominence="enhanced">
+                <CardDescription prominence="default">
                   Currently active or selected item
                 </CardDescription>
               </CardHeader>
@@ -558,10 +560,10 @@ export const VisualComparison: Story = {
               className="shadow-[var(--shadow-hover-prominent)] border-l-4 border-l-primary"
             >
               <CardHeader density="spacious">
-                <CardTitle level={3} weight="bold">
+                <CardTitle level={3} weight="semibold">
                   Elevated
                 </CardTitle>
-                <CardDescription prominence="enhanced">
+                <CardDescription prominence="default">
                   Maximum visual impact for primary content
                 </CardDescription>
               </CardHeader>
@@ -593,7 +595,7 @@ export const VisualComparison: Story = {
                 <CardTitle level={5} weight="medium">
                   Subtle
                 </CardTitle>
-                <CardDescription prominence="muted">
+                <CardDescription prominence="subtle">
                   Minimal visual weight for supporting content
                 </CardDescription>
               </CardHeader>

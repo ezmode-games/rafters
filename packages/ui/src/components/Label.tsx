@@ -1,3 +1,6 @@
+/**
+ * AI Intelligence: Token knowledge in .rafters/tokens/registry.json
+ */
 import * as LabelPrimitive from '@radix-ui/react-label';
 import { forwardRef } from 'react';
 import { cn } from '../lib/utils';

@@ -9,10 +9,14 @@ import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { configExists, defaultConfig, detectPackageManager, hasReact, isNodeProject, saveConfig, } from '../utils/config.js';
 import { getCoreDependencies, installDependencies } from '../utils/dependencies.js';
+import { getRaftersLogo, getRaftersTitle } from '../utils/logo.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 export async function initCommand() {
     const cwd = process.cwd();
-    console.log(chalk.blue('🏗️  Initializing Rafters...'));
+    // Display ASCII logo
+    console.log(getRaftersLogo());
+    console.log('\n' + getRaftersTitle());
+    console.log(chalk.blue('\n🏗️  Initializing Rafters...'));
     // Check prerequisites
     const spinner = ora('Checking prerequisites...').start();
     if (!isNodeProject(cwd)) {

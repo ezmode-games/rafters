@@ -189,7 +189,7 @@ export const VisualProminence: Story = {
             <CardTitle level={2} weight="semibold">
               Elevated Prominence
             </CardTitle>
-            <CardDescription prominence="enhanced">
+            <CardDescription prominence="default">
               Highest visual weight for primary content and featured information
             </CardDescription>
           </CardHeader>
@@ -237,7 +237,7 @@ export const VisualProminence: Story = {
               <CardTitle level={4} weight="normal">
                 Subtle Prominence
               </CardTitle>
-              <CardDescription prominence="muted">
+              <CardDescription prominence="subtle">
                 Reduced visual weight for supporting or background information
               </CardDescription>
             </CardHeader>
@@ -407,7 +407,7 @@ export const InteractiveStates: Story = {
             <CardTitle level={4} weight="medium">
               Loading State
             </CardTitle>
-            <CardDescription prominence="muted">
+            <CardDescription prominence="subtle">
               Content is being loaded or unavailable
             </CardDescription>
           </CardHeader>

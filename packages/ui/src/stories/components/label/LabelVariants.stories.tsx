@@ -5,7 +5,7 @@ import { Input } from '../../../components/Input';
 const Label = ({
   children,
   htmlFor,
-  variant = 'default',
+  variant = 'field',
   className = '',
   ...props
 }: {
@@ -65,6 +65,11 @@ type Story = StoryObj<typeof meta>;
  * of information being delivered to users.
  */
 export const InformationTypes: Story = {
+  args: {
+    children: 'Label Text',
+    htmlFor: 'example-input',
+    variant: 'field',
+  },
   render: () => (
     <div className="w-full max-w-4xl">
       <h3 className="text-lg font-medium mb-6">Label Information Type Variants</h3>
@@ -291,6 +296,11 @@ export const InformationTypes: Story = {
  * user context, and interaction requirements.
  */
 export const StateResponsive: Story = {
+  args: {
+    children: 'Label Text',
+    htmlFor: 'example-input',
+    variant: 'field',
+  },
   render: () => (
     <div className="w-full max-w-5xl">
       <h3 className="text-lg font-medium mb-6">State-Responsive Label Variants</h3>
@@ -586,6 +596,11 @@ export const StateResponsive: Story = {
  * appropriate usage patterns and communication effectiveness.
  */
 export const VisualComparison: Story = {
+  args: {
+    children: 'Label Text',
+    htmlFor: 'example-input',
+    variant: 'field',
+  },
   render: () => (
     <div className="w-full max-w-6xl">
       <h3 className="text-lg font-medium mb-6">Label Visual Treatment Comparison</h3>

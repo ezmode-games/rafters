@@ -48,10 +48,10 @@ export const ContentHierarchy: Story = {
         <section>
           <Card prominence="elevated" className="border-l-4 border-l-primary">
             <CardHeader density="spacious">
-              <CardTitle level={2} weight="bold">
+              <CardTitle level={2} weight="semibold">
                 Primary Feature Announcement
               </CardTitle>
-              <CardDescription prominence="enhanced">
+              <CardDescription prominence="default">
                 Most important information with highest semantic priority and visual emphasis
               </CardDescription>
             </CardHeader>
@@ -162,7 +162,7 @@ export const ContentHierarchy: Story = {
                 <CardTitle level={4} weight="medium">
                   Migration Guide
                 </CardTitle>
-                <CardDescription prominence="muted">
+                <CardDescription prominence="subtle">
                   Step-by-step upgrade instructions
                 </CardDescription>
               </CardHeader>
@@ -184,7 +184,9 @@ export const ContentHierarchy: Story = {
                 <CardTitle level={4} weight="medium">
                   Release Notes
                 </CardTitle>
-                <CardDescription prominence="muted">Complete changelog and updates</CardDescription>
+                <CardDescription prominence="subtle">
+                  Complete changelog and updates
+                </CardDescription>
               </CardHeader>
               <CardContent density="compact">
                 <p className="text-xs text-muted-foreground">
@@ -203,7 +205,7 @@ export const ContentHierarchy: Story = {
                 <CardTitle level={4} weight="medium">
                   Community
                 </CardTitle>
-                <CardDescription prominence="muted">Connect with other users</CardDescription>
+                <CardDescription prominence="subtle">Connect with other users</CardDescription>
               </CardHeader>
               <CardContent density="compact">
                 <p className="text-xs text-muted-foreground">
@@ -262,7 +264,7 @@ export const ContextualPurpose: Story = {
                 <CardTitle level={5} weight="medium">
                   Revenue
                 </CardTitle>
-                <CardDescription prominence="muted" className="text-xs">
+                <CardDescription prominence="subtle" className="text-xs">
                   Total monthly earnings
                 </CardDescription>
               </CardHeader>
@@ -277,7 +279,7 @@ export const ContextualPurpose: Story = {
                 <CardTitle level={5} weight="medium">
                   Users
                 </CardTitle>
-                <CardDescription prominence="muted" className="text-xs">
+                <CardDescription prominence="subtle" className="text-xs">
                   Active this month
                 </CardDescription>
               </CardHeader>
@@ -292,7 +294,7 @@ export const ContextualPurpose: Story = {
                 <CardTitle level={5} weight="medium">
                   Conversion
                 </CardTitle>
-                <CardDescription prominence="muted" className="text-xs">
+                <CardDescription prominence="subtle" className="text-xs">
                   Rate this month
                 </CardDescription>
               </CardHeader>
@@ -307,7 +309,7 @@ export const ContextualPurpose: Story = {
                 <CardTitle level={5} weight="medium">
                   Orders
                 </CardTitle>
-                <CardDescription prominence="muted" className="text-xs">
+                <CardDescription prominence="subtle" className="text-xs">
                   Completed this month
                 </CardDescription>
               </CardHeader>
@@ -328,7 +330,7 @@ export const ContextualPurpose: Story = {
                 <CardTitle level={4} weight="semibold">
                   Featured Article
                 </CardTitle>
-                <CardDescription prominence="enhanced">Editor's pick for this week</CardDescription>
+                <CardDescription prominence="default">Editor's pick for this week</CardDescription>
               </CardHeader>
               <CardContent density="comfortable">
                 <p className="text-sm text-muted-foreground mb-3">
@@ -411,7 +413,7 @@ export const ContextualPurpose: Story = {
                 <CardTitle level={4} weight="semibold">
                   Quick Setup
                 </CardTitle>
-                <CardDescription prominence="enhanced">
+                <CardDescription prominence="default">
                   Get started in under 5 minutes
                 </CardDescription>
               </CardHeader>
@@ -509,7 +511,7 @@ export const ProgressiveDisclosure: Story = {
                 <CardTitle level={3} weight="semibold">
                   Project Status Overview
                 </CardTitle>
-                <CardDescription prominence="enhanced">
+                <CardDescription prominence="default">
                   High-level summary of all active projects
                 </CardDescription>
               </CardHeader>
@@ -610,7 +612,7 @@ export const ProgressiveDisclosure: Story = {
                   <CardTitle level={5} weight="medium">
                     Mobile App Redesign
                   </CardTitle>
-                  <CardDescription prominence="muted" className="text-xs">
+                  <CardDescription prominence="subtle" className="text-xs">
                     Due: March 30, 2024
                   </CardDescription>
                 </CardHeader>
@@ -642,7 +644,7 @@ export const ProgressiveDisclosure: Story = {
                   <CardTitle level={5} weight="medium">
                     API Integration
                   </CardTitle>
-                  <CardDescription prominence="muted" className="text-xs">
+                  <CardDescription prominence="subtle" className="text-xs">
                     Due: April 15, 2024
                   </CardDescription>
                 </CardHeader>
@@ -674,7 +676,7 @@ export const ProgressiveDisclosure: Story = {
                   <CardTitle level={5} weight="medium">
                     Performance Optimization
                   </CardTitle>
-                  <CardDescription prominence="muted" className="text-xs">
+                  <CardDescription prominence="subtle" className="text-xs">
                     Due: May 1, 2024
                   </CardDescription>
                 </CardHeader>

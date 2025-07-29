@@ -73,8 +73,9 @@ export type ComponentManifest = z.infer<typeof ComponentManifestSchema>;
 export type Registry = z.infer<typeof RegistrySchema>;
 
 // Registry configuration
-const REGISTRY_BASE_URL =
-  process.env.RAFTERS_REGISTRY_URL || 'https://rafters.realhandy.tech/registry';
+function getRegistryBaseUrl(): string {
+  return process.env.RAFTERS_REGISTRY_URL || 'https://rafters-registry.realhandy.tech';
+}
 const REGISTRY_TIMEOUT = 10000; // 10 seconds
 
 // HTTP client response schema
@@ -84,7 +85,7 @@ const RegistryResponseSchema = z.unknown();
 async function fetchFromRegistry(
   endpoint: string
 ): Promise<z.infer<typeof RegistryResponseSchema>> {
-  const url = `${REGISTRY_BASE_URL}${endpoint}`;
+  const url = `${getRegistryBaseUrl()}${endpoint}`;
 
   try {
     const controller = new AbortController();
@@ -121,14 +122,18 @@ async function fetchFromRegistry(
  * Fetch complete component registry from the hosted API
  */
 export async function fetchComponentRegistry(): Promise<Registry> {
-  try {
-    const data = await fetchFromRegistry('/components');
-    return RegistrySchema.parse(data);
-  } catch (error) {
-    // Fallback to mock data if registry is unavailable
-    console.warn('Registry API unavailable, using fallback data:', error);
-    return getFallbackRegistry();
+  const data = await fetchFromRegistry('/components');
+
+  // Transform the API response to match shadcn registry format
+  if (data && typeof data === 'object' && 'components' in data) {
+    return {
+      $schema: 'https://ui.shadcn.com/schema/registry.json',
+      name: 'Rafters AI Design Intelligence Registry',
+      components: (data as { components: unknown[] }).components as ComponentManifest[],
+    };
   }
+
+  return RegistrySchema.parse(data);
 }
 
 /**
@@ -139,103 +144,17 @@ export async function fetchComponent(componentName: string): Promise<ComponentMa
     const data = await fetchFromRegistry(`/components/${encodeURIComponent(componentName)}`);
     return ComponentManifestSchema.parse(data);
   } catch (error) {
-    console.warn(`Component '${componentName}' not found in registry:`, error);
-
-    // Fallback to registry search
-    const registry = await fetchComponentRegistry();
-    return (
-      registry.components.find((c) => c.name.toLowerCase() === componentName.toLowerCase()) || null
-    );
+    // Try searching the full registry if direct fetch fails
+    try {
+      const registry = await fetchComponentRegistry();
+      return (
+        registry.components?.find((c) => c.name.toLowerCase() === componentName.toLowerCase()) ||
+        null
+      );
+    } catch (registryError) {
+      throw new Error(
+        `Component '${componentName}' not found: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
   }
-}
-
-/**
- * Fallback registry data when API is unavailable
- * This ensures the CLI continues to work during development/outages
- * Uses shadcn-compatible format with rafters intelligence in meta
- */
-function getFallbackRegistry(): Registry {
-  const components: ComponentManifest[] = [
-    {
-      $schema: 'https://ui.shadcn.com/schema/registry-item.json',
-      name: 'button',
-      type: 'registry:component',
-      description: 'Action triggers with attention economics and trust-building patterns',
-      dependencies: ['@radix-ui/react-slot'],
-      files: [
-        {
-          path: 'components/ui/button.tsx',
-          type: 'registry:component',
-          content: '// Button component will be fetched from registry',
-        },
-      ],
-      meta: {
-        rafters: {
-          intelligence: {
-            cognitiveLoad: 3,
-            attentionEconomics: 'Size hierarchy: sm=tertiary, md=secondary, lg=primary',
-            accessibility: '44px touch targets, WCAG AAA contrast, keyboard navigation',
-            trustBuilding: 'Destructive variant requires confirmation patterns',
-            semanticMeaning:
-              'Primary=main action, Secondary=optional, Destructive=careful consideration',
-          },
-          version: '1.0.0',
-        },
-      },
-    },
-    {
-      $schema: 'https://ui.shadcn.com/schema/registry-item.json',
-      name: 'input',
-      type: 'registry:component',
-      description: 'Form fields with validation intelligence and state feedback',
-      dependencies: [],
-      files: [
-        {
-          path: 'components/ui/input.tsx',
-          type: 'registry:component',
-          content: '// Input component will be fetched from registry',
-        },
-      ],
-      meta: {
-        rafters: {
-          intelligence: {
-            cognitiveLoad: 4,
-            attentionEconomics: 'Clear validation states guide attention to errors',
-            accessibility: 'ARIA labels, error announcements, 44px touch targets',
-            trustBuilding: 'Progressive validation feedback builds confidence',
-            semanticMeaning: 'Validation states communicate system understanding',
-          },
-          version: '1.0.0',
-        },
-      },
-    },
-    {
-      $schema: 'https://ui.shadcn.com/schema/registry-item.json',
-      name: 'card',
-      type: 'registry:component',
-      description: 'Content containers with cognitive load optimization',
-      dependencies: [],
-      files: [
-        {
-          path: 'components/ui/card.tsx',
-          type: 'registry:component',
-          content: '// Card component will be fetched from registry',
-        },
-      ],
-      meta: {
-        rafters: {
-          intelligence: {
-            cognitiveLoad: 2,
-            attentionEconomics: 'Subtle elevation guides content hierarchy',
-            accessibility: 'Semantic landmarks, focus management for interactive cards',
-            trustBuilding: 'Consistent spacing builds visual reliability',
-            semanticMeaning: 'Container intelligence communicates content relationships',
-          },
-          version: '1.0.0',
-        },
-      },
-    },
-  ];
-
-  return { components };
 }

@@ -55,7 +55,7 @@ export async function listCommand(options = {}) {
                     console.log();
                 }
             }
-            const availableComponents = registry.components.filter((c) => !installed[c.name]);
+            const availableComponents = (registry.components || []).filter((c) => !installed[c.name]);
             if (availableComponents.length > 0) {
                 console.log(chalk.yellow(`Available Components: ${availableComponents.length} remaining`));
                 console.log();
@@ -71,7 +71,7 @@ export async function listCommand(options = {}) {
             // Show compact view
             console.log('Available Components:');
             console.log();
-            for (const component of registry.components) {
+            for (const component of registry.components || []) {
                 const isInstalled = installed[component.name];
                 const icon = isInstalled ? chalk.green('✓') : chalk.gray(' ');
                 const name = isInstalled ? chalk.green(component.name) : component.name;
@@ -79,7 +79,7 @@ export async function listCommand(options = {}) {
                 console.log(`${icon} ${name.padEnd(12)} ${description}`);
             }
             const installedCount = Object.keys(installed).length;
-            const totalCount = registry.components.length;
+            const totalCount = registry.components?.length || 0;
             console.log();
             console.log(chalk.gray(`Installed: ${installedCount}/${totalCount} components`));
             console.log();

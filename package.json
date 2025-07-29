@@ -18,7 +18,11 @@
     "ui:storybook": "pnpm --filter @rafters/ui storybook",
     "ui:build-storybook": "pnpm --filter @rafters/ui build-storybook",
     "cli:dev": "pnpm --filter @rafters/cli dev",
-    "studio:dev": "pnpm --filter @rafters/studio dev"
+    "studio:dev": "pnpm --filter @rafters/studio dev",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "changeset:publish": "changeset publish",
+    "changeset:check": "changeset status --verbose"
   },
   "keywords": [
     "design-system",
@@ -37,6 +41,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",
+    "@changesets/cli": "^2.29.5",
     "lefthook": "^1.11.13",
     "typescript": "^5.5.2"
   }

@@ -5,7 +5,7 @@ import { Input } from '../../../components/Input';
 const Label = ({
   children,
   htmlFor,
-  variant = 'default',
+  variant = 'field',
   className = '',
   ...props
 }: {
@@ -65,6 +65,11 @@ type Story = StoryObj<typeof meta>;
  * through proper HTML relationships and ARIA attributes.
  */
 export const SemanticRelationships: Story = {
+  args: {
+    children: 'Label Text',
+    htmlFor: 'example-input',
+    variant: 'field',
+  },
   render: () => (
     <div className="space-y-6 p-4 max-w-3xl">
       <div className="space-y-4">
@@ -235,6 +240,11 @@ export const SemanticRelationships: Story = {
  * when read aloud without visual context.
  */
 export const ScreenReaderOptimization: Story = {
+  args: {
+    children: 'Label Text',
+    htmlFor: 'example-input',
+    variant: 'field',
+  },
   render: () => (
     <div className="space-y-6 p-4 max-w-3xl">
       <div className="space-y-4">
@@ -426,6 +436,11 @@ export const ScreenReaderOptimization: Story = {
  * and non-native speakers while improving comprehension for everyone.
  */
 export const LanguageClarity: Story = {
+  args: {
+    children: 'Label Text',
+    htmlFor: 'example-input',
+    variant: 'field',
+  },
   render: () => (
     <div className="space-y-6 p-4 max-w-3xl">
       <div className="space-y-4">

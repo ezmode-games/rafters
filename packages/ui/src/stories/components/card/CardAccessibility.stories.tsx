@@ -60,7 +60,7 @@ export const SemanticStructure: Story = {
                 <CardTitle level={2} weight="semibold">
                   Featured Article
                 </CardTitle>
-                <CardDescription prominence="enhanced">
+                <CardDescription prominence="default">
                   Primary content with highest semantic importance and visual prominence
                 </CardDescription>
               </CardHeader>
@@ -481,7 +481,7 @@ export const ScreenReaderOptimization: Story = {
                 <CardTitle level={4} weight="medium" id="alert-title">
                   System Alert
                 </CardTitle>
-                <CardDescription prominence="enhanced">
+                <CardDescription prominence="default">
                   Important notification requiring attention
                 </CardDescription>
               </CardHeader>

@@ -1,3 +1,6 @@
+/**
+ * AI Intelligence: Token knowledge in .rafters/tokens/registry.json
+ */
 import { Slot } from '@radix-ui/react-slot';
 import { forwardRef } from 'react';
 import { cn } from '../lib/utils';

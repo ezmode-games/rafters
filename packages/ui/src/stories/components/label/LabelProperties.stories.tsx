@@ -5,7 +5,7 @@ import { Input } from '../../../components/Input';
 const Label = ({
   children,
   htmlFor,
-  variant = 'default',
+  variant = 'field',
   className = '',
   ...props
 }: {
@@ -65,6 +65,11 @@ type Story = StoryObj<typeof meta>;
  * Each variant optimizes communication for its specific context and user need.
  */
 export const LabelVariants: Story = {
+  args: {
+    children: 'Label Text',
+    htmlFor: 'example-input',
+    variant: 'field',
+  },
   render: () => (
     <div className="space-y-6 max-w-3xl">
       <div className="space-y-4">
@@ -277,6 +282,11 @@ export const LabelVariants: Story = {
  * through HTML relationships and ARIA attributes.
  */
 export const SemanticRelationships: Story = {
+  args: {
+    children: 'Label Text',
+    htmlFor: 'example-input',
+    variant: 'field',
+  },
   render: () => (
     <div className="space-y-6 max-w-3xl">
       <div className="space-y-4">
@@ -495,6 +505,11 @@ export const SemanticRelationships: Story = {
  * labels deliver helpful, trustworthy information across the interface.
  */
 export const ContentPatterns: Story = {
+  args: {
+    children: 'Label Text',
+    htmlFor: 'example-input',
+    variant: 'field',
+  },
   render: () => (
     <div className="space-y-6 max-w-4xl">
       <div className="space-y-4">

@@ -7,7 +7,8 @@
  */
 
 // Export all types and schemas
-export * from './types';
+export * from './types.js';
+export * from './registry-data.js';
 
 // Utility functions for AI intelligence
 export const DEFAULT_COGNITIVE_LOADS = {
@@ -60,3 +61,40 @@ export const AI_COMPONENT_PATTERNS = {
   COLOR_NOT_ONLY: 'Never rely on color alone for meaning',
   FOCUS_VISIBLE: 'Clear focus indicators for keyboard navigation',
 } as const;
+
+export const ASCII_LOGO = `
+                                    LL00CCLL                                                                        
+                                    GG000000GGCCLL                                                                  
+                                    LLGG0000000000CCLL                                                              
+                                        LLCCGG00000000GGCCLL                                                        
+                                              LLGG0000000000CCLL                                                    
+                                                  LLCCGG00000000GGCCLL                                              
+                                                        CC000000000000CCLL                                          
+                                                  LLCCGG000000000000000000GGCCLL                                    
+                                              LLCC0000000000GGLL  LLGG0000000000CCLL                                
+                                        LLCCGG00000000GGCCLL          LLCCGG00000000GGCCLL                          
+                                    LLCC0000000000GGLL                      LLGG0000000000CCLL                      
+                              LLCCGG00000000GGCCLL                              LLCCGG00000000GGCCLL                
+                          LLCC0000000000GGLL                                          LLGG0000000000CCLL            
+                    LLCCGG00000000GGCCLL                                                  LLCCGG00000000GGCCLL      
+                LLCC0000000000GGLL                                                              LLGG0000000000CCLL  
+          LLCCGG00000000GGCCLL                                                                      LLCC0000000000GG
+      LLCC0000000000GGLL                                                                                  LLGG0000GG
+  CCGG00000000GGCCLL                                                                                          LLCCLL
+GG00000000GGLL                                                                                                      
+GG0000CCLL                                                                                                          
+LLLL                                        GG888800                                                                
+                                          GG@@@@@@00                                                                
+                                          GG@@@@GG    GG0000                                                        
+                                          GG@@@@      00@@00                                                        
+            GGGGGGGG00GG  GG000000GGGG  GG00@@@@GGGGGG88@@88GGGG    GG0000GGGG    GGGGGGGG00GGGGGG000000GG          
+            GG@@8888@@00GG@@@@@@@@@@00  00@@@@@@@@00@@@@@@@@@@GG  00@@@@@@@@88GG  00@@88@@@@GG00@@@@@@@@88GG        
+            GG@@@@@@00GG00@@88GGGG@@@@  GG00@@@@GGGGGG88@@88GGGGGG@@@@GGGG88@@GG  00@@@@8800GG@@@@GGGG88@@GG        
+            GG@@@@GG    GG00GG  GG@@@@GG  GG@@@@      00@@00    00@@00    00@@00  00@@88GG  GG@@@@GG  0000GG        
+            GG@@@@        GG000000@@@@GG  GG@@@@      00@@00    00@@88GGGG88@@00  00@@88    GG88@@@@00GG            
+            GG@@@@      GG@@@@@@88@@@@GG  GG@@@@      00@@00    88@@@@@@@@@@@@00  00@@88      GG88@@@@88GG          
+            GG@@@@      88@@00GGGG@@@@GG  GG@@@@      00@@00    88@@00GGGGGGGGGG  00@@88          GG88@@@@GG        
+            GG@@@@      @@@@GG  GG@@@@GG  GG@@@@      00@@00    00@@00            00@@88    GG0000  GG88@@00        
+            GG@@@@      @@@@GG  GG@@@@GG  GG@@@@      00@@88    00@@88    88@@00  00@@88    GG@@@@GG  88@@00        
+            GG@@@@      88@@8800@@@@@@GG  GG@@@@      00@@@@88GGGG@@@@8888@@@@GG  00@@88    GG@@@@8888@@@@GG        
+            GG8888      GG888888GG8888GG  GG8888      GG008888GG  GG88@@@@88GG    008800      GG88888888GG          `;
