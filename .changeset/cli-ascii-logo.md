@@ -1,5 +1,5 @@
 ---
-"@rafters/cli": patch
+"rafters": patch
 "@rafters/shared": patch
 ---
 

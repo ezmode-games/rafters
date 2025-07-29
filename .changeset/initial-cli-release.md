@@ -1,5 +1,5 @@
 ---
-"@rafters/cli": minor
+"rafters": minor
 ---
 
 Initial release of Rafters CLI with comprehensive test suite
