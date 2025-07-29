@@ -1,154 +1,246 @@
 /**
  * @rafters/color-utils
  *
- * OKLCH color utilities, accessibility calculations, and color vision simulation
- * for the Rafters AI design intelligence system.
+ * Single-responsibility color utilities for the Rafters Studio.
+ * Built for AI-first design intelligence with accessibility and harmony focus.
  */
 
 import type { ColorVisionType, OKLCH } from '@rafters/shared';
 
+// =============================================================================
+// COLOR CONVERSIONS
+// =============================================================================
+
 /**
- * Convert hex color to OKLCH
- * This is a simplified conversion - in production we'd use a proper color library
+ * Convert hex string to OKLCH color object
  */
 export function hexToOKLCH(hex: string): OKLCH {
-  // Remove # if present
-  const cleanHex = hex.replace('#', '');
-
-  // Convert hex to RGB
-  const r = Number.parseInt(cleanHex.slice(0, 2), 16) / 255;
-  const g = Number.parseInt(cleanHex.slice(2, 4), 16) / 255;
-  const b = Number.parseInt(cleanHex.slice(4, 6), 16) / 255;
-
-  // Simplified RGB to OKLCH conversion (placeholder)
-  // In production, use a proper color library like colorjs.io
-  const l = (r + g + b) / 3; // Simplified lightness
-  const c = Math.sqrt((r - g) ** 2 + (g - b) ** 2 + (b - r) ** 2) / Math.sqrt(3);
-  const h = Math.atan2(g - r, b - r) * (180 / Math.PI);
-
-  return {
-    l: Math.max(0, Math.min(1, l)),
-    c: Math.max(0, c),
-    h: h < 0 ? h + 360 : h,
-  };
+  throw new Error('Not implemented - will use colorjs.io');
 }
 
 /**
- * Convert OKLCH to CSS oklch() string
+ * Convert OKLCH color object to hex string
+ */
+export function oklchToHex(oklch: OKLCH): string {
+  throw new Error('Not implemented - will use colorjs.io');
+}
+
+/**
+ * Convert OKLCH to CSS oklch() function string
  */
 export function oklchToCSS(oklch: OKLCH): string {
-  const { l, c, h, alpha = 1 } = oklch;
-
-  if (alpha < 1) {
-    return `oklch(${l.toFixed(3)} ${c.toFixed(3)} ${h.toFixed(1)} / ${alpha})`;
-  }
-
-  return `oklch(${l.toFixed(3)} ${c.toFixed(3)} ${h.toFixed(1)})`;
+  throw new Error('Not implemented - will use colorjs.io');
 }
 
 /**
- * Generate perceptually uniform lightness scale
- * Creates a scale from 50-950 similar to Tailwind
+ * Convert RGB values to OKLCH color object
+ */
+export function rgbToOKLCH(r: number, g: number, b: number): OKLCH {
+  throw new Error('Not implemented - will use colorjs.io');
+}
+
+/**
+ * Convert HSL values to OKLCH color object
+ */
+export function hslToOKLCH(h: number, s: number, l: number): OKLCH {
+  throw new Error('Not implemented - will use colorjs.io');
+}
+
+// =============================================================================
+// PALETTE GENERATION
+// =============================================================================
+
+/**
+ * Generate perceptually uniform lightness scale (50-950)
  */
 export function generateLightnessScale(baseColor: OKLCH): Record<number, OKLCH> {
-  const { c, h } = baseColor;
-
-  const scale: Record<number, OKLCH> = {};
-
-  // Generate 50-950 scale with perceptually uniform steps
-  const steps = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
-
-  for (const step of steps) {
-    // Map step to lightness (50 = lightest, 950 = darkest)
-    const lightness = 1 - (step - 50) / 900; // 0.94 to 0.05
-
-    scale[step] = {
-      l: Math.max(0.05, Math.min(0.95, lightness)),
-      c: c * (step === 50 || step === 950 ? 0.1 : 1), // Reduce chroma at extremes
-      h,
-    };
-  }
-
-  return scale;
+  throw new Error('Not implemented - will use OKLCH math');
 }
 
 /**
- * Calculate WCAG contrast ratio between two OKLCH colors
- * Simplified implementation - use proper library in production
+ * Generate harmonious color palette using color theory
  */
-export function calculateContrast(foreground: OKLCH, background: OKLCH): number {
-  // Convert OKLCH lightness to relative luminance (approximation)
-  const l1 = foreground.l;
-  const l2 = background.l;
-
-  const lighter = Math.max(l1, l2);
-  const darker = Math.min(l1, l2);
-
-  // WCAG contrast ratio formula (simplified)
-  return (lighter + 0.05) / (darker + 0.05);
+export function generateHarmoniousPalette(
+  baseColor: OKLCH,
+  harmony: 'monochromatic' | 'analogous' | 'complementary' | 'triadic' | 'tetradic'
+): OKLCH[] {
+  throw new Error('Not implemented - will use harmony algorithms');
 }
 
 /**
- * Check if contrast meets WCAG standards
+ * Generate accessible color variants from base color
  */
-export function meetsContrastStandard(
-  foreground: OKLCH,
-  background: OKLCH,
-  standard: 'AA' | 'AAA' = 'AA',
-  largeText = false
-): boolean {
-  const ratio = calculateContrast(foreground, background);
-
-  const thresholds = {
-    AA: largeText ? 3 : 4.5,
-    AAA: largeText ? 4.5 : 7,
-  };
-
-  return ratio >= thresholds[standard];
+export function generateAccessibleVariants(baseColor: OKLCH, backgroundColors: OKLCH[]): OKLCH[] {
+  throw new Error('Not implemented - will adjust lightness/chroma for contrast');
 }
 
 /**
- * Simulate color vision deficiency
- * Simplified simulation - use proper library in production
+ * Generate semantic color set (success, warning, danger, info)
  */
-export function simulateColorVision(color: OKLCH, type: ColorVisionType): OKLCH {
-  if (type === 'normal') return color;
-
-  // Simplified color vision simulation
-  // In production, use proper algorithms for deuteranopia, protanopia, tritanopia
-  const { l, c, h } = color;
-
-  switch (type) {
-    case 'deuteranopia':
-    case 'protanopia':
-      // Red-green color blindness - shift hues toward blue/yellow axis
-      return { l, c: c * 0.7, h: h > 180 ? 240 : 60 };
-
-    case 'tritanopia':
-      // Blue-yellow color blindness - shift toward red/green axis
-      return { l, c: c * 0.7, h: h > 180 ? 120 : 0 };
-
-    default:
-      return color;
-  }
-}
-
-/**
- * Generate semantic colors that work across all color vision types
- */
-export function generateSemanticColors(primary: OKLCH): {
+export function generateSemanticColors(brandColor: OKLCH): {
   success: OKLCH;
   warning: OKLCH;
   danger: OKLCH;
   info: OKLCH;
 } {
-  // Generate semantically appropriate colors that remain distinguishable
-  // across all color vision types
+  throw new Error('Not implemented - will use color psychology + accessibility');
+}
 
-  return {
-    success: { l: 0.7, c: 0.15, h: 142 }, // Green that works for color blind
-    warning: { l: 0.8, c: 0.12, h: 85 }, // Amber that works for color blind
-    danger: { l: 0.6, c: 0.2, h: 25 }, // Red that works for color blind
-    info: { l: 0.7, c: 0.15, h: 250 }, // Blue that works for color blind
-  };
+// =============================================================================
+// ACCESSIBILITY CALCULATIONS
+// =============================================================================
+
+/**
+ * Calculate WCAG 2.1 contrast ratio between two colors
+ */
+export function calculateWCAGContrast(foreground: OKLCH, background: OKLCH): number {
+  throw new Error('Not implemented - will use WCAG formula');
+}
+
+/**
+ * Calculate APCA contrast for modern accessibility
+ */
+export function calculateAPCAContrast(foreground: OKLCH, background: OKLCH): number {
+  throw new Error('Not implemented - will use APCA algorithm');
+}
+
+/**
+ * Check if color pair meets WCAG contrast standards
+ */
+export function meetsWCAGStandard(
+  foreground: OKLCH,
+  background: OKLCH,
+  level: 'AA' | 'AAA',
+  textSize: 'normal' | 'large'
+): boolean {
+  throw new Error('Not implemented - will check against WCAG thresholds');
+}
+
+/**
+ * Check if color pair meets APCA contrast standards
+ */
+export function meetsAPCAStandard(foreground: OKLCH, background: OKLCH, textSize: number): boolean {
+  throw new Error('Not implemented - will check against APCA thresholds');
+}
+
+/**
+ * Find the closest accessible color to target color
+ */
+export function findAccessibleColor(
+  targetColor: OKLCH,
+  backgroundColor: OKLCH,
+  standard: 'WCAG-AA' | 'WCAG-AAA' | 'APCA'
+): OKLCH {
+  throw new Error('Not implemented - will adjust lightness to meet contrast');
+}
+
+// =============================================================================
+// COLOR VISION SIMULATION
+// =============================================================================
+
+/**
+ * Simulate protanopia (red-blind) color vision
+ */
+export function simulateProtanopia(color: OKLCH): OKLCH {
+  throw new Error('Not implemented - will use proper CVD algorithm');
+}
+
+/**
+ * Simulate deuteranopia (green-blind) color vision
+ */
+export function simulateDeuteranopia(color: OKLCH): OKLCH {
+  throw new Error('Not implemented - will use proper CVD algorithm');
+}
+
+/**
+ * Simulate tritanopia (blue-blind) color vision
+ */
+export function simulateTritanopia(color: OKLCH): OKLCH {
+  throw new Error('Not implemented - will use proper CVD algorithm');
+}
+
+/**
+ * Simulate color vision deficiency for any type
+ */
+export function simulateColorVision(color: OKLCH, type: ColorVisionType): OKLCH {
+  throw new Error('Not implemented - will delegate to specific CVD functions');
+}
+
+/**
+ * Test palette visibility across all color vision types
+ */
+export function validatePaletteForColorVision(colors: OKLCH[]): {
+  normal: boolean;
+  protanopia: boolean;
+  deuteranopia: boolean;
+  tritanopia: boolean;
+  issues: string[];
+} {
+  throw new Error('Not implemented - will test distinguishability across CVD types');
+}
+
+// =============================================================================
+// COLOR ANALYSIS
+// =============================================================================
+
+/**
+ * Calculate perceptual distance between two colors
+ */
+export function calculateColorDistance(color1: OKLCH, color2: OKLCH): number {
+  throw new Error('Not implemented - will use Delta E or similar');
+}
+
+/**
+ * Determine if color is light or dark
+ */
+export function isLightColor(color: OKLCH): boolean {
+  throw new Error('Not implemented - will use lightness threshold');
+}
+
+/**
+ * Get the dominant hue family (red, orange, yellow, etc.)
+ */
+export function getHueFamily(
+  color: OKLCH
+): 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'purple' | 'neutral' {
+  throw new Error('Not implemented - will categorize by hue angle');
+}
+
+/**
+ * Calculate color temperature (warm/cool)
+ */
+export function getColorTemperature(color: OKLCH): 'warm' | 'cool' | 'neutral' {
+  throw new Error('Not implemented - will analyze hue for warmth');
+}
+
+// =============================================================================
+// STUDIO-SPECIFIC UTILITIES
+// =============================================================================
+
+/**
+ * Generate CSS custom properties from color palette
+ */
+export function generateCSSVariables(palette: Record<string, OKLCH>, prefix = '--color'): string {
+  throw new Error('Not implemented - will format as CSS custom properties');
+}
+
+/**
+ * Generate Tailwind color configuration
+ */
+export function generateTailwindConfig(palette: Record<string, OKLCH>): Record<string, string> {
+  throw new Error('Not implemented - will format for Tailwind config');
+}
+
+/**
+ * Validate color string format (hex, rgb, hsl, oklch)
+ */
+export function isValidColorString(colorString: string): boolean {
+  throw new Error('Not implemented - will validate color format');
+}
+
+/**
+ * Parse any color string format to OKLCH
+ */
+export function parseColorString(colorString: string): OKLCH {
+  throw new Error('Not implemented - will handle multiple input formats');
 }

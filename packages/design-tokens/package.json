@@ -24,14 +24,14 @@
     "clean": "rm -rf dist"
   },
   "devDependencies": {
-    "@types/fs-extra": "^11.0.4",
-    "@types/node": "^20.19.0",
-    "typescript": "^5.5.2",
-    "vitest": "^3.2.3"
+    "@types/fs-extra": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "dependencies": {
     "@rafters/shared": "workspace:*",
     "@rafters/color-utils": "workspace:*",
-    "fs-extra": "^11.2.0"
+    "fs-extra": "catalog:"
   }
 }
