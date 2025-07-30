@@ -216,10 +216,16 @@ importers:
 
   packages/shared:
     dependencies:
+      react:
+        specifier: '>=18.0.0'
+        version: 19.1.1
       zod:
         specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.1.9
       typescript:
         specifier: 'catalog:'
         version: 5.8.3

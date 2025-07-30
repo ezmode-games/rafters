@@ -24,11 +24,15 @@
     "clean": "rm -rf dist"
   },
   "devDependencies": {
+    "@types/react": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },
   "dependencies": {
     "zod": "catalog:"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
   },
   "author": "Sean Silvius",
   "license": "MIT",
