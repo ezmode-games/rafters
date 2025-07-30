@@ -13,14 +13,17 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": ".",
-    "paths": {
-      "@rafters/core": ["./packages/core/src"],
-      "@rafters/core/*": ["./packages/core/src/*"],
-      "@rafters/cli": ["./packages/cli/src"],
-      "@rafters/cli/*": ["./packages/cli/src/*"],
-      "@rafters/mcp-server": ["./packages/mcp-server/src"],
-      "@rafters/mcp-server/*": ["./packages/mcp-server/src/*"]
-    }
-  }
+    "baseUrl": "."
+  },
+  "include": ["src/components/**/*", "src/lib/**/*"],
+  "exclude": [
+    "src/stories/**/*",
+    "src/app/**/*",
+    "src/main.tsx",
+    "src/test-setup.ts",
+    "**/*.stories.*",
+    "**/*.test.*",
+    "dist",
+    "node_modules"
+  ]
 }
