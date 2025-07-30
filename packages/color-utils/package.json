@@ -28,7 +28,8 @@
     "vitest": "catalog:"
   },
   "dependencies": {
-    "@rafters/shared": "workspace:*"
+    "@rafters/shared": "workspace:*",
+    "colorjs.io": "^0.5.2"
   },
   "author": "Sean Silvius",
   "license": "MIT",
