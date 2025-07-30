@@ -25,10 +25,14 @@
   },
   "devDependencies": {
     "typescript": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "@types/chroma-js": "^2.4.4"
   },
   "dependencies": {
-    "@rafters/shared": "workspace:*"
+    "@rafters/shared": "workspace:*",
+    "colorjs.io": "^0.5.2",
+    "apca-w3": "^0.1.9",
+    "chroma-js": "^2.6.0"
   },
   "author": "Sean Silvius",
   "license": "MIT",
