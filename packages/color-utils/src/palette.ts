@@ -95,7 +95,7 @@ function generateAdvancedScale(
   const colors = scale.colors(swatches);
 
   // Convert back to OKLCH
-  return colors.map((hexColor) => {
+  return colors.map((hexColor: string) => {
     const color = new Color(hexColor);
     const oklch = color.to('oklch');
     return {
