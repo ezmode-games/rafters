@@ -89,3 +89,5 @@ LLLL                                        GG888800
             GG@@@@      @@@@GG  GG@@@@GG  GG@@@@      00@@88    00@@88    88@@00  00@@88    GG@@@@GG  88@@00        
             GG@@@@      88@@8800@@@@@@GG  GG@@@@      00@@@@88GGGG@@@@8888@@@@GG  00@@88    GG@@@@8888@@@@GG        
             GG8888      GG888888GG8888GG  GG8888      GG008888GG  GG88@@@@88GG    008800      GG88888888GG          `;
+// Export React components from separate file
+export * from './components.js';
