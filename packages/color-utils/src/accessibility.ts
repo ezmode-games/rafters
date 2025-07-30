@@ -3,6 +3,7 @@
  */
 
 import type { OKLCH } from '@rafters/shared';
+import { APCAcontrast, sRGBtoY } from 'apca-w3';
 import Color from 'colorjs.io';
 
 /**
@@ -42,50 +43,22 @@ export function calculateWCAGContrast(foreground: OKLCH, background: OKLCH): num
 
 /**
  * Calculate APCA contrast for modern accessibility
- * Based on APCA (Accessible Perceptual Contrast Algorithm)
+ * Uses the official APCA algorithm via apca-w3 library
  */
 export function calculateAPCAContrast(foreground: OKLCH, background: OKLCH): number {
-  // Convert to relative luminance
-  const textLum = getRelativeLuminance(foreground);
-  const bgLum = getRelativeLuminance(background);
+  // Convert OKLCH to RGB arrays for APCA
+  const foregroundColor = new Color('oklch', [foreground.l, foreground.c, foreground.h]);
+  const backgroundColorObj = new Color('oklch', [background.l, background.c, background.h]);
 
-  // APCA constants
-  const mainTRC = 2.4;
-  const Rco = 0.2126729;
-  const Gco = 0.7151522;
-  const Bco = 0.072175;
+  const fgRgb = foregroundColor.to('srgb');
+  const bgRgb = backgroundColorObj.to('srgb');
 
-  // Calculate Y (luminance) values
-  const textY = textLum;
-  const bgY = bgLum;
+  // Convert to 0-255 RGB arrays for apca-w3
+  const fgArray = [fgRgb.r * 255, fgRgb.g * 255, fgRgb.b * 255];
+  const bgArray = [bgRgb.r * 255, bgRgb.g * 255, bgRgb.b * 255];
 
-  // Calculate contrast
-  let sapc = 0;
-
-  if (Math.abs(bgY - textY) < 0.0005) {
-    return 0; // Same color
-  }
-
-  if (bgY > textY) {
-    // Light text on dark background (negative polarity)
-    sapc = (bgY ** 0.56 - textY ** 0.57) * 1.14;
-  } else {
-    // Dark text on light background (positive polarity)
-    sapc = (bgY ** 0.65 - textY ** 0.62) * 1.14;
-  }
-
-  // Clamp and scale
-  if (Math.abs(sapc) < 0.1) {
-    return 0;
-  }
-
-  if (sapc > 0) {
-    sapc = sapc ** 0.43 * 100;
-  } else {
-    sapc = -((-sapc) ** 0.43) * 100;
-  }
-
-  return sapc;
+  // Use official APCA calculation
+  return APCAcontrast(sRGBtoY(fgArray), sRGBtoY(bgArray));
 }
 
 /**

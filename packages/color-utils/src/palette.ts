@@ -1,66 +1,135 @@
 /**
  * Palette generation functions for design systems
+ * Advanced algorithms inspired by leonardo-contrast-colors
  */
 
 import type { OKLCH } from '@rafters/shared';
+import chroma from 'chroma-js';
+import Color from 'colorjs.io';
+
+/**
+ * Generate advanced perceptual color scale with smooth interpolation
+ * Algorithm inspired by leonardo's createScale approach
+ */
+function generateAdvancedScale(
+  colorKeys: OKLCH[],
+  swatches = 11,
+  options: {
+    colorspace?: 'LAB' | 'LCH' | 'OKLCH' | 'HSL' | 'HSLuv';
+    smooth?: boolean;
+    distributeLightness?: 'linear' | 'polynomial';
+    fullScale?: boolean;
+  } = {}
+): OKLCH[] {
+  const {
+    colorspace = 'OKLCH',
+    smooth = true,
+    distributeLightness = 'polynomial',
+    fullScale = true,
+  } = options;
+
+  // Convert OKLCH to hex for chroma-js compatibility
+  const hexKeys = colorKeys.map((oklch) => {
+    const color = new Color('oklch', [oklch.l, oklch.c, oklch.h]);
+    return color.to('srgb').toString({ format: 'hex' });
+  });
+
+  let domains: number[];
+
+  if (fullScale) {
+    // Set domain based on lightness against full black-to-white scale
+    domains = hexKeys
+      .map((key) => swatches - swatches * (chroma(key).hsl()[2] / 100))
+      .sort((a, b) => a - b)
+      .concat(swatches);
+    domains.unshift(0);
+  } else {
+    // Use relative lightness range
+    const lums = hexKeys.map((c) => chroma(c).hsl()[2] / 100);
+    const min = Math.min(...lums);
+    const max = Math.max(...lums);
+
+    domains = lums
+      .map((lum) => {
+        if (lum === 0 || Number.isNaN((lum - min) / (max - min))) return 0;
+        return swatches - ((lum - min) / (max - min)) * swatches;
+      })
+      .sort((a, b) => a - b);
+  }
+
+  // Apply advanced lightness distribution
+  if (distributeLightness === 'polynomial') {
+    // Polynomial mapping for perceptually uniform distribution
+    const polynomial = (x: number) => {
+      return Math.sqrt(Math.sqrt((x ** 2.25 + x ** 4) / 2));
+    };
+
+    const percDomains = domains.map((d) => d / swatches);
+    const newDomains = percDomains.map((d) => polynomial(d) * swatches);
+    domains = newDomains;
+  }
+
+  // Sort colors by lightness
+  const sortedHexKeys = hexKeys
+    .map((c, i) => ({ color: c, lightness: chroma(c).hsl()[2], index: i }))
+    .sort((a, b) => b.lightness - a.lightness)
+    .map((data) => data.color);
+
+  let colorsArray: string[] = [];
+  if (fullScale) {
+    colorsArray = ['#ffffff', ...sortedHexKeys, '#000000'];
+  } else {
+    colorsArray = sortedHexKeys;
+  }
+
+  // Create the scale
+  let scale: chroma.Scale;
+  if (smooth) {
+    // Use smooth interpolation for better perceptual uniformity
+    scale = chroma.scale(colorsArray).domain(domains).mode('lch');
+  } else {
+    scale = chroma.scale(colorsArray).domain(domains).mode('lch');
+  }
+
+  // Generate colors
+  const colors = scale.colors(swatches);
+
+  // Convert back to OKLCH
+  return colors.map((hexColor) => {
+    const color = new Color(hexColor);
+    const oklch = color.to('oklch');
+    return {
+      l: Math.max(0, Math.min(1, oklch.coords[0])), // Clamp lightness
+      c: Math.max(0, oklch.coords[1] || 0), // Ensure positive chroma
+      h: ((oklch.coords[2] || 0) + 360) % 360, // Normalize hue
+    };
+  });
+}
 
 /**
  * Generate perceptually uniform lightness scale (50-950)
  * Creates a Tailwind-style color scale with perceptually even steps
  */
-export function generateLightnessScale(baseColor: OKLCH): Record<number, OKLCH> {
+export function generateLightnessScale(
+  baseColor: OKLCH,
+  steps: number[] = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950]
+): Record<number, OKLCH> {
+  // Create multiple color keys around the base color for smooth interpolation
+  const colorKeys = [
+    { ...baseColor, l: Math.min(0.95, baseColor.l + 0.4) }, // Lighter
+    baseColor, // Base
+    { ...baseColor, l: Math.max(0.05, baseColor.l - 0.4) }, // Darker
+  ];
+
+  const advancedColors = generateAdvancedScale(colorKeys, steps.length, {
+    smooth: true,
+    distributeLightness: 'polynomial',
+    fullScale: true,
+  });
+
   const scale: Record<number, OKLCH> = {};
-
-  // Define the lightness curve - adjusted for perceptual uniformity
-  // These values are based on research into perceptual lightness scales
-  const lightnessMap: Record<number, number> = {
-    50: 0.97, // Very light
-    100: 0.92, // Light
-    200: 0.84, // Light-medium
-    300: 0.74, // Medium-light
-    400: 0.62, // Medium
-    500: 0.5, // Base (will be adjusted to match input)
-    600: 0.42, // Medium-dark
-    700: 0.34, // Dark-medium
-    800: 0.26, // Dark
-    900: 0.18, // Very dark
-    950: 0.1, // Darkest
-  };
-
-  // Calculate adjustment factor to center the base color at 500
-  const targetL500 = 0.5;
-  const adjustment = baseColor.l - targetL500;
-
-  // Generate each step in the scale
-  for (const [step, targetLightness] of Object.entries(lightnessMap)) {
-    const stepNum = Number.parseInt(step);
-    let adjustedLightness = targetLightness + adjustment;
-
-    // Clamp lightness to valid range
-    adjustedLightness = Math.max(0.02, Math.min(0.98, adjustedLightness));
-
-    // Adjust chroma based on lightness to maintain color appearance
-    // Chroma tends to appear less saturated at very light/dark values
-    let adjustedChroma = baseColor.c;
-
-    if (adjustedLightness > 0.85) {
-      // Very light colors - reduce chroma slightly
-      const reduction = (adjustedLightness - 0.85) * 0.3;
-      adjustedChroma = baseColor.c * (1 - reduction);
-    } else if (adjustedLightness < 0.25) {
-      // Very dark colors - reduce chroma more significantly
-      const reduction = (0.25 - adjustedLightness) * 0.4;
-      adjustedChroma = baseColor.c * (1 - reduction);
-    }
-
-    // Ensure chroma doesn't go negative
-    adjustedChroma = Math.max(0, adjustedChroma);
-
-    scale[stepNum] = {
-      l: adjustedLightness,
-      c: adjustedChroma,
-      h: baseColor.h, // Preserve hue
-    };
+  for (let i = 0; i < steps.length && i < advancedColors.length; i++) {
+    scale[steps[i]] = advancedColors[i];
   }
 
   return scale;
@@ -71,70 +140,56 @@ export function generateLightnessScale(baseColor: OKLCH): Record<number, OKLCH> 
  */
 export function generateHarmoniousPalette(
   baseColor: OKLCH,
-  harmony: 'monochromatic' | 'analogous' | 'complementary' | 'triadic' | 'tetradic'
+  harmony: 'monochromatic' | 'analogous' | 'complementary' | 'triadic' | 'tetradic',
+  variations = 5
 ): OKLCH[] {
-  const colors: OKLCH[] = [baseColor];
+  let colorKeys: OKLCH[] = [baseColor];
 
   switch (harmony) {
     case 'monochromatic':
-      // Same hue, different lightness and chroma
-      colors.push(
-        { ...baseColor, l: baseColor.l * 0.7, c: baseColor.c * 0.8 },
-        { ...baseColor, l: baseColor.l * 1.2, c: baseColor.c * 0.6 },
-        { ...baseColor, c: baseColor.c * 0.5 },
-        { ...baseColor, c: baseColor.c * 1.3 }
-      );
+      // Create lightness and chroma variations
+      colorKeys = [
+        { ...baseColor, l: Math.min(0.9, baseColor.l + 0.2), c: baseColor.c * 0.8 },
+        baseColor,
+        { ...baseColor, l: Math.max(0.1, baseColor.l - 0.2), c: baseColor.c * 1.2 },
+      ];
       break;
 
     case 'analogous':
-      // Adjacent hues (±30°)
-      colors.push(
-        { ...baseColor, h: (baseColor.h + 30) % 360 },
+      colorKeys = [
         { ...baseColor, h: (baseColor.h - 30 + 360) % 360 },
-        { ...baseColor, h: (baseColor.h + 60) % 360, c: baseColor.c * 0.8 },
-        { ...baseColor, h: (baseColor.h - 60 + 360) % 360, c: baseColor.c * 0.8 }
-      );
+        baseColor,
+        { ...baseColor, h: (baseColor.h + 30) % 360 },
+      ];
       break;
 
-    case 'complementary': {
-      // Opposite hue (180°)
-      const complementHue = (baseColor.h + 180) % 360;
-      colors.push(
-        { ...baseColor, h: complementHue },
-        { ...baseColor, h: complementHue, l: baseColor.l * 0.8 },
-        { ...baseColor, h: complementHue, l: baseColor.l * 1.1, c: baseColor.c * 0.7 },
-        { ...baseColor, l: baseColor.l * 0.8 }
-      );
+    case 'complementary':
+      colorKeys = [baseColor, { ...baseColor, h: (baseColor.h + 180) % 360 }];
       break;
-    }
 
     case 'triadic':
-      // 120° intervals
-      colors.push(
+      colorKeys = [
+        baseColor,
         { ...baseColor, h: (baseColor.h + 120) % 360 },
         { ...baseColor, h: (baseColor.h + 240) % 360 },
-        { ...baseColor, l: baseColor.l * 0.8, c: baseColor.c * 0.8 },
-        { ...baseColor, l: baseColor.l * 1.1, c: baseColor.c * 0.7 }
-      );
+      ];
       break;
 
     case 'tetradic':
-      // 90° intervals (square)
-      colors.push(
+      colorKeys = [
+        baseColor,
         { ...baseColor, h: (baseColor.h + 90) % 360 },
         { ...baseColor, h: (baseColor.h + 180) % 360 },
         { ...baseColor, h: (baseColor.h + 270) % 360 },
-        { ...baseColor, l: baseColor.l * 0.9, c: baseColor.c * 0.8 }
-      );
+      ];
       break;
   }
 
-  // Ensure all colors have valid ranges
-  return colors.map((color) => ({
-    l: Math.max(0, Math.min(1, color.l)),
-    c: Math.max(0, color.c),
-    h: ((color.h % 360) + 360) % 360,
-  }));
+  return generateAdvancedScale(colorKeys, variations, {
+    smooth: true,
+    fullScale: false,
+    distributeLightness: 'polynomial',
+  });
 }
 
 /**
