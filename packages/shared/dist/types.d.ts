@@ -54,15 +54,15 @@ export declare const SemanticTokenSchema: z.ZodObject<{
     semantic: z.ZodString;
     aiIntelligence: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    value: string;
-    type: "color" | "spacing" | "typography" | "shadow" | "border";
     name: string;
+    type: "color" | "spacing" | "typography" | "shadow" | "border";
+    value: string;
     semantic: string;
     aiIntelligence?: string | undefined;
 }, {
-    value: string;
-    type: "color" | "spacing" | "typography" | "shadow" | "border";
     name: string;
+    type: "color" | "spacing" | "typography" | "shadow" | "border";
+    value: string;
     semantic: string;
     aiIntelligence?: string | undefined;
 }>;
@@ -93,15 +93,15 @@ export declare const DesignSystemSchema: z.ZodObject<{
         semantic: z.ZodString;
         aiIntelligence: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
-        value: string;
-        type: "color" | "spacing" | "typography" | "shadow" | "border";
         name: string;
+        type: "color" | "spacing" | "typography" | "shadow" | "border";
+        value: string;
         semantic: string;
         aiIntelligence?: string | undefined;
     }, {
-        value: string;
-        type: "color" | "spacing" | "typography" | "shadow" | "border";
         name: string;
+        type: "color" | "spacing" | "typography" | "shadow" | "border";
+        value: string;
         semantic: string;
         aiIntelligence?: string | undefined;
     }>, "many">;
@@ -111,15 +111,15 @@ export declare const DesignSystemSchema: z.ZodObject<{
         mono: z.ZodString;
         scale: z.ZodRecord<z.ZodString, z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
+        scale: Record<string, number>;
         heading: string;
         body: string;
         mono: string;
-        scale: Record<string, number>;
     }, {
+        scale: Record<string, number>;
         heading: string;
         body: string;
         mono: string;
-        scale: Record<string, number>;
     }>;
     intelligence: z.ZodObject<{
         colorVisionTested: z.ZodArray<z.ZodEnum<["normal", "deuteranopia", "protanopia", "tritanopia"]>, "many">;
@@ -174,23 +174,23 @@ export declare const DesignSystemSchema: z.ZodObject<{
         updated: z.ZodString;
         version: z.ZodString;
     }, "strip", z.ZodTypeAny, {
+        version: string;
         created: string;
         updated: string;
-        version: string;
     }, {
+        version: string;
         created: string;
         updated: string;
-        version: string;
     }>;
 }, "strip", z.ZodTypeAny, {
+    id: string;
     name: string;
     typography: {
+        scale: Record<string, number>;
         heading: string;
         body: string;
         mono: string;
-        scale: Record<string, number>;
     };
-    id: string;
     primaryColor: {
         l: number;
         c: number;
@@ -198,9 +198,9 @@ export declare const DesignSystemSchema: z.ZodObject<{
         alpha?: number | undefined;
     };
     tokens: {
-        value: string;
-        type: "color" | "spacing" | "typography" | "shadow" | "border";
         name: string;
+        type: "color" | "spacing" | "typography" | "shadow" | "border";
+        value: string;
         semantic: string;
         aiIntelligence?: string | undefined;
     }[];
@@ -217,19 +217,19 @@ export declare const DesignSystemSchema: z.ZodObject<{
         }>;
     };
     metadata: {
+        version: string;
         created: string;
         updated: string;
-        version: string;
     };
 }, {
+    id: string;
     name: string;
     typography: {
+        scale: Record<string, number>;
         heading: string;
         body: string;
         mono: string;
-        scale: Record<string, number>;
     };
-    id: string;
     primaryColor: {
         l: number;
         c: number;
@@ -237,9 +237,9 @@ export declare const DesignSystemSchema: z.ZodObject<{
         alpha?: number | undefined;
     };
     tokens: {
-        value: string;
-        type: "color" | "spacing" | "typography" | "shadow" | "border";
         name: string;
+        type: "color" | "spacing" | "typography" | "shadow" | "border";
+        value: string;
         semantic: string;
         aiIntelligence?: string | undefined;
     }[];
@@ -256,9 +256,9 @@ export declare const DesignSystemSchema: z.ZodObject<{
         }>;
     };
     metadata: {
+        version: string;
         created: string;
         updated: string;
-        version: string;
     };
 }>;
 export type DesignSystem = z.infer<typeof DesignSystemSchema>;
@@ -326,8 +326,8 @@ export declare const ComponentRegistrySchema: z.ZodObject<{
         };
     }>;
 }, "strip", z.ZodTypeAny, {
-    type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
     name: string;
+    type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
     files: string[];
     meta: {
         rafters: {
@@ -341,8 +341,8 @@ export declare const ComponentRegistrySchema: z.ZodObject<{
         };
     };
 }, {
-    type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
     name: string;
+    type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
     files: string[];
     meta: {
         rafters: {
@@ -368,8 +368,8 @@ export declare const PublicDesignSystemSchema: z.ZodObject<{
     preview: z.ZodOptional<z.ZodString>;
     created: z.ZodString;
 }, "strip", z.ZodTypeAny, {
-    name: string;
     id: string;
+    name: string;
     primaryColor: string;
     created: string;
     popularity: number;
@@ -378,8 +378,8 @@ export declare const PublicDesignSystemSchema: z.ZodObject<{
     author?: string | undefined;
     preview?: string | undefined;
 }, {
-    name: string;
     id: string;
+    name: string;
     primaryColor: string;
     created: string;
     author?: string | undefined;
@@ -405,13 +405,13 @@ export declare const ComponentManifestSchema: z.ZodObject<{
         type: z.ZodString;
         target: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
-        path: string;
         type: string;
+        path: string;
         content: string;
         target?: string | undefined;
     }, {
-        path: string;
         type: string;
+        path: string;
         content: string;
         target?: string | undefined;
     }>, "many">;
@@ -486,15 +486,16 @@ export declare const ComponentManifestSchema: z.ZodObject<{
         } | undefined;
     }>>;
 }, "strip", z.ZodTypeAny, {
-    type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
     name: string;
+    type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
     files: {
-        path: string;
         type: string;
+        path: string;
         content: string;
         target?: string | undefined;
     }[];
     dependencies: string[];
+    title?: string | undefined;
     meta?: {
         rafters?: {
             intelligence: {
@@ -510,7 +511,6 @@ export declare const ComponentManifestSchema: z.ZodObject<{
     author?: string | undefined;
     $schema?: string | undefined;
     description?: string | undefined;
-    title?: string | undefined;
     devDependencies?: string[] | undefined;
     registryDependencies?: string[] | undefined;
     tailwind?: Record<string, unknown> | undefined;
@@ -520,14 +520,15 @@ export declare const ComponentManifestSchema: z.ZodObject<{
     categories?: string[] | undefined;
     docs?: string | undefined;
 }, {
-    type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
     name: string;
+    type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
     files: {
-        path: string;
         type: string;
+        path: string;
         content: string;
         target?: string | undefined;
     }[];
+    title?: string | undefined;
     meta?: {
         rafters?: {
             intelligence: {
@@ -543,7 +544,6 @@ export declare const ComponentManifestSchema: z.ZodObject<{
     author?: string | undefined;
     $schema?: string | undefined;
     description?: string | undefined;
-    title?: string | undefined;
     dependencies?: string[] | undefined;
     devDependencies?: string[] | undefined;
     registryDependencies?: string[] | undefined;
@@ -575,13 +575,13 @@ export declare const RegistryResponseSchema: z.ZodObject<{
             type: z.ZodString;
             target: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
-            path: string;
             type: string;
+            path: string;
             content: string;
             target?: string | undefined;
         }, {
-            path: string;
             type: string;
+            path: string;
             content: string;
             target?: string | undefined;
         }>, "many">;
@@ -656,15 +656,16 @@ export declare const RegistryResponseSchema: z.ZodObject<{
             } | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
-        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
         name: string;
+        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
         files: {
-            path: string;
             type: string;
+            path: string;
             content: string;
             target?: string | undefined;
         }[];
         dependencies: string[];
+        title?: string | undefined;
         meta?: {
             rafters?: {
                 intelligence: {
@@ -680,7 +681,6 @@ export declare const RegistryResponseSchema: z.ZodObject<{
         author?: string | undefined;
         $schema?: string | undefined;
         description?: string | undefined;
-        title?: string | undefined;
         devDependencies?: string[] | undefined;
         registryDependencies?: string[] | undefined;
         tailwind?: Record<string, unknown> | undefined;
@@ -690,14 +690,15 @@ export declare const RegistryResponseSchema: z.ZodObject<{
         categories?: string[] | undefined;
         docs?: string | undefined;
     }, {
-        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
         name: string;
+        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
         files: {
-            path: string;
             type: string;
+            path: string;
             content: string;
             target?: string | undefined;
         }[];
+        title?: string | undefined;
         meta?: {
             rafters?: {
                 intelligence: {
@@ -713,7 +714,6 @@ export declare const RegistryResponseSchema: z.ZodObject<{
         author?: string | undefined;
         $schema?: string | undefined;
         description?: string | undefined;
-        title?: string | undefined;
         dependencies?: string[] | undefined;
         devDependencies?: string[] | undefined;
         registryDependencies?: string[] | undefined;
@@ -740,13 +740,13 @@ export declare const RegistryResponseSchema: z.ZodObject<{
             type: z.ZodString;
             target: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
-            path: string;
             type: string;
+            path: string;
             content: string;
             target?: string | undefined;
         }, {
-            path: string;
             type: string;
+            path: string;
             content: string;
             target?: string | undefined;
         }>, "many">;
@@ -821,15 +821,16 @@ export declare const RegistryResponseSchema: z.ZodObject<{
             } | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
-        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
         name: string;
+        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
         files: {
-            path: string;
             type: string;
+            path: string;
             content: string;
             target?: string | undefined;
         }[];
         dependencies: string[];
+        title?: string | undefined;
         meta?: {
             rafters?: {
                 intelligence: {
@@ -845,7 +846,6 @@ export declare const RegistryResponseSchema: z.ZodObject<{
         author?: string | undefined;
         $schema?: string | undefined;
         description?: string | undefined;
-        title?: string | undefined;
         devDependencies?: string[] | undefined;
         registryDependencies?: string[] | undefined;
         tailwind?: Record<string, unknown> | undefined;
@@ -855,14 +855,15 @@ export declare const RegistryResponseSchema: z.ZodObject<{
         categories?: string[] | undefined;
         docs?: string | undefined;
     }, {
-        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
         name: string;
+        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
         files: {
-            path: string;
             type: string;
+            path: string;
             content: string;
             target?: string | undefined;
         }[];
+        title?: string | undefined;
         meta?: {
             rafters?: {
                 intelligence: {
@@ -878,7 +879,6 @@ export declare const RegistryResponseSchema: z.ZodObject<{
         author?: string | undefined;
         $schema?: string | undefined;
         description?: string | undefined;
-        title?: string | undefined;
         dependencies?: string[] | undefined;
         devDependencies?: string[] | undefined;
         registryDependencies?: string[] | undefined;
@@ -892,15 +892,16 @@ export declare const RegistryResponseSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     name?: string | undefined;
     components?: {
-        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
         name: string;
+        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
         files: {
-            path: string;
             type: string;
+            path: string;
             content: string;
             target?: string | undefined;
         }[];
         dependencies: string[];
+        title?: string | undefined;
         meta?: {
             rafters?: {
                 intelligence: {
@@ -916,7 +917,6 @@ export declare const RegistryResponseSchema: z.ZodObject<{
         author?: string | undefined;
         $schema?: string | undefined;
         description?: string | undefined;
-        title?: string | undefined;
         devDependencies?: string[] | undefined;
         registryDependencies?: string[] | undefined;
         tailwind?: Record<string, unknown> | undefined;
@@ -929,15 +929,16 @@ export declare const RegistryResponseSchema: z.ZodObject<{
     $schema?: string | undefined;
     homepage?: string | undefined;
     items?: {
-        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
         name: string;
+        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
         files: {
-            path: string;
             type: string;
+            path: string;
             content: string;
             target?: string | undefined;
         }[];
         dependencies: string[];
+        title?: string | undefined;
         meta?: {
             rafters?: {
                 intelligence: {
@@ -953,7 +954,6 @@ export declare const RegistryResponseSchema: z.ZodObject<{
         author?: string | undefined;
         $schema?: string | undefined;
         description?: string | undefined;
-        title?: string | undefined;
         devDependencies?: string[] | undefined;
         registryDependencies?: string[] | undefined;
         tailwind?: Record<string, unknown> | undefined;
@@ -966,14 +966,15 @@ export declare const RegistryResponseSchema: z.ZodObject<{
 }, {
     name?: string | undefined;
     components?: {
-        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
         name: string;
+        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
         files: {
-            path: string;
             type: string;
+            path: string;
             content: string;
             target?: string | undefined;
         }[];
+        title?: string | undefined;
         meta?: {
             rafters?: {
                 intelligence: {
@@ -989,7 +990,6 @@ export declare const RegistryResponseSchema: z.ZodObject<{
         author?: string | undefined;
         $schema?: string | undefined;
         description?: string | undefined;
-        title?: string | undefined;
         dependencies?: string[] | undefined;
         devDependencies?: string[] | undefined;
         registryDependencies?: string[] | undefined;
@@ -1003,14 +1003,15 @@ export declare const RegistryResponseSchema: z.ZodObject<{
     $schema?: string | undefined;
     homepage?: string | undefined;
     items?: {
-        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
         name: string;
+        type: "registry:component" | "registry:lib" | "registry:style" | "registry:block" | "registry:page" | "registry:hook";
         files: {
-            path: string;
             type: string;
+            path: string;
             content: string;
             target?: string | undefined;
         }[];
+        title?: string | undefined;
         meta?: {
             rafters?: {
                 intelligence: {
@@ -1026,7 +1027,6 @@ export declare const RegistryResponseSchema: z.ZodObject<{
         author?: string | undefined;
         $schema?: string | undefined;
         description?: string | undefined;
-        title?: string | undefined;
         dependencies?: string[] | undefined;
         devDependencies?: string[] | undefined;
         registryDependencies?: string[] | undefined;

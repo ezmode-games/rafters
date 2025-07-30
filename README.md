@@ -1,4 +1,4 @@
-# Rafters
+![Rafters](logo.svg)
 ## React Components Built with Design Master Intelligence
 
 *Beautiful, accessible, intelligent React components that embody the design mastery of Jony Ive and Nielsen Norman Group*
@@ -7,17 +7,17 @@
 
 ## Features
 
-### 🧠 **Design Intelligence**
+### **Design Intelligence**
 - **Semantic-First**: Every component communicates meaning before aesthetics
 - **Cognitive Load Optimization**: Minimize mental overhead while maintaining functionality
 - **Attention Economics**: Visual hierarchy matches functional importance
 
-### ♿ **Accessibility Foundation**
+### **Accessibility Foundation**
 - **WCAG AAA Compliance**: Beyond minimum requirements
 - **Universal Design**: Works for motor, visual, cognitive, and auditory needs
 - **Real-world Testing**: Validated with assistive technologies
 
-### 🎨 **Systematic Design**
+### **Systematic Design**
 - **OKLCH Color Intelligence**: Perceptually uniform color systems
 - **Mathematical Typography**: Scales with precision and purpose
 - **Gestalt Principles**: Layouts that guide natural eye flow
@@ -60,13 +60,13 @@ function App() {
 
 Rafters follows the **shadcn model** but adds design intelligence patterns:
 
-### 🎨 **Web Configurator**
+### **Web Configurator**
 Transform grayscale foundation components into your design system:
 - Configure colors, spacing, typography, borders
 - Real-time preview of your design system
 - Export Tailwind v4+ CSS custom properties
 
-### 🛠️ **CLI Installation**
+### **CLI Installation**
 Install components as source code with embedded intelligence:
 
 ```bash
@@ -79,7 +79,7 @@ npx rafters add input
 npx rafters add dialog
 ```
 
-### 🧠 **Design Intelligence Included**
+### **Design Intelligence Included**
 Each component includes three layers of intelligence:
 
 **1. Component Comments** (Essential patterns)
@@ -104,7 +104,7 @@ Each component includes three layers of intelligence:
 **3. Intelligence Stories** (Complete education)
 Full Storybook stories demonstrating design reasoning and accessibility patterns.
 
-### ✨ **Source Code Ownership**
+### **Source Code Ownership**
 - Components become **your code** to customize
 - No black box dependencies
 - Intelligence patterns travel with the code
