@@ -1,5 +1,25 @@
 # Rafters Coding Standards
 
+## 🚨 MANDATORY PREFLIGHT CHECKS - READ FIRST 🚨
+
+**BEFORE ANY COMMIT OR PR - AI AGENTS MUST RUN:**
+
+```bash
+pnpm preflight
+```
+
+This single command runs: format → lint → type-check → test → build in sequence.
+
+**❌ NEVER COMMIT if preflight fails**
+**❌ NEVER skip preflight to "save time"** 
+**❌ NEVER expect CI to catch what you should fix locally**
+
+**✅ Preflight must pass before commit - no exceptions**
+
+See [Section 13: Mandatory Preflight Checks](#13-mandatory-preflight-checks-before-any-commit) for details.
+
+---
+
 ## Core Principles
 
 ### 1. **Strict Type Safety**
@@ -449,9 +469,106 @@ try {
 }
 ```
 
-## Git Commit Standards
+## Git Commit Standards & CI Requirements
 
-### 13. **Commit Messages**
+### 13. **Mandatory Preflight Checks (BEFORE ANY COMMIT)**
+
+**CRITICAL: CI will fail unless ALL preflight checks pass locally first.**
+
+#### **Required Commands (Run in Order):**
+```bash
+# 1. MANDATORY - Format all code
+pnpm biome format --write .
+
+# 2. MANDATORY - Lint and fix issues  
+pnpm biome check --fix .
+
+# 3. MANDATORY - Type check all packages
+pnpm type-check
+
+# 4. MANDATORY - Run all tests (including stories)
+pnpm test
+
+# 5. MANDATORY - Build all packages
+pnpm build
+```
+
+#### **AI Agent Requirements:**
+**Every AI agent (Copilot, Claude, etc.) MUST:**
+- ✅ **Run all 5 preflight commands** before committing
+- ✅ **Fix ALL errors** that appear in any command
+- ✅ **Never commit** if any preflight command fails
+- ✅ **Never skip** preflight checks to "save time"
+- ✅ **Never commit** with the expectation that CI will catch issues
+
+#### **Lefthook Pre-commit Enforcement:**
+The repository uses lefthook to block commits that don't pass basic checks:
+```yaml
+pre-commit:
+  commands:
+    biome:
+      run: pnpm biome check --no-errors-on-unmatched
+      stage_fixed: true
+```
+
+**If lefthook blocks your commit:**
+1. **DO NOT override or skip** the pre-commit hook
+2. **Fix the issues** reported by the failing command
+3. **Re-run preflight checks** until all pass
+4. **Then commit** - lefthook will allow it through
+
+#### **Package-Specific Requirements:**
+
+**UI Package (Story Testing):**
+```bash
+# UI package uses stories as tests - no separate unit tests
+pnpm --filter @rafters/ui test              # Runs story tests
+pnpm --filter @rafters/ui storybook:build   # Verify stories build
+```
+
+**Other Packages (Unit Testing):**
+```bash
+# Other packages use traditional unit tests
+pnpm --filter @rafters/cli test
+pnpm --filter @rafters/color-utils test  
+pnpm --filter @rafters/design-tokens test
+```
+
+#### **Common Preflight Failures & Fixes:**
+
+**Biome Format/Lint Failures:**
+```bash
+# Fix: Run format and check with fixes
+pnpm biome format --write .
+pnpm biome check --fix .
+```
+
+**TypeScript Errors:**
+```bash
+# Check specific package
+pnpm --filter @rafters/ui type-check
+pnpm --filter @rafters/cli type-check
+
+# Fix: Add explicit types, fix imports
+```
+
+**Test Failures:**
+```bash
+# UI package - fix broken stories
+pnpm --filter @rafters/ui storybook:dev  # Debug in browser
+
+# Other packages - fix unit tests
+pnpm --filter @rafters/cli test -- --watch
+```
+
+**Build Failures:**
+```bash
+# Fix: Usually TypeScript or missing dependencies
+pnpm --filter @rafters/ui build
+pnpm --filter @rafters/cli build
+```
+
+### 14. **Commit Messages**
 - Use conventional commits format
 - Include scope when relevant
 - Reference issues/PRs when applicable
