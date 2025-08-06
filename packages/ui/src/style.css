@@ -613,3 +613,82 @@
     overflow: auto;
   }
 }
+
+/* ========================================
+ * PHI-BASED GAP UTILITIES FOR GRID INTELLIGENCE
+ * Mathematical spacing based on golden ratio
+ * ======================================== */
+
+@utility gap-phi--2 {
+  gap: var(--spacing-phi--2);
+}
+
+@utility gap-phi--1 {
+  gap: var(--spacing-phi--1);
+}
+
+@utility gap-phi-0 {
+  gap: var(--spacing-phi-0);
+}
+
+@utility gap-phi-1 {
+  gap: var(--spacing-phi-1);
+}
+
+@utility gap-phi-2 {
+  gap: var(--spacing-phi-2);
+}
+
+@utility gap-phi-3 {
+  gap: var(--spacing-phi-3);
+}
+
+/* Row gap utilities */
+@utility gap-y-phi--2 {
+  row-gap: var(--spacing-phi--2);
+}
+
+@utility gap-y-phi--1 {
+  row-gap: var(--spacing-phi--1);
+}
+
+@utility gap-y-phi-0 {
+  row-gap: var(--spacing-phi-0);
+}
+
+@utility gap-y-phi-1 {
+  row-gap: var(--spacing-phi-1);
+}
+
+@utility gap-y-phi-2 {
+  row-gap: var(--spacing-phi-2);
+}
+
+@utility gap-y-phi-3 {
+  row-gap: var(--spacing-phi-3);
+}
+
+/* Column gap utilities */
+@utility gap-x-phi--2 {
+  column-gap: var(--spacing-phi--2);
+}
+
+@utility gap-x-phi--1 {
+  column-gap: var(--spacing-phi--1);
+}
+
+@utility gap-x-phi-0 {
+  column-gap: var(--spacing-phi-0);
+}
+
+@utility gap-x-phi-1 {
+  column-gap: var(--spacing-phi-1);
+}
+
+@utility gap-x-phi-2 {
+  column-gap: var(--spacing-phi-2);
+}
+
+@utility gap-x-phi-3 {
+  column-gap: var(--spacing-phi-3);
+}

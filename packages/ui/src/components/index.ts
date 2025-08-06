@@ -78,3 +78,11 @@ export type {
   LayoutProps,
   ContentStackProps,
 } from './Layout';
+
+export { Grid, GridItem } from './Grid';
+export type {
+  GridProps,
+  GridItemProps,
+  ResponsiveValue,
+  GridGap,
+} from './Grid';
