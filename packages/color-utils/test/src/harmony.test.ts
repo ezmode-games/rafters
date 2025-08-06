@@ -2,13 +2,13 @@
  * Tests for harmony functions - Pure OKLCH workflow
  */
 
-import { describe, it, expect } from 'vitest';
 import type { OKLCH } from '@rafters/shared';
+import { describe, expect, it } from 'vitest';
 import {
-  generateFiveColorHarmony,
-  generateSemanticColorSuggestions,
-  generateOKLCHScale,
   generateColorCombinations,
+  generateFiveColorHarmony,
+  generateOKLCHScale,
+  generateSemanticColorSuggestions,
   generateSemanticColorSystem,
 } from '../../src/harmony.js';
 
@@ -32,7 +32,7 @@ describe('Pure OKLCH Harmony Functions', () => {
       expect(harmony).toHaveProperty('neutral');
 
       // All colors should be valid OKLCH objects
-      Object.values(harmony).forEach(color => {
+      Object.values(harmony).forEach((color) => {
         expect(color).toHaveProperty('l');
         expect(color).toHaveProperty('c');
         expect(color).toHaveProperty('h');
@@ -58,11 +58,11 @@ describe('Pure OKLCH Harmony Functions', () => {
       expect(suggestions).toHaveProperty('info');
 
       // Each semantic type should have array of OKLCH colors
-      Object.values(suggestions).forEach(colorArray => {
+      Object.values(suggestions).forEach((colorArray) => {
         expect(Array.isArray(colorArray)).toBe(true);
         expect(colorArray.length).toBeGreaterThan(0);
-        
-        colorArray.forEach(color => {
+
+        colorArray.forEach((color) => {
           expect(color).toHaveProperty('l');
           expect(color).toHaveProperty('c');
           expect(color).toHaveProperty('h');
@@ -77,15 +77,15 @@ describe('Pure OKLCH Harmony Functions', () => {
       const scale = generateOKLCHScale(testColor);
 
       const expectedSteps = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900'];
-      expectedSteps.forEach(step => {
+      expectedSteps.forEach((step) => {
         expect(scale).toHaveProperty(step);
-        
+
         const color = scale[step];
         expect(color).toHaveProperty('l');
         expect(color).toHaveProperty('c');
         expect(color).toHaveProperty('h');
         expect(color).toHaveProperty('alpha');
-        
+
         // Hue should remain consistent
         expect(color.h).toBe(testColor.h);
         expect(color.alpha).toBe(testColor.alpha);
@@ -109,7 +109,7 @@ describe('Pure OKLCH Harmony Functions', () => {
       expect(Array.isArray(combinations)).toBe(true);
       expect(combinations.length).toBeGreaterThan(0);
 
-      combinations.forEach(combo => {
+      combinations.forEach((combo) => {
         expect(combo).toHaveProperty('background');
         expect(combo).toHaveProperty('foreground');
         expect(combo).toHaveProperty('contrastRatio');
@@ -119,7 +119,7 @@ describe('Pure OKLCH Harmony Functions', () => {
         expect(combo.background).toHaveProperty('l');
         expect(combo.background).toHaveProperty('c');
         expect(combo.background).toHaveProperty('h');
-        
+
         expect(combo.foreground).toHaveProperty('l');
         expect(combo.foreground).toHaveProperty('c');
         expect(combo.foreground).toHaveProperty('h');
@@ -139,13 +139,13 @@ describe('Pure OKLCH Harmony Functions', () => {
       expect(system).toHaveProperty('warning');
       expect(system).toHaveProperty('info');
 
-      Object.values(system).forEach(semantic => {
+      Object.values(system).forEach((semantic) => {
         expect(semantic).toHaveProperty('colors');
         expect(semantic).toHaveProperty('scale');
         expect(semantic).toHaveProperty('combinations');
 
         // Scale should be OKLCH objects
-        Object.values(semantic.scale).forEach(color => {
+        Object.values(semantic.scale).forEach((color) => {
           expect(color).toHaveProperty('l');
           expect(color).toHaveProperty('c');
           expect(color).toHaveProperty('h');
@@ -154,7 +154,7 @@ describe('Pure OKLCH Harmony Functions', () => {
 
         // Combinations should reference OKLCH objects
         if (semantic.combinations) {
-          semantic.combinations.forEach(combo => {
+          semantic.combinations.forEach((combo) => {
             expect(combo.background).toHaveProperty('l');
             expect(combo.foreground).toHaveProperty('l');
           });

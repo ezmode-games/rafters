@@ -286,12 +286,12 @@ export function generateOKLCHScale(baseColor: OKLCH): Record<string, OKLCH> {
   Object.entries(lightnessSteps).forEach(([step, lightness]) => {
     // Adjust chroma based on lightness to maintain perceptual uniformity
     let adjustedChroma = baseColor.c;
-    
+
     // Reduce chroma at very light and very dark ends
     if (lightness > 0.9) {
       adjustedChroma *= 0.3; // Very light colors need less chroma
     } else if (lightness < 0.15) {
-      adjustedChroma *= 0.6; // Very dark colors need less chroma  
+      adjustedChroma *= 0.6; // Very dark colors need less chroma
     }
 
     scale[step] = {

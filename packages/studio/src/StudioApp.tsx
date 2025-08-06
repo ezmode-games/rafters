@@ -2,8 +2,8 @@
  * Main Studio App - Testing ColorWheel component
  */
 
-import { useState } from 'react';
 import type { OKLCH } from '@rafters/shared';
+import { useState } from 'react';
 import { ColorWheel } from './components/ColorWheel';
 
 // Default blue color in OKLCH
@@ -34,4 +34,3 @@ export function StudioApp() {
     </div>
   );
 }
-

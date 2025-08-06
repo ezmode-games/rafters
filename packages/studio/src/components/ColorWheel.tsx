@@ -3,10 +3,10 @@
  * Integrates react-colorful with OKLCH workflow
  */
 
+import { hexToOKLCH, oklchToCSS, oklchToHex } from '@rafters/color-utils';
+import type { OKLCH } from '@rafters/shared';
 import React, { useState, useCallback, useEffect } from 'react';
 import { HexColorPicker } from 'react-colorful';
-import { hexToOKLCH, oklchToHex, oklchToCSS } from '@rafters/color-utils';
-import type { OKLCH } from '@rafters/shared';
 
 interface ColorWheelProps {
   color: OKLCH;
@@ -34,16 +34,19 @@ export function ColorWheel({ color, onChange, className = '' }: ColorWheelProps)
     }
   }, [color]);
 
-  const handleColorChange = useCallback((newHex: string) => {
-    setHexColor(newHex);
-    
-    try {
-      const oklchColor = hexToOKLCH(newHex);
-      onChange(oklchColor);
-    } catch (error) {
-      console.warn('Failed to convert hex to OKLCH:', error);
-    }
-  }, [onChange]);
+  const handleColorChange = useCallback(
+    (newHex: string) => {
+      setHexColor(newHex);
+
+      try {
+        const oklchColor = hexToOKLCH(newHex);
+        onChange(oklchColor);
+      } catch (error) {
+        console.warn('Failed to convert hex to OKLCH:', error);
+      }
+    },
+    [onChange]
+  );
 
   return (
     <div className={`color-wheel ${className}`}>
@@ -54,17 +57,17 @@ export function ColorWheel({ color, onChange, className = '' }: ColorWheelProps)
           onChange={handleColorChange}
           className="color-wheel__picker"
         />
-        
+
         {/* Current color display */}
         <div className="color-wheel__current">
-          <div 
+          <div
             className="color-wheel__swatch"
-            style={{ 
+            style={{
               backgroundColor: oklchToCSS(color),
-              borderColor: color.l > 0.5 ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'
+              borderColor: color.l > 0.5 ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)',
             }}
           />
-          
+
           {/* OKLCH values display */}
           <div className="color-wheel__values">
             <div className="color-wheel__value">
@@ -80,7 +83,7 @@ export function ColorWheel({ color, onChange, className = '' }: ColorWheelProps)
               <span className="value">{color.h.toFixed(1)}°</span>
             </div>
           </div>
-          
+
           {/* CSS output */}
           <div className="color-wheel__css">
             <code>{oklchToCSS(color)}</code>
@@ -90,4 +93,3 @@ export function ColorWheel({ color, onChange, className = '' }: ColorWheelProps)
     </div>
   );
 }
-
