@@ -1,0 +1,209 @@
+@import "tailwindcss";
+
+@theme {
+  /* Studio color palette */
+  --color-studio-bg-start: oklch(0.98 0.01 60);
+  --color-studio-bg-end: oklch(0.88 0.03 45);
+  --color-studio-text: oklch(0.2 0.01 0);
+  --color-studio-text-muted: oklch(0.4 0.01 0);
+  --color-studio-glass: oklch(1 0 0 / 0.05);
+  --color-studio-border: oklch(1 0 0 / 0.1);
+  --color-studio-shadow: oklch(0 0 0 / 0.1);
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Studio App Styles */
+.studio-app {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--color-studio-bg-start), var(--color-studio-bg-end));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.studio-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.studio-header h1 {
+  font-size: 3rem;
+  font-weight: 200;
+  color: var(--color-studio-text);
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.02em;
+}
+
+.studio-header p {
+  font-size: 1.125rem;
+  color: var(--color-studio-text-muted);
+  margin: 0;
+  font-weight: 300;
+}
+
+.studio-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.studio-color-wheel {
+  width: 100%;
+}
+
+/* Color Wheel Styles */
+.color-wheel {
+  --wheel-size: min(70vh, 70vw);
+  --wheel-border: 2px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 100%;
+}
+
+.color-wheel__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+/* React-colorful overrides */
+.color-wheel__picker {
+  width: var(--wheel-size) !important;
+  height: var(--wheel-size) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 8px 32px var(--color-studio-shadow) !important;
+  border: var(--wheel-border) solid var(--color-studio-border) !important;
+}
+
+.color-wheel__picker .react-colorful__saturation {
+  border-radius: 50% !important;
+}
+
+.color-wheel__picker .react-colorful__hue {
+  height: 24px !important;
+  border-radius: 12px !important;
+  margin-top: 1.5rem !important;
+}
+
+.color-wheel__picker .react-colorful__pointer {
+  width: 32px !important;
+  height: 32px !important;
+  border: 3px solid white !important;
+  box-shadow: 0 4px 16px var(--color-studio-shadow) !important;
+}
+
+/* Current color display */
+.color-wheel__current {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: var(--color-studio-glass);
+  border-radius: 16px;
+  border: 1px solid var(--color-studio-border);
+  backdrop-filter: blur(20px);
+  min-width: 280px;
+}
+
+.color-wheel__swatch {
+  width: 128px;
+  height: 128px;
+  border-radius: 16px;
+  border: 2px solid;
+  box-shadow: 0 8px 32px var(--color-studio-shadow);
+  transition: all 0.2s ease;
+}
+
+.color-wheel__values {
+  display: flex;
+  gap: 1rem;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.color-wheel__value {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.color-wheel__value .label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-studio-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.color-wheel__value .value {
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
+  color: var(--color-studio-text);
+}
+
+.color-wheel__css {
+  padding: 0.75rem 1rem;
+  background: oklch(0 0 0 / 0.05);
+  border-radius: 8px;
+  font-family: ui-monospace, "SF Mono", Monaco, "Cascadia Code", monospace;
+  font-size: 0.875rem;
+  color: var(--color-studio-text-muted);
+  border: 1px solid oklch(0 0 0 / 0.1);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .color-wheel {
+    --wheel-size: min(60vh, 80vw);
+    padding: 1rem;
+  }
+
+  .color-wheel__current {
+    min-width: 240px;
+  }
+
+  .color-wheel__swatch {
+    width: 96px;
+    height: 96px;
+  }
+}
+
+@media (max-width: 480px) {
+  .color-wheel {
+    --wheel-size: min(50vh, 90vw);
+  }
+
+  .color-wheel__values {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
