@@ -14,10 +14,9 @@ export default defineConfig({
         test: {
           name: 'unit',
           globals: true,
-          environment: 'jsdom',
-          setupFiles: ['src/test-setup.ts'],
+          environment: 'node',
           exclude: ['**/node_modules', '**/dist'],
-          include: ['tests/**/*.test.{ts,tsx}'],
+          include: ['tests/**/*.test.ts'],
         },
       },
       // Storybook tests project

@@ -1,13 +1,13 @@
 /**
  * AI Intelligence: Container component with layout intelligence patterns
- * Token knowledge in .rafters/tokens/registry.json
+ * Token knowledge in design system tokens
  * 
  * Implements Rafters Design Intelligence methodology:
  * - EMPATHIZE: Users need readable content with appropriate spacing
- * - DEFINE: Container with layout intelligence and responsive optimization  
- * - IDEATE: Layout patterns, responsive intelligence, and content optimization
- * - PROTOTYPE: Semantic HTML with intelligent spacing and accessibility
- * - TEST: Comprehensive testing for all layout scenarios
+ * - DEFINE: Container with layout intelligence using design system tokens
+ * - IDEATE: Layout patterns leveraging existing token system and utilities
+ * - PROTOTYPE: Semantic HTML with phi-based spacing from design tokens
+ * - TEST: Comprehensive story-based testing for all layout scenarios
  */
 import { forwardRef } from 'react';
 import { cn } from '../lib/utils';
@@ -17,30 +17,24 @@ import { cn } from '../lib/utils';
  */
 export interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
-   * Layout intelligence - responsive container sizes
-   * sm: 24rem (384px) - mobile content
-   * md: 42rem (672px) - optimal reading width (65-75 characters)
-   * lg: 56rem (896px) - content with sidebars
-   * xl: 72rem (1152px) - wide layouts
-   * 2xl: 80rem (1280px) - extra wide content
-   * full: 100% - full width layouts
+   * Layout intelligence using design system containers
+   * reading: 38rem optimal reading width (~45-75 characters)
+   * golden: 61.8rem golden ratio content width
+   * wide: max-w-7xl for wide layouts
+   * full: 100% full width layouts
    */
-  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
+  variant?: 'reading' | 'golden' | 'wide' | 'full';
   
   /**
-   * Content optimization - center content horizontally
-   * Applies mx-auto for centered layouts
-   */
-  center?: boolean;
-  
-  /**
-   * Spacing intelligence - consistent padding using phi-based spacing
+   * Spacing intelligence using phi-based spacing from design tokens
    * none: no padding
-   * sm: 1rem (16px) - compact layouts
-   * md: 1.5rem (24px) - balanced spacing (default)
-   * lg: 2rem (32px) - generous breathing room
+   * phi--2: 0.382rem minimal spacing
+   * phi--1: 0.618rem tight spacing
+   * phi-0: 1rem base spacing (default)
+   * phi-1: 1.618rem paragraph spacing
+   * phi-2: 2.618rem content block spacing
    */
-  padding?: 'none' | 'sm' | 'md' | 'lg';
+  padding?: 'none' | 'phi--2' | 'phi--1' | 'phi-0' | 'phi-1' | 'phi-2';
   
   /**
    * Semantic HTML element type for accessibility excellence
@@ -55,19 +49,17 @@ export interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
 /**
  * Container component with layout intelligence
  * 
- * Provides responsive layout foundation with content optimization patterns:
- * - Responsive intelligence with smart breakpoint behavior
- * - Content optimization with optimal reading width
- * - Spacing intelligence with consistent phi-based patterns
- * - Cognitive load optimization with clear boundaries
- * - Accessibility excellence with proper landmarks
+ * Provides responsive layout foundation using design system tokens:
+ * - Uses design system container utilities (container-reading, container-golden)
+ * - Phi-based spacing following golden ratio principles
+ * - Semantic HTML support for accessibility
+ * - Builds on existing Tailwind utilities and design tokens
  */
 export const Container = forwardRef<HTMLDivElement, ContainerProps>(
   (
     {
-      size = 'md',
-      center = true,
-      padding = 'md',
+      variant = 'golden',
+      padding = 'phi-0',
       as = 'div',
       className,
       children,
@@ -78,35 +70,33 @@ export const Container = forwardRef<HTMLDivElement, ContainerProps>(
     // Polymorphic component - render as specified element
     const Component = as;
 
+    // Container variants using design system tokens
+    const containerVariants = {
+      reading: 'container-reading',     // Uses --container-reading token
+      golden: 'container-golden',       // Uses --container-golden token  
+      wide: 'max-w-7xl mx-auto px-4',   // Wide layout with standard padding
+      full: 'w-full',                   // Full width container
+    };
+
+    // Spacing variants using phi-based design tokens
+    const paddingVariants = {
+      'none': '',                       // No padding
+      'phi--2': 'p-[var(--spacing-phi--2)]',   // 0.382rem minimal
+      'phi--1': 'p-[var(--spacing-phi--1)]',   // 0.618rem tight
+      'phi-0': 'p-[var(--spacing-phi-0)]',     // 1rem base (default)
+      'phi-1': 'p-[var(--spacing-phi-1)]',     // 1.618rem paragraph
+      'phi-2': 'p-[var(--spacing-phi-2)]',     // 2.618rem content block
+    };
+
     return (
       <Component
         ref={ref}
         className={cn(
-          // Base container styles for layout intelligence
-          'w-full',
+          // Base container variant using design system tokens
+          containerVariants[variant],
           
-          // Responsive intelligence - size variants with content optimization
-          {
-            'max-w-sm': size === 'sm',    // 24rem - mobile content
-            'max-w-2xl': size === 'md',   // 42rem - optimal reading width (65-75 chars)
-            'max-w-4xl': size === 'lg',   // 56rem - content with sidebars
-            'max-w-6xl': size === 'xl',   // 72rem - wide layouts
-            'max-w-7xl': size === '2xl',  // 80rem - extra wide content
-            'w-full': size === 'full',    // 100% - full width layouts
-          },
-          
-          // Content optimization - center alignment for readability
-          {
-            'mx-auto': center && size !== 'full',
-          },
-          
-          // Spacing intelligence - phi-based padding for cognitive load optimization
-          {
-            'p-0': padding === 'none',    // No padding
-            'p-4': padding === 'sm',      // 1rem - compact
-            'p-6': padding === 'md',      // 1.5rem - balanced (default)
-            'p-8': padding === 'lg',      // 2rem - generous
-          },
+          // Phi-based padding using design system spacing tokens
+          paddingVariants[padding],
           
           // Custom classes
           className
