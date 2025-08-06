@@ -19,8 +19,8 @@ const PropertyDemo = ({ title, description }: { title: string; description: stri
     <p className="text-body text-muted-foreground">{description}</p>
     <div className="bg-muted/10 p-4 rounded border">
       <p className="text-body-small">
-        Interactive demonstration of container properties using design system tokens
-        for consistent spacing and layout behavior.
+        Interactive demonstration of container properties using design system tokens for consistent
+        spacing and layout behavior.
       </p>
     </div>
   </div>
@@ -35,11 +35,11 @@ export const SpacingProperties: Story = {
           Container padding using golden ratio design tokens
         </p>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="space-y-4">
           <h3 className="heading-subsection">Minimal Spacing</h3>
-          
+
           <div className="border border-muted rounded">
             <div className="p-2 bg-muted/10 border-b">
               <code className="text-sm">padding="phi--2"</code>
@@ -51,7 +51,7 @@ export const SpacingProperties: Story = {
               />
             </Container>
           </div>
-          
+
           <div className="border border-muted rounded">
             <div className="p-2 bg-muted/10 border-b">
               <code className="text-sm">padding="phi--1"</code>
@@ -64,10 +64,10 @@ export const SpacingProperties: Story = {
             </Container>
           </div>
         </div>
-        
+
         <div className="space-y-4">
           <h3 className="heading-subsection">Standard Spacing</h3>
-          
+
           <div className="border border-muted rounded">
             <div className="p-2 bg-muted/10 border-b">
               <code className="text-sm">padding="phi-0"</code>
@@ -80,10 +80,10 @@ export const SpacingProperties: Story = {
             </Container>
           </div>
         </div>
-        
+
         <div className="space-y-4">
           <h3 className="heading-subsection">Generous Spacing</h3>
-          
+
           <div className="border border-muted rounded">
             <div className="p-2 bg-muted/10 border-b">
               <code className="text-sm">padding="phi-1"</code>
@@ -95,7 +95,7 @@ export const SpacingProperties: Story = {
               />
             </Container>
           </div>
-          
+
           <div className="border border-muted rounded">
             <div className="p-2 bg-muted/10 border-b">
               <code className="text-sm">padding="phi-2"</code>
@@ -114,7 +114,8 @@ export const SpacingProperties: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Demonstrates all padding properties using phi-based spacing tokens from the design system for mathematical spacing relationships.',
+        story:
+          'Demonstrates all padding properties using phi-based spacing tokens from the design system for mathematical spacing relationships.',
       },
     },
   },
@@ -129,7 +130,7 @@ export const VariantProperties: Story = {
           Different container variants for specific layout needs
         </p>
       </div>
-      
+
       <div className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="border border-muted rounded">
@@ -143,7 +144,7 @@ export const VariantProperties: Story = {
               />
             </Container>
           </div>
-          
+
           <div className="border border-muted rounded">
             <div className="p-3 bg-muted/10 border-b">
               <code className="text-sm">variant="golden"</code>
@@ -156,7 +157,7 @@ export const VariantProperties: Story = {
             </Container>
           </div>
         </div>
-        
+
         <div className="border border-muted rounded">
           <div className="p-3 bg-muted/10 border-b">
             <code className="text-sm">variant="wide"</code>
@@ -168,7 +169,7 @@ export const VariantProperties: Story = {
             />
           </Container>
         </div>
-        
+
         <div className="border border-muted rounded">
           <div className="p-3 bg-muted/10 border-b">
             <code className="text-sm">variant="full"</code>
@@ -186,7 +187,8 @@ export const VariantProperties: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Comprehensive demonstration of container variant properties showing how each serves specific layout purposes using design system tokens.',
+        story:
+          'Comprehensive demonstration of container variant properties showing how each serves specific layout purposes using design system tokens.',
       },
     },
   },
@@ -203,52 +205,64 @@ export const CombinedProperties: Story = {
               Demonstrating variant and spacing combinations for complex layouts
             </p>
           </div>
-          
+
           <div className="space-y-6">
             <div className="border border-muted rounded-lg overflow-hidden">
               <div className="p-4 bg-muted/10 border-b">
                 <h3 className="heading-component">Article Layout</h3>
-                <code className="text-sm text-muted-foreground">variant="reading" padding="phi-1"</code>
+                <code className="text-sm text-muted-foreground">
+                  variant="reading" padding="phi-1"
+                </code>
               </div>
               <Container variant="reading" padding="phi-1">
                 <article className="space-y-4">
                   <h1 className="heading-subsection">Design System Intelligence</h1>
                   <p className="text-body">
-                    Reading containers with phi-1 spacing create optimal conditions for long-form content.
-                    The 38rem width ensures 45-75 characters per line while the 1.618rem padding provides
-                    comfortable breathing room that follows natural mathematical relationships.
+                    Reading containers with phi-1 spacing create optimal conditions for long-form
+                    content. The 38rem width ensures 45-75 characters per line while the 1.618rem
+                    padding provides comfortable breathing room that follows natural mathematical
+                    relationships.
                   </p>
                   <p className="text-body">
-                    This combination reduces cognitive load and improves reading comprehension through
-                    scientifically-backed typography principles integrated into our design system tokens.
+                    This combination reduces cognitive load and improves reading comprehension
+                    through scientifically-backed typography principles integrated into our design
+                    system tokens.
                   </p>
                 </article>
               </Container>
             </div>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="border border-muted rounded-lg overflow-hidden">
                 <div className="p-3 bg-muted/10 border-b">
                   <h4 className="heading-subcomponent">Compact Card</h4>
-                  <code className="text-sm text-muted-foreground">variant="reading" padding="phi--1"</code>
+                  <code className="text-sm text-muted-foreground">
+                    variant="reading" padding="phi--1"
+                  </code>
                 </div>
                 <Container variant="reading" padding="phi--1" className="bg-accent/5">
                   <div className="space-y-2">
                     <h5 className="heading-subcomponent">Quick Info</h5>
-                    <p className="text-body-small">Compact spacing for information density while maintaining readability.</p>
+                    <p className="text-body-small">
+                      Compact spacing for information density while maintaining readability.
+                    </p>
                   </div>
                 </Container>
               </div>
-              
+
               <div className="border border-muted rounded-lg overflow-hidden">
                 <div className="p-3 bg-muted/10 border-b">
                   <h4 className="heading-subcomponent">Spacious Section</h4>
-                  <code className="text-sm text-muted-foreground">variant="golden" padding="phi-2"</code>
+                  <code className="text-sm text-muted-foreground">
+                    variant="golden" padding="phi-2"
+                  </code>
                 </div>
                 <Container variant="golden" padding="phi-2" className="bg-primary/5">
                   <div className="space-y-3">
                     <h5 className="heading-subcomponent">Featured Content</h5>
-                    <p className="text-body-small">Generous spacing for important content that needs emphasis and breathing room.</p>
+                    <p className="text-body-small">
+                      Generous spacing for important content that needs emphasis and breathing room.
+                    </p>
                   </div>
                 </Container>
               </div>
@@ -261,7 +275,8 @@ export const CombinedProperties: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Real-world examples of combining variant and spacing properties to create purposeful layouts using design system intelligence.',
+        story:
+          'Real-world examples of combining variant and spacing properties to create purposeful layouts using design system intelligence.',
       },
     },
   },

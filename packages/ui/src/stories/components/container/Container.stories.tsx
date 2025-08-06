@@ -43,13 +43,13 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 // Demo content for stories
-const DemoContent = ({ title = "Container Intelligence" }: { title?: string }) => (
+const DemoContent = ({ title = 'Container Intelligence' }: { title?: string }) => (
   <div className="space-y-4">
     <h2 className="heading-section text-primary">{title}</h2>
     <p className="text-body text-muted-foreground">
-      This container demonstrates intelligent layout patterns using design system tokens.
-      The golden ratio containers and phi-based spacing create natural, readable layouts
-      that reduce cognitive load and enhance user experience.
+      This container demonstrates intelligent layout patterns using design system tokens. The golden
+      ratio containers and phi-based spacing create natural, readable layouts that reduce cognitive
+      load and enhance user experience.
     </p>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div className="bg-accent/10 p-4 rounded">

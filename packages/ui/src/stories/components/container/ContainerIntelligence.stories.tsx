@@ -41,7 +41,8 @@ export const ReadingOptimization: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Demonstrates reading optimization using the container-reading design token for optimal character-per-line ratios that enhance reading comprehension.',
+        story:
+          'Demonstrates reading optimization using the container-reading design token for optimal character-per-line ratios that enhance reading comprehension.',
       },
     },
   },
@@ -61,7 +62,8 @@ export const GoldenRatioLayout: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Golden ratio proportions create subconscious comfort through mathematical harmony. Uses the container-golden design token for naturally balanced layouts.',
+        story:
+          'Golden ratio proportions create subconscious comfort through mathematical harmony. Uses the container-golden design token for naturally balanced layouts.',
       },
     },
   },
@@ -77,8 +79,8 @@ export const PhiSpacingHierarchy: Story = {
           </div>
           <Container variant="golden" padding={spacing} className="bg-accent/5">
             <p className="text-body">
-              This container uses {spacing} padding from the phi-based spacing scale.
-              Each step follows mathematical relationships for natural visual rhythm.
+              This container uses {spacing} padding from the phi-based spacing scale. Each step
+              follows mathematical relationships for natural visual rhythm.
             </p>
           </Container>
         </div>
@@ -88,7 +90,8 @@ export const PhiSpacingHierarchy: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Phi-based spacing hierarchy using design system tokens creates natural visual rhythm through mathematical relationships that reduce cognitive processing.',
+        story:
+          'Phi-based spacing hierarchy using design system tokens creates natural visual rhythm through mathematical relationships that reduce cognitive processing.',
       },
     },
   },
@@ -98,24 +101,32 @@ export const CognitiveLoadOptimization: Story = {
   render: () => (
     <div className="min-h-screen bg-background">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
-        <Container variant="reading" padding="phi-1" className="bg-destructive/5 border border-destructive/20">
+        <Container
+          variant="reading"
+          padding="phi-1"
+          className="bg-destructive/5 border border-destructive/20"
+        >
           <div className="space-y-4">
             <h3 className="heading-subsection text-destructive-foreground">High Cognitive Load</h3>
             <p className="text-body-small">
-              Without proper spacing and width constraints, users must work harder to track
-              line endings, parse dense information, and maintain reading focus across
-              excessively wide text blocks.
+              Without proper spacing and width constraints, users must work harder to track line
+              endings, parse dense information, and maintain reading focus across excessively wide
+              text blocks.
             </p>
           </div>
         </Container>
-        
-        <Container variant="reading" padding="phi-1" className="bg-success/5 border border-success/20">
+
+        <Container
+          variant="reading"
+          padding="phi-1"
+          className="bg-success/5 border border-success/20"
+        >
           <div className="space-y-4">
             <h3 className="heading-subsection text-success-foreground">Optimized Cognitive Load</h3>
             <p className="text-body-small">
               Proper reading width and phi-based spacing reduce mental effort, improve
-              comprehension, and create comfortable reading patterns that users can
-              sustain for longer periods.
+              comprehension, and create comfortable reading patterns that users can sustain for
+              longer periods.
             </p>
           </div>
         </Container>
@@ -125,7 +136,8 @@ export const CognitiveLoadOptimization: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Cognitive load comparison showing how proper container sizing and spacing reduce mental effort and improve user experience through design intelligence.',
+        story:
+          'Cognitive load comparison showing how proper container sizing and spacing reduce mental effort and improve user experience through design intelligence.',
       },
     },
   },
