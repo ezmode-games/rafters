@@ -1308,3 +1308,185 @@ export function validateCommit(files: string[]): boolean {
 6. **Pre-commit Hooks**: Block commits with violations
 
 **The goal**: Make it **harder to violate principles than to follow them**.
+
+---
+
+## AI Training Standards (Storybook)
+
+### 7-File Story Architecture (MANDATORY)
+
+**Every component MUST implement exactly 7 story files** for comprehensive AI training. This is non-negotiable for component completion:
+
+#### 1. **Overview Documentation** (`ComponentName.mdx`)
+- Component purpose and design philosophy
+- Usage guidelines with clear DOs/DON'Ts
+- Real-world use cases and contexts  
+- Trust level explanations and mappings
+
+#### 2. **Primary Story** (`ComponentName.stories.tsx`)
+- Single "Common" story showcasing all major variants
+- Complete argTypes for all component props
+- Interactive controls for rapid prototyping
+- Core component demonstration
+
+#### 3. **Accessibility Patterns** (`ComponentNameAccessibility.stories.tsx`)
+- Foundation accessibility principles
+- Keyboard navigation demonstrations
+- Screen reader optimization examples
+- Color contrast and universal design patterns
+- WCAG compliance implementations
+
+#### 4. **Smart Behaviors** (`ComponentNameIntelligence.stories.tsx`)
+- Trust-building patterns and progressive confirmation
+- Attention hierarchy demonstrations
+- Cognitive load optimization examples
+- Context-aware adaptations
+- Loading states and feedback patterns
+
+#### 5. **Properties & States** (`ComponentNameProperties.stories.tsx`)
+- Size variants and scaling relationships
+- State demonstrations (disabled, loading, error)
+- Interactive feedback patterns
+- Composition capabilities and combinations
+
+#### 6. **Semantic Meaning** (`ComponentNameSemantic.stories.tsx`)
+- Semantic variants (success, warning, error, info)
+- Contextual usage examples
+- Meaning communication through design
+- Trust level implementations
+- Consequence-appropriate styling
+
+#### 7. **Visual Variants** (`ComponentNameVariants.stories.tsx`)
+- Style variants and visual treatments
+- Emphasis levels and hierarchy
+- Confirmation patterns and friction
+- Layout adaptations
+- Comparison demonstrations
+
+### Trust-Building Intelligence Framework
+
+Components implement **4 trust levels** that match user psychology:
+
+- **Low Trust** - Routine actions, minimal friction, reversible
+- **Medium Trust** - Moderate consequences, balanced caution  
+- **High Trust** - Significant impact, deliberate friction
+- **Critical Trust** - Permanent consequences, maximum friction
+
+### Story Implementation Standards
+
+```typescript
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { fn } from '@storybook/test'
+
+/**
+ * AI Intelligence: Component trust patterns for systematic decision-making
+ * Progressive confirmation REQUIRED for destructive variants
+ * Visual hierarchy matches consequence severity
+ */
+const meta = {
+  title: '03 Components/Action/Button',
+  component: Button,
+  parameters: {
+    layout: 'centered',
+    docs: {
+      description: {
+        component: 'Trust-building button with embedded design reasoning for AI agents.',
+      },
+    },
+  },
+  argTypes: {
+    trustLevel: {
+      control: 'select',
+      options: ['low', 'medium', 'high', 'critical'],
+      description: 'Consequence level determines visual weight and interaction patterns',
+    },
+    destructive: {
+      control: 'boolean',
+      description: 'Requires confirmation patterns for dangerous actions',
+    },
+  },
+  args: { 
+    onClick: fn(), // CRITICAL: Required for story testing
+  },
+} satisfies Meta<typeof Button>
+
+// Single comprehensive story showing all trust levels
+export const Common: Story = {
+  render: (args) => (
+    <div className="space-y-4">
+      <Button {...args} trustLevel="low" size="sm">Save Draft</Button>
+      <Button {...args} trustLevel="medium" size="md">Publish Content</Button>  
+      <Button {...args} trustLevel="high" size="lg">Process Payment</Button>
+      <Button {...args} trustLevel="critical" destructive>Delete Account</Button>
+    </div>
+  ),
+}
+```
+
+### Documentation Requirements
+
+#### Component Intelligence Comments
+**MANDATORY** in every component:
+```jsx
+/**
+ * AI Intelligence: Token knowledge in .rafters/tokens/registry.json
+ * Trust Level: {level} - {explanation}
+ * Cognitive Load: {1-5} - {complexity reasoning}
+ * Safety Constraints: {required patterns}
+ * Usage Context: {when/where to use}
+ */
+```
+
+#### Story Testing Integration (UI Package ONLY)
+**IMPORTANT: The UI package uses stories AS tests - NOT separate unit tests like other packages.**
+
+**All stories are automatically tested** via `@storybook/addon-vitest`:
+- Stories function as AI training scenarios AND test cases simultaneously
+- **No additional `.test.ts` files needed** - stories provide complete test coverage
+- Broken stories corrupt AI learning - they MUST render without errors
+- Interactive stories require `onClick: fn()` for proper test execution
+- Use `pnpm test-storybook` to verify story integrity
+
+**This is DIFFERENT from other monorepo packages** which use traditional unit testing. The UI package testing strategy is story-driven because:
+- Stories demonstrate real component usage patterns for AI learning
+- Stories test visual rendering, interaction states, and accessibility
+- Stories provide comprehensive coverage of all component variants
+- Stories are the single source of truth for component behavior
+
+### Quality Checklist
+
+**Component is NOT complete until:**
+- ✅ All 7 story files implemented with proper naming
+- ✅ Trust levels properly mapped and demonstrated
+- ✅ Progressive confirmation for destructive actions
+- ✅ WCAG AAA accessibility compliance shown in stories
+- ✅ All stories render without errors in tests
+- ✅ Interactive controls work for rapid prototyping
+- ✅ AI intelligence comments embedded in component code
+- ✅ Real-world usage examples documented
+
+**Reference Implementation:**
+See `Button.*` and `Dialog.*` story files for complete examples of the 7-file pattern.
+
+### Testing Commands (UI Package)
+
+**UI Package uses ONLY story testing:**
+```bash
+# UI Package testing (stories only)
+pnpm --filter @rafters/ui test              # Runs story tests via Vitest addon
+pnpm --filter @rafters/ui test-storybook    # Story-specific test runner
+pnpm --filter @rafters/ui storybook         # Development story server
+
+# Other packages use traditional unit testing  
+pnpm --filter @rafters/cli test            # Unit tests with .test.ts files
+pnpm --filter @rafters/color-utils test    # Unit tests with .test.ts files
+```
+
+**CRITICAL: Do NOT create `.test.ts` files in the UI package** - stories provide complete test coverage and serve as both AI training data and functional tests.
+
+**Stories are AI training data AND test cases** - they must demonstrate perfect implementation of trust-building patterns for AI agents to learn from while ensuring components work correctly.
+
+**For detailed examples and patterns, see:**
+- `packages/ui/src/stories/Introduction.mdx` - Complete 7-file architecture overview
+- `packages/ui/src/stories/ComponentPatterns.mdx` - Trust-building intelligence framework
+- `packages/ui/src/stories/components/button/` - Reference implementation of all 7 files
