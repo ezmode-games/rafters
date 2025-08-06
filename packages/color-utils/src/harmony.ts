@@ -283,7 +283,7 @@ export function generateOKLCHScale(baseColor: OKLCH): Record<string, OKLCH> {
 
   const scale: Record<string, OKLCH> = {};
 
-  Object.entries(lightnessSteps).forEach(([step, lightness]) => {
+  for (const [step, lightness] of Object.entries(lightnessSteps)) {
     // Adjust chroma based on lightness to maintain perceptual uniformity
     let adjustedChroma = baseColor.c;
 
@@ -300,7 +300,7 @@ export function generateOKLCHScale(baseColor: OKLCH): Record<string, OKLCH> {
       h: baseColor.h,
       alpha: baseColor.alpha,
     };
-  });
+  }
 
   return scale;
 }
@@ -324,7 +324,7 @@ export function generateSemanticColorSystem(baseColor: OKLCH) {
   };
 
   // For each semantic type, generate a scale from the first suggestion and analyze combinations
-  Object.entries(suggestions).forEach(([semanticType, colors]) => {
+  for (const [semanticType, colors] of Object.entries(suggestions)) {
     if (colors.length > 0) {
       const baseSemanticColor = colors[0]; // Use first suggestion
 
@@ -337,7 +337,7 @@ export function generateSemanticColorSystem(baseColor: OKLCH) {
       semanticSystem[semanticType as keyof typeof semanticSystem].scale = colorScale;
       semanticSystem[semanticType as keyof typeof semanticSystem].combinations = combinations;
     }
-  });
+  }
 
   return semanticSystem;
 }
@@ -403,12 +403,12 @@ export function calculateSimultaneousContrast(
   let avgHueX = 0;
   let avgHueY = 0;
 
-  adjacentColors.forEach((color) => {
+  for (const color of adjacentColors) {
     avgLightness += color.l;
     avgChroma += color.c;
     avgHueX += Math.cos((color.h * Math.PI) / 180) * color.c;
     avgHueY += Math.sin((color.h * Math.PI) / 180) * color.c;
-  });
+  }
 
   const count = adjacentColors.length;
   avgLightness /= count;
@@ -565,7 +565,7 @@ export function enhanceSemanticColorsWithLeonardo(
   const allSemanticColors = Object.values(semanticSuggestions).flat();
   const contextColors = [baseColor, ...allSemanticColors.slice(0, 3)];
 
-  Object.entries(semanticSuggestions).forEach(([semanticType, colors]) => {
+  for (const [semanticType, colors] of Object.entries(semanticSuggestions)) {
     const enhancedColors = colors.map((color) => {
       const atmosphericWeight = calculateAtmosphericWeight(color);
       const perceptualWeight = calculatePerceptualWeight(color);
@@ -630,7 +630,7 @@ export function enhanceSemanticColorsWithLeonardo(
       colors: enhancedColors,
       contextualRecommendations: recommendations,
     };
-  });
+  }
 
   return enhancedSystem;
 }
