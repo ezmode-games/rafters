@@ -5,18 +5,16 @@
 **BEFORE ANY COMMIT OR PR - AI AGENTS MUST RUN:**
 
 ```bash
-pnpm biome format --write .  # Format code
-pnpm biome check --fix .     # Lint and fix 
-pnpm type-check              # Type check all packages
-pnpm test                    # Run all tests (stories + unit)
-pnpm build                   # Build all packages
+pnpm preflight
 ```
 
-**❌ NEVER COMMIT if ANY command fails**
+This single command runs: format → lint → type-check → test → build in sequence.
+
+**❌ NEVER COMMIT if preflight fails**
 **❌ NEVER skip preflight to "save time"** 
 **❌ NEVER expect CI to catch what you should fix locally**
 
-**✅ ALL must pass before commit - no exceptions**
+**✅ Preflight must pass before commit - no exceptions**
 
 See [Section 13: Mandatory Preflight Checks](#13-mandatory-preflight-checks-before-any-commit) for details.
 

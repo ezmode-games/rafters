@@ -13,6 +13,7 @@
     "lint": "pnpm --recursive lint",
     "format": "pnpm --recursive format",
     "type-check": "pnpm --recursive type-check",
+    "preflight": "pnpm format && pnpm lint && pnpm type-check && pnpm test:run && pnpm build",
     "clean": "pnpm --recursive clean && rm -rf node_modules",
     "ui:dev": "pnpm --filter @rafters/ui dev",
     "ui:storybook": "pnpm --filter @rafters/ui storybook",

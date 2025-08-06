@@ -15,9 +15,8 @@
   },
   "files": ["dist", "README.md"],
   "scripts": {
-    "dev": "vite",
+    "dev": "storybook dev -p 6006",
     "build": "vite build && tsc --emitDeclarationOnly",
-    "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
