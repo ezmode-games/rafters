@@ -76,8 +76,10 @@ export type {
   DialogDescriptionProps,
 } from './Dialog';
 
+export { Container } from './Container';
+export type { ContainerProps } from './Container';
+
 export {
-  Container,
   ReadingLayout,
   ActionLayout,
   ContentSidebar,
@@ -85,7 +87,6 @@ export {
   ContentStack,
 } from './Layout';
 export type {
-  ContainerProps,
   LayoutProps,
   ContentStackProps,
 } from './Layout';

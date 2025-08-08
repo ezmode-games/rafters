@@ -1,0 +1,133 @@
+import { Canvas, Meta, Story } from '@storybook/blocks';
+import * as ContainerStories from './Container.stories';
+
+<Meta of={ContainerStories} />
+
+# Container
+
+Layout intelligence begins with the container. Every content area needs clear boundaries, optimal reading widths, and mathematical spacing that serves human cognitive patterns.
+
+## Design Philosophy
+
+The Container component implements design intelligence using established design system tokens rather than arbitrary values. This approach ensures consistency, accessibility, and mathematical harmony across all layouts.
+
+### Core Principles
+
+- **Design System Integration**: Uses established tokens like `container-reading`, `container-golden`, and phi-based spacing
+- **Mathematical Proportions**: Golden ratio and phi-based measurements for natural visual harmony
+- **Accessibility First**: Semantic HTML elements and WCAG AAA color contrast
+- **Cognitive Load Optimization**: Optimal reading widths and consistent spacing patterns
+
+## Usage Guidelines
+
+### DO ✓
+
+- Use `variant="reading"` for text-heavy content (articles, documentation)
+- Use `variant="golden"` for balanced main content areas
+- Use phi-based spacing (`phi-0`, `phi-1`, `phi-2`) for consistent rhythm
+- Choose appropriate semantic elements (`main`, `section`, `article`)
+- Combine variants thoughtfully for hierarchical layouts
+
+### DON'T ✗
+
+- Mix arbitrary spacing with design system tokens
+- Use `variant="full"` unless you need true edge-to-edge layouts
+- Nest containers without semantic purpose
+- Override container widths with custom CSS
+- Use generic `div` when semantic elements apply
+
+## Container Variants
+
+### Reading Container
+- **Token**: `container-reading` (~38rem)
+- **Purpose**: Optimal reading width (45-75 characters per line)
+- **Use Cases**: Articles, blog posts, documentation, long-form content
+
+### Golden Container
+- **Token**: `container-golden` (61.8rem)
+- **Purpose**: Golden ratio proportions for balanced layouts
+- **Use Cases**: Main content areas, landing pages, balanced compositions
+
+### Wide Container
+- **Width**: `max-w-7xl`
+- **Purpose**: Wide layouts for complex interfaces
+- **Use Cases**: Dashboards, data tables, admin interfaces
+
+### Full Container
+- **Width**: `100%`
+- **Purpose**: Edge-to-edge layouts
+- **Use Cases**: Hero sections, full-bleed images, immersive experiences
+
+## Spacing System
+
+The Container uses phi-based spacing tokens from the design system:
+
+- `phi--2`: 0.382rem (minimal spacing)
+- `phi--1`: 0.618rem (tight spacing)
+- `phi-0`: 1rem (base spacing)
+- `phi-1`: 1.618rem (paragraph spacing)
+- `phi-2`: 2.618rem (content block spacing)
+
+## Semantic HTML
+
+Container supports semantic elements for proper document structure:
+
+- `as="main"`: Primary content landmark
+- `as="section"`: Thematic content grouping
+- `as="article"`: Standalone, distributable content
+- `as="div"`: Generic container (default)
+
+## Real-World Examples
+
+### Article Layout
+```tsx
+<Container as="article" variant="reading" padding="phi-1">
+  <h1>Article Title</h1>
+  <p>Optimized for sustained reading with proper line length...</p>
+</Container>
+```
+
+### Main Content Area
+```tsx
+<Container as="main" variant="golden" padding="phi-2">
+  <section>Balanced layout using golden ratio proportions...</section>
+</Container>
+```
+
+### Dashboard Layout
+```tsx
+<Container as="main" variant="wide" padding="phi-1">
+  <div className="grid grid-cols-12 gap-6">
+    {/* Complex dashboard interface */}
+  </div>
+</Container>
+```
+
+## Accessibility Features
+
+- **WCAG AAA Compliance**: All color combinations meet 7:1+ contrast ratios
+- **Semantic Structure**: Proper HTML landmarks for screen reader navigation
+- **Keyboard Navigation**: Maintains logical tab order and focus management
+- **Responsive Design**: Accessible across all screen sizes and devices
+
+## Component Intelligence
+
+The Container component embeds design reasoning that AI agents can understand:
+
+- **Trust Level**: Low - Foundational layout component with minimal cognitive load
+- **Cognitive Load**: 1-2 - Simple, predictable layout behavior
+- **Safety Constraints**: Uses only design system tokens for consistency
+- **Usage Context**: Universal layout foundation for all content types
+
+<Canvas of={ContainerStories.Common} />
+
+## Integration with Design System
+
+Container components integrate seamlessly with the broader design system:
+
+- **Color Tokens**: Uses semantic color tokens for consistent theming
+- **Typography Scale**: Works with heading and body text utilities
+- **Spacing System**: Phi-based spacing maintains rhythm with other components
+- **Layout Utilities**: Combines with grid, flex, and other layout patterns
+
+This thoughtful integration ensures that Container components feel like a natural extension of the design system rather than isolated components.

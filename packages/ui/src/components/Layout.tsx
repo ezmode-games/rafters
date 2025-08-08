@@ -7,25 +7,6 @@ import { cn } from '../lib/utils';
 // Base layout props interface
 export interface LayoutProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-// Container component for width constraints and padding
-export interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'reading' | 'golden' | 'wide' | 'full';
-}
-
-export const Container = forwardRef<HTMLDivElement, ContainerProps>(
-  ({ variant = 'golden', className, ...props }, ref) => {
-    const variants = {
-      reading: 'container-reading',
-      golden: 'container-golden',
-      wide: 'max-w-7xl mx-auto px-phi-1',
-      full: 'w-full px-phi-1',
-    };
-
-    return <div ref={ref} className={cn(variants[variant], className)} {...props} />;
-  }
-);
-Container.displayName = 'Container';
-
 // Reading layout for text-heavy content (F-pattern optimized)
 export const ReadingLayout = forwardRef<HTMLDivElement, LayoutProps>(
   ({ className, ...props }, ref) => (

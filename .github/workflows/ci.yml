@@ -34,7 +34,7 @@ jobs:
         run: pnpm --filter rafters-ui exec playwright install chromium
 
       - name: Build
-        run: pnpm build
+        run: pnpm --recursive --filter "!rafters-ui" build
 
       - name: Lint
         run: pnpm lint
