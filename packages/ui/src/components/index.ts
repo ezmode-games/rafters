@@ -18,6 +18,17 @@ export {
   CardContent,
   CardFooter,
 } from './Card';
+
+export {
+  Toast,
+  ToastProvider,
+  ToastViewport,
+  ToastTitle,
+  ToastDescription,
+  ToastClose,
+  ToastAction,
+} from './Toast';
+export type { ToastProps, ToastActionElement } from './Toast';
 export type {
   CardProps,
   CardHeaderProps,

@@ -32,7 +32,7 @@ describe('Pure OKLCH Harmony Functions', () => {
       expect(harmony).toHaveProperty('neutral');
 
       // All colors should be valid OKLCH objects
-      Object.values(harmony).forEach((color) => {
+      for (const color of Object.values(harmony)) {
         expect(color).toHaveProperty('l');
         expect(color).toHaveProperty('c');
         expect(color).toHaveProperty('h');
@@ -41,7 +41,7 @@ describe('Pure OKLCH Harmony Functions', () => {
         expect(typeof color.c).toBe('number');
         expect(typeof color.h).toBe('number');
         expect(typeof color.alpha).toBe('number');
-      });
+      }
 
       // Primary should match input
       expect(harmony.primary).toEqual(testColor);
@@ -58,17 +58,17 @@ describe('Pure OKLCH Harmony Functions', () => {
       expect(suggestions).toHaveProperty('info');
 
       // Each semantic type should have array of OKLCH colors
-      Object.values(suggestions).forEach((colorArray) => {
+      for (const colorArray of Object.values(suggestions)) {
         expect(Array.isArray(colorArray)).toBe(true);
         expect(colorArray.length).toBeGreaterThan(0);
 
-        colorArray.forEach((color) => {
+        for (const color of colorArray) {
           expect(color).toHaveProperty('l');
           expect(color).toHaveProperty('c');
           expect(color).toHaveProperty('h');
           expect(color).toHaveProperty('alpha');
-        });
-      });
+        }
+      }
     });
   });
 
@@ -77,7 +77,7 @@ describe('Pure OKLCH Harmony Functions', () => {
       const scale = generateOKLCHScale(testColor);
 
       const expectedSteps = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900'];
-      expectedSteps.forEach((step) => {
+      for (const step of expectedSteps) {
         expect(scale).toHaveProperty(step);
 
         const color = scale[step];
@@ -89,7 +89,7 @@ describe('Pure OKLCH Harmony Functions', () => {
         // Hue should remain consistent
         expect(color.h).toBe(testColor.h);
         expect(color.alpha).toBe(testColor.alpha);
-      });
+      }
 
       // 500 should match the base color lightness
       expect(scale['500'].l).toBe(testColor.l);
@@ -109,7 +109,7 @@ describe('Pure OKLCH Harmony Functions', () => {
       expect(Array.isArray(combinations)).toBe(true);
       expect(combinations.length).toBeGreaterThan(0);
 
-      combinations.forEach((combo) => {
+      for (const combo of combinations) {
         expect(combo).toHaveProperty('background');
         expect(combo).toHaveProperty('foreground');
         expect(combo).toHaveProperty('contrastRatio');
@@ -126,7 +126,7 @@ describe('Pure OKLCH Harmony Functions', () => {
 
         expect(typeof combo.contrastRatio).toBe('number');
         expect(['primary', 'secondary', 'subtle']).toContain(combo.usage);
-      });
+      }
     });
   });
 
@@ -139,27 +139,27 @@ describe('Pure OKLCH Harmony Functions', () => {
       expect(system).toHaveProperty('warning');
       expect(system).toHaveProperty('info');
 
-      Object.values(system).forEach((semantic) => {
+      for (const semantic of Object.values(system)) {
         expect(semantic).toHaveProperty('colors');
         expect(semantic).toHaveProperty('scale');
         expect(semantic).toHaveProperty('combinations');
 
         // Scale should be OKLCH objects
-        Object.values(semantic.scale).forEach((color) => {
+        for (const color of Object.values(semantic.scale)) {
           expect(color).toHaveProperty('l');
           expect(color).toHaveProperty('c');
           expect(color).toHaveProperty('h');
           expect(color).toHaveProperty('alpha');
-        });
+        }
 
         // Combinations should reference OKLCH objects
         if (semantic.combinations) {
-          semantic.combinations.forEach((combo) => {
+          for (const combo of semantic.combinations) {
             expect(combo.background).toHaveProperty('l');
             expect(combo.foreground).toHaveProperty('l');
-          });
+          }
         }
-      });
+      }
     });
   });
 });
