@@ -29,8 +29,8 @@ catalog:
   clsx: ^2.1.1
   tailwind-merge: ^3.3.1
   
-  # Utilities - Keep Zod v3 for stability (v4 is major breaking change)
-  zod: ^3.25.76
+  # Utilities - Updated to Zod v4 for latest features
+  zod: ^4.0.13
   fs-extra: ^11.2.0
   "@types/fs-extra": ^11.0.4
   

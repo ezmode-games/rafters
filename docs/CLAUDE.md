@@ -1,16 +1,28 @@
 # Claude AI Assistant Instructions for Rafters
 
-## AI-First Design Intelligence System
+## Human-AI Design Collaboration System
 
-**Rafters is a design intelligence system for AI agents.** Components are the delivery mechanism for encoded human design reasoning. This system exists to make AI agents better at design decisions through systematic constraints and machine-readable design knowledge.
+**Rafters bridges human creative judgment and AI systematic precision.** It enables designers to make complex aesthetic decisions with minimal cognitive load, then provides AI agents with the systematic language to execute those decisions consistently across all applications.
 
-**This is NOT a human-facing component library.** This is an AI reasoning system that teaches design intelligence through:
+**The Human-AI Partnership:**
 
-1. **Component Comments** - Design reasoning embedded in JSX comments for AI parsing
-2. **Component Manifest** - Machine-readable intelligence data for systematic decision-making  
-3. **Intelligence Stories** - Comprehensive training scenarios for AI design education
+**Humans Provide:**
+- Aesthetic judgment and creative intent
+- Brand vision and emotional direction
+- Strategic design decisions based on taste and cultural context
 
-**Core Purpose**: Prevent AI agents from making bad design choices by encoding human design judgment in consumable formats. Components use shadcn-style source code ownership with OKLCH color systems, accessibility-first design, and systematic constraints.
+**AI Agents Receive:**
+- Mathematical precision (OKLCH calculations, contrast ratios, systematic relationships)
+- Embedded design reasoning for context-appropriate decisions
+- Systematic constraints that honor human design intent
+
+**The Bridge: Studio + Component Intelligence**
+
+1. **Rafters Studio** - Handles complex mathematical relationships gracefully so designers can focus on creative decisions
+2. **Component Intelligence** - Embedded reasoning in JSX comments and manifests for AI parsing
+3. **Systematic Language** - Machine-readable design knowledge that preserves human intent
+
+**Core Purpose**: Enable seamless human-AI design collaboration where humans focus on what they do best (creative judgment) and AI handles what it does best (systematic consistency and mathematical precision).
 
 ## Critical Development Standards
 

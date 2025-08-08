@@ -1,26 +1,26 @@
 ![Rafters](logo.svg)
-## React Components Built with Design Master Intelligence
+## Human-AI Design Collaboration System
 
-*Beautiful, accessible, intelligent React components that embody the design mastery of Jony Ive and Nielsen Norman Group*
+*Enables designers to make complex aesthetic decisions with minimal cognitive load, then gives AI agents systematic language to execute those decisions with line, shape, and color*
 
 ---
 
 ## Features
 
-### **Design Intelligence**
-- **Semantic-First**: Every component communicates meaning before aesthetics
-- **Cognitive Load Optimization**: Minimize mental overhead while maintaining functionality
-- **Attention Economics**: Visual hierarchy matches functional importance
+### **Cognitive Load Reduction**
+- **Mathematical Infrastructure**: Studio handles OKLCH conversions, contrast ratios, and systematic relationships gracefully
+- **Graceful Complexity**: Motion design makes complex decisions feel intuitive and natural
+- **Progressive Disclosure**: Complex choices revealed through manageable interaction moments
 
 ### **Accessibility Foundation**
 - **WCAG AAA Compliance**: Beyond minimum requirements
 - **Universal Design**: Works for motor, visual, cognitive, and auditory needs
 - **Real-world Testing**: Validated with assistive technologies
 
-### **Systematic Design**
-- **OKLCH Color Intelligence**: Perceptually uniform color systems
-- **Mathematical Typography**: Scales with precision and purpose
-- **Gestalt Principles**: Layouts that guide natural eye flow
+### **AI Intelligence Integration**
+- **Embedded Design Reasoning**: Components include human design intent for AI consumption
+- **Systematic Language**: Machine-readable patterns that preserve human creative decisions
+- **Mathematical Precision**: AI handles systematic consistency while honoring human aesthetic judgment
 
 ---
 
@@ -56,59 +56,59 @@ function App() {
 }
 ```
 
-## How Rafters Works
+## Human-AI Design Collaboration
 
-Rafters follows the **shadcn model** but adds design intelligence patterns:
+Rafters bridges human creativity and AI precision through a **three-layer system**:
 
-### **Web Configurator**
-Transform grayscale foundation components into your design system:
-- Configure colors, spacing, typography, borders
-- Real-time preview of your design system
-- Export Tailwind v4+ CSS custom properties
+### **1. Rafters Studio** (Human Experience)
+**Reduces cognitive load** for complex design decisions:
+- Designer chooses colors aesthetically → Studio handles OKLCH math gracefully
+- Designer defines brand intent → Studio generates systematic relationships
+- Designer makes refinements → Studio maintains accessibility and consistency
+- **Graceful motion design** makes complex mathematical relationships feel intuitive
 
-### **CLI Installation**
-Install components as source code with embedded intelligence:
+### **2. Component Intelligence** (AI Integration)
+Each component includes **embedded human reasoning** for AI consumption:
 
-```bash
-# Initialize in your project
-npx rafters init
-
-# Install components with design intelligence
-npx rafters add button
-npx rafters add input
-npx rafters add dialog
-```
-
-### **Design Intelligence Included**
-Each component includes three layers of intelligence:
-
-**1. Component Comments** (Essential patterns)
+**Component Comments** (Human Intent)
 ```tsx
 /**
- * Button Intelligence: cognitiveLoad=3, size=attention hierarchy
- * Destructive variant REQUIRES confirmation UX patterns
+ * Designer Intent: Destructive actions need careful consideration
+ * Cognitive Load: 7/10 - requires confirmation patterns  
+ * Usage Context: Account deletion, data loss, irreversible actions
  */
 ```
 
-**2. Component Manifest** (Machine-readable data)
+**Component Manifest** (Mathematical Relationships)
 ```json
 {
   "intelligence": {
-    "cognitiveLoad": 3,
-    "attentionEconomics": "Size hierarchy: sm=tertiary, md=secondary, lg=primary",
-    "accessibility": "44px touch targets, WCAG AAA contrast"
+    "contrastRatio": 4.8,
+    "colorHarmony": "complementary", 
+    "accessibilityZone": "AAA",
+    "attentionEconomy": "high-priority"
   }
 }
 ```
 
-**3. Intelligence Stories** (Complete education)
-Full Storybook stories demonstrating design reasoning and accessibility patterns.
+### **3. CLI Installation** (Implementation)
+Install components as source code with embedded intelligence:
 
-### **Source Code Ownership**
-- Components become **your code** to customize
-- No black box dependencies
-- Intelligence patterns travel with the code
-- Perfect for AI development
+```bash
+# Initialize human-AI design collaboration
+npx rafters init
+
+# Install components with design reasoning
+npx rafters add button
+npx rafters add input  
+npx rafters add dialog
+```
+
+### **The Result: Systematic Design Language**
+- **Humans focus** on aesthetic judgment and creative decisions
+- **AI agents receive** systematic constraints and embedded reasoning
+- **Components preserve** human design intent through mathematical precision
+- **Teams scale** design decisions without losing creative quality
 
 ---
 

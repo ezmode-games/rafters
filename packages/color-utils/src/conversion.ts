@@ -29,9 +29,10 @@ export function hexToOKLCH(hex: string): OKLCH {
     const oklch = color.to('oklch');
 
     return {
-      l: oklch.l,
-      c: oklch.c,
-      h: oklch.h || 0, // Handle undefined hue for achromatic colors
+      l: oklch.coords[0] || 0,
+      c: oklch.coords[1] || 0,
+      h: oklch.coords[2] || 0, // Handle undefined hue for achromatic colors
+      alpha: oklch.alpha || 1,
     };
   } catch (error) {
     throw new Error(`Invalid hex color: ${hex}`);

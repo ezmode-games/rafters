@@ -14,3 +14,4 @@ export * from './accessibility.js';
 export * from './palette.js';
 export * from './analysis.js';
 export * from './studio.js';
+export * from './harmony.js';
