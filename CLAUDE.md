@@ -94,6 +94,7 @@ Apply the embedded design knowledge to:
 3. **TDD Required** - Write tests first, then implementation
 4. **Error Boundaries** - Structured error handling with recovery strategies
 5. **No `.then()` Chaining** - Always use `await` for async operations
+6. **No Array Index as Keys** - Never use array indices as React keys. Use semantic identifiers like `\`item-${i}\`` or unique IDs
 
 See [CODING_STANDARDS.md](./CODING_STANDARDS.md) for complete requirements.
 
