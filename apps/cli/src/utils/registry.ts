@@ -40,10 +40,10 @@ export const ComponentManifestSchema = z.object({
   devDependencies: z.array(z.string()).optional(),
   registryDependencies: z.array(z.string()).optional(),
   files: z.array(RegistryFileSchema),
-  tailwind: z.record(z.unknown()).optional(),
-  cssVars: z.record(z.unknown()).optional(),
+  tailwind: z.record(z.string(), z.unknown()).optional(),
+  cssVars: z.record(z.string(), z.unknown()).optional(),
   css: z.array(z.string()).optional(),
-  envVars: z.record(z.string()).optional(),
+  envVars: z.record(z.string(), z.string()).optional(),
   categories: z.array(z.string()).optional(),
   docs: z.string().optional(),
   // Our AI intelligence metadata in the meta field

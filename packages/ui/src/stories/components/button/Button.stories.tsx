@@ -110,3 +110,26 @@ export const Common: Story = {
     },
   },
 };
+
+export const CustomVariantTest: Story = {
+  render: (args) => {
+    return (
+      <div className="flex items-center gap-4">
+        <Button {...args} className="btn-custom-lime bg-blue-500">
+          Custom Lime Hover
+        </Button>
+        <p className="text-sm text-muted-foreground">
+          Hover over the button to see if @variant works - should turn lime
+        </p>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Testing @variant directive to create custom hover states that jump to different colors.',
+      },
+    },
+  },
+};

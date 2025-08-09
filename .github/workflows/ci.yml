@@ -37,10 +37,10 @@ jobs:
         run: pnpm --recursive --filter "!rafters-ui" build
 
       - name: Lint
-        run: pnpm lint
+        run: pnpm biome:lint
 
       - name: Type Check
-        run: pnpm type-check
+        run: pnpm typecheck
 
       - name: Test
         run: pnpm test:run
