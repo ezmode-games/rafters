@@ -4,6 +4,9 @@ import { z } from 'zod';
  * Simple Spacing System Schema that matches TokenSchema structure
  */
 
+// Golden ratio constant for spacing calculations
+const PHI = 1.618;
+
 // Simple spacing token matching the TokenSchema from index.ts
 const SpacingTokenSchema = z.object({
   name: z.string(),
@@ -30,7 +33,7 @@ export const SpacingSystemSchema = z.object({
   // Golden ratio based spacing scale
   minimal: SpacingTokenSchema.default({
     name: '--spacing-minimal',
-    value: '0.382rem',
+    value: `${(1 / PHI / PHI).toFixed(3)}rem`, // φ^-2 ≈ 0.382rem
     description:
       'Minimal spacing. Golden ratio φ^-2 for micro-adjustments and fine details. Very low cognitive load (1/10) maintains clean layouts without visual weight.',
     category: 'spacing',
@@ -44,7 +47,7 @@ export const SpacingSystemSchema = z.object({
 
   tight: SpacingTokenSchema.default({
     name: '--spacing-tight',
-    value: '0.618rem',
+    value: `${(1 / PHI).toFixed(3)}rem`, // φ^-1 ≈ 0.618rem
     description:
       'Tight spacing. Golden ratio φ^-1 for compact layouts and dense information. Low cognitive load (2/10) creates intimacy without claustrophobia.',
     category: 'spacing',
@@ -72,7 +75,7 @@ export const SpacingSystemSchema = z.object({
 
   comfortable: SpacingTokenSchema.default({
     name: '--spacing-comfortable',
-    value: '1.618rem',
+    value: `${PHI.toFixed(3)}rem`, // φ^1 ≈ 1.618rem
     description:
       'Comfortable spacing. Golden ratio φ^1 for generous breathing room. Medium cognitive load (4/10) enhances readability and reduces visual tension.',
     category: 'spacing',
@@ -86,7 +89,7 @@ export const SpacingSystemSchema = z.object({
 
   generous: SpacingTokenSchema.default({
     name: '--spacing-generous',
-    value: '2.618rem',
+    value: `${(PHI ** 2).toFixed(3)}rem`, // φ^2 ≈ 2.618rem
     description:
       'Generous spacing. Golden ratio φ^2 for major section separation. Higher cognitive load (5/10) creates clear content boundaries and hierarchy.',
     category: 'spacing',
@@ -100,7 +103,7 @@ export const SpacingSystemSchema = z.object({
 
   architectural: SpacingTokenSchema.default({
     name: '--spacing-architectural',
-    value: '4.236rem',
+    value: `${(PHI ** 3).toFixed(3)}rem`, // φ^3 ≈ 4.236rem
     description:
       'Architectural spacing. Golden ratio φ^3 for major page structure. High cognitive load (6/10) creates dramatic separation and establishes strong layout hierarchy.',
     category: 'spacing',

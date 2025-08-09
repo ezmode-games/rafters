@@ -35,7 +35,6 @@ describe('SmartColorTokenSchema', () => {
     expect(result.states.focus).toBeDefined();
     expect(result.states.active).toBeDefined();
     expect(result.accessibility).toBeDefined();
-    console.log('Base contrast:', result.accessibility.baseContrast);
     expect(result.accessibility.baseContrast).toBeGreaterThan(4.5);
   });
 });
@@ -85,7 +84,6 @@ describe('createColorDesignSystem', () => {
     // All tokens should have accessibility data
     for (const token of system.allTokens) {
       expect(token.accessibility).toBeDefined();
-      console.log(`${token.name} contrast:`, token.accessibility.baseContrast);
       expect(token.accessibility.baseContrast).toBeGreaterThan(3); // At least AA level
       expect(token.states).toBeDefined();
     }

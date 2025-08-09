@@ -105,6 +105,7 @@ export function createDefaultRegistry(): TokenSet {
 export async function fetchStudioTokens(shortcode: string): Promise<TokenSet> {
   // For now, return default - Studio integration would happen here
   // TODO: Implement actual Studio API integration
+  // Note: console.warn is appropriate for CLI communication
   console.warn(
     `Studio integration not implemented yet. Using default tokens for shortcode: ${shortcode}`
   );
@@ -212,6 +213,7 @@ export async function injectCSSImport(format: 'css' | 'tailwind', cwd: string): 
     const newContent = `${importLine}\n${content}`;
     writeFileSync(targetFile, newContent);
   } catch (error) {
+    // Note: console.warn is appropriate for CLI error communication
     console.warn(
       `Could not inject CSS import: ${error instanceof Error ? error.message : 'Unknown error'}`
     );

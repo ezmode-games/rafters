@@ -15,6 +15,13 @@ import {
 import type { OKLCH } from '@rafters/shared';
 import { z } from 'zod';
 
+// Cognitive load constants for color weight analysis
+const COGNITIVE_LOAD_LOW_WEIGHT_THRESHOLD = 400;
+const COGNITIVE_LOAD_HIGH_WEIGHT_THRESHOLD = 800;
+const COGNITIVE_LOAD_LOW = 3;
+const COGNITIVE_LOAD_MEDIUM = 4;
+const COGNITIVE_LOAD_HIGH = 6;
+
 /**
  * Base OKLCH Color Schema with validation
  */
@@ -147,7 +154,12 @@ export function generateIntelligentColorScale(
       type: 'dynamic' as const,
       semanticGroup: 'brand',
       aiIntelligence: {
-        cognitiveLoad: Number.parseInt(weight) <= 400 ? 3 : Number.parseInt(weight) >= 800 ? 6 : 4,
+        cognitiveLoad:
+          Number.parseInt(weight) <= COGNITIVE_LOAD_LOW_WEIGHT_THRESHOLD
+            ? COGNITIVE_LOAD_LOW
+            : Number.parseInt(weight) >= COGNITIVE_LOAD_HIGH_WEIGHT_THRESHOLD
+              ? COGNITIVE_LOAD_HIGH
+              : COGNITIVE_LOAD_MEDIUM,
         trustLevel: 'high',
         accessibilityLevel: 'aaa',
       },

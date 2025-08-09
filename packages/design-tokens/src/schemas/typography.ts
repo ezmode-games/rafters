@@ -4,6 +4,9 @@ import { z } from 'zod';
  * Simple Typography System Schema that matches TokenSchema structure
  */
 
+// Golden ratio constant for typography scaling
+const PHI = 1.618;
+
 // Simple typography token matching the TokenSchema from index.ts
 const TypographyTokenSchema = z.object({
   name: z.string(),
@@ -51,7 +54,7 @@ export const TypographySystemSchema = z.object({
   // Font sizes with golden ratio scaling
   hero: TypographyTokenSchema.default({
     name: '--font-size-hero',
-    value: '4.854rem',
+    value: `${(PHI ** 4).toFixed(3)}rem`, // φ^4 ≈ 4.854rem
     description:
       'Hero text size. Golden ratio φ^4 scaling creates dramatic impact. Very high cognitive load (9/10) demands attention. Use sparingly for maximum effectiveness. AAA accessibility compliant.',
     category: 'typography',
@@ -66,7 +69,7 @@ export const TypographySystemSchema = z.object({
 
   display: TypographyTokenSchema.default({
     name: '--font-size-display',
-    value: '3rem',
+    value: `${(PHI ** 3).toFixed(3)}rem`, // φ^3 ≈ 4.236rem
     description:
       'Display text size. Golden ratio φ^3 scaling for major headings. High cognitive load (7/10) establishes clear hierarchy. Ideal for section headers and important announcements.',
     category: 'typography',
@@ -81,7 +84,7 @@ export const TypographySystemSchema = z.object({
 
   section: TypographyTokenSchema.default({
     name: '--font-size-section',
-    value: '1.875rem',
+    value: `${(PHI ** 2).toFixed(3)}rem`, // φ^2 ≈ 2.618rem
     description:
       'Section heading size. Golden ratio φ^2 creates balanced hierarchy. Moderate cognitive load (5/10) organizes content without overwhelming. Perfect for subsection headers.',
     category: 'typography',
@@ -111,7 +114,7 @@ export const TypographySystemSchema = z.object({
 
   small: TypographyTokenSchema.default({
     name: '--font-size-small',
-    value: '0.875rem',
+    value: `${(1 / PHI).toFixed(3)}rem`, // φ^-1 ≈ 0.618rem
     description:
       'Small text size. Golden ratio φ^-1 maintains proportional harmony. Very low cognitive load (1/10) for secondary information. Use for captions, metadata, and supporting details.',
     category: 'typography',

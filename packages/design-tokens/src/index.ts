@@ -117,7 +117,7 @@ const generateSpacingTokens = (config: {
 
       switch (scale) {
         case 'linear':
-          // 2x progression: each step doubles
+          // Linear progression: consistent 0.25rem increments (4px steps)
           remValue = numKey * 0.25; // 0.25rem base unit (4px at 16px base)
           break;
 
