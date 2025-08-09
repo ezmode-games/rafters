@@ -63,12 +63,12 @@ export const DesignSystemSchema = z.object({
     heading: z.string(), // Font family
     body: z.string(), // Font family
     mono: z.string(), // Font family
-    scale: z.record(z.number()), // Typography scale
+    scale: z.record(z.string(), z.number()), // Typography scale
   }),
   intelligence: z.object({
     colorVisionTested: z.array(ColorVisionTypeSchema),
     contrastLevel: ContrastLevelSchema,
-    components: z.record(ComponentIntelligenceSchema),
+    components: z.record(z.string(), ComponentIntelligenceSchema),
   }),
   metadata: z.object({
     created: z.string(),
@@ -147,10 +147,10 @@ export const ComponentManifestSchema = z.object({
       target: z.string().optional(),
     })
   ),
-  tailwind: z.record(z.unknown()).optional(),
-  cssVars: z.record(z.unknown()).optional(),
+  tailwind: z.record(z.string(), z.unknown()).optional(),
+  cssVars: z.record(z.string(), z.unknown()).optional(),
   css: z.array(z.string()).optional(),
-  envVars: z.record(z.string()).optional(),
+  envVars: z.record(z.string(), z.string()).optional(),
   categories: z.array(z.string()).optional(),
   docs: z.string().optional(),
   // Our AI intelligence metadata in the meta field
