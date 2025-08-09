@@ -1,5 +1,22 @@
 /**
- * AI Intelligence: Token knowledge in .rafters/tokens/registry.json
+ * Button Component - AI Intelligence
+ *
+ * COGNITIVE LOAD: 3/10 (simple action trigger)
+ * ATTENTION HIERARCHY: Primary commands highest attention - use sparingly (1 per section)
+ * TRUST BUILDING: Destructive variant requires confirmation UX patterns
+ *
+ * DESIGN INTELLIGENCE GUIDES:
+ * - Attention Economics: rafters.realhandy.tech/llm/patterns/attention-economics
+ * - Trust Building Patterns: rafters.realhandy.tech/llm/patterns/trust-building
+ * - Component Integration: rafters.realhandy.tech/llm/patterns/component-synthesis
+ *
+ * USAGE PATTERNS:
+ * ✅ Primary: Main user goal, maximum 1 per section
+ * ✅ Secondary: Alternative paths, supporting actions
+ * ✅ Destructive: Permanent actions, requires confirmation patterns
+ * ❌ Never: Multiple primary buttons competing for attention
+ *
+ * Token knowledge: .rafters/tokens/registry.json
  */
 import { Slot } from '@radix-ui/react-slot';
 import { forwardRef } from 'react';

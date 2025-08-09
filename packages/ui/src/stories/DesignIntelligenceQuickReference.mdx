@@ -1,0 +1,163 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="00 Introduction/Design Intelligence Quick Reference" name="Overview" />
+
+# Design Intelligence Quick Reference
+
+Essential design reasoning patterns for AI agents composing Rafters components into trustworthy user interfaces.
+
+## The 6-Pattern Integration Framework
+
+Before implementing any interface, apply these intelligence patterns in order:
+
+### 1. **Attention Economics** 
+**Question**: What deserves the user's focus?
+- **1 Primary Action** per section (commands highest attention)
+- **2 Secondary Actions** maximum (supporting paths) 
+- **Many Tertiary Actions** (discoverable, low-friction)
+- Use visual hierarchy: Primary > Secondary > Tertiary
+
+### 2. **Cognitive Load Management**
+**Question**: How much mental effort does this require?
+- **7±2 Rule**: Maximum 7 items per cognitive chunk
+- **Progressive Disclosure**: Hide complexity until needed
+- **Consistent Patterns**: Same interactions behave identically
+- **Clear Mental Models**: Interface behavior is predictable
+
+### 3. **Negative Space Mastery**
+**Question**: How does whitespace create hierarchy?
+- **More Space = More Importance**: Generous space around key content
+- **Less Space = Relationship**: Tight spacing groups related items
+- **Mathematical Scales**: Use consistent spacing relationships (1.5x, 2x, golden ratio)
+- **Breathing Room**: Provide recovery points between complex sections
+
+### 4. **Typography Intelligence**
+**Question**: How does text support information flow?
+- **6-Level Hierarchy**: Display → H1 → H2 → H3 → Body → Caption
+- **Scannable Structure**: Headers guide content flow and relationships
+- **Appropriate Emphasis**: Bold/italic used strategically, not everywhere
+- **WCAG AAA Compliance**: 7:1 contrast ratio for all text
+
+### 5. **Progressive Enhancement**
+**Question**: What's core vs. enhanced experience?
+- **Layer 1**: Core functionality works without JavaScript
+- **Layer 2**: JavaScript adds interactive improvements
+- **Layer 3**: Advanced features for optimal conditions
+- **Graceful Degradation**: Failures don't break core experience
+
+### 6. **Trust Building**
+**Question**: What's the consequence level?
+- **Low Trust**: Routine actions, minimal friction (save draft, preferences)
+- **Medium Trust**: Moderate consequence, brief confirmation (publish, send email)
+- **High Trust**: Significant impact, detailed explanation (payment, subscription)
+- **Critical Trust**: Permanent consequence, progressive confirmation (delete account, data loss)
+
+## Component Intelligence Integration
+
+### Before Using Any Component:
+```tsx
+// Check component intelligence in comments:
+/**
+ * Dialog Intelligence: cognitiveLoad=7, trustLevel=critical
+ * Use for: Account deletion, data loss, irreversible actions
+ * Requires: Progressive confirmation, clear escape hatches
+ * Never use for: Simple confirmations, low-stakes decisions
+ */
+<Dialog trustLevel="critical" destructive>
+```
+
+### Pattern Application Checklist:
+- [ ] **Attention**: Clear primary action identified, hierarchy established
+- [ ] **Cognition**: 7±2 rule respected, progressive disclosure planned
+- [ ] **Space**: Whitespace creates intended relationships and hierarchy
+- [ ] **Typography**: Information hierarchy supports scanning and comprehension
+- [ ] **Enhancement**: Core experience works, enhancements layer appropriately
+- [ ] **Trust**: Friction matches consequence level, appropriate safeguards in place
+
+## Quick Pattern Examples
+
+### Landing Page Intelligence:
+```tsx
+// ATTENTION: Single primary focus + supporting alternatives
+<div className="text-center space-y-8">
+  <h1 className="text-5xl font-bold">Primary Message</h1>
+  <Button variant="primary" size="lg">Primary Action</Button>
+  <div className="flex gap-4">
+    <Button variant="ghost" size="sm">Learn More</Button>
+    <Button variant="ghost" size="sm">View Demo</Button>
+  </div>
+</div>
+```
+
+### Form Intelligence:
+```tsx
+// COGNITION: Grouped fields + SPACE: Related items close together
+<div className="space-y-6">
+  <div className="space-y-4"> {/* Group: Personal Info */}
+    <h3>Personal Information</h3>
+    <div className="grid grid-cols-2 gap-3">
+      <Input label="First Name" />
+      <Input label="Last Name" />
+    </div>
+  </div>
+  
+  <div className="space-y-4"> {/* Group: Contact Info */}
+    <h3>Contact Details</h3>
+    <Input label="Email" />
+  </div>
+</div>
+```
+
+### Dashboard Intelligence:
+```tsx
+// TYPOGRAPHY: Data hierarchy + ATTENTION: Scannable metrics
+<Card className="p-6 space-y-2">
+  <div className="text-3xl font-bold tabular-nums">1,234</div> {/* Most prominent */}
+  <div className="text-sm text-muted-foreground">Active Users</div> {/* Context */}
+  <div className="text-xs text-success-foreground">+12% this month</div> {/* Supporting */}
+</Card>
+```
+
+## Anti-Patterns to Avoid
+
+### ❌ Attention Overload:
+```tsx
+// Multiple primary actions competing
+<div>
+  <Button variant="primary">Subscribe Now!</Button>
+  <Button variant="primary">Download Free!</Button>
+  <Button variant="primary">Get Started!</Button>
+</div>
+```
+
+### ❌ Cognitive Overwhelm:
+```tsx
+// Too many choices without grouping
+<form>
+  {/* 15 form fields in a single flat list */}
+</form>
+```
+
+### ❌ Pattern Conflicts:
+```tsx
+// Space suggests separation but typography suggests relationship
+<div className="space-y-12"> {/* Large gap */}
+  <h2 className="text-base font-normal">Weak Title</h2> {/* Weak hierarchy */}
+  <div className="grid gap-2"> {/* Tight grid */}
+```
+
+## Integration Success Criteria
+
+Your interface composition succeeds when:
+- **Users immediately understand** what's most important (Attention)
+- **Mental effort feels justified** by the value provided (Cognition)  
+- **Visual relationships are clear** through spatial hierarchy (Space)
+- **Information flows naturally** with scannable structure (Typography)
+- **Core functionality always works** regardless of conditions (Enhancement)
+- **User confidence builds** through appropriate friction levels (Trust)
+
+---
+
+**Remember**: These patterns work best when they reinforce each other. Every decision should support the user's core goal of accomplishing their task with confidence and ease.
+
+For detailed implementation examples, see the complete design intelligence guides in Storybook under "00 Introduction".

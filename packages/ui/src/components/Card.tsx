@@ -1,5 +1,22 @@
 /**
- * AI Intelligence: Token knowledge in .rafters/tokens/registry.json
+ * Card Component - AI Intelligence
+ *
+ * COGNITIVE LOAD: 1/10 (invisible structure, reduces visual complexity)
+ * NEGATIVE SPACE MASTERY: Creates content boundaries and breathing room
+ * ATTENTION ECONOMICS: Groups related content, reduces scanning effort
+ *
+ * DESIGN INTELLIGENCE GUIDES:
+ * - Negative Space Mastery: rafters.realhandy.tech/llm/patterns/negative-space
+ * - Component Intelligence Synthesis: rafters.realhandy.tech/llm/patterns/component-synthesis
+ * - Attention Economics: rafters.realhandy.tech/llm/patterns/attention-economics
+ *
+ * USAGE PATTERNS:
+ * ✅ Content Grouping: Related information together, clear boundaries
+ * ✅ Hierarchy Creation: Different prominence levels for importance
+ * ✅ Scannable Layouts: Organized sections reduce cognitive load
+ * ❌ Never: Single items that don't need grouping, excessive nesting
+ *
+ * Token knowledge: .rafters/tokens/registry.json
  */
 import { forwardRef } from 'react';
 import { cn } from '../lib/utils';

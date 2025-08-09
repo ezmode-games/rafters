@@ -1,3 +1,24 @@
+/**
+ * Toast Component - AI Intelligence
+ *
+ * COGNITIVE LOAD: 2/10 (non-blocking notification, brief attention)
+ * ATTENTION ECONOMICS: Temporary interruption, must be dismissible
+ * TRUST BUILDING: Immediate feedback for user actions builds confidence
+ *
+ * DESIGN INTELLIGENCE GUIDES:
+ * - Attention Economics: rafters.realhandy.tech/llm/patterns/attention-economics
+ * - Trust Building Patterns: rafters.realhandy.tech/llm/patterns/trust-building
+ * - Progressive Enhancement: rafters.realhandy.tech/llm/patterns/progressive-enhancement
+ *
+ * USAGE PATTERNS:
+ * ✅ Action Feedback: Confirm successful operations (save, delete, send)
+ * ✅ Error Recovery: Provide clear next steps for failures
+ * ✅ Auto-dismiss: 4-6 seconds for info, user dismiss for errors
+ * ✅ Semantic Variants: Success, error, warning, info with appropriate colors
+ * ❌ Never: Critical information that shouldn't disappear, multiple simultaneous toasts
+ *
+ * Token knowledge: .rafters/tokens/registry.json
+ */
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import { type VariantProps, cva } from 'class-variance-authority';
 import * as React from 'react';

@@ -1,5 +1,23 @@
 /**
- * AI Intelligence: Token knowledge in .rafters/tokens/registry.json
+ * Slider Component - AI Intelligence
+ *
+ * COGNITIVE LOAD: 5/10 (requires understanding current value and precision)
+ * TRUST BUILDING: Immediate visual feedback builds user confidence
+ * ACCESSIBILITY PRIORITY: Motor accessibility with enhanced touch targets
+ *
+ * DESIGN INTELLIGENCE GUIDES:
+ * - Trust Building Patterns: rafters.realhandy.tech/llm/patterns/trust-building
+ * - Progressive Enhancement: rafters.realhandy.tech/llm/patterns/progressive-enhancement
+ * - Cognitive Load Management: rafters.realhandy.tech/llm/patterns/cognitive-load
+ *
+ * USAGE PATTERNS:
+ * ✅ Precise Values: Show current value and units for clarity
+ * ✅ Touch Targets: Large thumb size for mobile and accessibility
+ * ✅ Step Indicators: Visual markers for discrete value ranges
+ * ✅ Immediate Feedback: Real-time updates as user drags
+ * ❌ Never: Invisible ranges, unclear min/max values, tiny touch targets
+ *
+ * Token knowledge: .rafters/tokens/registry.json
  */
 import * as SliderPrimitive from '@radix-ui/react-slider';
 import { forwardRef } from 'react';

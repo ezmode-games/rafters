@@ -51,8 +51,6 @@ export {
   SelectScrollDownButton,
 } from './Select';
 
-export { Slider } from './Slider';
-
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
 
 export {

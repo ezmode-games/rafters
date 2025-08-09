@@ -1,5 +1,23 @@
 /**
- * AI Intelligence: Token knowledge in .rafters/tokens/registry.json
+ * Select Component - AI Intelligence
+ *
+ * COGNITIVE LOAD: 4/10 (requires understanding options and making choice)
+ * ATTENTION ECONOMICS: Dropdown state must be clearly indicated
+ * PROGRESSIVE ENHANCEMENT: Works with keyboard, enhances with mouse interaction
+ *
+ * DESIGN INTELLIGENCE GUIDES:
+ * - Cognitive Load Management: rafters.realhandy.tech/llm/patterns/cognitive-load
+ * - Attention Economics: rafters.realhandy.tech/llm/patterns/attention-economics
+ * - Progressive Enhancement: rafters.realhandy.tech/llm/patterns/progressive-enhancement
+ *
+ * USAGE PATTERNS:
+ * ✅ Limited Options: 3-12 choices work best, use radio buttons for fewer
+ * ✅ Clear Labels: Descriptive option text, avoid technical jargon
+ * ✅ Default Selection: Pre-select most common/safe option when appropriate
+ * ✅ Search Support: Enable search for 8+ options to reduce cognitive load
+ * ❌ Never: Too many options without grouping, unclear option descriptions
+ *
+ * Token knowledge: .rafters/tokens/registry.json
  */
 import {
   CheckIcon,

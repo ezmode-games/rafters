@@ -1,5 +1,23 @@
 /**
- * AI Intelligence: Token knowledge in .rafters/tokens/registry.json
+ * Label Component - AI Intelligence
+ *
+ * COGNITIVE LOAD: 1/10 (provides clarity, reduces interpretation effort)
+ * TYPOGRAPHY INTELLIGENCE: Critical for information hierarchy and form accessibility
+ * ACCESSIBILITY FOUNDATION: Essential for screen readers and form association
+ *
+ * DESIGN INTELLIGENCE GUIDES:
+ * - Typography Intelligence: rafters.realhandy.tech/llm/patterns/typography-intelligence
+ * - Cognitive Load Management: rafters.realhandy.tech/llm/patterns/cognitive-load
+ * - Progressive Enhancement: rafters.realhandy.tech/llm/patterns/progressive-enhancement
+ *
+ * USAGE PATTERNS:
+ * ✅ Form Association: Always associate with input using htmlFor/id
+ * ✅ Clear Hierarchy: Use importance levels to guide user attention
+ * ✅ Required Indication: Visual and semantic marking for required fields
+ * ✅ Context Awareness: Adapt styling based on form vs descriptive context
+ * ❌ Never: Orphaned labels, unclear or ambiguous text, missing required indicators
+ *
+ * Token knowledge: .rafters/tokens/registry.json
  */
 import * as LabelPrimitive from '@radix-ui/react-label';
 import { forwardRef } from 'react';

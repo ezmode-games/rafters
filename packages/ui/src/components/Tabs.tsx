@@ -1,5 +1,23 @@
 /**
- * AI Intelligence: Token knowledge in .rafters/tokens/registry.json
+ * Tabs Component - AI Intelligence
+ *
+ * COGNITIVE LOAD: 4/10 (requires understanding current state and available options)
+ * ATTENTION ECONOMICS: Active state must be immediately clear
+ * PROGRESSIVE ENHANCEMENT: Works with keyboard, enhances with mouse
+ *
+ * DESIGN INTELLIGENCE GUIDES:
+ * - Attention Economics: rafters.realhandy.tech/llm/patterns/attention-economics
+ * - Cognitive Load Management: rafters.realhandy.tech/llm/patterns/cognitive-load
+ * - Progressive Enhancement: rafters.realhandy.tech/llm/patterns/progressive-enhancement
+ *
+ * USAGE PATTERNS:
+ * ✅ Related Content: Different views of same data/context
+ * ✅ Clear Labels: Descriptive, scannable tab names (7±2 maximum)
+ * ✅ State Indication: Active tab visually prominent
+ * ✅ Logical Order: Arrange tabs by frequency or workflow sequence
+ * ❌ Never: More than 7 tabs, unrelated content sections, unclear active state
+ *
+ * Token knowledge: .rafters/tokens/registry.json
  */
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { forwardRef } from 'react';

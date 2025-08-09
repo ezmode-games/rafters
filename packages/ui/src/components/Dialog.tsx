@@ -1,8 +1,24 @@
 /**
- * Dialog Intelligence: cognitiveLoad=7, trustLevel=critical
+ * Dialog Component - AI Intelligence
+ *
+ * COGNITIVE LOAD: 7/10 (interrupts user flow, requires decision)
+ * TRUST BUILDING: Friction must match consequence level (low/medium/high/critical)
+ * ATTENTION FOCUS: Captures 100% attention - use judiciously
+ *
+ * DESIGN INTELLIGENCE GUIDES:
+ * - Trust Building Patterns: rafters.realhandy.tech/llm/patterns/trust-building
+ * - Cognitive Load Management: rafters.realhandy.tech/llm/patterns/cognitive-load
+ * - Progressive Enhancement: rafters.realhandy.tech/llm/patterns/progressive-enhancement
+ *
+ * USAGE PATTERNS:
+ * ✅ Low Trust: Quick confirmations, save draft (size=sm, minimal friction)
+ * ✅ Medium Trust: Publish content, moderate consequences (clear context)
+ * ✅ High Trust: Payments, significant impact (detailed explanation)
+ * ✅ Critical Trust: Account deletion, permanent loss (progressive confirmation)
+ * ❌ Never: Routine actions, non-essential interruptions
+ *
  * Progressive confirmation REQUIRED for destructive actions
- * Trust-building patterns: clear consequences, escape hatches, familiar confirmation flows
- * Full patterns: .rafters/agent-instructions.md
+ * Trust-building patterns: clear consequences, escape hatches, familiar flows
  */
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { forwardRef } from 'react';

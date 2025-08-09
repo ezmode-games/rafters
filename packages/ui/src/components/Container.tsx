@@ -1,13 +1,23 @@
 /**
- * AI Intelligence: Container component with layout intelligence patterns
- * Token knowledge in design system tokens
+ * Container Component - AI Intelligence
  *
- * Implements Rafters Design Intelligence methodology:
- * - EMPATHIZE: Users need readable content with appropriate spacing
- * - DEFINE: Container with layout intelligence using design system tokens
- * - IDEATE: Layout patterns leveraging existing token system and utilities
- * - PROTOTYPE: Semantic HTML with phi-based spacing from design tokens
- * - TEST: Comprehensive story-based testing for all layout scenarios
+ * COGNITIVE LOAD: 0/10 (invisible structure, reduces complexity)
+ * NEGATIVE SPACE MASTERY: Controls content width and breathing room
+ * TYPOGRAPHY INTELLIGENCE: Maintains optimal line length for reading
+ *
+ * DESIGN INTELLIGENCE GUIDES:
+ * - Negative Space Mastery: rafters.realhandy.tech/llm/patterns/negative-space
+ * - Typography Intelligence: rafters.realhandy.tech/llm/patterns/typography-intelligence
+ * - Progressive Enhancement: rafters.realhandy.tech/llm/patterns/progressive-enhancement
+ *
+ * USAGE PATTERNS:
+ * ✅ Content Width: Maintains 45-75 character line length for readability
+ * ✅ Responsive Scaling: Adapts spacing and width across device sizes
+ * ✅ Semantic Structure: Provides logical content boundaries
+ * ✅ Breathing Room: Creates appropriate margins and visual containment
+ * ❌ Never: Unnecessarily nested containers, fixed widths that break responsive design
+ *
+ * Token knowledge: .rafters/tokens/registry.json
  */
 import { forwardRef } from 'react';
 import { cn } from '../lib/utils';

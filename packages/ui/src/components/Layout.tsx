@@ -1,5 +1,23 @@
 /**
- * AI Intelligence: Token knowledge in .rafters/tokens/registry.json
+ * Layout Component - AI Intelligence
+ *
+ * COGNITIVE LOAD: 0/10 (invisible structure, organizes complexity)
+ * ATTENTION ECONOMICS: Creates scanning patterns (Z-pattern, F-pattern)
+ * NEGATIVE SPACE MASTERY: Strategic placement of content and breathing room
+ *
+ * DESIGN INTELLIGENCE GUIDES:
+ * - Attention Economics: rafters.realhandy.tech/llm/patterns/attention-economics
+ * - Negative Space Mastery: rafters.realhandy.tech/llm/patterns/negative-space
+ * - Cognitive Load Management: rafters.realhandy.tech/llm/patterns/cognitive-load
+ *
+ * USAGE PATTERNS:
+ * ✅ Reading Layout: F-pattern for content-heavy interfaces
+ * ✅ Landing Layout: Z-pattern for conversion-focused pages
+ * ✅ Dashboard Layout: Grid-based for data and metrics
+ * ✅ Responsive Structure: Adapts layout patterns to screen size
+ * ❌ Never: Complex nested layouts, inconsistent spacing systems
+ *
+ * Token knowledge: .rafters/tokens/registry.json
  */
 import { forwardRef } from 'react';
 import { cn } from '../lib/utils';

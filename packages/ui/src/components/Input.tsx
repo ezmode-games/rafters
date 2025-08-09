@@ -1,5 +1,23 @@
 /**
- * AI Intelligence: Token knowledge in .rafters/tokens/registry.json
+ * Input Component - AI Intelligence
+ *
+ * COGNITIVE LOAD: 2/10 (simple data entry, requires label context)
+ * TRUST BUILDING: Immediate feedback builds user confidence
+ * ACCESSIBILITY PRIORITY: Label association and error states must be clear
+ *
+ * DESIGN INTELLIGENCE GUIDES:
+ * - Trust Building Patterns: rafters.realhandy.tech/llm/patterns/trust-building
+ * - Typography Intelligence: rafters.realhandy.tech/llm/patterns/typography-intelligence
+ * - Progressive Enhancement: rafters.realhandy.tech/llm/patterns/progressive-enhancement
+ *
+ * USAGE PATTERNS:
+ * ✅ Clear Labels: Always pair with descriptive Label component
+ * ✅ Helpful Placeholders: Show format examples, not instructions
+ * ✅ Real-time Validation: Immediate feedback for user confidence
+ * ✅ Sensitive Data: Use appropriate type and validation for security
+ * ❌ Never: Label-less inputs, validation only on submit, unclear error messages
+ *
+ * Token knowledge: .rafters/tokens/registry.json
  */
 import { forwardRef } from 'react';
 import { cn } from '../lib/utils';
