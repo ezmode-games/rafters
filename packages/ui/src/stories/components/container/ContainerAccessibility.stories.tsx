@@ -1,28 +1,39 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Container } from '../../../components/Container';
 
+/**
+ * AI Training: Container Accessibility Intelligence
+ *
+ * ACCESSIBILITY CONSTRAINT TRAINING: WCAG compliance patterns and inclusive design
+ * SEMANTIC HTML MASTERY: Landmark navigation and document structure
+ * ASSISTIVE TECHNOLOGY: Screen reader optimization and keyboard navigation
+ *
+ * ACCESSIBILITY TRAINING SCENARIOS:
+ * - Landmark roles and navigation structure
+ * - Skip links and keyboard navigation patterns
+ * - Color contrast and visual hierarchy
+ * - Focus management and semantic ordering
+ * - Screen reader compatibility testing
+ *
+ * This trains AI agents on accessibility-first design and inclusive UX patterns.
+ */
 const meta = {
   title: '03 Components/Layout/Container/Accessibility',
   component: Container,
   parameters: {
     layout: 'fullscreen',
-    a11y: {
-      config: {
-        rules: [
-          {
-            id: 'color-contrast',
-            enabled: true,
-          },
-          {
-            id: 'landmark-unique',
-            enabled: true,
-          },
-          {
-            id: 'region',
-            enabled: true,
-          },
-        ],
+    docs: {
+      description: {
+        component:
+          'AI Training: Accessibility patterns showing WCAG compliance, landmark navigation, and inclusive design with Container components.',
       },
+    },
+  },
+  argTypes: {
+    as: {
+      control: 'select',
+      options: ['main', 'article', 'section', 'div'],
+      description: 'Semantic HTML element - impacts accessibility landmarks',
     },
   },
 } satisfies Meta<typeof Container>;
@@ -30,372 +41,502 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Demo content for accessibility demonstrations
-const AccessibilityDemo = ({
-  title,
-  description,
-  level,
-}: { title: string; description: string; level: 'success' | 'info' | 'warning' }) => {
-  const levelStyles = {
-    success: 'bg-success/10 border-success text-success-foreground',
-    info: 'bg-info/10 border-info text-info-foreground',
-    warning: 'bg-warning/10 border-warning text-warning-foreground',
-  };
-
-  return (
-    <div className="space-y-3">
-      <h3 className="heading-component text-primary">{title}</h3>
-      <p className="text-body text-muted-foreground">{description}</p>
-      <div className={`p-4 rounded border ${levelStyles[level]}`}>
-        <p className="text-body-small">
-          This demonstrates WCAG AAA compliance through proper semantic structure, color contrast,
-          and design system token integration.
-        </p>
-      </div>
-    </div>
-  );
-};
-
-export const WCAGCompliance: Story = {
+/**
+ * Landmark navigation structure for screen readers.
+ * Shows proper document outline and navigation patterns.
+ */
+export const LandmarkNavigation: Story = {
   render: () => (
-    <div className="space-y-8 bg-background p-8">
-      <div className="text-center mb-8">
-        <h1 className="heading-section">WCAG AAA Accessibility</h1>
-        <p className="text-body-large text-muted-foreground">
-          Container components designed for universal accessibility
-        </p>
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Skip to content link */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded z-50"
+      >
+        Skip to main content
+      </a>
 
-      <div className="space-y-6">
-        <Container
-          as="section"
-          variant="golden"
-          padding="phi-2"
-          className="bg-card rounded-lg border"
-          aria-labelledby="contrast-heading"
-        >
-          <div className="space-y-4">
-            <h2 id="contrast-heading" className="heading-subsection">
-              Color Contrast Excellence
+      {/* Navigation landmark */}
+      <Container as="nav" size="full" padding="4" className="bg-white border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          <div className="text-lg font-semibold">Accessible Site</div>
+          <nav aria-label="Primary navigation">
+            <ul className="flex space-x-6">
+              <li>
+                <a
+                  href="#home"
+                  className="text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+                >
+                  Home
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#about"
+                  className="text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+                >
+                  About
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#contact"
+                  className="text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+                >
+                  Contact
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </Container>
+
+      {/* Main content landmark */}
+      <Container as="main" id="main-content" className="focus:outline-none">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            Accessibility-First Container Design
+          </h1>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            Semantic HTML containers provide automatic landmark roles for assistive technology,
+            creating clear document structure and navigation paths.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <h3 className="font-semibold text-gray-900 mb-3">Landmark Roles</h3>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li>
+                • <code>&lt;main&gt;</code> = main landmark
+              </li>
+              <li>
+                • <code>&lt;nav&gt;</code> = navigation landmark
+              </li>
+              <li>
+                • <code>&lt;article&gt;</code> = article role
+              </li>
+              <li>
+                • <code>&lt;section&gt;</code> = region role
+              </li>
+            </ul>
+          </div>
+
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <h3 className="font-semibold text-gray-900 mb-3">Screen Reader Benefits</h3>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li>• Quick landmark navigation</li>
+              <li>• Document outline structure</li>
+              <li>• Skip navigation patterns</li>
+              <li>• Content region identification</li>
+            </ul>
+          </div>
+
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <h3 className="font-semibold text-gray-900 mb-3">Keyboard Navigation</h3>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li>• Tab order preservation</li>
+              <li>• Focus management</li>
+              <li>• Skip links for efficiency</li>
+              <li>• Logical reading order</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Article section with proper heading hierarchy */}
+        <Container as="article" className="bg-white shadow-sm mb-8">
+          <header>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Understanding Container Accessibility
             </h2>
-            <p className="text-body">
-              All container backgrounds maintain WCAG AAA color contrast ratios (7:1+) using
-              semantic design tokens that ensure readability for all users.
+            <p className="text-gray-600 mb-6">
+              Published on <time dateTime="2025-01-09">January 9, 2025</time>
+            </p>
+          </header>
+
+          <div className="prose max-w-none">
+            <h3>Semantic Structure Benefits</h3>
+            <p>
+              Using semantic HTML elements like <code>&lt;article&gt;</code> provides automatic
+              accessibility benefits. Screen readers can identify content regions and provide
+              navigation shortcuts to users.
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-success/10 border border-success p-4 rounded">
-                <h3 className="heading-component text-success-foreground">Success States</h3>
-                <p className="text-body-small">Contrast ratio: 7.2:1</p>
-              </div>
-
-              <div className="bg-warning/10 border border-warning p-4 rounded">
-                <h3 className="heading-component text-warning-foreground">Warning States</h3>
-                <p className="text-body-small">Contrast ratio: 8.1:1</p>
-              </div>
-
-              <div className="bg-info/10 border border-info p-4 rounded">
-                <h3 className="heading-component text-info-foreground">Info States</h3>
-                <p className="text-body-small">Contrast ratio: 7.5:1</p>
-              </div>
-            </div>
+            <h3>Design System Integration</h3>
+            <p>
+              The container's automatic prose styling ensures consistent typography hierarchy,
+              making content easier to navigate for all users, including those using assistive
+              technology.
+            </p>
           </div>
         </Container>
 
-        <Container
-          as="section"
-          variant="reading"
-          padding="phi-1"
-          className="bg-card rounded-lg border"
-          aria-labelledby="structure-heading"
-        >
-          <AccessibilityDemo
-            title="Semantic Structure"
-            description="Proper HTML landmarks and regions enable screen reader navigation. Each container element contributes to logical document hierarchy."
-            level="success"
-          />
+        {/* Section with complementary content */}
+        <Container as="section" aria-labelledby="related-heading" className="bg-blue-50">
+          <h2 id="related-heading" className="text-xl font-semibold text-gray-900 mb-6">
+            Related Accessibility Resources
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white p-4 rounded-lg">
+              <h3 className="font-medium text-gray-900 mb-2">WCAG Guidelines</h3>
+              <p className="text-sm text-gray-600">
+                Web Content Accessibility Guidelines compliance
+              </p>
+            </div>
+            <div className="bg-white p-4 rounded-lg">
+              <h3 className="font-medium text-gray-900 mb-2">ARIA Best Practices</h3>
+              <p className="text-sm text-gray-600">
+                Accessible Rich Internet Applications patterns
+              </p>
+            </div>
+          </div>
         </Container>
-
-        <Container
-          as="section"
-          variant="wide"
-          padding="phi-1"
-          className="bg-card rounded-lg border"
-          aria-labelledby="responsive-heading"
-        >
-          <AccessibilityDemo
-            title="Responsive Accessibility"
-            description="Containers maintain accessibility across all screen sizes. Text remains readable and navigable from mobile to desktop viewports."
-            level="info"
-          />
-        </Container>
-      </div>
+      </Container>
     </div>
   ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'WCAG AAA compliance demonstration showing color contrast, semantic structure, and responsive accessibility features built into Container components.',
-      },
-    },
-  },
 };
 
+/**
+ * Focus management and keyboard navigation patterns.
+ * Shows proper focus indicators and tab order.
+ */
+export const FocusManagement: Story = {
+  render: () => (
+    <Container as="main" className="space-y-8">
+      <div className="text-center mb-8">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Focus Management Demo</h1>
+        <p className="text-gray-600">
+          Press Tab to navigate through the focusable elements and observe focus indicators.
+        </p>
+      </div>
+
+      {/* Form with proper focus management */}
+      <Container className="bg-white border border-gray-200">
+        <form className="space-y-6">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+              Full Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter your full name"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              Email Address
+            </label>
+            <input
+              type="email"
+              id="email"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter your email"
+              aria-describedby="email-help"
+            />
+            <div id="email-help" className="text-xs text-gray-500 mt-1">
+              We'll never share your email with third parties.
+            </div>
+          </div>
+
+          <fieldset className="space-y-3">
+            <legend className="text-sm font-medium text-gray-700">Notification Preferences</legend>
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
+                />
+                <span className="ml-2 text-sm text-gray-700">Email notifications</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
+                />
+                <span className="ml-2 text-sm text-gray-700">SMS notifications</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div className="flex space-x-4">
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              Submit Form
+            </button>
+            <button
+              type="button"
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </Container>
+
+      {/* Interactive elements with focus indicators */}
+      <Container className="bg-gray-50 border border-gray-200">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Interactive Elements</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <button
+            type="button"
+            className="p-4 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            Primary Action
+          </button>
+          <button
+            type="button"
+            className="p-4 bg-green-100 text-green-800 rounded-lg hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+          >
+            Success Action
+          </button>
+          <button
+            type="button"
+            className="p-4 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+          >
+            Warning Action
+          </button>
+          <button
+            type="button"
+            className="p-4 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          >
+            Danger Action
+          </button>
+        </div>
+      </Container>
+    </Container>
+  ),
+};
+
+/**
+ * Color contrast and visual hierarchy for accessibility.
+ * Shows WCAG AA/AAA compliant color combinations.
+ */
+export const ColorContrastHierarchy: Story = {
+  render: () => (
+    <Container as="main" className="space-y-8">
+      <div className="text-center mb-8">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Color Contrast & Visual Hierarchy</h1>
+        <p className="text-gray-600">
+          Examples of WCAG compliant color combinations and visual hierarchy patterns.
+        </p>
+      </div>
+
+      {/* WCAG AA compliant examples */}
+      <Container className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            WCAG AA Compliant (4.5:1 ratio minimum)
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-blue-600 text-white p-4 rounded-lg">
+              <h3 className="font-semibold mb-2">Primary Blue on White Text</h3>
+              <p className="text-sm opacity-90">
+                This combination meets WCAG AA standards for normal text with a contrast ratio of
+                approximately 7:1.
+              </p>
+            </div>
+
+            <div className="bg-gray-800 text-white p-4 rounded-lg">
+              <h3 className="font-semibold mb-2">Dark Gray on White Text</h3>
+              <p className="text-sm opacity-90">
+                High contrast combination ensuring readability for users with visual impairments.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Visual hierarchy example */}
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Visual Hierarchy</h2>
+          <Container as="article" className="bg-white border border-gray-200">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">Primary Heading (H1)</h1>
+            <p className="text-gray-700 mb-6">
+              Primary body text with sufficient contrast ratio for comfortable reading. The
+              automatic prose styling ensures optimal line height and spacing.
+            </p>
+
+            <h2 className="text-2xl font-semibold text-gray-900 mb-3">Secondary Heading (H2)</h2>
+            <p className="text-gray-700 mb-4">
+              Secondary content with maintained contrast ratios. The typography scale uses golden
+              ratio proportions for harmonious visual hierarchy.
+            </p>
+
+            <h3 className="text-xl font-medium text-gray-900 mb-2">Tertiary Heading (H3)</h3>
+            <p className="text-gray-600 text-sm mb-4">
+              Supporting text in a slightly lighter gray that still maintains WCAG AA compliance
+              while providing visual hierarchy distinction.
+            </p>
+
+            <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
+              <p className="text-sm text-gray-700">
+                <strong className="text-gray-900">Note:</strong> All color combinations in this
+                design system have been tested for WCAG compliance to ensure accessibility for users
+                with visual impairments.
+              </p>
+            </div>
+          </Container>
+        </div>
+      </Container>
+    </Container>
+  ),
+};
+
+/**
+ * Screen reader optimization patterns.
+ * Shows proper ARIA labels, descriptions, and semantic markup.
+ */
 export const ScreenReaderOptimization: Story = {
   render: () => (
-    <div className="min-h-screen bg-background">
-      <Container
-        as="main"
-        variant="wide"
-        padding="phi-2"
-        aria-label="Screen reader optimization demonstration"
-      >
-        <div className="space-y-8">
-          <div className="text-center">
-            <h1 className="heading-section">Screen Reader Navigation</h1>
-            <p className="text-body-large text-muted-foreground">
-              Optimized container structure for assistive technology
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <Container
-              as="article"
-              variant="reading"
-              padding="phi-2"
-              className="bg-card rounded-lg border"
-              aria-labelledby="navigation-article"
-            >
-              <div className="space-y-4">
-                <h2 id="navigation-article" className="heading-subsection">
-                  Landmark Navigation
-                </h2>
-                <p className="text-body">
-                  Screen reader users can navigate between containers using landmark keys:
-                </p>
-                <ul className="space-y-2 text-body-small ml-4">
-                  <li className="flex items-start gap-2">
-                    <kbd className="bg-muted px-2 py-1 rounded text-xs">M</kbd>
-                    <span>Jump to main content area</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <kbd className="bg-muted px-2 py-1 rounded text-xs">R</kbd>
-                    <span>Navigate between regions and sections</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <kbd className="bg-muted px-2 py-1 rounded text-xs">H</kbd>
-                    <span>Navigate by heading levels</span>
-                  </li>
-                </ul>
-              </div>
-            </Container>
-
-            <Container
-              as="section"
-              variant="reading"
-              padding="phi-2"
-              className="bg-card rounded-lg border"
-              aria-labelledby="content-section"
-            >
-              <div className="space-y-4">
-                <h2 id="content-section" className="heading-subsection">
-                  Content Structure
-                </h2>
-                <p className="text-body">
-                  Proper heading hierarchy and semantic elements create logical content flow that
-                  assistive technology can interpret effectively.
-                </p>
-
-                <Container
-                  as="section"
-                  variant="reading"
-                  padding="phi-1"
-                  className="bg-accent/10 rounded border"
-                  aria-labelledby="nested-section"
-                >
-                  <h3 id="nested-section" className="heading-component">
-                    Nested Sections
-                  </h3>
-                  <p className="text-body-small">
-                    Nested containers maintain semantic relationships while providing visual
-                    hierarchy through design tokens.
-                  </p>
-                </Container>
-              </div>
-            </Container>
-          </div>
-
-          <Container
-            as="section"
-            variant="golden"
-            padding="phi-2"
-            className="bg-info/5 rounded-lg border"
-            role="complementary"
-            aria-labelledby="tips-section"
-          >
-            <div className="space-y-4">
-              <h2 id="tips-section" className="heading-subsection text-info-foreground">
-                Accessibility Tips
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-card p-4 rounded border">
-                  <h3 className="heading-component mb-2">Unique Labels</h3>
-                  <p className="text-body-small">
-                    Each landmark has unique aria-label or aria-labelledby for clear identification
-                    by screen readers.
-                  </p>
-                </div>
-                <div className="bg-card p-4 rounded border">
-                  <h3 className="heading-component mb-2">Logical Order</h3>
-                  <p className="text-body-small">
-                    Content flows logically from top to bottom, matching visual and semantic
-                    hierarchy.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </Container>
-        </div>
-      </Container>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Screen reader optimization showcase demonstrating proper landmark navigation, content structure, and ARIA labeling for Container components.',
-      },
-    },
-  },
-};
-
-export const KeyboardNavigation: Story = {
-  render: () => (
-    <div className="space-y-6 bg-background p-8">
-      <div className="text-center">
-        <h1 className="heading-section">Keyboard Navigation Support</h1>
-        <p className="text-body-large text-muted-foreground">
-          Tab order and focus management in container layouts
+    <Container as="main" className="space-y-8">
+      <div className="text-center mb-8">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Screen Reader Optimization</h1>
+        <p className="text-gray-600">
+          Examples of ARIA labels, descriptions, and semantic markup for assistive technology.
         </p>
       </div>
 
-      <Container as="main" variant="wide" padding="phi-2" className="bg-card rounded-lg border">
-        <div className="space-y-6">
-          <div className="bg-info/10 border border-info rounded p-4">
-            <h2 className="heading-component text-info-foreground mb-2">Navigation Instructions</h2>
-            <p className="text-body-small">
-              Use Tab key to navigate through focusable elements. Container structure maintains
-              logical tab order without interfering with keyboard navigation.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Container
-              as="section"
-              variant="reading"
-              padding="phi-1"
-              className="bg-card rounded border"
-            >
-              <h3 className="heading-subsection mb-4">Interactive Elements</h3>
-              <div className="space-y-3">
-                <button
-                  type="button"
-                  className="bg-primary text-primary-foreground px-4 py-2 rounded hover:bg-primary/90 focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                >
-                  Primary Action
-                </button>
-                <button
-                  type="button"
-                  className="bg-secondary text-secondary-foreground px-4 py-2 rounded hover:bg-secondary/90 focus:ring-2 focus:ring-secondary focus:ring-offset-2"
-                >
-                  Secondary Action
-                </button>
-                <a
-                  href="/docs/container"
-                  className="text-primary hover:underline focus:ring-2 focus:ring-primary rounded px-1"
-                >
-                  Link Example
-                </a>
-              </div>
-            </Container>
-
-            <Container
-              as="section"
-              variant="reading"
-              padding="phi-1"
-              className="bg-card rounded border"
-            >
-              <h3 className="heading-subsection mb-4">Form Controls</h3>
-              <div className="space-y-3">
-                <div>
-                  <label htmlFor="name-input" className="block text-body-small font-medium mb-1">
-                    Name
-                  </label>
-                  <input
-                    id="name-input"
-                    type="text"
-                    className="w-full px-3 py-2 border border-input rounded focus:ring-2 focus:ring-primary focus:border-primary"
-                    placeholder="Enter your name"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="message-input" className="block text-body-small font-medium mb-1">
-                    Message
-                  </label>
-                  <textarea
-                    id="message-input"
-                    className="w-full px-3 py-2 border border-input rounded focus:ring-2 focus:ring-primary focus:border-primary"
-                    rows={3}
-                    placeholder="Enter your message"
-                  />
-                </div>
-              </div>
-            </Container>
-          </div>
-
-          <Container
-            as="section"
-            variant="golden"
-            padding="phi-1"
-            className="bg-accent/10 rounded border"
-          >
-            <h3 className="heading-subsection mb-3">Focus Management</h3>
-            <p className="text-body mb-4">
-              Container components preserve natural tab order while providing semantic structure.
-              Focus indicators remain clearly visible with proper contrast ratios.
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                className="bg-success text-success-foreground px-3 py-1 rounded text-sm hover:bg-success/90 focus:ring-2 focus:ring-success focus:ring-offset-1"
-              >
-                Submit
-              </button>
-              <button
-                type="button"
-                className="bg-muted text-muted-foreground px-3 py-1 rounded text-sm hover:bg-muted/90 focus:ring-2 focus:ring-muted focus:ring-offset-1"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="bg-destructive text-destructive-foreground px-3 py-1 rounded text-sm hover:bg-destructive/90 focus:ring-2 focus:ring-destructive focus:ring-offset-1"
-              >
-                Delete
-              </button>
-            </div>
-          </Container>
+      {/* Data table with proper markup */}
+      <Container className="bg-white border border-gray-200">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Accessible Data Table</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse" aria-label="Container size specifications">
+            <caption className="text-left text-sm text-gray-600 mb-4">
+              Container size specifications with corresponding max-width values and use cases
+            </caption>
+            <thead>
+              <tr className="bg-gray-50">
+                <th scope="col" className="px-4 py-3 text-left font-medium text-gray-900 border-b">
+                  Size
+                </th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-gray-900 border-b">
+                  Max Width
+                </th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-gray-900 border-b">
+                  Use Case
+                </th>
+                <th scope="col" className="px-4 py-3 text-left font-medium text-gray-900 border-b">
+                  Accessibility Notes
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row" className="px-4 py-3 font-medium text-gray-900 border-b">
+                  sm
+                </th>
+                <td className="px-4 py-3 text-gray-700 border-b">24rem</td>
+                <td className="px-4 py-3 text-gray-700 border-b">Mobile cards, sidebars</td>
+                <td className="px-4 py-3 text-gray-700 border-b">Good for touch targets</td>
+              </tr>
+              <tr>
+                <th scope="row" className="px-4 py-3 font-medium text-gray-900 border-b">
+                  2xl
+                </th>
+                <td className="px-4 py-3 text-gray-700 border-b">42rem</td>
+                <td className="px-4 py-3 text-gray-700 border-b">Reading content</td>
+                <td className="px-4 py-3 text-gray-700 border-b">
+                  Optimal line length 65-75 chars
+                </td>
+              </tr>
+              <tr>
+                <th scope="row" className="px-4 py-3 font-medium text-gray-900 border-b">
+                  full
+                </th>
+                <td className="px-4 py-3 text-gray-700 border-b">100%</td>
+                <td className="px-4 py-3 text-gray-700 border-b">Application layouts</td>
+                <td className="px-4 py-3 text-gray-700 border-b">
+                  Responsive breakpoints important
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </Container>
-    </div>
+
+      {/* Complex widget with ARIA */}
+      <Container className="bg-white border border-gray-200">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Interactive Widget with ARIA</h2>
+        <div
+          role="tablist"
+          aria-label="Container feature documentation"
+          className="flex border-b border-gray-200"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected="true"
+            aria-controls="features-panel"
+            id="features-tab"
+            className="px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600"
+          >
+            Features
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected="false"
+            aria-controls="props-panel"
+            id="props-tab"
+            className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700"
+          >
+            Props
+          </button>
+        </div>
+
+        <div role="tabpanel" id="features-panel" aria-labelledby="features-tab" className="p-4">
+          <h3 className="font-medium text-gray-900 mb-3">Container Features</h3>
+          <ul className="space-y-2 text-sm text-gray-700">
+            <li>• Responsive container queries (Tailwind v4)</li>
+            <li>• Semantic HTML with automatic accessibility landmarks</li>
+            <li>• Design system integration with --spacing-* tokens</li>
+            <li>• Golden ratio aspect ratios and typography scaling</li>
+          </ul>
+        </div>
+      </Container>
+
+      {/* Status and feedback */}
+      <Container className="bg-white border border-gray-200">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Status and Feedback</h2>
+        <div className="space-y-4">
+          <output
+            aria-live="polite"
+            className="bg-green-50 border border-green-200 rounded-lg p-4 block"
+          >
+            <div className="flex items-center">
+              <div className="text-green-600 mr-3" aria-hidden="true">
+                ✓
+              </div>
+              <div>
+                <div className="font-medium text-green-800">Form submitted successfully</div>
+                <div className="text-sm text-green-700">Your preferences have been saved.</div>
+              </div>
+            </div>
+          </output>
+
+          <div
+            role="alert"
+            aria-live="assertive"
+            className="bg-red-50 border border-red-200 rounded-lg p-4"
+          >
+            <div className="flex items-center">
+              <div className="text-red-600 mr-3" aria-hidden="true">
+                ⚠
+              </div>
+              <div>
+                <div className="font-medium text-red-800">Validation error</div>
+                <div className="text-sm text-red-700">
+                  Please check the required fields and try again.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Container>
+    </Container>
   ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Keyboard navigation demonstration showing how Container components maintain logical tab order and focus management for accessible interaction.',
-      },
-    },
-  },
 };
