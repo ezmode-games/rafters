@@ -613,3 +613,11 @@
     overflow: auto;
   }
 }
+
+/* Test variant for custom button hover state */
+@variant hover {
+  .btn-custom-lime {
+    background-color: oklch(0.708 0.15 127); /* lime-600 equivalent */
+    color: oklch(0.145 0 0); /* dark text for contrast */
+  }
+}
