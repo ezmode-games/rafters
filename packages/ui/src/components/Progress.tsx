@@ -214,11 +214,7 @@ const Progress = forwardRef<ElementRef<typeof ProgressPrimitive.Root>, ProgressP
     const isComplete = value === 100;
     const isIndeterminate = value === undefined || value === null;
 
-    // Helper functions following single responsibility principle
-    const shouldShowTimeEstimate = (): boolean => {
-      return showTime && !isComplete && !isIndeterminate;
-    };
-
+    // Helper functions for time calculation and formatting
     const calculateRemainingMilliseconds = (): number | null => {
       if (timeRemaining) return timeRemaining;
       if (estimatedTime && value != null && value > 0) {
@@ -268,9 +264,34 @@ const Progress = forwardRef<ElementRef<typeof ProgressPrimitive.Root>, ProgressP
 
           <div className="flex items-center justify-between">
             <div className="flex-1 space-y-1">
-              <div className="flex items-center gap-2">
-                {/* Step indicators would be implemented as children */}
-              </div>
+              {totalSteps && currentStep && (
+                <div className="flex items-center gap-2">
+                  {Array.from({ length: totalSteps }, (_, i) => {
+                    const stepNumber = i + 1;
+                    const isCompleted = stepNumber < currentStep;
+                    const isCurrent = stepNumber === currentStep;
+                    return (
+                      <div
+                        key={`step-${stepNumber}`}
+                        className={cn(
+                          'h-2 flex-1 rounded-full transition-colors',
+                          isCompleted && 'bg-primary',
+                          isCurrent && 'bg-primary/50',
+                          !isCompleted && !isCurrent && 'bg-background-subtle'
+                        )}
+                        role="progressbar"
+                        tabIndex={-1}
+                        aria-valuenow={isCompleted ? 100 : isCurrent ? 50 : 0}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-label={`Step ${stepNumber} of ${totalSteps}: ${
+                          isCompleted ? 'Completed' : isCurrent ? 'In Progress' : 'Not Started'
+                        }`}
+                      />
+                    );
+                  })}
+                </div>
+              )}
               {showDescription && description && (
                 <p className="text-sm text-muted-foreground">{description}</p>
               )}
