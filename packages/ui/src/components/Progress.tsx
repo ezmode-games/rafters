@@ -2,6 +2,7 @@ import * as ProgressPrimitive from '@radix-ui/react-progress';
 import { type VariantProps, cva } from 'class-variance-authority';
 import { type ComponentPropsWithoutRef, type ElementRef, forwardRef } from 'react';
 import { cn } from '../lib/utils';
+import { Button } from './Button';
 
 /**
  * Progress Communication Intelligence Component
@@ -301,22 +302,24 @@ const Progress = forwardRef<ElementRef<typeof ProgressPrimitive.Root>, ProgressP
           {(pausable || cancellable) && (
             <div className="flex gap-2">
               {pausable && (
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={onPause}
-                  className="text-xs text-muted-foreground hover:text-foreground"
+                  className="h-auto p-1 text-xs text-muted-foreground hover:text-foreground"
                 >
                   Pause
-                </button>
+                </Button>
               )}
               {cancellable && (
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={onCancel}
-                  className="text-xs text-muted-foreground hover:text-foreground"
+                  className="h-auto p-1 text-xs text-muted-foreground hover:text-foreground"
                 >
                   Cancel
-                </button>
+                </Button>
               )}
             </div>
           )}
@@ -370,13 +373,14 @@ const Progress = forwardRef<ElementRef<typeof ProgressPrimitive.Root>, ProgressP
           <div className="flex items-center justify-between text-sm">
             <span className="text-success">{completionMessage}</span>
             {nextAction && (
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={onComplete}
-                className="text-primary hover:text-primary/80 underline underline-offset-4"
+                className="h-auto p-1 text-primary hover:text-primary/80 underline underline-offset-4"
               >
                 {nextAction}
-              </button>
+              </Button>
             )}
           </div>
         )}
@@ -385,22 +389,24 @@ const Progress = forwardRef<ElementRef<typeof ProgressPrimitive.Root>, ProgressP
         {!isComplete && (pausable || cancellable) && (
           <div className="flex gap-2">
             {pausable && (
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={onPause}
-                className="text-xs text-muted-foreground hover:text-foreground"
+                className="h-auto p-1 text-xs text-muted-foreground hover:text-foreground"
               >
                 Pause
-              </button>
+              </Button>
             )}
             {cancellable && (
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={onCancel}
-                className="text-xs text-muted-foreground hover:text-foreground"
+                className="h-auto p-1 text-xs text-muted-foreground hover:text-foreground"
               >
                 Cancel
-              </button>
+              </Button>
             )}
           </div>
         )}
