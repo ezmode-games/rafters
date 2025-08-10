@@ -759,7 +759,7 @@ export const RealWorldScenarios: Story = {
               key={scenario.id}
               variant="outline"
               onClick={() => runScenario(scenario.id)}
-              disabled={scenario !== null}
+              disabled={scenario.id === scenario}
               className="h-auto p-3 text-left"
             >
               <div>
