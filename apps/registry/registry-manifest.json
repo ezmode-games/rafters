@@ -49,14 +49,6 @@
       "status": "published"
     },
     {
-      "name": "layout",
-      "path": "components/ui/Layout.tsx",
-      "type": "registry:component",
-      "content": "/**\n * Layout Component - AI Intelligence\n *\n * COGNITIVE LOAD: 0/10 (invisible structure, organizes complexity)\n * ATTENTION ECONOMICS: Creates scanning patterns (Z-pattern, F-pattern)\n * NEGATIVE SPACE MASTERY: Strategic placement of content and breathing room\n *\n * DESIGN INTELLIGENCE GUIDES:\n * - Attention Economics: rafters.realhandy.tech/llm/patterns/attention-economics\n * - Negative Space Mastery: rafters.realhandy.tech/llm/patterns/negative-space\n * - Cognitive Load Management: rafters.realhandy.tech/llm/patterns/cognitive-load\n *\n * USAGE PATTERNS:\n * ✅ Reading Layout: F-pattern for content-heavy interfaces\n * ✅ Landing Layout: Z-pattern for conversion-focused pages\n * ✅ Dashboard Layout: Grid-based for data and metrics\n * ✅ Responsive Structure: Adapts layout patterns to screen size\n * ❌ Never: Complex nested layouts, inconsistent spacing systems\n *\n * Token knowledge: .rafters/tokens/registry.json\n */\nimport { forwardRef } from 'react';\nimport { cn } from '../lib/utils';\n\n// Base layout props interface\nexport interface LayoutProps extends React.HTMLAttributes<HTMLDivElement> {}\n\n// Reading layout for text-heavy content (F-pattern optimized)\nexport const ReadingLayout = forwardRef<HTMLDivElement, LayoutProps>(\n  ({ className, ...props }, ref) => (\n    <div ref={ref} className={cn('reading-layout', className)} {...props} />\n  )\n);\nReadingLayout.displayName = 'ReadingLayout';\n\n// Action layout for conversion-focused content (Z-pattern optimized)\nexport const ActionLayout = forwardRef<HTMLDivElement, LayoutProps>(\n  ({ className, ...props }, ref) => (\n    <div ref={ref} className={cn('action-layout', className)} {...props} />\n  )\n);\nActionLayout.displayName = 'ActionLayout';\n\n// Content sidebar layout for main content + complementary info\nexport const ContentSidebar = forwardRef<HTMLDivElement, LayoutProps>(\n  ({ className, ...props }, ref) => (\n    <div ref={ref} className={cn('content-sidebar', className)} {...props} />\n  )\n);\nContentSidebar.displayName = 'ContentSidebar';\n\n// Application layout for header + sidebar + main content\nexport const AppLayout = forwardRef<HTMLDivElement, LayoutProps>(({ className, ...props }, ref) => (\n  <div ref={ref} className={cn('app-layout', className)} {...props} />\n));\nAppLayout.displayName = 'AppLayout';\n\n// Content stack for vertical content flow with phi spacing\nexport interface ContentStackProps extends React.HTMLAttributes<HTMLDivElement> {\n  gap?: 'phi-0' | 'phi-1' | 'phi-2' | 'phi-3';\n}\n\nexport const ContentStack = forwardRef<HTMLDivElement, ContentStackProps>(\n  ({ gap = 'phi-1', className, ...props }, ref) => (\n    <div ref={ref} className={cn('content-stack', `gap-${gap}`, className)} {...props} />\n  )\n);\nContentStack.displayName = 'ContentStack';\n",
-      "version": "0.1.0",
-      "status": "published"
-    },
-    {
       "name": "rafterslogo",
       "path": "components/ui/RaftersLogo.tsx",
       "type": "registry:component",
@@ -97,6 +89,6 @@
       "status": "published"
     }
   ],
-  "total": 12,
-  "lastUpdated": "2025-08-09T22:42:27.065Z"
+  "total": 11,
+  "lastUpdated": "2025-08-10T05:00:09.378Z"
 }
