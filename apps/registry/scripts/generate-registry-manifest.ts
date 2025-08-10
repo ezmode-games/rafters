@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { z } from 'zod';
 
-const componentsDir = path.resolve(__dirname, '../../packages/ui');
+const componentsDir = path.resolve(__dirname, '../../packages/ui/src/components');
 const manifestPath = path.resolve(__dirname, '../registry-manifest.json');
 
 const ComponentSchema = z.object({
@@ -12,6 +12,7 @@ const ComponentSchema = z.object({
   content: z.string(),
   version: z.string(),
   status: z.enum(['published', 'draft', 'depreciated']),
+  dependencies: z.array(z.string()),
 });
 
 const ManifestSchema = z.object({
@@ -42,15 +43,55 @@ function getStoriesFlags(name: string) {
   };
 }
 
+function extractDependencies(content: string): string[] {
+  const dependencies = new Set<string>();
+
+  // Match import statements for external packages
+  const importRegex = /import\s+.*?\s+from\s+['"]([^'"]+)['"]/g;
+  const matches = content.match(importRegex) || [];
+
+  for (const matchStr of matches) {
+    // Extract the import path from the match string
+    const pathMatch = matchStr.match(/from\s+['"]([^'"]+)['"]/);
+    if (!pathMatch) continue;
+
+    const importPath = pathMatch[1];
+
+    // Only include external dependencies (not relative imports)
+    if (!importPath.startsWith('.') && !importPath.startsWith('@/')) {
+      // Extract package name from scoped packages like @radix-ui/react-progress
+      const packageName = importPath.startsWith('@')
+        ? importPath.split('/').slice(0, 2).join('/')
+        : importPath.split('/')[0];
+
+      dependencies.add(packageName);
+    }
+  }
+
+  // Remove common dependencies that are usually already installed
+  const commonDeps = new Set([
+    'react',
+    'react-dom',
+    'class-variance-authority',
+    'clsx',
+    'tailwind-merge',
+  ]);
+  return Array.from(dependencies).filter((dep) => !commonDeps.has(dep));
+}
+
 function getComponentMeta(name: string) {
   const flags = getStoriesFlags(name);
+  const content = fs.readFileSync(path.join(componentsDir, name), 'utf8');
+  const dependencies = extractDependencies(content);
+
   return {
     name: name.replace('.tsx', '').toLowerCase(),
     path: `components/ui/${name}`,
     type: 'registry:component',
-    content: fs.readFileSync(path.join(componentsDir, name), 'utf8'),
+    content,
     version: flags.version,
     status: flags.status,
+    dependencies,
   };
 }
 

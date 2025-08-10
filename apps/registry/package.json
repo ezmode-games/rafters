@@ -1,6 +1,6 @@
 {
   "name": "@rafters/registry",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Component registry API for Rafters AI design intelligence system",
   "type": "module",
   "main": "./src/index.ts",
