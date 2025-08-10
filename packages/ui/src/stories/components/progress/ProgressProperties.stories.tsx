@@ -421,6 +421,13 @@ export const ControlBehaviors: Story = {
       setOperations((prev) => prev.filter((op) => op.id !== id));
     };
 
+    const formatControlLabels = (pausable: boolean, cancellable: boolean): string => {
+      const labels = [];
+      if (pausable) labels.push('Pausable');
+      if (cancellable) labels.push('Cancellable');
+      return labels.join(' • ');
+    };
+
     const operationTypes = [
       {
         name: 'File Upload',
@@ -471,8 +478,7 @@ export const ControlBehaviors: Story = {
               <div>
                 <div className="font-medium text-sm">{type.name}</div>
                 <div className="text-xs text-muted-foreground">
-                  {type.pausable && 'Pausable'} {type.pausable && type.cancellable && '•'}{' '}
-                  {type.cancellable && 'Cancellable'}
+                  {formatControlLabels(type.pausable, type.cancellable)}
                 </div>
               </div>
             </Button>

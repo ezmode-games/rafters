@@ -645,7 +645,7 @@ export const MultiStepWorkflows: Story = {
  */
 export const RealWorldScenarios: Story = {
   render: () => {
-    const [scenario, setScenario] = useState<string | null>(null);
+    const [activeScenario, setActiveScenario] = useState<string | null>(null);
     const [progresses, setProgresses] = useState<
       Array<{
         id: number;
@@ -658,7 +658,7 @@ export const RealWorldScenarios: Story = {
     const [nextId, setNextId] = useState(1);
 
     const runScenario = (scenarioName: string) => {
-      setScenario(scenarioName);
+      setActiveScenario(scenarioName);
       setProgresses([]);
 
       const scenarios = {
@@ -717,7 +717,7 @@ export const RealWorldScenarios: Story = {
 
       // Reset scenario after completion
       setTimeout(() => {
-        setScenario(null);
+        setActiveScenario(null);
         setProgresses([]);
         setNextId((prev) => prev + steps.length);
       }, 16000);
@@ -759,7 +759,7 @@ export const RealWorldScenarios: Story = {
               key={scenario.id}
               variant="outline"
               onClick={() => runScenario(scenario.id)}
-              disabled={scenario.id === scenario}
+              disabled={activeScenario !== null}
               className="h-auto p-3 text-left"
             >
               <div>
@@ -770,13 +770,13 @@ export const RealWorldScenarios: Story = {
           ))}
         </div>
 
-        {scenario && (
+        {activeScenario && (
           <div className="space-y-2">
             <h4 className="text-sm font-medium">
-              {scenarioTypes.find((s) => s.id === scenario)?.name}
+              {scenarioTypes.find((s) => s.id === activeScenario)?.name}
             </h4>
             <div className="text-xs text-muted-foreground">
-              Running {scenarioTypes.find((s) => s.id === scenario)?.description}
+              Running {scenarioTypes.find((s) => s.id === activeScenario)?.description}
             </div>
           </div>
         )}

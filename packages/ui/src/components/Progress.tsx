@@ -214,37 +214,39 @@ const Progress = forwardRef<ElementRef<typeof ProgressPrimitive.Root>, ProgressP
     const isComplete = value === 100;
     const isIndeterminate = value === undefined || value === null;
 
-    // Calculate time remaining if not provided
-    const calculateTimeRemaining = (): string | null => {
+    // Helper functions following single responsibility principle
+    const shouldShowTimeEstimate = (): boolean => {
+      return showTime && !isComplete && !isIndeterminate;
+    };
+
+    const calculateRemainingMilliseconds = (): number | null => {
+      if (timeRemaining) return timeRemaining;
+      if (estimatedTime && value != null && value > 0) {
+        return (estimatedTime * (100 - value)) / 100;
+      }
+      return null;
+    };
+
+    const formatTimeRemaining = (milliseconds: number): string => {
+      const minutes = Math.floor(milliseconds / 60000);
+      const seconds = Math.floor((milliseconds % 60000) / 1000);
+
+      if (minutes > 0) {
+        return `About ${minutes}m ${seconds}s remaining`;
+      }
+      return seconds > 0 ? `About ${seconds}s remaining` : 'Almost done...';
+    };
+
+    const getTimeDisplay = (): string | null => {
       if (!showTime) return null;
       if (isComplete) return null;
       if (isIndeterminate) return 'Calculating...';
 
-      if (timeRemaining) {
-        const minutes = Math.floor(timeRemaining / 60000);
-        const seconds = Math.floor((timeRemaining % 60000) / 1000);
-
-        if (minutes > 0) {
-          return `About ${minutes}m ${seconds}s remaining`;
-        }
-        return seconds > 0 ? `About ${seconds}s remaining` : 'Almost done...';
-      }
-
-      if (estimatedTime && value > 0) {
-        const remainingMs = (estimatedTime * (100 - value)) / 100;
-        const minutes = Math.floor(remainingMs / 60000);
-        const seconds = Math.floor((remainingMs % 60000) / 1000);
-
-        if (minutes > 0) {
-          return `About ${minutes}m ${seconds}s remaining`;
-        }
-        return seconds > 0 ? `About ${seconds}s remaining` : 'Almost done...';
-      }
-
-      return null;
+      const remainingMs = calculateRemainingMilliseconds();
+      return remainingMs ? formatTimeRemaining(remainingMs) : null;
     };
 
-    const timeDisplay = calculateTimeRemaining();
+    const timeDisplay = getTimeDisplay();
     const percentageDisplay = showPercentage && !isIndeterminate ? `${Math.round(value)}%` : null;
 
     if (variant === 'steps' && showSteps) {
