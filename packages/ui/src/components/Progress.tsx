@@ -214,6 +214,9 @@ const Progress = forwardRef<ElementRef<typeof ProgressPrimitive.Root>, ProgressP
   ) => {
     const isComplete = value === 100;
     const isIndeterminate = value === undefined || value === null;
+    const descriptionId = description
+      ? `progress-desc-${Math.random().toString(36).substr(2, 9)}`
+      : undefined;
 
     // Helper functions for time calculation and formatting
     const calculateRemainingMilliseconds = (): number | null => {
@@ -266,32 +269,30 @@ const Progress = forwardRef<ElementRef<typeof ProgressPrimitive.Root>, ProgressP
           <div className="flex items-center justify-between">
             <div className="flex-1 space-y-1">
               {totalSteps && currentStep && (
-                <div className="flex items-center gap-2">
+                <ol
+                  aria-label={`Progress steps: ${currentStep} of ${totalSteps}`}
+                  className="flex items-center gap-2"
+                >
                   {Array.from({ length: totalSteps }, (_, i) => {
                     const stepNumber = i + 1;
                     const isCompleted = stepNumber < currentStep;
                     const isCurrent = stepNumber === currentStep;
                     return (
-                      <div
+                      <li
                         key={`step-${stepNumber}`}
+                        aria-label={`Step ${stepNumber} of ${totalSteps}: ${
+                          isCompleted ? 'Completed' : isCurrent ? 'In Progress' : 'Not Started'
+                        }`}
                         className={cn(
                           'h-2 flex-1 rounded-full transition-colors',
                           isCompleted && 'bg-primary',
                           isCurrent && 'bg-primary/50',
                           !isCompleted && !isCurrent && 'bg-background-subtle'
                         )}
-                        role="progressbar"
-                        tabIndex={-1}
-                        aria-valuenow={isCompleted ? 100 : isCurrent ? 50 : 0}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                        aria-label={`Step ${stepNumber} of ${totalSteps}: ${
-                          isCompleted ? 'Completed' : isCurrent ? 'In Progress' : 'Not Started'
-                        }`}
                       />
                     );
                   })}
-                </div>
+                </ol>
               )}
               {showDescription && description && (
                 <p className="text-sm text-muted-foreground">{description}</p>
@@ -348,6 +349,8 @@ const Progress = forwardRef<ElementRef<typeof ProgressPrimitive.Root>, ProgressP
             isComplete && status === 'success' && 'bg-success/10'
           )}
           value={isIndeterminate ? undefined : value}
+          aria-label={label || 'Progress indicator'}
+          aria-describedby={descriptionId}
           {...props}
         >
           <ProgressPrimitive.Indicator
@@ -365,7 +368,9 @@ const Progress = forwardRef<ElementRef<typeof ProgressPrimitive.Root>, ProgressP
 
         {/* Description */}
         {showDescription && description && (
-          <p className="text-sm text-muted-foreground">{description}</p>
+          <p id={descriptionId} className="text-sm text-muted-foreground">
+            {description}
+          </p>
         )}
 
         {/* Completion message */}
