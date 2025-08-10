@@ -85,6 +85,24 @@ Apply the embedded design knowledge to:
 
 ## Critical Development Standards
 
+### 🚨 MANDATORY PREFLIGHT CHECKS - READ FIRST 🚨
+
+**BEFORE ANY COMMIT OR PR - AI AGENTS MUST RUN:**
+
+```bash
+pnpm preflight
+```
+
+This single command runs: format → lint → type-check → test → build in sequence.
+
+**❌ NEVER COMMIT if preflight fails**
+**❌ NEVER skip preflight to "save time"**
+**❌ NEVER expect CI to catch what you should fix locally**
+
+**✅ Preflight must pass before commit - no exceptions**
+
+See [docs/CODING_STANDARDS.md](./docs/CODING_STANDARDS.md) Section 13 for complete preflight requirements.
+
 ### Code Quality Requirements
 
 **You MUST follow these standards strictly:**
@@ -96,7 +114,7 @@ Apply the embedded design knowledge to:
 5. **No `.then()` Chaining** - Always use `await` for async operations
 6. **No Array Index as Keys** - Never use array indices as React keys. Use semantic identifiers like `\`item-${i}\`` or unique IDs
 
-See [CODING_STANDARDS.md](./CODING_STANDARDS.md) for complete requirements.
+See [docs/CODING_STANDARDS.md](./docs/CODING_STANDARDS.md) for complete requirements.
 
 ### Testing Requirements with Vitest
 
@@ -156,17 +174,69 @@ pre-commit:
 
 ## AI Training Standards (Storybook)
 
-### Multi-File Training Architecture
+See [docs/STORYBOOK_STANDARDS.md](./docs/STORYBOOK_STANDARDS.md) for complete standards.
 
-**Complex components require 7 dedicated training files for comprehensive AI education:**
+### 7-File Story Architecture (MANDATORY)
 
-1. `ComponentName.mdx` - Overview documentation with design philosophy
-2. `ComponentName.stories.tsx` - Main component story with core behavioral patterns
-3. `ComponentNameIntelligence.stories.tsx` - Design intelligence patterns and cognitive load principles  
-4. `ComponentNameVariants.stories.tsx` - Visual styling variants and semantic meaning
-5. `ComponentNameProperties.stories.tsx` - Interactive properties and component states
-6. `ComponentNameSemantic.stories.tsx` - Contextual usage patterns and semantic meaning
-7. `ComponentNameAccessibility.stories.tsx` - WCAG AAA compliance and accessibility demonstrations
+**Every component MUST implement exactly 7 story files** for comprehensive AI training:
+
+#### 1. **Overview Documentation** (`ComponentName.mdx`)
+- Component purpose and basic usage
+- Simple usage guidelines with DOs/DONTs  
+- Import from main `.stories.tsx` file only
+- Single Canvas example showing common usage
+
+#### 2. **Primary Story** (`ComponentName.stories.tsx`)
+- **Status comment REQUIRED** at top of file:
+  ```typescript
+  // @componentStatus published | draft | depreciated
+  // @version 0.1.0
+  ```
+- Single "Common" story showcasing all major variants
+- Complete argTypes for all component props
+- Interactive controls for rapid prototyping
+- Must include `onClick: fn()` for interactive components
+
+#### 3. **Design Intelligence** (`ComponentNameIntelligence.stories.tsx`)
+- Trust-building patterns and progressive confirmation
+- Attention hierarchy demonstrations
+- Cognitive load optimization examples
+- Context-aware adaptations
+- Loading states and feedback patterns
+
+#### 4. **Visual Variants** (`ComponentNameVariants.stories.tsx`)
+- All visual styling variants (primary, secondary, etc.)
+- Visual hierarchy demonstrations
+- Semantic color token usage exclusively
+- Style-focused examples with semantic meaning
+
+#### 5. **Interactive Properties** (`ComponentNameProperties.stories.tsx`)
+- Size variations and scaling relationships
+- State demonstrations (disabled, loading, error)
+- Interactive feedback patterns
+- Property combinations and behaviors
+
+#### 6. **Semantic Usage** (`ComponentNameSemantic.stories.tsx`)
+- Contextual usage examples in real scenarios
+- Semantic variants (success, warning, error, info)
+- Trust level implementations
+- Consequence-appropriate styling
+
+#### 7. **Accessibility Compliance** (`ComponentNameAccessibility.stories.tsx`)
+- WCAG AAA compliance demonstrations
+- Keyboard navigation patterns
+- Screen reader compatibility
+- Focus management and ARIA properties
+- Color contrast demonstrations
+
+### Trust-Building Intelligence Framework
+
+Components implement **4 trust levels** that match user psychology:
+
+- **Low Trust** - Routine actions, minimal friction, reversible
+- **Medium Trust** - Moderate consequences, balanced caution  
+- **High Trust** - Significant impact, deliberate friction
+- **Critical Trust** - Permanent consequences, maximum friction
 
 ### AI Training Requirements
 
@@ -177,6 +247,7 @@ pre-commit:
 - Use semantic design tokens exclusively (teaches proper token usage to AI)
 - Pass accessibility checks (ensures AI learns accessible patterns)
 - Function as executable tests (validates AI training data quality)
+- Follow title hierarchy: `03 Components/Category/ComponentName/StoryType`
 
 **Example AI training scenario:**
 ```typescript
@@ -293,7 +364,31 @@ export const Primary: Story = {
 
 **Additional Story Files**: Follow same pattern for Intelligence, Variants, Properties, Semantic, and Accessibility stories.
 
-**Complete 7-File Architecture**: See the comprehensive ComponentPatterns.mdx documentation in Storybook (`00 Introduction/Component Patterns`) for detailed implementation guides and examples for all 7 file types.
+### Component Intelligence Comments
+**MANDATORY** in every component:
+```jsx
+/**
+ * AI Intelligence: Component knowledge embedded for systematic decision-making
+ * Trust Level: {level} - {explanation}
+ * Cognitive Load: {1-10} - {complexity reasoning}
+ * Safety Constraints: {required patterns}
+ * Usage Context: {when/where to use}
+ */
+```
+
+### Story Testing Integration (UI Package ONLY)
+**IMPORTANT: The UI package uses stories AS tests - NOT separate unit tests like other packages.**
+
+**All stories are automatically tested** via `@storybook/addon-vitest`:
+- Stories function as AI training scenarios AND test cases simultaneously
+- **No additional `.test.ts` files needed** - stories provide complete test coverage
+- Broken stories corrupt AI learning - they MUST render without errors
+- Interactive stories require `onClick: fn()` for proper test execution
+- Use `pnpm test-storybook` to verify story integrity
+
+**This is DIFFERENT from other monorepo packages** which use traditional unit testing.
+
+**Complete 7-File Architecture**: See [docs/STORYBOOK_STANDARDS.md](./docs/STORYBOOK_STANDARDS.md) for detailed implementation guides and examples for all 7 file types.
 
 ## Testing Requirements with Vitest
 
@@ -310,6 +405,28 @@ pnpm test              # Run all tests including stories
 pnpm test-storybook    # Run story tests specifically  
 pnpm vitest run        # CI test runner
 ```
+
+## Design Intelligence Integration
+
+See [docs/DESIGN_INTELLIGENCE_PRIMER.md](./docs/DESIGN_INTELLIGENCE_PRIMER.md) for comprehensive design mastery training.
+
+### Semantic-First Design Thinking
+**Process: Intent → Meaning → Form → Implementation**
+
+Never ask "What color should this be?"
+Always ask "What should this color communicate?"
+
+### Negative Space (Whitespace) Mastery
+- **Guides Attention**: Empty space directs the eye to what matters
+- **Creates Hierarchy**: More space = more importance  
+- **Reduces Cognitive Load**: Breathing room helps users process information
+- **Mathematical Approaches**: Golden ratio, Fibonacci sequences, modular scales
+
+### OKLCH Color Space
+- **Perceptually Uniform**: Equal numeric changes = equal visual changes
+- **Predictable Lightness**: L=50 always looks like 50% lightness
+- **Better Dark Modes**: Maintains color relationships across themes
+- **Accessibility**: Easier to predict contrast ratios
 
 ## Key Principles for AI Agents
 

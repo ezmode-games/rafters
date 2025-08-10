@@ -12,7 +12,7 @@ import {
 } from '../../../components/Toast';
 
 const meta = {
-  title: '03 Components/Feedback/Toast',
+  title: '03 Components/Feedback/Toast/Toast',
   component: Toast,
   parameters: {
     layout: 'centered',
