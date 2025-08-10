@@ -1,8 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 
-const componentsDir = path.resolve(__dirname, '../../packages/ui/src/components');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const componentsDir = path.resolve(__dirname, '../../../packages/ui/src/components');
 const manifestPath = path.resolve(__dirname, '../registry-manifest.json');
 
 const ComponentSchema = z.object({
@@ -25,7 +29,7 @@ function getStoriesFlags(name: string) {
   const baseName = name.replace('.tsx', '');
   const storiesDir = path.resolve(
     __dirname,
-    `../../packages/ui/src/stories/components/${baseName}`
+    `../../../packages/ui/src/stories/components/${baseName}`
   );
   const storiesFiles = fs.existsSync(storiesDir)
     ? fs.readdirSync(storiesDir).filter((f) => f.endsWith('.stories.tsx'))
