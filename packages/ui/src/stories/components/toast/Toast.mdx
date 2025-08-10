@@ -1,0 +1,59 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import * as Stories from './Toast.stories.tsx';
+
+<Meta title="03 Components/Feedback/Toast" of={Stories} name="Overview" />
+
+# Toast Component
+
+Feedback delivered at exactly the right moment. Toast notifications provide immediate confirmation that builds user confidence in their actions.
+
+## Design Intelligence
+
+**Cognitive Load: 2/10** - Brief, non-blocking notification that respects user attention  
+**Trust Building: Critical** - Immediate feedback for user actions builds confidence  
+**Attention Economics: Temporal** - Appears briefly, then gracefully disappears  
+
+## Core Principles
+
+### Timing Intelligence
+- **Low urgency**: 3 seconds (casual notifications)
+- **Medium urgency**: 5 seconds (standard confirmations)  
+- **High urgency**: 8 seconds (important alerts)
+- **Persistent**: Until manually dismissed (errors, critical actions)
+
+### Interruption Behavior
+- **Polite**: Subtle appearance, non-disruptive
+- **Assertive**: Standard notification level
+- **Demanding**: Forces user attention (errors only)
+
+### Trust Building Patterns
+- **Success confirmations** build confidence in completed actions
+- **Error recovery** provides clear next steps for failures  
+- **Auto-dismiss timing** respects cognitive load and urgency level
+- **Manual dismiss option** gives users control over their attention
+
+## Usage Guidelines
+
+### ✅ When to Use
+- Action confirmation (save, delete, send successful)
+- Error feedback with recovery options
+- Status updates that don't require interaction
+- Temporary information that users should notice
+
+### ❌ When Not to Use  
+- Critical information that shouldn't disappear
+- Multiple simultaneous messages (creates cognitive overload)
+- Primary navigation or persistent interface elements
+- Information that requires thoughtful reading time
+
+## Semantic Variants
+
+Each variant carries semantic meaning and appropriate visual weight:
+
+- **Default**: Neutral information, medium attention
+- **Success**: Positive confirmation, builds trust
+- **Warning**: Caution needed, medium urgency
+- **Error**: Problem occurred, high attention, often persistent
+- **Destructive**: Critical system issues, demanding attention
+
+The Toast component automatically applies appropriate timing, styling, and behavior based on the semantic variant chosen.
