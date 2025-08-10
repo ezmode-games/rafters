@@ -1,18 +1,21 @@
-## Component Status Flag
+## Component Status Comments
 
-Every main component story (`<Component>.stories.tsx`) MUST include a `status` field in the meta object:
+Every main component story (`<Component>.stories.tsx`) MUST include status comments at the top of the file:
 
 ```typescript
-const meta = {
-  ...
-  status: 'published', // 'published', 'draft', or 'depreciated'
-  ...
-}
+// @componentStatus published
+// @version 0.1.0
+
+import type { Meta, StoryObj } from '@storybook/react-vite'
+// ... rest of story file
 ```
 
-- Only components with `status: 'published'` are included in the registry and available for production use.
-- Components with `status: 'draft'` or `status: 'depreciated'` are excluded from the registry build and not published.
-- This flag is required for all main component stories and is used for automated registry publishing and release management.
+**Status Values:**
+- `published` - Component is included in the registry and available for production use
+- `draft` - Component is excluded from the registry build and not published
+- `depreciated` - Component is marked for removal and excluded from registry
+
+- These comments are required for all main component stories and are parsed by the CLI for automated registry publishing and release management.
 # Storybook Standards for Rafters Design System
 
 ## Overview
@@ -199,6 +202,9 @@ const meta = {
 Main component stories include comprehensive documentation and testing setup:
 
 ```typescript
+// @componentStatus published
+// @version 0.1.0
+
 /**
  * Every interaction begins with intent. The button is where user intention meets interface response.
  * Our button system is built on the principle that clarity of purpose should be immediately apparent.
@@ -620,6 +626,9 @@ import '../src/style.css' // Required for design tokens
 
 ### Basic Story Template
 ```typescript
+// @componentStatus published
+// @version 0.1.0
+
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { ComponentName } from '../components/ComponentName';
@@ -661,6 +670,7 @@ Before committing story changes, verify:
 
 ### File Structure & Imports
 - [ ] Uses `.tsx` extension for JSX content
+- [ ] **Status comments at top**: `// @componentStatus published` and `// @version 0.1.0`
 - [ ] Correct relative import paths (`../../../components/Button`)
 - [ ] Imports `fn` from `storybook/test` for interactive props
 - [ ] Follows proper title hierarchy (`03 Components/Action/Button`)
@@ -685,6 +695,7 @@ Before committing story changes, verify:
 - [ ] Passes accessibility addon checks
 - [ ] Uses proper component categories and naming conventions
 - [ ] Main story includes `tags: ['!autodocs', '!dev', 'test']`
+- [ ] **Status comments present** for registry publishing control
 
 ## Story Development Summary
 

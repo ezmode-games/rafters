@@ -76,3 +76,6 @@ export type {
 
 export { Container } from './Container';
 export type { ContainerProps } from './Container';
+
+export { Progress, ProgressStep } from './Progress';
+export type { ProgressProps } from './Progress';

@@ -19,7 +19,7 @@ import {
 } from '../../../components/Toast';
 
 const meta = {
-  title: '03 Components/Feedback/Toast Properties',
+  title: '03 Components/Feedback/Toast/Properties',
   component: Toast,
   parameters: {
     layout: 'centered',

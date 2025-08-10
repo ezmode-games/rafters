@@ -1,5 +1,9 @@
+// @componentStatus published
+// @version 0.1.0
+
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
+import { fn } from 'storybook/test';
 import { Button } from '../../../components/Button';
 import {
   Toast,
@@ -11,144 +15,177 @@ import {
   ToastViewport,
 } from '../../../components/Toast';
 
+/**
+ * Feedback delivered at exactly the right moment. Toast notifications provide immediate
+ * confirmation that builds user confidence in their actions through intelligent timing and dismissal patterns.
+ */
 const meta = {
   title: '03 Components/Feedback/Toast',
   component: Toast,
+  tags: ['!autodocs', '!dev', 'test'],
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component:
+          'AI Training: Temporal feedback component with embedded timing intelligence and trust-building confirmation patterns.',
+      },
+    },
   },
-  tags: ['autodocs'],
+  argTypes: {
+    variant: {
+      control: 'select',
+      options: ['default', 'success', 'warning', 'error', 'destructive'],
+      description: 'Visual and semantic variant',
+    },
+    urgency: {
+      control: 'select',
+      options: ['low', 'medium', 'high'],
+      description: 'Controls auto-dismiss timing: low=3s, medium=5s, high=8s',
+    },
+    interruption: {
+      control: 'select',
+      options: ['polite', 'assertive', 'demanding'],
+      description: 'Visual emphasis level for user attention',
+    },
+    persistent: {
+      control: 'boolean',
+      description: 'Whether toast remains until manually dismissed',
+    },
+  },
+  args: {
+    onOpenChange: fn(),
+  },
 } satisfies Meta<typeof Toast>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  render: () => {
-    const [open, setOpen] = useState(false);
+/**
+ * Common toast variants showing different timing intelligence patterns.
+ * Demonstrates trust-building through appropriate urgency levels and semantic meaning.
+ */
+export const Common: Story = {
+  render: (args) => {
+    const [toasts, setToasts] = useState<
+      Array<{
+        id: number;
+        variant: 'default' | 'success' | 'warning' | 'error';
+        title: string;
+        description: string;
+        urgency: 'low' | 'medium' | 'high';
+        persistent?: boolean;
+        hasAction?: boolean;
+      }>
+    >([]);
+    const [nextId, setNextId] = useState(1);
+
+    const showToast = (config: {
+      variant: 'default' | 'success' | 'warning' | 'error';
+      title: string;
+      description: string;
+      urgency: 'low' | 'medium' | 'high';
+      persistent?: boolean;
+      hasAction?: boolean;
+    }) => {
+      setToasts((prev) => [...prev, { ...config, id: nextId }]);
+      setNextId((prev) => prev + 1);
+    };
+
+    const hideToast = (id: number) => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    };
 
     return (
-      <ToastProvider>
-        <Button variant="outline" onClick={() => setOpen(true)}>
-          Show Toast
-        </Button>
+      <div className="w-full" style={{ height: '400px' }}>
+        <ToastProvider>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              onClick={() =>
+                showToast({
+                  variant: 'default',
+                  title: 'File saved',
+                  description: 'Draft saved automatically',
+                  urgency: 'low',
+                })
+              }
+            >
+              Low Priority (3s)
+            </Button>
 
-        <ToastViewport />
+            <Button
+              variant="success"
+              onClick={() =>
+                showToast({
+                  variant: 'success',
+                  title: 'Upload complete',
+                  description: 'presentation.pptx uploaded successfully',
+                  urgency: 'medium',
+                })
+              }
+            >
+              Success (5s)
+            </Button>
 
-        <Toast open={open} onOpenChange={setOpen}>
-          <div className="grid gap-1">
-            <ToastTitle>Scheduled: Catch up</ToastTitle>
-            <ToastDescription>Friday, February 10, 2023 at 5:57 PM</ToastDescription>
+            <Button
+              variant="warning"
+              onClick={() =>
+                showToast({
+                  variant: 'warning',
+                  title: 'Session expiring',
+                  description: 'Your session will expire in 2 minutes',
+                  urgency: 'high',
+                  hasAction: true,
+                })
+              }
+            >
+              Warning (8s + Action)
+            </Button>
+
+            <Button
+              variant="destructive"
+              onClick={() =>
+                showToast({
+                  variant: 'error',
+                  title: 'Upload failed',
+                  description: 'Network connection lost. Your work is saved.',
+                  urgency: 'high',
+                  persistent: true,
+                  hasAction: true,
+                })
+              }
+            >
+              Error (Persistent)
+            </Button>
           </div>
-          <ToastClose />
-        </Toast>
-      </ToastProvider>
-    );
-  },
-};
 
-export const WithAction: Story = {
-  render: () => {
-    const [open, setOpen] = useState(false);
+          <ToastViewport />
 
-    return (
-      <ToastProvider>
-        <Button variant="outline" onClick={() => setOpen(true)}>
-          Show Toast with Action
-        </Button>
-
-        <ToastViewport />
-
-        <Toast open={open} onOpenChange={setOpen}>
-          <div className="grid gap-1">
-            <ToastTitle>Uh oh! Something went wrong</ToastTitle>
-            <ToastDescription>There was a problem with your request.</ToastDescription>
-          </div>
-          <ToastAction altText="Try again">Try again</ToastAction>
-          <ToastClose />
-        </Toast>
-      </ToastProvider>
-    );
-  },
-};
-
-export const Success: Story = {
-  render: () => {
-    const [open, setOpen] = useState(false);
-
-    return (
-      <ToastProvider>
-        <Button variant="outline" onClick={() => setOpen(true)}>
-          Show Success Toast
-        </Button>
-
-        <ToastViewport />
-
-        <Toast open={open} onOpenChange={setOpen} variant="success">
-          <div className="grid gap-1">
-            <ToastTitle>Success!</ToastTitle>
-            <ToastDescription>Your file has been uploaded successfully.</ToastDescription>
-          </div>
-          <ToastClose />
-        </Toast>
-      </ToastProvider>
-    );
-  },
-};
-
-export const Warning: Story = {
-  render: () => {
-    const [open, setOpen] = useState(false);
-
-    return (
-      <ToastProvider>
-        <Button variant="outline" onClick={() => setOpen(true)}>
-          Show Warning Toast
-        </Button>
-
-        <ToastViewport />
-
-        <Toast open={open} onOpenChange={setOpen} variant="warning">
-          <div className="grid gap-1">
-            <ToastTitle>Warning</ToastTitle>
-            <ToastDescription>Your session will expire in 5 minutes.</ToastDescription>
-          </div>
-          <ToastAction altText="Extend session">Extend</ToastAction>
-          <ToastClose />
-        </Toast>
-      </ToastProvider>
-    );
-  },
-};
-
-export const ErrorToast: Story = {
-  render: () => {
-    const [open, setOpen] = useState(false);
-
-    return (
-      <ToastProvider>
-        <Button variant="outline" onClick={() => setOpen(true)}>
-          Show Error Toast
-        </Button>
-
-        <ToastViewport />
-
-        <Toast
-          open={open}
-          onOpenChange={setOpen}
-          variant="error"
-          urgency="high"
-          interruption="demanding"
-          persistent={true}
-        >
-          <div className="grid gap-1">
-            <ToastTitle>Error</ToastTitle>
-            <ToastDescription>Failed to save your changes. Please try again.</ToastDescription>
-          </div>
-          <ToastAction altText="Retry saving">Retry</ToastAction>
-          <ToastClose />
-        </Toast>
-      </ToastProvider>
+          {toasts.map((toast) => (
+            <Toast
+              key={toast.id}
+              open={true}
+              onOpenChange={() => hideToast(toast.id)}
+              variant={toast.variant}
+              urgency={toast.urgency}
+              persistent={toast.persistent}
+              {...args}
+            >
+              <div className="grid gap-1">
+                <ToastTitle>{toast.title}</ToastTitle>
+                <ToastDescription>{toast.description}</ToastDescription>
+              </div>
+              {toast.hasAction && (
+                <ToastAction altText="Take action" onClick={fn()}>
+                  {toast.variant === 'warning' ? 'Extend' : 'Retry'}
+                </ToastAction>
+              )}
+              <ToastClose />
+            </Toast>
+          ))}
+        </ToastProvider>
+      </div>
     );
   },
 };

@@ -1,0 +1,41 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import * as Stories from './Progress.stories.tsx';
+
+<Meta title="03 Components/Feedback/Progress" of={Stories} name="Overview" />
+
+# Progress
+Progress indicators communicate time and completion status for operations longer than 2 seconds. They transform waiting into understanding through intelligent time estimation and clear status feedback.
+
+<Canvas of={Stories.Common} />
+
+## Usage Guidelines
+Progress indicators should match the real characteristics of work being performed. Choose patterns that build trust through accurate time estimation and honest visual feedback.
+
+#### DOs
+- **Time Estimation**
+  - Use linear patterns for consistent operations (file transfers)
+  - Use accelerating patterns for operations that speed up (downloads with caching)
+  - Use decelerating patterns for complex finalization steps
+  - Provide accurate time estimates based on current performance
+- **Complexity Levels**
+  - Use simple complexity for end users and casual operations
+  - Use detailed complexity for professional tools and critical operations
+  - Include pause/cancel controls for long-running user-initiated processes
+  - Show step indicators for multi-phase operations
+
+#### DON'Ts
+- **Progress Patterns**
+  - Never show fake progress to appear faster
+  - Don't use progress for operations under 1 second
+  - Avoid indeterminate spinners when progress can be measured
+  - Don't provide inaccurate time estimates that destroy trust
+- **Information Density**
+  - Don't overwhelm users with unnecessary details in simple contexts
+  - Avoid showing controls for system-critical operations that cannot be interrupted
+  - Don't use progress for decorative animations without functional purpose
+
+#### Use Cases
+- **File Operations**: Upload, download, backup with pause/cancel controls
+- **System Operations**: Installation, updates with step-by-step breakdown
+- **Data Processing**: Analysis, imports with intelligent time estimation
+- **Multi-step Workflows**: Setup, onboarding with clear phase indicators
