@@ -1,0 +1,172 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import * as Stories from './ProgressIntelligence.stories.tsx';
+
+<Meta title="03 Components/Feedback/Progress" of={Stories} name="Overview" />
+
+# Progress Component
+
+Time is the most precious resource in user interfaces. Progress indicators transform waiting into understanding, anxiety into confidence, and uncertainty into trust.
+
+## Design Intelligence
+
+**Cognitive Load: 4/10** - Moderate attention required for progress monitoring  
+**Trust Building: Critical** - Accurate progress communication builds user confidence  
+**Attention Economics: Temporal** - Holds attention during wait states, then gracefully releases it  
+
+## Core Principles
+
+### Time Estimation Intelligence
+Progress without time context creates anxiety. Our intelligent time estimation helps users make informed decisions about their attention:
+
+- **Predictive Timing**: Smart algorithms calculate remaining time based on progress patterns
+- **Contextual Precision**: Different accuracy levels for different task types
+- **Graceful Uncertainty**: Clear communication when time cannot be estimated
+
+### Progress Patterns
+Different types of work have different progress characteristics. Visual patterns should match reality:
+
+- **Linear**: Steady progress for predictable tasks (file transfers, simple operations)
+- **Accelerating**: Starts slow, speeds up (downloads, caching, initial processing)
+- **Decelerating**: Fast start, slows down (complex calculations, finalization steps)
+- **Pulsing**: Active but indeterminate (waiting for external responses)
+
+### Completion Intelligence
+The moment of completion is crucial for user experience:
+
+- **Clear Success States**: Unmistakable visual confirmation of completion
+- **Next Action Guidance**: Clear direction on what happens next
+- **Error Recovery**: Constructive failure states with recovery options
+
+## Communication Intelligence Patterns
+
+### Cognitive Load Optimization
+Information density should match user context and capacity:
+
+**Simple Mode** (cognitive load = 2/10):
+- Progress bar only
+- Percentage optional
+- Minimal text
+
+**Detailed Mode** (cognitive load = 6/10):
+- Progress bar with timeline
+- Descriptive text
+- Control options
+- Step-by-step breakdown
+
+### Motor Accessibility
+Users need control over long-running processes:
+
+- **Pausable Progress**: Allow users to pause when appropriate
+- **Cancellable Operations**: Clear escape routes for unwanted processes
+- **Resume Intelligence**: Smart resumption after pauses or interruptions
+
+## Usage Guidelines
+
+### ✅ When to Use Progress
+- Any operation taking longer than 2 seconds
+- File uploads, downloads, installations
+- Data processing or complex calculations
+- Multi-step workflows
+- Loading states with known duration
+
+### ❌ When Not to Use
+- Very quick operations (< 1 second)
+- When progress cannot be measured meaningfully
+- Simple loading states without time component
+- Decorative animations without functional purpose
+
+## Intelligence Examples
+
+### File Upload Progress
+```tsx
+<Progress 
+  value={73} 
+  showTime 
+  showPercentage
+  pattern="linear"
+  pausable
+  cancellable
+  label="Uploading presentation.pptx"
+  description="15.7 MB of 21.3 MB"
+  estimatedTime={120000}
+  onPause={() => console.log('Paused')}
+  onCancel={() => console.log('Cancelled')}
+/>
+```
+
+**Intelligence Applied**:
+- Linear pattern matches consistent upload speeds
+- Time estimation based on current transfer rate
+- Pausable/cancellable for user control
+- Clear file context and data transferred
+
+### Installation Progress
+```tsx
+<Progress 
+  variant="steps" 
+  currentStep={2} 
+  totalSteps={4}
+  showSteps
+  complexity="detailed"
+  label="Installing React Components"
+  description="Setting up development environment..."
+>
+  <ProgressStep completed>Download dependencies</ProgressStep>
+  <ProgressStep current>Installing packages</ProgressStep>
+  <ProgressStep>Configuring settings</ProgressStep>
+  <ProgressStep>Finalizing setup</ProgressStep>
+</Progress>
+```
+
+**Intelligence Applied**:
+- Step-based progress for multi-phase operations
+- Detailed complexity for technical users
+- Clear phase descriptions
+- Visual step completion indicators
+
+### Data Processing Progress
+```tsx
+<Progress 
+  value={89} 
+  showTime 
+  pattern="decelerating"
+  complexity="simple"
+  label="Processing customer data"
+  description="Analyzing 50,000 records..."
+  timeRemaining={15000}
+/>
+```
+
+**Intelligence Applied**:
+- Decelerating pattern matches processing complexity
+- Simple complexity for end users
+- Contextual description of work being done
+- Realistic time estimation
+
+## Trust Building Through Progress
+
+### Accurate Time Estimation
+Wrong time estimates destroy user trust. Our intelligent estimation considers:
+
+- Historical data for similar operations
+- Current system performance
+- Network conditions (for uploads/downloads)
+- Graceful degradation when precision isn't possible
+
+### Visual Honesty
+Progress bars should never lie:
+
+- Never show fake progress to "feel faster"
+- Pause visual progress if actual progress stalls
+- Clear error states when operations fail
+- Honest communication about indeterminate states
+
+### Expectation Management
+Help users understand what's happening:
+
+- Clear labels describing the current operation
+- Context about data being processed
+- Step-by-step breakdown for complex operations
+- Realistic time frames that account for variability
+
+The Progress component transforms waiting from a source of anxiety into an opportunity to build trust and demonstrate system intelligence.

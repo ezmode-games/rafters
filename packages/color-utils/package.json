@@ -1,6 +1,6 @@
 {
   "name": "@rafters/color-utils",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OKLCH color utilities, accessibility calculations, and color vision simulation for Rafters",
   "type": "module",
   "private": true,
