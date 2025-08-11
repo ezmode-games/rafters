@@ -71,36 +71,8 @@ export const StateSystemSchema = z.object({
     },
   }),
 
-  // Timing tokens
-  fast: StateTokenSchema.default({
-    name: '--duration-fast',
-    value: '150ms',
-    description:
-      'Fast animation duration. Provides immediate feedback with low cognitive load (2/10). High trust level ensures responsive feel. AAA accessibility compliant for motion sensitivity.',
-    category: 'state',
-    type: 'static',
-    semanticGroup: 'interactive',
-    aiIntelligence: {
-      cognitiveLoad: 2,
-      trustLevel: 'high',
-      accessibilityLevel: 'aaa',
-    },
-  }),
-
-  standard: StateTokenSchema.default({
-    name: '--duration-standard',
-    value: '200ms',
-    description:
-      'Standard animation duration. Balanced timing with moderate cognitive load (3/10). High trust level provides comfortable interaction pace. AAA accessibility for all users.',
-    category: 'state',
-    type: 'static',
-    semanticGroup: 'core',
-    aiIntelligence: {
-      cognitiveLoad: 3,
-      trustLevel: 'high',
-      accessibilityLevel: 'aaa',
-    },
-  }),
+  // NOTE: Timing tokens moved to motion/timing.ts for better semantic organization
+  // These are kept for backwards compatibility and will be deprecated
 
   // Additional opacity states
   hoverSubtle: StateTokenSchema.default({
@@ -163,51 +135,7 @@ export const StateSystemSchema = z.object({
     },
   }),
 
-  // Additional duration tokens
-  instant: StateTokenSchema.default({
-    name: '--duration-instant',
-    value: '50ms',
-    description:
-      'Instant duration. Near-immediate feedback with very low cognitive load (1/10). High trust level provides snappy interactions. Critical for real-time feedback.',
-    category: 'state',
-    type: 'static',
-    semanticGroup: 'interactive',
-    aiIntelligence: {
-      cognitiveLoad: 1,
-      trustLevel: 'high',
-      accessibilityLevel: 'aaa',
-    },
-  }),
-
-  deliberate: StateTokenSchema.default({
-    name: '--duration-deliberate',
-    value: '300ms',
-    description:
-      'Deliberate duration. Thoughtful timing with medium cognitive load (4/10). High trust level encourages consideration. Use for important state changes.',
-    category: 'state',
-    type: 'static',
-    semanticGroup: 'core',
-    aiIntelligence: {
-      cognitiveLoad: 4,
-      trustLevel: 'high',
-      accessibilityLevel: 'aaa',
-    },
-  }),
-
-  slow: StateTokenSchema.default({
-    name: '--duration-slow',
-    value: '500ms',
-    description:
-      'Slow duration. Extended timing with higher cognitive load (6/10). Medium trust level may test patience. Use sparingly for dramatic effects or safety delays.',
-    category: 'state',
-    type: 'static',
-    semanticGroup: 'semantic-state',
-    aiIntelligence: {
-      cognitiveLoad: 6,
-      trustLevel: 'medium',
-      consequence: 'significant',
-    },
-  }),
+  // Additional duration tokens - DEPRECATED: Use motion/timing.ts instead
 
   // Delay tokens
   delayNone: StateTokenSchema.default({

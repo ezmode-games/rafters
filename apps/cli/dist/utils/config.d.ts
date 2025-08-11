@@ -4,23 +4,13 @@ export declare const ConfigSchema: z.ZodObject<{
     componentsDir: z.ZodString;
     storiesDir: z.ZodOptional<z.ZodString>;
     hasStorybook: z.ZodBoolean;
-    packageManager: z.ZodEnum<["npm", "yarn", "pnpm"]>;
+    packageManager: z.ZodEnum<{
+        npm: "npm";
+        yarn: "yarn";
+        pnpm: "pnpm";
+    }>;
     registry: z.ZodString;
-}, "strip", z.ZodTypeAny, {
-    version: string;
-    componentsDir: string;
-    hasStorybook: boolean;
-    packageManager: "npm" | "yarn" | "pnpm";
-    registry: string;
-    storiesDir?: string | undefined;
-}, {
-    version: string;
-    componentsDir: string;
-    hasStorybook: boolean;
-    packageManager: "npm" | "yarn" | "pnpm";
-    registry: string;
-    storiesDir?: string | undefined;
-}>;
+}, z.core.$strip>;
 export type Config = z.infer<typeof ConfigSchema>;
 export declare const defaultConfig: Config;
 export declare function getConfigPath(cwd?: string): string;
