@@ -20,6 +20,7 @@
  * Token knowledge: .rafters/tokens/registry.json
  */
 import * as SliderPrimitive from '@radix-ui/react-slider';
+import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
 import { forwardRef } from 'react';
 import { cn } from '../lib/utils';
 
@@ -89,13 +90,21 @@ const Slider = forwardRef<React.ElementRef<typeof SliderPrimitive.Root>, SliderP
               trackSize === 'large' && 'h-3'
             )}
           >
-            <SliderPrimitive.Range className="absolute h-full bg-primary transition-all duration-200" />
+            <SliderPrimitive.Range
+              className={cn(
+                'absolute h-full bg-primary transition-all',
+                contextTiming.hover,
+                contextEasing.hover
+              )}
+            />
           </SliderPrimitive.Track>
 
           <SliderPrimitive.Thumb
             className={cn(
               'block rounded-full border-2 border-primary bg-background ring-offset-background',
-              'transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+              'transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+              contextTiming.hover,
+              contextEasing.hover,
               'hover:scale-110 active:scale-95 disabled:pointer-events-none disabled:opacity-disabled',
               // Motor accessibility: Enhanced thumb sizes for easier manipulation
               thumbSize === 'default' && 'h-5 w-5',

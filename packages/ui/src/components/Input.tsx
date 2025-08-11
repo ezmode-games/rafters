@@ -1,3 +1,4 @@
+import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
 /**
  * Input Component - AI Intelligence
  *
@@ -63,7 +64,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             'placeholder:text-muted-foreground',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
             'disabled:cursor-not-allowed disabled:opacity-disabled',
-            'transition-all duration-200',
+            'transition-all',
+            contextTiming.hover,
+            contextEasing.hover,
             'hover:opacity-hover',
 
             // Motor accessibility: Enhanced touch targets on mobile
