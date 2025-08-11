@@ -21,7 +21,6 @@
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test-storybook": "vitest run --project=storybook",
     "lint": "biome check .",
     "format": "biome format --write .",
     "type-check": "tsc --noEmit",

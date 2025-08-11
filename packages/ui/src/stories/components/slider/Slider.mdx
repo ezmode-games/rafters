@@ -1,0 +1,101 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import * as Stories from './Slider.stories.tsx';
+
+<Meta title="03 Components/Input/Slider" of={Stories} name="Overview" />
+
+# Slider Component
+
+Precision lives in the balance between control and simplicity. The slider transforms abstract values into tangible, manipulable representations—bridging the gap between human intuition and digital precision.
+
+Our slider system is built on the principle that every interaction should feel naturally responsive while providing the accuracy users need for meaningful control.
+
+## Design Intelligence
+
+### Core Principles
+- **Motor Accessibility First**: Enhanced touch targets and thumb sizes ensure universal usability
+- **Precision with Context**: Value display and units provide immediate feedback for informed decisions  
+- **Trust Through Responsiveness**: Instant visual feedback builds confidence in every adjustment
+- **Progressive Disclosure**: Step indicators and value labels appear when precision matters
+
+### Cognitive Load Management
+- **Base Cognitive Load**: 5/10 (requires understanding current value and precision needs)
+- **With Value Display**: Reduces to 3/10 (immediate feedback eliminates guesswork)
+- **With Step Indicators**: Can increase to 7/10 (additional visual processing required)
+
+The cognitive load varies significantly based on the precision requirements of the task. A volume slider requires minimal cognitive overhead, while a temperature control for medical equipment demands maximum precision and clarity.
+
+### Trust Building Patterns
+- **Immediate Visual Feedback**: Range fill updates in real-time during interaction
+- **Clear Value Communication**: Optional value display with units for precision tasks
+- **Predictable Behavior**: Consistent motion timing across all interactions
+- **Accessible Labels**: ARIA labels provide context for assistive technologies
+
+### Motor Accessibility Intelligence
+- **Enhanced Touch Targets**: 44px minimum touch area on mobile, following iOS and Android guidelines
+- **Thumb Size Options**: Default (20px) and large (24px) variants for different dexterity needs
+- **Track Size Options**: Standard (8px) and large (12px) heights for easier targeting
+- **Hover States**: 110% scale on hover provides clear interaction feedback
+
+## When to Use Sliders
+
+### Optimal Use Cases
+- **Range Selection**: Choosing values within a defined range (volume, brightness, temperature)
+- **Approximate Values**: When precise input matters less than quick adjustment
+- **Real-time Preview**: Settings that benefit from immediate visual feedback
+- **Bounded Ranges**: Clear minimum and maximum values that users understand
+
+### Avoid Sliders When
+- **Precise Input Required**: Use Input fields for exact values (phone numbers, IDs)
+- **Unbounded Ranges**: No clear min/max creates cognitive confusion
+- **Few Options**: 3-5 discrete choices work better as radio buttons
+- **Critical Precision**: Financial amounts, medical dosages need explicit input
+
+## Attention Economics
+
+Sliders naturally draw attention through their interactive affordance. The slider track creates a visual "runway" that guides the eye, while the thumb position communicates current state at a glance.
+
+### Hierarchy Guidelines
+- **Primary Control**: Use for the most important value adjustment in a form
+- **Supporting Controls**: Group related sliders with clear visual separation
+- **Label Priority**: Value display should never compete with control interaction
+
+## Usage with Design Intelligence
+
+### Quick Decision Framework
+1. **Motor Accessibility**: Who needs to use this control? Choose appropriate thumb and track sizes
+2. **Precision Requirements**: Does the task need exact values? Show value display and units
+3. **Context Understanding**: Will users benefit from step indicators? Enable for discrete value ranges
+4. **Trust Building**: Always use motion tokens for responsive feedback
+
+### Common Patterns
+- **Settings Panels**: Volume, brightness, notification preferences
+- **Filtering Interfaces**: Price ranges, date ranges, rating filters
+- **Creative Tools**: Opacity, brush size, effect intensity
+- **Data Visualization**: Time series scrubbing, threshold adjustment
+
+## Progressive Enhancement
+
+The slider is built with progressive enhancement at its core:
+
+### Core Experience (Keyboard)
+- Arrow keys adjust value by step amount
+- Page Up/Down for larger increments  
+- Home/End for min/max values
+- Tab navigation between controls
+
+### Enhanced Experience (Mouse/Touch)
+- Drag interaction for continuous adjustment
+- Click-to-position for quick jumps
+- Hover states for interaction feedback
+- Touch-optimized targets for mobile
+
+## Semantic Token Integration
+
+The slider leverages semantic design tokens for consistent behavior:
+
+- **Motion Tokens**: `contextTiming.hover` and `contextEasing.hover` for responsive feedback
+- **Color Tokens**: `bg-primary` for active range, `bg-secondary` for track
+- **Space Tokens**: Systematic padding and margins for proper touch targets
+- **Typography Tokens**: Value display uses monospace for consistent width
+
+This systematic approach ensures sliders feel consistent across your entire interface while maintaining their unique interactive characteristics.
