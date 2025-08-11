@@ -1,3 +1,4 @@
+import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
 /**
  * Card Component - AI Intelligence
  *
@@ -38,7 +39,9 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
     <div
       ref={ref}
       className={cn(
-        'rounded-lg border bg-card text-card-foreground transition-all duration-200',
+        'rounded-lg border bg-card text-card-foreground transition-all',
+        contextTiming.hover,
+        contextEasing.hover,
         // Cognitive load: Information density controls
         {
           'border-border shadow-sm': prominence === 'subtle',

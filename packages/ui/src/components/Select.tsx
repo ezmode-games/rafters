@@ -26,6 +26,7 @@ import {
   MagnifyingGlassIcon,
 } from '@radix-ui/react-icons';
 import * as SelectPrimitive from '@radix-ui/react-select';
+import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
 import { forwardRef, useState } from 'react';
 import { cn } from '../lib/utils';
 
@@ -51,7 +52,9 @@ const SelectTrigger = forwardRef<
       'placeholder:text-muted-foreground',
       'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
       'disabled:cursor-not-allowed disabled:opacity-disabled',
-      'transition-all duration-200 hover:opacity-hover',
+      'transition-all hover:opacity-hover',
+      contextTiming.hover,
+      contextEasing.hover,
       '[&>span]:line-clamp-1',
       // Motor accessibility: Enhanced touch targets
       size === 'default' && 'h-10 py-2 min-h-[40px] sm:min-h-[40px]',
@@ -134,6 +137,9 @@ const SelectContent = forwardRef<
           ref={ref}
           className={cn(
             'relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md',
+            'transition-all',
+            contextTiming.modal,
+            contextEasing.modalEnter,
             'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
             'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
             position === 'popper' &&

@@ -19,6 +19,7 @@
  * Token knowledge: .rafters/tokens/registry.json
  */
 import { Slot } from '@radix-ui/react-slot';
+import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
 import { forwardRef } from 'react';
 import { cn } from '../lib/utils';
 
@@ -68,7 +69,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           'inline-flex items-center justify-center rounded-md text-sm font-medium',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           'disabled:pointer-events-none disabled:opacity-disabled',
-          'transition-all duration-200',
+          'transition-all',
+          contextTiming.hover,
+          contextEasing.hover,
           'hover:opacity-hover active:scale-active',
 
           // Loading state reduces opacity for trust-building

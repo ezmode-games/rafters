@@ -1,3 +1,4 @@
+import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Input } from '../../../components/Input';
@@ -182,4 +183,69 @@ export const TrustBuilding: Story = {
       </div>
     </div>
   ),
+};
+
+/**
+ * Motion Intelligence
+ *
+ * Documents the motion design tokens and intelligence patterns used by Input components.
+ * Shows how timing and easing choices support form validation and trust building.
+ */
+export const MotionIntelligence: Story = {
+  render: () => {
+    return (
+      <div className="space-y-6 max-w-2xl p-6">
+        {/* Motion Token Documentation */}
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold">Motion Tokens Used</h3>
+          <ul className="text-sm space-y-1 font-mono">
+            <li>
+              <code>contextTiming.hover</code> - {contextTiming.hover} (75ms)
+            </li>
+            <li>
+              <code>contextEasing.hover</code> - {contextEasing.hover} (snappy response)
+            </li>
+          </ul>
+        </div>
+
+        {/* Design Intelligence Integration */}
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold">Design Intelligence</h3>
+          <ul className="text-sm space-y-1">
+            <li>
+              <strong>Cognitive Load:</strong> 2/10 - Simple data entry with immediate feedback
+            </li>
+            <li>
+              <strong>Trust Building:</strong> Responsive transitions reduce form anxiety
+            </li>
+            <li>
+              <strong>Form Flow:</strong> Smooth hover states encourage interaction
+            </li>
+          </ul>
+        </div>
+
+        {/* Interactive Demo */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Motion Demonstration</h3>
+          <div className="space-y-3">
+            <Input placeholder="Hover and focus to experience motion intelligence" />
+            <Input variant="success" value="Valid input" readOnly />
+            <Input variant="error" value="Error state motion" readOnly />
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Input motion tokens provide instant 75ms feedback for hover and focus states, building
+            trust through responsive form interactions without cognitive overhead.
+          </p>
+        </div>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Motion intelligence patterns showing how timing and easing tokens support Input component validation and trust-building interactions.',
+      },
+    },
+  },
 };

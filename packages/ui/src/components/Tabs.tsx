@@ -20,6 +20,7 @@
  * Token knowledge: .rafters/tokens/registry.json
  */
 import * as TabsPrimitive from '@radix-ui/react-tabs';
+import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
 import { forwardRef } from 'react';
 import { cn } from '../lib/utils';
 
@@ -95,6 +96,8 @@ const TabsTrigger = forwardRef<React.ElementRef<typeof TabsPrimitive.Trigger>, T
       disabled={disabled}
       className={cn(
         'inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-all',
+        contextTiming.hover,
+        contextEasing.hover,
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         'disabled:pointer-events-none disabled:opacity-disabled',
 

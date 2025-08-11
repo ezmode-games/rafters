@@ -21,6 +21,7 @@
  * Trust-building patterns: clear consequences, escape hatches, familiar flows
  */
 import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
 import { forwardRef } from 'react';
 import { cn } from '../lib/utils';
 
@@ -131,7 +132,10 @@ export const DialogContent = forwardRef<
           },
 
           // Trust pattern: Smooth animations reduce cognitive jarring
-          'duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out',
+          'transition-all',
+          contextTiming.modal,
+          contextEasing.modalEnter,
+          'data-[state=open]:animate-in data-[state=closed]:animate-out',
           'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
           'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
           'data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]',
