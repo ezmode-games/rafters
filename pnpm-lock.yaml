@@ -420,6 +420,9 @@ importers:
       '@radix-ui/react-toast':
         specifier: ^1.2.14
         version: 1.2.14(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      '@rafters/design-tokens':
+        specifier: workspace:*
+        version: link:../design-tokens
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -6741,6 +6744,26 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@vitest/browser@3.2.4(playwright@1.54.1)(vite@5.4.19(@types/node@20.19.1)(lightningcss@1.30.1))(vitest@3.2.4)':
+    dependencies:
+      '@testing-library/dom': 10.4.0
+      '@testing-library/user-event': 14.6.1(@testing-library/dom@10.4.0)
+      '@vitest/mocker': 3.2.4(vite@5.4.19(@types/node@20.19.1)(lightningcss@1.30.1))
+      '@vitest/utils': 3.2.4
+      magic-string: 0.30.17
+      sirv: 3.0.1
+      tinyrainbow: 2.0.0
+      vitest: 3.2.4(@types/debug@4.1.12)(@types/node@20.19.1)(@vitest/browser@3.2.4)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.30.1)(tsx@4.20.3)
+      ws: 8.18.2
+    optionalDependencies:
+      playwright: 1.54.1
+    transitivePeerDependencies:
+      - bufferutil
+      - msw
+      - utf-8-validate
+      - vite
+    optional: true
+
   '@vitest/browser@3.2.4(playwright@1.54.1)(vite@7.0.6(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.3))(vitest@3.2.4)':
     dependencies:
       '@testing-library/dom': 10.4.0
@@ -8948,7 +8971,7 @@ snapshots:
     optionalDependencies:
       '@types/debug': 4.1.12
       '@types/node': 20.19.1
-      '@vitest/browser': 3.2.4(playwright@1.54.1)(vite@7.0.6(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.3))(vitest@3.2.4)
+      '@vitest/browser': 3.2.4(playwright@1.54.1)(vite@5.4.19(@types/node@20.19.1)(lightningcss@1.30.1))(vitest@3.2.4)
       '@vitest/ui': 3.2.4(vitest@3.2.4)
       jsdom: 26.1.0
     transitivePeerDependencies:

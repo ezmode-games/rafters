@@ -1,4 +1,5 @@
 import * as ProgressPrimitive from '@radix-ui/react-progress';
+import { contextEasing, contextTiming, easing, timing } from '@rafters/design-tokens/motion';
 import { type VariantProps, cva } from 'class-variance-authority';
 import { type ComponentPropsWithoutRef, type ElementRef, forwardRef } from 'react';
 import { cn } from '../lib/utils';
@@ -35,9 +36,9 @@ const progressVariants = cva(
       },
       pattern: {
         linear: '',
-        accelerating: '[&>div]:transition-all [&>div]:duration-300 [&>div]:ease-out',
-        decelerating: '[&>div]:transition-all [&>div]:duration-500 [&>div]:ease-in',
-        pulsing: '[&>div]:animate-pulse',
+        accelerating: `[&>div]:transition-all [&>div]:${contextTiming.modal} [&>div]:${contextEasing.modalEnter}`,
+        decelerating: `[&>div]:transition-all [&>div]:${contextTiming.progress} [&>div]:${contextEasing.modalExit}`,
+        pulsing: `[&>div]:${contextTiming.skeleton} [&>div]:${contextEasing.loading} [&>div]:pulse-animation`,
       },
       complexity: {
         simple: 'gap-1',
@@ -55,10 +56,10 @@ const progressVariants = cva(
 const progressIndicatorVariants = cva('h-full w-full flex-1 bg-primary transition-all', {
   variants: {
     pattern: {
-      linear: 'transition-transform duration-300 ease-linear',
-      accelerating: 'transition-transform duration-300 ease-out',
-      decelerating: 'transition-transform duration-500 ease-in',
-      pulsing: 'animate-pulse',
+      linear: `transition-transform ${contextTiming.progress} ${contextEasing.progress}`,
+      accelerating: `transition-transform ${contextTiming.modal} ${contextEasing.modalEnter}`,
+      decelerating: `transition-transform ${contextTiming.progress} ${contextEasing.modalExit}`,
+      pulsing: `${contextTiming.skeleton} ${contextEasing.loading} animate-pulse`,
     },
     status: {
       default: 'bg-primary',
@@ -284,7 +285,7 @@ const Progress = forwardRef<ElementRef<typeof ProgressPrimitive.Root>, ProgressP
                           isCompleted ? 'Completed' : isCurrent ? 'In Progress' : 'Not Started'
                         }`}
                         className={cn(
-                          'h-2 flex-1 rounded-full transition-colors',
+                          `h-2 flex-1 rounded-full transition-colors ${contextTiming.progress} ${contextEasing.progress}`,
                           isCompleted && 'bg-primary',
                           isCurrent && 'bg-primary/50',
                           !isCompleted && !isCurrent && 'bg-background-subtle'

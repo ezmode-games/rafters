@@ -8,6 +8,7 @@ export * from './schemas/colors';
 export * from './schemas/typography';
 export * from './schemas/spacing';
 export * from './schemas/state';
+export * from './schemas/motion';
 export * from './schemas/border';
 export * from './schemas/shadow';
 export * from './schemas/ring';
@@ -16,6 +17,7 @@ export * from './schemas/opacity';
 import { z } from 'zod';
 import { BorderSystemSchema } from './schemas/border';
 import { ColorSystemSchema } from './schemas/colors';
+import { MotionSystemSchema } from './schemas/motion';
 import { OpacitySystemSchema } from './schemas/opacity';
 import { RingSystemSchema } from './schemas/ring';
 import { ShadowSystemSchema } from './schemas/shadow';
@@ -30,6 +32,7 @@ export const GrayscaleDesignSystemSchema = z
     typography: TypographySystemSchema,
     spacing: SpacingSystemSchema,
     state: StateSystemSchema,
+    motion: MotionSystemSchema,
     border: BorderSystemSchema,
     shadow: ShadowSystemSchema,
     ring: RingSystemSchema,
@@ -75,6 +78,8 @@ export const GrayscaleDesignSystemSchema = z
       ...Object.values(data.typography),
       ...Object.values(data.spacing),
       ...Object.values(data.state),
+      ...Object.values(data.motion.timing),
+      ...Object.values(data.motion.easing),
       ...Object.values(data.border),
       ...Object.values(data.shadow),
       ...Object.values(data.ring),
@@ -111,6 +116,10 @@ export const defaultGrayscaleSystem = GrayscaleDesignSystemSchema.parse({
   typography: {},
   spacing: {},
   state: {},
+  motion: {
+    timing: {},
+    easing: {},
+  },
   border: {},
   shadow: {},
   ring: {},

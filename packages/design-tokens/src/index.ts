@@ -19,6 +19,7 @@ const TokenSchema = z.object({
     'spacing',
     'state',
     'timing',
+    'easing',
     'opacity',
     'scaling',
     'border',
@@ -300,3 +301,8 @@ export * from './grayscale';
 export * from './color-tool';
 export { designSystemsAPI } from './api';
 export * from './cli';
+
+// Export motion tokens
+export * from './motion/timing';
+export * from './motion/easing';
+export * from './schemas/motion';

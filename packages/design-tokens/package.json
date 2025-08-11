@@ -11,6 +11,10 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./motion": {
+      "import": "./dist/motion/index.js",
+      "types": "./dist/motion/index.d.ts"
     }
   },
   "files": ["dist", "tokens", "README.md"],
