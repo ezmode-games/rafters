@@ -285,7 +285,7 @@ const Progress = forwardRef<ElementRef<typeof ProgressPrimitive.Root>, ProgressP
                           isCompleted ? 'Completed' : isCurrent ? 'In Progress' : 'Not Started'
                         }`}
                         className={cn(
-                          `h-2 flex-1 rounded-full transition-colors ${timing.standard} ${easing.smooth}`,
+                          `h-2 flex-1 rounded-full transition-colors ${contextTiming.progress} ${contextEasing.progress}`,
                           isCompleted && 'bg-primary',
                           isCurrent && 'bg-primary/50',
                           !isCompleted && !isCurrent && 'bg-background-subtle'
