@@ -38,7 +38,7 @@ const progressVariants = cva(
         linear: '',
         accelerating: `[&>div]:transition-all [&>div]:${contextTiming.modal} [&>div]:${contextEasing.modalEnter}`,
         decelerating: `[&>div]:transition-all [&>div]:${contextTiming.progress} [&>div]:${contextEasing.modalExit}`,
-        pulsing: `[&>div]:${contextTiming.skeleton} [&>div]:${contextEasing.loading} [&>div]:animate-pulse`,
+        pulsing: `[&>div]:${contextTiming.skeleton} [&>div]:${contextEasing.loading} [&>div]:pulse-animation`,
       },
       complexity: {
         simple: 'gap-1',
