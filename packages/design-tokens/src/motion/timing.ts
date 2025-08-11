@@ -50,6 +50,43 @@ export const timing = {
 } as const;
 
 /**
+ * Accessibility-compliant timing tokens for Section 508 and strict WCAG compliance
+ * Use when AI agents need to build for federal/government requirements
+ */
+export const accessibilityTiming = {
+  /**
+   * Instant feedback with full accessibility compliance
+   * 0ms for reduced motion prevents vestibular symptoms
+   */
+  instant: 'duration-75 motion-reduce:duration-[0ms]',
+
+  /**
+   * Fast interactions with full accessibility compliance
+   */
+  fast: 'duration-150 motion-reduce:duration-[0ms]',
+
+  /**
+   * Standard transitions with full accessibility compliance
+   */
+  standard: 'duration-300 motion-reduce:duration-[0ms]',
+
+  /**
+   * Deliberate timing with full accessibility compliance
+   */
+  deliberate: 'duration-500 motion-reduce:duration-[0ms]',
+
+  /**
+   * Slow transitions with full accessibility compliance
+   */
+  slow: 'duration-700 motion-reduce:duration-[0ms]',
+
+  /**
+   * Dramatic timing with full accessibility compliance
+   */
+  dramatic: 'duration-1000 motion-reduce:duration-[0ms]',
+} as const;
+
+/**
  * Context-specific timing tokens for common UI patterns
  * AI agents use these for informed UX decisions in specific contexts
  */
@@ -122,15 +159,40 @@ export const contextTiming = {
 } as const;
 
 /**
+ * Accessibility-compliant context timing for Section 508 compliance
+ */
+export const accessibilityContextTiming = {
+  hover: accessibilityTiming.instant,
+  focus: accessibilityTiming.fast,
+  modal: accessibilityTiming.standard,
+  toast: accessibilityTiming.standard,
+  progress: accessibilityTiming.deliberate,
+  navigation: accessibilityTiming.slow,
+  guidance: accessibilityTiming.dramatic,
+  search: accessibilityTiming.standard,
+  longPress: accessibilityTiming.deliberate,
+  tooltip: accessibilityTiming.fast,
+  skeleton: accessibilityTiming.slow,
+} as const;
+
+/**
  * Type definitions for timing tokens
  */
 export type TimingToken = (typeof timing)[keyof typeof timing];
 export type ContextTimingToken = (typeof contextTiming)[keyof typeof contextTiming];
+export type AccessibilityTimingToken =
+  (typeof accessibilityTiming)[keyof typeof accessibilityTiming];
+export type AccessibilityContextTimingToken =
+  (typeof accessibilityContextTiming)[keyof typeof accessibilityContextTiming];
 
 /**
  * Union type for all timing tokens - AI agents can use this for type safety
  */
-export type AllTimingTokens = TimingToken | ContextTimingToken;
+export type AllTimingTokens =
+  | TimingToken
+  | ContextTimingToken
+  | AccessibilityTimingToken
+  | AccessibilityContextTimingToken;
 
 /**
  * Motion timing intelligence for AI decision-making

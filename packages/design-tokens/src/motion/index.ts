@@ -18,9 +18,13 @@ export * from './patterns';
 export {
   timing,
   contextTiming,
+  accessibilityTiming,
+  accessibilityContextTiming,
   timingIntelligence,
   type TimingToken,
   type ContextTimingToken,
+  type AccessibilityTimingToken,
+  type AccessibilityContextTimingToken,
   type AllTimingTokens,
   type TimingIntelligence,
 } from './timing';

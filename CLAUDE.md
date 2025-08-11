@@ -1,3 +1,99 @@
+# MANDATORY REQUIREMENTS - READ FIRST
+
+## UI/UX WORK - MANDATORY SAMI CONSULTATION:
+**BEFORE ANY UI/UX WORK - ALWAYS USE SAMI AGENT**
+- Sami enforces systematic Rafters design intelligence consumption
+- Prevents hardcoded values, ensures semantic token usage
+- Validates component intelligence before implementation
+- Acts as forcing function to apply embedded design reasoning
+
+## BEFORE ANY CODE - RUN THIS COMMAND:
+```bash
+pnpm preflight
+```
+
+** NEVER commit if preflight fails**
+** NEVER skip this step to "save time"**  
+** NEVER expect CI to catch what you should fix locally**
+** Preflight MUST pass before commit - NO EXCEPTIONS**
+
+## ACCESSIBILITY CONSULTATION - MANDATORY SALLY:
+**BEFORE PREFLIGHT - ALWAYS CONSULT SALLY FOR ACCESSIBILITY REVIEW**
+- Sally ensures WCAG AAA compliance and Section 508 requirements
+- Validates keyboard navigation and screen reader support
+- Reviews reduced motion and high contrast compatibility
+- Required checkpoint before any code commitment
+
+**IGNORING THESE REQUIREMENTS = REJECTED PR**
+
+** NEVER USE FUCKING EMOJI FOR ANYTING **
+## COMPONENT USAGE REQUIREMENTS - MANDATORY:
+
+### 1. READ Component Intelligence BEFORE Using ANY Component
+```tsx
+/**
+ * Dialog Intelligence: cognitiveLoad=7, trustLevel=critical
+ * Use for: Account deletion, data loss, irreversible actions  
+ * Requires: Progressive confirmation patterns, clear escape hatches
+ * NEVER use for: Simple confirmations, low-stakes decisions
+ */
+```
+
+### 2. ALWAYS Use Semantic Tokens - NEVER Arbitrary Values
+```tsx
+// CORRECT - Uses semantic meaning
+<Button className="bg-primary text-primary-foreground">
+
+// WRONG - Arbitrary color values  
+<Button className="bg-blue-500 text-white">
+```
+
+### 3. FOLLOW 7-File Story Architecture for New Components
+**MANDATORY files for every component:**
+1. `ComponentName.mdx` - Overview Documentation
+2. `ComponentName.stories.tsx` - Primary Story (with `onClick: fn()`)
+3. `ComponentNameIntelligence.stories.tsx` - Design Intelligence
+4. `ComponentNameVariants.stories.tsx` - Visual Variants
+5. `ComponentNameProperties.stories.tsx` - Interactive Properties  
+6. `ComponentNameSemantic.stories.tsx` - Semantic Usage
+7. `ComponentNameAccessibility.stories.tsx` - Accessibility Compliance
+
+### 4. RUN Tests Before Committing
+```bash
+pnpm test
+```
+
+** Broken stories = Corrupted AI training data**
+
+## CRITICAL DEVELOPMENT STANDARDS
+
+### Code Quality Requirements - NON-NEGOTIABLE:
+1. **Strict TypeScript** - NEVER use `any`, ALWAYS explicit return types
+2. **Zod Everywhere** - ALL external data MUST be validated with Zod schemas
+3. **TDD Required** - Write tests FIRST, then implementation
+4. **Error Boundaries** - Structured error handling with recovery strategies
+5. **No `.then()` Chaining** - ALWAYS use `await` for async operations
+6. **No Array Index as Keys** - NEVER use array indices as React keys
+
+### Lefthook Pre-commit Will BLOCK Commits Unless:
+- `pnpm biome check` passes
+- `pnpm vitest run` passes (includes story tests)
+- All TypeScript compiles without errors
+- No linting violations
+
+## DESIGN INTELLIGENCE QUICK REFERENCE
+
+**BEFORE implementing any interface, apply this framework:**
+
+1. **Attention**: What deserves user focus? → [Attention Economics](./packages/ui/src/stories/AttentionEconomics.mdx)
+2. **Cognition**: How much mental effort? → [Cognitive Load](./packages/ui/src/stories/CognitiveLoad.mdx)  
+3. **Space**: How does whitespace create hierarchy? → [Negative Space](./packages/ui/src/stories/NegativeSpace.mdx)
+4. **Typography**: How does text support information flow? → [Typography Intelligence](./packages/ui/src/stories/TypographyIntelligence.mdx)
+5. **Enhancement**: What's core vs. enhanced? → [Progressive Enhancement](./packages/ui/src/stories/ProgressiveEnhancement.mdx)
+6. **Trust**: What's the consequence level? → [Trust Building](./packages/ui/src/stories/TrustBuilding.mdx)
+
+---
+
 # Claude AI Assistant Instructions for Rafters
 
 ## Human-AI Design Collaboration System
@@ -50,16 +146,6 @@ Instead of guessing, read the embedded guidance:
 - **Spatial Relationships**: Use negative space to create hierarchy and breathing room
 - **Information Architecture**: Apply typography intelligence for scannable content
 
-### **Quick Decision Framework**
-Before implementing any interface, apply this intelligence integration process:
-
-1. **Attention**: What deserves user focus? Apply [Attention Economics](./packages/ui/src/stories/AttentionEconomics.mdx) principles
-2. **Cognition**: How much mental effort? Follow [Cognitive Load](./packages/ui/src/stories/CognitiveLoad.mdx) guidelines  
-3. **Space**: How does whitespace create hierarchy? Use [Negative Space](./packages/ui/src/stories/NegativeSpace.mdx) mastery
-4. **Typography**: How does text support information flow? Apply [Typography Intelligence](./packages/ui/src/stories/TypographyIntelligence.mdx)
-5. **Enhancement**: What's core vs. enhanced? Follow [Progressive Enhancement](./packages/ui/src/stories/ProgressiveEnhancement.mdx)
-6. **Trust**: What's the consequence level? Use [Trust Building](./packages/ui/src/stories/TrustBuilding.mdx) patterns
-
 ### **Use Familiar Tailwind Classes with Intelligence**
 Standard Tailwind syntax powered by semantic tokens:
 
@@ -83,40 +169,7 @@ Apply the embedded design knowledge to:
 - Create clear attention hierarchy and information flow
 - Ensure progressive enhancement and universal access
 
-## Critical Development Standards
-
-### 🚨 MANDATORY PREFLIGHT CHECKS - READ FIRST 🚨
-
-**BEFORE ANY COMMIT OR PR - AI AGENTS MUST RUN:**
-
-```bash
-pnpm preflight
-```
-
-This single command runs: format → lint → type-check → test → build in sequence.
-
-**❌ NEVER COMMIT if preflight fails**
-**❌ NEVER skip preflight to "save time"**
-**❌ NEVER expect CI to catch what you should fix locally**
-
-**✅ Preflight must pass before commit - no exceptions**
-
-See [docs/CODING_STANDARDS.md](./docs/CODING_STANDARDS.md) Section 13 for complete preflight requirements.
-
-### Code Quality Requirements
-
-**You MUST follow these standards strictly:**
-
-1. **Strict TypeScript** - Never use `any`, always explicit return types
-2. **Zod Everywhere** - All external data validated with Zod schemas
-3. **TDD Required** - Write tests first, then implementation
-4. **Error Boundaries** - Structured error handling with recovery strategies
-5. **No `.then()` Chaining** - Always use `await` for async operations
-6. **No Array Index as Keys** - Never use array indices as React keys. Use semantic identifiers like `\`item-${i}\`` or unique IDs
-
-See [docs/CODING_STANDARDS.md](./docs/CODING_STANDARDS.md) for complete requirements.
-
-### Testing Requirements with Vitest
+## Testing Requirements with Vitest
 
 **All Storybook stories are tested with Vitest** through `@storybook/addon-vitest`. Stories are AI training data that must function correctly:
 
@@ -144,33 +197,6 @@ export const Primary: Story = {
 }
 // This story runs as a test in browser environment
 ```
-
-### Lefthook Pre-commit Constraints
-
-**Lefthook will BLOCK commits unless these pass:**
-
-1. **Biome Check** - `pnpm biome check` must pass
-2. **Vitest Run** - `pnpm vitest run` must pass (includes story tests)
-
-**Current lefthook.yml:**
-```yaml
-pre-commit:
-  commands:
-    biome:
-      run: pnpm biome check --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files}
-      glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}"
-      stage_fixed: true
-```
-
-**This means:**
-- All TypeScript must compile without errors
-- All tests (including stories) must pass
-- Code formatting must be consistent
-- No linting violations allowed
-
-## Testing Recommendations
-
-- **Prefer SpyOn over Mock in tests** - SpyOn provides more natural and transparent test behavior
 
 ## AI Training Standards (Storybook)
 
@@ -390,22 +416,6 @@ export const Primary: Story = {
 
 **Complete 7-File Architecture**: See [docs/STORYBOOK_STANDARDS.md](./docs/STORYBOOK_STANDARDS.md) for detailed implementation guides and examples for all 7 file types.
 
-## Testing Requirements with Vitest
-
-**All Storybook stories are tested with Vitest** through `@storybook/addon-vitest`. Stories are AI training data that must function correctly:
-
-- **Stories are AI training scenarios** - not just documentation but behavior examples
-- **Every story becomes a test case** - ensuring AI guidance actually works
-- **Stories must render without errors** - broken training data corrupts AI learning
-- **Interactive stories must work** - AI needs real behavior patterns to learn from
-
-**Test commands:**
-```bash
-pnpm test              # Run all tests including stories
-pnpm test-storybook    # Run story tests specifically  
-pnpm vitest run        # CI test runner
-```
-
 ## Design Intelligence Integration
 
 See [docs/DESIGN_INTELLIGENCE_PRIMER.md](./docs/DESIGN_INTELLIGENCE_PRIMER.md) for comprehensive design mastery training.
@@ -451,3 +461,7 @@ Prefer design system tokens over arbitrary values:
 - `space-md` over `p-4` (systematic spacing relationships)
 
 This system enables you to create better user experiences by understanding the human design reasoning embedded in every component.
+
+## Testing Recommendations
+
+- **Prefer SpyOn over Mock in tests** - SpyOn provides more natural and transparent test behavior

@@ -276,8 +276,9 @@ const meta = {
 - Destructive confirmation patterns  
 - Attention hierarchy demonstrations
 - Trust-building interaction examples
+- **Motion intelligence patterns** (see Motion Intelligence Documentation below)
 
-**Example stories:** `LoadingState`, `DestructiveConfirm`, `AttentionHierarchy`
+**Example stories:** `LoadingState`, `DestructiveConfirm`, `AttentionHierarchy`, `MotionIntelligence`
 
 ### Variants Story (`ButtonVariants.stories.tsx`)
 **Purpose:** Visual styling variants and semantic meaning
@@ -311,6 +312,176 @@ const meta = {
 - Screen reader compatibility
 - Focus management
 - Color contrast demonstrations
+- **Motion accessibility features** (see Motion Intelligence Documentation below)
+
+## Motion Intelligence Documentation
+
+### Motion Token Integration Standards
+
+Components that use motion design tokens must document their motion intelligence across **multiple story files** to provide comprehensive AI training:
+
+#### Primary Location: Intelligence Stories 🧠
+**`ComponentIntelligence.stories.tsx`** - Main motion intelligence documentation:
+- **WHY motion choices were made** (cognitive load, trust building, attention economics)
+- **Motion context patterns** (contextTiming.hover, contextTiming.modal, etc.)
+- **Interactive demonstrations** showing motion in component's overall intelligence
+- **Decision reasoning** explaining motion's role in design intelligence
+
+```typescript
+export const MotionIntelligence: Story = {
+  render: () => (
+    <div className="space-y-4">
+      <h3>Motion Intelligence: contextTiming.hover + contextEasing.hover</h3>
+      <p>Cognitive Load: 3/10 - Instant feedback builds user confidence</p>
+      <Button>Hover to see motion intelligence</Button>
+      <p className="text-sm text-muted-foreground">
+        Motion tokens provide 75ms instant feedback with snappy easing,
+        building immediate trust through responsive interactions.
+      </p>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Motion intelligence demonstrates how timing and easing tokens support the component\'s design intelligence principles.',
+      },
+    },
+  },
+}
+```
+
+#### Secondary Location: Accessibility Stories ♿
+**`ComponentAccessibility.stories.tsx`** - Motion accessibility aspects:
+- **`prefers-reduced-motion`** compliance demonstration
+- **Accessibility timing options** (standard vs. accessibilityTiming)
+- **Vestibular disorder protection** (0ms durations)
+- **WCAG 2.1 motion guidelines** compliance
+
+```typescript
+export const MotionAccessibility: Story = {
+  render: () => (
+    <div className="space-y-4">
+      <h3>Motion Accessibility</h3>
+      <div className="space-y-2">
+        <Button>Default Motion (contextTiming.hover)</Button>
+        <p className="text-sm text-muted-foreground">
+          Auto-reduces to 1ms duration with prefers-reduced-motion
+        </p>
+      </div>
+      <div className="space-y-2">
+        <Button className={cn('transition-all', accessibilityTiming.hover, easing.smooth)}>
+          Accessibility Compliant (0ms reduced motion)
+        </Button>
+        <p className="text-sm text-muted-foreground">
+          Section 508 compliant with 0ms duration for vestibular disorder protection
+        </p>
+      </div>
+    </div>
+  ),
+}
+```
+
+#### Tertiary Location: Properties Stories ⚙️
+**`ComponentProperties.stories.tsx`** - Interactive motion behavior:
+- **How motion responds** to different props/states
+- **State-specific animations** (hover, focus, disabled, loading)
+- **Motion variation demonstrations** for different component configurations
+
+```typescript
+export const InteractiveStates: Story = {
+  render: () => (
+    <div className="grid grid-cols-2 gap-4">
+      <Button>Normal (hover motion enabled)</Button>
+      <Button disabled>Disabled (no motion)</Button>
+      <Button loading>Loading (progress motion pattern)</Button>
+      <Button variant="destructive">Destructive (deliberate motion timing)</Button>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Motion behavior adapts to component state and variant, using appropriate timing for each interaction context.',
+      },
+    },
+  },
+}
+```
+
+### Motion Documentation Requirements
+
+#### Intelligence Story Motion Section
+Every component with motion tokens MUST include a `MotionIntelligence` story that documents:
+
+1. **Motion Token Usage**: Which tokens (`contextTiming.hover`, `contextEasing.smooth`, etc.)
+2. **Cognitive Load Impact**: How motion affects user mental processing (1-10 scale)
+3. **Trust Building Role**: How motion contributes to user confidence
+4. **Decision Reasoning**: Why these specific timing/easing choices were made
+5. **Interactive Demo**: Hoverable/clickable examples showing motion in action
+
+#### Accessibility Story Motion Section
+Components with motion tokens SHOULD include motion accessibility documentation:
+
+1. **Reduced Motion Compliance**: Show `prefers-reduced-motion` behavior
+2. **Accessibility Options**: Demonstrate `accessibilityTiming` vs standard timing
+3. **WCAG Compliance Notes**: Reference specific WCAG 2.1 motion guidelines
+4. **Vestibular Considerations**: Explain 0ms vs 1ms duration choices
+
+#### Properties Story Motion Integration
+Interactive components SHOULD demonstrate motion across different states:
+
+1. **State-Based Motion**: How motion changes for disabled, loading, error states
+2. **Variant Motion Differences**: Different motion patterns for destructive vs standard variants
+3. **Motion Interaction**: How motion responds to user interactions
+
+### Motion Story Template
+
+```typescript
+/**
+ * Motion Intelligence
+ * 
+ * Documents the motion design tokens and intelligence patterns used by this component.
+ * Shows how timing and easing choices support design intelligence principles.
+ */
+export const MotionIntelligence: Story = {
+  render: () => {
+    return (
+      <div className="space-y-6">
+        {/* Motion Token Documentation */}
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold">Motion Tokens Used</h3>
+          <ul className="text-sm space-y-1">
+            <li><code>contextTiming.hover</code> - {timing.instant} (75ms)</li>
+            <li><code>contextEasing.hover</code> - {easing.snappy} (immediate response)</li>
+          </ul>
+        </div>
+
+        {/* Design Intelligence Integration */}
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold">Design Intelligence</h3>
+          <ul className="text-sm space-y-1">
+            <li><strong>Cognitive Load:</strong> 3/10 - Instant feedback reduces uncertainty</li>
+            <li><strong>Trust Building:</strong> Immediate response builds user confidence</li>
+            <li><strong>Attention Economics:</strong> Motion supports interaction hierarchy</li>
+          </ul>
+        </div>
+
+        {/* Interactive Demo */}
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold">Motion Demonstration</h3>
+          <ComponentName>Hover/click to experience motion intelligence</ComponentName>
+        </div>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Motion intelligence patterns showing how timing and easing tokens support the component\'s design intelligence principles.',
+      },
+    },
+  },
+}
+```
 
 ## Testing Integration with Vitest
 
