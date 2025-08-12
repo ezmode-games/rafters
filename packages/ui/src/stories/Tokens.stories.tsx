@@ -6,7 +6,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
  * across platforms, themes, and application states.
  */
 const meta = {
-  title: '01 Identity/Tokens',
+  title: 'Tokens',
   parameters: {
     layout: 'fullscreen',
     docs: {
@@ -28,7 +28,7 @@ type Story = StoryObj<typeof meta>;
  * vocabulary for design decisions. Our token system enables theming, consistency,
  * and maintainability across all digital experiences.
  */
-export const Overview: Story = {
+export const TokenSystem: Story = {
   render: () => (
     <div className="min-h-screen">
       <div className="container mx-auto px-16 py-32 max-w-7xl">

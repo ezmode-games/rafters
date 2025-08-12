@@ -7,7 +7,7 @@ import { Button } from '../../../components/Button';
  * They provide immediate understanding of action consequences.
  */
 const meta = {
-  title: '03 Components/Action/Button/Semantic Variants',
+  title: 'Components/Button/Semantic Variants',
   component: Button,
   parameters: {
     layout: 'centered',
@@ -18,7 +18,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
   args: { onClick: fn() },
 } satisfies Meta<typeof Button>;
 

@@ -15,7 +15,7 @@ import {
  * Proper semantic structure and interaction patterns benefit everyone.
  */
 const meta = {
-  title: '03 Components/Layout/Card/Accessibility',
+  title: 'Components/Card/Accessibility',
   component: Card,
   parameters: {
     layout: 'centered',
@@ -26,7 +26,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
   args: { onClick: fn() },
 } satisfies Meta<typeof Card>;
 

@@ -11,7 +11,7 @@ import { Button } from '../../../components/Button';
 import { Progress, ProgressStep } from '../../../components/Progress';
 
 const meta = {
-  title: '03 Components/Feedback/Progress/Variants',
+  title: 'Components/Progress/Variants',
   component: Progress,
   parameters: {
     layout: 'centered',

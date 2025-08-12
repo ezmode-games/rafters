@@ -1,124 +1,321 @@
 /* Storybook-specific styles */
 @import "../src/style.css";
 
-/* MDX Typography Styling for Storybook Documentation */
-/* Apply our semantic typography styles to MDX-generated HTML elements */
+/**
+ * BLUEPRINT ECOSYSTEM THEME
+ *
+ * DESIGN PHILOSOPHY:
+ * - Technical precision aesthetic for government/enterprise clients
+ * - Section 508 accessibility compliance through high contrast
+ * - Grid-based visual hierarchy matching architectural blueprints
+ * - Professional confidence building through systematic design
+ */
 
-/* Target Storybook docs pages specifically */
+/* Blueprint Grid Overlay - Subtle Technical Background */
+.sb-main-padded {
+  background-image: linear-gradient(oklch(0.95 0.01 240) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.95 0.01 240) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: -1px -1px;
+}
+
+/* Blueprint Technical Headers */
+.sbdocs h1,
+.sbdocs h2,
+.sbdocs h3 {
+  position: relative;
+  color: oklch(0.25 0.08 240) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.sbdocs h1::before {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: oklch(0.45 0.12 240);
+  border-radius: 1px;
+}
+
+.sbdocs h2::before {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 40px;
+  height: 1px;
+  background: oklch(0.55 0.06 240);
+}
+
+/* Blueprint Code Blocks - Technical Documentation */
+.sbdocs pre,
+.sbdocs code {
+  background: oklch(0.98 0.005 240) !important;
+  border: 1px solid oklch(0.92 0.01 240) !important;
+  font-family: "JetBrains Mono", "Fira Code", monospace !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+
+.sbdocs pre {
+  padding: 16px !important;
+  border-radius: 6px !important;
+  box-shadow: 0 1px 3px oklch(0.85 0.02 240 / 0.1) !important;
+}
+
+/* Blueprint Story Canvas - Technical Precision */
+.docs-story {
+  border: 1px solid oklch(0.88 0.02 240) !important;
+  border-radius: 8px !important;
+  background: oklch(1 0 0) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.docs-story::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    oklch(0.45 0.12 240 / 0.3) 0%,
+    oklch(0.45 0.12 240 / 0.1) 50%,
+    oklch(0.45 0.12 240 / 0.3) 100%
+  );
+  pointer-events: none;
+}
+
+/* Blueprint Navigation - Technical Sidebar */
+.sidebar-container {
+  border-right: 2px solid oklch(0.88 0.02 240) !important;
+  background: oklch(0.985 0.005 240) !important;
+}
+
+/* Blueprint Controls Panel - Technical Interface */
+.panel-container {
+  border-top: 2px solid oklch(0.88 0.02 240) !important;
+  background: oklch(0.99 0.002 240) !important;
+}
+
+/* Section 508 Accessibility Enhancements */
+.sb-show-main {
+  /* Ensure sufficient color contrast for government compliance */
+  color: oklch(0.15 0.005 240) !important;
+}
+
+.sb-bar {
+  /* High contrast toolbar for accessibility */
+  background: oklch(0.97 0.01 240) !important;
+  border-bottom: 1px solid oklch(0.85 0.02 240) !important;
+}
+
+/* Focus indicators for keyboard navigation */
+.sidebar-item:focus,
+.tabbutton:focus,
+button:focus {
+  outline: 2px solid oklch(0.45 0.12 240) !important;
+  outline-offset: 2px !important;
+  border-radius: 4px !important;
+}
+
+/**
+ * MDX Documentation Layout System
+ *
+ * DESIGN PHILOSOPHY:
+ * - Removes Storybook's default constraints that conflict with our design system
+ * - Allows our MDX components to handle all layout and spacing
+ * - Uses Container component philosophy: mx-auto for centering, padding for spacing
+ * - Ensures consistent documentation experience across all pages
+ */
+
+/* Remove Storybook's default documentation container constraints */
 .sbdocs-content,
 .docs-story,
 [data-docs-story],
-#storybook-docs {
-  /* Remove any default Storybook constraints */
+#storybook-docs,
+.sbdocs,
+.sbdocs-wrapper {
+  /* Remove ALL default Storybook layout constraints */
   max-width: none !important;
   padding: 0 !important;
   margin: 0 !important;
-  /* Apply semantic typography to MDX headings */
-  & h1 {
-    @apply heading-display;
-  }
-
-  & h2 {
-    @apply heading-section;
-  }
-
-  & h3 {
-    @apply heading-subsection;
-  }
-
-  & h4 {
-    @apply heading-component;
-  }
-
-  & h5,
-  & h6 {
-    @apply heading-label;
-  }
-
-  /* Apply semantic typography to MDX body text */
-  & p {
-    font-family: var(--font-sans);
-    font-size: var(--text-body);
-    line-height: var(--text-body-line-height);
-    margin-bottom: var(--spacing-phi-1);
-  }
-
-  /* Style MDX lists */
-  & ul,
-  & ol {
-    font-family: var(--font-sans);
-    font-size: var(--text-body);
-    line-height: var(--text-body-line-height);
-    margin-bottom: var(--spacing-phi-1);
-  }
-
-  & li {
-    font-family: var(--font-sans);
-    font-size: var(--text-body);
-    line-height: var(--text-body-line-height);
-    margin-bottom: var(--spacing-phi--2);
-  }
-
-  /* Style MDX code elements */
-  & code {
-    font-family: var(--font-mono);
-    font-size: 0.875rem;
-    background-color: var(--color-muted);
-    padding: 0.125rem 0.25rem;
-    border-radius: var(--radius);
-  }
-
-  & pre {
-    font-family: var(--font-mono);
-    font-size: 0.875rem;
-    background-color: var(--color-muted);
-    padding: var(--spacing-phi-1);
-    border-radius: var(--radius);
-    border: 1px solid var(--color-border);
-    overflow-x: auto;
-  }
-
-  /* Style MDX emphasis */
-  & strong {
-    font-weight: 600;
-  }
-
-  & em {
-    font-style: italic;
-  }
-
-  /* Style MDX links */
-  & a {
-    color: var(--color-primary);
-    transition: color 0.2s ease;
-
-    &:hover {
-      color: var(--color-primary);
-      opacity: var(--opacity-hover);
-    }
-  }
-
-  /* Style MDX horizontal rules */
-  & hr {
-    border-color: var(--color-border);
-    margin: var(--spacing-phi-2) 0;
-  }
-
-  /* Style MDX blockquotes */
-  & blockquote {
-    border-left: 4px solid var(--color-primary);
-    padding-left: var(--spacing-phi-1);
-    color: var(--color-muted-foreground);
-    font-style: italic;
-  }
+  width: 100% !important;
 }
 
-/* Override Storybook's default story container constraints */
-.sbdocs .sbdocs-content {
-  @apply w-5/6 mx-auto;
-}
-
+/* Ensure story previews don't have constraints */
 .docs-story > div {
   width: 100% !important;
   max-width: none !important;
+}
+
+/* MDX content wrapper - applied by our MDX components */
+.mdx-content {
+  /* All layout handled by Container component and MDX components */
+  /* No additional styles needed here */
+}
+
+/**
+ * Story Canvas Styling
+ * Ensures stories display properly within documentation
+ */
+.sb-story,
+.sb-canvas {
+  /* Reset any Storybook defaults */
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+/**
+ * Documentation-specific utilities
+ * These classes can be used directly in MDX files when needed
+ */
+
+/* Center text utility for hero sections */
+.text-center {
+  text-align: center;
+}
+
+/* Gradient backgrounds for hero sections */
+.gradient-hero {
+  @apply bg-gradient-to-b from-background to-muted/20;
+}
+
+/* Documentation grid layouts */
+.doc-grid-2 {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-[var(--spacing-phi-2)];
+}
+
+.doc-grid-3 {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--spacing-phi-2)];
+}
+
+.doc-grid-4 {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[var(--spacing-phi-2)];
+}
+
+/* Documentation card styling */
+.doc-card {
+  @apply p-[var(--spacing-phi-2)] bg-card border border-border rounded-xl;
+}
+
+.doc-card-hover {
+  @apply p-[var(--spacing-phi-2)] bg-card border border-border rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200;
+}
+
+/* Documentation section spacing */
+.doc-section {
+  @apply py-[var(--spacing-phi-4)];
+}
+
+.doc-section-muted {
+  @apply py-[var(--spacing-phi-4)] bg-muted/30;
+}
+
+/* Documentation content max-widths with auto centering */
+.doc-content-sm {
+  @apply max-w-sm mx-auto;
+}
+
+.doc-content-md {
+  @apply max-w-md mx-auto;
+}
+
+.doc-content-lg {
+  @apply max-w-lg mx-auto;
+}
+
+.doc-content-xl {
+  @apply max-w-xl mx-auto;
+}
+
+.doc-content-2xl {
+  @apply max-w-2xl mx-auto;
+}
+
+.doc-content-3xl {
+  @apply max-w-3xl mx-auto;
+}
+
+.doc-content-4xl {
+  @apply max-w-4xl mx-auto;
+}
+
+.doc-content-5xl {
+  @apply max-w-5xl mx-auto;
+}
+
+.doc-content-prose {
+  @apply max-w-prose mx-auto;
+}
+
+/* Documentation padding utilities */
+.doc-padding-sm {
+  @apply px-[var(--spacing-phi-2)];
+}
+
+.doc-padding-md {
+  @apply px-[var(--spacing-phi-3)];
+}
+
+.doc-padding-lg {
+  @apply px-[var(--spacing-phi-4)];
+}
+
+/**
+ * Code block enhancements for documentation
+ */
+.language-tsx,
+.language-jsx,
+.language-ts,
+.language-js,
+.language-css,
+.language-html,
+.language-json,
+.language-bash,
+.language-shell {
+  @apply font-mono text-sm;
+}
+
+/**
+ * Documentation-specific typography utilities
+ */
+.doc-heading-hero {
+  @apply heading-display text-center mb-[var(--spacing-phi-2)];
+}
+
+.doc-heading-section {
+  @apply text-2xl font-semibold text-center mb-[var(--spacing-phi-3)];
+}
+
+.doc-text-lead {
+  @apply text-body-large text-muted-foreground leading-relaxed;
+}
+
+.doc-text-center {
+  @apply text-center;
+}
+
+/**
+ * Documentation emphasis patterns
+ */
+.doc-emphasis-primary {
+  @apply text-primary font-semibold;
+}
+
+.doc-emphasis-success {
+  @apply text-success font-semibold;
+}
+
+.doc-emphasis-warning {
+  @apply text-warning font-semibold;
+}
+
+.doc-emphasis-destructive {
+  @apply text-destructive font-semibold;
 }

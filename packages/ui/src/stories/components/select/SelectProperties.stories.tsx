@@ -13,7 +13,7 @@ import {
  * Each property serves the interface's functional requirements.
  */
 const meta = {
-  title: '03 Components/Form/Select/Properties & States',
+  title: 'Components/Select/Properties',
   component: Select,
   parameters: {
     layout: 'centered',
@@ -24,7 +24,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
   args: { onValueChange: fn() },
 } satisfies Meta<typeof Select>;
 

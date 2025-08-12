@@ -10,9 +10,8 @@ import { Progress } from '../../../components/Progress';
  * into understanding, anxiety into confidence, and uncertainty into trust.
  */
 const meta = {
-  title: '03 Components/Feedback/Progress',
+  title: 'Components/Progress',
   component: Progress,
-  tags: ['!autodocs', '!dev', 'test'],
   parameters: {
     layout: 'centered',
     docs: {

@@ -7,7 +7,7 @@ import { Input } from '../../../components/Input';
  * They provide immediate understanding of data validity and required actions.
  */
 const meta = {
-  title: '03 Components/Forms/Input/Semantic Meaning & Context',
+  title: 'Components/Input/Semantic',
   component: Input,
   parameters: {
     layout: 'centered',
@@ -18,7 +18,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
   args: { onChange: fn() },
 } satisfies Meta<typeof Input>;
 

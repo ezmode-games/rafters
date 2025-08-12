@@ -15,7 +15,7 @@ import {
  * They organize information in ways that match user mental models and expectations.
  */
 const meta = {
-  title: '03 Components/Layout/Card/Semantic Meaning & Context',
+  title: 'Components/Card/Semantic',
   component: Card,
   parameters: {
     layout: 'centered',
@@ -26,7 +26,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
   args: { onClick: fn() },
 } satisfies Meta<typeof Card>;
 

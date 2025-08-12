@@ -13,12 +13,11 @@ import {
 } from '../../../components/Card';
 
 const meta = {
-  title: '03 Components/Layout/Card',
+  title: 'Components/Card',
   component: Card,
   parameters: {
     layout: 'centered',
   },
-  tags: ['autodocs'],
   args: { onClick: fn() },
 } satisfies Meta<typeof Card>;
 

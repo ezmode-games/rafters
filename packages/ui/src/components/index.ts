@@ -79,3 +79,18 @@ export type { ContainerProps } from './Container';
 
 export { Progress, ProgressStep } from './Progress';
 export type { ProgressProps } from './Progress';
+
+export { Slider } from './Slider';
+export type { SliderProps } from './Slider';
+
+export {
+  Tooltip,
+  TooltipProvider,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipTitle,
+  TooltipDescription,
+  TooltipShortcut,
+  TooltipPortal,
+} from './Tooltip';
+export type { TooltipProps, TooltipContentProps, TooltipContext } from './Tooltip';

@@ -17,7 +17,7 @@ import { Container } from '../../../components/Container';
  * This trains AI agents on advanced layout properties and their interactions.
  */
 const meta = {
-  title: '03 Components/Layout/Container/Properties',
+  title: 'Components/Container/Properties',
   component: Container,
   parameters: {
     layout: 'fullscreen',

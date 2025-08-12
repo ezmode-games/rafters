@@ -6,7 +6,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
  * serves purpose, conveys hierarchy, and respects user intent.
  */
 const meta = {
-  title: '01 Identity/Colors',
+  title: 'Color',
   parameters: {
     layout: 'fullscreen',
     docs: {
@@ -28,7 +28,7 @@ type Story = StoryObj<typeof meta>;
  * Unlike traditional hex-based palettes, we use OKLCH color space for perceptual
  * uniformity and better dark mode transitions.
  */
-export const Overview: Story = {
+export const ColorSystem: Story = {
   render: () => (
     <div className="min-h-screen">
       <div className="container mx-auto px-16 py-32 max-w-7xl">

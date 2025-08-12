@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/Ta
  * accurate mental models without overwhelming users with too many simultaneous choices.
  */
 const meta = {
-  title: '03 Components/Navigation/Tabs',
+  title: 'Components/Tabs',
   component: Tabs,
   parameters: {
     layout: 'centered',

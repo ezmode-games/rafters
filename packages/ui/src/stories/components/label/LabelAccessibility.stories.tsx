@@ -41,7 +41,7 @@ const Label = ({
  * Labels provide the semantic foundation that assistive technologies depend on.
  */
 const meta = {
-  title: '03 Components/Forms/Label/Accessibility',
+  title: 'Components/Label/Accessibility',
   component: Label,
   parameters: {
     layout: 'centered',
@@ -52,7 +52,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
 } satisfies Meta<typeof Label>;
 
 export default meta;

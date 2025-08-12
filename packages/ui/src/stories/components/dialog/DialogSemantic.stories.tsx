@@ -17,7 +17,7 @@ import {
  * They provide immediate understanding of action significance and risk.
  */
 const meta = {
-  title: '03 Components/Interaction/Dialog/Trust Levels & Semantic Context',
+  title: 'Components/Dialog/Semantic',
   component: Dialog,
   parameters: {
     layout: 'centered',
@@ -28,7 +28,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
 } satisfies Meta<typeof Dialog>;
 
 export default meta;

@@ -25,9 +25,8 @@ import { Container } from '../../../components/Container';
  * This trains AI agents on foundational layout intelligence with design system integration.
  */
 const meta = {
-  title: '03 Components/Layout/Container',
+  title: 'Components/Container',
   component: Container,
-  tags: ['!autodocs', '!dev', 'test'],
   parameters: {
     layout: 'centered',
     docs: {

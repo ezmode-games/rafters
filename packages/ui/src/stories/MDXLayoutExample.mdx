@@ -1,0 +1,129 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { RaftersLogo } from '../components/RaftersLogo';
+
+<Meta title="Foundation/MDX Layout Example" />
+
+# MDX Layout System Demonstration
+
+This page demonstrates the automatic layout system for MDX documentation. Notice how all content is properly centered and sized without any manual `mx-auto` or max-width classes.
+
+## Automatic Typography & Centering
+
+This paragraph is automatically centered with `max-w-prose mx-auto` for optimal reading width. The system handles all layout concerns, allowing you to focus on content.
+
+### Subsection with Perfect Spacing
+
+The heading above is automatically styled with proper spacing and centering. No manual classes needed.
+
+Here's what the system provides automatically:
+- Optimal line lengths for readability
+- Consistent spacing using phi-based design tokens
+- Proper visual hierarchy through typography
+- Automatic horizontal centering with mx-auto
+
+## Lists Work Automatically
+
+### Unordered Lists
+- First item with automatic spacing
+- Second item properly indented
+- Third item with consistent styling
+- All centered with max-w-prose mx-auto
+
+### Ordered Lists
+1. Step one in a process
+2. Step two with proper numbering
+3. Step three with consistent spacing
+4. Automatically centered and styled
+
+## Code Blocks Are Properly Formatted
+
+Inline code like `const example = true` is automatically styled.
+
+```tsx
+// Code blocks are centered with max-w-5xl mx-auto
+// They have proper syntax highlighting and spacing
+const Component = () => {
+  return (
+    <div className="automatic-styling">
+      <h1>No manual layout needed</h1>
+      <p>Everything is handled by the MDX system</p>
+    </div>
+  );
+};
+```
+
+## Blockquotes Have Visual Emphasis
+
+> This blockquote is automatically styled with a primary color border, italic text, and proper centering. It stands out from regular content while maintaining readability.
+
+## Tables Are Responsive
+
+| Feature | Description | Status |
+|---------|------------|--------|
+| Auto Centering | Content centered with mx-auto | ✅ Complete |
+| Max Widths | Intelligent max-width constraints | ✅ Complete |
+| Spacing | Phi-based spacing tokens | ✅ Complete |
+| Typography | Semantic heading hierarchy | ✅ Complete |
+
+## Links and Emphasis
+
+This paragraph contains a [link to documentation](#) that's automatically styled with primary color and hover effects. You can also use **bold text** for emphasis and *italic text* for subtle emphasis.
+
+---
+
+## Complex Layouts with MDX Components
+
+<div className="doc-section-muted">
+  <div className="doc-content-5xl">
+    <h2 className="doc-heading-section">Using Utility Classes</h2>
+    <p className="doc-text-lead doc-text-center">
+      When you need specific layouts, utility classes are available.
+    </p>
+  </div>
+
+  <div className="doc-grid-3 doc-content-5xl mt-8">
+    <div className="doc-card-hover">
+      <h3 className="heading-subsection text-center">Card One</h3>
+      <p className="text-center">Automatic card styling with hover effects</p>
+    </div>
+    <div className="doc-card-hover">
+      <h3 className="heading-subsection text-center">Card Two</h3>
+      <p className="text-center">Consistent spacing and borders</p>
+    </div>
+    <div className="doc-card-hover">
+      <h3 className="heading-subsection text-center">Card Three</h3>
+      <p className="text-center">Responsive grid layout</p>
+    </div>
+  </div>
+</div>
+
+## Images Are Responsive
+
+Images would be automatically centered and responsive with proper spacing. The system handles all image layout concerns.
+
+## Summary
+
+This MDX layout system provides:
+
+### Automatic Features
+✅ **Content centering** - All content uses mx-auto appropriately
+✅ **Max-width constraints** - Optimal reading widths for different content types
+✅ **Consistent spacing** - Phi-based spacing tokens throughout
+✅ **Semantic HTML** - Proper document structure for accessibility
+✅ **Typography hierarchy** - Clear information architecture
+
+### Design Benefits
+- **Reduced cognitive load** - No manual layout decisions needed
+- **Consistency** - All documentation follows the same patterns
+- **Maintainability** - Changes to the system update all documentation
+- **Accessibility** - Semantic HTML and proper structure built-in
+
+### Developer Experience
+- **Focus on content** - Write documentation without layout concerns
+- **No class memorization** - System handles common patterns
+- **Flexibility when needed** - Utility classes and components available
+- **Container philosophy** - Consistent with the design system
+
+---
+
+*This example demonstrates how the MDX layout system creates well-designed documentation pages automatically, following the Container component's philosophy of using mx-auto for centering and padding for spacing.*

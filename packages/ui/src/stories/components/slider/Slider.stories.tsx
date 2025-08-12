@@ -12,9 +12,8 @@ import { Slider } from '../../../components/Slider';
  * Our slider system prioritizes motor accessibility and immediate feedback for trustworthy interactions.
  */
 const meta = {
-  title: '03 Components/Input/Slider',
+  title: 'Components/Slider',
   component: Slider,
-  tags: ['!autodocs', '!dev', 'test'],
   parameters: {
     layout: 'centered',
     docs: {

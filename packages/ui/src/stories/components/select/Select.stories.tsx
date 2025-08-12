@@ -22,9 +22,8 @@ import {
  * that guide users toward confident decisions.
  */
 const meta = {
-  title: '03 Components/Forms/Select',
+  title: 'Components/Select',
   component: Select,
-  tags: ['!autodocs', '!dev', 'test'],
   parameters: {
     layout: 'centered',
     docs: {

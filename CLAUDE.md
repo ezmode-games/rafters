@@ -181,7 +181,6 @@ Apply the embedded design knowledge to:
 **Test commands:**
 ```bash
 pnpm test              # Run all tests including stories
-pnpm test-storybook    # Run story tests specifically  
 pnpm vitest run        # CI test runner
 ```
 
@@ -410,7 +409,7 @@ export const Primary: Story = {
 - **No additional `.test.ts` files needed** - stories provide complete test coverage
 - Broken stories corrupt AI learning - they MUST render without errors
 - Interactive stories require `onClick: fn()` for proper test execution
-- Use `pnpm test-storybook` to verify story integrity
+- Use `pnpm test` to verify story integrity
 
 **This is DIFFERENT from other monorepo packages** which use traditional unit testing.
 

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Slider } from '../../../components/Slider';
 
 const meta = {
-  title: '03 Components/Input/Slider/Intelligence',
+  title: 'Components/Slider/Intelligence',
   component: Slider,
   parameters: {
     layout: 'centered',

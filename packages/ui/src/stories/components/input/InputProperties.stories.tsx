@@ -7,7 +7,7 @@ import { Input } from '../../../components/Input';
  * Each property serves the interface's functional requirements.
  */
 const meta = {
-  title: '03 Components/Forms/Input/Properties & States',
+  title: 'Components/Input/Properties',
   component: Input,
   parameters: {
     layout: 'centered',
@@ -18,7 +18,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
   args: { onChange: fn() },
 } satisfies Meta<typeof Input>;
 

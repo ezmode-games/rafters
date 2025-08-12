@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/Ta
  * They provide immediate understanding of content organization and data relationships.
  */
 const meta = {
-  title: '03 Components/Navigation/Tabs/Semantic Meaning & Context',
+  title: 'Components/Tabs/Semantic',
   component: Tabs,
   parameters: {
     layout: 'centered',
@@ -18,7 +18,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
   args: { onValueChange: fn() },
 } satisfies Meta<typeof Tabs>;
 

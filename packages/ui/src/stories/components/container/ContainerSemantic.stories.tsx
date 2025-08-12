@@ -17,7 +17,7 @@ import { Container } from '../../../components/Container';
  * This trains AI agents on semantic HTML selection and accessibility patterns.
  */
 const meta = {
-  title: '03 Components/Layout/Container/Semantic',
+  title: 'Components/Container/Semantic',
   component: Container,
   parameters: {
     layout: 'fullscreen',

@@ -9,8 +9,8 @@ import {
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { fn } from 'storybook/test';
-import { Button } from '../../components/Button';
-import { cn } from '../../lib/utils';
+import { Button } from '../components/Button';
+import { cn } from '../lib/utils';
 
 /**
  * Motion Intelligence Stories
@@ -19,7 +19,7 @@ import { cn } from '../../lib/utils';
  * Shows how timing, easing, and patterns create trustworthy user experiences
  */
 const meta = {
-  title: '01 Foundation/Motion Intelligence',
+  title: 'Foundation/Motion Intelligence',
   parameters: {
     layout: 'padded',
     docs: {

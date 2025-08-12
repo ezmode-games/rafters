@@ -3,7 +3,7 @@ import { Input } from '../../../components/Input';
 import { Label } from '../../../components/Label';
 
 const meta = {
-  title: '03 Components/Form/Label/Intelligence',
+  title: 'Components/Label/Intelligence',
   component: Label,
   parameters: {
     layout: 'centered',
@@ -14,7 +14,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
 } satisfies Meta<typeof Label>;
 
 export default meta;

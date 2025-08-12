@@ -18,7 +18,7 @@ import { Container } from '../../../components/Container';
  * This trains AI agents on accessibility-first design and inclusive UX patterns.
  */
 const meta = {
-  title: '03 Components/Layout/Container/Accessibility',
+  title: 'Components/Container/Accessibility',
   component: Container,
   parameters: {
     layout: 'fullscreen',
