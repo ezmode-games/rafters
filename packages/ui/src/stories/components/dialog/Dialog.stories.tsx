@@ -21,9 +21,8 @@ import {
  * patterns that reduce anxiety during important interactions.
  */
 const meta = {
-  title: '03 Components/Interaction/Dialog',
+  title: 'Components/Dialog',
   component: Dialog,
-  tags: ['!autodocs', '!dev', 'test'],
   parameters: {
     layout: 'centered',
     docs: {

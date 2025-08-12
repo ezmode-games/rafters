@@ -13,12 +13,11 @@ import {
 } from '../../../components/Dialog';
 
 const meta = {
-  title: '03 Components/Interaction/Dialog/Visual Variants',
+  title: 'Components/Dialog/Variants',
   component: Dialog,
   parameters: {
     layout: 'centered',
   },
-  tags: ['autodocs'],
 } satisfies Meta<typeof Dialog>;
 
 export default meta;

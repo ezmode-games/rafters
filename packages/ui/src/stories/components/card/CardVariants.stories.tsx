@@ -15,7 +15,7 @@ import {
  * and interface context while maintaining consistent interaction patterns.
  */
 const meta = {
-  title: '03 Components/Layout/Card/Visual Variants',
+  title: 'Components/Card/Variants',
   component: Card,
   parameters: {
     layout: 'centered',
@@ -26,7 +26,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
   args: { onClick: fn() },
 } satisfies Meta<typeof Card>;
 

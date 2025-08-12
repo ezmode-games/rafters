@@ -41,7 +41,7 @@ const Label = ({
  * Each property serves specific communication and relationship requirements.
  */
 const meta = {
-  title: '03 Components/Forms/Label/Properties & States',
+  title: 'Components/Label/Properties',
   component: Label,
   parameters: {
     layout: 'centered',
@@ -52,7 +52,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
 } satisfies Meta<typeof Label>;
 
 export default meta;

@@ -41,7 +41,7 @@ const Label = ({
  * for different types of information delivery and user guidance needs.
  */
 const meta = {
-  title: '03 Components/Forms/Label/Visual Variants',
+  title: 'Components/Label/Variants',
   component: Label,
   parameters: {
     layout: 'centered',
@@ -52,7 +52,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
 } satisfies Meta<typeof Label>;
 
 export default meta;

@@ -15,7 +15,7 @@ import { Input } from '../../../components/Input';
 import { Label } from '../../../components/Label';
 
 const meta = {
-  title: '03 Components/Interaction/Dialog/Intelligence',
+  title: 'Components/Dialog/Intelligence',
   component: Dialog,
   parameters: {
     layout: 'centered',

@@ -7,7 +7,7 @@ import { Input } from '../../../components/Input';
  * Every accessibility feature improves the input experience for all users.
  */
 const meta = {
-  title: '03 Components/Forms/Input/Accessibility',
+  title: 'Components/Input/Accessibility',
   component: Input,
   parameters: {
     layout: 'centered',
@@ -18,7 +18,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
   args: { onChange: fn() },
 } satisfies Meta<typeof Input>;
 

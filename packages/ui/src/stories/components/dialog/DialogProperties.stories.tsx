@@ -17,7 +17,7 @@ import {
  * Each property serves the interface's functional requirements.
  */
 const meta = {
-  title: '03 Components/Interaction/Dialog/Properties & States',
+  title: 'Components/Dialog/Properties',
   component: Dialog,
   parameters: {
     layout: 'centered',
@@ -28,7 +28,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
 } satisfies Meta<typeof Dialog>;
 
 export default meta;

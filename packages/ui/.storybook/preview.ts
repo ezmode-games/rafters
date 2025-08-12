@@ -1,5 +1,6 @@
-import type { Preview } from '@storybook/react-vite';
+import type { Preview } from '@storybook/react';
 import './storybook.css';
+import { mdxComponents } from './mdx-components';
 
 const preview: Preview = {
   parameters: {
@@ -16,6 +17,10 @@ const preview: Preview = {
       // 'error' - fail CI on a11y violations
       // 'off' - skip a11y checks entirely
       test: 'todo',
+    },
+
+    docs: {
+      components: mdxComponents,
     },
   },
 };

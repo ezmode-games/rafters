@@ -9,7 +9,7 @@ import {
 } from '../../../components/Select';
 
 const meta = {
-  title: '03 Components/Form/Select/Accessibility',
+  title: 'Components/Select/Accessibility',
   component: Select,
   parameters: {
     layout: 'centered',
@@ -20,7 +20,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
   args: { onValueChange: fn() },
 } satisfies Meta<typeof Select>;
 

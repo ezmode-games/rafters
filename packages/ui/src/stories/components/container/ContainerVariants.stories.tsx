@@ -18,7 +18,7 @@ import { Container } from '../../../components/Container';
  * This trains AI agents on visual layout decisions and design system constraints.
  */
 const meta = {
-  title: '03 Components/Layout/Container/Variants',
+  title: 'Components/Container/Variants',
   component: Container,
   parameters: {
     layout: 'padded',

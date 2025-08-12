@@ -41,7 +41,7 @@ const Label = ({
  * They create understanding by matching communication patterns to user mental models.
  */
 const meta = {
-  title: '03 Components/Forms/Label/Semantic Meaning & Context',
+  title: 'Components/Label/Semantic',
   component: Label,
   parameters: {
     layout: 'centered',
@@ -52,7 +52,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
 } satisfies Meta<typeof Label>;
 
 export default meta;

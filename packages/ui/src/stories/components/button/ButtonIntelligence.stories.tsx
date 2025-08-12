@@ -4,7 +4,7 @@ import { fn } from 'storybook/test';
 import { Button } from '../../../components/Button';
 
 const meta = {
-  title: '03 Components/Action/Button/Intelligence',
+  title: 'Components/Button/Intelligence',
   component: Button,
   parameters: {
     layout: 'centered',

@@ -8,10 +8,9 @@ import { Input } from '../../../components/Input';
  * and error prevention strategies that support rather than judge.
  */
 const meta = {
-  title: '03 Components/Forms/Input',
+  title: 'Components/Input',
   component: Input,
   // status removed
-  tags: ['!autodocs', '!dev', 'test'],
   parameters: {
     layout: 'centered',
     docs: {

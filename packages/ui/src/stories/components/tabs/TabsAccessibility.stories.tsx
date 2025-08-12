@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/Tabs';
 
 const meta = {
-  title: '03 Components/Navigation/Tabs/Accessibility',
+  title: 'Components/Tabs/Accessibility',
   component: Tabs,
   parameters: {
     layout: 'centered',

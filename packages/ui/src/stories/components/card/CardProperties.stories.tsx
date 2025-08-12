@@ -15,7 +15,7 @@ import {
  * Each property serves specific cognitive and interaction requirements.
  */
 const meta = {
-  title: '03 Components/Layout/Card/Properties & States',
+  title: 'Components/Card/Properties',
   component: Card,
   parameters: {
     layout: 'centered',
@@ -26,7 +26,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
   args: { onClick: fn() },
 } satisfies Meta<typeof Card>;
 

@@ -12,12 +12,11 @@ import {
 } from '../../../components/Select';
 
 const meta = {
-  title: '03 Components/Forms/Select/Intelligence',
+  title: 'Components/Select/Intelligence',
   component: Select,
   parameters: {
     layout: 'centered',
   },
-  tags: ['autodocs'],
 } satisfies Meta<typeof Select>;
 
 export default meta;

@@ -13,7 +13,7 @@ import {
  * Each selection serves specific interaction patterns and user goals.
  */
 const meta = {
-  title: '03 Components/Form/Select/Semantic Usage',
+  title: 'Components/Select/Semantic',
   component: Select,
   parameters: {
     layout: 'centered',
@@ -24,7 +24,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
   args: { onValueChange: fn() },
 } satisfies Meta<typeof Select>;
 

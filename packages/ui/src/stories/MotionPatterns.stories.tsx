@@ -7,8 +7,8 @@ import {
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { fn } from 'storybook/test';
-import { Button } from '../../components/Button';
-import { cn } from '../../lib/utils';
+import { Button } from '../components/Button';
+import { cn } from '../lib/utils';
 
 /**
  * Motion Pattern Library
@@ -17,7 +17,7 @@ import { cn } from '../../lib/utils';
  * Pre-configured motion combinations ready for systematic component implementation
  */
 const meta = {
-  title: '01 Foundation/Motion Patterns',
+  title: 'Motion',
   parameters: {
     layout: 'padded',
     docs: {

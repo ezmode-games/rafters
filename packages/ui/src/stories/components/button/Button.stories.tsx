@@ -2,7 +2,7 @@
 // @version 0.1.0
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from 'storybook/test';
+import { vi } from 'vitest';
 import { Button } from '../../../components/Button';
 
 /**
@@ -11,9 +11,8 @@ import { Button } from '../../../components/Button';
  * both visually and functionally.
  */
 const meta = {
-  title: '03 Components/Action/Button',
+  title: 'Components/Button',
   component: Button,
-  tags: ['!autodocs', '!dev', 'test'],
   parameters: {
     layout: 'centered',
     docs: {
@@ -64,7 +63,7 @@ const meta = {
       description: 'For toggle buttons, indicates pressed state',
     },
   },
-  args: { onClick: fn() },
+  args: { onClick: vi.fn() },
 } satisfies Meta<typeof Button>;
 
 export default meta;

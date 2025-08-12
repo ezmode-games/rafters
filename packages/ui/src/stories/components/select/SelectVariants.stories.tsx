@@ -9,12 +9,11 @@ import {
 } from '../../../components/Select';
 
 const meta = {
-  title: '03 Components/Form/Select/Visual Variants',
+  title: 'Components/Select/Variants',
   component: Select,
   parameters: {
     layout: 'centered',
   },
-  tags: ['autodocs'],
   args: { onValueChange: fn() },
 } satisfies Meta<typeof Select>;
 

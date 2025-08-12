@@ -7,7 +7,7 @@ import { Button } from '../../../components/Button';
  * Every accessibility feature improves the experience for all users.
  */
 const meta = {
-  title: '03 Components/Action/Button/Accessibility',
+  title: 'Components/Button/Accessibility',
   component: Button,
   parameters: {
     layout: 'centered',
@@ -18,7 +18,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
   args: { onClick: fn() },
 } satisfies Meta<typeof Button>;
 

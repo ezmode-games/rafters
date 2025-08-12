@@ -4,12 +4,11 @@ import { useState } from 'react';
 import { Input } from '../../../components/Input';
 
 const meta = {
-  title: '03 Components/Forms/Input/Intelligence',
+  title: 'Components/Input/Intelligence',
   component: Input,
   parameters: {
     layout: 'centered',
   },
-  tags: ['autodocs'],
 } satisfies Meta<typeof Input>;
 
 export default meta;

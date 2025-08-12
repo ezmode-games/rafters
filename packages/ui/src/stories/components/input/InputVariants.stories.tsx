@@ -3,12 +3,11 @@ import { fn } from 'storybook/test';
 import { Input } from '../../../components/Input';
 
 const meta = {
-  title: '03 Components/Forms/Input/Visual Variants',
+  title: 'Components/Input/Variants',
   component: Input,
   parameters: {
     layout: 'centered',
   },
-  tags: ['autodocs'],
   args: { onChange: fn() },
 } satisfies Meta<typeof Input>;
 

@@ -7,7 +7,7 @@ import { Button } from '../../../components/Button';
  * Each property serves the interface's functional requirements.
  */
 const meta = {
-  title: '03 Components/Action/Button/Properties & States',
+  title: 'Components/Button/Properties & States',
   component: Button,
   parameters: {
     layout: 'centered',
@@ -18,7 +18,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
   args: { onClick: fn() },
 } satisfies Meta<typeof Button>;
 

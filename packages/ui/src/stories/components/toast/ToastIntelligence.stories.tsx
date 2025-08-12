@@ -12,7 +12,7 @@ import {
 } from '../../../components/Toast';
 
 const meta = {
-  title: '03 Components/Feedback/Toast/Intelligence',
+  title: 'Components/Toast/Intelligence',
   component: Toast,
   parameters: {
     layout: 'centered',
@@ -44,7 +44,6 @@ These properties work together to create contextually appropriate user experienc
       },
     },
   },
-  tags: ['autodocs'],
 } satisfies Meta<typeof Toast>;
 
 export default meta;

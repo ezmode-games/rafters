@@ -41,12 +41,11 @@ const Label = ({
 };
 
 const meta = {
-  title: '03 Components/Forms/Label',
+  title: 'Components/Label',
   component: Label,
   parameters: {
     layout: 'centered',
   },
-  tags: ['autodocs'],
 } satisfies Meta<typeof Label>;
 
 export default meta;

@@ -33,8 +33,14 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm --filter rafters-ui exec playwright install chromium
 
-      - name: Build
-        run: pnpm --recursive --filter "!rafters-ui" build
+      - name: Build Dependencies First
+        run: pnpm --filter @rafters/shared build && pnpm --filter @rafters/color-utils build && pnpm --filter @rafters/design-tokens build
+
+      - name: Build UI Package
+        run: pnpm --filter rafters-ui build
+
+      - name: Build Remaining Packages
+        run: pnpm --recursive --filter "!rafters-ui" --filter "!@rafters/shared" --filter "!@rafters/color-utils" --filter "!@rafters/design-tokens" build
 
       - name: Lint
         run: pnpm biome:lint

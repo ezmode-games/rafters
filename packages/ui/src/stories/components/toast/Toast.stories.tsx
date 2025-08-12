@@ -20,9 +20,8 @@ import {
  * confirmation that builds user confidence in their actions through intelligent timing and dismissal patterns.
  */
 const meta = {
-  title: '03 Components/Feedback/Toast',
+  title: 'Components/Toast',
   component: Toast,
-  tags: ['!autodocs', '!dev', 'test'],
   parameters: {
     layout: 'centered',
     docs: {

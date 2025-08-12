@@ -10,12 +10,11 @@ import {
 } from '../../../components/Card';
 
 const meta = {
-  title: '03 Components/Layout/Card/Intelligence',
+  title: 'Components/Card/Intelligence',
   component: Card,
   parameters: {
     layout: 'centered',
   },
-  tags: ['autodocs'],
 } satisfies Meta<typeof Card>;
 
 export default meta;

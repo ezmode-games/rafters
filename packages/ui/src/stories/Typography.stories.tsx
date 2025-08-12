@@ -6,7 +6,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
  * communicated clearly, effectively, and efficiently.
  */
 const meta = {
-  title: '01 Identity/Typography',
+  title: 'Typography',
   parameters: {
     layout: 'fullscreen',
   },
@@ -16,14 +16,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Typography System Overview
+ * Typography System
  *
  * Rafters uses a systematic approach to typography that creates intuitive
  * hierarchies and maintains consistency across all digital experiences.
  * Our semantic typography system replaces verbose utility classes with
  * meaningful tokens based on golden ratio proportions.
  */
-export const Overview: Story = {
+export const TypeSystem: Story = {
   render: () => (
     <div className="min-h-screen">
       <div className="container mx-auto px-16 py-32 max-w-7xl">
@@ -34,10 +34,6 @@ export const Overview: Story = {
               Typography guidelines establish clear hierarchies and organize information based on
               importance. When applied well, typography enables content to be communicated clearly,
               effectively, and efficiently.
-            </p>
-            <p className="body text-muted-foreground mt-8">
-              To modify your typography settings, visit the <strong>/manage</strong> route in your
-              application.
             </p>
           </div>
 
@@ -96,24 +92,6 @@ export const Overview: Story = {
               </div>
             </div>
           </div>
-
-          <div className="my-40">
-            <h2 className="heading-page mb-16">Typography as Interface</h2>
-            <p className="body-large text-muted-foreground max-w-4xl mb-20">
-              Rafters typography creates flexible systems understood intuitively. Different weights,
-              sizes, and spacing work together to guide users through content with confidence and
-              clarity.
-            </p>
-
-            <div className="bg-accent/30 p-16 rounded-lg border-l-4 border-primary">
-              <h4 className="heading-subsection mb-8">Hierarchy Through Contrast</h4>
-              <p className="body-large text-muted-foreground">
-                Typography hierarchies emerge through strategic contrast in size, weight, and
-                spacing. Every typographic choice should serve the user's journey through your
-                content.
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -121,7 +99,7 @@ export const Overview: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Overview of the Rafters typography philosophy and systematic approach.',
+        story: 'Complete typography system with semantic classes and design principles.',
       },
     },
   },

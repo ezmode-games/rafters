@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Slider } from '../../../components/Slider';
 
 const meta = {
-  title: '03 Components/Input/Slider/Variants',
+  title: 'Components/Slider/Variants',
   component: Slider,
   parameters: {
     layout: 'centered',
