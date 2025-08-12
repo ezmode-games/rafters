@@ -209,7 +209,22 @@ export const mdxComponents = {
   ),
 
   h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h2 className={cn('mb-[var(--spacing-phi-2)]', 'mt-[var(--spacing-phi-3)]')} {...props} />
+    <h2
+      className={cn(
+        'mb-[var(--spacing-phi-2)]',
+        'mt-[var(--spacing-phi-4)]',
+        'relative',
+        'before:content-[""]',
+        'before:absolute',
+        'before:bottom-[-2px]',
+        'before:left-0',
+        'before:w-[40px]',
+        'before:h-px',
+        'before:bg-border',
+        'before:rounded-[1px]'
+      )}
+      {...props}
+    />
   ),
 
   h3: (props: React.HTMLAttributes<HTMLHeadingElement>) => (

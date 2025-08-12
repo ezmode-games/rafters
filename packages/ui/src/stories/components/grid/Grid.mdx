@@ -1,0 +1,80 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { MDXSection, MDXGrid, MDXCard } from '../../../../.storybook/mdx-components';
+import * as Stories from './Grid.stories.tsx';
+
+<Meta title="Components/Grid" of={Stories} name="Overview" />
+
+<MDXSection size="7xl" padding="8">
+
+# Grid
+
+<div className="text-xl leading-relaxed max-w-4xl mx-auto">
+Intelligent layout system with embedded UX reasoning for systematic design decisions. Four cognitive presets encode human design expertise: linear for equal-priority content, golden for natural hierarchy, bento for editorial layouts, and custom for specialized needs.
+</div>
+
+</MDXSection>
+
+<MDXSection size="7xl" padding="6">
+
+<Canvas of={Stories.LinearPreset} />
+
+</MDXSection>
+
+<MDXSection size="7xl" padding="8">
+
+## Usage Guidelines
+
+<MDXGrid cols={2} gap="lg">
+
+<MDXCard variant="outlined">
+
+### DOs
+
+**Choose the right preset for your content context:**
+- **Linear Preset** - Equal-priority content like product catalogs and galleries. Democratic attention pattern with predictable scanning. Cognitive load: 2/10.
+- **Golden Preset** - Content with natural hierarchy like editorial showcases. Uses φ proportions for mathematical visual balance. Cognitive load: 4/10.
+- **Bento Preset** - Editorial layouts and dashboards requiring semantic asymmetry. Use sparingly with careful content hierarchy. Cognitive load: 6/10.
+- **Custom Preset** - Specialized layouts when intelligent presets don't fit. Full control over grid behavior. Variable cognitive load.
+
+**Respect cognitive limits:**
+- Use `maxItems="auto"` for viewport-appropriate limits
+- Allow presets to handle responsive breakpoints automatically
+- Apply Miller's Law (7±2) cognitive load principles
+
+**Ensure accessibility:**
+- Use `role="presentation"` for layout-only grids (default)
+- Apply `role="grid"` with `ariaLabel` for interactive grids only
+- Maintain 44x44px minimum touch targets
+- Enable keyboard navigation for interactive grids
+
+**Apply semantic meaning:**
+- Choose bento patterns based on content purpose, not decoration
+- Use `autoFit` with design tokens for content-driven sizing
+- Apply appropriate semantic HTML elements with `as` prop
+
+</MDXCard>
+
+<MDXCard variant="outlined">
+
+### DON'Ts
+
+**Cognitive overload:**
+- Never exceed 8 items on wide viewports (Miller's Law violation)
+- Don't use bento layouts for simple equal-priority content
+- Avoid decorative asymmetry without semantic meaning
+
+**Accessibility violations:**
+- Never use interactive `role="grid"` without proper keyboard navigation
+- Don't create touch targets smaller than 44x44px
+- Avoid missing `ariaLabel` on interactive grids
+
+**Pattern misuse:**
+- Don't use custom preset when intelligent presets would work better
+- Avoid golden preset for content without natural hierarchy
+- Never use bento patterns purely for visual decoration
+
+</MDXCard>
+
+</MDXGrid>
+
+</MDXSection>
