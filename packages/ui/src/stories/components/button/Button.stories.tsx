@@ -2,7 +2,7 @@
 // @version 0.1.0
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { vi } from 'vitest';
+import { fn } from 'storybook/test';
 import { Button } from '../../../components/Button';
 
 /**
