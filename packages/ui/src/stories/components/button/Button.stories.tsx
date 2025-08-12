@@ -1,7 +1,7 @@
 // @componentStatus published
 // @version 0.1.0
 
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { vi } from 'vitest';
 import { Button } from '../../../components/Button';
 
