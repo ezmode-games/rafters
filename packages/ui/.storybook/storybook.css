@@ -319,3 +319,30 @@ button:focus {
 .doc-emphasis-destructive {
   @apply text-destructive font-semibold;
 }
+
+/**
+ * MDX Component Overrides
+ * Override default Storybook blueprint styling for clean MDX components
+ */
+
+/* Remove blueprint decorative underlines from MDX h2 elements */
+.mdx-content h2::before,
+.mdx-content h2::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Additional override for direct h2 targeting */
+.sbdocs .mdx-content h2::before,
+.sbdocs .mdx-content h2::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Clean h2 styling for MDX components */
+.mdx-content h2 {
+  border: none !important;
+  text-decoration: none !important;
+  border-bottom: none !important;
+  border-top: none !important;
+}

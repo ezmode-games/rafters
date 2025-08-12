@@ -97,3 +97,6 @@ export type { TooltipProps, TooltipContentProps, TooltipContext } from './Toolti
 
 export { RaftersLogo } from './RaftersLogo';
 export type { RaftersLogoProps } from './RaftersLogo';
+
+export { Grid, GridItem } from './Grid';
+export type { GridProps, GridItemProps } from './Grid';

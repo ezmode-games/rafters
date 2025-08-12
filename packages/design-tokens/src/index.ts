@@ -25,6 +25,7 @@ const TokenSchema = z.object({
     'border',
     'shadow',
     'aspect',
+    'grid',
   ]),
   type: z.enum(['static', 'dynamic']),
   // Semantic groupings for AI intelligence
@@ -306,3 +307,6 @@ export * from './cli';
 export * from './motion/timing';
 export * from './motion/easing';
 export * from './schemas/motion';
+
+// Export grid layout intelligence tokens
+export * from './schemas/grid';
