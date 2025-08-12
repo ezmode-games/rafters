@@ -75,7 +75,7 @@ export async function addCommand(componentName: string, options: AddOptions = {}
     if (!componentManifest) {
       fetchSpinner.fail(`Component '${componentName}' not found in registry`);
       console.log(
-        chalk.gray('Available components: button, input, card, select, dialog, label, tabs')
+        chalk.gray('Available components: button, input, card, select, dialog, label, tabs, grid')
       );
       process.exit(1);
     }
