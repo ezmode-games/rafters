@@ -1,6 +1,7 @@
 import type React from 'react';
+import { cn } from '../lib/utils';
 
-interface RaftersLogoProps {
+export interface RaftersLogoProps {
   variant?: 'light' | 'dark' | 'custom';
   size?: 'sm' | 'md' | 'lg' | 'xl';
   textColor?: string;
@@ -8,13 +9,9 @@ interface RaftersLogoProps {
   className?: string;
 }
 
-export const RaftersLogo: React.FC<RaftersLogoProps> = ({
-  variant = 'light',
-  size = 'md',
-  textColor,
-  markColor,
-  className = '',
-}) => {
+export const RaftersLogo: React.FC<RaftersLogoProps> = (props) => {
+  const { variant = 'light', size = 'md', textColor, markColor, className = '' } = props;
+
   // Size classes
   const sizeClasses = {
     sm: 'w-24 h-auto',
@@ -27,34 +24,33 @@ export const RaftersLogo: React.FC<RaftersLogoProps> = ({
   const getColors = () => {
     if (variant === 'custom') {
       return {
-        text: textColor || 'hsl(var(--foreground))',
-        mark: markColor || 'hsl(var(--primary))',
+        text: textColor || 'bg-muted',
+        mark: markColor || 'bg-muted',
       };
     }
 
     if (variant === 'dark') {
       return {
-        text: 'hsl(var(--background))',
-        mark: 'hsl(var(--background))',
+        text: 'bg-background',
+        mark: 'bg-background',
       };
     }
 
     // Default light variant uses semantic tokens
     return {
-      text: 'hsl(var(--foreground))',
-      mark: 'hsl(var(--foreground))',
+      text: 'var(--color-foreground)',
+      mark: 'var(--color-foreground)',
     };
   };
 
   const colors = getColors();
-  const logoClasses = `${sizeClasses[size]} ${className}`.trim();
 
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 374 227"
-      className={logoClasses}
+      className={cn(sizeClasses[size], className)}
     >
       <title>Rafters Logo</title>
       {/* Typography: Rafters wordmark */}

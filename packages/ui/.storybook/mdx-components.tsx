@@ -14,6 +14,7 @@
 
 import type React from 'react';
 import { Container } from '../src/components/Container';
+import { RaftersLogo as RaftersLogoComponent } from '../src/components/RaftersLogo';
 import { cn } from '../src/lib/utils';
 
 /**
@@ -27,16 +28,7 @@ export const MDXWrapper = ({
   children: React.ReactNode;
   className?: string;
 }) => {
-  return (
-    <Container
-      as="article"
-      size="5xl"
-      padding="8"
-      className={cn('mdx-content', 'min-h-screen', className)}
-    >
-      {children}
-    </Container>
-  );
+  return <div className={cn('mdx-content', 'min-h-screen', 'px-8', className)}>{children}</div>;
 };
 
 /**
@@ -58,7 +50,7 @@ export const MDXSection = ({
     <Container
       as="section"
       size={size}
-      padding={padding as '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8'}
+      padding={padding === '7' ? '8' : padding}
       className={cn('my-[var(--spacing-phi-3)]', className)}
     >
       {children}
@@ -73,13 +65,24 @@ export const MDXSection = ({
 export const MDXContent = ({
   children,
   className,
-  center = true,
   maxWidth = '4xl',
 }: {
   children: React.ReactNode;
   className?: string;
-  center?: boolean;
-  maxWidth?: 'prose' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl';
+  center?: boolean | false;
+  maxWidth?:
+    | 'prose'
+    | 'sm'
+    | 'md'
+    | 'lg'
+    | 'xl'
+    | '2xl'
+    | '3xl'
+    | '4xl'
+    | '5xl'
+    | '6xl'
+    | '7xl'
+    | 'full';
 }) => {
   const maxWidthClasses = {
     prose: 'max-w-prose',
@@ -91,11 +94,12 @@ export const MDXContent = ({
     '3xl': 'max-w-3xl',
     '4xl': 'max-w-4xl',
     '5xl': 'max-w-5xl',
+    '6xl': 'max-w-6xl',
+    '7xl': 'max-w-7xl',
+    full: 'max-w-full',
   };
 
-  return (
-    <div className={cn(maxWidthClasses[maxWidth], center && 'mx-auto', className)}>{children}</div>
-  );
+  return <div className={cn(maxWidthClasses[maxWidth], 'mx-auto', className)}>{children}</div>;
 };
 
 /**
@@ -181,15 +185,12 @@ export const MDXHero = ({
     <div
       className={cn(
         'w-full',
-        'text-center',
         'py-[var(--spacing-phi-4)]',
         gradient && 'bg-gradient-to-b from-background to-muted/20',
         className
       )}
     >
-      <MDXContent maxWidth="5xl" center>
-        {children}
-      </MDXContent>
+      <MDXContent maxWidth="7xl">{children}</MDXContent>
     </div>
   );
 };
@@ -202,71 +203,25 @@ export const mdxComponents = {
   // Wrapper for all MDX content
   wrapper: MDXWrapper,
 
-  // Typography elements with proper max-width and centering
+  // Typography elements
   h1: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h1
-      className={cn(
-        'heading-display',
-        'mb-[var(--spacing-phi-2)]',
-        'text-center',
-        'max-w-5xl',
-        'mx-auto'
-      )}
-      {...props}
-    />
+    <h1 className={cn('mb-[var(--spacing-phi-2)]')} {...props} />
   ),
 
   h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h2
-      className={cn(
-        'heading-section',
-        'mb-[var(--spacing-phi-2)]',
-        'mt-[var(--spacing-phi-3)]',
-        'text-center',
-        'max-w-4xl',
-        'mx-auto'
-      )}
-      {...props}
-    />
+    <h2 className={cn('mb-[var(--spacing-phi-2)]', 'mt-[var(--spacing-phi-3)]')} {...props} />
   ),
 
   h3: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h3
-      className={cn(
-        'heading-section',
-        'mb-[var(--spacing-phi-1)]',
-        'mt-[var(--spacing-phi-2)]',
-        'max-w-4xl',
-        'mx-auto'
-      )}
-      {...props}
-    />
+    <h3 className={cn('mb-[var(--spacing-phi-1)]', 'mt-[var(--spacing-phi-2)]')} {...props} />
   ),
 
   h4: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h4
-      className={cn(
-        'heading-subsection',
-        'mb-[var(--spacing-phi--1)]',
-        'mt-[var(--spacing-phi-1)]',
-        'max-w-4xl',
-        'mx-auto'
-      )}
-      {...props}
-    />
+    <h4 className={cn('mb-[var(--spacing-phi--1)]', 'mt-[var(--spacing-phi-1)]')} {...props} />
   ),
 
   h5: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h5
-      className={cn(
-        'heading-component',
-        'mb-[var(--spacing-phi--2)]',
-        'mt-[var(--spacing-phi-0)]',
-        'max-w-4xl',
-        'mx-auto'
-      )}
-      {...props}
-    />
+    <h5 className={cn('mb-[var(--spacing-phi--2)]', 'mt-[var(--spacing-phi-0)]')} {...props} />
   ),
 
   h6: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
@@ -463,6 +418,9 @@ export const mdxComponents = {
   MDXContent,
   MDXGrid,
   MDXCard,
+
+  // Re-export RaftersLogo with proper prop handling
+  RaftersLogo: RaftersLogoComponent,
   MDXHero,
 };
 

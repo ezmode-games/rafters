@@ -25,7 +25,7 @@
 .sbdocs h3 {
   position: relative;
   color: oklch(0.25 0.08 240) !important;
-  font-weight: 600 !important;
+  font-weight: 300 !important;
   letter-spacing: -0.02em !important;
 }
 

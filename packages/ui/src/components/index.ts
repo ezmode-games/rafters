@@ -94,3 +94,6 @@ export {
   TooltipPortal,
 } from './Tooltip';
 export type { TooltipProps, TooltipContentProps, TooltipContext } from './Tooltip';
+
+export { RaftersLogo } from './RaftersLogo';
+export type { RaftersLogoProps } from './RaftersLogo';
