@@ -342,7 +342,7 @@ export const Badge = forwardRef<HTMLElement, BadgeProps>(
                 handleKeyDown(e);
               }
             }}
-            aria-label={`${statusInfo.ariaLabel}${children ? `: ${children}` : ''} - press Enter or Space to activate, Delete to remove`}
+            aria-label={`${statusInfo.ariaLabel}${children ? `: ${children}` : ''} - removable badge`}
             aria-busy={loading}
           >
             {/* Main content zone */}
