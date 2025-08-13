@@ -129,9 +129,8 @@ export const Badge = forwardRef<HTMLElement, BadgeProps>(
         case 'Enter':
           event.preventDefault();
           if (onClick) {
-            // Simulate a click event for keyboard activation
-            const target = event.currentTarget;
-            target.click();
+            // Directly call the onClick handler to avoid double firing
+            onClick(event as unknown as React.MouseEvent<HTMLElement>);
           }
           break;
         case 'Delete':

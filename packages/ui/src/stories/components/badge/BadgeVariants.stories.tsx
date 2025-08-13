@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { AlertTriangle, CheckCircle, Info, Star, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Info, XCircle } from 'lucide-react';
 import { Badge } from '../../../components/Badge';
 
 /**
@@ -109,7 +109,7 @@ export const StatusMatrix: Story = {
         <Badge variant="neutral" emphasis="prominent">
           Label
         </Badge>
-        <Badge variant="neutral" icon={Star}>
+        <Badge variant="neutral" icon={Info}>
           Neutral
         </Badge>
       </div>

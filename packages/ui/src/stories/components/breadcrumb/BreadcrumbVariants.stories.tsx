@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from '@storybook/test';
-import { ArrowRight, ChevronRight, Minus, MoreHorizontal, Slash } from 'lucide-react';
+import { ArrowRight, ChevronRight, Minus, MoreHorizontal } from 'lucide-react';
 import {
   Breadcrumb,
   BreadcrumbItem,
