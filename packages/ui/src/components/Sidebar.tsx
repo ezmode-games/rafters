@@ -31,7 +31,23 @@
  */
 import { contextEasing, contextTiming, timing } from '@rafters/design-tokens/motion';
 import React, { createContext, forwardRef, useCallback, useContext, useState } from 'react';
+import { z } from 'zod';
 import { cn } from '../lib/utils';
+
+// Zod validation schemas for external data (CLAUDE.md requirement)
+const NavigationPathSchema = z
+  .string()
+  .min(1, 'Path cannot be empty')
+  .startsWith('/', 'Path must start with /');
+const LocalStorageValueSchema = z.string();
+const HrefSchema = z.string().refine((val) => {
+  try {
+    new URL(val);
+    return true;
+  } catch {
+    return val.startsWith('/');
+  }
+}, 'Must be a valid URL or path starting with /');
 
 // Context for sidebar state management
 interface SidebarContextValue {
@@ -192,6 +208,18 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(
     },
     ref
   ) => {
+    // Validate external data (CLAUDE.md Zod requirement)
+    const validatedCurrentPath = currentPath
+      ? (() => {
+          try {
+            return NavigationPathSchema.parse(currentPath);
+          } catch (error) {
+            console.warn('Invalid currentPath provided:', error);
+            return currentPath; // Fallback for critical functionality
+          }
+        })()
+      : undefined;
+
     // Navigation state management with trust-building persistence
     const [internalCollapsed, setInternalCollapsed] = useState(defaultCollapsed);
     const isCollapsed = controlledCollapsed ?? internalCollapsed;
@@ -205,7 +233,14 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(
 
       // Trust building: Persist user preference
       if (persistCollapsedState && typeof window !== 'undefined') {
-        localStorage.setItem('sidebar-collapsed', String(newCollapsed));
+        try {
+          const validatedValue = LocalStorageValueSchema.parse(String(newCollapsed));
+          localStorage.setItem('sidebar-collapsed', validatedValue);
+        } catch (error) {
+          console.warn('Failed to validate localStorage value:', error);
+          // Fallback without validation for critical functionality
+          localStorage.setItem('sidebar-collapsed', String(newCollapsed));
+        }
       }
     }, [isCollapsed, controlledCollapsed, onCollapsedChange, persistCollapsedState]);
 
@@ -213,7 +248,7 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(
     const contextValue: SidebarContextValue = {
       collapsed: isCollapsed,
       collapsible,
-      currentPath,
+      currentPath: validatedCurrentPath,
       onNavigate,
       toggleCollapsed,
     };
@@ -511,7 +546,6 @@ export const SidebarItem = forwardRef<HTMLDivElement, SidebarItemProps>(
     // Navigation state intelligence
     const isCurrentPath = currentPath === href;
     const isActive = active || isCurrentPath;
-
     const handleClick = useCallback(
       (event: React.MouseEvent<HTMLDivElement>) => {
         if (disabled || loading) {
@@ -521,8 +555,17 @@ export const SidebarItem = forwardRef<HTMLDivElement, SidebarItemProps>(
 
         // Trust building: Consistent navigation behavior
         if (href && onNavigate) {
-          event.preventDefault();
-          onNavigate(href);
+          try {
+            const validatedHref = HrefSchema.parse(href);
+            const validatedPath = NavigationPathSchema.parse(validatedHref);
+            event.preventDefault();
+            onNavigate(validatedPath);
+          } catch (error) {
+            console.warn('Navigation validation failed:', error);
+            // Fallback for critical functionality - navigate anyway
+            event.preventDefault();
+            onNavigate(href);
+          }
         }
 
         onClick?.(event as React.MouseEvent<HTMLElement>);
@@ -539,8 +582,17 @@ export const SidebarItem = forwardRef<HTMLDivElement, SidebarItemProps>(
 
         // Trust building: Consistent navigation behavior
         if (href && onNavigate) {
-          event.preventDefault();
-          onNavigate(href);
+          try {
+            const validatedHref = HrefSchema.parse(href);
+            const validatedPath = NavigationPathSchema.parse(validatedHref);
+            event.preventDefault();
+            onNavigate(validatedPath);
+          } catch (error) {
+            console.warn('Navigation validation failed:', error);
+            // Fallback for critical functionality - navigate anyway
+            event.preventDefault();
+            onNavigate(href);
+          }
         }
 
         onClick?.(event as React.MouseEvent<HTMLElement>);

@@ -444,6 +444,9 @@ importers:
       tailwind-merge:
         specifier: 'catalog:'
         version: 3.3.1
+      zod:
+        specifier: 'catalog:'
+        version: 4.0.16
     devDependencies:
       '@biomejs/biome':
         specifier: 'catalog:'

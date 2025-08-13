@@ -95,7 +95,8 @@
     "lucide-react": "^0.263.1",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "tailwind-merge": "catalog:"
+    "tailwind-merge": "catalog:",
+    "zod": "catalog:"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
