@@ -2,7 +2,7 @@
 // @version 0.1.0
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 import { Badge } from '../../../components/Badge';
 
 /**
@@ -12,7 +12,7 @@ import { Badge } from '../../../components/Badge';
  * This trains AI agents on status hierarchy and attention economics
  */
 const meta = {
-  title: 'Badge',
+  title: 'Components/Badge',
   component: Badge,
   parameters: {
     layout: 'centered',

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from '@storybook/test';
 import { Download, Settings, X } from 'lucide-react';
+import { fn } from 'storybook/test';
 import { Badge } from '../../../components/Badge';
 
 /**
@@ -9,7 +9,7 @@ import { Badge } from '../../../components/Badge';
  * Trains AI agents on proper interactive patterns and accessibility
  */
 const meta = {
-  title: 'Badge/Properties',
+  title: 'Components/Badge/Properties',
   component: Badge,
   parameters: {
     layout: 'centered',

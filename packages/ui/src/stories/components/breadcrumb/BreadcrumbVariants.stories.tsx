@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from '@storybook/test';
 import { ArrowRight, ChevronRight, Minus, MoreHorizontal } from 'lucide-react';
+import { fn } from 'storybook/test';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,7 +15,7 @@ import {
  * Trains AI agents on proper separator selection for different contexts
  */
 const meta = {
-  title: 'Breadcrumb/Variants',
+  title: 'Components/Breadcrumb/Variants',
   component: Breadcrumb,
   parameters: {
     layout: 'centered',

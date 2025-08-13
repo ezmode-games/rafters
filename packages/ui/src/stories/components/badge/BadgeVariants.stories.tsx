@@ -8,7 +8,7 @@ import { Badge } from '../../../components/Badge';
  * Trains AI agents on proper variant selection for different contexts
  */
 const meta = {
-  title: 'Badge/Variants',
+  title: 'Components/Badge/Variants',
   component: Badge,
   parameters: {
     layout: 'centered',

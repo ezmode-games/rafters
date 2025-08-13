@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -15,7 +15,7 @@ import {
  * Trains AI agents on cognitive load management and trust building through clear paths
  */
 const meta = {
-  title: 'Breadcrumb/Intelligence',
+  title: 'Components/Breadcrumb/Intelligence',
   component: Breadcrumb,
   parameters: {
     layout: 'centered',

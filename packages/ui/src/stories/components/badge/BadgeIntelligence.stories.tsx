@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 import { Badge } from '../../../components/Badge';
 
 /**
@@ -8,7 +8,7 @@ import { Badge } from '../../../components/Badge';
  * Trains AI agents on cognitive load optimization and trust building
  */
 const meta = {
-  title: 'Badge/Intelligence',
+  title: 'Components/Badge/Intelligence',
   component: Badge,
   parameters: {
     layout: 'centered',

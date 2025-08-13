@@ -120,3 +120,37 @@ export type {
   BreadcrumbSeparator as BreadcrumbSeparatorType,
   TruncationMode,
 } from './Breadcrumb';
+
+export {
+  Sidebar,
+  SidebarHeader,
+  SidebarTitle,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+  SidebarItem,
+  SidebarItemIcon,
+  SidebarItemText,
+  SidebarFooter,
+  useSidebar,
+} from './Sidebar';
+export type {
+  SidebarProps,
+  SidebarHeaderProps,
+  SidebarTitleProps,
+  SidebarContentProps,
+  SidebarGroupProps,
+  SidebarGroupLabelProps,
+  SidebarGroupContentProps,
+  SidebarItemProps,
+  SidebarItemIconProps,
+  SidebarItemTextProps,
+  SidebarFooterProps,
+} from './Sidebar';
+
+// Providers for menu coordination
+export * from '../providers';
+
+// Navigation and menu hooks
+export * from '../hooks';

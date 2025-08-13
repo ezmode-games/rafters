@@ -1,0 +1,169 @@
+# Menu Motion Intelligence Guide
+
+Motion intelligence patterns for compositional menu architecture: DropdownMenu, NavigationMenu, ContextMenu, and BreadcrumbMenu integration.
+
+## Executive Summary
+
+Your compositional menu architecture requires coordinated motion intelligence that respects cognitive load, attention economics, and trust-building principles. Each menu type serves distinct interaction contexts and must work harmoniously when active simultaneously.
+
+## Motion Coordination Framework
+
+### Primary Principle: Attention Isolation
+
+Only **one menu type** should command primary attention through motion at any given moment. Secondary motion should support without competing.
+
+### Cognitive Load Budget System
+
+- **Total Interface Budget**: 15 cognitive load points maximum
+- **Active Menu Allocation**: 8-10 points (primary focus)
+- **Supporting Elements**: 3-5 points (secondary awareness)
+- **Reserve Capacity**: 2 points (emergency feedback)
+
+### Motion Priority Hierarchy
+
+1. **ContextMenu** - Highest priority (immediate user intent)
+2. **NavigationMenu** - High priority (task-critical navigation)
+3. **DropdownMenu** - Medium priority (tool access)
+4. **BreadcrumbMenu** - Lowest priority (wayfinding support)
+
+## Component-Specific Motion Patterns
+
+### DropdownMenu Motion Intelligence
+
+**Design Challenge**: Must serve both dropdown and accordion use cases with motion that works for both contexts.
+
+**Unified Motion Pattern**:
+```typescript
+// Universal reveal pattern for both dropdown and accordion
+const dropdownMotion = {
+  timing: contextTiming.modal, // 300ms - balanced for both contexts
+  easing: contextEasing.modalEnter, // Welcoming appearance
+  cognitiveLoad: 4, // Medium impact
+  trustLevel: 'medium',
+  
+  // Dropdown-specific (overlay positioning)
+  dropdownTransform: 'opacity-0 scale-95 translate-y-1',
+  dropdownEnter: 'opacity-100 scale-100 translate-y-0',
+  
+  // Accordion-specific (in-place expansion)  
+  accordionTransform: 'opacity-0 max-h-0',
+  accordionEnter: 'opacity-100 max-h-screen'
+}
+```
+
+**Key Insights**:
+- **Common Timing**: 300ms works for both dropdown appearance and accordion expansion
+- **Contextual Transforms**: Different transforms for overlay vs. in-place behavior
+- **Shared Personality**: Welcoming entrance reduces anxiety in both contexts
+- **Accessibility**: Reduced motion collapses to 0ms for both patterns
+
+### NavigationMenu Motion Intelligence (Recursive)
+
+**Design Challenge**: Handle nested submenu motion without overwhelming users or causing motion sickness.
+
+**Depth-Aware Motion System**:
+```typescript
+const navigationMotion = {
+  // Base timing scales with depth to prevent cascading chaos
+  getTimingForDepth: (depth: number) => {
+    const baseTiming = 200; // Faster than modals
+    const depthPenalty = Math.min(depth * 50, 150); // Max 150ms penalty
+    return Math.min(baseTiming + depthPenalty, 400); // Cap at 400ms
+  },
+  
+  // Depth-aware cognitive load
+  getCognitiveLoadForDepth: (depth: number) => {
+    return Math.min(3 + depth, 7); // Increases with depth, capped at 7
+  },
+  
+  // Staggered entrance for submenu items
+  itemStagger: 50, // 50ms between item appearances
+  maxStagger: 200, // Don't exceed 200ms total stagger
+}
+```
+
+**Recursive Motion Strategy**:
+- **Timing Graduation**: Each level gets slightly slower to prevent cascading chaos
+- **Transform Reduction**: Deeper levels use more subtle transforms
+- **Staggered Entrance**: Menu items appear sequentially, not simultaneously
+- **Cognitive Load Awareness**: Deeper menus automatically respect higher cognitive load
+
+### ContextMenu Motion Intelligence
+
+**Design Challenge**: Needs immediate attention-grabbing motion without being jarring.
+
+**Immediate Response Pattern**:
+```typescript
+const contextMenuMotion = {
+  timing: contextTiming.fast, // 150ms - immediate response
+  easing: contextEasing.snappy, // Sharp feedback for user-initiated action
+  cognitiveLoad: 5, // Higher than other menus due to interruption
+  trustLevel: 'high', // Must feel responsive and reliable
+  
+  // Attention-grabbing but not jarring
+  entryTransform: 'opacity-0 scale-90 translate-y-2',
+  entryTarget: 'opacity-100 scale-100 translate-y-0',
+  
+  // Quick exit to not interfere with user's next action
+  exitTiming: contextTiming.instant, // 75ms
+  exitEasing: contextEasing.decelerating,
+  exitTransform: 'opacity-0 scale-95'
+}
+```
+
+**Strategic Considerations**:
+- **Priority Override**: Context menus can interrupt other menu motion
+- **Immediate Feedback**: Must appear within 150ms of user action
+- **Quick Dismissal**: Fast exit to minimize interference with next action
+- **Position-Aware**: Motion adapts to available screen space
+
+### BreadcrumbMenu Motion Intelligence
+
+**Design Challenge**: Provide subtle wayfinding motion that doesn't compete with primary content.
+
+**Subtle Wayfinding Pattern**:
+```typescript
+const breadcrumbMotion = {
+  timing: contextTiming.hover, // 75ms - immediate feedback
+  easing: contextEasing.smooth, // Natural, unobtrusive
+  cognitiveLoad: 1, // Minimal impact on user attention
+  trustLevel: 'high', // Reliable wayfinding builds trust
+  
+  // Hover feedback (very subtle)
+  hoverTransform: 'text-muted-foreground',
+  hoverTarget: 'text-foreground',
+  
+  // New segment addition (when navigation occurs)
+  segmentEntry: {
+    timing: contextTiming.standard, // 300ms
+    transform: 'opacity-0 translate-x-4',
+    target: 'opacity-100 translate-x-0'
+  }
+}
+```
+
+**Wayfinding Intelligence**:
+- **Background Presence**: Motion should support, never demand attention
+- **Contextual Enhancement**: Slightly more prominent in error/critical contexts
+- **Progressive Disclosure**: Ellipsis expansion uses welcoming animation
+- **Trust Building**: Consistent, predictable motion builds navigation confidence
+
+## Reduced Motion Strategy
+
+**WCAG AAA Compliance Approach**:
+- **0ms Durations**: No micro-flash effects that trigger vestibular issues
+- **Essential Motion Only**: Focus indicators and state feedback remain
+- **Alternative Feedback**: Use color/text changes instead of transforms
+- **Progressive Enhancement**: Enhanced motion for users who can handle it
+
+## Conclusion
+
+This motion intelligence framework provides systematic guidance for creating cohesive, accessible, and trustworthy menu interactions. The key principles are:
+
+1. **Attention Isolation**: Only one menu type commands primary attention
+2. **Cognitive Load Management**: Respect the 15-point interface budget
+3. **Progressive Enhancement**: Base functionality works without motion
+4. **Trust Building**: Consistent, predictable motion personality
+5. **Accessibility First**: 0ms durations and alternative feedback for reduced motion users
+
+By following these patterns, AI agents can create menu experiences that feel coordinated, reduce user anxiety, and build trust through systematic design intelligence.
