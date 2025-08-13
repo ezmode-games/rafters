@@ -151,10 +151,13 @@ export const Badge = forwardRef<HTMLElement, BadgeProps>(
     };
 
     if (isInteractive && removable && onRemove) {
-      // For removable badges, use a container with two separate buttons
+      // Single button solution with separated interaction zones (Sally's recommendation)
       return (
         <div
           ref={ref as React.ForwardedRef<HTMLDivElement>}
+          // biome-ignore lint/a11y/useSemanticElements: div with role="group" is more appropriate than fieldset for badge interaction grouping
+          role="group"
+          aria-label={`${statusInfo.ariaLabel}${children ? `: ${children}` : ''} - clickable badge with remove option`}
           className={cn(
             'inline-flex items-center rounded-md text-xs font-medium select-none',
             'border transition-all duration-150',
@@ -197,22 +200,16 @@ export const Badge = forwardRef<HTMLElement, BadgeProps>(
           )}
           {...props}
         >
-          {/* Main content button */}
           <button
             type="button"
             tabIndex={0}
-            aria-label={
-              props['aria-label'] || `${statusInfo.ariaLabel}${children ? `: ${children}` : ''}`
-            }
-            aria-live={props['aria-live']}
-            aria-busy={loading}
             className={cn(
-              'inline-flex items-center gap-1',
+              'inline-flex items-center gap-1 w-full',
               // Enhanced touch targets for interactive badges (WCAG AAA)
               'min-h-11 min-w-11 touch-manipulation cursor-pointer',
               'hover:opacity-hover focus-visible:outline-none',
               'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-              'active:scale-active rounded-l-md',
+              'active:scale-active rounded-md',
 
               // Loading state feedback
               loading && 'opacity-75 cursor-wait',
@@ -224,81 +221,97 @@ export const Badge = forwardRef<HTMLElement, BadgeProps>(
                 'px-2.5 py-1': size === 'lg',
               }
             )}
-            onClick={onClick}
-            onKeyDown={handleKeyDown}
-          >
-            {/* Icon for multi-sensory status communication */}
-            {Icon && iconPosition === 'left' && (
-              <Icon
-                className={cn(
-                  'flex-shrink-0',
-                  size === 'sm' && 'w-3 h-3',
-                  size === 'md' && 'w-3 h-3',
-                  size === 'lg' && 'w-4 h-4'
-                )}
-                aria-hidden="true"
-              />
-            )}
-
-            {/* Loading indicator */}
-            {loading && (
-              <div
-                className={cn(
-                  'animate-spin rounded-full border-2 border-current border-t-transparent',
-                  size === 'sm' && 'w-3 h-3',
-                  size === 'md' && 'w-3 h-3',
-                  size === 'lg' && 'w-4 h-4'
-                )}
-                aria-hidden="true"
-              />
-            )}
-
-            {/* Content */}
-            {children && <span className="truncate">{children}</span>}
-
-            {/* Right-positioned icon */}
-            {Icon && iconPosition === 'right' && (
-              <Icon
-                className={cn(
-                  'flex-shrink-0',
-                  size === 'sm' && 'w-3 h-3',
-                  size === 'md' && 'w-3 h-3',
-                  size === 'lg' && 'w-4 h-4'
-                )}
-                aria-hidden="true"
-              />
-            )}
-          </button>
-
-          {/* Separate remove button */}
-          <button
-            type="button"
-            className={cn(
-              'flex-shrink-0 rounded-r-md hover:bg-current/20',
-              'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-              'transition-colors duration-150',
-              // Size variants
-              {
-                'p-1': size === 'sm',
-                'p-1.5': size === 'md',
-                'p-2': size === 'lg',
-              }
-            )}
             onClick={(e) => {
-              e.stopPropagation();
-              onRemove();
+              // Check if click was on remove zone
+              const target = e.target as HTMLElement;
+              const removeZone = target.closest('[data-remove-zone]');
+              if (removeZone) {
+                e.stopPropagation();
+                onRemove();
+              } else if (onClick) {
+                onClick(e);
+              }
             }}
-            aria-label="Remove badge"
-            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Delete' || e.key === 'Backspace') {
+                e.preventDefault();
+                onRemove();
+              } else {
+                handleKeyDown(e);
+              }
+            }}
+            aria-label={`${statusInfo.ariaLabel}${children ? `: ${children}` : ''} - press Enter or Space to activate, Delete to remove`}
+            aria-busy={loading}
           >
-            <XCircle
+            {/* Main content zone */}
+            <span className="pointer-events-none inline-flex items-center gap-1 flex-1">
+              {/* Icon for multi-sensory status communication */}
+              {Icon && iconPosition === 'left' && (
+                <Icon
+                  className={cn(
+                    'flex-shrink-0',
+                    size === 'sm' && 'w-3 h-3',
+                    size === 'md' && 'w-3 h-3',
+                    size === 'lg' && 'w-4 h-4'
+                  )}
+                  aria-hidden="true"
+                />
+              )}
+
+              {/* Loading indicator */}
+              {loading && (
+                <div
+                  className={cn(
+                    'animate-spin rounded-full border-2 border-current border-t-transparent',
+                    size === 'sm' && 'w-3 h-3',
+                    size === 'md' && 'w-3 h-3',
+                    size === 'lg' && 'w-4 h-4'
+                  )}
+                  aria-hidden="true"
+                />
+              )}
+
+              {/* Content */}
+              {children && <span className="truncate">{children}</span>}
+
+              {/* Right-positioned icon */}
+              {Icon && iconPosition === 'right' && (
+                <Icon
+                  className={cn(
+                    'flex-shrink-0',
+                    size === 'sm' && 'w-3 h-3',
+                    size === 'md' && 'w-3 h-3',
+                    size === 'lg' && 'w-4 h-4'
+                  )}
+                  aria-hidden="true"
+                />
+              )}
+            </span>
+
+            {/* Remove zone - visually separate but part of same button */}
+            <span
+              data-remove-zone="true"
               className={cn(
-                size === 'sm' && 'w-3 h-3',
-                size === 'md' && 'w-3 h-3',
-                size === 'lg' && 'w-4 h-4'
+                'ml-2 pl-1 border-l border-current/20',
+                'hover:bg-current/10 rounded-r-md cursor-pointer',
+                'inline-flex items-center justify-center',
+                {
+                  'p-0.5': size === 'sm',
+                  'p-1': size === 'md',
+                  'p-1.5': size === 'lg',
+                }
               )}
               aria-hidden="true"
-            />
+            >
+              <XCircle
+                className={cn(
+                  size === 'sm' && 'w-3 h-3',
+                  size === 'md' && 'w-3 h-3',
+                  size === 'lg' && 'w-4 h-4'
+                )}
+                aria-hidden="true"
+              />
+            </span>
           </button>
         </div>
       );
@@ -415,13 +428,31 @@ export const Badge = forwardRef<HTMLElement, BadgeProps>(
       );
     }
 
+    // Semantic element selection based on Sally's recommendations
+    const getSemanticProps = () => {
+      // Use status role for status communication variants
+      if (['success', 'warning', 'error', 'info'].includes(variant)) {
+        return {
+          role: 'status',
+          'aria-live': props['aria-live'] || (variant === 'error' ? 'assertive' : 'polite'),
+          'aria-label':
+            props['aria-label'] || `${statusInfo.ariaLabel}${children ? `: ${children}` : ''}`,
+        };
+      }
+
+      // Use generic span for labels/categories
+      return {
+        'aria-label':
+          props['aria-label'] || `${statusInfo.ariaLabel}${children ? `: ${children}` : ''}`,
+        'aria-live': props['aria-live'],
+      };
+    };
+
+    const semanticProps = getSemanticProps();
+
     return (
-      <output
-        ref={ref as React.ForwardedRef<HTMLOutputElement>}
-        aria-label={
-          props['aria-label'] || `${statusInfo.ariaLabel}${children ? `: ${children}` : ''}`
-        }
-        aria-live={props['aria-live']}
+      <span
+        ref={ref as React.ForwardedRef<HTMLSpanElement>}
         aria-busy={loading}
         className={cn(
           // Base styles with semantic tokens
@@ -468,6 +499,7 @@ export const Badge = forwardRef<HTMLElement, BadgeProps>(
 
           className
         )}
+        {...semanticProps}
         {...props}
       >
         {/* Icon for multi-sensory status communication */}
@@ -511,7 +543,7 @@ export const Badge = forwardRef<HTMLElement, BadgeProps>(
             aria-hidden="true"
           />
         )}
-      </output>
+      </span>
     );
   }
 );
