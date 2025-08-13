@@ -2,7 +2,6 @@
 // @version 0.1.0
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from '@storybook/test';
 import {
   AlertTriangle,
   BarChart3,
@@ -19,6 +18,7 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
+import { fn } from 'storybook/test';
 import {
   Sidebar,
   SidebarContent,
