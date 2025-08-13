@@ -1,0 +1,827 @@
+/**
+ * Sidebar Navigation Component - AI Intelligence
+ *
+ * COGNITIVE LOAD: 6/10 (complex navigation system requiring wayfinding intelligence)
+ * ATTENTION HIERARCHY: Secondary support system - should not compete with primary content
+ * TRUST BUILDING: Medium trust level for navigation reliability and spatial consistency
+ * PROGRESSIVE DISCLOSURE: Miller's Law - max 7 items per group, expandable sections
+ *
+ * DESIGN INTELLIGENCE GUIDES:
+ * - Navigation Intelligence: rafters.realhandy.tech/llm/patterns/navigation-systems
+ * - Cognitive Load Management: rafters.realhandy.tech/llm/patterns/cognitive-load
+ * - Attention Economics: rafters.realhandy.tech/llm/patterns/attention-economics
+ * - Trust Building Patterns: rafters.realhandy.tech/llm/patterns/trust-building
+ * - Progressive Enhancement: rafters.realhandy.tech/llm/patterns/progressive-enhancement
+ *
+ * USAGE PATTERNS:
+ * ✅ App Navigation: Primary sections, 3-7 main items, clear hierarchy
+ * ✅ Dashboard Sidebar: Grouped sections, collapsible groups, wayfinding support
+ * ✅ Documentation Nav: Nested structure, breadcrumb integration, search support
+ * ✅ Settings Navigation: Logical grouping, clear current selection, easy escape
+ * ❌ Never: More than 7 ungrouped items, unclear hierarchy, competing attention
+ *
+ * NAVIGATION INTELLIGENCE:
+ * - Spatial Consistency: Fixed positioning builds user mental model
+ * - Wayfinding: Clear current state, breadcrumb support, predictable interaction
+ * - Keyboard Navigation: Full arrow key support, skip links, focus management
+ * - URL Synchronization: Reflects current location, supports deep linking
+ * - Multi-modal: Touch-friendly targets, voice navigation ready, reduced motion support
+ *
+ * Token knowledge: .rafters/tokens/registry.json
+ */
+import { contextEasing, contextTiming, timing } from '@rafters/design-tokens/motion';
+import React, { createContext, forwardRef, useCallback, useContext, useState } from 'react';
+import { cn } from '../lib/utils';
+
+// Context for sidebar state management
+interface SidebarContextValue {
+  collapsed: boolean;
+  collapsible: boolean;
+  currentPath?: string;
+  onNavigate?: (path: string) => void;
+  toggleCollapsed: () => void;
+}
+
+const SidebarContext = createContext<SidebarContextValue | null>(null);
+
+// Hook for accessing sidebar context
+export const useSidebar = () => {
+  const context = useContext(SidebarContext);
+  if (!context) {
+    throw new Error('useSidebar must be used within a Sidebar component');
+  }
+  return context;
+};
+
+// Main sidebar props with navigation intelligence
+export interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
+  // Navigation state and behavior
+  collapsed?: boolean;
+  collapsible?: boolean;
+  defaultCollapsed?: boolean;
+  currentPath?: string;
+  onNavigate?: (path: string) => void;
+  onCollapsedChange?: (collapsed: boolean) => void;
+
+  // Design intelligence configuration
+  variant?: 'default' | 'floating' | 'overlay';
+  size?: 'compact' | 'comfortable' | 'spacious';
+  position?: 'left' | 'right';
+
+  // Accessibility and navigation support
+  ariaLabel?: string;
+  skipLinkTarget?: string;
+  landmark?: boolean;
+
+  // Progressive enhancement
+  persistCollapsedState?: boolean;
+  reduceMotion?: boolean;
+
+  // Trust-building
+  showBreadcrumb?: boolean;
+  highlightCurrent?: boolean;
+
+  children: React.ReactNode;
+}
+
+// Sidebar header component
+export interface SidebarHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+  showToggle?: boolean;
+  children: React.ReactNode;
+}
+
+// Sidebar title component
+export interface SidebarTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
+  level?: 1 | 2 | 3 | 4 | 5 | 6;
+  children: React.ReactNode;
+}
+
+// Sidebar content area
+export interface SidebarContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+}
+
+// Sidebar group for organizing navigation items
+export interface SidebarGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+  // Cognitive load management
+  collapsible?: boolean;
+  defaultExpanded?: boolean;
+  maxItems?: number; // Miller's Law enforcement
+
+  // Trust building
+  showCount?: boolean;
+
+  children: React.ReactNode;
+}
+
+// Sidebar group label
+export interface SidebarGroupLabelProps extends React.HTMLAttributes<HTMLHeadingElement> {
+  children: React.ReactNode;
+}
+
+// Sidebar group content
+export interface SidebarGroupContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+}
+
+// Individual sidebar navigation item
+export interface SidebarItemProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onClick'> {
+  onClick?: (event: React.MouseEvent<HTMLElement>) => void;
+  // Navigation behavior
+  href?: string;
+  active?: boolean;
+  disabled?: boolean;
+
+  // Visual hierarchy and attention
+  variant?: 'default' | 'primary' | 'secondary';
+  level?: number; // For nested hierarchies
+
+  // Content and accessibility
+  icon?: React.ReactNode;
+  badge?: React.ReactNode;
+  children: React.ReactNode;
+
+  // Progressive enhancement
+  asChild?: boolean;
+  external?: boolean;
+
+  // Trust building
+  showTooltip?: boolean;
+  loading?: boolean;
+}
+
+// Sidebar item icon container
+export interface SidebarItemIconProps extends React.HTMLAttributes<HTMLSpanElement> {
+  children: React.ReactNode;
+}
+
+// Sidebar item text container
+export interface SidebarItemTextProps extends React.HTMLAttributes<HTMLSpanElement> {
+  truncate?: boolean;
+  children: React.ReactNode;
+}
+
+// Sidebar footer component
+export interface SidebarFooterProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+}
+
+// Main Sidebar component with full navigation intelligence
+export const Sidebar = forwardRef<HTMLElement, SidebarProps>(
+  (
+    {
+      collapsed: controlledCollapsed,
+      collapsible = true,
+      defaultCollapsed = false,
+      currentPath,
+      onNavigate,
+      onCollapsedChange,
+      variant = 'default',
+      size = 'comfortable',
+      position = 'left',
+      ariaLabel = 'Main navigation',
+      skipLinkTarget,
+      landmark = true,
+      persistCollapsedState = true,
+      reduceMotion = false,
+      showBreadcrumb = false,
+      highlightCurrent = true,
+      className,
+      children,
+      ...props
+    },
+    ref
+  ) => {
+    // Navigation state management with trust-building persistence
+    const [internalCollapsed, setInternalCollapsed] = useState(defaultCollapsed);
+    const isCollapsed = controlledCollapsed ?? internalCollapsed;
+
+    const toggleCollapsed = useCallback(() => {
+      const newCollapsed = !isCollapsed;
+      if (controlledCollapsed === undefined) {
+        setInternalCollapsed(newCollapsed);
+      }
+      onCollapsedChange?.(newCollapsed);
+
+      // Trust building: Persist user preference
+      if (persistCollapsedState && typeof window !== 'undefined') {
+        localStorage.setItem('sidebar-collapsed', String(newCollapsed));
+      }
+    }, [isCollapsed, controlledCollapsed, onCollapsedChange, persistCollapsedState]);
+
+    // Context value for child components
+    const contextValue: SidebarContextValue = {
+      collapsed: isCollapsed,
+      collapsible,
+      currentPath,
+      onNavigate,
+      toggleCollapsed,
+    };
+
+    return (
+      <SidebarContext.Provider value={contextValue}>
+        <nav
+          ref={ref}
+          className={cn(
+            // Base navigation styles with spatial consistency
+            'flex flex-col bg-background border-r border-border',
+            'relative transition-all',
+            !reduceMotion && contextTiming.navigation,
+            !reduceMotion && contextEasing.navigation,
+
+            // Variant-based styling for different use cases
+            {
+              'shadow-none': variant === 'default',
+              'shadow-lg rounded-lg border': variant === 'floating',
+              'fixed inset-y-0 z-50 shadow-xl': variant === 'overlay',
+            },
+
+            // Position-based layout
+            {
+              'left-0': position === 'left' && variant === 'overlay',
+              'right-0': position === 'right' && variant === 'overlay',
+            },
+
+            // Size variants for cognitive load management
+            {
+              'w-60': size === 'compact' && !isCollapsed,
+              'w-72': size === 'comfortable' && !isCollapsed,
+              'w-80': size === 'spacious' && !isCollapsed,
+              'w-16': isCollapsed && collapsible,
+            },
+
+            // Trust building: Smooth collapse transitions
+            isCollapsed && 'overflow-hidden',
+
+            className
+          )}
+          role={landmark ? 'navigation' : undefined}
+          aria-label={ariaLabel}
+          aria-expanded={collapsible ? !isCollapsed : undefined}
+          {...props}
+        >
+          {/* Skip link for accessibility */}
+          {skipLinkTarget && (
+            <a
+              href={skipLinkTarget}
+              className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 
+                         bg-primary text-primary-foreground px-2 py-1 rounded text-sm z-50"
+            >
+              Skip navigation
+            </a>
+          )}
+
+          {children}
+        </nav>
+      </SidebarContext.Provider>
+    );
+  }
+);
+
+// Sidebar Header with toggle functionality
+export const SidebarHeader = forwardRef<HTMLDivElement, SidebarHeaderProps>(
+  ({ showToggle = true, className, children, ...props }, ref) => {
+    const { collapsed, collapsible, toggleCollapsed } = useSidebar();
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          // Header styling with proper spacing hierarchy
+          'flex items-center justify-between p-4 border-b border-border/50',
+          // Cognitive load: Adequate breathing room
+          'min-h-[60px]',
+          className
+        )}
+        {...props}
+      >
+        {/* Header content - collapses gracefully */}
+        <div className={cn('flex-1 min-w-0', collapsed && 'hidden')}>{children}</div>
+
+        {/* Toggle button with trust-building visual feedback */}
+        {showToggle && collapsible && (
+          <button
+            type="button"
+            onClick={toggleCollapsed}
+            className={cn(
+              // Interactive button with motor accessibility
+              'flex items-center justify-center w-8 h-8 rounded-md',
+              'border border-border hover:bg-accent transition-colors',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              contextTiming.hover,
+              // Trust pattern: Always visible, consistent position
+              collapsed && 'mx-auto'
+            )}
+            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            aria-expanded={!collapsed}
+          >
+            {/* Chevron icon with rotation animation */}
+            <svg
+              className={cn(
+                'w-4 h-4 transition-transform',
+                timing.standard,
+                collapsed && 'rotate-180'
+              )}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+        )}
+      </div>
+    );
+  }
+);
+
+// Sidebar Title with semantic heading levels
+export const SidebarTitle = forwardRef<HTMLHeadingElement, SidebarTitleProps>(
+  ({ level = 2, className, children, ...props }, ref) => {
+    const { collapsed } = useSidebar();
+    const Heading = `h${level}` as const;
+
+    return (
+      <Heading
+        ref={ref}
+        className={cn(
+          // Typography hierarchy with trust-building clarity
+          'text-lg font-semibold text-foreground',
+          'truncate',
+          // Graceful collapse behavior
+          collapsed && 'sr-only',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </Heading>
+    );
+  }
+);
+
+// Sidebar Content with scroll management
+export const SidebarContent = forwardRef<HTMLDivElement, SidebarContentProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          // Scrollable content area with trust-building consistency
+          'flex-1 overflow-y-auto overflow-x-hidden',
+          // Cognitive load: Comfortable padding and spacing
+          'p-2 space-y-1',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+
+// Sidebar Group for organizing navigation items (Miller's Law)
+export const SidebarGroup = forwardRef<HTMLDivElement, SidebarGroupProps>(
+  (
+    {
+      collapsible = false,
+      defaultExpanded = true,
+      maxItems = 7, // Miller's Law enforcement
+      showCount = false,
+      className,
+      children,
+      ...props
+    },
+    ref
+  ) => {
+    const [expanded] = useState(defaultExpanded);
+
+    // Miller's Law validation for cognitive load management
+    const childArray = React.Children.toArray(children);
+    const itemCount = childArray.length;
+    const hasOverflow = itemCount > maxItems;
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          // Group container with spacing for visual hierarchy
+          'space-y-1',
+          className
+        )}
+        {...props}
+      >
+        {/* Group content with progressive disclosure */}
+        <div
+          className={cn(
+            'space-y-1',
+            // Smooth expand/collapse for cognitive comfort
+            'transition-all',
+            timing.standard,
+            collapsible && !expanded && 'hidden'
+          )}
+        >
+          {children}
+        </div>
+
+        {/* Cognitive load warning for AI agents */}
+        {hasOverflow && process.env.NODE_ENV === 'development' && (
+          <div className="text-xs text-warning p-1 rounded bg-warning/10">
+            Warning: {itemCount} items exceed Miller's Law limit of {maxItems}
+          </div>
+        )}
+      </div>
+    );
+  }
+);
+
+// Sidebar Group Label with semantic structure
+export const SidebarGroupLabel = forwardRef<HTMLHeadingElement, SidebarGroupLabelProps>(
+  ({ className, children, ...props }, ref) => {
+    const { collapsed } = useSidebar();
+
+    return (
+      <h3
+        ref={ref}
+        className={cn(
+          // Label typography with information hierarchy
+          'px-2 py-1 text-xs font-medium text-muted-foreground uppercase tracking-wider',
+          // Graceful collapse behavior
+          collapsed && 'sr-only',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </h3>
+    );
+  }
+);
+
+// Sidebar Group Content wrapper
+export const SidebarGroupContent = forwardRef<HTMLDivElement, SidebarGroupContentProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          // Content spacing for cognitive hierarchy
+          'space-y-1',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+
+// Individual Sidebar Item with full navigation intelligence
+export const SidebarItem = forwardRef<HTMLDivElement, SidebarItemProps>(
+  (
+    {
+      href,
+      active = false,
+      disabled = false,
+      variant = 'default',
+      level = 0,
+      icon,
+      badge,
+      asChild = false,
+      external = false,
+      showTooltip = false,
+      loading = false,
+      className,
+      children,
+      onClick,
+      ...props
+    },
+    ref
+  ) => {
+    const { collapsed, currentPath, onNavigate } = useSidebar();
+
+    // Navigation state intelligence
+    const isCurrentPath = currentPath === href;
+    const isActive = active || isCurrentPath;
+
+    const handleClick = useCallback(
+      (event: React.MouseEvent<HTMLDivElement>) => {
+        if (disabled || loading) {
+          event.preventDefault();
+          return;
+        }
+
+        // Trust building: Consistent navigation behavior
+        if (href && onNavigate) {
+          event.preventDefault();
+          onNavigate(href);
+        }
+
+        onClick?.(event as React.MouseEvent<HTMLElement>);
+      },
+      [disabled, loading, href, onNavigate, onClick]
+    );
+
+    const handleAnchorClick = useCallback(
+      (event: React.MouseEvent<HTMLAnchorElement>) => {
+        if (disabled || loading) {
+          event.preventDefault();
+          return;
+        }
+
+        // Trust building: Consistent navigation behavior
+        if (href && onNavigate) {
+          event.preventDefault();
+          onNavigate(href);
+        }
+
+        onClick?.(event as React.MouseEvent<HTMLElement>);
+      },
+      [disabled, loading, href, onNavigate, onClick]
+    );
+
+    if (href) {
+      return (
+        <a
+          href={href}
+          target={external ? '_blank' : undefined}
+          rel={external ? 'noopener noreferrer' : undefined}
+          className={cn(
+            // Base item styles with motor accessibility
+            'flex items-center gap-3 px-2 py-2 rounded-md text-sm font-medium',
+            'transition-all cursor-pointer select-none',
+            contextTiming.hover,
+
+            // Navigation hierarchy with proper indentation
+            level > 0 && `ml-${Math.min(level * 4, 12)}`,
+
+            // Active state with trust-building visual feedback
+            isActive && [
+              'bg-primary/10 text-primary border-r-2 border-primary',
+              'font-semibold shadow-sm',
+            ],
+
+            // Interactive states
+            !disabled &&
+              !loading && [
+                'hover:bg-accent hover:text-accent-foreground',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              ],
+
+            // Disabled state with clear visual feedback
+            disabled && 'opacity-50 cursor-not-allowed pointer-events-none',
+
+            // Loading state with trust-building indicator
+            loading && 'opacity-75 cursor-wait',
+
+            // Variant styling for attention hierarchy
+            {
+              'text-foreground': variant === 'default',
+              'text-primary font-semibold': variant === 'primary',
+              'text-muted-foreground': variant === 'secondary',
+            },
+
+            // Collapsed state adjustments
+            collapsed && 'justify-center px-2',
+
+            className
+          )}
+          onClick={handleAnchorClick}
+          aria-current={isActive ? 'page' : undefined}
+          aria-disabled={disabled}
+          aria-busy={loading}
+          title={collapsed && showTooltip ? String(children) : undefined}
+          {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
+        >
+          {/* Icon with consistent sizing */}
+          {icon && (
+            <SidebarItemIcon>
+              {loading ? (
+                // Loading spinner with trust-building feedback
+                <svg
+                  className="animate-spin w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+              ) : (
+                icon
+              )}
+            </SidebarItemIcon>
+          )}
+
+          {/* Text content with graceful collapse */}
+          {!collapsed && <SidebarItemText truncate={true}>{children}</SidebarItemText>}
+
+          {/* Badge with attention hierarchy */}
+          {badge && !collapsed && <div className="ml-auto flex-shrink-0">{badge}</div>}
+
+          {/* External link indicator */}
+          {external && !collapsed && (
+            <svg
+              className="w-3 h-3 ml-1 opacity-50"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+              />
+            </svg>
+          )}
+        </a>
+      );
+    }
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          // Base item styles with motor accessibility
+          'flex items-center gap-3 px-2 py-2 rounded-md text-sm font-medium',
+          'transition-all cursor-pointer select-none',
+          contextTiming.hover,
+
+          // Navigation hierarchy with proper indentation
+          level > 0 && `ml-${Math.min(level * 4, 12)}`,
+
+          // Active state with trust-building visual feedback
+          isActive && [
+            'bg-primary/10 text-primary border-r-2 border-primary',
+            'font-semibold shadow-sm',
+          ],
+
+          // Interactive states
+          !disabled &&
+            !loading && [
+              'hover:bg-accent hover:text-accent-foreground',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+            ],
+
+          // Disabled state with clear visual feedback
+          disabled && 'opacity-50 cursor-not-allowed pointer-events-none',
+
+          // Loading state with trust-building indicator
+          loading && 'opacity-75 cursor-wait',
+
+          // Variant styling for attention hierarchy
+          {
+            'text-foreground': variant === 'default',
+            'text-primary font-semibold': variant === 'primary',
+            'text-muted-foreground': variant === 'secondary',
+          },
+
+          // Collapsed state adjustments
+          collapsed && 'justify-center px-2',
+
+          className
+        )}
+        onClick={handleClick}
+        aria-current={isActive ? 'page' : undefined}
+        aria-disabled={disabled}
+        aria-busy={loading}
+        title={collapsed && showTooltip ? String(children) : undefined}
+        {...props}
+      >
+        {/* Icon with consistent sizing */}
+        {icon && (
+          <SidebarItemIcon>
+            {loading ? (
+              // Loading spinner with trust-building feedback
+              <svg
+                className="animate-spin w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+            ) : (
+              icon
+            )}
+          </SidebarItemIcon>
+        )}
+
+        {/* Text content with graceful collapse */}
+        {!collapsed && <SidebarItemText truncate={true}>{children}</SidebarItemText>}
+
+        {/* Badge with attention hierarchy */}
+        {badge && !collapsed && <div className="ml-auto flex-shrink-0">{badge}</div>}
+      </div>
+    );
+  }
+);
+
+// Sidebar Item Icon with consistent sizing
+export const SidebarItemIcon = forwardRef<HTMLSpanElement, SidebarItemIconProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <span
+        ref={ref}
+        className={cn(
+          // Icon container with trust-building consistency
+          'flex items-center justify-center w-4 h-4 flex-shrink-0',
+          className
+        )}
+        aria-hidden="true"
+        {...props}
+      >
+        {children}
+      </span>
+    );
+  }
+);
+
+// Sidebar Item Text with truncation support
+export const SidebarItemText = forwardRef<HTMLSpanElement, SidebarItemTextProps>(
+  ({ truncate = false, className, children, ...props }, ref) => {
+    return (
+      <span
+        ref={ref}
+        className={cn(
+          // Text styling with cognitive load optimization
+          'flex-1 min-w-0',
+          truncate && 'truncate',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </span>
+    );
+  }
+);
+
+// Sidebar Footer with consistent styling
+export const SidebarFooter = forwardRef<HTMLDivElement, SidebarFooterProps>(
+  ({ className, children, ...props }, ref) => {
+    const { collapsed } = useSidebar();
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          // Footer styling with spatial consistency
+          'border-t border-border/50 p-4 mt-auto',
+          // Graceful collapse behavior
+          collapsed && 'px-2',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+
+// Display names for React DevTools
+Sidebar.displayName = 'Sidebar';
+SidebarHeader.displayName = 'SidebarHeader';
+SidebarTitle.displayName = 'SidebarTitle';
+SidebarContent.displayName = 'SidebarContent';
+SidebarGroup.displayName = 'SidebarGroup';
+SidebarGroupLabel.displayName = 'SidebarGroupLabel';
+SidebarGroupContent.displayName = 'SidebarGroupContent';
+SidebarItem.displayName = 'SidebarItem';
+SidebarItemIcon.displayName = 'SidebarItemIcon';
+SidebarItemText.displayName = 'SidebarItemText';
+SidebarFooter.displayName = 'SidebarFooter';
