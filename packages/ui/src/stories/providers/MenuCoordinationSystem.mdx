@@ -1,0 +1,118 @@
+import { Meta, Canvas } from '@storybook/addon-docs';
+import * as Stories from './MenuCoordinationSystem.stories.tsx';
+
+<Meta title="02 Providers/MenuCoordinationSystem" of={Stories} name="Overview" />
+
+# Menu Coordination System
+
+The foundation of intelligent menu behavior. Every menu interaction is an opportunity to build user trust or erode it. Our coordination system ensures menus work together harmoniously, never fighting for attention or overwhelming users.
+
+## Design Philosophy
+
+**Cognitive Load as Currency**: We treat attention as a finite resource with a 15-point budget system. Each menu interaction costs cognitive points, and the system prevents overload by queuing or reducing complexity when the budget is exceeded.
+
+**Trust Through Consistency**: Predictable behavior builds confidence. Users learn to trust that menus will behave consistently across contexts, whether they're navigating with keyboard, mouse, or screen reader.
+
+**Progressive Enhancement Architecture**: Core functionality works without coordination. Enhanced behavior emerges when the full system is available, ensuring graceful degradation and universal accessibility.
+
+## System Components
+
+### 1. MenuProvider - Core Coordination
+- **Cognitive Load Budget**: 15-point maximum with priority-based allocation
+- **Attention Management**: Only one menu type commands primary attention through motion
+- **Registration System**: Menus register for coordination, receive coordination services
+
+### 2. FocusManager - Focus Orchestration  
+- **Focus Traps**: Manage focus containment without conflicts across menu types
+- **Restoration**: Intelligent focus restoration when menus close
+- **Screen Reader Support**: Proper ARIA region management and announcements
+
+### 3. KeyboardNavigationProvider - Unified Shortcuts
+- **Context-Aware Patterns**: Different menu types get appropriate keyboard behaviors
+- **Type-Ahead Search**: Universal search across all menu contexts
+- **Global Coordination**: Prevent shortcut conflicts between simultaneous menus
+
+### 4. AnnouncementProvider - Accessibility Coordination
+- **ARIA Live Regions**: Coordinated screen reader announcements without conflicts  
+- **Priority Management**: Critical announcements take precedence over informational ones
+- **Debouncing**: Prevent announcement spam from rapid interactions
+
+### 5. MotionCoordinator - Animation Intelligence
+- **Performance Budgets**: Maximum 3 concurrent animations with GPU acceleration
+- **Priority System**: Context menus override dropdown animations when needed
+- **Accessibility**: Automatic reduced motion compliance and vestibular safety
+
+## Coordination Principles
+
+### Attention Economics
+- **Single Primary Focus**: Only one menu type commands attention through motion at any time
+- **Hierarchical Priority**: ContextMenu > NavigationMenu > DropdownMenu > BreadcrumbMenu
+- **Graceful Degradation**: Lower priority menus automatically reduce motion complexity
+
+### Trust Building Patterns
+- **Predictable Timing**: Consistent animation durations create reliable expectations
+- **Spatial Consistency**: Menus appear in logical, expected locations
+- **Feedback Loops**: Every interaction provides clear, immediate feedback
+
+### Cognitive Load Management
+- **Miller's Rule Compliance**: Maximum 7±2 simultaneous interface elements
+- **Progressive Disclosure**: Complex menus reveal information gradually
+- **Escape Hatches**: Clear ways to dismiss or step back from any interaction
+
+## Integration Usage
+
+```tsx
+import { MenuCoordinationSystem } from '@rafters/ui';
+
+function App() {
+  return (
+    <MenuCoordinationSystem
+      menuProvider={{
+        maxCognitiveLoad: 15,
+        onLoadExceeded: (current, max) => {
+          console.warn(`Cognitive load exceeded: ${current}/${max}`);
+        },
+      }}
+      focusManager={{
+        announceChanges: true,
+      }}
+      keyboardNavigation={{
+        enableTypeAhead: true,
+      }}
+      announcements={{
+        config: {
+          maxConcurrentAnnouncements: 2,
+          verbosityLevel: 'standard',
+        },
+      }}
+      motionCoordinator={{
+        budget: {
+          maxConcurrentAnimations: 3,
+          respectReducedMotion: true,
+        },
+      }}
+    >
+      <Navigation />
+      <DropdownMenus />
+      <ContextMenus />
+      <BreadcrumbTrails />
+    </MenuCoordinationSystem>
+  );
+}
+```
+
+## AI Agent Guidelines
+
+When implementing menus with this coordination system:
+
+1. **Read Component Intelligence**: Every menu component contains embedded guidance about cognitive load, trust levels, and usage contexts
+
+2. **Use Semantic Patterns**: Follow the embedded design reasoning rather than guessing at appropriate behavior
+
+3. **Trust the System**: The coordination system handles conflicts automatically - focus on component-specific logic
+
+4. **Test Integration**: Always test menu combinations, not just individual menus in isolation
+
+5. **Monitor Budgets**: Use the debug tools to understand cognitive load distribution and performance impact
+
+This system enables you to create sophisticated, accessible menu experiences while maintaining the simplicity of individual component implementation.
