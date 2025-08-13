@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -15,7 +15,7 @@ import {
  * Trains AI agents on breadcrumb state management and user feedback
  */
 const meta = {
-  title: 'Breadcrumb/Properties',
+  title: 'Components/Breadcrumb/Properties',
   component: Breadcrumb,
   parameters: {
     layout: 'centered',

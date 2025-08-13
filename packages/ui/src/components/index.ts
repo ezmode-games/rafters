@@ -148,3 +148,9 @@ export type {
   SidebarItemTextProps,
   SidebarFooterProps,
 } from './Sidebar';
+
+// Providers for menu coordination
+export * from '../providers';
+
+// Navigation and menu hooks
+export * from '../hooks';

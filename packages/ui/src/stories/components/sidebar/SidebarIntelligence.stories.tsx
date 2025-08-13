@@ -30,6 +30,7 @@ import {
   SidebarItem,
   SidebarTitle,
 } from '../../../components/Sidebar';
+import { MenuProvider } from '../../../providers';
 
 /**
  * AI Training: Sidebar Navigation Intelligence
@@ -37,7 +38,7 @@ import {
  * Teaches AI agents systematic navigation design and Miller's Law enforcement
  */
 const meta = {
-  title: '03 Components/Navigation/Sidebar/Intelligence',
+  title: 'Components/Sidebar/Intelligence',
   component: Sidebar,
   parameters: {
     layout: 'fullscreen',
@@ -65,72 +66,74 @@ export const MillersLawEnforcement: Story = {
   render: (args) => {
     return (
       <div className="flex h-screen bg-muted/20">
-        <Sidebar {...args} currentPath="/dashboard" className="border-r" size="comfortable">
-          <SidebarHeader>
-            <SidebarTitle>Miller's Law Demo</SidebarTitle>
-          </SidebarHeader>
+        <MenuProvider>
+          <Sidebar {...args} currentPath="/dashboard" className="border-r" size="comfortable">
+            <SidebarHeader>
+              <SidebarTitle>Miller's Law Demo</SidebarTitle>
+            </SidebarHeader>
 
-          <SidebarContent>
-            {/* GOOD: 6 items - within Miller's Law limit */}
-            <SidebarGroup maxItems={7}>
-              <SidebarGroupLabel>Main Features (6 items - GOOD)</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarItem href="/dashboard" icon={<Home />} active>
-                  Dashboard
-                </SidebarItem>
-                <SidebarItem href="/users" icon={<Users />}>
-                  Users
-                </SidebarItem>
-                <SidebarItem href="/analytics" icon={<BarChart3 />}>
-                  Analytics
-                </SidebarItem>
-                <SidebarItem href="/documents" icon={<FileText />}>
-                  Documents
-                </SidebarItem>
-                <SidebarItem href="/settings" icon={<Settings />}>
-                  Settings
-                </SidebarItem>
-                <SidebarItem href="/help" icon={<HelpCircle />}>
-                  Help
-                </SidebarItem>
-              </SidebarGroupContent>
-            </SidebarGroup>
+            <SidebarContent>
+              {/* GOOD: 6 items - within Miller's Law limit */}
+              <SidebarGroup maxItems={7}>
+                <SidebarGroupLabel>Main Features (6 items - GOOD)</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarItem href="/dashboard" icon={<Home />} active>
+                    Dashboard
+                  </SidebarItem>
+                  <SidebarItem href="/users" icon={<Users />}>
+                    Users
+                  </SidebarItem>
+                  <SidebarItem href="/analytics" icon={<BarChart3 />}>
+                    Analytics
+                  </SidebarItem>
+                  <SidebarItem href="/documents" icon={<FileText />}>
+                    Documents
+                  </SidebarItem>
+                  <SidebarItem href="/settings" icon={<Settings />}>
+                    Settings
+                  </SidebarItem>
+                  <SidebarItem href="/help" icon={<HelpCircle />}>
+                    Help
+                  </SidebarItem>
+                </SidebarGroupContent>
+              </SidebarGroup>
 
-            {/* BAD: 9 items - exceeds Miller's Law (triggers development warning) */}
-            <SidebarGroup maxItems={7}>
-              <SidebarGroupLabel>Admin Tools (9 items - BAD)</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarItem href="/admin/security" icon={<Shield />}>
-                  Security
-                </SidebarItem>
-                <SidebarItem href="/admin/database" icon={<Database />}>
-                  Database
-                </SidebarItem>
-                <SidebarItem href="/admin/api" icon={<Code2 />}>
-                  API Management
-                </SidebarItem>
-                <SidebarItem href="/admin/integrations" icon={<Layers />}>
-                  Integrations
-                </SidebarItem>
-                <SidebarItem href="/admin/performance" icon={<Zap />}>
-                  Performance
-                </SidebarItem>
-                <SidebarItem href="/admin/monitoring" icon={<Monitor />}>
-                  Monitoring
-                </SidebarItem>
-                <SidebarItem href="/admin/logs" icon={<FileText />}>
-                  Logs
-                </SidebarItem>
-                <SidebarItem href="/admin/backups" icon={<Database />}>
-                  Backups
-                </SidebarItem>
-                <SidebarItem href="/admin/system" icon={<Cpu />}>
-                  System Health
-                </SidebarItem>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
-        </Sidebar>
+              {/* BAD: 9 items - exceeds Miller's Law (triggers development warning) */}
+              <SidebarGroup maxItems={7}>
+                <SidebarGroupLabel>Admin Tools (9 items - BAD)</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarItem href="/admin/security" icon={<Shield />}>
+                    Security
+                  </SidebarItem>
+                  <SidebarItem href="/admin/database" icon={<Database />}>
+                    Database
+                  </SidebarItem>
+                  <SidebarItem href="/admin/api" icon={<Code2 />}>
+                    API Management
+                  </SidebarItem>
+                  <SidebarItem href="/admin/integrations" icon={<Layers />}>
+                    Integrations
+                  </SidebarItem>
+                  <SidebarItem href="/admin/performance" icon={<Zap />}>
+                    Performance
+                  </SidebarItem>
+                  <SidebarItem href="/admin/monitoring" icon={<Monitor />}>
+                    Monitoring
+                  </SidebarItem>
+                  <SidebarItem href="/admin/logs" icon={<FileText />}>
+                    Logs
+                  </SidebarItem>
+                  <SidebarItem href="/admin/backups" icon={<Database />}>
+                    Backups
+                  </SidebarItem>
+                  <SidebarItem href="/admin/system" icon={<Cpu />}>
+                    System Health
+                  </SidebarItem>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
+          </Sidebar>
+        </MenuProvider>
 
         <main className="flex-1 p-6 overflow-auto">
           <div className="max-w-2xl space-y-6">
@@ -180,64 +183,66 @@ export const ProgressiveDisclosure: Story = {
   render: (args) => {
     return (
       <div className="flex h-screen bg-muted/20">
-        <Sidebar {...args} currentPath="/projects/web" className="border-r" size="comfortable">
-          <SidebarHeader>
-            <SidebarTitle>Project Manager</SidebarTitle>
-          </SidebarHeader>
+        <MenuProvider>
+          <Sidebar {...args} currentPath="/projects/web" className="border-r" size="comfortable">
+            <SidebarHeader>
+              <SidebarTitle>Project Manager</SidebarTitle>
+            </SidebarHeader>
 
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel>Overview</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarItem href="/dashboard" icon={<Home />}>
-                  Dashboard
-                </SidebarItem>
-                <SidebarItem href="/analytics" icon={<BarChart3 />}>
-                  Analytics
-                </SidebarItem>
-              </SidebarGroupContent>
-            </SidebarGroup>
+            <SidebarContent>
+              <SidebarGroup>
+                <SidebarGroupLabel>Overview</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarItem href="/dashboard" icon={<Home />}>
+                    Dashboard
+                  </SidebarItem>
+                  <SidebarItem href="/analytics" icon={<BarChart3 />}>
+                    Analytics
+                  </SidebarItem>
+                </SidebarGroupContent>
+              </SidebarGroup>
 
-            <SidebarGroup collapsible={true} defaultExpanded={true}>
-              <SidebarGroupLabel>Active Projects</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarItem href="/projects/web" icon={<Code2 />} active level={0}>
-                  Web Platform
-                </SidebarItem>
-                <SidebarItem href="/projects/web/frontend" level={1}>
-                  Frontend App
-                </SidebarItem>
-                <SidebarItem href="/projects/web/api" level={1}>
-                  API Service
-                </SidebarItem>
-                <SidebarItem href="/projects/mobile" icon={<Monitor />} level={0}>
-                  Mobile App
-                </SidebarItem>
-                <SidebarItem href="/projects/mobile/ios" level={1}>
-                  iOS Version
-                </SidebarItem>
-                <SidebarItem href="/projects/mobile/android" level={1}>
-                  Android Version
-                </SidebarItem>
-              </SidebarGroupContent>
-            </SidebarGroup>
+              <SidebarGroup collapsible={true} defaultExpanded={true}>
+                <SidebarGroupLabel>Active Projects</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarItem href="/projects/web" icon={<Code2 />} active level={0}>
+                    Web Platform
+                  </SidebarItem>
+                  <SidebarItem href="/projects/web/frontend" level={1}>
+                    Frontend App
+                  </SidebarItem>
+                  <SidebarItem href="/projects/web/api" level={1}>
+                    API Service
+                  </SidebarItem>
+                  <SidebarItem href="/projects/mobile" icon={<Monitor />} level={0}>
+                    Mobile App
+                  </SidebarItem>
+                  <SidebarItem href="/projects/mobile/ios" level={1}>
+                    iOS Version
+                  </SidebarItem>
+                  <SidebarItem href="/projects/mobile/android" level={1}>
+                    Android Version
+                  </SidebarItem>
+                </SidebarGroupContent>
+              </SidebarGroup>
 
-            <SidebarGroup>
-              <SidebarGroupLabel>Tools</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarItem href="/deployment" icon={<Zap />}>
-                  Deployment
-                </SidebarItem>
-                <SidebarItem href="/monitoring" icon={<Monitor />}>
-                  Monitoring
-                </SidebarItem>
-                <SidebarItem href="/settings" icon={<Settings />}>
-                  Settings
-                </SidebarItem>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
-        </Sidebar>
+              <SidebarGroup>
+                <SidebarGroupLabel>Tools</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarItem href="/deployment" icon={<Zap />}>
+                    Deployment
+                  </SidebarItem>
+                  <SidebarItem href="/monitoring" icon={<Monitor />}>
+                    Monitoring
+                  </SidebarItem>
+                  <SidebarItem href="/settings" icon={<Settings />}>
+                    Settings
+                  </SidebarItem>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
+          </Sidebar>
+        </MenuProvider>
 
         <main className="flex-1 p-6 overflow-auto">
           <div className="max-w-2xl space-y-6">
@@ -289,56 +294,58 @@ export const TrustBuildingPatterns: Story = {
   render: (args) => {
     return (
       <div className="flex h-screen bg-muted/20">
-        <Sidebar
-          {...args}
-          currentPath="/dashboard"
-          className="border-r"
-          size="comfortable"
-          persistCollapsedState={true}
-          highlightCurrent={true}
-        >
-          <SidebarHeader showToggle={true}>
-            <SidebarTitle>Trust Demo</SidebarTitle>
-          </SidebarHeader>
+        <MenuProvider>
+          <Sidebar
+            {...args}
+            currentPath="/dashboard"
+            className="border-r"
+            size="comfortable"
+            persistCollapsedState={true}
+            highlightCurrent={true}
+          >
+            <SidebarHeader showToggle={true}>
+              <SidebarTitle>Trust Demo</SidebarTitle>
+            </SidebarHeader>
 
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel>Core Features</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarItem href="/dashboard" icon={<Home />} active>
-                  Dashboard
-                </SidebarItem>
-                <SidebarItem href="/users" icon={<Users />}>
-                  User Management
-                </SidebarItem>
-                <SidebarItem href="/analytics" icon={<BarChart3 />}>
-                  Analytics Hub
-                </SidebarItem>
-              </SidebarGroupContent>
-            </SidebarGroup>
+            <SidebarContent>
+              <SidebarGroup>
+                <SidebarGroupLabel>Core Features</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarItem href="/dashboard" icon={<Home />} active>
+                    Dashboard
+                  </SidebarItem>
+                  <SidebarItem href="/users" icon={<Users />}>
+                    User Management
+                  </SidebarItem>
+                  <SidebarItem href="/analytics" icon={<BarChart3 />}>
+                    Analytics Hub
+                  </SidebarItem>
+                </SidebarGroupContent>
+              </SidebarGroup>
 
-            <SidebarGroup>
-              <SidebarGroupLabel>Administration</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarItem href="/settings" icon={<Settings />}>
-                  System Settings
-                </SidebarItem>
-                <SidebarItem href="/security" icon={<Shield />}>
-                  Security Center
-                </SidebarItem>
-                <SidebarItem href="/alerts" icon={<AlertTriangle />} variant="secondary">
-                  System Alerts
-                </SidebarItem>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
+              <SidebarGroup>
+                <SidebarGroupLabel>Administration</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarItem href="/settings" icon={<Settings />}>
+                    System Settings
+                  </SidebarItem>
+                  <SidebarItem href="/security" icon={<Shield />}>
+                    Security Center
+                  </SidebarItem>
+                  <SidebarItem href="/alerts" icon={<AlertTriangle />} variant="secondary">
+                    System Alerts
+                  </SidebarItem>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
 
-          <SidebarFooter>
-            <SidebarItem icon={<HelpCircle />} variant="secondary">
-              Help & Support
-            </SidebarItem>
-          </SidebarFooter>
-        </Sidebar>
+            <SidebarFooter>
+              <SidebarItem icon={<HelpCircle />} variant="secondary">
+                Help & Support
+              </SidebarItem>
+            </SidebarFooter>
+          </Sidebar>
+        </MenuProvider>
 
         <main className="flex-1 p-6 overflow-auto">
           <div className="max-w-2xl space-y-6">
@@ -398,40 +405,42 @@ export const AttentionEconomics: Story = {
   render: (args) => {
     return (
       <div className="flex h-screen bg-muted/20">
-        <Sidebar {...args} currentPath="/content" className="border-r" size="compact">
-          <SidebarHeader>
-            <SidebarTitle level={3}>Navigation</SidebarTitle>
-          </SidebarHeader>
+        <MenuProvider>
+          <Sidebar {...args} currentPath="/content" className="border-r" size="compact">
+            <SidebarHeader>
+              <SidebarTitle level={3}>Navigation</SidebarTitle>
+            </SidebarHeader>
 
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel>Content</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarItem href="/content" icon={<FileText />} active variant="default">
-                  Articles
-                </SidebarItem>
-                <SidebarItem href="/drafts" icon={<FileText />} variant="secondary">
-                  Drafts
-                </SidebarItem>
-                <SidebarItem href="/media" icon={<Layers />} variant="secondary">
-                  Media
-                </SidebarItem>
-              </SidebarGroupContent>
-            </SidebarGroup>
+            <SidebarContent>
+              <SidebarGroup>
+                <SidebarGroupLabel>Content</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarItem href="/content" icon={<FileText />} active variant="default">
+                    Articles
+                  </SidebarItem>
+                  <SidebarItem href="/drafts" icon={<FileText />} variant="secondary">
+                    Drafts
+                  </SidebarItem>
+                  <SidebarItem href="/media" icon={<Layers />} variant="secondary">
+                    Media
+                  </SidebarItem>
+                </SidebarGroupContent>
+              </SidebarGroup>
 
-            <SidebarGroup>
-              <SidebarGroupLabel>Tools</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarItem href="/analytics" icon={<BarChart3 />} variant="secondary">
-                  Analytics
-                </SidebarItem>
-                <SidebarItem href="/settings" icon={<Settings />} variant="secondary">
-                  Settings
-                </SidebarItem>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
-        </Sidebar>
+              <SidebarGroup>
+                <SidebarGroupLabel>Tools</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarItem href="/analytics" icon={<BarChart3 />} variant="secondary">
+                    Analytics
+                  </SidebarItem>
+                  <SidebarItem href="/settings" icon={<Settings />} variant="secondary">
+                    Settings
+                  </SidebarItem>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
+          </Sidebar>
+        </MenuProvider>
 
         <main className="flex-1 p-6 overflow-auto">
           <div className="max-w-4xl">

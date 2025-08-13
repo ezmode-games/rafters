@@ -2,8 +2,8 @@
 // @version 0.1.0
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from '@storybook/test';
 import { BarChart3, FileText, HelpCircle, Home, Settings, Users } from 'lucide-react';
+import { fn } from 'storybook/test';
 import {
   Sidebar,
   SidebarContent,
@@ -15,6 +15,7 @@ import {
   SidebarItem,
   SidebarTitle,
 } from '../../../components/Sidebar';
+import { MenuProvider } from '../../../providers';
 
 /**
  * AI Training: Sidebar Visual Variants
@@ -22,7 +23,7 @@ import {
  * Teaches AI agents appropriate variant selection for use case requirements
  */
 const meta = {
-  title: '03 Components/Navigation/Sidebar/Variants',
+  title: 'Components/Sidebar/Variants',
   component: Sidebar,
   parameters: {
     layout: 'fullscreen',
@@ -50,37 +51,39 @@ export const Default: Story = {
   render: (args) => {
     return (
       <div className="flex h-screen bg-muted/20">
-        <Sidebar {...args} variant="default" currentPath="/dashboard" className="border-r">
-          <SidebarHeader>
-            <SidebarTitle>Default Layout</SidebarTitle>
-          </SidebarHeader>
+        <MenuProvider>
+          <Sidebar {...args} variant="default" currentPath="/dashboard" className="border-r">
+            <SidebarHeader>
+              <SidebarTitle>Default Layout</SidebarTitle>
+            </SidebarHeader>
 
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarItem href="/dashboard" icon={<Home />} active>
-                  Dashboard
-                </SidebarItem>
-                <SidebarItem href="/users" icon={<Users />}>
-                  Users
-                </SidebarItem>
-                <SidebarItem href="/analytics" icon={<BarChart3 />}>
-                  Analytics
-                </SidebarItem>
-                <SidebarItem href="/documents" icon={<FileText />}>
-                  Documents
-                </SidebarItem>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
+            <SidebarContent>
+              <SidebarGroup>
+                <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarItem href="/dashboard" icon={<Home />} active>
+                    Dashboard
+                  </SidebarItem>
+                  <SidebarItem href="/users" icon={<Users />}>
+                    Users
+                  </SidebarItem>
+                  <SidebarItem href="/analytics" icon={<BarChart3 />}>
+                    Analytics
+                  </SidebarItem>
+                  <SidebarItem href="/documents" icon={<FileText />}>
+                    Documents
+                  </SidebarItem>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
 
-          <SidebarFooter>
-            <SidebarItem href="/settings" icon={<Settings />} variant="secondary">
-              Settings
-            </SidebarItem>
-          </SidebarFooter>
-        </Sidebar>
+            <SidebarFooter>
+              <SidebarItem href="/settings" icon={<Settings />} variant="secondary">
+                Settings
+              </SidebarItem>
+            </SidebarFooter>
+          </Sidebar>
+        </MenuProvider>
 
         <main className="flex-1 p-6">
           <div className="max-w-2xl">
@@ -112,37 +115,39 @@ export const Floating: Story = {
   render: (args) => {
     return (
       <div className="flex h-screen bg-muted/20 p-4">
-        <Sidebar {...args} variant="floating" currentPath="/analytics" className="mr-4">
-          <SidebarHeader>
-            <SidebarTitle>Floating Panel</SidebarTitle>
-          </SidebarHeader>
+        <MenuProvider>
+          <Sidebar {...args} variant="floating" currentPath="/analytics" className="mr-4">
+            <SidebarHeader>
+              <SidebarTitle>Floating Panel</SidebarTitle>
+            </SidebarHeader>
 
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel>Analytics</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarItem href="/analytics" icon={<BarChart3 />} active>
-                  Overview
-                </SidebarItem>
-                <SidebarItem href="/analytics/users" icon={<Users />}>
-                  User Metrics
-                </SidebarItem>
-                <SidebarItem href="/analytics/content" icon={<FileText />}>
-                  Content Stats
-                </SidebarItem>
-                <SidebarItem href="/analytics/performance" icon={<Settings />}>
-                  Performance
-                </SidebarItem>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
+            <SidebarContent>
+              <SidebarGroup>
+                <SidebarGroupLabel>Analytics</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarItem href="/analytics" icon={<BarChart3 />} active>
+                    Overview
+                  </SidebarItem>
+                  <SidebarItem href="/analytics/users" icon={<Users />}>
+                    User Metrics
+                  </SidebarItem>
+                  <SidebarItem href="/analytics/content" icon={<FileText />}>
+                    Content Stats
+                  </SidebarItem>
+                  <SidebarItem href="/analytics/performance" icon={<Settings />}>
+                    Performance
+                  </SidebarItem>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
 
-          <SidebarFooter>
-            <SidebarItem href="/help" icon={<HelpCircle />} variant="secondary">
-              Help
-            </SidebarItem>
-          </SidebarFooter>
-        </Sidebar>
+            <SidebarFooter>
+              <SidebarItem href="/help" icon={<HelpCircle />} variant="secondary">
+                Help
+              </SidebarItem>
+            </SidebarFooter>
+          </Sidebar>
+        </MenuProvider>
 
         <main className="flex-1 bg-background rounded-lg p-6 overflow-auto">
           <div className="max-w-2xl">
@@ -230,37 +235,39 @@ export const Overlay: Story = {
         </main>
 
         {/* Overlay sidebar */}
-        <Sidebar {...args} variant="overlay" position="left" currentPath="/mobile">
-          <SidebarHeader>
-            <SidebarTitle>Mobile Nav</SidebarTitle>
-          </SidebarHeader>
+        <MenuProvider>
+          <Sidebar {...args} variant="overlay" position="left" currentPath="/mobile">
+            <SidebarHeader>
+              <SidebarTitle>Mobile Nav</SidebarTitle>
+            </SidebarHeader>
 
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel>Main</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarItem href="/mobile" icon={<Home />} active>
-                  Home
-                </SidebarItem>
-                <SidebarItem href="/mobile/profile" icon={<Users />}>
-                  Profile
-                </SidebarItem>
-                <SidebarItem href="/mobile/activity" icon={<BarChart3 />}>
-                  Activity
-                </SidebarItem>
-                <SidebarItem href="/mobile/documents" icon={<FileText />}>
-                  Files
-                </SidebarItem>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
+            <SidebarContent>
+              <SidebarGroup>
+                <SidebarGroupLabel>Main</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarItem href="/mobile" icon={<Home />} active>
+                    Home
+                  </SidebarItem>
+                  <SidebarItem href="/mobile/profile" icon={<Users />}>
+                    Profile
+                  </SidebarItem>
+                  <SidebarItem href="/mobile/activity" icon={<BarChart3 />}>
+                    Activity
+                  </SidebarItem>
+                  <SidebarItem href="/mobile/documents" icon={<FileText />}>
+                    Files
+                  </SidebarItem>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
 
-          <SidebarFooter>
-            <SidebarItem href="/mobile/settings" icon={<Settings />} variant="secondary">
-              Settings
-            </SidebarItem>
-          </SidebarFooter>
-        </Sidebar>
+            <SidebarFooter>
+              <SidebarItem href="/mobile/settings" icon={<Settings />} variant="secondary">
+                Settings
+              </SidebarItem>
+            </SidebarFooter>
+          </Sidebar>
+        </MenuProvider>
       </div>
     );
   },
@@ -282,37 +289,39 @@ export const Collapsed: Story = {
   render: (args) => {
     return (
       <div className="flex h-screen bg-muted/20">
-        <Sidebar {...args} collapsed={true} currentPath="/dashboard" className="border-r">
-          <SidebarHeader showToggle={true}>
-            <SidebarTitle>App</SidebarTitle>
-          </SidebarHeader>
+        <MenuProvider>
+          <Sidebar {...args} collapsed={true} currentPath="/dashboard" className="border-r">
+            <SidebarHeader showToggle={true}>
+              <SidebarTitle>App</SidebarTitle>
+            </SidebarHeader>
 
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel>Main</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarItem href="/dashboard" icon={<Home />} active showTooltip>
-                  Dashboard
-                </SidebarItem>
-                <SidebarItem href="/users" icon={<Users />} showTooltip>
-                  Users
-                </SidebarItem>
-                <SidebarItem href="/analytics" icon={<BarChart3 />} showTooltip>
-                  Analytics
-                </SidebarItem>
-                <SidebarItem href="/documents" icon={<FileText />} showTooltip>
-                  Documents
-                </SidebarItem>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
+            <SidebarContent>
+              <SidebarGroup>
+                <SidebarGroupLabel>Main</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarItem href="/dashboard" icon={<Home />} active showTooltip>
+                    Dashboard
+                  </SidebarItem>
+                  <SidebarItem href="/users" icon={<Users />} showTooltip>
+                    Users
+                  </SidebarItem>
+                  <SidebarItem href="/analytics" icon={<BarChart3 />} showTooltip>
+                    Analytics
+                  </SidebarItem>
+                  <SidebarItem href="/documents" icon={<FileText />} showTooltip>
+                    Documents
+                  </SidebarItem>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
 
-          <SidebarFooter>
-            <SidebarItem href="/settings" icon={<Settings />} variant="secondary" showTooltip>
-              Settings
-            </SidebarItem>
-          </SidebarFooter>
-        </Sidebar>
+            <SidebarFooter>
+              <SidebarItem href="/settings" icon={<Settings />} variant="secondary" showTooltip>
+                Settings
+              </SidebarItem>
+            </SidebarFooter>
+          </Sidebar>
+        </MenuProvider>
 
         <main className="flex-1 p-6 overflow-auto">
           <div className="max-w-2xl">

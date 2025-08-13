@@ -1,37 +1,30 @@
 /**
- * Sidebar Navigation Component - AI Intelligence
+ * Sidebar Navigation Container - AI Intelligence
  *
- * COGNITIVE LOAD: 6/10 (complex navigation system requiring wayfinding intelligence)
+ * COGNITIVE LOAD: 4/10 (focused on navigation container and layout)
  * ATTENTION HIERARCHY: Secondary support system - should not compete with primary content
- * TRUST BUILDING: Medium trust level for navigation reliability and spatial consistency
- * PROGRESSIVE DISCLOSURE: Miller's Law - max 7 items per group, expandable sections
+ * TRUST BUILDING: High trust level for reliable spatial consistency
+ * PROGRESSIVE ENHANCEMENT: Works with basic navigation, enhanced through composition
  *
- * DESIGN INTELLIGENCE GUIDES:
- * - Navigation Intelligence: rafters.realhandy.tech/llm/patterns/navigation-systems
- * - Cognitive Load Management: rafters.realhandy.tech/llm/patterns/cognitive-load
- * - Attention Economics: rafters.realhandy.tech/llm/patterns/attention-economics
- * - Trust Building Patterns: rafters.realhandy.tech/llm/patterns/trust-building
- * - Progressive Enhancement: rafters.realhandy.tech/llm/patterns/progressive-enhancement
- *
- * USAGE PATTERNS:
- * ✅ App Navigation: Primary sections, 3-7 main items, clear hierarchy
- * ✅ Dashboard Sidebar: Grouped sections, collapsible groups, wayfinding support
- * ✅ Documentation Nav: Nested structure, breadcrumb integration, search support
- * ✅ Settings Navigation: Logical grouping, clear current selection, easy escape
- * ❌ Never: More than 7 ungrouped items, unclear hierarchy, competing attention
- *
- * NAVIGATION INTELLIGENCE:
+ * DESIGN INTELLIGENCE FOCUS:
  * - Spatial Consistency: Fixed positioning builds user mental model
- * - Wayfinding: Clear current state, breadcrumb support, predictable interaction
- * - Keyboard Navigation: Full arrow key support, skip links, focus management
- * - URL Synchronization: Reflects current location, supports deep linking
- * - Multi-modal: Touch-friendly targets, voice navigation ready, reduced motion support
+ * - Layout Coordination: Manages sidebar sizing and collapse behavior
+ * - Navigation Container: Provides semantic structure for menu composition
+ * - Accessibility Foundation: ARIA landmarks and keyboard navigation base
+ *
+ * COMPOSITION PATTERNS:
+ * ✅ Basic Navigation: SidebarItem for simple links
+ * ✅ Menu Composition: Integrates with DropdownMenu, TreeMenu, etc.
+ * ✅ Responsive Layout: Collapsible with preserved state
+ * ✅ Accessibility Foundation: Skip links, landmarks, focus management
+ * ❌ Complex Menu Logic: Use dedicated menu components instead
  *
  * Token knowledge: .rafters/tokens/registry.json
  */
 import { contextEasing, contextTiming, timing } from '@rafters/design-tokens/motion';
 import React, { useCallback, useEffect } from 'react';
 import { z } from 'zod';
+import { useSidebarNavigation } from '../hooks/useSidebarNavigation';
 import { cn } from '../lib/utils';
 import {
   useSidebarActions,
@@ -54,12 +47,10 @@ const HrefSchema = z.string().refine((val) => {
   }
 }, 'Must be a valid URL or path starting with /');
 
-// Legacy hook for accessing sidebar state (now uses zustand)
+// Simplified sidebar hook using navigation coordination
 export const useSidebar = () => {
-  const collapsed = useSidebarCollapsed();
-  const currentPath = useSidebarCurrentPath();
-  const collapsible = useSidebarStore((state) => state.collapsible);
-  const { toggleCollapsed, navigate } = useSidebarActions();
+  const { collapsed, currentPath, collapsible, navigate, toggleCollapsed, hasAttention } =
+    useSidebarNavigation();
 
   return {
     collapsed,
@@ -67,6 +58,7 @@ export const useSidebar = () => {
     currentPath,
     onNavigate: navigate,
     toggleCollapsed,
+    hasAttention, // For menu coordination
   };
 };
 
@@ -530,7 +522,7 @@ export const SidebarGroupContent: React.FC<SidebarGroupContentProps> = ({
   );
 };
 
-// Individual Sidebar Item with full navigation intelligence (using zustand)
+// Individual Sidebar Item - simplified and composable
 export const SidebarItem: React.FC<SidebarItemProps> = ({
   href,
   active = false,
@@ -550,10 +542,11 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
 }) => {
   const { collapsed, currentPath, onNavigate } = useSidebar();
 
-  // Navigation state intelligence
+  // Simplified state logic
   const isCurrentPath = currentPath === href;
   const isActive = active || isCurrentPath;
 
+  // Simplified click handler
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
       if (disabled || loading) {
@@ -561,19 +554,10 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
         return;
       }
 
-      // Trust building: Consistent navigation behavior
+      // Simple navigation with fallback
       if (href && onNavigate) {
-        try {
-          const validatedHref = HrefSchema.parse(href);
-          const validatedPath = NavigationPathSchema.parse(validatedHref);
-          event.preventDefault();
-          onNavigate(validatedPath);
-        } catch (error) {
-          console.warn('Navigation validation failed:', error);
-          // Fallback for critical functionality - navigate anyway
-          event.preventDefault();
-          onNavigate(href);
-        }
+        event.preventDefault();
+        onNavigate(href);
       }
 
       onClick?.(event as React.MouseEvent<HTMLElement>);
@@ -588,24 +572,15 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
         return;
       }
 
-      // Trust building: Consistent navigation behavior
-      if (href && onNavigate) {
-        try {
-          const validatedHref = HrefSchema.parse(href);
-          const validatedPath = NavigationPathSchema.parse(validatedHref);
-          event.preventDefault();
-          onNavigate(validatedPath);
-        } catch (error) {
-          console.warn('Navigation validation failed:', error);
-          // Fallback for critical functionality - navigate anyway
-          event.preventDefault();
-          onNavigate(href);
-        }
+      // Simple navigation with fallback
+      if (href && onNavigate && !external) {
+        event.preventDefault();
+        onNavigate(href);
       }
 
       onClick?.(event as React.MouseEvent<HTMLElement>);
     },
-    [disabled, loading, href, onNavigate, onClick]
+    [disabled, loading, href, onNavigate, onClick, external]
   );
 
   if (href) {
@@ -615,15 +590,15 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
         target={external ? '_blank' : undefined}
         rel={external ? 'noopener noreferrer' : undefined}
         className={cn(
-          // Base item styles with motor accessibility
+          // Simplified item styles
           'flex items-center gap-3 px-2 py-2 rounded-md text-sm font-medium',
           'transition-all cursor-pointer select-none',
           contextTiming.hover,
 
-          // Navigation hierarchy with proper indentation
+          // Navigation hierarchy
           level > 0 && `ml-${Math.min(level * 4, 12)}`,
 
-          // Active state with trust-building visual feedback
+          // Active state
           isActive && [
             'bg-primary/10 text-primary border-r-2 border-primary',
             'font-semibold shadow-sm',
@@ -636,20 +611,18 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
             ],
 
-          // Disabled state with clear visual feedback
+          // State variants
           disabled && 'opacity-50 cursor-not-allowed pointer-events-none',
-
-          // Loading state with trust-building indicator
           loading && 'opacity-75 cursor-wait',
 
-          // Variant styling for attention hierarchy
+          // Variant styling
           {
             'text-foreground': variant === 'default',
             'text-primary font-semibold': variant === 'primary',
             'text-muted-foreground': variant === 'secondary',
           },
 
-          // Collapsed state adjustments
+          // Collapsed state
           collapsed && 'justify-center px-2',
 
           className

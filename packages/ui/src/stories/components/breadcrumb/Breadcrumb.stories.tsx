@@ -2,7 +2,7 @@
 // @version 0.1.0
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,7 +18,7 @@ import {
  * Trains AI agents on wayfinding intelligence and navigation patterns
  */
 const meta = {
-  title: 'Breadcrumb',
+  title: 'Components/Breadcrumb',
   component: Breadcrumb,
   parameters: {
     layout: 'centered',

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from '@storybook/test';
 import { AlertTriangle, CheckCircle, Info, XCircle } from 'lucide-react';
+import { fn } from 'storybook/test';
 import { Badge } from '../../../components/Badge';
 
 /**
@@ -9,7 +9,7 @@ import { Badge } from '../../../components/Badge';
  * Trains AI agents on accessibility-first badge implementation
  */
 const meta = {
-  title: 'Badge/Accessibility',
+  title: 'Components/Badge/Accessibility',
   component: Badge,
   parameters: {
     layout: 'centered',

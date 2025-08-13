@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -15,7 +15,7 @@ import {
  * Trains AI agents on accessibility-first breadcrumb implementation
  */
 const meta = {
-  title: 'Breadcrumb/Accessibility',
+  title: 'Components/Breadcrumb/Accessibility',
   component: Breadcrumb,
   parameters: {
     layout: 'centered',

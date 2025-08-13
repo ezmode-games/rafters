@@ -317,10 +317,11 @@ export const useSidebarStore = create<SidebarStore>()(
       }),
       {
         name: 'sidebar-store',
-        // Only persist essential user preferences and state
+        // Only persist essential user preferences and navigation state
         partialize: (state) => ({
           collapsed: state.collapsed,
           currentPath: state.currentPath,
+          activeItem: state.activeItem,
           userPreferences: state.userPreferences,
         }),
         // Restore state on hydration

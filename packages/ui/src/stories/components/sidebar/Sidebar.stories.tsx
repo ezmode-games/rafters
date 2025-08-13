@@ -2,8 +2,8 @@
 // @version 0.1.0
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { fn } from '@storybook/test';
 import { BarChart3, FileText, HelpCircle, Home, LogOut, Settings, Users } from 'lucide-react';
+import { fn } from 'storybook/test';
 import {
   Sidebar,
   SidebarContent,
@@ -15,6 +15,7 @@ import {
   SidebarItem,
   SidebarTitle,
 } from '../../../components/Sidebar';
+import { MenuProvider } from '../../../providers';
 
 /**
  * Navigation is the thread that weaves through every user journey. The Sidebar component
@@ -22,7 +23,7 @@ import {
  * can trust across their entire experience.
  */
 const meta = {
-  title: '03 Components/Navigation/Sidebar',
+  title: 'Components/Sidebar',
   component: Sidebar,
   parameters: {
     layout: 'fullscreen',
@@ -87,49 +88,51 @@ export const Common: Story = {
   render: (args) => {
     return (
       <div className="flex h-screen bg-muted/20">
-        <Sidebar {...args} currentPath="/dashboard" className="border-r">
-          <SidebarHeader showToggle={true}>
-            <SidebarTitle>Application</SidebarTitle>
-          </SidebarHeader>
+        <MenuProvider>
+          <Sidebar {...args} currentPath="/dashboard" className="border-r">
+            <SidebarHeader showToggle={true}>
+              <SidebarTitle>Application</SidebarTitle>
+            </SidebarHeader>
 
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel>Main Navigation</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarItem href="/dashboard" icon={<Home />} active>
-                  Dashboard
-                </SidebarItem>
-                <SidebarItem href="/users" icon={<Users />}>
-                  Users
-                </SidebarItem>
-                <SidebarItem href="/analytics" icon={<BarChart3 />}>
-                  Analytics
-                </SidebarItem>
-                <SidebarItem href="/documents" icon={<FileText />}>
-                  Documents
-                </SidebarItem>
-              </SidebarGroupContent>
-            </SidebarGroup>
+            <SidebarContent>
+              <SidebarGroup>
+                <SidebarGroupLabel>Main Navigation</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarItem href="/dashboard" icon={<Home />} active>
+                    Dashboard
+                  </SidebarItem>
+                  <SidebarItem href="/users" icon={<Users />}>
+                    Users
+                  </SidebarItem>
+                  <SidebarItem href="/analytics" icon={<BarChart3 />}>
+                    Analytics
+                  </SidebarItem>
+                  <SidebarItem href="/documents" icon={<FileText />}>
+                    Documents
+                  </SidebarItem>
+                </SidebarGroupContent>
+              </SidebarGroup>
 
-            <SidebarGroup>
-              <SidebarGroupLabel>Administration</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarItem href="/settings" icon={<Settings />}>
-                  Settings
-                </SidebarItem>
-                <SidebarItem href="/help" icon={<HelpCircle />}>
-                  Help Center
-                </SidebarItem>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
+              <SidebarGroup>
+                <SidebarGroupLabel>Administration</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarItem href="/settings" icon={<Settings />}>
+                    Settings
+                  </SidebarItem>
+                  <SidebarItem href="/help" icon={<HelpCircle />}>
+                    Help Center
+                  </SidebarItem>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
 
-          <SidebarFooter>
-            <SidebarItem icon={<LogOut />} variant="secondary">
-              Sign Out
-            </SidebarItem>
-          </SidebarFooter>
-        </Sidebar>
+            <SidebarFooter>
+              <SidebarItem icon={<LogOut />} variant="secondary">
+                Sign Out
+              </SidebarItem>
+            </SidebarFooter>
+          </Sidebar>
+        </MenuProvider>
 
         {/* Demo content area */}
         <main className="flex-1 p-6 overflow-auto">
