@@ -149,31 +149,7 @@ const CHIP_INTELLIGENCE = {
     textColor: 'text-destructive-foreground',
     cognitiveLoad: 8,
     attentionWeight: 'high',
-    ariaLabel: 'Urgent notification',
-  },
-  new: {
-    color: 'bg-primary',
-    textColor: 'text-primary-foreground',
-    ariaLabel: 'New feature or content',
-  },
-  live: {
-    color: 'bg-success',
-    textColor: 'text-success-foreground',
-    ariaLabel: 'Live status indicator',
-  },
-  beta: {
-    color: 'bg-warning',
-    textColor: 'text-warning-foreground',
-    ariaLabel: 'Beta feature indicator',
-  },
-  premium: {
-    color: 'bg-accent',
-    textColor: 'text-accent-foreground',
-    ariaLabel: 'Premium feature indicator',
-  },
-  count: {
-    color: 'bg-destructive',
-    textColor: 'text-destructive-foreground',
+    psychology: 'quantified_urgency',
     ariaLabel: 'Notification count',
   },
 } as const;
