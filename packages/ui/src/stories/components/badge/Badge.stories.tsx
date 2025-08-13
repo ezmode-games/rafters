@@ -55,6 +55,20 @@ const meta = {
       control: 'boolean',
       description: 'Enable animations (respects reduced motion preferences)',
     },
+    chip: {
+      control: 'select',
+      options: ['urgent', 'new', 'live', 'beta', 'premium', 'count'],
+      description: 'High visibility chip indicator that breaks badge boundaries',
+    },
+    chipPosition: {
+      control: 'select',
+      options: ['top-right', 'top-left', 'bottom-right', 'bottom-left'],
+      description: 'Position of the chip relative to badge',
+    },
+    chipValue: {
+      control: 'text',
+      description: 'Custom text or number for the chip (e.g., unread count)',
+    },
     onClick: {
       description: 'Click handler - required for interactive testing',
     },
@@ -144,4 +158,54 @@ export const Removable: Story = {
     children: 'Removable',
     onRemove: fn(),
   },
+};
+
+/**
+ * High visibility chip notifications for count displays.
+ * Ideal for inbox messages, notifications, and status indicators.
+ */
+export const NotificationCount: Story = {
+  render: () => (
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <h4 className="text-sm font-medium">Notification Count Chips</h4>
+        <p className="text-xs text-muted-foreground">
+          High visibility chips that break badge boundaries for unread counts
+        </p>
+        <div className="flex gap-4">
+          <Badge chip="count" chipValue="5">
+            Inbox
+          </Badge>
+          <Badge chip="count" chipValue="99+">
+            Messages
+          </Badge>
+          <Badge chip="urgent" chipValue="3">
+            Alerts
+          </Badge>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <h4 className="text-sm font-medium">Status Chips</h4>
+        <div className="flex gap-4">
+          <Badge chip="new">Feature</Badge>
+          <Badge chip="live">Stream</Badge>
+          <Badge chip="beta">API</Badge>
+          <Badge chip="premium">Pro</Badge>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <h4 className="text-sm font-medium">Interactive with Chips</h4>
+        <div className="flex gap-4">
+          <Badge interactive chip="count" chipValue="12" onClick={fn()}>
+            Notifications
+          </Badge>
+          <Badge removable chip="urgent" chipValue="!" onRemove={fn()}>
+            Critical
+          </Badge>
+        </div>
+      </div>
+    </div>
+  ),
 };
