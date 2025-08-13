@@ -100,3 +100,23 @@ export type { RaftersLogoProps } from './RaftersLogo';
 
 export { Grid, GridItem } from './Grid';
 export type { GridProps, GridItemProps } from './Grid';
+
+export { Badge } from './Badge';
+export type { BadgeProps, BadgeVariant, BadgeSize, BadgeEmphasis } from './Badge';
+
+export {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  BreadcrumbEllipsis,
+} from './Breadcrumb';
+export type {
+  BreadcrumbProps,
+  BreadcrumbItemProps,
+  BreadcrumbLinkProps,
+  BreadcrumbPageProps,
+  BreadcrumbSeparator as BreadcrumbSeparatorType,
+  TruncationMode,
+} from './Breadcrumb';

@@ -1,0 +1,54 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import * as Stories from './Badge.stories.tsx';
+
+<Meta title="03 Components/Display/Badge" of={Stories} name="Overview" />
+
+# Badge Component
+
+Status communication through systematic design intelligence. Badges provide instant recognition without cognitive overhead.
+
+## Design Intelligence
+
+Every interface needs status communication that works in peripheral vision. Our badge system delivers meaning through multiple sensory channels while respecting attention economics.
+
+### Cognitive Load: 2/10
+- **Base Load (1/10)**: Simple visual pattern recognition
+- **Context Load (+1)**: Status meaning interpretation
+- **Instant Recognition**: Status apparent within 100ms
+
+### Multi-Sensory Communication
+Never rely on color alone. Each status includes:
+- **Color**: Semantic meaning (success = green, error = red)
+- **Icon**: Universal symbols across languages
+- **Text**: Clear, scannable labels
+- **Pattern**: Visual weight matches importance
+
+### Attention Economics
+Badges consume precious cognitive resources. Use strategically:
+- **Maximum 1 high-attention badge** per navigation section
+- **2-3 medium-attention badges** maximum per viewport
+- **Unlimited subtle badges** for status communication
+- **Empty states preferred** over meaningless badges
+
+## Usage Guidelines
+
+<Canvas of={Stories.Primary} />
+
+### DO
+- Use semantic variants (success, warning, error, info, neutral)
+- Apply appropriate emphasis for context (subtle, default, prominent)
+- Include icons for multi-sensory communication
+- Provide meaningful aria-labels for screen readers
+
+### DON'T
+- Use badges for primary actions
+- Overwhelm interfaces with high-attention badges
+- Rely solely on color for status communication
+- Create badges without semantic meaning
+
+## Trust Building
+Consistent badge patterns build user confidence:
+- Same status = same visual treatment
+- Predictable icon + color combinations
+- Clear interactive affordances when clickable
+- Reliable removal patterns for dismissible badges

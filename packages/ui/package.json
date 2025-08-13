@@ -53,6 +53,7 @@
     "@storybook/addon-onboarding": "^9.1.2",
     "@storybook/addon-vitest": "^9.1.2",
     "@storybook/react-vite": "^9.1.2",
+    "@storybook/test": "^8.6.14",
     "@tailwindcss/vite": "catalog:",
     "@testing-library/jest-dom": "catalog:",
     "@testing-library/react": "catalog:",
@@ -91,6 +92,7 @@
     "@rafters/design-tokens": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "clsx": "catalog:",
+    "lucide-react": "^0.263.1",
     "react": "catalog:",
     "react-dom": "catalog:",
     "tailwind-merge": "catalog:"
