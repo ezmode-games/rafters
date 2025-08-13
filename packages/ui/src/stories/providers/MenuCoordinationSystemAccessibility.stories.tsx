@@ -835,7 +835,7 @@ export const VisualAccessibility: Story = {
           </div>
         </div>
 
-        <style jsx>{`
+        <style>{`
           .high-contrast {
             --background: 0 0% 0%;
             --foreground: 0 0% 100%;

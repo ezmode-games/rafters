@@ -150,6 +150,160 @@ export const Badge = forwardRef<HTMLElement, BadgeProps>(
       }
     };
 
+    if (isInteractive && removable && onRemove) {
+      // For removable badges, use a container with two separate buttons
+      return (
+        <div
+          ref={ref as React.ForwardedRef<HTMLDivElement>}
+          className={cn(
+            'inline-flex items-center rounded-md text-xs font-medium select-none',
+            'border transition-all duration-150',
+
+            // Motion respect
+            animate && 'motion-reduce:transition-none',
+
+            // Size variants with attention hierarchy
+            {
+              'text-xs': size === 'sm' || size === 'md',
+              'text-sm': size === 'lg',
+            },
+
+            // Emphasis levels for attention economics
+            {
+              'opacity-75 border-0': emphasis === 'subtle',
+              'opacity-100 border': emphasis === 'default',
+              'opacity-100 border-2 shadow-sm': emphasis === 'prominent',
+            },
+
+            // Variant styles with multi-sensory communication
+            {
+              // Success: Confidence building through subtle confirmation
+              'bg-success/20 border-success/30 text-success': variant === 'success',
+
+              // Warning: Balanced visibility for awareness
+              'bg-warning/20 border-warning/30 text-warning': variant === 'warning',
+
+              // Error: Strong contrast for immediate attention
+              'bg-destructive/20 border-destructive/30 text-destructive': variant === 'error',
+
+              // Info: Supportive context without competition
+              'bg-info/20 border-info/30 text-info': variant === 'info',
+
+              // Neutral: Invisible organization
+              'bg-muted border-muted-foreground/20 text-muted-foreground': variant === 'neutral',
+            },
+
+            className
+          )}
+          {...props}
+        >
+          {/* Main content button */}
+          <button
+            type="button"
+            tabIndex={0}
+            aria-label={
+              props['aria-label'] || `${statusInfo.ariaLabel}${children ? `: ${children}` : ''}`
+            }
+            aria-live={props['aria-live']}
+            aria-busy={loading}
+            className={cn(
+              'inline-flex items-center gap-1',
+              // Enhanced touch targets for interactive badges (WCAG AAA)
+              'min-h-11 min-w-11 touch-manipulation cursor-pointer',
+              'hover:opacity-hover focus-visible:outline-none',
+              'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+              'active:scale-active rounded-l-md',
+
+              // Loading state feedback
+              loading && 'opacity-75 cursor-wait',
+
+              // Size variants with attention hierarchy
+              {
+                'px-1.5 py-0.5': size === 'sm',
+                'px-2 py-0.5': size === 'md',
+                'px-2.5 py-1': size === 'lg',
+              }
+            )}
+            onClick={onClick}
+            onKeyDown={handleKeyDown}
+          >
+            {/* Icon for multi-sensory status communication */}
+            {Icon && iconPosition === 'left' && (
+              <Icon
+                className={cn(
+                  'flex-shrink-0',
+                  size === 'sm' && 'w-3 h-3',
+                  size === 'md' && 'w-3 h-3',
+                  size === 'lg' && 'w-4 h-4'
+                )}
+                aria-hidden="true"
+              />
+            )}
+
+            {/* Loading indicator */}
+            {loading && (
+              <div
+                className={cn(
+                  'animate-spin rounded-full border-2 border-current border-t-transparent',
+                  size === 'sm' && 'w-3 h-3',
+                  size === 'md' && 'w-3 h-3',
+                  size === 'lg' && 'w-4 h-4'
+                )}
+                aria-hidden="true"
+              />
+            )}
+
+            {/* Content */}
+            {children && <span className="truncate">{children}</span>}
+
+            {/* Right-positioned icon */}
+            {Icon && iconPosition === 'right' && (
+              <Icon
+                className={cn(
+                  'flex-shrink-0',
+                  size === 'sm' && 'w-3 h-3',
+                  size === 'md' && 'w-3 h-3',
+                  size === 'lg' && 'w-4 h-4'
+                )}
+                aria-hidden="true"
+              />
+            )}
+          </button>
+
+          {/* Separate remove button */}
+          <button
+            type="button"
+            className={cn(
+              'flex-shrink-0 rounded-r-md hover:bg-current/20',
+              'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+              'transition-colors duration-150',
+              // Size variants
+              {
+                'p-1': size === 'sm',
+                'p-1.5': size === 'md',
+                'p-2': size === 'lg',
+              }
+            )}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+            aria-label="Remove badge"
+            tabIndex={0}
+          >
+            <XCircle
+              className={cn(
+                size === 'sm' && 'w-3 h-3',
+                size === 'md' && 'w-3 h-3',
+                size === 'lg' && 'w-4 h-4'
+              )}
+              aria-hidden="true"
+            />
+          </button>
+        </div>
+      );
+    }
+
     if (isInteractive) {
       return (
         <button
@@ -257,33 +411,6 @@ export const Badge = forwardRef<HTMLElement, BadgeProps>(
               aria-hidden="true"
             />
           )}
-
-          {/* Remove button for removable badges */}
-          {removable && onRemove && (
-            <button
-              type="button"
-              className={cn(
-                'ml-1 flex-shrink-0 rounded-full p-0.5 hover:bg-current/20',
-                'focus:outline-none focus:ring-1 focus:ring-current',
-                'transition-colors duration-150'
-              )}
-              onClick={(e) => {
-                e.stopPropagation();
-                onRemove();
-              }}
-              aria-label="Remove badge"
-              tabIndex={-1} // Parent handles tab focus
-            >
-              <XCircle
-                className={cn(
-                  size === 'sm' && 'w-3 h-3',
-                  size === 'md' && 'w-3 h-3',
-                  size === 'lg' && 'w-4 h-4'
-                )}
-                aria-hidden="true"
-              />
-            </button>
-          )}
         </button>
       );
     }
@@ -383,33 +510,6 @@ export const Badge = forwardRef<HTMLElement, BadgeProps>(
             )}
             aria-hidden="true"
           />
-        )}
-
-        {/* Remove button for removable badges */}
-        {removable && onRemove && (
-          <button
-            type="button"
-            className={cn(
-              'ml-1 flex-shrink-0 rounded-full p-0.5 hover:bg-current/20',
-              'focus:outline-none focus:ring-1 focus:ring-current',
-              'transition-colors duration-150'
-            )}
-            onClick={(e) => {
-              e.stopPropagation();
-              onRemove();
-            }}
-            aria-label="Remove badge"
-            tabIndex={-1} // Parent handles tab focus
-          >
-            <XCircle
-              className={cn(
-                size === 'sm' && 'w-3 h-3',
-                size === 'md' && 'w-3 h-3',
-                size === 'lg' && 'w-4 h-4'
-              )}
-              aria-hidden="true"
-            />
-          </button>
         )}
       </output>
     );
