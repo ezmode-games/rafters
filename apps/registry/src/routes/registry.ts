@@ -28,7 +28,7 @@ registry.get('/', async (c) => {
         type: component.type,
         cognitiveLoad: component.meta?.rafters?.intelligence.cognitiveLoad || 0,
         dependencies: component.dependencies || [],
-        files: component.files.map((f) => f.path),
+        files: component.files?.map((f) => f.path) || [],
       })),
       totalComponents: registryData.components.length,
       lastUpdated: new Date().toISOString(),
