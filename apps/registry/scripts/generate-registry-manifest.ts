@@ -135,7 +135,8 @@ function parseJSDocComment(content: string) {
     let match: RegExpExecArray | null;
 
     // biome-ignore lint/suspicious/noAssignInExpressions: Necessary for regex exec loop
-    while ((match = codeBlockRegex.exec(content)) !== null) {
+
+    for (const match of content.matchAll(codeBlockRegex)) {
       const code = match[2].trim();
       // Look for comment before the code block as title/description
       const beforeCode = content.substring(0, match.index).trim();
