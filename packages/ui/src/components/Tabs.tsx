@@ -21,41 +21,48 @@
  */
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
-import { forwardRef } from 'react';
 import { cn } from '../lib/utils';
 
 interface TabsProps extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.Root> {
   cognitiveLoad?: 'minimal' | 'standard' | 'complex';
   orientation?: 'horizontal' | 'vertical';
   wayfinding?: boolean;
+  ref?: React.Ref<React.ElementRef<typeof TabsPrimitive.Root>>;
 }
 
-const Tabs = forwardRef<React.ElementRef<typeof TabsPrimitive.Root>, TabsProps>(
-  (
-    { cognitiveLoad = 'standard', orientation = 'horizontal', wayfinding = false, ...props },
-    ref
-  ) => (
+function Tabs({
+  cognitiveLoad = 'standard',
+  orientation = 'horizontal',
+  wayfinding = false,
+  ref,
+  ...props
+}: TabsProps) {
+  return (
     <TabsPrimitive.Root
       ref={ref}
       orientation={orientation}
       className={cn('w-full', wayfinding && 'tabs-wayfinding')}
       {...props}
     />
-  )
-);
-Tabs.displayName = TabsPrimitive.Root.displayName;
+  );
+}
 
 interface TabsListProps extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.List> {
   variant?: 'default' | 'pills' | 'underline';
   density?: 'compact' | 'comfortable' | 'spacious';
   showIndicator?: boolean;
+  ref?: React.Ref<React.ElementRef<typeof TabsPrimitive.List>>;
 }
 
-const TabsList = forwardRef<React.ElementRef<typeof TabsPrimitive.List>, TabsListProps>(
-  (
-    { className, variant = 'default', density = 'comfortable', showIndicator = true, ...props },
-    ref
-  ) => (
+function TabsList({
+  className,
+  variant = 'default',
+  density = 'comfortable',
+  showIndicator = true,
+  ref,
+  ...props
+}: TabsListProps) {
+  return (
     <TabsPrimitive.List
       ref={ref}
       className={cn(
@@ -79,18 +86,26 @@ const TabsList = forwardRef<React.ElementRef<typeof TabsPrimitive.List>, TabsLis
       )}
       {...props}
     />
-  )
-);
-TabsList.displayName = TabsPrimitive.List.displayName;
+  );
+}
 
 interface TabsTriggerProps extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> {
   badge?: string | number;
   icon?: React.ReactNode;
   disabled?: boolean;
+  ref?: React.Ref<React.ElementRef<typeof TabsPrimitive.Trigger>>;
 }
 
-const TabsTrigger = forwardRef<React.ElementRef<typeof TabsPrimitive.Trigger>, TabsTriggerProps>(
-  ({ className, badge, icon, children, disabled, ...props }, ref) => (
+function TabsTrigger({
+  className,
+  badge,
+  icon,
+  children,
+  disabled,
+  ref,
+  ...props
+}: TabsTriggerProps) {
+  return (
     <TabsPrimitive.Trigger
       ref={ref}
       disabled={disabled}
@@ -121,17 +136,24 @@ const TabsTrigger = forwardRef<React.ElementRef<typeof TabsPrimitive.Trigger>, T
         </span>
       )}
     </TabsPrimitive.Trigger>
-  )
-);
-TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
+  );
+}
 
 interface TabsContentProps extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content> {
   loading?: boolean;
   lazy?: boolean;
+  ref?: React.Ref<React.ElementRef<typeof TabsPrimitive.Content>>;
 }
 
-const TabsContent = forwardRef<React.ElementRef<typeof TabsPrimitive.Content>, TabsContentProps>(
-  ({ className, loading = false, lazy = false, children, ...props }, ref) => (
+function TabsContent({
+  className,
+  loading = false,
+  lazy = false,
+  children,
+  ref,
+  ...props
+}: TabsContentProps) {
+  return (
     <TabsPrimitive.Content
       ref={ref}
       className={cn(
@@ -153,9 +175,8 @@ const TabsContent = forwardRef<React.ElementRef<typeof TabsPrimitive.Content>, T
         children
       )}
     </TabsPrimitive.Content>
-  )
-);
-TabsContent.displayName = TabsPrimitive.Content.displayName;
+  );
+}
 
 // Navigation helper component for wayfinding
 interface TabsBreadcrumbProps {
@@ -163,7 +184,7 @@ interface TabsBreadcrumbProps {
   tabs: Array<{ value: string; label: string }>;
 }
 
-const TabsBreadcrumb = ({ activeTab, tabs }: TabsBreadcrumbProps) => {
+function TabsBreadcrumb({ activeTab, tabs }: TabsBreadcrumbProps) {
   const activeIndex = tabs.findIndex((tab) => tab.value === activeTab);
   const activeTabLabel = tabs[activeIndex]?.label;
 
@@ -172,7 +193,7 @@ const TabsBreadcrumb = ({ activeTab, tabs }: TabsBreadcrumbProps) => {
       Tab {activeIndex + 1} of {tabs.length}: {activeTabLabel}
     </output>
   );
-};
+}
 
 export { Tabs, TabsList, TabsTrigger, TabsContent, TabsBreadcrumb };
 export type { TabsProps };

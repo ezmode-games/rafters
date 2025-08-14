@@ -22,7 +22,6 @@
  */
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
-import { forwardRef } from 'react';
 import { cn } from '../lib/utils';
 
 export interface DialogProps {
@@ -62,42 +61,44 @@ export const DialogTrigger = DialogPrimitive.Trigger;
 export const DialogPortal = DialogPrimitive.Portal;
 
 // Overlay with trust-building visual hierarchy
-export const DialogOverlay = forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Overlay>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Overlay
-    ref={ref}
-    className={cn(
-      // Base overlay with trust-building opacity
-      'fixed inset-0 z-50 bg-background/80 backdrop-blur-sm',
-      // Trust pattern: Smooth entrance reduces cognitive jarring
-      'data-[state=open]:animate-in data-[state=closed]:animate-out',
-      'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-      className
-    )}
-    {...props}
-  />
-));
-DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
+interface DialogOverlayProps
+  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay> {
+  ref?: React.Ref<React.ElementRef<typeof DialogPrimitive.Overlay>>;
+}
+
+export function DialogOverlay({ className, ref, ...props }: DialogOverlayProps) {
+  return (
+    <DialogPrimitive.Overlay
+      ref={ref}
+      className={cn(
+        // Base overlay with trust-building opacity
+        'fixed inset-0 z-50 bg-background/80 backdrop-blur-sm',
+        // Trust pattern: Smooth entrance reduces cognitive jarring
+        'data-[state=open]:animate-in data-[state=closed]:animate-out',
+        'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+        className
+      )}
+      {...props}
+    />
+  );
+}
 
 // Main Content component with intelligence patterns
-export const DialogContent = forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Content>,
-  DialogContentProps
->(
-  (
-    {
-      className,
-      children,
-      trustLevel = 'medium',
-      destructive = false,
-      size = 'md',
-      cognitiveComplexity = 'moderate',
-      ...props
-    },
-    ref
-  ) => (
+interface DialogContentPropsWithRef extends DialogContentProps {
+  ref?: React.Ref<React.ElementRef<typeof DialogPrimitive.Content>>;
+}
+
+export function DialogContent({
+  className,
+  children,
+  trustLevel = 'medium',
+  destructive = false,
+  size = 'md',
+  cognitiveComplexity = 'moderate',
+  ref,
+  ...props
+}: DialogContentPropsWithRef) {
+  return (
     <DialogPortal>
       <DialogOverlay />
       <DialogPrimitive.Content
@@ -148,13 +149,16 @@ export const DialogContent = forwardRef<
         {children}
       </DialogPrimitive.Content>
     </DialogPortal>
-  )
-);
-DialogContent.displayName = DialogPrimitive.Content.displayName;
+  );
+}
 
 // Header with trust-building hierarchy
-export const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(
-  ({ className, ...props }, ref) => (
+interface DialogHeaderPropsWithRef extends DialogHeaderProps {
+  ref?: React.Ref<HTMLDivElement>;
+}
+
+export function DialogHeader({ className, ref, ...props }: DialogHeaderPropsWithRef) {
+  return (
     <div
       ref={ref}
       className={cn(
@@ -166,13 +170,16 @@ export const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(
       )}
       {...props}
     />
-  )
-);
-DialogHeader.displayName = 'DialogHeader';
+  );
+}
 
 // Footer with action hierarchy and trust patterns
-export const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
-  ({ className, ...props }, ref) => (
+interface DialogFooterPropsWithRef extends DialogFooterProps {
+  ref?: React.Ref<HTMLDivElement>;
+}
+
+export function DialogFooter({ className, ref, ...props }: DialogFooterPropsWithRef) {
+  return (
     <div
       ref={ref}
       className={cn(
@@ -186,47 +193,50 @@ export const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(
       )}
       {...props}
     />
-  )
-);
-DialogFooter.displayName = 'DialogFooter';
+  );
+}
 
 // Title with semantic hierarchy
-export const DialogTitle = forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Title>,
-  DialogTitleProps
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Title
-    ref={ref}
-    className={cn(
-      // Cognitive load: Clear title hierarchy
-      'text-lg font-semibold leading-none tracking-tight',
-      // Trust pattern: Titles establish context and confidence
-      'text-foreground',
-      className
-    )}
-    {...props}
-  />
-));
-DialogTitle.displayName = DialogPrimitive.Title.displayName;
+interface DialogTitlePropsWithRef extends DialogTitleProps {
+  ref?: React.Ref<React.ElementRef<typeof DialogPrimitive.Title>>;
+}
+
+export function DialogTitle({ className, ref, ...props }: DialogTitlePropsWithRef) {
+  return (
+    <DialogPrimitive.Title
+      ref={ref}
+      className={cn(
+        // Cognitive load: Clear title hierarchy
+        'text-lg font-semibold leading-none tracking-tight',
+        // Trust pattern: Titles establish context and confidence
+        'text-foreground',
+        className
+      )}
+      {...props}
+    />
+  );
+}
 
 // Description with trust-building clarity
-export const DialogDescription = forwardRef<
-  React.ElementRef<typeof DialogPrimitive.Description>,
-  DialogDescriptionProps
->(({ className, ...props }, ref) => (
-  <DialogPrimitive.Description
-    ref={ref}
-    className={cn(
-      // Trust pattern: Clear explanation reduces uncertainty
-      'text-sm text-muted-foreground leading-relaxed',
-      // Cognitive load: Comfortable reading line height
-      'max-w-none',
-      className
-    )}
-    {...props}
-  />
-));
-DialogDescription.displayName = DialogPrimitive.Description.displayName;
+interface DialogDescriptionPropsWithRef extends DialogDescriptionProps {
+  ref?: React.Ref<React.ElementRef<typeof DialogPrimitive.Description>>;
+}
+
+export function DialogDescription({ className, ref, ...props }: DialogDescriptionPropsWithRef) {
+  return (
+    <DialogPrimitive.Description
+      ref={ref}
+      className={cn(
+        // Trust pattern: Clear explanation reduces uncertainty
+        'text-sm text-muted-foreground leading-relaxed',
+        // Cognitive load: Comfortable reading line height
+        'max-w-none',
+        className
+      )}
+      {...props}
+    />
+  );
+}
 
 // Close button with escape hatch accessibility
 export const DialogClose = DialogPrimitive.Close;
