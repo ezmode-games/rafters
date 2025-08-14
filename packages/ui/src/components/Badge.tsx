@@ -24,7 +24,7 @@ import { AlertTriangle, CheckCircle, Info, Minus, XCircle } from 'lucide-react';
 import { forwardRef } from 'react';
 import { cn } from '../lib/utils';
 import { Chip } from './Chip';
-import type { ChipVariant, ChipPosition } from './Chip';
+import type { ChipPosition, ChipVariant } from './Chip';
 
 export type BadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'neutral';
 export type BadgeSize = 'sm' | 'md' | 'lg';
@@ -137,14 +137,7 @@ export const Badge = forwardRef<HTMLElement, BadgeProps>(
     const renderChip = () => {
       if (!chip) return null;
 
-      return (
-        <Chip
-          variant={chip}
-          position={chipPosition}
-          value={chipValue}
-          size={size}
-        />
-      );
+      return <Chip variant={chip} position={chipPosition} value={chipValue} size={size} />;
     };
 
     // Handle keyboard navigation for interactive badges

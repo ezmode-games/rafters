@@ -105,7 +105,7 @@ export const Composition: Story = {
       <div className="space-y-4">
         <h4 className="text-sm font-medium">Button + Chip</h4>
         <div className="relative inline-block">
-          <button className="px-4 py-2 bg-primary text-primary-foreground rounded-md">
+          <button type="button" className="px-4 py-2 bg-primary text-primary-foreground rounded-md">
             Messages
           </button>
           <Chip variant="count" value="5" />

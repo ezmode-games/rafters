@@ -30,16 +30,16 @@ export type ChipSize = 'sm' | 'md' | 'lg';
 export interface ChipProps extends React.HTMLAttributes<HTMLSpanElement> {
   // Core variant for semantic meaning
   variant: ChipVariant;
-  
+
   // Positioning relative to parent component
   position?: ChipPosition;
-  
+
   // Custom display value (numbers, text, icons)
   value?: string | number;
-  
+
   // Size adaptation for parent component context
   size?: ChipSize;
-  
+
   // Enhanced accessibility
   'aria-label'?: string;
 }
@@ -122,11 +122,11 @@ export const Chip = forwardRef<HTMLSpanElement, ChipProps>(
           'border-2 border-background', // Creates separation from parent
           chipInfo.color,
           chipInfo.textColor,
-          
+
           // Position-specific styles (ALL break boundaries with -2px)
           {
             '-top-2 -right-2': position === 'top-right',
-            '-top-2 -left-2': position === 'top-left', 
+            '-top-2 -left-2': position === 'top-left',
             '-bottom-2 -right-2': position === 'bottom-right',
             '-bottom-2 -left-2': position === 'bottom-left',
           },
@@ -134,7 +134,7 @@ export const Chip = forwardRef<HTMLSpanElement, ChipProps>(
           // Size responsive
           {
             'text-xs min-w-4 h-4': size === 'sm',
-            'text-xs min-w-5 h-5': size === 'md', 
+            'text-xs min-w-5 h-5': size === 'md',
             'text-sm min-w-6 h-6': size === 'lg',
           },
 
