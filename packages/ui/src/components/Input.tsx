@@ -41,7 +41,6 @@
  */
 import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
 import { cn } from '../lib/utils';
-
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   variant?: 'default' | 'error' | 'success' | 'warning';
   validationMode?: 'live' | 'onBlur' | 'onSubmit';
