@@ -154,3 +154,6 @@ export * from '../providers';
 
 // Navigation and menu hooks
 export * from '../hooks';
+
+export { Chip } from './Chip';
+export type { ChipProps, ChipVariant, ChipPosition } from './Chip';

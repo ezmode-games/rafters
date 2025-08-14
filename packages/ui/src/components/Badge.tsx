@@ -23,12 +23,15 @@
 import { AlertTriangle, CheckCircle, Info, Minus, XCircle } from 'lucide-react';
 import { forwardRef } from 'react';
 import { cn } from '../lib/utils';
+import { Chip } from './Chip';
+import type { ChipVariant, ChipPosition } from './Chip';
 
 export type BadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'neutral';
 export type BadgeSize = 'sm' | 'md' | 'lg';
 export type BadgeEmphasis = 'subtle' | 'default' | 'prominent';
-export type BadgeChipVariant = 'urgent' | 'new' | 'live' | 'beta' | 'premium' | 'count';
-export type BadgeChipPosition = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
+// Use Chip component types for backward compatibility
+export type BadgeChipVariant = ChipVariant;
+export type BadgeChipPosition = ChipPosition;
 
 export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLElement>, 'onClick'> {
   // Core semantic variants for status communication
@@ -57,9 +60,9 @@ export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLElement>, 'onC
   animate?: boolean;
   loading?: boolean;
 
-  // High visibility chip indicator
-  chip?: BadgeChipVariant;
-  chipPosition?: BadgeChipPosition;
+  // High visibility chip indicator (uses independent Chip component)
+  chip?: ChipVariant;
+  chipPosition?: ChipPosition;
   chipValue?: string | number; // For count badges or custom text
 }
 
@@ -102,58 +105,6 @@ const STATUS_INDICATORS = {
   },
 } as const;
 
-// High visibility chip intelligence with attention economics
-const CHIP_INTELLIGENCE = {
-  urgent: {
-    color: 'bg-destructive',
-    textColor: 'text-destructive-foreground',
-    cognitiveLoad: 9,
-    attentionWeight: 'maximum',
-    psychology: 'immediate_action_required',
-    ariaLabel: 'Urgent notification',
-  },
-  new: {
-    color: 'bg-primary',
-    textColor: 'text-primary-foreground',
-    cognitiveLoad: 6,
-    attentionWeight: 'high',
-    psychology: 'discovery_excitement',
-    ariaLabel: 'New feature or content',
-  },
-  live: {
-    color: 'bg-success',
-    textColor: 'text-success-foreground',
-    cognitiveLoad: 7,
-    attentionWeight: 'high',
-    psychology: 'real_time_awareness',
-    ariaLabel: 'Live status indicator',
-  },
-  beta: {
-    color: 'bg-warning',
-    textColor: 'text-warning-foreground',
-    cognitiveLoad: 4,
-    attentionWeight: 'medium',
-    psychology: 'experimental_caution',
-    ariaLabel: 'Beta feature indicator',
-  },
-  premium: {
-    color: 'bg-accent',
-    textColor: 'text-accent-foreground',
-    cognitiveLoad: 5,
-    attentionWeight: 'medium',
-    psychology: 'value_proposition',
-    ariaLabel: 'Premium feature indicator',
-  },
-  count: {
-    color: 'bg-destructive',
-    textColor: 'text-destructive-foreground',
-    cognitiveLoad: 8,
-    attentionWeight: 'high',
-    psychology: 'quantified_urgency',
-    ariaLabel: 'Notification count',
-  },
-} as const;
-
 export const Badge = forwardRef<HTMLElement, BadgeProps>(
   (
     {
@@ -182,43 +133,17 @@ export const Badge = forwardRef<HTMLElement, BadgeProps>(
     const Icon = CustomIcon || statusInfo.icon;
     const isInteractive = interactive || removable || !!onClick;
 
-    // Chip rendering helper
+    // Chip rendering using independent Chip component
     const renderChip = () => {
       if (!chip) return null;
 
-      const chipInfo = CHIP_INTELLIGENCE[chip];
-      const displayValue = chipValue || (chip === 'count' ? '1' : '');
-
       return (
-        <span
-          className={cn(
-            // High visibility positioning that breaks badge boundaries
-            'absolute z-10 rounded-full text-xs font-bold leading-none',
-            'min-w-5 h-5 flex items-center justify-center',
-            'border-2 border-background', // Creates separation from badge
-            chipInfo.color,
-            chipInfo.textColor,
-
-            // Position-specific styles
-            {
-              '-top-2 -right-2': chipPosition === 'top-right',
-              '-top-2 -left-2': chipPosition === 'top-left',
-              '-bottom-2 -right-2': chipPosition === 'bottom-right',
-              '-bottom-2 -left-2': chipPosition === 'bottom-left',
-            },
-
-            // Size responsive
-            {
-              'text-xs min-w-4 h-4': size === 'sm',
-              'text-xs min-w-5 h-5': size === 'md',
-              'text-sm min-w-6 h-6': size === 'lg',
-            }
-          )}
-          aria-label={`${chipInfo.ariaLabel}${chipValue ? `: ${chipValue}` : ''}`}
-          aria-hidden="false" // Important for screen readers to announce counts
-        >
-          {displayValue}
-        </span>
+        <Chip
+          variant={chip}
+          position={chipPosition}
+          value={chipValue}
+          size={size}
+        />
       );
     };
 
