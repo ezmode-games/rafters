@@ -1,23 +1,49 @@
 /**
- * Tabs Component - AI Intelligence
+ * Tabbed interface component with keyboard navigation and ARIA compliance
  *
- * COGNITIVE LOAD: 4/10 (requires understanding current state and available options)
- * ATTENTION ECONOMICS: Active state must be immediately clear
- * PROGRESSIVE ENHANCEMENT: Works with keyboard, enhances with mouse
+ * @registry-name tabs
+ * @registry-version 0.1.0
+ * @registry-status published
+ * @registry-path components/ui/Tabs.tsx
+ * @registry-type registry:component
  *
- * DESIGN INTELLIGENCE GUIDES:
- * - Attention Economics: rafters.realhandy.tech/llm/patterns/attention-economics
- * - Cognitive Load Management: rafters.realhandy.tech/llm/patterns/cognitive-load
- * - Progressive Enhancement: rafters.realhandy.tech/llm/patterns/progressive-enhancement
+ * @cognitive-load 4/10 - Content organization with state management requires cognitive processing
+ * @attention-economics Content organization: visible=current context, hidden=available contexts, active=user focus
+ * @trust-building Persistent selection, clear active indication, predictable navigation patterns
+ * @accessibility Arrow key navigation, tab focus management, panel association, screen reader support
+ * @semantic-meaning Structure: tablist=navigation, tab=option, tabpanel=content, selected=current view
  *
- * USAGE PATTERNS:
- * ✅ Related Content: Different views of same data/context
- * ✅ Clear Labels: Descriptive, scannable tab names (7±2 maximum)
- * ✅ State Indication: Active tab visually prominent
- * ✅ Logical Order: Arrange tabs by frequency or workflow sequence
- * ❌ Never: More than 7 tabs, unrelated content sections, unclear active state
+ * @usage-patterns
+ * DO: Use for related content showing different views of same data/context
+ * DO: Provide clear, descriptive, scannable tab names (7±2 maximum)
+ * DO: Make active state visually prominent and immediately clear
+ * DO: Arrange tabs by frequency or logical workflow sequence
+ * NEVER: More than 7 tabs, unrelated content sections, unclear active state
  *
- * Token knowledge: .rafters/tokens/registry.json
+ * @design-guides
+ * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
+ * - Cognitive Load: https://rafters.realhandy.tech/docs/llm/cognitive-load
+ * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
+ *
+ * @dependencies @radix-ui/react-tabs, @rafters/design-tokens/motion
+ *
+ * @example
+ * ```tsx
+ * // Basic tabs with content panels
+ * <Tabs defaultValue="overview">
+ *   <TabsList>
+ *     <TabsTrigger value="overview">Overview</TabsTrigger>
+ *     <TabsTrigger value="details">Details</TabsTrigger>
+ *     <TabsTrigger value="settings">Settings</TabsTrigger>
+ *   </TabsList>
+ *   <TabsContent value="overview">
+ *     Overview content
+ *   </TabsContent>
+ *   <TabsContent value="details">
+ *     Details content
+ *   </TabsContent>
+ * </Tabs>
+ * ```
  */
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';

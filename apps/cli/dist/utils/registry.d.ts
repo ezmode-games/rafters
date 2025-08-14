@@ -9,6 +9,19 @@ export declare const IntelligenceSchema: z.ZodObject<{
     trustBuilding: z.ZodString;
     semanticMeaning: z.ZodString;
 }, z.core.$strip>;
+export declare const UsagePatternsSchema: z.ZodObject<{
+    dos: z.ZodArray<z.ZodString>;
+    nevers: z.ZodArray<z.ZodString>;
+}, z.core.$strip>;
+export declare const DesignGuideSchema: z.ZodObject<{
+    name: z.ZodString;
+    url: z.ZodString;
+}, z.core.$strip>;
+export declare const ExampleSchema: z.ZodObject<{
+    title: z.ZodOptional<z.ZodString>;
+    code: z.ZodString;
+    description: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
 export declare const ComponentManifestSchema: z.ZodObject<{
     $schema: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
@@ -26,12 +39,14 @@ export declare const ComponentManifestSchema: z.ZodObject<{
     dependencies: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodString>>>;
     devDependencies: z.ZodOptional<z.ZodArray<z.ZodString>>;
     registryDependencies: z.ZodOptional<z.ZodArray<z.ZodString>>;
-    files: z.ZodArray<z.ZodObject<{
+    files: z.ZodOptional<z.ZodArray<z.ZodObject<{
         path: z.ZodString;
         content: z.ZodString;
         type: z.ZodString;
         target: z.ZodOptional<z.ZodString>;
-    }, z.core.$strip>>;
+    }, z.core.$strip>>>;
+    content: z.ZodOptional<z.ZodString>;
+    path: z.ZodOptional<z.ZodString>;
     tailwind: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
     cssVars: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
     css: z.ZodOptional<z.ZodArray<z.ZodString>>;
@@ -40,6 +55,7 @@ export declare const ComponentManifestSchema: z.ZodObject<{
     docs: z.ZodOptional<z.ZodString>;
     meta: z.ZodOptional<z.ZodObject<{
         rafters: z.ZodOptional<z.ZodObject<{
+            version: z.ZodString;
             intelligence: z.ZodObject<{
                 cognitiveLoad: z.ZodNumber;
                 attentionEconomics: z.ZodString;
@@ -47,7 +63,19 @@ export declare const ComponentManifestSchema: z.ZodObject<{
                 trustBuilding: z.ZodString;
                 semanticMeaning: z.ZodString;
             }, z.core.$strip>;
-            version: z.ZodOptional<z.ZodString>;
+            usagePatterns: z.ZodObject<{
+                dos: z.ZodArray<z.ZodString>;
+                nevers: z.ZodArray<z.ZodString>;
+            }, z.core.$strip>;
+            designGuides: z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                url: z.ZodString;
+            }, z.core.$strip>>;
+            examples: z.ZodArray<z.ZodObject<{
+                title: z.ZodOptional<z.ZodString>;
+                code: z.ZodString;
+                description: z.ZodOptional<z.ZodString>;
+            }, z.core.$strip>>;
         }, z.core.$strip>>;
     }, z.core.$strip>>;
 }, z.core.$strip>;
@@ -72,12 +100,14 @@ export declare const RegistrySchema: z.ZodObject<{
         dependencies: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodString>>>;
         devDependencies: z.ZodOptional<z.ZodArray<z.ZodString>>;
         registryDependencies: z.ZodOptional<z.ZodArray<z.ZodString>>;
-        files: z.ZodArray<z.ZodObject<{
+        files: z.ZodOptional<z.ZodArray<z.ZodObject<{
             path: z.ZodString;
             content: z.ZodString;
             type: z.ZodString;
             target: z.ZodOptional<z.ZodString>;
-        }, z.core.$strip>>;
+        }, z.core.$strip>>>;
+        content: z.ZodOptional<z.ZodString>;
+        path: z.ZodOptional<z.ZodString>;
         tailwind: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
         cssVars: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
         css: z.ZodOptional<z.ZodArray<z.ZodString>>;
@@ -86,6 +116,7 @@ export declare const RegistrySchema: z.ZodObject<{
         docs: z.ZodOptional<z.ZodString>;
         meta: z.ZodOptional<z.ZodObject<{
             rafters: z.ZodOptional<z.ZodObject<{
+                version: z.ZodString;
                 intelligence: z.ZodObject<{
                     cognitiveLoad: z.ZodNumber;
                     attentionEconomics: z.ZodString;
@@ -93,7 +124,19 @@ export declare const RegistrySchema: z.ZodObject<{
                     trustBuilding: z.ZodString;
                     semanticMeaning: z.ZodString;
                 }, z.core.$strip>;
-                version: z.ZodOptional<z.ZodString>;
+                usagePatterns: z.ZodObject<{
+                    dos: z.ZodArray<z.ZodString>;
+                    nevers: z.ZodArray<z.ZodString>;
+                }, z.core.$strip>;
+                designGuides: z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    url: z.ZodString;
+                }, z.core.$strip>>;
+                examples: z.ZodArray<z.ZodObject<{
+                    title: z.ZodOptional<z.ZodString>;
+                    code: z.ZodString;
+                    description: z.ZodOptional<z.ZodString>;
+                }, z.core.$strip>>;
             }, z.core.$strip>>;
         }, z.core.$strip>>;
     }, z.core.$strip>>>;
@@ -114,12 +157,14 @@ export declare const RegistrySchema: z.ZodObject<{
         dependencies: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodString>>>;
         devDependencies: z.ZodOptional<z.ZodArray<z.ZodString>>;
         registryDependencies: z.ZodOptional<z.ZodArray<z.ZodString>>;
-        files: z.ZodArray<z.ZodObject<{
+        files: z.ZodOptional<z.ZodArray<z.ZodObject<{
             path: z.ZodString;
             content: z.ZodString;
             type: z.ZodString;
             target: z.ZodOptional<z.ZodString>;
-        }, z.core.$strip>>;
+        }, z.core.$strip>>>;
+        content: z.ZodOptional<z.ZodString>;
+        path: z.ZodOptional<z.ZodString>;
         tailwind: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
         cssVars: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
         css: z.ZodOptional<z.ZodArray<z.ZodString>>;
@@ -128,6 +173,7 @@ export declare const RegistrySchema: z.ZodObject<{
         docs: z.ZodOptional<z.ZodString>;
         meta: z.ZodOptional<z.ZodObject<{
             rafters: z.ZodOptional<z.ZodObject<{
+                version: z.ZodString;
                 intelligence: z.ZodObject<{
                     cognitiveLoad: z.ZodNumber;
                     attentionEconomics: z.ZodString;
@@ -135,7 +181,19 @@ export declare const RegistrySchema: z.ZodObject<{
                     trustBuilding: z.ZodString;
                     semanticMeaning: z.ZodString;
                 }, z.core.$strip>;
-                version: z.ZodOptional<z.ZodString>;
+                usagePatterns: z.ZodObject<{
+                    dos: z.ZodArray<z.ZodString>;
+                    nevers: z.ZodArray<z.ZodString>;
+                }, z.core.$strip>;
+                designGuides: z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    url: z.ZodString;
+                }, z.core.$strip>>;
+                examples: z.ZodArray<z.ZodObject<{
+                    title: z.ZodOptional<z.ZodString>;
+                    code: z.ZodString;
+                    description: z.ZodOptional<z.ZodString>;
+                }, z.core.$strip>>;
             }, z.core.$strip>>;
         }, z.core.$strip>>;
     }, z.core.$strip>>>;

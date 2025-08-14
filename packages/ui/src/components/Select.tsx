@@ -1,23 +1,45 @@
 /**
- * Select Component - AI Intelligence
+ * Dropdown selection component with search and accessibility features
  *
- * COGNITIVE LOAD: 4/10 (requires understanding options and making choice)
- * ATTENTION ECONOMICS: Dropdown state must be clearly indicated
- * PROGRESSIVE ENHANCEMENT: Works with keyboard, enhances with mouse interaction
+ * @registry-name select
+ * @registry-version 0.1.0
+ * @registry-status published
+ * @registry-path components/ui/Select.tsx
+ * @registry-type registry:component
  *
- * DESIGN INTELLIGENCE GUIDES:
- * - Cognitive Load Management: rafters.realhandy.tech/llm/patterns/cognitive-load
- * - Attention Economics: rafters.realhandy.tech/llm/patterns/attention-economics
- * - Progressive Enhancement: rafters.realhandy.tech/llm/patterns/progressive-enhancement
+ * @cognitive-load 5/10 - Option selection with search functionality requires cognitive processing
+ * @attention-economics State management: closed=compact display, open=full options, searching=filtered results
+ * @trust-building Search functionality, clear selection indication, undo patterns for accidental selections
+ * @accessibility Keyboard navigation, screen reader announcements, focus management, option grouping
+ * @semantic-meaning Option structure: value=data, label=display, group=categorization, disabled=unavailable choices
  *
- * USAGE PATTERNS:
- * ✅ Limited Options: 3-12 choices work best, use radio buttons for fewer
- * ✅ Clear Labels: Descriptive option text, avoid technical jargon
- * ✅ Default Selection: Pre-select most common/safe option when appropriate
- * ✅ Search Support: Enable search for 8+ options to reduce cognitive load
- * ❌ Never: Too many options without grouping, unclear option descriptions
+ * @usage-patterns
+ * DO: Use 3-12 choices for optimal cognitive load
+ * DO: Provide clear, descriptive option text
+ * DO: Pre-select most common/safe option when appropriate
+ * DO: Enable search for 8+ options to reduce cognitive load
+ * NEVER: Too many options without grouping, unclear option descriptions
  *
- * Token knowledge: .rafters/tokens/registry.json
+ * @design-guides
+ * - Cognitive Load: https://rafters.realhandy.tech/docs/llm/cognitive-load
+ * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
+ * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
+ *
+ * @dependencies @radix-ui/react-select, @radix-ui/react-icons, @rafters/design-tokens/motion
+ *
+ * @example
+ * ```tsx
+ * // Basic select with options
+ * <Select>
+ *   <SelectTrigger>
+ *     <SelectValue placeholder="Choose option..." />
+ *   </SelectTrigger>
+ *   <SelectContent>
+ *     <SelectItem value="option1">Option 1</SelectItem>
+ *     <SelectItem value="option2">Option 2</SelectItem>
+ *   </SelectContent>
+ * </Select>
+ * ```
  */
 import {
   CheckIcon,

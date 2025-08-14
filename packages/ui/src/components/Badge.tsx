@@ -1,24 +1,44 @@
 /**
- * Badge Component - AI Intelligence
+ * Status badge component with multi-sensory communication patterns
  *
- * COGNITIVE LOAD: 2/10 (optimized for peripheral scanning)
- * ATTENTION HIERARCHY: Secondary/Tertiary - supports primary content without overwhelming
- * TRUST BUILDING: Low trust level - informational display with optional interaction
+ * @registry-name badge
+ * @registry-version 0.1.0
+ * @registry-status published
+ * @registry-path components/ui/Badge.tsx
+ * @registry-type registry:component
  *
- * DESIGN INTELLIGENCE GUIDES:
- * - Status Communication: rafters.realhandy.tech/llm/patterns/status-communication
- * - Attention Economics: rafters.realhandy.tech/llm/patterns/attention-economics
- * - Multi-Sensory Design: rafters.realhandy.tech/llm/patterns/accessibility-excellence
+ * @cognitive-load 2/10 - Optimized for peripheral scanning with minimal cognitive overhead
+ * @attention-economics Secondary/tertiary support: Maximum 1 high-attention badge per section, unlimited subtle badges
+ * @trust-building Low trust informational display with optional interaction patterns
+ * @accessibility Multi-sensory communication: Color + Icon + Text + Pattern prevents single-point accessibility failure
+ * @semantic-meaning Status communication with semantic variants: success=completion, warning=caution, error=problems, info=neutral information
  *
- * USAGE PATTERNS:
- * ✅ Status indicators: success, warning, error, info, neutral with multi-sensory communication
- * ✅ Navigation badges: notification counts, status in sidebar contexts
- * ✅ Category labels: single words, semantic meaning over arbitrary colors
- * ✅ Interactive badges: removal, expansion with enhanced touch targets
- * ❌ Never: Primary actions, complex information, critical alerts
+ * @usage-patterns
+ * DO: Use for status indicators with multi-sensory communication
+ * DO: Navigation badges for notification counts and sidebar status
+ * DO: Category labels with semantic meaning over arbitrary colors
+ * DO: Interactive badges with enhanced touch targets for removal/expansion
+ * NEVER: Primary actions, complex information, critical alerts requiring immediate action
  *
- * Multi-sensory status: Color + Icon + Text + Pattern prevents single-point failure
- * Attention budget: Maximum 1 high-attention badge per section, unlimited subtle badges
+ * @design-guides
+ * - Status Communication: https://rafters.realhandy.tech/docs/llm/status-communication
+ * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
+ * - Multi-Sensory Design: https://rafters.realhandy.tech/docs/llm/accessibility-excellence
+ *
+ * @dependencies lucide-react
+ *
+ * @example
+ * ```tsx
+ * // Status badge with icon and semantic meaning
+ * <Badge variant="success" emphasis="default">
+ *   Completed
+ * </Badge>
+ *
+ * // Interactive badge for removal
+ * <Badge variant="info" interactive onRemove={() => {}}>
+ *   Category
+ * </Badge>
+ * ```
  */
 import { AlertTriangle, CheckCircle, Info, Minus, XCircle } from 'lucide-react';
 import { cn } from '../lib/utils';

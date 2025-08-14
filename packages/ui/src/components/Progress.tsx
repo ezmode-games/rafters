@@ -6,21 +6,47 @@ import { cn } from '../lib/utils';
 import { Button } from './Button';
 
 /**
- * Progress Communication Intelligence Component
+ * Progress indicator component with time estimation and completion intelligence
  *
- * This component implements communication intelligence patterns to help users
- * understand progress and manage expectations during waiting periods.
+ * @registry-name progress
+ * @registry-version 0.1.0
+ * @registry-status published
+ * @registry-path components/ui/Progress.tsx
+ * @registry-type registry:component
  *
- * Design Intelligence:
- * - cognitiveLoad=4 (moderate attention required for progress monitoring)
- * - trustLevel=high (accurate progress builds user confidence)
- * - attentionEconomics=temporal (holds attention during wait states)
+ * @cognitive-load 4/10 - Moderate attention required for progress monitoring
+ * @attention-economics Temporal attention: Holds user attention during wait states with clear progress indication
+ * @trust-building Accurate progress builds user confidence, clear completion states and next steps
+ * @accessibility Screen reader announcements, keyboard navigation, high contrast support
+ * @semantic-meaning Progress communication: determinate=known duration, indeterminate=unknown duration, completed=finished state
  *
- * Communication Patterns:
- * - Time Estimation: Intelligent remaining time calculations
- * - Progress Patterns: Visual patterns matching task characteristics
- * - Completion Intelligence: Clear completion states and next steps
- * - Cognitive Load Optimization: Simple vs detailed information density
+ * @usage-patterns
+ * DO: Provide accurate progress indication with time estimation
+ * DO: Use visual patterns that match task characteristics
+ * DO: Show clear completion states and next steps
+ * DO: Optimize information density based on cognitive load
+ * NEVER: Inaccurate progress bars, missing completion feedback, unclear time estimates
+ *
+ * @design-guides
+ * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
+ * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
+ * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
+ *
+ * @dependencies @radix-ui/react-progress, @rafters/design-tokens/motion, class-variance-authority
+ *
+ * @example
+ * ```tsx
+ * // Determinate progress with percentage
+ * <Progress value={65} max={100} />
+ *
+ * // Progress with time estimation
+ * <Progress
+ *   value={30}
+ *   max={100}
+ *   showTimeRemaining
+ *   estimatedTimeRemaining="2 minutes"
+ * />
+ * ```
  */
 
 const progressVariants = cva(

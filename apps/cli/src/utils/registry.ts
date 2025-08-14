@@ -4,13 +4,29 @@
 
 import { z } from 'zod';
 
-// Shadcn-compatible registry schemas with AI intelligence
+// Rafters intelligence schemas
 export const IntelligenceSchema = z.object({
-  cognitiveLoad: z.number().min(1).max(10),
+  cognitiveLoad: z.number().min(0).max(10),
   attentionEconomics: z.string(),
   accessibility: z.string(),
   trustBuilding: z.string(),
   semanticMeaning: z.string(),
+});
+
+export const UsagePatternsSchema = z.object({
+  dos: z.array(z.string()),
+  nevers: z.array(z.string()),
+});
+
+export const DesignGuideSchema = z.object({
+  name: z.string(),
+  url: z.string(),
+});
+
+export const ExampleSchema = z.object({
+  title: z.string().optional(),
+  code: z.string(),
+  description: z.string().optional(),
 });
 
 // Shadcn registry file schema
@@ -21,7 +37,7 @@ const RegistryFileSchema = z.object({
   target: z.string().optional(),
 });
 
-// Main component manifest schema - matches shadcn registry-item.json
+// Main component manifest schema - matches shadcn registry-item.json with Rafters extensions
 export const ComponentManifestSchema = z.object({
   $schema: z.string().optional(),
   name: z.string(),
@@ -39,20 +55,25 @@ export const ComponentManifestSchema = z.object({
   dependencies: z.array(z.string()).optional().default([]),
   devDependencies: z.array(z.string()).optional(),
   registryDependencies: z.array(z.string()).optional(),
-  files: z.array(RegistryFileSchema),
+  files: z.array(RegistryFileSchema).optional(),
+  content: z.string().optional(), // For simple single-file components
+  path: z.string().optional(), // Component file path
   tailwind: z.record(z.string(), z.unknown()).optional(),
   cssVars: z.record(z.string(), z.unknown()).optional(),
   css: z.array(z.string()).optional(),
   envVars: z.record(z.string(), z.string()).optional(),
   categories: z.array(z.string()).optional(),
   docs: z.string().optional(),
-  // Our AI intelligence metadata in the meta field
+  // Expanded Rafters intelligence metadata in the meta field
   meta: z
     .object({
       rafters: z
         .object({
+          version: z.string(),
           intelligence: IntelligenceSchema,
-          version: z.string().optional(),
+          usagePatterns: UsagePatternsSchema,
+          designGuides: z.array(DesignGuideSchema),
+          examples: z.array(ExampleSchema),
         })
         .optional(),
     })

@@ -1,24 +1,48 @@
 /**
- * Chip Component - AI Intelligence
+ * Notification chip component for status indicators and count overlays
  *
- * COGNITIVE LOAD: 3-9/10 (varies by variant - see CHIP_INTELLIGENCE)
- * ATTENTION HIERARCHY: Secondary overlay - high visibility without overwhelming primary content
- * TRUST BUILDING: Medium-High trust level - provides critical status/count information
+ * @registry-name chip
+ * @registry-version 0.1.0
+ * @registry-status published
+ * @registry-path components/ui/Chip.tsx
+ * @registry-type registry:component
  *
- * DESIGN INTELLIGENCE GUIDES:
- * - Attention Economics: rafters.realhandy.tech/llm/patterns/attention-economics
- * - Notification Patterns: rafters.realhandy.tech/llm/patterns/notification-intelligence
- * - Trust Building: rafters.realhandy.tech/llm/patterns/trust-building
+ * @cognitive-load 5/10 - High visibility overlay requiring immediate attention (varies by variant)
+ * @attention-economics Secondary overlay with maximum visibility without overwhelming primary content
+ * @trust-building Critical status and count information builds user awareness and system transparency
+ * @accessibility High contrast indicators, screen reader announcements, keyboard navigation support
+ * @semantic-meaning Status communication: count=quantity indication, status=state indication, badge=feature marking, dot=simple presence indicator
  *
- * USAGE PATTERNS:
- * ✅ Notification counts: unread messages, alerts, status updates
- * ✅ Status indicators: live, new, beta, premium features
- * ✅ Urgent overlays: breaking badge/component boundaries for maximum visibility
- * ✅ Universal attachment: works with buttons, cards, avatars, badges, any component
- * ❌ Never: Primary actions, complex information, standalone content
+ * @usage-patterns
+ * DO: Use for notification counts (unread messages, alerts, status updates)
+ * DO: Provide status indicators (live, new, beta, premium features)
+ * DO: Create urgent overlays that break component boundaries for maximum visibility
+ * DO: Attach universally to buttons, cards, avatars, badges, any component
+ * NEVER: Use for primary actions, complex information, or standalone content
  *
- * Position intelligence: All positions break parent boundaries (-2px) for maximum attention
- * Accessibility: Full WCAG AAA compliance with screen reader count announcements
+ * @design-guides
+ * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
+ * - Notification Intelligence: https://rafters.realhandy.tech/docs/llm/notification-intelligence
+ * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
+ *
+ * @dependencies class-variance-authority, clsx
+ *
+ * @example
+ * ```tsx
+ * // Notification count chip
+ * <div className="relative">
+ *   <Button>Messages</Button>
+ *   <Chip variant="count" position="top-right">
+ *     3
+ *   </Chip>
+ * </div>
+ *
+ * // Status indicator chip
+ * <div className="relative">
+ *   <Badge>Premium</Badge>
+ *   <Chip variant="dot" position="top-right" color="success" />
+ * </div>
+ * ```
  */
 import { forwardRef } from 'react';
 import { cn } from '../lib/utils';

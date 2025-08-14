@@ -6,7 +6,16 @@
     "useIgnoreFile": true
   },
   "files": {
-    "ignore": ["apps/registry/worker-configuration.d.ts", "apps/website/worker-configuration.d.ts"]
+    "ignore": [
+      "apps/registry/worker-configuration.d.ts",
+      "apps/website/worker-configuration.d.ts",
+      "**/.wrangler/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/.next/**",
+      "**/storybook-static/**",
+      "**/registry-manifest.json"
+    ]
   },
   "organizeImports": {
     "enabled": true

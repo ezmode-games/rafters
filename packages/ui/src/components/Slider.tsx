@@ -1,23 +1,50 @@
 /**
- * Slider Component - AI Intelligence
+ * Range slider component with precise value selection and accessibility features
  *
- * COGNITIVE LOAD: 5/10 (requires understanding current value and precision)
- * TRUST BUILDING: Immediate visual feedback builds user confidence
- * ACCESSIBILITY PRIORITY: Motor accessibility with enhanced touch targets
+ * @registry-name slider
+ * @registry-version 0.1.0
+ * @registry-status published
+ * @registry-path components/ui/Slider.tsx
+ * @registry-type registry:component
  *
- * DESIGN INTELLIGENCE GUIDES:
- * - Trust Building Patterns: rafters.realhandy.tech/llm/patterns/trust-building
- * - Progressive Enhancement: rafters.realhandy.tech/llm/patterns/progressive-enhancement
- * - Cognitive Load Management: rafters.realhandy.tech/llm/patterns/cognitive-load
+ * @cognitive-load 3/10 - Value selection with immediate visual feedback
+ * @attention-economics Value communication: visual track, precise labels, immediate feedback
+ * @trust-building Immediate visual feedback, undo capability, clear value indication
+ * @accessibility Keyboard increment/decrement, screen reader value announcements, touch-friendly handles
+ * @semantic-meaning Range contexts: settings=configuration, filters=data selection, controls=media/volume
  *
- * USAGE PATTERNS:
- * ✅ Precise Values: Show current value and units for clarity
- * ✅ Touch Targets: Large thumb size for mobile and accessibility
- * ✅ Step Indicators: Visual markers for discrete value ranges
- * ✅ Immediate Feedback: Real-time updates as user drags
- * ❌ Never: Invisible ranges, unclear min/max values, tiny touch targets
+ * @usage-patterns
+ * DO: Show current value and units for clarity
+ * DO: Use large thumb size for mobile and accessibility
+ * DO: Provide visual markers for discrete value ranges
+ * DO: Give immediate feedback with real-time updates
+ * NEVER: Invisible ranges, unclear min/max values, tiny touch targets
  *
- * Token knowledge: .rafters/tokens/registry.json
+ * @design-guides
+ * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
+ * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
+ * - Cognitive Load: https://rafters.realhandy.tech/docs/llm/cognitive-load
+ *
+ * @dependencies @radix-ui/react-slider, @rafters/design-tokens/motion
+ *
+ * @example
+ * ```tsx
+ * // Basic slider with value display
+ * <Slider
+ *   defaultValue={[50]}
+ *   max={100}
+ *   step={1}
+ *   className="w-full"
+ * />
+ *
+ * // Range slider with multiple handles
+ * <Slider
+ *   defaultValue={[25, 75]}
+ *   max={100}
+ *   step={5}
+ *   className="w-full"
+ * />
+ * ```
  */
 import * as SliderPrimitive from '@radix-ui/react-slider';
 import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';

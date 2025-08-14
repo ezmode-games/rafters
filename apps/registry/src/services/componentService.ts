@@ -2,58 +2,122 @@
  * Component Service
  *
  * Manages loading and processing of components for the registry API.
- * Uses shared registry data for consistency across the system.
+ * Uses generated registry manifest with embedded JSDoc intelligence.
  */
 
-import type { ComponentManifest } from '@rafters/shared';
-import {
-  COMPONENT_INTELLIGENCE_MAP,
-  REGISTRY_MANIFEST,
-  type RegistryManifestComponent,
-} from '@rafters/shared';
+// Import the generated manifest directly as a JSON module
+// @ts-ignore - JSON import is supported in Workers
+import generatedManifest from '../../registry-manifest.json';
 
-// Convert manifest component to shadcn-compatible format
-function convertToComponentManifest(
-  manifestComponent: RegistryManifestComponent
-): ComponentManifest {
-  const meta = COMPONENT_INTELLIGENCE_MAP[manifestComponent.name] || {
-    description: `${manifestComponent.name} component`,
-    dependencies: ['class-variance-authority', 'clsx'],
-    intelligence: {
-      cognitiveLoad: 3,
-      attentionEconomics: 'Standard interaction patterns',
-      accessibility: 'WCAG compliant design',
-      trustBuilding: 'Consistent user experience',
-      semanticMeaning: 'Semantic HTML structure',
-    },
+// Type definitions for our generated registry manifest
+interface RaftersIntelligence {
+  cognitiveLoad: number;
+  attentionEconomics: string;
+  accessibility: string;
+  trustBuilding: string;
+  semanticMeaning: string;
+}
+
+interface UsagePatterns {
+  dos: string[];
+  nevers: string[];
+}
+
+interface DesignGuide {
+  name: string;
+  url: string;
+}
+
+interface Example {
+  title?: string;
+  code: string;
+  description?: string;
+}
+
+interface GeneratedComponent {
+  name: string;
+  path: string;
+  type: string;
+  description?: string;
+  content: string;
+  dependencies: string[];
+  docs?: string;
+  meta?: {
+    rafters: {
+      version: string;
+      intelligence: RaftersIntelligence;
+      usagePatterns: UsagePatterns;
+      designGuides: DesignGuide[];
+      examples: Example[];
+    };
   };
+}
 
+interface GeneratedManifest {
+  components: GeneratedComponent[];
+  total: number;
+  lastUpdated: string;
+}
+
+// Shadcn-compatible ComponentManifest type
+export interface ComponentManifest {
+  $schema?: string;
+  name: string;
+  type:
+    | 'registry:component'
+    | 'registry:lib'
+    | 'registry:style'
+    | 'registry:block'
+    | 'registry:page'
+    | 'registry:hook';
+  description?: string;
+  dependencies?: string[];
+  files?: Array<{
+    path: string;
+    type: string;
+    content: string;
+  }>;
+  docs?: string;
+  meta?: {
+    rafters?: {
+      version: string;
+      intelligence: RaftersIntelligence;
+      usagePatterns: UsagePatterns;
+      designGuides: DesignGuide[];
+      examples: Example[];
+    };
+  };
+}
+
+// Load the generated registry manifest (already imported as JSON module)
+function loadGeneratedManifest(): GeneratedManifest {
+  return generatedManifest as GeneratedManifest;
+}
+
+// Convert generated component to shadcn-compatible format
+function convertToComponentManifest(component: GeneratedComponent): ComponentManifest {
   return {
     $schema: 'https://ui.shadcn.com/schema/registry-item.json',
-    name: manifestComponent.name,
-    type: manifestComponent.type as 'registry:component',
-    description: meta.description,
-    dependencies: meta.dependencies,
+    name: component.name,
+    type: component.type as ComponentManifest['type'],
+    description: component.description,
+    dependencies: component.dependencies,
+    docs: component.docs,
     files: [
       {
-        path: manifestComponent.path,
-        type: manifestComponent.type,
-        content: manifestComponent.content,
+        path: component.path,
+        type: component.type,
+        content: component.content,
       },
     ],
-    meta: {
-      rafters: {
-        intelligence: meta.intelligence,
-        version: manifestComponent.version,
-      },
-    },
+    meta: component.meta,
   };
 }
 
 export async function getComponentRegistry(): Promise<{ components: ComponentManifest[] }> {
-  const components = REGISTRY_MANIFEST.components
-    .filter((comp) => comp.status === 'published')
-    .map(convertToComponentManifest);
+  const manifest = loadGeneratedManifest();
+
+  const components = manifest.components.map(convertToComponentManifest);
 
   return { components };
 }

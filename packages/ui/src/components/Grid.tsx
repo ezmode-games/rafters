@@ -1,30 +1,47 @@
 /**
- * Grid Component - AI Layout Intelligence
+ * Intelligent layout grid with 4 semantic presets and embedded design reasoning for AI agents
  *
- * COGNITIVE LOAD: 4/10 (layout container with intelligent presets)
- * ATTENTION ECONOMICS: Neutral attention cost - content receives focus
- * TRUST BUILDING: Invisible scaffolding users can rely on
- * NEGATIVE SPACE MASTERY: Golden ratio gaps for natural breathing
+ * @registry-name grid
+ * @registry-version 0.1.0
+ * @registry-status published
+ * @registry-path components/ui/Grid.tsx
+ * @registry-type registry:component
  *
- * SPACING PHILOSOPHY: Uses design system tokens for consistent spacing.
- * Grid intelligence comes from presets that encode human design reasoning,
- * enabling AI agents to make informed layout decisions.
+ * @cognitive-load 4/10 - Layout container with intelligent presets that respect Miller's Law
+ * @attention-economics Preset hierarchy: linear=democratic attention, golden=hierarchical flow, bento=complex attention patterns, custom=user-defined
+ * @trust-building Mathematical spacing (golden ratio), Miller's Law cognitive load limits, consistent preset behavior builds user confidence
+ * @accessibility WCAG AAA compliance with keyboard navigation, screen reader patterns, and ARIA grid support for interactive layouts
+ * @semantic-meaning Layout intelligence: linear=equal-priority content, golden=natural hierarchy, bento=content showcases with semantic asymmetry, custom=specialized layouts
  *
- * DESIGN INTELLIGENCE GUIDES:
- * - Cognitive Load: Respects Miller's Law (7±2) through viewport-aware limits
- * - Attention Economics: Linear = democratic, Golden = hierarchical, Bento = complex
- * - Progressive Enhancement: Core functionality works without JavaScript
- * - Accessibility: WCAG AAA compliance with keyboard navigation support
+ * @usage-patterns
+ * DO: Linear - Product catalogs, image galleries, equal-priority content
+ * DO: Golden - Editorial layouts, feature showcases, natural hierarchy
+ * DO: Bento - Editorial layouts, dashboards, content showcases (use sparingly)
+ * DO: Custom - Specialized layouts requiring specific configurations
+ * NEVER: Decorative asymmetry without semantic meaning
+ * NEVER: Exceed cognitive load limits (8 items max on wide screens)
  *
- * USAGE PATTERNS:
- * ✅ Linear: Product catalogs, image galleries, equal-priority content
- * ✅ Golden: Editorial layouts, feature showcases, natural hierarchy
- * ✅ Bento: Editorial layouts, dashboards, content showcases (use sparingly)
- * ✅ Custom: Specialized layouts requiring specific configurations
- * ❌ Never: Decorative asymmetry without semantic meaning
- * ❌ Never: Exceed cognitive load limits (8 items max on wide screens)
+ * @design-guides
+ * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
+ * - Negative Space: https://rafters.realhandy.tech/docs/llm/negative-space
+ * - Cognitive Load: https://rafters.realhandy.tech/docs/llm/cognitive-load
  *
- * Token knowledge: Uses --grid-* tokens from design system for intelligent spacing
+ * @dependencies class-variance-authority, clsx
+ *
+ * @example
+ * ```tsx
+ * // Linear grid for equal-priority content
+ * <Grid preset="linear" gap="comfortable">
+ *   <GridItem>Content 1</GridItem>
+ *   <GridItem>Content 2</GridItem>
+ * </Grid>
+ *
+ * // Bento layout with primary content
+ * <Grid preset="bento" bentoPattern="editorial">
+ *   <GridItem priority="primary">Hero Article</GridItem>
+ *   <GridItem priority="secondary">Supporting Content</GridItem>
+ * </Grid>
+ * ```
  */
 import { cn } from '../lib/utils';
 

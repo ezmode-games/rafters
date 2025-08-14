@@ -11,12 +11,12 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    # Only run if CI passed - trust the validation pipeline
-    needs: []
+    if: github.repository_owner != 'dependabot[bot]'
     permissions:
       contents: write
       id-token: write
       pull-requests: write
+      packages: write
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -59,21 +59,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
 
-      # OPTIONAL: Deploy documentation/storybook if needed
-      - name: Deploy Storybook (if released)
-        if: steps.changesets.outputs.published == 'true'
-        run: |
-          echo "Packages released: ${{ steps.changesets.outputs.publishedPackages }}"
-          # Add deployment commands here if needed
-          # pnpm ui:build-storybook
-          # Deploy to hosting platform
-
-      # OPTIONAL: Update registry after successful release
-      - name: Update Registry (if released)
-        if: steps.changesets.outputs.published == 'true'
-        run: |
-          echo "Updating component registry after release..."
-          # Add registry update commands here
-          pnpm manifest:generate

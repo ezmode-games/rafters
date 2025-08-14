@@ -1,29 +1,54 @@
 /**
- * Tooltip Component - Contextual Intelligence
+ * Contextual tooltip component with smart timing and accessibility
  *
- * COGNITIVE LOAD: 2/10 (contextual help without interruption)
- * TIMING INTELLIGENCE: Smart delays prevent accidental triggers while ensuring help availability
- * CONTEXTUAL RELEVANCE: Content adapts to user context and expertise level
+ * @registry-name tooltip
+ * @registry-version 0.1.0
+ * @registry-status published
+ * @registry-path components/ui/Tooltip.tsx
+ * @registry-type registry:component
  *
- * DESIGN INTELLIGENCE GUIDES:
- * - Cognitive Load Management: rafters.realhandy.tech/llm/patterns/cognitive-load
- * - Trust Building Patterns: rafters.realhandy.tech/llm/patterns/trust-building
- * - Attention Economics: rafters.realhandy.tech/llm/patterns/attention-economics
+ * @cognitive-load 2/10 - Contextual help without interrupting user workflow
+ * @attention-economics Non-intrusive assistance: Smart delays prevent accidental triggers while ensuring help availability
+ * @trust-building Reliable contextual guidance that builds user confidence through progressive disclosure
+ * @accessibility Keyboard navigation, screen reader support, focus management, escape key handling
+ * @semantic-meaning Contextual assistance: help=functionality explanation, definition=terminology clarification, action=shortcuts and outcomes, status=system state
  *
- * USAGE PATTERNS:
- * ✅ Help: Explain functionality without overwhelming
- * ✅ Definition: Clarify terminology contextually
- * ✅ Action: Show shortcuts and expected outcomes
- * ✅ Status: Provide feedback on system state
- * ❌ Never: Essential information that should be visible by default
+ * @usage-patterns
+ * DO: Explain functionality without overwhelming users
+ * DO: Clarify terminology contextually when needed
+ * DO: Show shortcuts and expected action outcomes
+ * DO: Provide feedback on system state changes
+ * NEVER: Include essential information that should be visible by default
  *
- * CONTEXTUAL INTELLIGENCE:
- * - Simple tooltips: 700ms delay (quick confirmation)
- * - Detailed tooltips: 1200ms delay (prevents accidental triggers)
- * - Essential tooltips: 500ms delay (critical information)
- * - Progressive disclosure for complex information
+ * @design-guides
+ * - Cognitive Load: https://rafters.realhandy.tech/docs/llm/cognitive-load
+ * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
+ * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
  *
- * Token knowledge: .rafters/tokens/registry.json
+ * @dependencies @radix-ui/react-tooltip
+ *
+ * @example
+ * ```tsx
+ * // Basic tooltip with help text
+ * <Tooltip>
+ *   <TooltipTrigger asChild>
+ *     <Button variant="ghost">Help</Button>
+ *   </TooltipTrigger>
+ *   <TooltipContent>
+ *     Click to open the help documentation
+ *   </TooltipContent>
+ * </Tooltip>
+ *
+ * // Tooltip with keyboard shortcut
+ * <Tooltip>
+ *   <TooltipTrigger asChild>
+ *     <Button>Save</Button>
+ *   </TooltipTrigger>
+ *   <TooltipContent>
+ *     Save changes (⌘+S)
+ *   </TooltipContent>
+ * </Tooltip>
+ * ```
  */
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';

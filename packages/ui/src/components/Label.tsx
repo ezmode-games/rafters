@@ -1,23 +1,45 @@
 /**
- * Label Component - AI Intelligence
+ * Form label component with semantic variants and accessibility associations
  *
- * COGNITIVE LOAD: 1/10 (provides clarity, reduces interpretation effort)
- * TYPOGRAPHY INTELLIGENCE: Critical for information hierarchy and form accessibility
- * ACCESSIBILITY FOUNDATION: Essential for screen readers and form association
+ * @registry-name label
+ * @registry-version 0.1.0
+ * @registry-status published
+ * @registry-path components/ui/Label.tsx
+ * @registry-type registry:component
  *
- * DESIGN INTELLIGENCE GUIDES:
- * - Typography Intelligence: rafters.realhandy.tech/llm/patterns/typography-intelligence
- * - Cognitive Load Management: rafters.realhandy.tech/llm/patterns/cognitive-load
- * - Progressive Enhancement: rafters.realhandy.tech/llm/patterns/progressive-enhancement
+ * @cognitive-load 2/10 - Provides clarity and reduces interpretation effort
+ * @attention-economics Information hierarchy: field=required label, hint=helpful guidance, error=attention needed
+ * @trust-building Clear requirement indication, helpful hints, non-punitive error messaging
+ * @accessibility Form association, screen reader optimization, color-independent error indication
+ * @semantic-meaning Variant meanings: field=input association, hint=guidance, error=validation feedback, success=confirmation
  *
- * USAGE PATTERNS:
- * ✅ Form Association: Always associate with input using htmlFor/id
- * ✅ Clear Hierarchy: Use importance levels to guide user attention
- * ✅ Required Indication: Visual and semantic marking for required fields
- * ✅ Context Awareness: Adapt styling based on form vs descriptive context
- * ❌ Never: Orphaned labels, unclear or ambiguous text, missing required indicators
+ * @usage-patterns
+ * DO: Always associate with input using htmlFor/id
+ * DO: Use importance levels to guide user attention
+ * DO: Provide visual and semantic marking for required fields
+ * DO: Adapt styling based on form vs descriptive context
+ * NEVER: Orphaned labels, unclear or ambiguous text, missing required indicators
  *
- * Token knowledge: .rafters/tokens/registry.json
+ * @design-guides
+ * - Typography Intelligence: https://rafters.realhandy.tech/docs/llm/typography-intelligence
+ * - Cognitive Load: https://rafters.realhandy.tech/docs/llm/cognitive-load
+ * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
+ *
+ * @dependencies @radix-ui/react-label
+ *
+ * @example
+ * ```tsx
+ * // Form label with required indication
+ * <Label htmlFor="email" required>
+ *   Email Address
+ * </Label>
+ * <Input id="email" type="email" />
+ *
+ * // Label with validation state
+ * <Label variant="error" htmlFor="password">
+ *   Password (required)
+ * </Label>
+ * ```
  */
 import * as LabelPrimitive from '@radix-ui/react-label';
 import { cn } from '../lib/utils';

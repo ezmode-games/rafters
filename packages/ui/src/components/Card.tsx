@@ -1,24 +1,50 @@
-import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
 /**
- * Card Component - AI Intelligence
+ * Flexible container component for grouping related content with semantic structure
  *
- * COGNITIVE LOAD: 1/10 (invisible structure, reduces visual complexity)
- * NEGATIVE SPACE MASTERY: Creates content boundaries and breathing room
- * ATTENTION ECONOMICS: Groups related content, reduces scanning effort
+ * @registry-name card
+ * @registry-version 0.1.0
+ * @registry-status published
+ * @registry-path components/ui/Card.tsx
+ * @registry-type registry:component
  *
- * DESIGN INTELLIGENCE GUIDES:
- * - Negative Space Mastery: rafters.realhandy.tech/llm/patterns/negative-space
- * - Component Intelligence Synthesis: rafters.realhandy.tech/llm/patterns/component-synthesis
- * - Attention Economics: rafters.realhandy.tech/llm/patterns/attention-economics
+ * @cognitive-load 2/10 - Simple container with clear boundaries and minimal cognitive overhead
+ * @attention-economics Neutral container: Content drives attention, elevation hierarchy for interactive states
+ * @trust-building Consistent spacing, predictable interaction patterns, clear content boundaries
+ * @accessibility Proper heading structure, landmark roles, keyboard navigation for interactive cards
+ * @semantic-meaning Structural roles: article=standalone content, section=grouped content, aside=supplementary information
  *
- * USAGE PATTERNS:
- * ✅ Content Grouping: Related information together, clear boundaries
- * ✅ Hierarchy Creation: Different prominence levels for importance
- * ✅ Scannable Layouts: Organized sections reduce cognitive load
- * ❌ Never: Single items that don't need grouping, excessive nesting
+ * @usage-patterns
+ * DO: Group related information with clear visual boundaries
+ * DO: Create interactive cards with hover states and focus management
+ * DO: Establish information hierarchy with header, content, actions
+ * DO: Implement responsive scaling with consistent proportions
+ * NEVER: Use decorative containers without semantic purpose
  *
- * Token knowledge: .rafters/tokens/registry.json
+ * @design-guides
+ * - Content Grouping: https://rafters.realhandy.tech/docs/llm/content-grouping
+ * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
+ * - Spatial Relationships: https://rafters.realhandy.tech/docs/llm/spatial-relationships
+ *
+ * @dependencies @rafters/design-tokens/motion
+ *
+ * @example
+ * ```tsx
+ * // Basic card with content structure
+ * <Card>
+ *   <CardHeader>
+ *     <CardTitle>Card Title</CardTitle>
+ *     <CardDescription>Supporting description</CardDescription>
+ *   </CardHeader>
+ *   <CardContent>
+ *     Main card content
+ *   </CardContent>
+ *   <CardFooter>
+ *     <Button>Action</Button>
+ *   </CardFooter>
+ * </Card>
+ * ```
  */
+import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
 import { cn } from '../lib/utils';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
