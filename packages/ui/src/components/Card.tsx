@@ -1,3 +1,5 @@
+import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
+import { cn } from '../lib/utils';
 /**
  * Flexible container component for grouping related content with semantic structure
  *
@@ -44,7 +46,6 @@
  * </Card>
  * ```
  */
-import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Cognitive load: Card density for information hierarchy */

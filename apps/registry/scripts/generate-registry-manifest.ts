@@ -132,9 +132,6 @@ function parseJSDocComment(content: string) {
     // Extract code blocks and comments
     const examples = [];
     const codeBlockRegex = /```(\w+)?\s*([\s\S]*?)```/g;
-    let match: RegExpExecArray | null;
-
-    // biome-ignore lint/suspicious/noAssignInExpressions: Necessary for regex exec loop
 
     for (const match of content.matchAll(codeBlockRegex)) {
       const code = match[2].trim();
@@ -258,7 +255,8 @@ function processComponent(fileName: string) {
 
     return { component, status: jsdoc.registryStatus };
   } catch (error) {
-    console.warn(`Warning: Could not parse JSDoc for ${fileName}: ${error.message}`);
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn(`Warning: Could not parse JSDoc for ${fileName}: ${message}`);
     return null;
   }
 }
