@@ -21,6 +21,9 @@ catalogs:
     '@testing-library/user-event':
       specifier: ^14.6.1
       version: 14.6.1
+    '@types/fs-extra':
+      specifier: ^11.0.4
+      version: 11.0.4
     '@types/node':
       specifier: ^20.19.1
       version: 20.19.1
@@ -42,6 +45,9 @@ catalogs:
     clsx:
       specifier: ^2.1.1
       version: 2.1.1
+    fs-extra:
+      specifier: ^11.2.0
+      version: 11.3.0
     jsdom:
       specifier: ^26.1.0
       version: 26.1.0
@@ -51,6 +57,9 @@ catalogs:
     react-dom:
       specifier: ^19.1.1
       version: 19.1.1
+    sqids:
+      specifier: 0.3.0
+      version: 0.3.0
     tailwind-merge:
       specifier: ^3.3.1
       version: 3.3.1
