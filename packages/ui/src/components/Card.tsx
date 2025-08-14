@@ -45,7 +45,6 @@
  * ```
  */
 import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
-import { cn } from '../lib/utils';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Cognitive load: Card density for information hierarchy */
