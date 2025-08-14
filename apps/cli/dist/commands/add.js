@@ -90,7 +90,7 @@ export async function addCommand(componentName, options = {}) {
         // Write component file
         const componentSpinner = ora(`Writing component to ${componentPath}...`).start();
         // First try to get actual component source from registry files
-        const componentFile = componentManifest.files.find((f) => f.path.endsWith('.tsx') && f.type === 'registry:component' && !f.path.includes('.stories.'));
+        const componentFile = componentManifest.files?.find((f) => f.path.endsWith('.tsx') && f.type === 'registry:component' && !f.path.includes('.stories.'));
         if (!componentFile?.content || componentFile.content.trim() === '') {
             componentSpinner.fail(`No component source available for ${componentManifest.name}`);
             console.log(chalk.gray('Component source should be available from the registry or packages/shared'));
