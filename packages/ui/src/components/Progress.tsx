@@ -1,7 +1,7 @@
 import * as ProgressPrimitive from '@radix-ui/react-progress';
 import { contextEasing, contextTiming, easing, timing } from '@rafters/design-tokens/motion';
 import { type VariantProps, cva } from 'class-variance-authority';
-import { type ComponentPropsWithoutRef, type ElementRef, forwardRef } from 'react';
+import type { ComponentPropsWithoutRef, ElementRef } from 'react';
 import { cn } from '../lib/utils';
 import { Button } from './Button';
 
@@ -181,218 +181,126 @@ export interface ProgressProps
    * Complete handler
    */
   onComplete?: () => void;
+
+  ref?: React.Ref<ElementRef<typeof ProgressPrimitive.Root>>;
 }
 
-const Progress = forwardRef<ElementRef<typeof ProgressPrimitive.Root>, ProgressProps>(
-  (
-    {
-      className,
-      value = 0,
-      variant = 'bar',
-      pattern = 'linear',
-      complexity = 'simple',
-      status = 'default',
-      showPercentage = false,
-      showTime = false,
-      showDescription = false,
-      showSteps = false,
-      estimatedTime,
-      timeRemaining,
-      completionMessage,
-      nextAction,
-      pausable = false,
-      cancellable = false,
-      currentStep,
-      totalSteps,
-      label,
-      description,
-      onPause,
-      onCancel,
-      onComplete,
-      ...props
-    },
-    ref
-  ) => {
-    const isComplete = value === 100;
-    const isIndeterminate = value === undefined || value === null;
-    const descriptionId = description
-      ? `progress-desc-${Math.random().toString(36).substr(2, 9)}`
-      : undefined;
+export function Progress({
+  className,
+  value = 0,
+  variant = 'bar',
+  pattern = 'linear',
+  complexity = 'simple',
+  status = 'default',
+  showPercentage = false,
+  showTime = false,
+  showDescription = false,
+  showSteps = false,
+  estimatedTime,
+  timeRemaining,
+  completionMessage,
+  nextAction,
+  pausable = false,
+  cancellable = false,
+  currentStep,
+  totalSteps,
+  label,
+  description,
+  onPause,
+  onCancel,
+  onComplete,
+  ref,
+  ...props
+}: ProgressProps) {
+  const isComplete = value === 100;
+  const isIndeterminate = value === undefined || value === null;
+  const descriptionId = description
+    ? `progress-desc-${Math.random().toString(36).substr(2, 9)}`
+    : undefined;
 
-    // Helper functions for time calculation and formatting
-    const calculateRemainingMilliseconds = (): number | null => {
-      if (timeRemaining) return timeRemaining;
-      if (estimatedTime && value != null && value > 0) {
-        return (estimatedTime * (100 - value)) / 100;
-      }
-      return null;
-    };
-
-    const formatTimeRemaining = (milliseconds: number): string => {
-      const minutes = Math.floor(milliseconds / 60000);
-      const seconds = Math.floor((milliseconds % 60000) / 1000);
-
-      if (minutes > 0) {
-        return `About ${minutes}m ${seconds}s remaining`;
-      }
-      return seconds > 0 ? `About ${seconds}s remaining` : 'Almost done...';
-    };
-
-    const getTimeDisplay = (): string | null => {
-      if (!showTime) return null;
-      if (isComplete) return null;
-      if (isIndeterminate) return 'Calculating...';
-
-      const remainingMs = calculateRemainingMilliseconds();
-      return remainingMs ? formatTimeRemaining(remainingMs) : null;
-    };
-
-    const timeDisplay = getTimeDisplay();
-    const percentageDisplay = showPercentage && !isIndeterminate ? `${Math.round(value)}%` : null;
-
-    if (variant === 'steps' && showSteps) {
-      return (
-        <div className={cn('space-y-2', className)}>
-          {(label || percentageDisplay || timeDisplay) && (
-            <div className="flex items-center justify-between text-sm">
-              <span className="font-medium text-foreground">{label}</span>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                {currentStep && totalSteps && (
-                  <span>
-                    {currentStep} of {totalSteps}
-                  </span>
-                )}
-                {timeDisplay && <span>{timeDisplay}</span>}
-              </div>
-            </div>
-          )}
-
-          <div className="flex items-center justify-between">
-            <div className="flex-1 space-y-1">
-              {totalSteps && currentStep && (
-                <ol
-                  aria-label={`Progress steps: ${currentStep} of ${totalSteps}`}
-                  className="flex items-center gap-2"
-                >
-                  {Array.from({ length: totalSteps }, (_, i) => {
-                    const stepNumber = i + 1;
-                    const isCompleted = stepNumber < currentStep;
-                    const isCurrent = stepNumber === currentStep;
-                    return (
-                      <li
-                        key={`step-${stepNumber}`}
-                        aria-label={`Step ${stepNumber} of ${totalSteps}: ${
-                          isCompleted ? 'Completed' : isCurrent ? 'In Progress' : 'Not Started'
-                        }`}
-                        className={cn(
-                          `h-2 flex-1 rounded-full transition-colors ${contextTiming.progress} ${contextEasing.progress}`,
-                          isCompleted && 'bg-primary',
-                          isCurrent && 'bg-primary/50',
-                          !isCompleted && !isCurrent && 'bg-background-subtle'
-                        )}
-                      />
-                    );
-                  })}
-                </ol>
-              )}
-              {showDescription && description && (
-                <p className="text-sm text-muted-foreground">{description}</p>
-              )}
-            </div>
-          </div>
-
-          {(pausable || cancellable) && (
-            <div className="flex gap-2">
-              {pausable && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onPause}
-                  className="h-auto p-1 text-xs text-muted-foreground hover:text-foreground"
-                >
-                  Pause
-                </Button>
-              )}
-              {cancellable && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onCancel}
-                  className="h-auto p-1 text-xs text-muted-foreground hover:text-foreground"
-                >
-                  Cancel
-                </Button>
-              )}
-            </div>
-          )}
-        </div>
-      );
+  // Helper functions for time calculation and formatting
+  const calculateRemainingMilliseconds = (): number | null => {
+    if (timeRemaining) return timeRemaining;
+    if (estimatedTime && value != null && value > 0) {
+      return (estimatedTime * (100 - value)) / 100;
     }
+    return null;
+  };
 
+  const formatTimeRemaining = (milliseconds: number): string => {
+    const minutes = Math.floor(milliseconds / 60000);
+    const seconds = Math.floor((milliseconds % 60000) / 1000);
+
+    if (minutes > 0) {
+      return `About ${minutes}m ${seconds}s remaining`;
+    }
+    return seconds > 0 ? `About ${seconds}s remaining` : 'Almost done...';
+  };
+
+  const getTimeDisplay = (): string | null => {
+    if (!showTime) return null;
+    if (isComplete) return null;
+    if (isIndeterminate) return 'Calculating...';
+
+    const remainingMs = calculateRemainingMilliseconds();
+    return remainingMs ? formatTimeRemaining(remainingMs) : null;
+  };
+
+  const timeDisplay = getTimeDisplay();
+  const percentageDisplay = showPercentage && !isIndeterminate ? `${Math.round(value)}%` : null;
+
+  if (variant === 'steps' && showSteps) {
     return (
       <div className={cn('space-y-2', className)}>
-        {/* Header with label and time/percentage */}
         {(label || percentageDisplay || timeDisplay) && (
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium text-foreground">{label}</span>
             <div className="flex items-center gap-2 text-muted-foreground">
-              {percentageDisplay && <span>{percentageDisplay}</span>}
+              {currentStep && totalSteps && (
+                <span>
+                  {currentStep} of {totalSteps}
+                </span>
+              )}
               {timeDisplay && <span>{timeDisplay}</span>}
             </div>
           </div>
         )}
 
-        {/* Progress bar */}
-        <ProgressPrimitive.Root
-          ref={ref}
-          className={cn(
-            progressVariants({ variant, pattern, complexity }),
-            isComplete && status === 'success' && 'bg-success/10'
-          )}
-          value={isIndeterminate ? undefined : value}
-          aria-label={label || 'Progress indicator'}
-          aria-describedby={descriptionId}
-          {...props}
-        >
-          <ProgressPrimitive.Indicator
-            className={cn(
-              progressIndicatorVariants({
-                pattern,
-                status: isComplete ? 'success' : status,
-              })
-            )}
-            style={{
-              transform: isIndeterminate ? undefined : `translateX(-${100 - value}%)`,
-            }}
-          />
-        </ProgressPrimitive.Root>
-
-        {/* Description */}
-        {showDescription && description && (
-          <p id={descriptionId} className="text-sm text-muted-foreground">
-            {description}
-          </p>
-        )}
-
-        {/* Completion message */}
-        {isComplete && completionMessage && (
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-success">{completionMessage}</span>
-            {nextAction && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onComplete}
-                className="h-auto p-1 text-primary hover:text-primary/80 underline underline-offset-4"
+        <div className="flex items-center justify-between">
+          <div className="flex-1 space-y-1">
+            {totalSteps && currentStep && (
+              <ol
+                aria-label={`Progress steps: ${currentStep} of ${totalSteps}`}
+                className="flex items-center gap-2"
               >
-                {nextAction}
-              </Button>
+                {Array.from({ length: totalSteps }, (_, i) => {
+                  const stepNumber = i + 1;
+                  const isCompleted = stepNumber < currentStep;
+                  const isCurrent = stepNumber === currentStep;
+                  return (
+                    <li
+                      key={`step-${stepNumber}`}
+                      aria-label={`Step ${stepNumber} of ${totalSteps}: ${
+                        isCompleted ? 'Completed' : isCurrent ? 'In Progress' : 'Not Started'
+                      }`}
+                      className={cn(
+                        `h-2 flex-1 rounded-full transition-colors ${contextTiming.progress} ${contextEasing.progress}`,
+                        isCompleted && 'bg-primary',
+                        isCurrent && 'bg-primary/50',
+                        !isCompleted && !isCurrent && 'bg-background-subtle'
+                      )}
+                    />
+                  );
+                })}
+              </ol>
+            )}
+            {showDescription && description && (
+              <p className="text-sm text-muted-foreground">{description}</p>
             )}
           </div>
-        )}
+        </div>
 
-        {/* Controls */}
-        {!isComplete && (pausable || cancellable) && (
+        {(pausable || cancellable) && (
           <div className="flex gap-2">
             {pausable && (
               <Button
@@ -419,43 +327,138 @@ const Progress = forwardRef<ElementRef<typeof ProgressPrimitive.Root>, ProgressP
       </div>
     );
   }
-);
 
-Progress.displayName = ProgressPrimitive.Root.displayName;
+  return (
+    <div className={cn('space-y-2', className)}>
+      {/* Header with label and time/percentage */}
+      {(label || percentageDisplay || timeDisplay) && (
+        <div className="flex items-center justify-between text-sm">
+          <span className="font-medium text-foreground">{label}</span>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            {percentageDisplay && <span>{percentageDisplay}</span>}
+            {timeDisplay && <span>{timeDisplay}</span>}
+          </div>
+        </div>
+      )}
+
+      {/* Progress bar */}
+      <ProgressPrimitive.Root
+        ref={ref}
+        className={cn(
+          progressVariants({ variant, pattern, complexity }),
+          isComplete && status === 'success' && 'bg-success/10'
+        )}
+        value={isIndeterminate ? undefined : value}
+        aria-label={label || 'Progress indicator'}
+        aria-describedby={descriptionId}
+        {...props}
+      >
+        <ProgressPrimitive.Indicator
+          className={cn(
+            progressIndicatorVariants({
+              pattern,
+              status: isComplete ? 'success' : status,
+            })
+          )}
+          style={{
+            transform: isIndeterminate ? undefined : `translateX(-${100 - value}%)`,
+          }}
+        />
+      </ProgressPrimitive.Root>
+
+      {/* Description */}
+      {showDescription && description && (
+        <p id={descriptionId} className="text-sm text-muted-foreground">
+          {description}
+        </p>
+      )}
+
+      {/* Completion message */}
+      {isComplete && completionMessage && (
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-success">{completionMessage}</span>
+          {nextAction && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onComplete}
+              className="h-auto p-1 text-primary hover:text-primary/80 underline underline-offset-4"
+            >
+              {nextAction}
+            </Button>
+          )}
+        </div>
+      )}
+
+      {/* Controls */}
+      {!isComplete && (pausable || cancellable) && (
+        <div className="flex gap-2">
+          {pausable && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onPause}
+              className="h-auto p-1 text-xs text-muted-foreground hover:text-foreground"
+            >
+              Pause
+            </Button>
+          )}
+          {cancellable && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onCancel}
+              className="h-auto p-1 text-xs text-muted-foreground hover:text-foreground"
+            >
+              Cancel
+            </Button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 // Additional helper components for step progress
-const ProgressStep = forwardRef<
-  HTMLDivElement,
-  {
-    children: React.ReactNode;
-    completed?: boolean;
-    current?: boolean;
-    className?: string;
-  }
->(({ children, completed = false, current = false, className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      'flex items-center gap-2 text-sm',
-      current && 'font-medium text-primary',
-      completed && 'text-muted-foreground',
-      !completed && !current && 'text-muted-foreground/50',
-      className
-    )}
-    {...props}
-  >
+export interface ProgressStepProps {
+  children: React.ReactNode;
+  completed?: boolean;
+  current?: boolean;
+  className?: string;
+  ref?: React.Ref<HTMLDivElement>;
+}
+
+export function ProgressStep({
+  children,
+  completed = false,
+  current = false,
+  className,
+  ref,
+  ...props
+}: ProgressStepProps) {
+  return (
     <div
+      ref={ref}
       className={cn(
-        'h-2 w-2 rounded-full',
-        current && 'bg-primary',
-        completed && 'bg-success',
-        !completed && !current && 'bg-muted-foreground/20'
+        'flex items-center gap-2 text-sm',
+        current && 'font-medium text-primary',
+        completed && 'text-muted-foreground',
+        !completed && !current && 'text-muted-foreground/50',
+        className
       )}
-    />
-    {children}
-  </div>
-));
+      {...props}
+    >
+      <div
+        className={cn(
+          'h-2 w-2 rounded-full',
+          current && 'bg-primary',
+          completed && 'bg-success',
+          !completed && !current && 'bg-muted-foreground/20'
+        )}
+      />
+      {children}
+    </div>
+  );
+}
 
-ProgressStep.displayName = 'ProgressStep';
-
-export { Progress, ProgressStep, progressVariants };
+export { progressVariants };

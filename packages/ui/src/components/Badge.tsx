@@ -21,7 +21,6 @@
  * Attention budget: Maximum 1 high-attention badge per section, unlimited subtle badges
  */
 import { AlertTriangle, CheckCircle, Info, Minus, XCircle } from 'lucide-react';
-import { forwardRef } from 'react';
 import { cn } from '../lib/utils';
 import { Chip } from './Chip';
 import type { ChipPosition, ChipVariant } from './Chip';
@@ -64,6 +63,8 @@ export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLElement>, 'onC
   chip?: ChipVariant;
   chipPosition?: ChipPosition;
   chipValue?: string | number; // For count badges or custom text
+
+  ref?: React.Ref<HTMLElement>;
 }
 
 // Status indicators with multi-sensory communication
@@ -105,306 +106,163 @@ const STATUS_INDICATORS = {
   },
 } as const;
 
-export const Badge = forwardRef<HTMLElement, BadgeProps>(
-  (
-    {
-      variant = 'neutral',
-      size = 'md',
-      emphasis = 'default',
-      interactive = false,
-      removable = false,
-      onRemove,
-      icon: CustomIcon,
-      iconPosition = 'left',
-      animate = false,
-      loading = false,
-      chip,
-      chipPosition = 'top-right',
-      chipValue,
-      children,
-      className,
-      onClick,
-      onKeyDown,
-      ...props
-    },
-    ref
-  ) => {
-    const statusInfo = STATUS_INDICATORS[variant];
-    const Icon = CustomIcon || statusInfo.icon;
-    const isInteractive = interactive || removable || !!onClick;
+export function Badge({
+  variant = 'neutral',
+  size = 'md',
+  emphasis = 'default',
+  interactive = false,
+  removable = false,
+  onRemove,
+  icon: CustomIcon,
+  iconPosition = 'left',
+  animate = false,
+  loading = false,
+  chip,
+  chipPosition = 'top-right',
+  chipValue,
+  children,
+  className,
+  onClick,
+  onKeyDown,
+  ref,
+  ...props
+}: BadgeProps) {
+  const statusInfo = STATUS_INDICATORS[variant];
+  const Icon = CustomIcon || statusInfo.icon;
+  const isInteractive = interactive || removable || !!onClick;
 
-    // Chip rendering using independent Chip component
-    const renderChip = () => {
-      if (!chip) return null;
+  // Chip rendering using independent Chip component
+  const renderChip = () => {
+    if (!chip) return null;
 
-      return <Chip variant={chip} position={chipPosition} value={chipValue} size={size} />;
-    };
+    return <Chip variant={chip} position={chipPosition} value={chipValue} size={size} />;
+  };
 
-    // Handle keyboard navigation for interactive badges
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
-      if (!isInteractive) return;
+  // Handle keyboard navigation for interactive badges
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (!isInteractive) return;
 
-      switch (event.key) {
-        case ' ':
-        case 'Enter':
+    switch (event.key) {
+      case ' ':
+      case 'Enter':
+        event.preventDefault();
+        if (onClick) {
+          // Directly call the onClick handler to avoid double firing
+          onClick(event as unknown as React.MouseEvent<HTMLElement>);
+        }
+        break;
+      case 'Delete':
+      case 'Backspace':
+        if (removable && onRemove) {
           event.preventDefault();
-          if (onClick) {
-            // Directly call the onClick handler to avoid double firing
-            onClick(event as unknown as React.MouseEvent<HTMLElement>);
-          }
-          break;
-        case 'Delete':
-        case 'Backspace':
-          if (removable && onRemove) {
-            event.preventDefault();
-            onRemove();
-          }
-          break;
-        case 'Escape':
-          // Allow parent components to handle escape
-          break;
-      }
+          onRemove();
+        }
+        break;
+      case 'Escape':
+        // Allow parent components to handle escape
+        break;
+    }
 
-      if (onKeyDown) {
-        onKeyDown(event as React.KeyboardEvent<HTMLElement>);
-      }
-    };
+    if (onKeyDown) {
+      onKeyDown(event as React.KeyboardEvent<HTMLElement>);
+    }
+  };
 
-    if (isInteractive && removable && onRemove) {
-      // Single button solution with separated interaction zones (Sally's recommendation)
-      return (
-        <div
-          ref={ref as React.ForwardedRef<HTMLDivElement>}
-          // biome-ignore lint/a11y/useSemanticElements: div with role="group" is more appropriate than fieldset for badge interaction grouping
-          role="group"
-          aria-label={`${statusInfo.ariaLabel}${children ? `: ${children}` : ''} - clickable badge with remove option`}
+  if (isInteractive && removable && onRemove) {
+    // Single button solution with separated interaction zones (Sally's recommendation)
+    return (
+      <div
+        ref={ref as React.ForwardedRef<HTMLDivElement>}
+        // biome-ignore lint/a11y/useSemanticElements: div with role="group" is more appropriate than fieldset for badge interaction grouping
+        role="group"
+        aria-label={`${statusInfo.ariaLabel}${children ? `: ${children}` : ''} - clickable badge with remove option`}
+        className={cn(
+          'relative inline-flex items-center rounded-md text-xs font-medium select-none',
+          'border transition-all duration-150',
+
+          // Motion respect
+          animate && 'motion-reduce:transition-none',
+
+          // Size variants with attention hierarchy
+          {
+            'text-xs': size === 'sm' || size === 'md',
+            'text-sm': size === 'lg',
+          },
+
+          // Emphasis levels for attention economics
+          {
+            'opacity-75 border-0': emphasis === 'subtle',
+            'opacity-100 border': emphasis === 'default',
+            'opacity-100 border-2 shadow-sm': emphasis === 'prominent',
+          },
+
+          // Variant styles with multi-sensory communication
+          {
+            // Success: Confidence building through subtle confirmation
+            'bg-success/20 border-success/30 text-success': variant === 'success',
+
+            // Warning: Balanced visibility for awareness
+            'bg-warning/20 border-warning/30 text-warning': variant === 'warning',
+
+            // Error: Strong contrast for immediate attention
+            'bg-destructive/20 border-destructive/30 text-destructive': variant === 'error',
+
+            // Info: Supportive context without competition
+            'bg-info/20 border-info/30 text-info': variant === 'info',
+
+            // Neutral: Invisible organization
+            'bg-muted border-muted-foreground/20 text-muted-foreground': variant === 'neutral',
+          },
+
+          className
+        )}
+        {...props}
+      >
+        <button
+          type="button"
+          tabIndex={0}
           className={cn(
-            'relative inline-flex items-center rounded-md text-xs font-medium select-none',
-            'border transition-all duration-150',
+            'inline-flex items-center gap-1 w-full',
+            // Enhanced touch targets for interactive badges (WCAG AAA)
+            'min-h-11 min-w-11 touch-manipulation cursor-pointer',
+            'hover:opacity-hover focus-visible:outline-none',
+            'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+            'active:scale-active rounded-md',
 
-            // Motion respect
-            animate && 'motion-reduce:transition-none',
+            // Loading state feedback
+            loading && 'opacity-75 cursor-wait',
 
             // Size variants with attention hierarchy
             {
-              'text-xs': size === 'sm' || size === 'md',
-              'text-sm': size === 'lg',
-            },
-
-            // Emphasis levels for attention economics
-            {
-              'opacity-75 border-0': emphasis === 'subtle',
-              'opacity-100 border': emphasis === 'default',
-              'opacity-100 border-2 shadow-sm': emphasis === 'prominent',
-            },
-
-            // Variant styles with multi-sensory communication
-            {
-              // Success: Confidence building through subtle confirmation
-              'bg-success/20 border-success/30 text-success': variant === 'success',
-
-              // Warning: Balanced visibility for awareness
-              'bg-warning/20 border-warning/30 text-warning': variant === 'warning',
-
-              // Error: Strong contrast for immediate attention
-              'bg-destructive/20 border-destructive/30 text-destructive': variant === 'error',
-
-              // Info: Supportive context without competition
-              'bg-info/20 border-info/30 text-info': variant === 'info',
-
-              // Neutral: Invisible organization
-              'bg-muted border-muted-foreground/20 text-muted-foreground': variant === 'neutral',
-            },
-
-            className
-          )}
-          {...props}
-        >
-          <button
-            type="button"
-            tabIndex={0}
-            className={cn(
-              'inline-flex items-center gap-1 w-full',
-              // Enhanced touch targets for interactive badges (WCAG AAA)
-              'min-h-11 min-w-11 touch-manipulation cursor-pointer',
-              'hover:opacity-hover focus-visible:outline-none',
-              'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-              'active:scale-active rounded-md',
-
-              // Loading state feedback
-              loading && 'opacity-75 cursor-wait',
-
-              // Size variants with attention hierarchy
-              {
-                'px-1.5 py-0.5': size === 'sm',
-                'px-2 py-0.5': size === 'md',
-                'px-2.5 py-1': size === 'lg',
-              }
-            )}
-            onClick={(e) => {
-              // Check if click was on remove zone
-              const target = e.target as HTMLElement;
-              const removeZone = target.closest('[data-remove-zone]');
-              if (removeZone) {
-                e.stopPropagation();
-                onRemove();
-              } else if (onClick) {
-                onClick(e);
-              }
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Delete' || e.key === 'Backspace') {
-                e.preventDefault();
-                onRemove();
-              } else {
-                handleKeyDown(e);
-              }
-            }}
-            aria-label={`${statusInfo.ariaLabel}${children ? `: ${children}` : ''} - removable badge`}
-            aria-busy={loading}
-          >
-            {/* Main content zone */}
-            <span className="pointer-events-none inline-flex items-center gap-1 flex-1">
-              {/* Icon for multi-sensory status communication */}
-              {Icon && iconPosition === 'left' && (
-                <Icon
-                  className={cn(
-                    'flex-shrink-0',
-                    size === 'sm' && 'w-3 h-3',
-                    size === 'md' && 'w-3 h-3',
-                    size === 'lg' && 'w-4 h-4'
-                  )}
-                  aria-hidden="true"
-                />
-              )}
-
-              {/* Loading indicator */}
-              {loading && (
-                <div
-                  className={cn(
-                    'animate-spin rounded-full border-2 border-current border-t-transparent',
-                    size === 'sm' && 'w-3 h-3',
-                    size === 'md' && 'w-3 h-3',
-                    size === 'lg' && 'w-4 h-4'
-                  )}
-                  aria-hidden="true"
-                />
-              )}
-
-              {/* Content */}
-              {children && <span className="truncate">{children}</span>}
-
-              {/* Right-positioned icon */}
-              {Icon && iconPosition === 'right' && (
-                <Icon
-                  className={cn(
-                    'flex-shrink-0',
-                    size === 'sm' && 'w-3 h-3',
-                    size === 'md' && 'w-3 h-3',
-                    size === 'lg' && 'w-4 h-4'
-                  )}
-                  aria-hidden="true"
-                />
-              )}
-            </span>
-
-            {/* Remove zone - visually separate but part of same button */}
-            <span
-              data-remove-zone="true"
-              className={cn(
-                'ml-2 pl-1 border-l border-current/20',
-                'hover:bg-current/10 rounded-r-md cursor-pointer',
-                'inline-flex items-center justify-center',
-                {
-                  'p-0.5': size === 'sm',
-                  'p-1': size === 'md',
-                  'p-1.5': size === 'lg',
-                }
-              )}
-              aria-hidden="true"
-            >
-              <XCircle
-                className={cn(
-                  size === 'sm' && 'w-3 h-3',
-                  size === 'md' && 'w-3 h-3',
-                  size === 'lg' && 'w-4 h-4'
-                )}
-                aria-hidden="true"
-              />
-            </span>
-          </button>
-          {renderChip()}
-        </div>
-      );
-    }
-
-    if (isInteractive) {
-      return (
-        <div className="relative inline-block">
-          <button
-            ref={ref as React.ForwardedRef<HTMLButtonElement>}
-            type="button"
-            tabIndex={0}
-            aria-label={
-              props['aria-label'] || `${statusInfo.ariaLabel}${children ? `: ${children}` : ''}`
+              'px-1.5 py-0.5': size === 'sm',
+              'px-2 py-0.5': size === 'md',
+              'px-2.5 py-1': size === 'lg',
             }
-            aria-live={props['aria-live']}
-            aria-busy={loading}
-            className={cn(
-              // Base styles with semantic tokens
-              'inline-flex items-center gap-1 rounded-md text-xs font-medium select-none',
-              'border transition-all duration-150',
-
-              // Enhanced touch targets for interactive badges (WCAG AAA)
-              'min-h-11 min-w-11 touch-manipulation cursor-pointer',
-              'hover:opacity-hover focus-visible:outline-none',
-              'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-              'active:scale-active',
-
-              // Loading state feedback
-              loading && 'opacity-75 cursor-wait',
-
-              // Motion respect
-              animate && 'motion-reduce:transition-none',
-
-              // Size variants with attention hierarchy
-              {
-                'px-1.5 py-0.5 text-xs': size === 'sm',
-                'px-2 py-0.5 text-xs': size === 'md',
-                'px-2.5 py-1 text-sm': size === 'lg',
-              },
-
-              // Emphasis levels for attention economics
-              {
-                'opacity-75 border-0': emphasis === 'subtle',
-                'opacity-100 border': emphasis === 'default',
-                'opacity-100 border-2 shadow-sm': emphasis === 'prominent',
-              },
-
-              // Variant styles with multi-sensory communication
-              {
-                // Success: Confidence building through subtle confirmation
-                'bg-success/20 border-success/30 text-success': variant === 'success',
-
-                // Warning: Balanced visibility for awareness
-                'bg-warning/20 border-warning/30 text-warning': variant === 'warning',
-
-                // Error: Strong contrast for immediate attention
-                'bg-destructive/20 border-destructive/30 text-destructive': variant === 'error',
-
-                // Info: Supportive context without competition
-                'bg-info/20 border-info/30 text-info': variant === 'info',
-
-                // Neutral: Invisible organization
-                'bg-muted border-muted-foreground/20 text-muted-foreground': variant === 'neutral',
-              },
-
-              className
-            )}
-            onClick={onClick}
-            onKeyDown={handleKeyDown}
-            {...props}
-          >
+          )}
+          onClick={(e) => {
+            // Check if click was on remove zone
+            const target = e.target as HTMLElement;
+            const removeZone = target.closest('[data-remove-zone]');
+            if (removeZone) {
+              e.stopPropagation();
+              onRemove();
+            } else if (onClick) {
+              onClick(e);
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+              e.preventDefault();
+              onRemove();
+            } else {
+              handleKeyDown(e);
+            }
+          }}
+          aria-label={`${statusInfo.ariaLabel}${children ? `: ${children}` : ''} - removable badge`}
+          aria-busy={loading}
+        >
+          {/* Main content zone */}
+          <span className="pointer-events-none inline-flex items-center gap-1 flex-1">
             {/* Icon for multi-sensory status communication */}
             {Icon && iconPosition === 'left' && (
               <Icon
@@ -446,43 +304,60 @@ export const Badge = forwardRef<HTMLElement, BadgeProps>(
                 aria-hidden="true"
               />
             )}
-          </button>
-          {renderChip()}
-        </div>
-      );
-    }
+          </span>
 
-    // Semantic element selection based on Sally's recommendations
-    const getSemanticProps = () => {
-      // Use status role for status communication variants
-      if (['success', 'warning', 'error', 'info'].includes(variant)) {
-        return {
-          role: 'status',
-          'aria-live': props['aria-live'] || (variant === 'error' ? 'assertive' : 'polite'),
-          'aria-label':
-            props['aria-label'] || `${statusInfo.ariaLabel}${children ? `: ${children}` : ''}`,
-        };
-      }
+          {/* Remove zone - visually separate but part of same button */}
+          <span
+            data-remove-zone="true"
+            className={cn(
+              'ml-2 pl-1 border-l border-current/20',
+              'hover:bg-current/10 rounded-r-md cursor-pointer',
+              'inline-flex items-center justify-center',
+              {
+                'p-0.5': size === 'sm',
+                'p-1': size === 'md',
+                'p-1.5': size === 'lg',
+              }
+            )}
+            aria-hidden="true"
+          >
+            <XCircle
+              className={cn(
+                size === 'sm' && 'w-3 h-3',
+                size === 'md' && 'w-3 h-3',
+                size === 'lg' && 'w-4 h-4'
+              )}
+              aria-hidden="true"
+            />
+          </span>
+        </button>
+        {renderChip()}
+      </div>
+    );
+  }
 
-      // Use generic span for labels/categories
-      return {
-        'aria-label':
-          props['aria-label'] || `${statusInfo.ariaLabel}${children ? `: ${children}` : ''}`,
-        'aria-live': props['aria-live'],
-      };
-    };
-
-    const semanticProps = getSemanticProps();
-
+  if (isInteractive) {
     return (
       <div className="relative inline-block">
-        <span
-          ref={ref as React.ForwardedRef<HTMLSpanElement>}
+        <button
+          ref={ref as React.ForwardedRef<HTMLButtonElement>}
+          type="button"
+          tabIndex={0}
+          aria-label={
+            props['aria-label'] || `${statusInfo.ariaLabel}${children ? `: ${children}` : ''}`
+          }
+          aria-live={props['aria-live']}
           aria-busy={loading}
           className={cn(
             // Base styles with semantic tokens
             'inline-flex items-center gap-1 rounded-md text-xs font-medium select-none',
             'border transition-all duration-150',
+
+            // Enhanced touch targets for interactive badges (WCAG AAA)
+            'min-h-11 min-w-11 touch-manipulation cursor-pointer',
+            'hover:opacity-hover focus-visible:outline-none',
+            'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+            'active:scale-active',
 
             // Loading state feedback
             loading && 'opacity-75 cursor-wait',
@@ -524,7 +399,8 @@ export const Badge = forwardRef<HTMLElement, BadgeProps>(
 
             className
           )}
-          {...semanticProps}
+          onClick={onClick}
+          onKeyDown={handleKeyDown}
           {...props}
         >
           {/* Icon for multi-sensory status communication */}
@@ -568,11 +444,130 @@ export const Badge = forwardRef<HTMLElement, BadgeProps>(
               aria-hidden="true"
             />
           )}
-        </span>
+        </button>
         {renderChip()}
       </div>
     );
   }
-);
 
-Badge.displayName = 'Badge';
+  // Semantic element selection based on Sally's recommendations
+  const getSemanticProps = () => {
+    // Use status role for status communication variants
+    if (['success', 'warning', 'error', 'info'].includes(variant)) {
+      return {
+        role: 'status',
+        'aria-live': props['aria-live'] || (variant === 'error' ? 'assertive' : 'polite'),
+        'aria-label':
+          props['aria-label'] || `${statusInfo.ariaLabel}${children ? `: ${children}` : ''}`,
+      };
+    }
+
+    // Use generic span for labels/categories
+    return {
+      'aria-label':
+        props['aria-label'] || `${statusInfo.ariaLabel}${children ? `: ${children}` : ''}`,
+      'aria-live': props['aria-live'],
+    };
+  };
+
+  const semanticProps = getSemanticProps();
+
+  return (
+    <div className="relative inline-block">
+      <span
+        ref={ref as React.ForwardedRef<HTMLSpanElement>}
+        aria-busy={loading}
+        className={cn(
+          // Base styles with semantic tokens
+          'inline-flex items-center gap-1 rounded-md text-xs font-medium select-none',
+          'border transition-all duration-150',
+
+          // Loading state feedback
+          loading && 'opacity-75 cursor-wait',
+
+          // Motion respect
+          animate && 'motion-reduce:transition-none',
+
+          // Size variants with attention hierarchy
+          {
+            'px-1.5 py-0.5 text-xs': size === 'sm',
+            'px-2 py-0.5 text-xs': size === 'md',
+            'px-2.5 py-1 text-sm': size === 'lg',
+          },
+
+          // Emphasis levels for attention economics
+          {
+            'opacity-75 border-0': emphasis === 'subtle',
+            'opacity-100 border': emphasis === 'default',
+            'opacity-100 border-2 shadow-sm': emphasis === 'prominent',
+          },
+
+          // Variant styles with multi-sensory communication
+          {
+            // Success: Confidence building through subtle confirmation
+            'bg-success/20 border-success/30 text-success': variant === 'success',
+
+            // Warning: Balanced visibility for awareness
+            'bg-warning/20 border-warning/30 text-warning': variant === 'warning',
+
+            // Error: Strong contrast for immediate attention
+            'bg-destructive/20 border-destructive/30 text-destructive': variant === 'error',
+
+            // Info: Supportive context without competition
+            'bg-info/20 border-info/30 text-info': variant === 'info',
+
+            // Neutral: Invisible organization
+            'bg-muted border-muted-foreground/20 text-muted-foreground': variant === 'neutral',
+          },
+
+          className
+        )}
+        {...semanticProps}
+        {...props}
+      >
+        {/* Icon for multi-sensory status communication */}
+        {Icon && iconPosition === 'left' && (
+          <Icon
+            className={cn(
+              'flex-shrink-0',
+              size === 'sm' && 'w-3 h-3',
+              size === 'md' && 'w-3 h-3',
+              size === 'lg' && 'w-4 h-4'
+            )}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* Loading indicator */}
+        {loading && (
+          <div
+            className={cn(
+              'animate-spin rounded-full border-2 border-current border-t-transparent',
+              size === 'sm' && 'w-3 h-3',
+              size === 'md' && 'w-3 h-3',
+              size === 'lg' && 'w-4 h-4'
+            )}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* Content */}
+        {children && <span className="truncate">{children}</span>}
+
+        {/* Right-positioned icon */}
+        {Icon && iconPosition === 'right' && (
+          <Icon
+            className={cn(
+              'flex-shrink-0',
+              size === 'sm' && 'w-3 h-3',
+              size === 'md' && 'w-3 h-3',
+              size === 'lg' && 'w-4 h-4'
+            )}
+            aria-hidden="true"
+          />
+        )}
+      </span>
+      {renderChip()}
+    </div>
+  );
+}

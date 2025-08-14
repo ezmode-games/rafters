@@ -21,7 +21,7 @@
  * Context awareness: Adapts to sidebar visibility and responsive breakpoints
  */
 import { ChevronRight, Home, MoreHorizontal } from 'lucide-react';
-import { createContext, forwardRef, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { cn } from '../lib/utils';
 
 export type BreadcrumbSeparator =
@@ -62,6 +62,8 @@ export interface BreadcrumbProps extends React.HTMLAttributes<HTMLElement> {
 
   // Enhanced accessibility
   'aria-describedby'?: string;
+
+  ref?: React.Ref<HTMLElement>;
 }
 
 export interface BreadcrumbItemProps extends React.HTMLAttributes<HTMLLIElement> {
@@ -69,14 +71,17 @@ export interface BreadcrumbItemProps extends React.HTMLAttributes<HTMLLIElement>
   href?: string;
   active?: boolean;
   truncated?: boolean;
+  ref?: React.Ref<HTMLLIElement>;
 }
 
 export interface BreadcrumbLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   children: React.ReactNode;
+  ref?: React.Ref<HTMLAnchorElement>;
 }
 
 export interface BreadcrumbPageProps extends React.HTMLAttributes<HTMLSpanElement> {
   children: React.ReactNode;
+  ref?: React.Ref<HTMLSpanElement>;
 }
 
 // Separator intelligence with cognitive load ratings
@@ -137,150 +142,146 @@ const BreadcrumbContext = createContext<{
   separatorProps: undefined,
 });
 
-export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
-  (
-    {
-      maxItems = 5,
-      truncationMode = 'smart',
-      separator = 'chevron-right',
-      separatorProps,
-      showHome = true,
-      homeIcon: HomeIcon = Home,
-      homeLabel = 'Home',
-      size = 'md',
-      variant = 'default',
-      expandable = true,
-      responsive = true,
-      className,
-      children,
-      ...props
-    },
-    ref
-  ) => {
-    const [expanded, setExpanded] = useState(false);
+export function Breadcrumb({
+  maxItems = 5,
+  truncationMode = 'smart',
+  separator = 'chevron-right',
+  separatorProps,
+  showHome = true,
+  homeIcon: HomeIcon = Home,
+  homeLabel = 'Home',
+  size = 'md',
+  variant = 'default',
+  expandable = true,
+  responsive = true,
+  className,
+  children,
+  ref,
+  ...props
+}: BreadcrumbProps) {
+  const [expanded, setExpanded] = useState(false);
 
-    const renderSeparator = useCallback(() => {
-      if (typeof separator === 'string') {
-        const separatorMap = {
-          'chevron-right': <ChevronRight className="w-4 h-4" aria-hidden="true" />,
-          slash: SAFE_SEPARATORS.slash,
-          angle: SAFE_SEPARATORS.angle,
-          arrow: SAFE_SEPARATORS.arrow,
-          pipe: SAFE_SEPARATORS.pipe,
-          dot: SAFE_SEPARATORS.dot,
-        };
+  const renderSeparator = useCallback(() => {
+    if (typeof separator === 'string') {
+      const separatorMap = {
+        'chevron-right': <ChevronRight className="w-4 h-4" aria-hidden="true" />,
+        slash: SAFE_SEPARATORS.slash,
+        angle: SAFE_SEPARATORS.angle,
+        arrow: SAFE_SEPARATORS.arrow,
+        pipe: SAFE_SEPARATORS.pipe,
+        dot: SAFE_SEPARATORS.dot,
+      };
 
-        const separatorContent = separatorMap[separator];
+      const separatorContent = separatorMap[separator];
 
-        if (typeof separatorContent === 'string') {
-          return (
-            <span aria-hidden="true" className="select-none text-muted-foreground">
-              {separatorContent}
-            </span>
-          );
-        }
-
-        return separatorContent;
+      if (typeof separatorContent === 'string') {
+        return (
+          <span aria-hidden="true" className="select-none text-muted-foreground">
+            {separatorContent}
+          </span>
+        );
       }
 
-      // Custom Lucide icon
-      const CustomIcon = separator;
-      return (
-        <CustomIcon
-          aria-hidden={true}
-          className="w-4 h-4 text-muted-foreground"
-          {...separatorProps}
-        />
-      );
-    }, [separator, separatorProps]);
+      return separatorContent;
+    }
 
+    // Custom Lucide icon
+    const CustomIcon = separator;
     return (
-      <BreadcrumbContext.Provider value={{ separator, separatorProps }}>
-        <nav
-          ref={ref}
-          aria-label="Breadcrumb navigation"
-          aria-describedby={props['aria-describedby']}
-          className={cn(
-            // Base styles with semantic tokens
-            'flex items-center text-sm text-muted-foreground',
-
-            // Size variants
-            {
-              'text-xs': size === 'sm',
-              'text-sm': size === 'md',
-              'text-base': size === 'lg',
-            },
-
-            // Variant styles
-            {
-              'opacity-100': variant === 'default',
-              'opacity-75': variant === 'minimal',
-            },
-
-            className
-          )}
-          {...props}
-        >
-          <ol className="flex items-center space-x-2">{children}</ol>
-        </nav>
-      </BreadcrumbContext.Provider>
+      <CustomIcon
+        aria-hidden={true}
+        className="w-4 h-4 text-muted-foreground"
+        {...separatorProps}
+      />
     );
-  }
-);
+  }, [separator, separatorProps]);
 
-export const BreadcrumbItem = forwardRef<HTMLLIElement, BreadcrumbItemProps>(
-  ({ children, className, ...props }, ref) => {
-    return (
-      <li ref={ref} className={cn('flex items-center', className)} {...props}>
-        {children}
-      </li>
-    );
-  }
-);
-
-export const BreadcrumbLink = forwardRef<HTMLAnchorElement, BreadcrumbLinkProps>(
-  ({ children, className, ...props }, ref) => {
-    return (
-      <a
+  return (
+    <BreadcrumbContext.Provider value={{ separator, separatorProps }}>
+      <nav
         ref={ref}
+        aria-label="Breadcrumb navigation"
+        aria-describedby={props['aria-describedby']}
         className={cn(
-          // Base interactive styles with semantic tokens
-          'text-muted-foreground hover:text-foreground transition-colors',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          // Base styles with semantic tokens
+          'flex items-center text-sm text-muted-foreground',
 
-          // Enhanced touch targets (WCAG AAA)
-          'min-h-11 min-w-11 flex items-center justify-center rounded px-2 py-1',
-          'touch-manipulation',
+          // Size variants
+          {
+            'text-xs': size === 'sm',
+            'text-sm': size === 'md',
+            'text-base': size === 'lg',
+          },
+
+          // Variant styles
+          {
+            'opacity-100': variant === 'default',
+            'opacity-75': variant === 'minimal',
+          },
 
           className
         )}
         {...props}
       >
-        {children}
-      </a>
-    );
-  }
-);
+        <ol className="flex items-center space-x-2">{children}</ol>
+      </nav>
+    </BreadcrumbContext.Provider>
+  );
+}
 
-export const BreadcrumbPage = forwardRef<HTMLSpanElement, BreadcrumbPageProps>(
-  ({ children, className, ...props }, ref) => {
-    return (
-      <span
-        ref={ref}
-        aria-current="page"
-        className={cn('text-foreground font-medium', className)}
-        {...props}
-      >
-        {children}
-      </span>
-    );
-  }
-);
+export function BreadcrumbItem({ children, className, ref, ...props }: BreadcrumbItemProps) {
+  return (
+    <li ref={ref} className={cn('flex items-center', className)} {...props}>
+      {children}
+    </li>
+  );
+}
 
-export const BreadcrumbSeparator = forwardRef<
-  HTMLSpanElement,
-  React.HTMLAttributes<HTMLSpanElement>
->(({ children, className, ...props }, ref) => {
+export function BreadcrumbLink({ children, className, ref, ...props }: BreadcrumbLinkProps) {
+  return (
+    <a
+      ref={ref}
+      className={cn(
+        // Base interactive styles with semantic tokens
+        'text-muted-foreground hover:text-foreground transition-colors',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+
+        // Enhanced touch targets (WCAG AAA)
+        'min-h-11 min-w-11 flex items-center justify-center rounded px-2 py-1',
+        'touch-manipulation',
+
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </a>
+  );
+}
+
+export function BreadcrumbPage({ children, className, ref, ...props }: BreadcrumbPageProps) {
+  return (
+    <span
+      ref={ref}
+      aria-current="page"
+      className={cn('text-foreground font-medium', className)}
+      {...props}
+    >
+      {children}
+    </span>
+  );
+}
+
+export interface BreadcrumbSeparatorProps extends React.HTMLAttributes<HTMLSpanElement> {
+  ref?: React.Ref<HTMLSpanElement>;
+}
+
+export function BreadcrumbSeparator({
+  children,
+  className,
+  ref,
+  ...props
+}: BreadcrumbSeparatorProps) {
   const { separator, separatorProps } = useContext(BreadcrumbContext);
 
   const renderSeparatorContent = () => {
@@ -333,12 +334,13 @@ export const BreadcrumbSeparator = forwardRef<
       {renderSeparatorContent()}
     </span>
   );
-});
+}
 
-export const BreadcrumbEllipsis = forwardRef<
-  HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement>
->(({ className, onClick, ...props }, ref) => {
+export interface BreadcrumbEllipsisProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  ref?: React.Ref<HTMLButtonElement>;
+}
+
+export function BreadcrumbEllipsis({ className, onClick, ref, ...props }: BreadcrumbEllipsisProps) {
   return (
     <button
       ref={ref}
@@ -357,12 +359,4 @@ export const BreadcrumbEllipsis = forwardRef<
       <MoreHorizontal className="w-4 h-4" aria-hidden="true" />
     </button>
   );
-});
-
-// Export display names for better debugging
-Breadcrumb.displayName = 'Breadcrumb';
-BreadcrumbItem.displayName = 'BreadcrumbItem';
-BreadcrumbLink.displayName = 'BreadcrumbLink';
-BreadcrumbPage.displayName = 'BreadcrumbPage';
-BreadcrumbSeparator.displayName = 'BreadcrumbSeparator';
-BreadcrumbEllipsis.displayName = 'BreadcrumbEllipsis';
+}
