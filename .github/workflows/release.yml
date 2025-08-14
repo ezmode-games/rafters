@@ -34,8 +34,14 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps
+
       - name: Build packages
         run: pnpm build
+
+      - name: Generate Registry Manifest
+        run: pnpm manifest:generate
 
       - name: Run tests
         run: pnpm test:run

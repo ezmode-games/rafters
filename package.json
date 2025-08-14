@@ -22,7 +22,8 @@
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
-    "changeset:check": "changeset status --verbose"
+    "changeset:check": "changeset status --verbose",
+    "manifest:generate": "pnpm --filter @rafters/registry manifest:generate"
   },
   "keywords": [
     "design-system",

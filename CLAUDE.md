@@ -27,6 +27,31 @@ pnpm preflight
 **IGNORING THESE REQUIREMENTS = REJECTED PR**
 
 ** NEVER USE FUCKING EMOJI FOR ANYTING **
+
+## REACT 19 PURITY REQUIREMENTS - MANDATORY:
+**ALL COMPONENTS MUST BE PURE - NO EXCEPTIONS**
+- NO `Math.random()`, `Date.now()`, or `console.log()` in render
+- NO side effects during component execution
+- NO mutations of props or external state
+- ALL functions must be deterministic (same inputs → same outputs)
+- Use `useState(() => value)` for one-time random/time values
+- Use `useEffect()` for ALL side effects
+- React 19 concurrent rendering WILL BREAK impure components
+
+### React 19 Pattern Requirements:
+```tsx
+// ✅ CORRECT - Direct ref prop (React 19)
+function Button({ ref, children, onClick }: ButtonProps & { ref?: React.Ref<HTMLButtonElement> }) {
+  return <button ref={ref} onClick={onClick}>{children}</button>
+}
+
+// ❌ WRONG - forwardRef pattern (React 18)  
+const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
+  return <button ref={ref} {...props} />
+})
+```
+
+**15 COMPONENTS NEED FORWARDREF → DIRECT REF MIGRATION**
 ## COMPONENT USAGE REQUIREMENTS - MANDATORY:
 
 ### 1. READ Component Intelligence BEFORE Using ANY Component
@@ -183,6 +208,118 @@ Apply the embedded design knowledge to:
 pnpm test              # Run all tests including stories
 pnpm vitest run        # CI test runner
 ```
+
+## React 19 Hook Patterns - MANDATORY KNOWLEDGE:
+
+### **useActionState for Forms** (replaces manual form state):
+```tsx
+// ✅ CORRECT - React 19 pattern
+function ContactForm() {
+  const [state, formAction] = useActionState(async (prevState, formData) => {
+    try {
+      await submitForm(formData)
+      return { success: true }
+    } catch (error) {
+      return { error: error.message }
+    }
+  }, { success: false })
+  
+  return <form action={formAction}>...</form>
+}
+```
+
+### **useOptimistic for Immediate UI Updates**:
+```tsx
+// ✅ CORRECT - Optimistic updates with auto-rollback
+const [optimisticTodos, addOptimistic] = useOptimistic(
+  todos,
+  (state, newTodo) => [...state, newTodo] // MUST be pure function
+)
+
+const addTodo = async (text) => {
+  addOptimistic({ id: 'temp', text })
+  try {
+    const newTodo = await createTodo(text)
+    setTodos(prev => [...prev, newTodo])
+  } catch (error) {
+    // Automatic rollback on failure!
+  }
+}
+```
+
+### **useTransition for Non-blocking Updates**:
+```tsx
+// ✅ CORRECT - Keep UI responsive during heavy work
+const [isPending, startTransition] = useTransition()
+
+const handleSearch = (query) => {
+  setQuery(query) // Urgent: immediate
+  
+  startTransition(() => {
+    // Non-urgent: can be interrupted for user input
+    const results = heavySearchFunction(query)
+    setResults(results)
+  })
+}
+```
+
+### **use() Hook for Promises and Context**:
+```tsx
+// ✅ CORRECT - Replaces useEffect for data fetching
+function UserProfile({ userPromise }) {
+  const user = use(userPromise) // Suspends until resolved
+  return <div>{user.name}</div>
+}
+
+// Usage with Suspense
+<Suspense fallback={<Loading />}>
+  <UserProfile userPromise={fetchUser(id)} />
+</Suspense>
+```
+
+## ZOD + REACT 19 AUTO-FORM SYSTEM:
+
+### **Schema-Driven Form Generation**:
+```tsx
+// Define schema once, get validation + types + UI
+const UserSchema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
+  role: z.enum(['user', 'admin'])
+})
+
+// Auto-generates form with validation
+const UserForm = createFormFromSchema(UserSchema, async (data) => {
+  return await api.createUser(data)
+})
+
+// Usage: <UserForm className="form" />
+```
+
+**FUTURE: This pattern will power Rafters+ Studio registry interface**
+
+## COMPONENT MIGRATION CHECKLIST - MANDATORY:
+
+### **Before Migrating Any Component to React 19:**
+- [ ] **Purity Audit**: Remove all `Math.random()`, `Date.now()`, `console.log()` from render
+- [ ] **Side Effect Check**: Move all side effects to `useEffect()`
+- [ ] **Deterministic Functions**: Ensure same inputs always produce same outputs
+- [ ] **forwardRef Removal**: Convert to direct `ref` prop pattern
+- [ ] **Hook Updates**: Replace manual patterns with React 19 hooks where applicable
+- [ ] **Story Updates**: Ensure all 7 story files use React 19 patterns
+- [ ] **Test Verification**: Confirm component works with concurrent rendering
+
+### **Priority Migration List (15 Components)**:
+1. Button, Input, Select - Core form components (HIGH PRIORITY)
+2. Dialog, Modal - Complex interaction patterns (HIGH PRIORITY)  
+3. Tooltip, Popover - Overlay components (MEDIUM PRIORITY)
+4. Badge, Card, Container - Layout components (LOW PRIORITY)
+
+### **Post-Migration Requirements:**
+- All components MUST pass `pnpm preflight`
+- All stories MUST render without errors
+- All components MUST work with `useTransition` and `useOptimistic`
+- TypeScript interfaces MUST include proper `ref` prop types
 
 **Story Testing Integration:**
 ```typescript
