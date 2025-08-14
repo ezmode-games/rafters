@@ -19,7 +19,6 @@ import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
  *
  * Token knowledge: .rafters/tokens/registry.json
  */
-import { forwardRef } from 'react';
 import { cn } from '../lib/utils';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -29,13 +28,18 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   interactive?: boolean;
   /** Scanability: Visual prominence for important cards */
   prominence?: 'subtle' | 'default' | 'elevated';
+  ref?: React.Ref<HTMLDivElement>;
 }
 
-export const Card = forwardRef<HTMLDivElement, CardProps>(
-  (
-    { className, density = 'comfortable', interactive = false, prominence = 'default', ...props },
-    ref
-  ) => (
+export function Card({
+  className,
+  density = 'comfortable',
+  interactive = false,
+  prominence = 'default',
+  ref,
+  ...props
+}: CardProps) {
+  return (
     <div
       ref={ref}
       className={cn(
@@ -59,17 +63,17 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
       tabIndex={interactive ? 0 : undefined}
       {...props}
     />
-  )
-);
-Card.displayName = 'Card';
+  );
+}
 
 export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Cognitive load: Header density for information hierarchy */
   density?: 'compact' | 'comfortable' | 'spacious';
+  ref?: React.Ref<HTMLDivElement>;
 }
 
-export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
-  ({ className, density = 'comfortable', ...props }, ref) => (
+export function CardHeader({ className, density = 'comfortable', ref, ...props }: CardHeaderProps) {
+  return (
     <div
       ref={ref}
       className={cn(
@@ -84,59 +88,69 @@ export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
       )}
       {...props}
     />
-  )
-);
-CardHeader.displayName = 'CardHeader';
+  );
+}
 
 export interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
   /** Information hierarchy: Semantic heading level */
   level?: 1 | 2 | 3 | 4 | 5 | 6;
   /** Scanability: Visual weight for content hierarchy */
   weight?: 'normal' | 'medium' | 'semibold';
+  ref?: React.Ref<HTMLHeadingElement>;
 }
 
-export const CardTitle = forwardRef<HTMLHeadingElement, CardTitleProps>(
-  ({ className, level = 3, weight = 'semibold', ...props }, ref) => {
-    const HeadingTag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+export function CardTitle({
+  className,
+  level = 3,
+  weight = 'semibold',
+  ref,
+  ...props
+}: CardTitleProps) {
+  const HeadingTag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
-    return (
-      <HeadingTag
-        ref={ref}
-        className={cn(
-          'leading-none tracking-tight',
-          // Information hierarchy: Semantic sizing based on heading level
-          {
-            'text-3xl': level === 1,
-            'text-2xl': level === 2,
-            'text-xl': level === 3,
-            'text-lg': level === 4,
-            'text-base': level === 5,
-            'text-sm': level === 6,
-          },
-          // Scanability: Visual weight options
-          {
-            'font-normal': weight === 'normal',
-            'font-medium': weight === 'medium',
-            'font-semibold': weight === 'semibold',
-          },
-          className
-        )}
-        {...props}
-      />
-    );
-  }
-);
-CardTitle.displayName = 'CardTitle';
+  return (
+    <HeadingTag
+      ref={ref}
+      className={cn(
+        'leading-none tracking-tight',
+        // Information hierarchy: Semantic sizing based on heading level
+        {
+          'text-3xl': level === 1,
+          'text-2xl': level === 2,
+          'text-xl': level === 3,
+          'text-lg': level === 4,
+          'text-base': level === 5,
+          'text-sm': level === 6,
+        },
+        // Scanability: Visual weight options
+        {
+          'font-normal': weight === 'normal',
+          'font-medium': weight === 'medium',
+          'font-semibold': weight === 'semibold',
+        },
+        className
+      )}
+      {...props}
+    />
+  );
+}
 
 export interface CardDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
   /** Cognitive load: Text length awareness for readability */
   truncate?: boolean;
   /** Information hierarchy: Subtle vs prominent descriptions */
   prominence?: 'subtle' | 'default';
+  ref?: React.Ref<HTMLParagraphElement>;
 }
 
-export const CardDescription = forwardRef<HTMLParagraphElement, CardDescriptionProps>(
-  ({ className, truncate = false, prominence = 'default', ...props }, ref) => (
+export function CardDescription({
+  className,
+  truncate = false,
+  prominence = 'default',
+  ref,
+  ...props
+}: CardDescriptionProps) {
+  return (
     <p
       ref={ref}
       className={cn(
@@ -152,19 +166,25 @@ export const CardDescription = forwardRef<HTMLParagraphElement, CardDescriptionP
       )}
       {...props}
     />
-  )
-);
-CardDescription.displayName = 'CardDescription';
+  );
+}
 
 export interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Cognitive load: Content density for information hierarchy */
   density?: 'compact' | 'comfortable' | 'spacious';
   /** Scanability: Content organization patterns */
   layout?: 'default' | 'grid' | 'list';
+  ref?: React.Ref<HTMLDivElement>;
 }
 
-export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
-  ({ className, density = 'comfortable', layout = 'default', ...props }, ref) => (
+export function CardContent({
+  className,
+  density = 'comfortable',
+  layout = 'default',
+  ref,
+  ...props
+}: CardContentProps) {
+  return (
     <div
       ref={ref}
       className={cn(
@@ -185,19 +205,25 @@ export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
       )}
       {...props}
     />
-  )
-);
-CardContent.displayName = 'CardContent';
+  );
+}
 
 export interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Cognitive load: Footer density and action clarity */
   density?: 'compact' | 'comfortable' | 'spacious';
   /** Scanability: Action hierarchy in footer */
   justify?: 'start' | 'center' | 'end' | 'between';
+  ref?: React.Ref<HTMLDivElement>;
 }
 
-export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
-  ({ className, density = 'comfortable', justify = 'start', ...props }, ref) => (
+export function CardFooter({
+  className,
+  density = 'comfortable',
+  justify = 'start',
+  ref,
+  ...props
+}: CardFooterProps) {
+  return (
     <div
       ref={ref}
       className={cn(
@@ -219,6 +245,5 @@ export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
       )}
       {...props}
     />
-  )
-);
-CardFooter.displayName = 'CardFooter';
+  );
+}

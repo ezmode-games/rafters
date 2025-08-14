@@ -20,7 +20,6 @@
  * Token knowledge: .rafters/tokens/registry.json
  */
 import * as LabelPrimitive from '@radix-ui/react-label';
-import { forwardRef } from 'react';
 import { cn } from '../lib/utils';
 
 export interface LabelProps extends React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> {
@@ -30,23 +29,22 @@ export interface LabelProps extends React.ComponentPropsWithoutRef<typeof LabelP
   validationState?: 'error' | 'warning' | 'success' | 'default';
   helpText?: string;
   semantic?: boolean;
+  ref?: React.Ref<React.ElementRef<typeof LabelPrimitive.Root>>;
 }
 
-export const Label = forwardRef<React.ElementRef<typeof LabelPrimitive.Root>, LabelProps>(
-  (
-    {
-      className,
-      required,
-      importance = 'standard',
-      context = 'form',
-      validationState = 'default',
-      helpText,
-      semantic = true,
-      children,
-      ...props
-    },
-    ref
-  ) => (
+export function Label({
+  className,
+  required,
+  importance = 'standard',
+  context = 'form',
+  validationState = 'default',
+  helpText,
+  semantic = true,
+  children,
+  ref,
+  ...props
+}: LabelProps) {
+  return (
     <div className={cn('space-y-1', semantic && 'semantic-label-container')}>
       <LabelPrimitive.Root
         ref={ref}
@@ -111,7 +109,5 @@ export const Label = forwardRef<React.ElementRef<typeof LabelPrimitive.Root>, La
         </p>
       )}
     </div>
-  )
-);
-
-Label.displayName = LabelPrimitive.Root.displayName;
+  );
+}

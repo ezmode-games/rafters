@@ -26,7 +26,6 @@
  *
  * Token knowledge: Uses --grid-* tokens from design system for intelligent spacing
  */
-import { forwardRef } from 'react';
 import { cn } from '../lib/utils';
 
 /**
@@ -153,6 +152,7 @@ export interface GridProps extends React.HTMLAttributes<HTMLElement> {
    */
   onFocusChange?: (position: { row: number; col: number }) => void;
 
+  ref?: React.Ref<HTMLElement>;
   children: React.ReactNode;
 }
 
@@ -205,6 +205,7 @@ export interface GridItemProps extends React.HTMLAttributes<HTMLElement> {
    */
   as?: 'div' | 'article' | 'section';
 
+  ref?: React.Ref<HTMLElement>;
   children: React.ReactNode;
 }
 
@@ -352,142 +353,138 @@ const PRIORITY_SPANS = {
  * can understand and apply. Combines standard Tailwind utilities with
  * intelligent presets for systematic design decision-making.
  */
-export const Grid = forwardRef<HTMLElement, GridProps>(
-  (
-    {
-      preset = 'linear',
-      bentoPattern = 'editorial',
-      columns,
-      autoFit,
-      gap = 'md',
-      maxItems = 'auto',
-      role = 'presentation',
-      ariaLabel,
-      ariaLabelledBy,
-      as = 'div',
-      onFocusChange,
-      className,
-      children,
-      ...props
-    },
-    ref
-  ) => {
-    const Component = as;
+export function Grid({
+  preset = 'linear',
+  bentoPattern = 'editorial',
+  columns,
+  autoFit,
+  gap = 'md',
+  maxItems = 'auto',
+  role = 'presentation',
+  ariaLabel,
+  ariaLabelledBy,
+  as = 'div',
+  onFocusChange,
+  className,
+  children,
+  ref,
+  ...props
+}: GridProps) {
+  const Component = as;
 
-    // Get preset configuration
-    const presetConfig = GRID_PRESETS[preset];
+  // Get preset configuration
+  const presetConfig = GRID_PRESETS[preset];
 
-    // Build base grid classes
-    const getGridClasses = () => {
-      const classes: string[] = ['grid'];
+  // Build base grid classes
+  const getGridClasses = () => {
+    const classes: string[] = ['grid'];
 
-      // Apply preset-specific responsive classes
-      if (preset !== 'custom' && 'responsive' in presetConfig && presetConfig.responsive) {
-        for (const cls of Object.values(presetConfig.responsive)) {
-          if (cls) classes.push(cls);
-        }
+    // Apply preset-specific responsive classes
+    if (preset !== 'custom' && 'responsive' in presetConfig && presetConfig.responsive) {
+      for (const cls of Object.values(presetConfig.responsive)) {
+        if (cls) classes.push(cls);
       }
+    }
 
-      // Apply bento pattern classes
-      if (preset === 'bento' && 'patterns' in presetConfig && presetConfig.patterns) {
-        const pattern = presetConfig.patterns[bentoPattern];
-        if (pattern) {
-          classes.push(pattern.template);
-        }
+    // Apply bento pattern classes
+    if (preset === 'bento' && 'patterns' in presetConfig && presetConfig.patterns) {
+      const pattern = presetConfig.patterns[bentoPattern];
+      if (pattern) {
+        classes.push(pattern.template);
       }
+    }
 
-      // Apply custom columns if specified
-      if (preset === 'custom' && columns) {
-        if (typeof columns === 'object' && 'base' in columns) {
-          // Responsive columns
-          if (columns.base) classes.push(`grid-cols-${columns.base}`);
-          if (columns.sm) classes.push(`sm:grid-cols-${columns.sm}`);
-          if (columns.md) classes.push(`md:grid-cols-${columns.md}`);
-          if (columns.lg) classes.push(`lg:grid-cols-${columns.lg}`);
-          if (columns.xl) classes.push(`xl:grid-cols-${columns.xl}`);
-          if (columns['2xl']) classes.push(`2xl:grid-cols-${columns['2xl']}`);
+    // Apply custom columns if specified
+    if (preset === 'custom' && columns) {
+      if (typeof columns === 'object' && 'base' in columns) {
+        // Responsive columns
+        if (columns.base) classes.push(`grid-cols-${columns.base}`);
+        if (columns.sm) classes.push(`sm:grid-cols-${columns.sm}`);
+        if (columns.md) classes.push(`md:grid-cols-${columns.md}`);
+        if (columns.lg) classes.push(`lg:grid-cols-${columns.lg}`);
+        if (columns.xl) classes.push(`xl:grid-cols-${columns.xl}`);
+        if (columns['2xl']) classes.push(`2xl:grid-cols-${columns['2xl']}`);
+      } else {
+        // Simple columns
+        if (columns === 'auto-fit' || columns === 'auto-fill') {
+          // Handled by inline styles
         } else {
-          // Simple columns
-          if (columns === 'auto-fit' || columns === 'auto-fill') {
-            // Handled by inline styles
-          } else {
-            classes.push(`grid-cols-${columns}`);
-          }
+          classes.push(`grid-cols-${columns}`);
         }
       }
+    }
 
-      // Apply gap classes
-      classes.push(GAP_CLASSES[gap]);
+    // Apply gap classes
+    classes.push(GAP_CLASSES[gap]);
 
-      return classes;
-    };
+    return classes;
+  };
 
-    // Build inline styles for auto-sizing and custom gaps
-    const getInlineStyles = (): React.CSSProperties => {
-      const styles: React.CSSProperties = {};
+  // Build inline styles for auto-sizing and custom gaps
+  const getInlineStyles = (): React.CSSProperties => {
+    const styles: React.CSSProperties = {};
 
-      // Handle auto-fit patterns
-      if (autoFit) {
-        const minWidth = AUTO_FIT_WIDTHS[autoFit as keyof typeof AUTO_FIT_WIDTHS] || autoFit;
+    // Handle auto-fit patterns
+    if (autoFit) {
+      const minWidth = AUTO_FIT_WIDTHS[autoFit as keyof typeof AUTO_FIT_WIDTHS] || autoFit;
+      styles.gridTemplateColumns = `repeat(auto-fit, minmax(${minWidth}, 1fr))`;
+    }
+
+    // Handle custom columns for auto patterns
+    if (preset === 'custom' && typeof columns === 'string') {
+      if (columns === 'auto-fit') {
+        const minWidth = autoFit
+          ? AUTO_FIT_WIDTHS[autoFit as keyof typeof AUTO_FIT_WIDTHS] || autoFit
+          : '250px';
         styles.gridTemplateColumns = `repeat(auto-fit, minmax(${minWidth}, 1fr))`;
+      } else if (columns === 'auto-fill') {
+        const minWidth = autoFit
+          ? AUTO_FIT_WIDTHS[autoFit as keyof typeof AUTO_FIT_WIDTHS] || autoFit
+          : '250px';
+        styles.gridTemplateColumns = `repeat(auto-fill, minmax(${minWidth}, 1fr))`;
       }
+    }
 
-      // Handle custom columns for auto patterns
-      if (preset === 'custom' && typeof columns === 'string') {
-        if (columns === 'auto-fit') {
-          const minWidth = autoFit
-            ? AUTO_FIT_WIDTHS[autoFit as keyof typeof AUTO_FIT_WIDTHS] || autoFit
-            : '250px';
-          styles.gridTemplateColumns = `repeat(auto-fit, minmax(${minWidth}, 1fr))`;
-        } else if (columns === 'auto-fill') {
-          const minWidth = autoFit
-            ? AUTO_FIT_WIDTHS[autoFit as keyof typeof AUTO_FIT_WIDTHS] || autoFit
-            : '250px';
-          styles.gridTemplateColumns = `repeat(auto-fill, minmax(${minWidth}, 1fr))`;
-        }
+    // Handle custom gaps that need inline styles (golden ratio gaps)
+    if (gap === 'comfortable' || gap === 'generous') {
+      if (gap === 'comfortable') {
+        styles.gap = '1.618rem'; // Golden ratio φ
+      } else if (gap === 'generous') {
+        styles.gap = '2.618rem'; // Golden ratio φ²
       }
+    }
 
-      // Handle custom gaps that need inline styles (golden ratio gaps)
-      if (gap === 'comfortable' || gap === 'generous') {
-        if (gap === 'comfortable') {
-          styles.gap = '1.618rem'; // Golden ratio φ
-        } else if (gap === 'generous') {
-          styles.gap = '2.618rem'; // Golden ratio φ²
-        }
-      }
+    return styles;
+  };
 
-      return styles;
-    };
-
-    return (
-      <Component
-        ref={ref as React.ForwardedRef<HTMLDivElement>}
-        role={role}
-        aria-label={ariaLabel}
-        aria-labelledby={ariaLabelledBy}
-        tabIndex={role === 'grid' ? 0 : undefined}
-        className={cn(
-          ...getGridClasses(),
-          // Focus management for interactive grids
-          role === 'grid' && [
-            'focus-visible:outline-none',
-            'focus-visible:ring-2',
-            'focus-visible:ring-primary',
-            'focus-visible:ring-offset-2',
-          ],
-          className
-        )}
-        style={{
-          ...getInlineStyles(),
-          ...props.style,
-        }}
-        {...props}
-      >
-        {children}
-      </Component>
-    );
-  }
-);
+  return (
+    <Component
+      ref={ref as React.ForwardedRef<HTMLDivElement>}
+      role={role}
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledBy}
+      tabIndex={role === 'grid' ? 0 : undefined}
+      className={cn(
+        ...getGridClasses(),
+        // Focus management for interactive grids
+        role === 'grid' && [
+          'focus-visible:outline-none',
+          'focus-visible:ring-2',
+          'focus-visible:ring-primary',
+          'focus-visible:ring-offset-2',
+        ],
+        className
+      )}
+      style={{
+        ...getInlineStyles(),
+        ...props.style,
+      }}
+      {...props}
+    >
+      {children}
+    </Component>
+  );
+}
 
 /**
  * GridItem companion component with priority-based intelligence
@@ -495,102 +492,95 @@ export const Grid = forwardRef<HTMLElement, GridProps>(
  * Provides semantic grid items with automatic sizing based on content
  * priority and accessibility integration for screen readers.
  */
-export const GridItem = forwardRef<HTMLElement, GridItemProps>(
-  (
-    {
-      colSpan,
-      rowSpan,
-      priority,
-      role = 'none',
-      ariaLabel,
-      focusable = false,
-      as = 'div',
-      className,
-      children,
-      ...props
-    },
-    ref
-  ) => {
-    const Component = as;
+export function GridItem({
+  colSpan,
+  rowSpan,
+  priority,
+  role = 'none',
+  ariaLabel,
+  focusable = false,
+  as = 'div',
+  className,
+  children,
+  ref,
+  ...props
+}: GridItemProps) {
+  const Component = as;
 
-    // Get priority-based spans for bento layouts
-    const getPrioritySpans = () => {
-      if (priority && PRIORITY_SPANS[priority]) {
-        const spans = PRIORITY_SPANS[priority];
-        return {
-          colSpan: spans.colSpan,
-          rowSpan: spans.rowSpan,
-        };
+  // Get priority-based spans for bento layouts
+  const getPrioritySpans = () => {
+    if (priority && PRIORITY_SPANS[priority]) {
+      const spans = PRIORITY_SPANS[priority];
+      return {
+        colSpan: spans.colSpan,
+        rowSpan: spans.rowSpan,
+      };
+    }
+    return { colSpan, rowSpan };
+  };
+
+  const { colSpan: finalColSpan, rowSpan: finalRowSpan } = getPrioritySpans();
+
+  // Build span classes
+  const getSpanClasses = () => {
+    const classes: string[] = [];
+
+    // Handle responsive colSpan
+    if (finalColSpan) {
+      if (typeof finalColSpan === 'object' && 'base' in finalColSpan) {
+        if (finalColSpan.base) classes.push(`col-span-${finalColSpan.base}`);
+        if (finalColSpan.sm) classes.push(`sm:col-span-${finalColSpan.sm}`);
+        if (finalColSpan.md) classes.push(`md:col-span-${finalColSpan.md}`);
+        if (finalColSpan.lg) classes.push(`lg:col-span-${finalColSpan.lg}`);
+        if (finalColSpan.xl) classes.push(`xl:col-span-${finalColSpan.xl}`);
+        if (finalColSpan['2xl']) classes.push(`2xl:col-span-${finalColSpan['2xl']}`);
+      } else {
+        classes.push(`col-span-${finalColSpan}`);
       }
-      return { colSpan, rowSpan };
-    };
+    }
 
-    const { colSpan: finalColSpan, rowSpan: finalRowSpan } = getPrioritySpans();
-
-    // Build span classes
-    const getSpanClasses = () => {
-      const classes: string[] = [];
-
-      // Handle responsive colSpan
-      if (finalColSpan) {
-        if (typeof finalColSpan === 'object' && 'base' in finalColSpan) {
-          if (finalColSpan.base) classes.push(`col-span-${finalColSpan.base}`);
-          if (finalColSpan.sm) classes.push(`sm:col-span-${finalColSpan.sm}`);
-          if (finalColSpan.md) classes.push(`md:col-span-${finalColSpan.md}`);
-          if (finalColSpan.lg) classes.push(`lg:col-span-${finalColSpan.lg}`);
-          if (finalColSpan.xl) classes.push(`xl:col-span-${finalColSpan.xl}`);
-          if (finalColSpan['2xl']) classes.push(`2xl:col-span-${finalColSpan['2xl']}`);
-        } else {
-          classes.push(`col-span-${finalColSpan}`);
-        }
+    // Handle responsive rowSpan
+    if (finalRowSpan) {
+      if (typeof finalRowSpan === 'object' && 'base' in finalRowSpan) {
+        if (finalRowSpan.base) classes.push(`row-span-${finalRowSpan.base}`);
+        if (finalRowSpan.sm) classes.push(`sm:row-span-${finalRowSpan.sm}`);
+        if (finalRowSpan.md) classes.push(`md:row-span-${finalRowSpan.md}`);
+        if (finalRowSpan.lg) classes.push(`lg:row-span-${finalRowSpan.lg}`);
+        if (finalRowSpan.xl) classes.push(`xl:row-span-${finalRowSpan.xl}`);
+        if (finalRowSpan['2xl']) classes.push(`2xl:row-span-${finalRowSpan['2xl']}`);
+      } else {
+        classes.push(`row-span-${finalRowSpan}`);
       }
+    }
 
-      // Handle responsive rowSpan
-      if (finalRowSpan) {
-        if (typeof finalRowSpan === 'object' && 'base' in finalRowSpan) {
-          if (finalRowSpan.base) classes.push(`row-span-${finalRowSpan.base}`);
-          if (finalRowSpan.sm) classes.push(`sm:row-span-${finalRowSpan.sm}`);
-          if (finalRowSpan.md) classes.push(`md:row-span-${finalRowSpan.md}`);
-          if (finalRowSpan.lg) classes.push(`lg:row-span-${finalRowSpan.lg}`);
-          if (finalRowSpan.xl) classes.push(`xl:row-span-${finalRowSpan.xl}`);
-          if (finalRowSpan['2xl']) classes.push(`2xl:row-span-${finalRowSpan['2xl']}`);
-        } else {
-          classes.push(`row-span-${finalRowSpan}`);
-        }
-      }
+    return classes;
+  };
 
-      return classes;
-    };
-
-    return (
-      <Component
-        ref={ref as React.ForwardedRef<HTMLDivElement>}
-        role={role}
-        aria-label={ariaLabel}
-        tabIndex={focusable ? 0 : undefined}
-        className={cn(
-          ...getSpanClasses(),
-          // Focus management for interactive grid items
-          focusable && [
-            'focus-visible:outline-none',
-            'focus-visible:ring-2',
-            'focus-visible:ring-primary',
-            'focus-visible:ring-offset-1',
-          ],
-          // Touch target compliance for interactive items
-          role === 'gridcell' && [
-            'min-h-[44px]', // WCAG AAA minimum
-            'min-w-[44px]',
-          ],
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </Component>
-    );
-  }
-);
-
-Grid.displayName = 'Grid';
-GridItem.displayName = 'GridItem';
+  return (
+    <Component
+      ref={ref as React.ForwardedRef<HTMLDivElement>}
+      role={role}
+      aria-label={ariaLabel}
+      tabIndex={focusable ? 0 : undefined}
+      className={cn(
+        ...getSpanClasses(),
+        // Focus management for interactive grid items
+        focusable && [
+          'focus-visible:outline-none',
+          'focus-visible:ring-2',
+          'focus-visible:ring-primary',
+          'focus-visible:ring-offset-1',
+        ],
+        // Touch target compliance for interactive items
+        role === 'gridcell' && [
+          'min-h-[44px]', // WCAG AAA minimum
+          'min-w-[44px]',
+        ],
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </Component>
+  );
+}
