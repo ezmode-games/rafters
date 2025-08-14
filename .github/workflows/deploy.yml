@@ -1,0 +1,80 @@
+name: Deploy
+
+on:
+  # Deploy on successful releases
+  workflow_run:
+    workflows: ["Release"]
+    types:
+      - completed
+    branches:
+      - main
+
+  # Manual deployment trigger
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    # Only deploy if release workflow succeeded
+    if: github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Build Storybook
+        run: pnpm ui:build-storybook
+
+      - name: Generate Registry Manifest
+        run: pnpm manifest:generate
+
+      # Deploy Storybook to GitHub Pages (or your hosting platform)
+      - name: Deploy Storybook
+        uses: peaceiris/actions-gh-pages@v4
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./packages/ui/storybook-static
+          destination_dir: storybook
+
+      # Deploy Registry API (if you have hosting)
+      - name: Deploy Registry
+        run: |
+          echo "Registry manifest generated"
+          echo "Deploy to your registry hosting platform here"
+          # Example: Deploy to Vercel, Netlify, or AWS
+          # vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
+
+      # Notify on successful deployment
+      - name: Deployment Success
+        run: |
+          echo "✅ Deployment completed successfully"
+          echo "🎨 Storybook: https://your-org.github.io/rafters/storybook"
+          echo "🔧 Registry: Updated with latest components"

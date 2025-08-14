@@ -23,7 +23,11 @@
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
     "changeset:check": "changeset status --verbose",
-    "manifest:generate": "pnpm --filter @rafters/registry manifest:generate"
+    "manifest:generate": "pnpm --filter @rafters/registry manifest:generate",
+    "release:dry": "pnpm changeset:version && pnpm build && pnpm manifest:generate",
+    "release:local": "pnpm preflight && pnpm changeset:publish",
+    "deploy:storybook": "pnpm ui:build-storybook",
+    "deploy:registry": "pnpm manifest:generate"
   },
   "keywords": [
     "design-system",
