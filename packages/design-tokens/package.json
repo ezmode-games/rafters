@@ -24,7 +24,7 @@
     "test": "vitest run --passWithNoTests",
     "lint": "biome check .",
     "format": "biome format --write .",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsc --build --dry",
     "clean": "rm -rf dist"
   },
   "devDependencies": {
