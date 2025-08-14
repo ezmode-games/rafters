@@ -7,7 +7,7 @@
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "dev": "pnpm --parallel dev",
-    "build": "pnpm --recursive build",
+    "build": "pnpm --recursive --sort build",
     "test": "pnpm --recursive test",
     "test:run": "pnpm --recursive test:run",
     "biome:lint": "pnpm --recursive lint",
