@@ -26,7 +26,7 @@ components.get('/', async (c) => {
           attentionEconomics: component.meta?.rafters?.intelligence.attentionEconomics || '',
           accessibility: component.meta?.rafters?.intelligence.accessibility || '',
         },
-        files: component.files.map((f) => f.path),
+        files: component.files?.map((f) => f.path) || [],
         dependencies: component.dependencies || [],
       })),
       total: registryData.components.length,
@@ -102,7 +102,7 @@ components.get('/:name/source', async (c) => {
       );
     }
 
-    const sourceFile = component.files.find(
+    const sourceFile = component.files?.find(
       (f) => f.path.endsWith('.tsx') && !f.path.includes('.stories.')
     );
 
@@ -149,7 +149,7 @@ components.get('/:name/stories', async (c) => {
       );
     }
 
-    const storyFiles = component.files.filter((f) => f.path.includes('.stories.'));
+    const storyFiles = component.files?.filter((f) => f.path.includes('.stories.')) || [];
 
     return c.json({
       component: componentName,

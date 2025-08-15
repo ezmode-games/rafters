@@ -119,7 +119,7 @@ export async function addCommand(componentName: string, options: AddOptions = {}
     const componentSpinner = ora(`Writing component to ${componentPath}...`).start();
 
     // First try to get actual component source from registry files
-    const componentFile = componentManifest.files.find(
+    const componentFile = componentManifest.files?.find(
       (f) =>
         f.path.endsWith('.tsx') && f.type === 'registry:component' && !f.path.includes('.stories.')
     );

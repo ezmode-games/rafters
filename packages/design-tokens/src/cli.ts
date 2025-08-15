@@ -6,8 +6,9 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { z } from 'zod';
-import { designSystemsAPI } from './api';
-import { defaultGrayscaleSystem } from './grayscale';
+import { designSystemsAPI } from './api.js';
+import { defaultGrayscaleSystem } from './grayscale.js';
+import { generateMotionTokens } from './index.js';
 
 /**
  * Check Tailwind CSS version in project
@@ -74,6 +75,7 @@ export function createDefaultRegistry(): TokenSet {
     ...Object.values(system.system.typography),
     ...Object.values(system.system.spacing),
     ...Object.values(system.system.state),
+    ...generateMotionTokens(), // Use properly formatted motion tokens
     ...Object.values(system.system.border),
     ...Object.values(system.system.shadow),
     ...Object.values(system.system.ring),

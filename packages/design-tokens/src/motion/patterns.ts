@@ -5,7 +5,7 @@
  * Provides pre-configured motion combinations for AI agents to use.
  */
 
-import { contextEasing, contextTiming } from './index';
+import { contextEasing, contextTiming } from './index.js';
 
 /**
  * Animation pattern combining timing and easing with AI intelligence

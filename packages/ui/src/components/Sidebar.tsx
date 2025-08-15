@@ -1,27 +1,48 @@
 /**
- * Sidebar Navigation Container - AI Intelligence
+ * Comprehensive navigation sidebar with embedded wayfinding intelligence and progressive disclosure patterns
  *
- * COGNITIVE LOAD: 4/10 (focused on navigation container and layout)
- * ATTENTION HIERARCHY: Secondary support system - should not compete with primary content
- * TRUST BUILDING: High trust level for reliable spatial consistency
- * PROGRESSIVE ENHANCEMENT: Works with basic navigation, enhanced through composition
+ * @registry-name sidebar
+ * @registry-version 0.1.0
+ * @registry-status published
+ * @registry-path components/ui/Sidebar.tsx
+ * @registry-type registry:component
  *
- * DESIGN INTELLIGENCE FOCUS:
- * - Spatial Consistency: Fixed positioning builds user mental model
- * - Layout Coordination: Manages sidebar sizing and collapse behavior
- * - Navigation Container: Provides semantic structure for menu composition
- * - Accessibility Foundation: ARIA landmarks and keyboard navigation base
+ * @cognitive-load 6/10 - Navigation system with state management and wayfinding intelligence
+ * @attention-economics Secondary support system: Never competes with primary content, uses muted variants and compact sizing for attention hierarchy
+ * @trust-building Spatial consistency builds user confidence, zustand state persistence remembers preferences, Miller's Law enforcement prevents cognitive overload
+ * @accessibility WCAG AAA compliance with skip links, keyboard navigation, screen reader optimization, and motion sensitivity support
+ * @semantic-meaning Navigation intelligence: Progressive disclosure for complex hierarchies, semantic grouping by domain, wayfinding through active state indication with zustand state machine
  *
- * COMPOSITION PATTERNS:
- * ✅ Basic Navigation: SidebarItem for simple links
- * ✅ Menu Composition: Integrates with DropdownMenu, TreeMenu, etc.
- * ✅ Responsive Layout: Collapsible with preserved state
- * ✅ Accessibility Foundation: Skip links, landmarks, focus management
- * ❌ Complex Menu Logic: Use dedicated menu components instead
+ * @usage-patterns
+ * DO: Use for main navigation with collapsible state management
+ * DO: Implement progressive disclosure for complex menu hierarchies
+ * DO: Provide skip links and keyboard navigation patterns
+ * DO: Integrate with zustand store for state persistence
+ * NEVER: Complex menu logic within sidebar - use dedicated menu components
+ * NEVER: Compete with primary content for attention
  *
- * Token knowledge: .rafters/tokens/registry.json
+ * @design-guides
+ * - Navigation Intelligence: https://rafters.realhandy.tech/docs/llm/navigation-patterns
+ * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
+ * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
+ *
+ * @dependencies @rafters/design-tokens, zustand, zod, lucide-react, class-variance-authority, clsx
+ *
+ * @example
+ * ```tsx
+ * // Basic sidebar with navigation items
+ * <Sidebar collapsed={false} collapsible>
+ *   <SidebarHeader>
+ *     <SidebarTitle>Navigation</SidebarTitle>
+ *   </SidebarHeader>
+ *   <SidebarContent>
+ *     <SidebarItem href="/dashboard">Dashboard</SidebarItem>
+ *     <SidebarItem href="/settings">Settings</SidebarItem>
+ *   </SidebarContent>
+ * </Sidebar>
+ * ```
  */
-import { contextEasing, contextTiming, timing } from '@rafters/design-tokens/motion';
+// Motion tokens now handled via CSS classes
 import React, { useCallback, useEffect } from 'react';
 import { z } from 'zod';
 import { useSidebarNavigation } from '../hooks/useSidebarNavigation';
@@ -265,8 +286,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         // Base navigation styles with spatial consistency
         'flex flex-col bg-background border-r border-border',
         'relative transition-all',
-        !reduceMotion && contextTiming.navigation,
-        !reduceMotion && contextEasing.navigation,
+        !reduceMotion && 'duration-300',
+        !reduceMotion && 'ease-in-out',
 
         // Variant-based styling for different use cases
         {
@@ -348,7 +369,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
             'flex items-center justify-center w-8 h-8 rounded-md',
             'border border-border hover:bg-accent transition-colors',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-            contextTiming.hover,
+            'duration-200',
             // Trust pattern: Always visible, consistent position
             collapsed && 'mx-auto'
           )}
@@ -359,7 +380,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
           <svg
             className={cn(
               'w-4 h-4 transition-transform',
-              timing.standard,
+              'duration-300',
               collapsed && 'rotate-180'
             )}
             fill="none"
@@ -461,7 +482,7 @@ export const SidebarGroup: React.FC<SidebarGroupProps> = ({
           'space-y-1',
           // Smooth expand/collapse for cognitive comfort
           'transition-all',
-          timing.standard,
+          'duration-300',
           collapsible && !expanded && 'hidden'
         )}
       >
@@ -593,7 +614,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
           // Simplified item styles
           'flex items-center gap-3 px-2 py-2 rounded-md text-sm font-medium',
           'transition-all cursor-pointer select-none',
-          contextTiming.hover,
+          'duration-200',
 
           // Navigation hierarchy
           level > 0 && `ml-${Math.min(level * 4, 12)}`,
@@ -698,7 +719,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
         // Base item styles with motor accessibility
         'flex items-center gap-3 px-2 py-2 rounded-md text-sm font-medium',
         'transition-all cursor-pointer select-none',
-        contextTiming.hover,
+        'duration-200',
 
         // Navigation hierarchy with proper indentation
         level > 0 && `ml-${Math.min(level * 4, 12)}`,

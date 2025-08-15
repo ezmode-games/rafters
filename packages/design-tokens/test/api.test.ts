@@ -106,6 +106,39 @@ describe('designSystemsAPI', () => {
       expect(css).toContain('--font-'); // Typography uses font prefix
     });
 
+    it('includes motion tokens in CSS export', () => {
+      const css = designSystemsAPI.exportCSS('000000');
+      expect(css).toBeDefined();
+
+      // Check motion timing tokens
+      expect(css).toContain('--duration-');
+      expect(css).toMatch(/--duration-fast:\s*\d+ms/);
+      expect(css).toMatch(/--duration-standard:\s*\d+ms/);
+      expect(css).toMatch(/--duration-slow:\s*\d+ms/);
+
+      // Check motion easing tokens
+      expect(css).toContain('--ease-');
+      expect(css).toMatch(/--ease-linear:\s*ease-linear/);
+      expect(css).toMatch(/--ease-smooth:\s*ease-in-out/);
+      expect(css).toMatch(/--ease-bouncy:\s*cubic-bezier/);
+    });
+
+    it('includes all token categories in CSS export', () => {
+      const css = designSystemsAPI.exportCSS('000000');
+      expect(css).toBeDefined();
+
+      // Check various token categories are present
+      expect(css).toContain('--color-'); // Colors
+      expect(css).toContain('--spacing-'); // Spacing
+      expect(css).toContain('--opacity-'); // State opacities
+      expect(css).toContain('--scale-'); // State scales
+      expect(css).toContain('--duration-'); // Motion timing
+      expect(css).toContain('--ease-'); // Motion easing
+      expect(css).toContain('--border-'); // Border tokens
+      expect(css).toContain('--shadow-'); // Shadow tokens
+      expect(css).toContain('--ring-'); // Ring tokens
+    });
+
     it('includes custom color tokens', () => {
       const primaryColor = { l: 0.5, c: 0.2, h: 220, alpha: 1 };
       const system = designSystemsAPI.createFromColor(primaryColor, 'Color System');
@@ -132,6 +165,44 @@ describe('designSystemsAPI', () => {
       expect(theme).toContain('/* color */');
       expect(theme).toContain('/* spacing */');
       expect(theme).toContain('/* typography */');
+    });
+
+    it('includes motion tokens in Tailwind export with proper categories', () => {
+      const theme = designSystemsAPI.exportTailwind('000000');
+      expect(theme).toBeDefined();
+      expect(theme).toContain('@theme {');
+
+      // Check motion category sections
+      expect(theme).toContain('/* timing */');
+      expect(theme).toContain('/* easing */');
+
+      // Check motion tokens are present
+      expect(theme).toContain('--duration-');
+      expect(theme).toContain('--ease-');
+
+      // Check tokens are properly categorized
+      const timingSection = theme.split('/* timing */')[1];
+      const easingSection = theme.split('/* easing */')[1];
+
+      expect(timingSection).toContain('--duration-fast:');
+      expect(easingSection).toContain('--ease-smooth:');
+    });
+
+    it('includes all token categories organized properly', () => {
+      const theme = designSystemsAPI.exportTailwind('000000');
+      expect(theme).toBeDefined();
+
+      // Check all expected category sections
+      expect(theme).toContain('/* color */');
+      expect(theme).toContain('/* typography */');
+      expect(theme).toContain('/* spacing */');
+      expect(theme).toContain('/* state */');
+      expect(theme).toContain('/* timing */');
+      expect(theme).toContain('/* easing */');
+      expect(theme).toContain('/* border */');
+      expect(theme).toContain('/* shadow */');
+      expect(theme).toContain('/* ring */');
+      expect(theme).toContain('/* opacity */');
     });
 
     it('returns null for non-existent system', () => {

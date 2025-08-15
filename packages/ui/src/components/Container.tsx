@@ -1,28 +1,45 @@
 /**
- * Container Component - AI Intelligence
+ * Layout container component for content width control and semantic structure
  *
- * COGNITIVE LOAD: 0/10 (invisible structure, reduces complexity)
- * NEGATIVE SPACE MASTERY: Controls content width and breathing room
- * TYPOGRAPHY INTELLIGENCE: Maintains optimal line length for reading
+ * @registry-name container
+ * @registry-version 0.1.0
+ * @registry-status published
+ * @registry-path components/ui/Container.tsx
+ * @registry-type registry:component
  *
- * SPACING PHILOSOPHY: Padding-first design for predictable boundaries.
- * Containers use mx-auto for centering, but prefer padding for content spacing.
- * Component edges should be clear boundaries where possible.
+ * @cognitive-load 0/10 - Invisible structure that reduces visual complexity
+ * @attention-economics Neutral structural element: Controls content width and breathing room without competing for attention
+ * @trust-building Predictable boundaries and consistent spacing patterns
+ * @accessibility Semantic HTML elements with proper landmark roles for screen readers
+ * @semantic-meaning Content width control and semantic structure: main=primary content, section=grouped content, article=standalone content
  *
- * DESIGN INTELLIGENCE GUIDES:
- * - Negative Space Mastery: rafters.realhandy.tech/llm/patterns/negative-space
- * - Typography Intelligence: rafters.realhandy.tech/llm/patterns/typography-intelligence
- * - Progressive Enhancement: rafters.realhandy.tech/llm/patterns/progressive-enhancement
+ * @usage-patterns
+ * DO: Use padding prop for internal breathing room
+ * DO: Control content boundaries with max-w-* classes
+ * DO: Apply semantic structure with as="main|section|article"
+ * DO: Maintain predictable component boundaries
+ * NEVER: Use margins for content spacing (use padding instead)
+ * NEVER: Unnecessarily nest containers or use fixed widths
  *
- * USAGE PATTERNS:
- * ✅ Padding Only: Use padding prop for internal breathing room
- * ✅ Content Width: max-w-* controls content boundaries
- * ✅ Semantic Structure: Use as="main|section|article" for accessibility
- * ✅ Predictable Edges: Component boundary = visual boundary
- * ❌ Never: Margins for content spacing (use padding instead)
- * ❌ Never: Unnecessarily nested containers, fixed widths
+ * @design-guides
+ * - Negative Space: https://rafters.realhandy.tech/docs/llm/negative-space
+ * - Typography Intelligence: https://rafters.realhandy.tech/docs/llm/typography-intelligence
+ * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
  *
- * Token knowledge: Uses --spacing-* tokens from design system
+ * @dependencies none
+ *
+ * @example
+ * ```tsx
+ * // Basic container with semantic structure
+ * <Container as="main" padding="comfortable">
+ *   Main page content
+ * </Container>
+ *
+ * // Article container with prose styling
+ * <Container as="article" variant="prose">
+ *   Long form content with optimal reading width
+ * </Container>
+ * ```
  */
 import { cn } from '../lib/utils';
 import './article-prose.css';

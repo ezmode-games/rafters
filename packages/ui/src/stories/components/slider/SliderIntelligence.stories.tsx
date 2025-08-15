@@ -1,4 +1,4 @@
-import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
+// Motion tokens now handled via CSS classes
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Slider } from '../../../components/Slider';
@@ -201,10 +201,10 @@ export const TrustBuildingPatterns: Story = {
               <h4 className="font-medium">Motion Tokens Used</h4>
               <ul className="text-sm space-y-1 font-mono">
                 <li>
-                  <code>contextTiming.hover</code> - {contextTiming.hover} (75ms)
+                  <code>duration-200</code> - 200ms (hover timing)
                 </li>
                 <li>
-                  <code>contextEasing.hover</code> - {contextEasing.hover}
+                  <code>ease-in-out</code> - ease-in-out (smooth response)
                 </li>
               </ul>
             </div>

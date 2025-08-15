@@ -11,12 +11,12 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    # Only run if CI passed - trust the validation pipeline
-    needs: []
+    if: github.repository_owner != 'dependabot[bot]'
     permissions:
       contents: write
       id-token: write
       pull-requests: write
+      packages: write
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -43,9 +43,43 @@ jobs:
       - name: Build packages for distribution
         run: pnpm build
 
-      # GENERATE REGISTRY MANIFEST
+      # DETECT COMPONENT CHANGES
+      - name: Check for component changes
+        id: component-changes
+        run: |
+          # Get list of changed files in this push
+          CHANGED_FILES=$(git diff --name-only HEAD~1..HEAD || echo "")
+          echo "Files changed in this push:"
+          echo "$CHANGED_FILES" | head -10
+          
+          # Check if any component files have changed
+          if echo "$CHANGED_FILES" | grep -E "^packages/ui/src/components/.*\.tsx$" > /dev/null; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+            echo ""
+            echo "Component changes detected:"
+            echo "$CHANGED_FILES" | grep -E "^packages/ui/src/components/.*\.tsx$"
+            echo "Registry deployment will be triggered"
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT  
+            echo ""
+            echo "No component changes detected - skipping registry deployment"
+            echo "Registry deployment triggers when .tsx files change in packages/ui/src/components/"
+          fi
+
+      # GENERATE REGISTRY MANIFEST (always run to ensure consistency)
       - name: Generate Registry Manifest
         run: pnpm manifest:generate
+
+      # DEPLOY REGISTRY TO CLOUDFLARE (conditional on component changes)
+      - name: Deploy Registry
+        if: steps.component-changes.outputs.changes == 'true'
+        run: |
+          echo "Deploying registry with updated component intelligence..."
+          cd apps/registry
+          pnpm cf:deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       # DELIVERY PIPELINE - No validation, just ship what CI approved
       - name: Create Release Pull Request or Publish to npm
@@ -59,21 +93,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
 
-      # OPTIONAL: Deploy documentation/storybook if needed
-      - name: Deploy Storybook (if released)
-        if: steps.changesets.outputs.published == 'true'
-        run: |
-          echo "Packages released: ${{ steps.changesets.outputs.publishedPackages }}"
-          # Add deployment commands here if needed
-          # pnpm ui:build-storybook
-          # Deploy to hosting platform
-
-      # OPTIONAL: Update registry after successful release
-      - name: Update Registry (if released)
-        if: steps.changesets.outputs.published == 'true'
-        run: |
-          echo "Updating component registry after release..."
-          # Add registry update commands here
-          pnpm manifest:generate

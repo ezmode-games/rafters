@@ -6,6 +6,7 @@
   "main": "./src/index.ts",
   "scripts": {
     "dev": "wrangler dev",
+    "build": "pnpm typecheck && pnpm manifest:generate",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

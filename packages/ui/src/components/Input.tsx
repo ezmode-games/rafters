@@ -1,27 +1,45 @@
-import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
 /**
- * Input Component - AI Intelligence
+ * Form input component with validation states and accessibility
  *
- * COGNITIVE LOAD: 2/10 (simple data entry, requires label context)
- * TRUST BUILDING: Immediate feedback builds user confidence
- * ACCESSIBILITY PRIORITY: Label association and error states must be clear
+ * @registry-name input
+ * @registry-version 0.1.0
+ * @registry-status published
+ * @registry-path components/ui/Input.tsx
+ * @registry-type registry:component
  *
- * DESIGN INTELLIGENCE GUIDES:
- * - Trust Building Patterns: rafters.realhandy.tech/llm/patterns/trust-building
- * - Typography Intelligence: rafters.realhandy.tech/llm/patterns/typography-intelligence
- * - Progressive Enhancement: rafters.realhandy.tech/llm/patterns/progressive-enhancement
+ * @cognitive-load 4/10 - Data entry with validation feedback requires user attention
+ * @attention-economics State hierarchy: default=ready, focus=active input, error=requires attention, success=validation passed
+ * @trust-building Clear validation feedback, error recovery patterns, progressive enhancement
+ * @accessibility Screen reader labels, validation announcements, keyboard navigation, high contrast support
+ * @semantic-meaning Type-appropriate validation: email=format validation, password=security indicators, number=range constraints
  *
- * USAGE PATTERNS:
- * ✅ Clear Labels: Always pair with descriptive Label component
- * ✅ Helpful Placeholders: Show format examples, not instructions
- * ✅ Real-time Validation: Immediate feedback for user confidence
- * ✅ Sensitive Data: Use appropriate type and validation for security
- * ❌ Never: Label-less inputs, validation only on submit, unclear error messages
+ * @usage-patterns
+ * DO: Always pair with descriptive Label component
+ * DO: Use helpful placeholders showing format examples
+ * DO: Provide real-time validation for user confidence
+ * DO: Use appropriate input types for sensitive data
+ * NEVER: Label-less inputs, validation only on submit, unclear error messages
  *
- * Token knowledge: .rafters/tokens/registry.json
+ * @design-guides
+ * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
+ * - Typography Intelligence: https://rafters.realhandy.tech/docs/llm/typography-intelligence
+ * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
+ *
+ * @dependencies none
+ *
+ * @example
+ * ```tsx
+ * // Basic input with validation
+ * <Input variant="error" validationMessage="Required field" showValidation />
+ *
+ * // Sensitive data input
+ * <Input type="password" sensitive />
+ *
+ * // Real-time validation
+ * <Input validationMode="live" variant="success" />
+ * ```
  */
 import { cn } from '../lib/utils';
-
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   variant?: 'default' | 'error' | 'success' | 'warning';
   validationMode?: 'live' | 'onBlur' | 'onSubmit';
@@ -61,9 +79,7 @@ export function Input({
           'placeholder:text-muted-foreground',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           'disabled:cursor-not-allowed disabled:opacity-disabled',
-          'transition-all',
-          contextTiming.hover,
-          contextEasing.hover,
+          'transition-all motion-focus',
           'hover:opacity-hover',
 
           // Motor accessibility: Enhanced touch targets on mobile

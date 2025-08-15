@@ -187,7 +187,7 @@ export function createColorDesignSystem(
   const semanticTokens: SmartColorToken[] = [];
 
   for (const [semanticType, colors] of Object.entries(semanticSuggestions)) {
-    colors.forEach((color, index) => {
+    (colors as OKLCH[]).forEach((color: OKLCH, index: number) => {
       // Ensure semantic color is accessible against background
       const accessibleColor = findAccessibleColor(color, background, 'WCAG-AAA');
 

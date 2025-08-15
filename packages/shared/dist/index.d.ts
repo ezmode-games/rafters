@@ -6,7 +6,6 @@
  * and reason about design systems.
  */
 export * from './types.js';
-export * from './registry-data.js';
 export declare const DEFAULT_COGNITIVE_LOADS: {
     readonly simple: 1;
     readonly moderate: 2;

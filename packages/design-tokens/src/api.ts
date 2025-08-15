@@ -6,9 +6,93 @@
 import type { OKLCH } from '@rafters/shared';
 import Sqids from 'sqids';
 import { z } from 'zod';
-import { type SmartColorToken, createColorDesignSystem } from './color-tool';
-import type { GrayscaleDesignSystem } from './grayscale';
-import { GrayscaleDesignSystemSchema, defaultGrayscaleSystem } from './grayscale';
+import { type SmartColorToken, createColorDesignSystem } from './color-tool.js';
+import type { GrayscaleDesignSystem } from './grayscale.js';
+import { GrayscaleDesignSystemSchema, defaultGrayscaleSystem } from './grayscale.js';
+
+/**
+ * Generate motion tokens for API exports (avoids circular dependency)
+ */
+const getMotionTokensForAPI = (): Array<{ name: string; value: string; category: string }> => {
+  const tokens: Array<{ name: string; value: string; category: string }> = [];
+
+  try {
+    // Import motion objects at function level to avoid circular deps
+    const { timing } = require('./motion/timing.js') as {
+      timing: Record<string, { value: string }>;
+    };
+    const { easing } = require('./motion/easing.js') as {
+      easing: Record<string, { value: string }>;
+    };
+
+    // Generate timing tokens from the actual timing objects
+    for (const [key, token] of Object.entries(timing)) {
+      if (typeof token === 'object' && token.value) {
+        const durationMatch = token.value.match(/duration-(\d+)/);
+        const duration = durationMatch ? `${durationMatch[1]}ms` : '300ms';
+
+        tokens.push({
+          name: `--duration-${key}`,
+          value: duration,
+          category: 'timing',
+        });
+      }
+    }
+
+    // Generate easing tokens from the actual easing objects
+    for (const [key, token] of Object.entries(easing)) {
+      if (typeof token === 'object' && token.value) {
+        let cssValue: string = token.value;
+        if (token.value.startsWith('ease-[')) {
+          cssValue = token.value.replace('ease-[', '').replace(']', '');
+        }
+
+        tokens.push({
+          name: `--ease-${key}`,
+          value: cssValue,
+          category: 'easing',
+        });
+      }
+    }
+  } catch (error) {
+    // During testing or if motion modules aren't available, provide fallback tokens
+    const fallbackTiming = {
+      instant: '75ms',
+      fast: '150ms',
+      standard: '300ms',
+      deliberate: '500ms',
+      slow: '700ms',
+      dramatic: '1000ms',
+    };
+
+    for (const [key, value] of Object.entries(fallbackTiming)) {
+      tokens.push({
+        name: `--duration-${key}`,
+        value,
+        category: 'timing',
+      });
+    }
+
+    const fallbackEasing = {
+      linear: 'ease-linear',
+      smooth: 'ease-in-out',
+      accelerating: 'ease-out',
+      decelerating: 'ease-in',
+      bouncy: 'cubic-bezier(0.175,0.885,0.32,1.275)',
+      snappy: 'cubic-bezier(0.25,0.46,0.45,0.94)',
+    };
+
+    for (const [key, value] of Object.entries(fallbackEasing)) {
+      tokens.push({
+        name: `--ease-${key}`,
+        value,
+        category: 'easing',
+      });
+    }
+  }
+
+  return tokens;
+};
 
 /**
  * Design system with metadata
@@ -181,6 +265,7 @@ export const designSystemsAPI = {
       ...Object.values(system.system.typography),
       ...Object.values(system.system.spacing),
       ...Object.values(system.system.state),
+      ...getMotionTokensForAPI(), // Use processed motion tokens
       ...Object.values(system.system.border),
       ...Object.values(system.system.shadow),
       ...Object.values(system.system.ring),
@@ -226,6 +311,7 @@ export const designSystemsAPI = {
       ...Object.values(system.system.typography),
       ...Object.values(system.system.spacing),
       ...Object.values(system.system.state),
+      ...getMotionTokensForAPI(), // Use processed motion tokens
       ...Object.values(system.system.border),
       ...Object.values(system.system.shadow),
       ...Object.values(system.system.ring),

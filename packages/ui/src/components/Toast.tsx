@@ -1,26 +1,53 @@
 /**
- * Toast Component - AI Intelligence
+ * Toast notification component for temporary user feedback
  *
- * COGNITIVE LOAD: 2/10 (non-blocking notification, brief attention)
- * ATTENTION ECONOMICS: Temporary interruption, must be dismissible
- * TRUST BUILDING: Immediate feedback for user actions builds confidence
+ * @registry-name toast
+ * @registry-version 0.1.0
+ * @registry-status published
+ * @registry-path components/ui/Toast.tsx
+ * @registry-type registry:component
  *
- * DESIGN INTELLIGENCE GUIDES:
- * - Attention Economics: rafters.realhandy.tech/llm/patterns/attention-economics
- * - Trust Building Patterns: rafters.realhandy.tech/llm/patterns/trust-building
- * - Progressive Enhancement: rafters.realhandy.tech/llm/patterns/progressive-enhancement
+ * @cognitive-load 2/10 - Non-blocking notification requiring brief attention
+ * @attention-economics Temporary interruption: Must be dismissible and time-appropriate for message urgency
+ * @trust-building Immediate feedback for user actions builds confidence and confirms system responsiveness
+ * @accessibility Screen reader announcements, keyboard dismissal, high contrast variants
+ * @semantic-meaning Notification types: success=confirmation, error=failure with recovery, warning=caution, info=neutral updates
  *
- * USAGE PATTERNS:
- * ✅ Action Feedback: Confirm successful operations (save, delete, send)
- * ✅ Error Recovery: Provide clear next steps for failures
- * ✅ Auto-dismiss: 4-6 seconds for info, user dismiss for errors
- * ✅ Semantic Variants: Success, error, warning, info with appropriate colors
- * ❌ Never: Critical information that shouldn't disappear, multiple simultaneous toasts
+ * @usage-patterns
+ * DO: Confirm successful operations (save, delete, send)
+ * DO: Provide error recovery with clear next steps for failures
+ * DO: Auto-dismiss info toasts (4-6 seconds), require user dismiss for errors
+ * DO: Use semantic variants with appropriate colors and icons
+ * NEVER: Critical information that shouldn't disappear, multiple simultaneous toasts
  *
- * Token knowledge: .rafters/tokens/registry.json
+ * @design-guides
+ * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
+ * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
+ * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
+ *
+ * @dependencies @radix-ui/react-toast, lucide-react
+ *
+ * @example
+ * ```tsx
+ * // Success toast with auto-dismiss
+ * toast({
+ *   title: "Changes saved",
+ *   description: "Your settings have been updated successfully.",
+ *   variant: "success",
+ *   duration: 4000
+ * })
+ *
+ * // Error toast requiring user action
+ * toast({
+ *   title: "Upload failed",
+ *   description: "Please check your connection and try again.",
+ *   variant: "destructive",
+ *   duration: null // Manual dismiss only
+ * })
+ * ```
  */
 import * as ToastPrimitives from '@radix-ui/react-toast';
-import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
+
 import { type VariantProps, cva } from 'class-variance-authority';
 import { cn } from '../lib/utils';
 
@@ -48,8 +75,8 @@ const toastVariants = cva(
   cn(
     'group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-6 pr-8 shadow-lg',
     'transition-all',
-    contextTiming.toast,
-    contextEasing.toast,
+    'motion-toast',
+    'easing-smooth',
     'data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full'
   ),
   {

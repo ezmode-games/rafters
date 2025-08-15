@@ -1,24 +1,46 @@
 /**
- * Breadcrumb Component - AI Intelligence
+ * Navigation breadcrumb component for wayfinding and location context
  *
- * COGNITIVE LOAD: 2/10 (optimized for peripheral navigation aid)
- * ATTENTION HIERARCHY: Tertiary - supports primary content and navigation without overwhelming
- * TRUST BUILDING: Low trust level - routine navigation with predictable, reliable patterns
+ * @registry-name breadcrumb
+ * @registry-version 0.1.0
+ * @registry-status published
+ * @registry-path components/ui/Breadcrumb.tsx
+ * @registry-type registry:component
  *
- * DESIGN INTELLIGENCE GUIDES:
- * - Wayfinding Intelligence: rafters.realhandy.tech/llm/patterns/wayfinding-intelligence
- * - Attention Economics: rafters.realhandy.tech/llm/patterns/attention-economics
- * - Navigation Ecosystem: rafters.realhandy.tech/llm/patterns/navigation-integration
+ * @cognitive-load 2/10 - Optimized for peripheral navigation aid with minimal cognitive overhead
+ * @attention-economics Tertiary support: Never competes with primary content, provides spatial context only
+ * @trust-building Low trust routine navigation with predictable, reliable wayfinding patterns
+ * @accessibility Complete ARIA support with aria-current="page", aria-hidden separators, and keyboard navigation
+ * @semantic-meaning Wayfinding system with spatial context and navigation hierarchy indication
  *
- * USAGE PATTERNS:
- * ✅ Wayfinding system: spatial context and navigation hierarchy
- * ✅ Location awareness: clear current page indication with aria-current="page"
- * ✅ Truncation intelligence: smart strategies for long paths (Miller's Law)
- * ✅ Configurable separators: character or Lucide icon with accessibility
- * ❌ Never: Primary actions, complex information, critical alerts
+ * @usage-patterns
+ * DO: Provide spatial context and navigation hierarchy
+ * DO: Use clear current page indication with aria-current="page"
+ * DO: Implement truncation strategies for long paths (Miller's Law)
+ * DO: Configure separators with proper accessibility attributes
+ * NEVER: Use for primary actions, complex information, or critical alerts
  *
- * Separator intelligence: All separators MUST have aria-hidden="true" (purely decorative)
- * Context awareness: Adapts to sidebar visibility and responsive breakpoints
+ * @design-guides
+ * - Wayfinding Intelligence: https://rafters.realhandy.tech/docs/llm/wayfinding-intelligence
+ * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
+ * - Navigation Integration: https://rafters.realhandy.tech/docs/llm/navigation-integration
+ *
+ * @dependencies lucide-react
+ *
+ * @example
+ * ```tsx
+ * // Basic breadcrumb with navigation
+ * <Breadcrumb separator="chevron-right">
+ *   <BreadcrumbItem href="/">Home</BreadcrumbItem>
+ *   <BreadcrumbItem href="/products">Products</BreadcrumbItem>
+ *   <BreadcrumbItem current>Product Detail</BreadcrumbItem>
+ * </Breadcrumb>
+ *
+ * // Breadcrumb with truncation for long paths
+ * <Breadcrumb maxItems={3} collapseFrom="middle">
+ *   // Long navigation path automatically truncated
+ * </Breadcrumb>
+ * ```
  */
 import { ChevronRight, Home, MoreHorizontal } from 'lucide-react';
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';

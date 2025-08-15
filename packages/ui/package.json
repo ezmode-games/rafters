@@ -16,7 +16,7 @@
   "files": ["dist", "README.md"],
   "scripts": {
     "dev": "storybook dev -p 6006",
-    "build": "vite build && tsc --emitDeclarationOnly",
+    "build": "pnpm tokens:build && vite build && tsc --emitDeclarationOnly",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
@@ -26,7 +26,10 @@
     "type-check": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "validate:design": "node scripts/validate-design-system.js"
+    "validate:design": "node scripts/validate-design-system.js",
+    "tokens:build": "node scripts/build-tokens.js",
+    "tokens:watch": "node scripts/build-tokens.js --watch",
+    "tokens:dev": "node scripts/build-tokens.js --watch --verbose"
   },
   "keywords": [
     "react",
@@ -64,6 +67,7 @@
     "@vitest/browser": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "^3.2.2",
+    "chokidar": "^4.0.1",
     "glob": "^11.0.2",
     "jsdom": "catalog:",
     "markdown-to-jsx": "^7.7.8",

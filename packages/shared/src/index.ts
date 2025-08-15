@@ -8,7 +8,6 @@
 
 // Export all types and schemas
 export * from './types.js';
-export * from './registry-data.js';
 
 // Utility functions for AI intelligence
 export const DEFAULT_COGNITIVE_LOADS = {

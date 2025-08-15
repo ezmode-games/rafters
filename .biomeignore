@@ -1,0 +1,29 @@
+# Build outputs and generated files
+**/dist/**
+**/build/**
+**/.next/**
+**/.nuxt/**
+**/.vercel/**
+**/.wrangler/**
+**/node_modules/**
+
+# Generated files
+**/registry-manifest.json
+
+# Storybook build
+**/storybook-static/**
+
+# IDE files
+**/.vscode/**
+**/.idea/**
+
+# OS files
+**/.DS_Store
+**/Thumbs.db
+
+# Test coverage
+**/coverage/**
+
+# Temporary files
+**/tmp/**
+**/temp/**

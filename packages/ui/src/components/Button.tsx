@@ -1,25 +1,44 @@
 /**
- * Button Component - AI Intelligence
+ * Interactive button component for user actions
  *
- * COGNITIVE LOAD: 3/10 (simple action trigger)
- * ATTENTION HIERARCHY: Primary commands highest attention - use sparingly (1 per section)
- * TRUST BUILDING: Destructive variant requires confirmation UX patterns
+ * @registry-name button
+ * @registry-version 0.1.0
+ * @registry-status published
+ * @registry-path components/ui/Button.tsx
+ * @registry-type registry:component
  *
- * DESIGN INTELLIGENCE GUIDES:
- * - Attention Economics: rafters.realhandy.tech/llm/patterns/attention-economics
- * - Trust Building Patterns: rafters.realhandy.tech/llm/patterns/trust-building
- * - Component Integration: rafters.realhandy.tech/llm/patterns/component-synthesis
+ * @cognitive-load 3/10 - Simple action trigger with clear visual hierarchy
+ * @attention-economics Size hierarchy: sm=tertiary actions, md=secondary interactions, lg=primary calls-to-action. Primary variant commands highest attention - use sparingly (maximum 1 per section)
+ * @trust-building Destructive actions require confirmation patterns. Loading states prevent double-submission. Visual feedback reinforces user actions.
+ * @accessibility WCAG AAA compliant with 44px minimum touch targets, high contrast ratios, and screen reader optimization
+ * @semantic-meaning Variant mapping: primary=main actions, secondary=supporting actions, destructive=irreversible actions with safety patterns
  *
- * USAGE PATTERNS:
- * ✅ Primary: Main user goal, maximum 1 per section
- * ✅ Secondary: Alternative paths, supporting actions
- * ✅ Destructive: Permanent actions, requires confirmation patterns
- * ❌ Never: Multiple primary buttons competing for attention
+ * @usage-patterns
+ * DO: Primary: Main user goal, maximum 1 per section
+ * DO: Secondary: Alternative paths, supporting actions
+ * DO: Destructive: Permanent actions, requires confirmation patterns
+ * NEVER: Multiple primary buttons competing for attention
  *
- * Token knowledge: .rafters/tokens/registry.json
+ * @design-guides
+ * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
+ * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
+ * - Component Patterns: https://rafters.realhandy.tech/docs/llm/component-patterns
+ *
+ * @dependencies @radix-ui/react-slot
+ *
+ * @example
+ * ```tsx
+ * // Primary action - highest attention, use once per section
+ * <Button variant="primary">Save Changes</Button>
+ *
+ * // Destructive action - requires confirmation UX
+ * <Button variant="destructive" destructiveConfirm>Delete Account</Button>
+ *
+ * // Loading state - prevents double submission
+ * <Button loading>Processing...</Button>
+ * ```
  */
 import { Slot } from '@radix-ui/react-slot';
-import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
 import { cn } from '../lib/utils';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -66,9 +85,7 @@ export function Button({
         'inline-flex items-center justify-center rounded-md text-sm font-medium',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         'disabled:pointer-events-none disabled:opacity-disabled',
-        'transition-all',
-        contextTiming.hover,
-        contextEasing.hover,
+        'transition-all motion-hover',
         'hover:opacity-hover active:scale-active',
 
         // Loading state reduces opacity for trust-building
