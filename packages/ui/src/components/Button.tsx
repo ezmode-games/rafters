@@ -24,7 +24,7 @@
  * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
  * - Component Patterns: https://rafters.realhandy.tech/docs/llm/component-patterns
  *
- * @dependencies @radix-ui/react-slot, @rafters/design-tokens/motion
+ * @dependencies @radix-ui/react-slot
  *
  * @example
  * ```tsx
@@ -39,7 +39,6 @@
  * ```
  */
 import { Slot } from '@radix-ui/react-slot';
-import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
 import { cn } from '../lib/utils';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -86,9 +85,7 @@ export function Button({
         'inline-flex items-center justify-center rounded-md text-sm font-medium',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         'disabled:pointer-events-none disabled:opacity-disabled',
-        'transition-all',
-        contextTiming.hover,
-        contextEasing.hover,
+        'transition-all motion-hover',
         'hover:opacity-hover active:scale-active',
 
         // Loading state reduces opacity for trust-building

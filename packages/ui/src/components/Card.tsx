@@ -1,4 +1,3 @@
-import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
 import { cn } from '../lib/utils';
 /**
  * Flexible container component for grouping related content with semantic structure
@@ -70,8 +69,7 @@ export function Card({
       ref={ref}
       className={cn(
         'rounded-lg border bg-card text-card-foreground transition-all',
-        contextTiming.hover,
-        contextEasing.hover,
+        'motion-hover',
         // Cognitive load: Information density controls
         {
           'border-border shadow-sm': prominence === 'subtle',

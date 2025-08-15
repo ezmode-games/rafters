@@ -1,5 +1,4 @@
 import * as ProgressPrimitive from '@radix-ui/react-progress';
-import { contextEasing, contextTiming, easing, timing } from '@rafters/design-tokens/motion';
 import { type VariantProps, cva } from 'class-variance-authority';
 import type { ComponentPropsWithoutRef, ElementRef } from 'react';
 import { cn } from '../lib/utils';
@@ -62,9 +61,9 @@ const progressVariants = cva(
       },
       pattern: {
         linear: '',
-        accelerating: `[&>div]:transition-all [&>div]:${contextTiming.modal} [&>div]:${contextEasing.modalEnter}`,
-        decelerating: `[&>div]:transition-all [&>div]:${contextTiming.progress} [&>div]:${contextEasing.modalExit}`,
-        pulsing: `[&>div]:${contextTiming.skeleton} [&>div]:${contextEasing.loading} [&>div]:pulse-animation`,
+        accelerating: '[&>div]:transition-all [&>div]:motion-modal',
+        decelerating: '[&>div]:transition-all [&>div]:motion-progress',
+        pulsing: '[&>div]:motion-slow [&>div]:easing-smooth [&>div]:pulse-animation',
       },
       complexity: {
         simple: 'gap-1',
@@ -82,10 +81,10 @@ const progressVariants = cva(
 const progressIndicatorVariants = cva('h-full w-full flex-1 bg-primary transition-all', {
   variants: {
     pattern: {
-      linear: `transition-transform ${contextTiming.progress} ${contextEasing.progress}`,
-      accelerating: `transition-transform ${contextTiming.modal} ${contextEasing.modalEnter}`,
-      decelerating: `transition-transform ${contextTiming.progress} ${contextEasing.modalExit}`,
-      pulsing: `${contextTiming.skeleton} ${contextEasing.loading} animate-pulse`,
+      linear: 'transition-transform motion-progress',
+      accelerating: 'transition-transform motion-modal',
+      decelerating: 'transition-transform motion-progress',
+      pulsing: 'motion-slow easing-smooth animate-pulse',
     },
     status: {
       default: 'bg-primary',
@@ -310,7 +309,7 @@ export function Progress({
                         isCompleted ? 'Completed' : isCurrent ? 'In Progress' : 'Not Started'
                       }`}
                       className={cn(
-                        `h-2 flex-1 rounded-full transition-colors ${contextTiming.progress} ${contextEasing.progress}`,
+                        'h-2 flex-1 rounded-full transition-colors motion-progress',
                         isCompleted && 'bg-primary',
                         isCurrent && 'bg-primary/50',
                         !isCompleted && !isCurrent && 'bg-background-subtle'

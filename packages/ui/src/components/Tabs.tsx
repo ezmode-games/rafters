@@ -46,7 +46,7 @@
  * ```
  */
 import * as TabsPrimitive from '@radix-ui/react-tabs';
-import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
+
 import { cn } from '../lib/utils';
 
 interface TabsProps extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.Root> {
@@ -137,8 +137,8 @@ function TabsTrigger({
       disabled={disabled}
       className={cn(
         'inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-all',
-        contextTiming.hover,
-        contextEasing.hover,
+        'motion-hover',
+        'easing-snappy',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         'disabled:pointer-events-none disabled:opacity-disabled',
 

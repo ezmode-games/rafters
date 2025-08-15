@@ -51,7 +51,7 @@
  * ```
  */
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
-import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
+
 import { forwardRef } from 'react';
 import { cn } from '../lib/utils';
 
@@ -153,8 +153,8 @@ export const TooltipContent = forwardRef<HTMLDivElement, TooltipContentProps>(
 
           // Motion intelligence: Consistent with other interactive elements
           'transition-all',
-          contextTiming.modal, // Slightly slower for content comprehension
-          contextEasing.modalEnter, // Welcoming appearance reduces anxiety
+          'motion-modal',
+          'easing-accelerate',
 
           // Contextual styling based on tooltip type
           {
@@ -186,12 +186,7 @@ export const TooltipContent = forwardRef<HTMLDivElement, TooltipContentProps>(
           essential && ['ring-2 ring-primary/10', 'shadow-xl'],
 
           // Expandable tooltips show interaction affordance
-          expandable && [
-            'cursor-pointer',
-            'hover:shadow-lg',
-            'transition-shadow',
-            contextTiming.hover,
-          ],
+          expandable && ['cursor-pointer', 'hover:shadow-lg', 'transition-shadow', 'motion-hover'],
 
           className
         )}

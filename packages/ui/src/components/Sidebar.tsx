@@ -42,7 +42,7 @@
  * </Sidebar>
  * ```
  */
-import { contextEasing, contextTiming, timing } from '@rafters/design-tokens/motion';
+// Motion tokens now handled via CSS classes
 import React, { useCallback, useEffect } from 'react';
 import { z } from 'zod';
 import { useSidebarNavigation } from '../hooks/useSidebarNavigation';
@@ -286,8 +286,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         // Base navigation styles with spatial consistency
         'flex flex-col bg-background border-r border-border',
         'relative transition-all',
-        !reduceMotion && contextTiming.navigation,
-        !reduceMotion && contextEasing.navigation,
+        !reduceMotion && 'duration-300',
+        !reduceMotion && 'ease-in-out',
 
         // Variant-based styling for different use cases
         {
@@ -369,7 +369,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
             'flex items-center justify-center w-8 h-8 rounded-md',
             'border border-border hover:bg-accent transition-colors',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-            contextTiming.hover,
+            'duration-200',
             // Trust pattern: Always visible, consistent position
             collapsed && 'mx-auto'
           )}
@@ -380,7 +380,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
           <svg
             className={cn(
               'w-4 h-4 transition-transform',
-              timing.standard,
+              'duration-300',
               collapsed && 'rotate-180'
             )}
             fill="none"
@@ -482,7 +482,7 @@ export const SidebarGroup: React.FC<SidebarGroupProps> = ({
           'space-y-1',
           // Smooth expand/collapse for cognitive comfort
           'transition-all',
-          timing.standard,
+          'duration-300',
           collapsible && !expanded && 'hidden'
         )}
       >
@@ -614,7 +614,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
           // Simplified item styles
           'flex items-center gap-3 px-2 py-2 rounded-md text-sm font-medium',
           'transition-all cursor-pointer select-none',
-          contextTiming.hover,
+          'duration-200',
 
           // Navigation hierarchy
           level > 0 && `ml-${Math.min(level * 4, 12)}`,
@@ -719,7 +719,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
         // Base item styles with motor accessibility
         'flex items-center gap-3 px-2 py-2 rounded-md text-sm font-medium',
         'transition-all cursor-pointer select-none',
-        contextTiming.hover,
+        'duration-200',
 
         // Navigation hierarchy with proper indentation
         level > 0 && `ml-${Math.min(level * 4, 12)}`,

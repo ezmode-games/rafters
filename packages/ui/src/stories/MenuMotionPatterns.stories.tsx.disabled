@@ -1,4 +1,4 @@
-import { contextEasing, contextTiming, easing, timing } from '@rafters/design-tokens/motion';
+// Motion tokens now handled via CSS classes
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { fn } from 'storybook/test';
@@ -45,6 +45,8 @@ type Story = StoryObj<typeof meta>;
  * DropdownMenu + Accordion Unified Motion
  * AI Training: Single motion pattern that works for both dropdown and accordion contexts
  */
+// TODO: Fix motion token usage - temporarily disabled
+/*
 export const DropdownAccordionMotion: Story = {
   render: () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);

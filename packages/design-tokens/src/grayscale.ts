@@ -4,26 +4,26 @@
  */
 
 // Export all schema modules
-export * from './schemas/colors';
-export * from './schemas/typography';
-export * from './schemas/spacing';
-export * from './schemas/state';
-export * from './schemas/motion';
-export * from './schemas/border';
-export * from './schemas/shadow';
-export * from './schemas/ring';
-export * from './schemas/opacity';
+export * from './schemas/colors.js';
+export * from './schemas/typography.js';
+export * from './schemas/spacing.js';
+export * from './schemas/state.js';
+export * from './schemas/motion.js';
+export * from './schemas/border.js';
+export * from './schemas/shadow.js';
+export * from './schemas/ring.js';
+export * from './schemas/opacity.js';
 
 import { z } from 'zod';
-import { BorderSystemSchema } from './schemas/border';
-import { ColorSystemSchema } from './schemas/colors';
-import { MotionSystemSchema } from './schemas/motion';
-import { OpacitySystemSchema } from './schemas/opacity';
-import { RingSystemSchema } from './schemas/ring';
-import { ShadowSystemSchema } from './schemas/shadow';
-import { SpacingSystemSchema } from './schemas/spacing';
-import { StateSystemSchema } from './schemas/state';
-import { TypographySystemSchema } from './schemas/typography';
+import { BorderSystemSchema } from './schemas/border.js';
+import { ColorSystemSchema } from './schemas/colors.js';
+import { MotionSystemSchema } from './schemas/motion.js';
+import { OpacitySystemSchema } from './schemas/opacity.js';
+import { RingSystemSchema } from './schemas/ring.js';
+import { ShadowSystemSchema } from './schemas/shadow.js';
+import { SpacingSystemSchema } from './schemas/spacing.js';
+import { StateSystemSchema } from './schemas/state.js';
+import { TypographySystemSchema } from './schemas/typography.js';
 
 // Complete design system with all intelligence
 export const GrayscaleDesignSystemSchema = z

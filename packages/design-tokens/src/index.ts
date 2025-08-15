@@ -1,6 +1,6 @@
 import Sqids from 'sqids';
 import { z } from 'zod';
-import { type GrayscaleDesignSystem, defaultGrayscaleSystem } from './grayscale';
+import { type GrayscaleDesignSystem, defaultGrayscaleSystem } from './grayscale.js';
 
 /**
  * @rafters/design-tokens
@@ -24,6 +24,7 @@ const TokenSchema = z.object({
     'scaling',
     'border',
     'shadow',
+    'ring',
     'aspect',
     'grid',
   ]),
@@ -158,6 +159,102 @@ const generateSpacingTokens = (config: {
 };
 
 /**
+ * Generate motion tokens for Tailwind CSS --duration-* and --ease-* variables
+ */
+const generateMotionTokens = (): z.infer<typeof TokenSchema>[] => {
+  const tokens: z.infer<typeof TokenSchema>[] = [];
+
+  try {
+    // Import motion objects at function level to avoid circular deps
+    const { timing } = require('./motion/timing.js') as {
+      timing: Record<string, { value: string }>;
+    };
+    const { easing } = require('./motion/easing.js') as {
+      easing: Record<string, { value: string }>;
+    };
+
+    // Generate timing tokens from the actual timing objects
+    for (const [key, token] of Object.entries(timing)) {
+      if (typeof token === 'object' && token.value) {
+        const durationMatch = token.value.match(/duration-(\d+)/);
+        const duration = durationMatch ? `${durationMatch[1]}ms` : '300ms';
+
+        tokens.push({
+          name: `--duration-${key}`,
+          value: duration,
+          description: `${key} timing for semantic motion`,
+          category: 'timing',
+          type: 'static',
+          semanticGroup: 'interactive',
+        });
+      }
+    }
+
+    // Generate easing tokens from the actual easing objects
+    for (const [key, token] of Object.entries(easing)) {
+      if (typeof token === 'object' && token.value) {
+        let cssValue: string = token.value;
+        if (token.value.startsWith('ease-[')) {
+          cssValue = token.value.replace('ease-[', '').replace(']', '');
+        }
+
+        tokens.push({
+          name: `--ease-${key}`,
+          value: cssValue,
+          description: `${key} easing for semantic motion`,
+          category: 'easing',
+          type: 'static',
+          semanticGroup: 'interactive',
+        });
+      }
+    }
+  } catch (error) {
+    // During testing or if motion modules aren't available, provide fallback tokens
+    const fallbackTiming = {
+      instant: '75ms',
+      fast: '150ms',
+      standard: '300ms',
+      deliberate: '500ms',
+      slow: '700ms',
+      dramatic: '1000ms',
+    };
+
+    for (const [key, value] of Object.entries(fallbackTiming)) {
+      tokens.push({
+        name: `--duration-${key}`,
+        value,
+        description: `${key} timing for semantic motion`,
+        category: 'timing',
+        type: 'static',
+        semanticGroup: 'interactive',
+      });
+    }
+
+    const fallbackEasing = {
+      linear: 'ease-linear',
+      smooth: 'ease-in-out',
+      accelerating: 'ease-out',
+      decelerating: 'ease-in',
+      bouncy: 'cubic-bezier(0.175,0.885,0.32,1.275)',
+      snappy: 'cubic-bezier(0.25,0.46,0.45,0.94)',
+    };
+
+    for (const [key, value] of Object.entries(fallbackEasing)) {
+      tokens.push({
+        name: `--ease-${key}`,
+        value,
+        description: `${key} easing for semantic motion`,
+        category: 'easing',
+        type: 'static',
+        semanticGroup: 'interactive',
+      });
+    }
+  }
+
+  return tokens;
+};
+
+/**
  * Generate shadow tokens that match Tailwind's default shadow system
  */
 const generateShadowTokens = (config: {
@@ -239,6 +336,8 @@ const getGrayscaleTokens = (): z.infer<typeof TokenSchema>[] => {
     ...Object.values(gs.typography),
     ...Object.values(gs.spacing),
     ...Object.values(gs.state),
+    // Include motion tokens as part of the core system
+    ...generateMotionTokens(),
   ] as z.infer<typeof TokenSchema>[];
 };
 
@@ -295,18 +394,19 @@ export {
   getDesignSystem,
   generateSpacingTokens,
   generateShadowTokens,
+  generateMotionTokens,
 };
 
 // Export from other modules
-export * from './grayscale';
-export * from './color-tool';
-export { designSystemsAPI } from './api';
-export * from './cli';
+export * from './grayscale.js';
+export * from './color-tool.js';
+export { designSystemsAPI } from './api.js';
+export * from './cli.js';
 
-// Export motion tokens
-export * from './motion/timing';
-export * from './motion/easing';
-export * from './schemas/motion';
+// Export motion types only (not runtime values)
+export type { TimingToken, ContextTimingToken, AllTimingTokens } from './motion/timing.js';
+export type { EasingToken, ContextEasingToken, AllEasingTokens } from './motion/easing.js';
+export type { MotionSystem, TimingSystem, EasingSystem } from './schemas/motion.js';
 
 // Export grid layout intelligence tokens
-export * from './schemas/grid';
+export * from './schemas/grid.js';

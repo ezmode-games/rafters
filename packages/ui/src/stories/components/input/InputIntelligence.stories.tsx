@@ -1,4 +1,4 @@
-import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
+// Motion tokens now handled via CSS classes
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Input } from '../../../components/Input';
@@ -199,10 +199,10 @@ export const MotionIntelligence: Story = {
           <h3 className="text-lg font-semibold">Motion Tokens Used</h3>
           <ul className="text-sm space-y-1 font-mono">
             <li>
-              <code>contextTiming.hover</code> - {contextTiming.hover} (75ms)
+              <code>duration-200</code> - 200ms (hover timing)
             </li>
             <li>
-              <code>contextEasing.hover</code> - {contextEasing.hover} (snappy response)
+              <code>ease-in-out</code> - ease-in-out (smooth response)
             </li>
           </ul>
         </div>

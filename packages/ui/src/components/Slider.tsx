@@ -47,7 +47,7 @@
  * ```
  */
 import * as SliderPrimitive from '@radix-ui/react-slider';
-import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
+
 import { cn } from '../lib/utils';
 
 export interface SliderProps extends React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> {
@@ -117,8 +117,8 @@ export function Slider({
           <SliderPrimitive.Range
             className={cn(
               'absolute h-full bg-primary transition-all',
-              contextTiming.hover,
-              contextEasing.hover
+              'motion-hover',
+              'easing-snappy'
             )}
           />
         </SliderPrimitive.Track>
@@ -127,8 +127,8 @@ export function Slider({
           className={cn(
             'block rounded-full border-2 border-primary bg-background ring-offset-background',
             'transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-            contextTiming.hover,
-            contextEasing.hover,
+            'motion-hover',
+            'easing-snappy',
             'hover:scale-110 active:scale-95 disabled:pointer-events-none disabled:opacity-disabled',
             // Motor accessibility: Enhanced thumb sizes for easier manipulation
             thumbSize === 'default' && 'h-5 w-5',

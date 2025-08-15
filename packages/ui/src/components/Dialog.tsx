@@ -42,7 +42,6 @@
  * ```
  */
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
 import { cn } from '../lib/utils';
 
 export interface DialogProps {
@@ -161,8 +160,7 @@ export function DialogContent({
 
           // Trust pattern: Smooth animations reduce cognitive jarring
           'transition-all',
-          contextTiming.modal,
-          contextEasing.modalEnter,
+          'motion-modal',
           'data-[state=open]:animate-in data-[state=closed]:animate-out',
           'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
           'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',

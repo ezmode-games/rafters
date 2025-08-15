@@ -25,7 +25,7 @@
  * - Typography Intelligence: https://rafters.realhandy.tech/docs/llm/typography-intelligence
  * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
  *
- * @dependencies @rafters/design-tokens/motion
+ * @dependencies none
  *
  * @example
  * ```tsx
@@ -39,7 +39,6 @@
  * <Input validationMode="live" variant="success" />
  * ```
  */
-import { contextEasing, contextTiming } from '@rafters/design-tokens/motion';
 import { cn } from '../lib/utils';
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   variant?: 'default' | 'error' | 'success' | 'warning';
@@ -80,9 +79,7 @@ export function Input({
           'placeholder:text-muted-foreground',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           'disabled:cursor-not-allowed disabled:opacity-disabled',
-          'transition-all',
-          contextTiming.hover,
-          contextEasing.hover,
+          'transition-all motion-focus',
           'hover:opacity-hover',
 
           // Motor accessibility: Enhanced touch targets on mobile

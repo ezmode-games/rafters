@@ -9,7 +9,7 @@ const RingTokenSchema = z.object({
   name: z.string(),
   value: z.string(),
   description: z.string().optional(),
-  category: z.literal('border'),
+  category: z.literal('ring'),
   type: z.enum(['static', 'dynamic']),
   semanticGroup: z.enum(['core', 'brand', 'interactive', 'semantic-state', 'component']).optional(),
   aiIntelligence: z
@@ -31,7 +31,7 @@ export const RingSystemSchema = z.object({
     value: '2px',
     description:
       'Standard ring width for focus states. Clear accessibility indication with medium cognitive load (3/10). High trust level ensures keyboard navigation visibility. AAA accessibility compliant.',
-    category: 'border',
+    category: 'ring',
     type: 'static',
     semanticGroup: 'interactive',
     aiIntelligence: {
@@ -46,7 +46,7 @@ export const RingSystemSchema = z.object({
     value: '3px',
     description:
       'Enhanced ring width for prominent focus states. Stronger accessibility indication with higher cognitive load (4/10). High trust level draws attention to focus. Use for important interactive elements.',
-    category: 'border',
+    category: 'ring',
     type: 'static',
     semanticGroup: 'interactive',
     aiIntelligence: {
@@ -62,7 +62,7 @@ export const RingSystemSchema = z.object({
     value: '4px',
     description:
       'Prominent ring width for critical focus states. Maximum accessibility indication with high cognitive load (6/10). Medium trust level warns of importance. Reserve for error states and destructive actions.',
-    category: 'border',
+    category: 'ring',
     type: 'static',
     semanticGroup: 'semantic-state',
     aiIntelligence: {
@@ -79,7 +79,7 @@ export const RingSystemSchema = z.object({
     value: '2px',
     description:
       'Standard ring offset from element boundary. Provides clear separation with low cognitive load (2/10). High trust level ensures focus ring visibility against backgrounds.',
-    category: 'border',
+    category: 'ring',
     type: 'static',
     semanticGroup: 'core',
     aiIntelligence: {
@@ -94,7 +94,7 @@ export const RingSystemSchema = z.object({
     value: '3px',
     description:
       'Enhanced ring offset for better visibility. Increased separation with medium cognitive load (3/10). High trust level ensures focus rings work on complex backgrounds.',
-    category: 'border',
+    category: 'ring',
     type: 'static',
     semanticGroup: 'interactive',
     aiIntelligence: {
@@ -111,7 +111,7 @@ export const RingSystemSchema = z.object({
     value: '0.5',
     description:
       'Standard ring opacity. Balanced visibility with medium cognitive load (3/10). High trust level provides clear focus indication without overwhelming. Default for most focus states.',
-    category: 'border',
+    category: 'ring',
     type: 'static',
     semanticGroup: 'interactive',
     aiIntelligence: {
@@ -126,7 +126,7 @@ export const RingSystemSchema = z.object({
     value: '0.7',
     description:
       'Enhanced ring opacity for increased visibility. Stronger indication with higher cognitive load (4/10). High trust level ensures focus is unmissable. Good for important form elements.',
-    category: 'border',
+    category: 'ring',
     type: 'static',
     semanticGroup: 'interactive',
     aiIntelligence: {
@@ -142,7 +142,7 @@ export const RingSystemSchema = z.object({
     value: '0.9',
     description:
       'Prominent ring opacity for maximum visibility. Very strong indication with high cognitive load (6/10). Medium trust level demands attention. Use for error states and critical warnings.',
-    category: 'border',
+    category: 'ring',
     type: 'static',
     semanticGroup: 'semantic-state',
     aiIntelligence: {
