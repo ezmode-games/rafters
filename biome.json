@@ -14,7 +14,8 @@
       "**/build/**",
       "**/.next/**",
       "**/storybook-static/**",
-      "**/registry-manifest.json"
+      "**/registry-manifest.json",
+      "packages/ui/src/style.css"
     ]
   },
   "organizeImports": {
