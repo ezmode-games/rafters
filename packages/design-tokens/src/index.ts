@@ -10,6 +10,9 @@ import * as fs from 'fs-extra';
 import sqids from 'sqids';
 import { z } from 'zod';
 
+// Export core TokenRegistry class
+export { TokenRegistry } from './registry.js';
+
 export const generateShortCode = () => {
   const s = new sqids();
   return s.encode([Date.now()]);
