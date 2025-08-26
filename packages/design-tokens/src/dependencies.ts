@@ -98,8 +98,12 @@ export class TokenDependencyGraph {
     const allTokens = new Set<string>();
     for (const [token, dep] of this.dependencies.entries()) {
       allTokens.add(token);
-      dep.dependsOn.forEach(t => allTokens.add(t));
-      dep.dependents.forEach(t => allTokens.add(t));
+      for (const t of dep.dependsOn) {
+        allTokens.add(t);
+      }
+      for (const t of dep.dependents) {
+        allTokens.add(t);
+      }
     }
     
     // Depth-first search with cycle detection
