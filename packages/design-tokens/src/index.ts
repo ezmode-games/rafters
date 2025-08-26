@@ -13,6 +13,9 @@ import { z } from 'zod';
 // Export core TokenRegistry class
 export { TokenRegistry } from './registry.js';
 
+// Export dependency tracking system
+export { TokenDependencyGraph, type TokenDependency } from './dependencies.js';
+
 export const generateShortCode = () => {
   const s = new sqids();
   return s.encode([Date.now()]);
