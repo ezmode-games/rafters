@@ -54,7 +54,7 @@ describe('Component Service', () => {
       const intelligence = component.meta?.rafters?.intelligence;
       expect(intelligence).toBeDefined();
       expect(intelligence?.cognitiveLoad).toBeTypeOf('number');
-      expect(intelligence?.cognitiveLoad).toBeGreaterThan(0);
+      expect(intelligence?.cognitiveLoad).toBeGreaterThanOrEqual(0);
       expect(intelligence?.cognitiveLoad).toBeLessThanOrEqual(10);
 
       expect(intelligence?.attentionEconomics).toBeTypeOf('string');

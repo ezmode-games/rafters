@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkTailwindVersion, createDefaultRegistry, fetchStudioTokens, injectCSSImport, writeTokenFiles, } from '@rafters/design-tokens';
+import { checkTailwindVersion, createDefaultRegistry, fetchStudioTokens, injectCSSImport, writeTokenFiles, } from '@rafters/design-tokens/src';
 import { configExists, defaultConfig, detectPackageManager, hasReact, isNodeProject, saveConfig, } from '../utils/config.js';
 import { getCoreDependencies, installDependencies } from '../utils/dependencies.js';
 import { getRaftersLogo, getRaftersTitle } from '../utils/logo.js';

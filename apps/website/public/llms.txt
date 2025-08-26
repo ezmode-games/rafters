@@ -1,0 +1,138 @@
+# Rafters
+
+Rafters is an AI-focused React design system with embedded design intelligence that enables human-AI collaboration in building exceptional user experiences. Think shadcn/ui but with built-in UX intelligence for AI agents.
+
+## Overview
+
+Rafters components are drop-in shadcn replacements with embedded JSDoc intelligence that enables AI agents to make informed UX decisions automatically. Each component includes cognitive load ratings, accessibility patterns, trust-building features, and semantic usage guidelines - all machine-readable.
+
+The core principle: **Make the right UX decision the easy decision** for both humans and AI.
+
+## Key Components
+
+### shadcn/ui Compatible (Enhanced with Intelligence)
+- **Button**: Loading states, destructive confirmation patterns, trust-level enforcement, proper touch targets
+- **Dialog**: Automatic trust-level behavior (low/medium/high/critical), escape prevention for high-stakes actions
+- **Input**: Real-time validation states, sensitive data indicators, accessibility announcements
+- **Select**: Built-in search for 8+ options, choice architecture optimization, cognitive load management
+- **Card**: Semantic content containers with proper spacing and focus management
+- **Label**: Enhanced form labeling with validation state communication
+- **Tabs**: Keyboard navigation, focus management, semantic state handling
+- **Progress**: Accessible progress communication with screen reader updates
+- **Toast**: Non-intrusive notifications with proper timing and dismissal patterns
+- **Tooltip**: Context-aware help with keyboard accessibility and motion safety
+- **Badge**: Multi-sensory status communication with semantic color meaning
+- **Breadcrumb**: Navigation hierarchy with accessibility and truncation intelligence
+- **Slider**: Range input with proper touch targets and accessibility announcements
+
+### Rafters Additions (Beyond shadcn/ui)
+- **Container**: Responsive layout container with intelligent breakpoint behavior
+- **Grid**: CSS Grid layouts with auto-fit/auto-fill intelligence and responsive variants
+- **Sidebar**: Enhanced sidebar navigation with advanced collapsible states, focus management, and coordination patterns (extends beyond shadcn's basic sidebar)
+- **Chip**: Interactive tags with removal states and keyboard accessibility (independent primitive)
+
+### Advanced Menu System (In Development)
+- **DropdownMenu**: Unified dropdown/accordion with 300ms motion intelligence and MenuProvider coordination
+- **NavigationMenu**: Multi-level navigation with recursive motion intelligence and depth-aware timing
+- **ContextMenu**: Right-click menus with immediate attention hierarchy and priority management
+- **TreeMenu**: Hierarchical data structures with virtualization and depth-aware expansion patterns
+- **BreadcrumbMenu**: Enhanced breadcrumb navigation with subtle wayfinding motion
+- **MenuProvider**: Global coordination system for complex menu interactions and focus management
+
+### System Providers (Rafters Exclusive)
+- **FocusManager**: Global focus management for accessible navigation flows
+- **KeyboardNavigationProvider**: Enhanced keyboard navigation patterns across components
+- **MotionCoordinator**: Respects user motion preferences and coordinates component animations
+- **AnnouncementProvider**: Screen reader announcements and accessibility communication
+
+### Data & Content Components (Planned)
+- **Table**: Intelligent data tables with sorting, filtering, and virtualization
+- **Calendar**: Date selection with accessibility and localization intelligence
+- **Avatar**: Identity representation with fallback patterns and accessibility
+- **Alert**: Contextual notifications with severity-based styling and behavior
+- **Skeleton**: Loading state patterns with content-aware placeholder generation
+- **Command Palette**: Keyboard-driven command interface with fuzzy search
+- **Pagination**: Navigation with intelligent page grouping and accessibility
+- **Accordion**: Disclosure patterns with progressive information architecture
+- **Popover**: Contextual overlays with positioning intelligence and focus management
+- **Separator**: Visual hierarchy with semantic meaning and accessibility
+- **Empty State**: Content placeholder patterns with actionable guidance
+- **File Upload**: Drag-and-drop with progress indication and validation
+- **Code Block**: Syntax highlighting with copy functionality and accessibility
+
+## Design Intelligence Framework
+
+Components embed systematic human design reasoning that AI can access and apply:
+
+### Cognitive Load Management
+- **Numerical ratings (1-10)**: Each component includes cognitive load assessment
+- **Miller's Rule enforcement**: Limit choices and information density automatically
+- **Progressive disclosure**: Complex interactions broken into digestible steps
+- **Context switching minimization**: Components maintain user mental models
+
+### Trust Building Patterns
+- **Progressive confirmation**: Destructive actions require explicit confirmation flows
+- **Visual weight hierarchy**: More dangerous actions get more visual friction
+- **Escape hatches**: Users can always back out of destructive flows
+- **Transparent state communication**: Loading, error, and success states clearly communicated
+
+### Attention Economics
+- **Single primary rule**: Only one high-attention element per context
+- **Visual hierarchy enforcement**: Components automatically implement proper contrast and sizing
+- **Focus management**: Keyboard navigation and screen reader flow optimized
+- **Peripheral vision optimization**: Secondary elements designed for scanning
+
+### Accessibility Intelligence
+- **WCAG AAA compliance**: Built into component behavior, not an afterthought
+- **Screen reader optimization**: Proper ARIA labels and announcements included
+- **Motor accessibility**: 44px minimum touch targets, enhanced hover states
+- **Cognitive accessibility**: Clear language, predictable patterns, error prevention
+
+### Semantic Design Tokens
+- **OKLCH color space**: Perceptually uniform colors for consistent contrast
+- **Mathematical spacing**: Golden ratio and Fibonacci-based scales
+- **Semantic meaning**: Colors and sizes carry contextual meaning (destructive=red, success=green)
+- **Responsive intelligence**: Tokens adapt based on screen size and container context
+
+## Usage
+
+```bash
+# Install Rafters CLI
+npm install -g rafters
+
+# Initialize in your project  
+npx rafters init
+
+# Add components (shadcn-compatible syntax)
+npx rafters add button dialog input select
+```
+
+Components work exactly like shadcn/ui but with better defaults, built-in loading states, and embedded intelligence for AI development.
+
+## CLI Compatibility
+
+- **Drop-in shadcn replacement**: Same API, same class names, same import paths
+- **Enhanced intelligence**: Components include JSDoc with cognitive load, trust levels, usage patterns
+- **Better defaults**: Proper touch targets, loading states, confirmation patterns built-in
+
+## Architecture
+
+- **React 19 ready**: Direct ref props, useActionState, useOptimistic patterns
+- **TypeScript-first**: Strict typing with Zod validation
+- **Tailwind CSS**: Semantic design tokens with OKLCH color space
+- **Component registry**: Compatible with shadcn registry format with AI metadata
+
+## Documentation
+
+- Component Registry: https://rafters.realhandy.tech/registry
+- GitHub: https://github.com/real-handy/rafters
+- NPM: https://npmjs.com/package/rafters
+
+## AI Integration
+
+Rafters is designed for AI agents building UIs:
+- **JSDoc intelligence**: Every component includes cognitive load, trust requirements, usage patterns
+- **Semantic tokens**: Design tokens carry meaning, not just values
+- **Progressive enhancement**: Components work with and without JavaScript
+- **Accessibility-first**: Screen reader support and keyboard navigation built-in
+- **Trust-building patterns**: Confirmation flows for destructive actions automatically handled

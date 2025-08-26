@@ -3,91 +3,50 @@ import * as Stories from './Card.stories.tsx';
 
 <Meta title="Components/Card" of={Stories} name="Overview" />
 
-# Card Component
+# Card
 
-Cards organize related content into focused, scannable containers. They create predictable content boundaries while supporting both static display and interactive behaviors.
+Information architecture begins with containment. The card is where related content finds its boundaries and relationships become clear. Our card system is built on the principle that content grouping should create immediate understanding of information hierarchy.
 
-## Design Philosophy
+<Canvas of={Stories.Basic} />
 
-Cards excel at progressive disclosure - revealing information at appropriate levels of detail. They balance cognitive load through intelligent density management and clear visual hierarchy.
+## Design Intelligence
 
-### Core Principles
+**Cognitive Load**: 2/10 - Simple content containers with embedded spatial intelligence
+**Trust Building**: Consistent visual hierarchy builds user confidence in information structure
+**Attention Economics**: Cards create natural scanning patterns through spatial boundaries
 
-**Container Intelligence**
-Cards automatically adapt their presentation based on content type and context. Information density, visual prominence, and interaction patterns adjust to optimize cognitive load for each use case.
+## Usage Guidelines
 
-**Content Hierarchy**
-Semantic heading levels and visual weight create clear information architecture. Primary content gets elevated prominence, while supporting details use appropriate secondary styling.
+Cards should group related information while maintaining clear visual hierarchy and spatial relationships. The component includes embedded intelligence for elevation, spacing, and content organization.
 
-**Interaction Clarity**
-Interactive cards provide clear affordances through hover states, elevation changes, and cursor feedback. Static cards maintain clean presentation without interaction hints.
+#### DOs
+- **Information Architecture**
+  - Group closely related content within single cards
+  - Use elevation to indicate hierarchy and importance
+  - Maintain consistent padding and spacing within card content
+  - Apply hover states for interactive cards to indicate clickability
 
-## When to Use Cards
+- **Content Organization** 
+  - Lead with the most important information (headers, titles)
+  - Use clear visual hierarchy within card content
+  - Provide proper spacing between different content types
+  - Include clear action areas when cards are interactive
 
-✅ **DO use cards when:**
-- Grouping related information that belongs together
-- Creating scannable collections of similar content types
-- Displaying content that might need different interaction levels
-- Organizing dashboard widgets or content previews
-- Building content that needs clear visual boundaries
+- **Spatial Relationships**
+  - Maintain consistent card sizing within the same context
+  - Use appropriate gaps between cards in layouts
+  - Apply semantic variants that match content purpose
+  - Ensure cards work across different screen sizes
 
-❌ **DON'T use cards when:**
-- Content flows naturally as continuous text
-- Information doesn't need visual separation
-- Building primary navigation elements
-- Content is too simple for containerization
-- Forcing unnecessary visual complexity
+#### NEVERs
+- **Content Structure**
+  - Mixing unrelated information in a single card
+  - Overcrowding cards with too much content
+  - Inconsistent padding or spacing within card collections
+  - Cards without clear content hierarchy
 
-## Content Organization
-
-Cards work best when they contain complete, self-contained pieces of information. Each card should:
-
-- Have a clear purpose and focus
-- Contain related information that belongs together
-- Provide appropriate detail level for the context
-- Support the user's scanning and decision-making patterns
-
-### Information Architecture
-
-```
-Card Structure:
-├── Header (title, description, metadata)
-├── Content (primary information, media, data)
-└── Footer (actions, timestamps, navigation)
-```
-
-Each section serves specific cognitive functions:
-- **Header**: Establishes context and hierarchy
-- **Content**: Delivers primary information efficiently  
-- **Footer**: Provides actions and supplementary details
-
-## Adaptive Density
-
-Cards automatically adjust information density based on:
-
-- **Compact**: High-density widgets, dashboards, summary views
-- **Comfortable**: Standard content cards, article previews
-- **Spacious**: Featured content, detailed information, focus areas
-
-This density intelligence reduces cognitive load by matching presentation to content importance and available space.
-
-## Interactive Patterns
-
-### Static Cards
-Display information without interaction requirements. Focus on clear hierarchy and efficient information delivery.
-
-### Interactive Cards
-Provide clear interaction affordances:
-- Hover states with subtle elevation and opacity changes
-- Cursor feedback indicating clickable areas
-- Visual emphasis on interactive elements
-- Clear action indicators in footers
-
-### Collection Behaviors
-When cards appear in collections, they maintain:
-- Consistent interaction patterns within the group
-- Clear visual relationships between related cards
-- Appropriate spacing for touch and mouse interaction
-- Predictable behavior across similar content types
-
-Cards create trustworthy information containers that respect user attention and cognitive resources while supporting efficient content discovery and interaction.
+- **Interactive Patterns**
+  - Clickable cards without proper hover feedback
+  - Interactive cards without clear visual indicators
+  - Cards that don't respond appropriately to user interaction
+  - Inaccessible focus states for keyboard navigation

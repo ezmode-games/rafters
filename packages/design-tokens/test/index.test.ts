@@ -1,369 +1,297 @@
 /**
- * Tests for the main index exports
+ * Design Token Generator Tests
+ *
+ * Tests for mathematical token generation functions
  */
 
 import { describe, expect, it } from 'vitest';
 import {
-  DesignSystemSchema,
-  SmartColorTokenSchema,
   TokenSchema,
-  createColorDesignSystem,
-  defaultGrayscaleSystem,
-  designSystemsAPI,
-  exportToTailwindTheme,
-  generateMotionTokens,
-  generateShadowTokens,
-  generateSpacingTokens,
-  getDesignSystem,
-} from '../src/index';
+  generateDepthScale,
+  generateHeightScale,
+  generateSpacingScale,
+  generateTypographyScale,
+} from '../src/index.js';
 
-describe('index exports', () => {
-  it('exports all required schemas', () => {
-    expect(TokenSchema).toBeDefined();
-    expect(DesignSystemSchema).toBeDefined();
-    expect(SmartColorTokenSchema).toBeDefined();
+describe('generateSpacingScale', () => {
+  it('generates linear spacing scale without responsive variants', () => {
+    const tokens = generateSpacingScale('linear', 4, 1.25, 3, false);
+
+    expect(tokens).toHaveLength(4); // 0, 1, 2, 3
+    expect(tokens[0].name).toBe('0');
+    expect(tokens[0].value).toBe('0rem');
+    expect(tokens[1].name).toBe('1');
+    expect(tokens[1].value).toBe('4rem'); // 4 * 1 = 4rem
+    expect(tokens[2].name).toBe('2');
+    expect(tokens[2].value).toBe('8rem'); // 4 * 2 = 8rem
+
+    // Check token structure
+    expect(tokens[1].category).toBe('spacing');
+    expect(tokens[1].namespace).toBe('spacing');
+    expect(tokens[1].mathRelationship).toBe('4 * 1');
+    expect(tokens[1].scalePosition).toBe(1);
   });
 
-  it('exports design system functions', () => {
-    expect(getDesignSystem).toBeDefined();
-    expect(generateSpacingTokens).toBeDefined();
-    expect(generateShadowTokens).toBeDefined();
-    expect(generateMotionTokens).toBeDefined();
-    expect(exportToTailwindTheme).toBeDefined();
+  it('generates golden ratio spacing scale', () => {
+    const tokens = generateSpacingScale('golden', 4, 1.25, 2, false);
+
+    expect(tokens).toHaveLength(3); // 0, 1, 2
+    expect(tokens[0].name).toBe('0');
+    expect(tokens[1].name).toBe('golden-1');
+    expect(tokens[2].name).toBe('golden-2');
+
+    // Golden ratio: φ ≈ 1.618
+    expect(Number.parseFloat(tokens[1].value)).toBeCloseTo(4, 2); // 4 * φ^0 = 4rem
+    expect(Number.parseFloat(tokens[2].value)).toBeCloseTo(6.472, 2); // 4 * φ^1 ≈ 6.472rem
   });
 
-  it('exports grayscale system', () => {
-    expect(defaultGrayscaleSystem).toBeDefined();
-    expect(defaultGrayscaleSystem.colors).toBeDefined();
-    expect(defaultGrayscaleSystem.typography).toBeDefined();
-    expect(defaultGrayscaleSystem.spacing).toBeDefined();
-    expect(defaultGrayscaleSystem.state).toBeDefined();
-    expect(defaultGrayscaleSystem.motion).toBeDefined();
-    expect(defaultGrayscaleSystem.border).toBeDefined();
-    expect(defaultGrayscaleSystem.shadow).toBeDefined();
-    expect(defaultGrayscaleSystem.ring).toBeDefined();
-    expect(defaultGrayscaleSystem.opacity).toBeDefined();
+  it('generates custom spacing scale with multiplier', () => {
+    const tokens = generateSpacingScale('custom', 4, 1.5, 2, false);
+
+    expect(tokens[1].name).toBe('scale-1');
+    expect(tokens[2].name).toBe('scale-2');
+    expect(Number.parseFloat(tokens[1].value)).toBeCloseTo(4, 2); // 4 * 1.5^0 = 4rem
+    expect(Number.parseFloat(tokens[2].value)).toBeCloseTo(6, 2); // 4 * 1.5^1 = 6rem
   });
 
-  it('exports color tool functions', () => {
-    expect(createColorDesignSystem).toBeDefined();
+  it('generates responsive variants when enabled', () => {
+    const tokens = generateSpacingScale('linear', 4, 1.25, 1, true);
+
+    // Should have: base(2) + viewport(8) + container(10) = 20 tokens
+    // Base: 0, 1
+    // Viewport: sm-0, sm-1, md-0, md-1, lg-0, lg-1, xl-0, xl-1
+    // Container: @xs-0, @xs-1, @sm-0, @sm-1, @md-0, @md-1, @lg-0, @lg-1, @xl-0, @xl-1
+    expect(tokens.length).toBeGreaterThan(10);
+
+    // Check viewport variants exist
+    const smVariant = tokens.find((t) => t.name === 'sm-1');
+    expect(smVariant).toBeDefined();
+    expect(smVariant?.viewportAware).toBe(true);
+    expect(smVariant?.generatedFrom).toBe('1');
+
+    // Check container variants exist
+    const containerVariant = tokens.find((t) => t.name === '@md-1');
+    expect(containerVariant).toBeDefined();
+    expect(containerVariant?.containerQueryAware).toBe(true);
+    expect(containerVariant?.generatedFrom).toBe('1');
   });
 
-  it('exports design systems API', () => {
-    expect(designSystemsAPI).toBeDefined();
-    expect(designSystemsAPI.get).toBeDefined();
-    expect(designSystemsAPI.list).toBeDefined();
-    expect(designSystemsAPI.create).toBeDefined();
-    expect(designSystemsAPI.createFromColor).toBeDefined();
-    expect(designSystemsAPI.update).toBeDefined();
-    expect(designSystemsAPI.delete).toBeDefined();
-    expect(designSystemsAPI.exportCSS).toBeDefined();
-    expect(designSystemsAPI.exportTailwind).toBeDefined();
-  });
-});
+  it('validates token schema compliance', () => {
+    const tokens = generateSpacingScale('linear', 4, 1.25, 1, false);
 
-describe('getDesignSystem', () => {
-  it('returns default grayscale system for 000000', () => {
-    const system = getDesignSystem('000000');
-    expect(system).toBeDefined();
-    expect(system.colors).toBeDefined();
-    expect(system.meta).toBeDefined();
-    expect(system.meta.name).toBe('Rafters Grayscale');
-  });
-
-  it('throws error for unknown system ID', () => {
-    expect(() => getDesignSystem('unknown')).toThrow('Design system unknown not found');
-  });
-});
-
-describe('generateSpacingTokens', () => {
-  it('generates linear spacing tokens', () => {
-    const tokens = generateSpacingTokens({ scale: 'linear' });
-    expect(tokens.length).toBeGreaterThan(0);
-    expect(tokens[0].category).toBe('spacing');
-    expect(tokens.some((t) => t.name === '--spacing-0')).toBe(true);
-    expect(tokens.some((t) => t.name === '--spacing-4')).toBe(true);
-  });
-
-  it('generates golden ratio spacing tokens', () => {
-    const tokens = generateSpacingTokens({ scale: 'golden' });
-    expect(tokens.length).toBeGreaterThan(0);
-    expect(tokens.some((t) => t.semanticGroup === 'golden-ratio')).toBe(true);
-  });
-});
-
-describe('generateShadowTokens', () => {
-  it('generates shadow tokens', () => {
-    const tokens = generateShadowTokens({ scale: 'linear' });
-    expect(tokens.length).toBeGreaterThan(0);
-    expect(tokens[0].category).toBe('shadow');
-    expect(tokens.some((t) => t.name === '--shadow')).toBe(true);
-    expect(tokens.some((t) => t.name === '--shadow-lg')).toBe(true);
-  });
-});
-
-describe('generateMotionTokens', () => {
-  it('generates timing tokens from motion objects', () => {
-    const tokens = generateMotionTokens();
-    const timingTokens = tokens.filter((t) => t.category === 'timing');
-
-    expect(timingTokens.length).toBeGreaterThan(0);
-    expect(timingTokens.some((t) => t.name === '--duration-fast')).toBe(true);
-    expect(timingTokens.some((t) => t.name === '--duration-standard')).toBe(true);
-    expect(timingTokens.some((t) => t.name === '--duration-slow')).toBe(true);
-
-    // Check values are parsed from timing objects (e.g., "duration-150" -> "150ms")
-    const fastToken = timingTokens.find((t) => t.name === '--duration-fast');
-    expect(fastToken?.value).toMatch(/^\d+ms$/);
-  });
-
-  it('generates easing tokens from motion objects', () => {
-    const tokens = generateMotionTokens();
-    const easingTokens = tokens.filter((t) => t.category === 'easing');
-
-    expect(easingTokens.length).toBeGreaterThan(0);
-    expect(easingTokens.some((t) => t.name === '--ease-linear')).toBe(true);
-    expect(easingTokens.some((t) => t.name === '--ease-smooth')).toBe(true);
-    expect(easingTokens.some((t) => t.name === '--ease-bouncy')).toBe(true);
-
-    // Check cubic-bezier values are extracted properly
-    const bouncyToken = easingTokens.find((t) => t.name === '--ease-bouncy');
-    expect(bouncyToken?.value).toContain('cubic-bezier');
-  });
-
-  it('ensures all motion tokens have semantic group', () => {
-    const tokens = generateMotionTokens();
-    expect(tokens.every((t) => t.semanticGroup === 'interactive')).toBe(true);
-  });
-
-  it('ensures all motion tokens have descriptions', () => {
-    const tokens = generateMotionTokens();
-    expect(tokens.every((t) => t.description && t.description.length > 0)).toBe(true);
-  });
-});
-
-describe('exportToTailwindTheme', () => {
-  it('exports design system as Tailwind v4 theme', () => {
-    const designSystem = {
-      id: 'test',
-      name: 'Test System',
-      tokens: [
-        {
-          name: '--color-primary',
-          value: 'oklch(0.5 0.2 220)',
-          category: 'color' as const,
-          type: 'static' as const,
-        },
-        {
-          name: '--spacing-4',
-          value: '1rem',
-          category: 'spacing' as const,
-          type: 'static' as const,
-        },
-      ],
-    };
-
-    const theme = exportToTailwindTheme(designSystem);
-    expect(theme).toContain('@theme {');
-    expect(theme).toContain('--color-primary: oklch(0.5 0.2 220)');
-    expect(theme).toContain('--spacing-4: 1rem');
-    expect(theme).toContain('/* Color tokens */');
-    expect(theme).toContain('/* Spacing tokens */');
-  });
-});
-
-describe('Token Schema Validation', () => {
-  it('validates all token categories are supported', () => {
-    const validCategories = [
-      'color',
-      'typography',
-      'spacing',
-      'state',
-      'timing',
-      'easing',
-      'opacity',
-      'scaling',
-      'border',
-      'shadow',
-      'aspect',
-      'grid',
-    ];
-
-    // Test each category can be used in a token
-    for (const category of validCategories) {
-      const token = {
-        name: `--test-${category}`,
-        value: 'test-value',
-        category,
-        type: 'static' as const,
-      };
-
-      expect(() => TokenSchema.parse(token)).not.toThrow();
-    }
-  });
-
-  it('validates semantic groups are supported', () => {
-    const validGroups = [
-      'core',
-      'brand',
-      'interactive',
-      'semantic-state',
-      'consequence',
-      'sensitivity',
-      'validation',
-      'component',
-      'golden-ratio',
-    ];
-
-    for (const group of validGroups) {
-      const token = {
-        name: '--test-token',
-        value: 'test-value',
-        category: 'color' as const,
-        type: 'static' as const,
-        semanticGroup: group,
-      };
-
+    for (const token of tokens) {
       expect(() => TokenSchema.parse(token)).not.toThrow();
     }
   });
 });
 
-describe('Grayscale System Completeness', () => {
-  it('contains all required token systems', () => {
-    const system = defaultGrayscaleSystem;
+describe('generateDepthScale', () => {
+  it('generates shadow and semantic z-index tokens', () => {
+    const tokens = generateDepthScale('linear', 10);
 
-    // Check all systems exist
-    expect(system.colors).toBeDefined();
-    expect(system.typography).toBeDefined();
-    expect(system.spacing).toBeDefined();
-    expect(system.state).toBeDefined();
-    expect(system.motion).toBeDefined();
-    expect(system.border).toBeDefined();
-    expect(system.shadow).toBeDefined();
-    expect(system.ring).toBeDefined();
-    expect(system.opacity).toBeDefined();
-    expect(system.meta).toBeDefined();
+    // Should have shadow tokens + z-index tokens
+    expect(tokens.length).toBeGreaterThan(10);
+
+    // Check shadow tokens (now use simple names, filter by category)
+    const shadowSm = tokens.find((t) => t.name === 'sm' && t.category === 'shadow');
+    expect(shadowSm).toBeDefined();
+    expect(shadowSm?.category).toBe('shadow');
+    expect(shadowSm?.value).toContain('rgb(0 0 0');
+
+    // Check semantic z-index tokens
+    const zSticky = tokens.find((t) => t.name === 'sticky' && t.category === 'z-index');
+    expect(zSticky).toBeDefined();
+    expect(zSticky?.category).toBe('z-index');
+    expect(zSticky?.value).toBe('10');
+    expect(zSticky?.semanticMeaning).toContain('Sticky elements');
+
+    const zModal = tokens.find((t) => t.name === 'modal' && t.category === 'z-index');
+    expect(zModal?.value).toBe('1000');
+    expect(zModal?.semanticMeaning).toContain('Modal dialogs');
   });
 
-  it('has motion system with timing and easing', () => {
-    const motion = defaultGrayscaleSystem.motion;
+  it('generates semantic z-index layers', () => {
+    const tokens = generateDepthScale('exponential', 10);
 
-    expect(motion.timing).toBeDefined();
-    expect(motion.easing).toBeDefined();
+    // Test semantic layer hierarchy (filter by z-index category)
+    const zBase = tokens.find((t) => t.name === 'base' && t.category === 'z-index');
+    expect(zBase?.value).toBe('0'); // Base layer
 
-    // Check some key timing tokens exist
-    expect(motion.timing.fast).toBeDefined();
-    expect(motion.timing.standard).toBeDefined();
-    expect(motion.timing.slow).toBeDefined();
+    const zDropdown = tokens.find((t) => t.name === 'dropdown' && t.category === 'z-index');
+    expect(zDropdown?.value).toBe('100'); // Dropdown layer
 
-    // Check some key easing tokens exist
-    expect(motion.easing.linear).toBeDefined();
-    expect(motion.easing.smooth).toBeDefined();
-    expect(motion.easing.bouncy).toBeDefined();
-  });
+    const zTooltip = tokens.find((t) => t.name === 'tooltip' && t.category === 'z-index');
+    expect(zTooltip?.value).toBe('50000'); // Highest priority
 
-  it('has state system with opacity and scale tokens', () => {
-    const state = defaultGrayscaleSystem.state;
-
-    // Check opacity states
-    expect(state.hover).toBeDefined();
-    expect(state.active).toBeDefined();
-    expect(state.disabled).toBeDefined();
-    expect(state.loading).toBeDefined();
-
-    // Check scale states
-    expect(state.scaleActive).toBeDefined();
-    expect(state.scalePressed).toBeDefined();
-    expect(state.scaleHoverSubtle).toBeDefined();
-  });
-
-  it('has proper AI intelligence metadata', () => {
-    const meta = defaultGrayscaleSystem.meta;
-
-    expect(meta.version).toBeDefined();
-    expect(meta.name).toBe('Rafters Grayscale');
-    expect(meta.overallCognitiveLoad).toBeGreaterThanOrEqual(0);
-    expect(meta.designCoherence).toBeGreaterThanOrEqual(1);
-    expect(meta.designCoherence).toBeLessThanOrEqual(10);
-    expect(meta.accessibilityScore).toBeGreaterThanOrEqual(1);
-    expect(meta.accessibilityScore).toBeLessThanOrEqual(10);
-    expect(meta.intelligenceFeatures).toContain('cognitive-load-tracking');
-    expect(meta.intelligenceFeatures).toContain('accessibility-compliance');
+    // Verify semantic meanings
+    expect(zDropdown?.semanticMeaning).toContain('Dropdowns and select menus');
+    expect(zTooltip?.semanticMeaning).toContain('Tooltips (highest priority)');
   });
 });
 
-describe('API Token Export Coverage', () => {
-  it('exports CSS with all token categories', () => {
-    const css = designSystemsAPI.exportCSS('000000');
-    expect(css).toBeDefined();
+describe('generateHeightScale', () => {
+  it('generates linear height scale', () => {
+    const tokens = generateHeightScale('linear', 2.5, 1.25, false);
 
-    // Check motion tokens are included
-    expect(css).toContain('--duration-');
-    expect(css).toContain('--ease-');
+    expect(tokens).toHaveLength(8); // xs, sm, md, lg, xl, 2xl, 3xl, 4xl
 
-    // Check other token categories
-    expect(css).toContain('--color-');
-    expect(css).toContain('--spacing-');
-    expect(css).toContain('--opacity-');
+    const xs = tokens.find((t) => t.name === 'h-xs');
+    expect(xs?.value).toBe('2.5rem'); // baseUnit + (0 * 0.5)
+
+    const sm = tokens.find((t) => t.name === 'h-sm');
+    expect(sm?.value).toBe('3rem'); // baseUnit + (1 * 0.5)
+
+    const md = tokens.find((t) => t.name === 'h-md');
+    expect(md?.value).toBe('3.5rem'); // baseUnit + (2 * 0.5)
+
+    // Check touch target validation
+    expect(xs?.touchTargetSize).toBe(40); // 2.5rem * 16px
+    expect(md?.touchTargetSize).toBe(56); // 3.5rem * 16px
   });
 
-  it('exports Tailwind with all token categories organized by category', () => {
-    const tailwind = designSystemsAPI.exportTailwind('000000');
-    expect(tailwind).toBeDefined();
-    expect(tailwind).toContain('@theme {');
+  it('generates golden ratio height scale', () => {
+    const tokens = generateHeightScale('golden', 2.5, 1.25, false);
 
-    // Check category sections exist
-    expect(tailwind).toContain('/* timing */');
-    expect(tailwind).toContain('/* easing */');
-    expect(tailwind).toContain('/* color */');
-    expect(tailwind).toContain('/* spacing */');
-    expect(tailwind).toContain('/* state */');
+    const xs = tokens.find((t) => t.name === 'h-xs');
+    expect(Number.parseFloat(xs?.value || '0')).toBeCloseTo(2.5, 1);
 
-    // Check motion tokens are properly included
-    expect(tailwind).toContain('--duration-');
-    expect(tailwind).toContain('--ease-');
+    const sm = tokens.find((t) => t.name === 'h-sm');
+    expect(Number.parseFloat(sm?.value || '0')).toBeCloseTo(3.18, 1); // 2.5 * φ^0.5
+  });
+
+  it('generates responsive height variants', () => {
+    const tokens = generateHeightScale('linear', 2.5, 1.25, true);
+
+    // Should have base + responsive variants
+    expect(tokens.length).toBeGreaterThan(24); // 8 base + viewport variants + container variants
+
+    const smResponsive = tokens.find((t) => t.name === 'sm-h-md');
+    expect(smResponsive).toBeDefined();
+    expect(smResponsive?.viewportAware).toBe(true);
+
+    const containerResponsive = tokens.find((t) => t.name === '@lg-h-md');
+    expect(containerResponsive).toBeDefined();
+    expect(containerResponsive?.containerQueryAware).toBe(true);
   });
 });
 
-describe('integration', () => {
-  it('works end-to-end with API and color tool', () => {
-    // Create a color system
-    const primaryColor = { l: 0.5, c: 0.15, h: 240, alpha: 1 };
-    const system = designSystemsAPI.createFromColor(primaryColor, 'Integration Test');
+describe('generateTypographyScale', () => {
+  it('generates golden ratio typography scale', () => {
+    const tokens = generateTypographyScale('golden', 1, false);
 
-    expect(system.id).toBeDefined();
-    expect(system.name).toBe('Integration Test');
-    expect(system.colorTokens).toBeDefined();
+    // Should have font-size + line-height tokens
+    const fontSizeTokens = tokens.filter((t) => t.category === 'font-size');
+    const lineHeightTokens = tokens.filter((t) => t.category === 'line-height');
 
-    // Export to CSS
-    const css = designSystemsAPI.exportCSS(system.id);
-    expect(css).toContain('--color-primary-');
-    expect(css).toContain('oklch(');
+    expect(fontSizeTokens).toHaveLength(13); // xs through 9xl
+    expect(lineHeightTokens).toHaveLength(13);
 
-    // Export to Tailwind
-    const tailwind = designSystemsAPI.exportTailwind(system.id);
-    expect(tailwind).toContain('@theme {');
+    const base = fontSizeTokens.find((t) => t.name === 'text-base');
+    expect(base?.value).toBe('1rem'); // base size
 
-    // Clean up
-    designSystemsAPI.delete(system.id);
+    const lg = fontSizeTokens.find((t) => t.name === 'text-lg');
+    expect(Number.parseFloat(lg?.value || '0')).toBeCloseTo(1.618, 2); // 1 * φ^1
+
+    // Check line height pairing
+    const leadingBase = lineHeightTokens.find((t) => t.name === 'leading-base');
+    expect(leadingBase?.pairedWith).toContain('text-base');
   });
 
-  it('includes motion tokens in all system exports', () => {
-    const system = designSystemsAPI.get('000000');
-    expect(system).toBeDefined();
+  it('generates major-third typography scale', () => {
+    const tokens = generateTypographyScale('major-third', 1, false);
 
-    // Check that motion tokens are accessible through the system
-    expect(system!.system.motion.timing).toBeDefined();
-    expect(system!.system.motion.easing).toBeDefined();
+    const lg = tokens.filter((t) => t.category === 'font-size').find((t) => t.name === 'text-lg');
+    expect(Number.parseFloat(lg?.value || '0')).toBeCloseTo(1.25, 2); // 1 * 1.25^1
+  });
 
-    // Check exports include motion
-    const css = designSystemsAPI.exportCSS('000000');
-    const tailwind = designSystemsAPI.exportTailwind('000000');
+  it('generates responsive typography variants', () => {
+    const tokens = generateTypographyScale('golden', 1, true);
 
-    expect(css).toContain('--duration-');
-    expect(css).toContain('--ease-');
-    expect(tailwind).toContain('--duration-');
-    expect(tailwind).toContain('--ease-');
+    // Should have base + responsive variants for both font-size and line-height
+    expect(tokens.length).toBeGreaterThan(50);
+
+    const smResponsive = tokens.find((t) => t.name === 'sm-text-lg');
+    expect(smResponsive).toBeDefined();
+    expect(smResponsive?.category).toBe('font-size');
+    expect(smResponsive?.viewportAware).toBe(true);
+
+    const containerResponsive = tokens.find((t) => t.name === '@md-text-lg');
+    expect(containerResponsive).toBeDefined();
+    expect(containerResponsive?.containerQueryAware).toBe(true);
+  });
+
+  it('calculates appropriate line heights', () => {
+    const tokens = generateTypographyScale('golden', 1, false);
+
+    const lineHeights = tokens.filter((t) => t.category === 'line-height');
+
+    // Small text should have higher line height
+    const leadingXs = lineHeights.find((t) => t.name === 'leading-xs');
+    expect(Number.parseFloat(leadingXs?.value || '0')).toBe(1.6);
+
+    // Base text should have medium line height
+    const leadingBase = lineHeights.find((t) => t.name === 'leading-base');
+    expect(Number.parseFloat(leadingBase?.value || '0')).toBe(1.5);
+
+    // Large text should have tighter line height
+    const leading6xl = lineHeights.find((t) => t.name === 'leading-6xl');
+    expect(Number.parseFloat(leading6xl?.value || '0')).toBe(1.2);
+  });
+});
+
+describe('Token validation', () => {
+  it('all generated tokens pass schema validation', () => {
+    const spacingTokens = generateSpacingScale('linear', 4, 1.25, 2, false);
+    const depthTokens = generateDepthScale('linear', 10);
+    const heightTokens = generateHeightScale('linear', 2.5, 1.25, false);
+    const typographyTokens = generateTypographyScale('golden', 1, false);
+
+    const allTokens = [...spacingTokens, ...depthTokens, ...heightTokens, ...typographyTokens];
+
+    allTokens.forEach((token, index) => {
+      expect(
+        () => TokenSchema.parse(token),
+        `Token at index ${index} failed validation: ${JSON.stringify(token)}`
+      ).not.toThrow();
+    });
+  });
+
+  it('responsive tokens have proper metadata', () => {
+    const tokens = generateSpacingScale('linear', 4, 1.25, 2, true);
+
+    const baseToken = tokens.find((t) => t.name === '1');
+    expect(baseToken?.containerQueryAware).toBe(true);
+    expect(baseToken?.viewportAware).toBe(true);
+    expect(baseToken?.generatedFrom).toBeUndefined();
+
+    const responsiveToken = tokens.find((t) => t.name === 'md-1');
+    expect(responsiveToken?.viewportAware).toBe(true);
+    expect(responsiveToken?.generatedFrom).toBe('1');
+
+    const containerToken = tokens.find((t) => t.name === '@lg-1');
+    expect(containerToken?.containerQueryAware).toBe(true);
+    expect(containerToken?.generatedFrom).toBe('1');
+  });
+});
+
+describe('Mathematical relationships', () => {
+  it('preserves mathematical relationships in generated tokens', () => {
+    const tokens = generateSpacingScale('golden', 4, 1.25, 3, false);
+
+    for (const token of tokens) {
+      if (token.name !== '0') {
+        expect(token.mathRelationship).toBeDefined();
+        expect(token.mathRelationship).toContain('1.25^'); // Should show the multiplier formula
+      }
+    }
+  });
+
+  it('tracks scale positions correctly', () => {
+    const tokens = generateTypographyScale('golden', 1, false);
+    const fontTokens = tokens.filter((t) => t.category === 'font-size');
+
+    fontTokens.forEach((token, index) => {
+      expect(token.scalePosition).toBe(index);
+    });
   });
 });

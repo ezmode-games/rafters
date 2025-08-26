@@ -19,7 +19,7 @@ export const defaultConfig: Config = {
   storiesDir: './src/stories',
   hasStorybook: false,
   packageManager: 'npm',
-  registry: 'https://rafters-registry.realhandy.tech',
+  registry: 'https://rafters.realhandy.tech/registry',
 };
 
 export function getConfigPath(cwd = process.cwd()): string {

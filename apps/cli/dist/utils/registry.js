@@ -82,7 +82,7 @@ export const RegistrySchema = z.object({
 });
 // Registry configuration
 function getRegistryBaseUrl() {
-    return process.env.RAFTERS_REGISTRY_URL || 'https://rafters-registry.realhandy.tech';
+    return process.env.RAFTERS_REGISTRY_URL || 'https://rafters.realhandy.tech/registry';
 }
 const REGISTRY_TIMEOUT = 10000; // 10 seconds
 // HTTP client response schema

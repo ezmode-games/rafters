@@ -4,36 +4,49 @@ import * as Stories from './Button.stories.tsx';
 <Meta title="Components/Button" of={Stories} name="Overview" />
 
 # Button
-Buttons are used to show the user's choice of options for actions and assign these to a clear hierarchy. A button helps the user to find the most important actions of a page or within a viewport and enables them to perform these actions. The label is used to clearly indicate to the user what action will be triggered. Buttons allow users to commit a change, complete steps in a task, or make choices.
 
-<Canvas of={Stories.Common} />
+Every interaction begins with intent. The button is where user intention meets interface response. Our button system is built on the principle that clarity of purpose should be immediately apparent—both visually and functionally.
+
+<Canvas of={Stories.AllVariants} />
+
+## Design Intelligence
+
+**Cognitive Load**: 3/10 - Simple action triggers with embedded intelligence
+**Trust Building**: Progressive confirmation for destructive actions reduces user anxiety
+**Attention Economics**: Maximum 1 primary button per context to guide focus clearly
 
 ## Usage Guidelines
-The primary button is used for the most important action on a page or in a view. The transparent secondary button with a thin frame is used for subordinate actions. The text button is applied as a subtle call to action.
+
+Buttons should communicate intent through carefully chosen visual hierarchy and semantic meaning. The component includes embedded UX intelligence for loading states, destructive confirmation, and attention hierarchy.
 
 #### DOs
-- **Button Labels**
-  - Must be clear and concise
-  - Must describe the action that will be performed
-  - Should include verbs to indicate action
-  - Always include a noun to clarify the object of the action
-- **Button Position**
-  - Place primary buttons in the bottom right corner of a modal or form
-  - Use consistent placement across similar components
-  - Button groups always follow the same order: cancel, secondary, primary for modals and forms
+- **Attention Hierarchy**
+  - Use primary buttons sparingly—maximum one per context
+  - Reserve destructive variants for irreversible actions with consequences
+  - Apply loading states during async operations to prevent double-submission
+  - Size buttons according to importance (large=high attention, small=low attention)
 
-#### DON'Ts
-- **Button Labels**
-  - Avoid vague labels like "Click here" or "Submit"
-  - Don't use all caps for button text
-  - Avoid using icons without text unless the action is universally understood icon
-  - Do not use buttons for navigation links; use links instead
-  - Do not use two primary buttons in the same context
-  - Avoid using buttons for decorative purposes or non-interactive elements
+- **Trust Building** 
+  - Enable `destructiveConfirm` for dangerous actions (shows confirmation on first click)
+  - Use clear, action-oriented labels ("Delete Account" not "Delete")
+  - Provide proper disabled states when actions are unavailable
+  - Include loading feedback for operations that take time
 
-#### Use Cases
-- **Primary Actions**: Submit forms, save changes, confirm actions
-- **Secondary Actions**: Cancel, edit, delete
-- **Tertiary Actions**: View details, learn more, help links
-- **Key Calls to Action**: Sign up, log in, download
-- **Alongside Input**: Submit buttons next to input fields, action buttons like search or filter
+- **Semantic Clarity**
+  - Choose variants that match consequence level (success=safe, warning=caution, destructive=dangerous)
+  - Use outline/ghost for secondary actions that don't require attention
+  - Apply consistent sizing within interface sections
+  - Group related actions with proper spacing and alignment
+
+#### NEVERs
+- **Attention Economics**
+  - Multiple primary buttons competing for attention in the same context
+  - Destructive actions without confirmation or clear consequence explanation
+  - Buttons without clear, action-oriented labels
+  - Primary emphasis on low-priority or reversible actions
+
+- **Interaction Patterns**
+  - Missing loading states for async operations (leads to double-submission)
+  - Destructive actions that activate immediately without confirmation
+  - Disabled buttons without explanation of why they're unavailable
+  - Inconsistent button sizing within the same interface section

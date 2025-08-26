@@ -7,7 +7,7 @@ vi.mock('node:fs');
 vi.mock('fs-extra');
 vi.mock('inquirer');
 vi.mock('ora');
-vi.mock('@rafters/design-tokens');
+vi.mock('@rafters/design-tokens/src');
 vi.mock('../../src/utils/config.js');
 vi.mock('../../src/utils/dependencies.js');
 vi.mock('../../src/utils/logo.js');

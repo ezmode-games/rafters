@@ -4,24 +4,18 @@
   "description": "Generated design systems and semantic tokens for Rafters AI intelligence system",
   "type": "module",
   "private": true,
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./motion": {
-      "import": "./dist/motion/index.js",
-      "types": "./dist/motion/index.d.ts"
-    }
+  "dist": {
+    "directory": "dist",
+    "format": "esm"
   },
-  "files": ["dist", "tokens", "README.md"],
+  "files": ["tokens", "README.md"],
+
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.js",
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "test": "vitest run --passWithNoTests",
+    "test": "vitest run",
     "lint": "biome check .",
     "format": "biome format --write .",
     "type-check": "tsc --noEmit",

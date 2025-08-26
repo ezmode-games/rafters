@@ -51,7 +51,7 @@ export const MDXSection = ({
       as="section"
       size={size}
       padding={padding === '7' ? '8' : padding}
-      className={cn('my-[var(--spacing-phi-3)]', className)}
+      className={cn('my-8', className)}
     >
       {children}
     </Container>
@@ -125,10 +125,10 @@ export const MDXGrid = ({
   };
 
   const gapClasses = {
-    sm: 'gap-[var(--spacing-phi-1)]',
-    md: 'gap-[var(--spacing-phi-2)]',
-    lg: 'gap-[var(--spacing-phi-3)]',
-    xl: 'gap-[var(--spacing-phi-4)]',
+    sm: 'gap-4',
+    md: 'gap-6',
+    lg: 'gap-8',
+    xl: 'gap-16',
   };
 
   return (
@@ -160,11 +160,7 @@ export const MDXCard = ({
   };
 
   return (
-    <div
-      className={cn(variantClasses[variant], 'p-[var(--spacing-phi-2)]', 'rounded-xl', className)}
-    >
-      {children}
-    </div>
+    <div className={cn(variantClasses[variant], 'p-6', 'rounded-xl', className)}>{children}</div>
   );
 };
 
@@ -185,7 +181,7 @@ export const MDXHero = ({
     <div
       className={cn(
         'w-full',
-        'py-[var(--spacing-phi-4)]',
+        'py-16',
         gradient && 'bg-gradient-to-b from-background to-muted/20',
         className
       )}
@@ -205,14 +201,14 @@ export const mdxComponents = {
 
   // Typography elements
   h1: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h1 className={cn('mb-[var(--spacing-phi-2)]')} {...props} />
+    <h1 className={cn('mb-[1.5rem]')} {...props} />
   ),
 
   h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h2
       className={cn(
-        'mb-[var(--spacing-phi-2)]',
-        'mt-[var(--spacing-phi-4)]',
+        'mb-[1.5rem]',
+        'mt-[4rem]',
         'relative',
         'before:content-[""]',
         'before:absolute',
@@ -228,26 +224,20 @@ export const mdxComponents = {
   ),
 
   h3: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h3 className={cn('mb-[var(--spacing-phi-1)]', 'mt-[var(--spacing-phi-2)]')} {...props} />
+    <h3 className={cn('mb-[1rem]', 'mt-[1.5rem]')} {...props} />
   ),
 
   h4: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h4 className={cn('mb-[var(--spacing-phi--1)]', 'mt-[var(--spacing-phi-1)]')} {...props} />
+    <h4 className={cn('mb-[0.5rem]', 'mt-[1rem]')} {...props} />
   ),
 
   h5: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h5 className={cn('mb-[var(--spacing-phi--2)]', 'mt-[var(--spacing-phi-0)]')} {...props} />
+    <h5 className={cn('mb-[0.25rem]', 'mt-[0.5rem]')} {...props} />
   ),
 
   h6: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h6
-      className={cn(
-        'heading-label',
-        'mb-[var(--spacing-phi--2)]',
-        'mt-[var(--spacing-phi--1)]',
-        'max-w-4xl',
-        'mx-auto'
-      )}
+      className={cn('heading-label', 'mb-[0.25rem]', 'mt-[0.5rem]', 'max-w-4xl', 'mx-auto')}
       {...props}
     />
   ),
@@ -255,13 +245,7 @@ export const mdxComponents = {
   // Paragraph with optimal reading width
   p: (props: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p
-      className={cn(
-        'text-body',
-        'mb-[var(--spacing-phi-1)]',
-        'max-w-prose',
-        'mx-auto',
-        'leading-relaxed'
-      )}
+      className={cn('text-body', 'mb-[1rem]', 'max-w-prose', 'mx-auto', 'leading-relaxed')}
       {...props}
     />
   ),
@@ -271,12 +255,12 @@ export const mdxComponents = {
     <ul
       className={cn(
         'text-body',
-        'mb-[var(--spacing-phi-1)]',
-        'pl-[var(--spacing-phi-2)]',
+        'mb-[1rem]',
+        'pl-[1.5rem]',
         'list-disc',
         'max-w-prose',
         'mx-auto',
-        'space-y-[var(--spacing-phi--1)]'
+        'space-y-[0.5rem]'
       )}
       {...props}
     />
@@ -286,12 +270,12 @@ export const mdxComponents = {
     <ol
       className={cn(
         'text-body',
-        'mb-[var(--spacing-phi-1)]',
-        'pl-[var(--spacing-phi-2)]',
+        'mb-[1rem]',
+        'pl-[1.5rem]',
         'list-decimal',
         'max-w-prose',
         'mx-auto',
-        'space-y-[var(--spacing-phi--1)]'
+        'space-y-[0.5rem]'
       )}
       {...props}
     />
@@ -307,8 +291,8 @@ export const mdxComponents = {
       className={cn(
         'border-l-4',
         'border-primary',
-        'pl-[var(--spacing-phi-1)]',
-        'my-[var(--spacing-phi-2)]',
+        'pl-[1rem]',
+        'my-[1.5rem]',
         'text-muted-foreground',
         'italic',
         'max-w-prose',
@@ -325,12 +309,12 @@ export const mdxComponents = {
         'font-mono',
         'text-sm',
         'bg-muted',
-        'p-[var(--spacing-phi-1)]',
+        'p-[1rem]',
         'rounded-lg',
         'border',
         'border-border',
         'overflow-x-auto',
-        'my-[var(--spacing-phi-2)]',
+        'my-[1.5rem]',
         'max-w-5xl',
         'mx-auto'
       )}
@@ -357,10 +341,7 @@ export const mdxComponents = {
 
   // Horizontal rule
   hr: (props: React.HTMLAttributes<HTMLHRElement>) => (
-    <hr
-      className={cn('border-border', 'my-[var(--spacing-phi-3)]', 'max-w-4xl', 'mx-auto')}
-      {...props}
-    />
+    <hr className={cn('border-border', 'my-[2rem]', 'max-w-4xl', 'mx-auto')} {...props} />
   ),
 
   // Links with design system styling
@@ -380,7 +361,7 @@ export const mdxComponents = {
 
   // Tables with proper alignment and spacing
   table: (props: React.HTMLAttributes<HTMLTableElement>) => (
-    <div className="max-w-5xl mx-auto my-[var(--spacing-phi-2)] overflow-x-auto">
+    <div className="max-w-5xl mx-auto my-[1.5rem] overflow-x-auto">
       <table className={cn('w-full', 'border-collapse', 'border', 'border-border')} {...props} />
     </div>
   ),
@@ -390,14 +371,11 @@ export const mdxComponents = {
   ),
 
   th: (props: React.HTMLAttributes<HTMLTableCellElement>) => (
-    <th
-      className={cn('text-left', 'p-[var(--spacing-phi-0)]', 'font-semibold', 'text-sm')}
-      {...props}
-    />
+    <th className={cn('text-left', 'p-[0.5rem]', 'font-semibold', 'text-sm')} {...props} />
   ),
 
   td: (props: React.HTMLAttributes<HTMLTableCellElement>) => (
-    <td className={cn('p-[var(--spacing-phi-0)]', 'border-t', 'border-border')} {...props} />
+    <td className={cn('p-[0.5rem]', 'border-t', 'border-border')} {...props} />
   ),
 
   // Image with responsive sizing - requires alt text for accessibility
@@ -409,14 +387,7 @@ export const mdxComponents = {
     <img
       {...props}
       alt={alt}
-      className={cn(
-        'max-w-full',
-        'h-auto',
-        'rounded-lg',
-        'my-[var(--spacing-phi-2)]',
-        'mx-auto',
-        className
-      )}
+      className={cn('max-w-full', 'h-auto', 'rounded-lg', 'my-[1.5rem]', 'mx-auto', className)}
     />
   ),
 

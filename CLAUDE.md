@@ -601,3 +601,4 @@ This system enables you to create better user experiences by understanding the h
 ## Testing Recommendations
 
 - **Prefer SpyOn over Mock in tests** - SpyOn provides more natural and transparent test behavior
+- look for /llms.txt files for software, services, etc

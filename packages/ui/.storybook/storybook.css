@@ -188,33 +188,33 @@ button:focus {
 
 /* Documentation grid layouts */
 .doc-grid-2 {
-  @apply grid grid-cols-1 md:grid-cols-2 gap-[var(--spacing-phi-2)];
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
 }
 
 .doc-grid-3 {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--spacing-phi-2)];
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
 }
 
 .doc-grid-4 {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[var(--spacing-phi-2)];
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
 }
 
 /* Documentation card styling */
 .doc-card {
-  @apply p-[var(--spacing-phi-2)] bg-card border border-border rounded-xl;
+  @apply p-6 bg-card border border-border rounded-xl;
 }
 
 .doc-card-hover {
-  @apply p-[var(--spacing-phi-2)] bg-card border border-border rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200;
+  @apply p-6 bg-card border border-border rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200;
 }
 
 /* Documentation section spacing */
 .doc-section {
-  @apply py-[var(--spacing-phi-4)];
+  @apply py-16;
 }
 
 .doc-section-muted {
-  @apply py-[var(--spacing-phi-4)] bg-muted/30;
+  @apply py-16 bg-muted/30;
 }
 
 /* Documentation content max-widths with auto centering */
@@ -256,15 +256,15 @@ button:focus {
 
 /* Documentation padding utilities */
 .doc-padding-sm {
-  @apply px-[var(--spacing-phi-2)];
+  @apply px-6;
 }
 
 .doc-padding-md {
-  @apply px-[var(--spacing-phi-3)];
+  @apply px-8;
 }
 
 .doc-padding-lg {
-  @apply px-[var(--spacing-phi-4)];
+  @apply px-16;
 }
 
 /**
@@ -286,15 +286,15 @@ button:focus {
  * Documentation-specific typography utilities
  */
 .doc-heading-hero {
-  @apply heading-display text-center mb-[var(--spacing-phi-2)];
+  @apply text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-center mb-6;
 }
 
 .doc-heading-section {
-  @apply text-2xl font-semibold text-center mb-[var(--spacing-phi-3)];
+  @apply text-2xl font-semibold text-center mb-8;
 }
 
 .doc-text-lead {
-  @apply text-body-large text-muted-foreground leading-relaxed;
+  @apply text-lg text-muted-foreground leading-relaxed;
 }
 
 .doc-text-center {

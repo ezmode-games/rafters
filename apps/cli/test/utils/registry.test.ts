@@ -50,7 +50,7 @@ describe('registry', () => {
 
       const result = await fetchComponentRegistry();
       expect(result.components).toEqual(mockResponse.components);
-      expect(mockFetch).toHaveBeenCalledWith('https://rafters-registry.realhandy.tech/components', {
+      expect(mockFetch).toHaveBeenCalledWith('https://rafters.realhandy.tech/registry/components', {
         signal: expect.any(AbortSignal),
         headers: {
           Accept: 'application/json',
@@ -136,7 +136,7 @@ describe('registry', () => {
       const result = await fetchComponent('button');
       expect(result).toEqual(mockManifest);
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://rafters-registry.realhandy.tech/components/button',
+        'https://rafters.realhandy.tech/registry/components/button',
         {
           signal: expect.any(AbortSignal),
           headers: {

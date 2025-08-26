@@ -1,826 +1,144 @@
-## Component Status Comments
-
-Every main component story (`<Component>.stories.tsx`) MUST include status comments at the top of the file:
-
-```typescript
-// @componentStatus published
-// @version 0.1.0
-
-import type { Meta, StoryObj } from '@storybook/react-vite'
-// ... rest of story file
-```
-
-**Status Values:**
-- `published` - Component is included in the registry and available for production use
-- `draft` - Component is excluded from the registry build and not published
-- `depreciated` - Component is marked for removal and excluded from registry
-
-- These comments are required for all main component stories and are parsed by the CLI for automated registry publishing and release management.
 # Storybook Standards for Rafters Design System
 
-## Overview
+## New 3-File Component Architecture
 
-This document establishes the standards for creating Storybook stories in the Rafters design system. Stories serve **dual purposes**: comprehensive documentation AND automatic test cases via Vitest integration.
+Every component in the Rafters design system follows a streamlined 3-file structure that balances comprehensive documentation with maintainability.
 
-**Critical Requirements:**
-1. **Stories are Tests** - All stories run as tests via `@storybook/addon-vitest`
-2. **Intelligence Integration** - Every component includes design intelligence patterns
-3. **Semantic Token Usage** - All examples must use design system tokens, never arbitrary values
-4. **Accessibility Focus** - WCAG AAA compliance demonstrated in stories
+### Required Files for Each Component
 
-## Design System Dogfooding Standards
+#### 1. `ComponentName.mdx` - Design Philosophy & Usage
+**Purpose**: Primary documentation entry point with design philosophy and usage guidelines
 
-### Color Token Usage
+**Location**: `/src/stories/components/{component}/ComponentName.mdx`
 
-**ALWAYS use semantic design tokens instead of arbitrary colors.** Our stories teach proper design system usage, so every color choice must demonstrate best practices.
+**Required Sections**:
+- Component philosophy statement (why it exists)
+- Design intelligence metrics (cognitive load, trust building, attention economics)
+- Usage guidelines with DOs and NEVERs
+- Interactive Canvas examples from main stories
+- Real-world implementation patterns
 
-#### ❌ Avoid Arbitrary Colors
+**Template**:
+```mdx
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import * as Stories from './ComponentName.stories.tsx';
+
+<Meta title="Components/ComponentName" of={Stories} name="Overview" />
+
+# Component Name
+
+[Philosophy statement - why this component exists and its core purpose]
+
+<Canvas of={Stories.AllVariants} />
+
+## Design Intelligence
+
+**Cognitive Load**: X/10 - [Brief explanation]
+**Trust Building**: [How component builds user confidence]
+**Attention Economics**: [How component manages user attention]
+
+## Usage Guidelines
+
+[Clear guidance on when and how to use the component]
+
+#### DOs
+- **Category Name**
+  - Specific positive pattern
+  - Another positive pattern
+
+#### NEVERs
+- **Category Name**
+  - Anti-pattern to avoid
+  - Common mistake to prevent
+
+## Implementation Examples
+
+<Canvas of={Stories.RealWorldExample} />
+```
+
+#### 2. `ComponentName.stories.tsx` - Comprehensive Component Showcase
+**Purpose**: Complete component demonstration with all variants, states, and patterns in ONE file
+
+**Location**: `/src/stories/components/{component}/ComponentName.stories.tsx`
+
+**Required Elements**:
 ```typescript
-// DON'T - These teach bad habits and ignore our design system
-className="text-green-600 bg-blue-500 border-red-400"
-className="text-slate-700 bg-purple-50 border-amber-300"
-```
-
-#### ✅ Use Semantic Tokens
-```typescript
-// DO - These teach proper semantic meaning and system usage
-className="text-success-foreground bg-info border-destructive"
-className="text-muted-foreground bg-accent/10 border-warning"
-```
-
-### Semantic Color Guidelines
-
-**Success States:** Use `text-success-foreground`, `bg-success`, `border-success`
-- For positive outcomes, completed tasks, valid input states
-
-**Warning States:** Use `text-warning-foreground`, `bg-warning`, `border-warning`  
-- For caution, attention needed, non-critical issues
-
-**Error States:** Use `text-destructive-foreground`, `bg-destructive`, `border-destructive`
-- For errors, invalid states, dangerous actions
-
-**Info States:** Use `text-info-foreground`, `bg-info`, `border-info`
-- For neutral information, tips, helpful context
-
-**Muted Content:** Use `text-muted-foreground`, `bg-muted`, `border-muted`
-- For secondary information, subtle backgrounds
-
-### Typography & Spacing
-
-**Typography Scale:** Use design system scale classes (`text-xl`, `text-2xl`, etc.)
-**Spacing Scale:** Use consistent spacing tokens (`p-4`, `m-6`, `gap-8`, etc.)
-**Layout Classes:** Prefer semantic layout patterns over arbitrary measurements
-
-### Example Transformation
-
-```typescript
-// ❌ BEFORE - Arbitrary colors that don't teach design system
-<div className="bg-green-50 border border-green-200 text-green-800 p-4 rounded">
-  Success message with arbitrary green colors
-</div>
-
-// ✅ AFTER - Semantic tokens that teach proper usage  
-<div className="bg-success/10 border border-success text-success-foreground p-4 rounded">
-  Success message using semantic design tokens
-</div>
-```
-
-This approach ensures our documentation teaches proper design system habits while providing consistent, meaningful color usage throughout all examples.
-
-## Current File Structure
-
-### Story Organization
-
-Stories are organized by category with component-specific subdirectories:
-
-```
-src/stories/
-├── foundation/                          # Design system foundations
-│   ├── Colors.stories.tsx              # Color system documentation
-│   ├── Typography.stories.tsx          # Typography scale & patterns
-│   ├── LayoutSystem.stories.tsx        # Spacing & layout principles
-│   └── Tokens.stories.tsx              # Design token reference
-└── components/                          # Component documentation
-    ├── button/
-    │   ├── Button.stories.tsx           # Main component story
-    │   ├── ButtonIntelligence.stories.tsx  # 🧠 Design intelligence patterns
-    │   ├── ButtonVariants.stories.tsx   # Visual styling variants
-    │   ├── ButtonProperties.stories.tsx # Interactive properties/states
-    │   ├── ButtonSemantic.stories.tsx   # Semantic usage patterns
-    │   └── ButtonAccessibility.stories.tsx # Accessibility demonstrations
-    ├── select/
-    │   ├── SelectIntelligence.stories.tsx
-    │   ├── SelectVariants.stories.tsx
-    │   └── ...
-    └── ...
-```
-
-### Intelligence-First Architecture
-
-Every component includes a dedicated **`ComponentIntelligence.stories.tsx`** file that demonstrates:
-- Cognitive load principles
-- Attention hierarchy patterns  
-- Trust-building interactions
-- Semantic meaning through design
-
-### Title Hierarchy Convention
-
-Stories follow a three-tier hierarchy pattern:
-
-```typescript
-// Foundation stories
-title: '01 Identity/Colors'
-title: '01 Identity/Typography'
-title: '01 Identity/Layout System'
-
-// Component main story  
-title: '03 Components/Action/Button'
-title: '03 Components/Input/Select'
-title: '03 Components/Display/Card'
-
-// Component substories
-title: '03 Components/Action/Button/Intelligence'
-title: '03 Components/Action/Button/Variants'
-title: '03 Components/Action/Button/Properties'
-title: '03 Components/Action/Button/Semantic'
-title: '03 Components/Action/Button/Accessibility'
-```
-
-**Component Categories:**
-- `Action` - Interactive elements (Button, Link)
-- `Input` - Form controls (Input, Select, Slider)
-- `Display` - Content presentation (Card, Badge)  
-- `Layout` - Structural components (Container, Grid)
-- `Navigation` - Navigation components (Tabs, Breadcrumb)
-
-## File Structure & Naming
-
-### File Extensions
-- **Use `.tsx` extension** for all story files that contain JSX
-- **Use `.ts` extension** only for stories without JSX content
-
-### Import Standards
-```typescript
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { fn } from 'storybook/test'
-import { Button } from '../../../components/Button'
-```
-
-**Path Patterns:**
-- Foundation stories: No component imports needed
-- Component stories: Relative paths from story to component
-- Test functions: Always import `fn` from `storybook/test` for interactive props
-
-## Story Configuration
-
-### Meta Configuration Template
-
-#### Foundation Stories
-
-Foundation stories document design system principles with custom educational content:
-
-```typescript
-/**
- * Colors communicate meaning before words are read. Our color system prioritizes
- * accessibility and semantic clarity over decorative appeal.
- */
-const meta = {
-  title: '01 Identity/Colors',
-  parameters: {
-    layout: 'fullscreen',
-    docs: {
-      description: {
-        component: 'The foundational color system built on semantic tokens and accessibility-first principles.',
-      },
-    },
-  },
-} satisfies Meta
-```
-
-#### Component Stories
-
-Main component stories include comprehensive documentation and testing setup:
-
-```typescript
-// @componentStatus published
+// @componentStatus published | draft | deprecated
 // @version 0.1.0
 
-/**
- * Every interaction begins with intent. The button is where user intention meets interface response.
- * Our button system is built on the principle that clarity of purpose should be immediately apparent.
- */
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
+import { ComponentName } from '../../../components/ComponentName';
+
 const meta = {
-  title: '03 Components/Action/Button',
-  component: Button,
-  tags: ['!autodocs', '!dev', 'test'], // Vitest integration
+  title: 'Components/ComponentName',
+  component: ComponentName,
   parameters: {
     layout: 'centered',
     docs: {
       description: {
-        component: 'The foundational interactive element with embedded design intelligence.',
+        component: '[Component description with embedded intelligence]',
       },
     },
   },
   argTypes: {
-    variant: {
-      control: 'select',
-      options: ['primary', 'secondary', 'destructive', 'outline', 'ghost'],
-      description: 'Visual style variant using semantic tokens',
-    },
-    onClick: {
-      description: 'Click handler - required for interactive testing',
-    },
+    // Comprehensive argTypes for all props
   },
-  args: { onClick: fn() }, // CRITICAL for Vitest story testing
-} satisfies Meta<typeof Button>
-```
-
-#### Substory Files
-
-Intelligence, Variant, Properties, Semantic, and Accessibility stories use simplified meta:
-
-```typescript
-const meta = {
-  title: '03 Components/Action/Button/Intelligence',
-  component: Button,
-  parameters: {
-    layout: 'centered',
+  args: { 
+    onClick: fn(), // Required for interactive components
   },
-} satisfies Meta<typeof Button>
-```
+} satisfies Meta<typeof ComponentName>;
 
-#### Critical Tags Configuration
+export default meta;
+type Story = StoryObj<typeof meta>;
 
-**Required tags for component stories:**
-- `['!autodocs', '!dev', 'test']` - Excludes autodocs, marks for Vitest testing
+// REQUIRED STORIES:
 
-**Required args for interactive components:**
-- `args: { onClick: fn() }` - Enables proper event testing in Vitest
+export const AllVariants: Story = {
+  // Show all visual variants in one story
+};
 
-## Story Types & Content
+export const Sizes: Story = {
+  // Show all size options
+};
 
-### Main Component Story (`Button.stories.tsx`)
-**Purpose:** Core component documentation with all variants
-**Content:**
-- Philosophy JSDoc explaining design principles
-- Comprehensive argTypes for all props
-- Common variants demonstration
-- Complete testing setup with `fn()` handlers
+export const States: Story = {
+  // Loading, disabled, error states
+};
 
-**Example stories:** `Common` - Shows all variants in one view
+export const SemanticContexts: Story = {
+  // Real-world usage patterns
+};
 
-### Intelligence Story (`ButtonIntelligence.stories.tsx`) 🧠
-**Purpose:** Design intelligence patterns and cognitive load principles
-**Content:**
-- Loading states with proper UX patterns
-- Destructive confirmation patterns  
-- Attention hierarchy demonstrations
-- Trust-building interaction examples
-- **Motion intelligence patterns** (see Motion Intelligence Documentation below)
-
-**Example stories:** `LoadingState`, `DestructiveConfirm`, `AttentionHierarchy`, `MotionIntelligence`
-
-### Variants Story (`ButtonVariants.stories.tsx`)
-**Purpose:** Visual styling variants and semantic meaning
-**Content:**
-- All `variant` prop values
-- Visual hierarchy demonstration
-- Semantic color token usage
-- Style-focused examples
-
-### Properties Story (`ButtonProperties.stories.tsx`)
-**Purpose:** Interactive properties and component states
-**Content:**
-- Size variations (`sm`, `md`, `lg`)
-- Disabled states
-- Interactive property demonstrations
-- State management examples
-
-### Semantic Story (`ButtonSemantic.stories.tsx`) 
-**Purpose:** Semantic variants and contextual usage
-**Content:**
-- Success, Warning, Info, Destructive states
-- Context-appropriate usage examples
-- Semantic token demonstrations
-- Meaning-driven design patterns
-
-### Accessibility Story (`ButtonAccessibility.stories.tsx`)
-**Purpose:** WCAG AAA compliance and inclusive design
-**Content:**
-- ARIA properties and labels
-- Keyboard navigation patterns
-- Screen reader compatibility
-- Focus management
-- Color contrast demonstrations
-- **Motion accessibility features** (see Motion Intelligence Documentation below)
-
-## Motion Intelligence Documentation
-
-### Motion Token Integration Standards
-
-Components that use motion design tokens must document their motion intelligence across **multiple story files** to provide comprehensive AI training:
-
-#### Primary Location: Intelligence Stories 🧠
-**`ComponentIntelligence.stories.tsx`** - Main motion intelligence documentation:
-- **WHY motion choices were made** (cognitive load, trust building, attention economics)
-- **Motion context patterns** (contextTiming.hover, contextTiming.modal, etc.)
-- **Interactive demonstrations** showing motion in component's overall intelligence
-- **Decision reasoning** explaining motion's role in design intelligence
-
-```typescript
-export const MotionIntelligence: Story = {
-  render: () => (
-    <div className="space-y-4">
-      <h3>Motion Intelligence: contextTiming.hover + contextEasing.hover</h3>
-      <p>Cognitive Load: 3/10 - Instant feedback builds user confidence</p>
-      <Button>Hover to see motion intelligence</Button>
-      <p className="text-sm text-muted-foreground">
-        Motion tokens provide 75ms instant feedback with snappy easing,
-        building immediate trust through responsive interactions.
-      </p>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Motion intelligence demonstrates how timing and easing tokens support the component\'s design intelligence principles.',
-      },
-    },
-  },
-}
-```
-
-#### Secondary Location: Accessibility Stories ♿
-**`ComponentAccessibility.stories.tsx`** - Motion accessibility aspects:
-- **`prefers-reduced-motion`** compliance demonstration
-- **Accessibility timing options** (standard vs. accessibilityTiming)
-- **Vestibular disorder protection** (0ms durations)
-- **WCAG 2.1 motion guidelines** compliance
-
-```typescript
-export const MotionAccessibility: Story = {
-  render: () => (
-    <div className="space-y-4">
-      <h3>Motion Accessibility</h3>
-      <div className="space-y-2">
-        <Button>Default Motion (contextTiming.hover)</Button>
-        <p className="text-sm text-muted-foreground">
-          Auto-reduces to 1ms duration with prefers-reduced-motion
-        </p>
-      </div>
-      <div className="space-y-2">
-        <Button className={cn('transition-all', accessibilityTiming.hover, easing.smooth)}>
-          Accessibility Compliant (0ms reduced motion)
-        </Button>
-        <p className="text-sm text-muted-foreground">
-          Section 508 compliant with 0ms duration for vestibular disorder protection
-        </p>
-      </div>
-    </div>
-  ),
-}
-```
-
-#### Tertiary Location: Properties Stories ⚙️
-**`ComponentProperties.stories.tsx`** - Interactive motion behavior:
-- **How motion responds** to different props/states
-- **State-specific animations** (hover, focus, disabled, loading)
-- **Motion variation demonstrations** for different component configurations
-
-```typescript
 export const InteractiveStates: Story = {
-  render: () => (
-    <div className="grid grid-cols-2 gap-4">
-      <Button>Normal (hover motion enabled)</Button>
-      <Button disabled>Disabled (no motion)</Button>
-      <Button loading>Loading (progress motion pattern)</Button>
-      <Button variant="destructive">Destructive (deliberate motion timing)</Button>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Motion behavior adapts to component state and variant, using appropriate timing for each interaction context.',
-      },
-    },
-  },
-}
-```
-
-### Motion Documentation Requirements
-
-#### Intelligence Story Motion Section
-Every component with motion tokens MUST include a `MotionIntelligence` story that documents:
-
-1. **Motion Token Usage**: Which tokens (`contextTiming.hover`, `contextEasing.smooth`, etc.)
-2. **Cognitive Load Impact**: How motion affects user mental processing (1-10 scale)
-3. **Trust Building Role**: How motion contributes to user confidence
-4. **Decision Reasoning**: Why these specific timing/easing choices were made
-5. **Interactive Demo**: Hoverable/clickable examples showing motion in action
-
-#### Accessibility Story Motion Section
-Components with motion tokens SHOULD include motion accessibility documentation:
-
-1. **Reduced Motion Compliance**: Show `prefers-reduced-motion` behavior
-2. **Accessibility Options**: Demonstrate `accessibilityTiming` vs standard timing
-3. **WCAG Compliance Notes**: Reference specific WCAG 2.1 motion guidelines
-4. **Vestibular Considerations**: Explain 0ms vs 1ms duration choices
-
-#### Properties Story Motion Integration
-Interactive components SHOULD demonstrate motion across different states:
-
-1. **State-Based Motion**: How motion changes for disabled, loading, error states
-2. **Variant Motion Differences**: Different motion patterns for destructive vs standard variants
-3. **Motion Interaction**: How motion responds to user interactions
-
-### Motion Story Template
-
-```typescript
-/**
- * Motion Intelligence
- * 
- * Documents the motion design tokens and intelligence patterns used by this component.
- * Shows how timing and easing choices support design intelligence principles.
- */
-export const MotionIntelligence: Story = {
-  render: () => {
-    return (
-      <div className="space-y-6">
-        {/* Motion Token Documentation */}
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold">Motion Tokens Used</h3>
-          <ul className="text-sm space-y-1">
-            <li><code>contextTiming.hover</code> - {timing.instant} (75ms)</li>
-            <li><code>contextEasing.hover</code> - {easing.snappy} (immediate response)</li>
-          </ul>
-        </div>
-
-        {/* Design Intelligence Integration */}
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold">Design Intelligence</h3>
-          <ul className="text-sm space-y-1">
-            <li><strong>Cognitive Load:</strong> 3/10 - Instant feedback reduces uncertainty</li>
-            <li><strong>Trust Building:</strong> Immediate response builds user confidence</li>
-            <li><strong>Attention Economics:</strong> Motion supports interaction hierarchy</li>
-          </ul>
-        </div>
-
-        {/* Interactive Demo */}
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold">Motion Demonstration</h3>
-          <ComponentName>Hover/click to experience motion intelligence</ComponentName>
-        </div>
-      </div>
-    );
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Motion intelligence patterns showing how timing and easing tokens support the component\'s design intelligence principles.',
-      },
-    },
-  },
-}
-```
-
-## Testing Integration with Vitest
-
-### Automatic Story Testing
-
-**All stories are automatically tested** via `@storybook/addon-vitest`:
-
-```bash
-pnpm test              # Runs all tests including stories
-pnpm test-storybook    # Runs story-specific tests
-pnpm vitest run        # CI test runner
-```
-
-### Story Testing Requirements
-
-**Stories must be functional, not just documentation:**
-
-1. **Interactive props must work** - Use `fn()` for click handlers
-2. **Stories must render without errors** in browser environment  
-3. **No broken imports or missing dependencies**
-4. **Valid JSX and TypeScript** - stories are compiled and executed
-
-```typescript
-// ✅ CORRECT - Testable story
-export const Primary: Story = {
-  args: {
-    variant: 'primary',
-    children: 'Click me',
-    onClick: fn(), // Required for testing
-  },
-}
-
-// ❌ INCORRECT - Non-functional story
-export const Broken: Story = {
-  args: {
-    variant: 'primary',
-    onClick: undefined, // No handler - test will fail
-  },
-}
-```
-
-### Story Testing Benefits
-
-- **Quality assurance** - Stories that don't work break tests
-- **Regression prevention** - Component changes caught in story tests  
-- **Documentation accuracy** - Examples must actually function
-- **Accessibility verification** - A11y addon runs on all stories
-
-## Documentation Standards
-
-### JSDoc Standards
-1. **Component-level JSDoc** with:
-   - Design philosophy statement 
-   - Core purpose and principles
-   - Usage context and guidelines
-
-```typescript
-/**
- * Every interaction begins with intent. The button is where user intention meets interface response.
- * Our button system is built on the principle that clarity of purpose should be immediately apparent—
- * both visually and functionally.
- */
-```
-
-2. **Story-level JSDoc** with:
-   - Specific usage context
-   - When to use this variant
-   - Implementation considerations
-
-```typescript
-/**
- * Primary Button
- * 
- * The primary action in any interface. Used for the most important action
- * on a page or in a section. Should appear only once per context.
- */
-export const Primary: Story = {
-  // story implementation
+  // Hover, focus, active states
 };
 ```
 
-### Description Standards
+#### 3. `ComponentNameAccessibility.stories.tsx` - WCAG AAA Compliance
+**Purpose**: Comprehensive accessibility testing and demonstration
 
-#### Component Descriptions
-Should establish design philosophy and foundational principles:
-```typescript
-parameters: {
-  docs: {
-    description: {
-      component: 'The foundational interactive element. Every button communicates intent through carefully chosen visual hierarchy and semantic meaning.',
-    },
-  },
-}
-```
+**Location**: `/src/stories/components/{component}/ComponentNameAccessibility.stories.tsx`
 
-#### Story Descriptions  
-Should explain specific usage context and guidelines:
-```typescript
-parameters: {
-  docs: {
-    description: {
-      story: 'Primary action using semantic primary tokens. Most prominent call-to-action that should appear only once per context.',
-    },
-  },
-}
-```
-   - Technology notes (Radix, semantic tokens, etc.)
-
-2. **Story-level descriptions** for each variant explaining:
-   - When to use this variant
-   - Semantic meaning
-   - Design rationale
-
-## Story Organization
-
-### Required Stories
-Every component must include these story categories:
-
-#### 1. Variants Stories
-- Cover all visual variants (primary, secondary, destructive, etc.)
-- Each variant gets its own named export
-- Include semantic meaning in descriptions
-
-#### 2. Size Stories  
-- Cover all size variants (sm, md, lg)
-- Show sizing hierarchy and use cases
-
-#### 3. State Stories
-- Disabled state
-- Loading state (if applicable)
-- Error state (if applicable)
-
-#### 4. Interactive Stories
-- Demonstrate hover/focus behaviors
-- Test click handlers with `fn()` spies
-- Show responsive interactions
-
-#### 5. Composition Stories
-- `asChild` usage (for Radix components)
-- Integration examples
-- Complex compositions
-
-## Story Naming Conventions
-
-### Export Names
-- Use **PascalCase** for story exports
-- Use **descriptive names** that explain the variant
-- Examples: `Primary`, `Secondary`, `InteractiveStates`, `AsChild`
-
-### Story Descriptions
-- Start with action word ("Demonstrates", "Shows", "Uses")
-- Explain when/why to use this variant
-- Reference semantic tokens when relevant
-
-## ArgTypes Configuration
-
-### Control Types
-- **select**: For enums and variants
-- **boolean**: For flags and toggles  
-- **text**: For string content
-- **number**: For numeric values
-
-### Required Properties
-```typescript
-argTypes: {
-  propName: {
-    control: 'controlType',
-    options: [...], // for select controls
-    description: 'Clear description of prop purpose',
-  },
-}
-```
-
-## Semantic Token Integration
-
-### Documentation Requirements
-- Always mention semantic token usage in descriptions
-- Explain grayscale foundation approach
-- Reference design system principles
-
-### Example Pattern
-```typescript
-parameters: {
-  docs: {
-    description: {
-      story: 'Primary action using semantic primary tokens. Most prominent call-to-action.',
-    },
-  },
-}
-```
-
-## Testing Integration
-
-### Vitest Addon
-- All stories automatically generate tests via `@storybook/addon-vitest`
-- Stories run in browser environment with Playwright
-- Tests verify rendering, interactions, and accessibility
-
-### Test Structure
-```typescript
-// Companion test file: ComponentName.test.ts
-import { composeStories } from '@storybook/react-vite';
-import * as stories from './ComponentName.stories';
-
-const { Primary, Secondary, ... } = composeStories(stories);
-```
-
-## Accessibility Standards
-
-### A11y Addon Integration
-- All stories run through `@storybook/addon-a11y`
-- Test level set to 'todo' for development feedback
-- Focus states must be clearly documented
-- Color contrast verification required
-
-### Required Accessibility Stories
-Every component should include these accessibility-focused stories:
-
-#### 1. AccessibilityBasics
-- ARIA labels and descriptions
-- Loading states
-- Proper button semantics
-- Screen reader considerations
-
-#### 2. KeyboardNavigation  
-- Tab order verification
-- Focus management
-- Keyboard activation (Enter/Space)
-- Focus indicators
-
-#### 3. ColorContrastDemo
-- WCAG 2.1 AA compliance verification
-- Various background contexts
-- Disabled state contrast
-- Size-based readability
-
-### A11y Story Configuration
-```typescript
-export const AccessibilityExample: Story = {
-  parameters: {
-    a11y: {
-      config: {
-        rules: [
-          {
-            id: 'color-contrast',
-            enabled: true,
-          },
-          {
-            id: 'keyboard',
-            enabled: true,
-          },
-        ],
-      },
-    },
-  },
-};
-```
-
-### Accessibility ArgTypes
-Include ARIA properties in argTypes:
-```typescript
-argTypes: {
-  'aria-label': {
-    control: 'text',
-    description: 'Accessible label when button text is not descriptive enough',
-  },
-  'aria-describedby': {
-    control: 'text', 
-    description: 'ID of element that describes the button',
-  },
-  'aria-pressed': {
-    control: 'boolean',
-    description: 'For toggle buttons, indicates pressed state',
-  },
-}
-```
-
-### Focus Management
-```typescript
-// Document focus behavior in stories
-argTypes: {
-  // Focus-related props should explain keyboard navigation
-}
-```
-
-## CSS & Styling
-
-### Tailwind CSS Integration
-- Storybook configured with `@tailwindcss/vite` plugin
-- Main CSS file imported in `.storybook/preview.ts`
-- All semantic tokens available in stories
-
-### Style Dependencies
-```typescript
-// .storybook/preview.ts
-import '../src/style.css' // Required for design tokens
-```
-
-## Error Handling
-
-### Common Issues
-1. **JSX in .ts files**: Use `.tsx` extension
-2. **Missing imports**: Always import from correct paths
-3. **Invalid hrefs**: Use real URLs, not `#` placeholders
-4. **Missing fn()**: Interactive props need spy functions
-
-### Validation
-- All stories must compile without errors
-- All stories must pass a11y checks
-- All stories must render in tests
-
-## File Templates
-
-### Basic Story Template
+**Required Stories**:
 ```typescript
 // @componentStatus published
 // @version 0.1.0
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-import { ComponentName } from '../components/ComponentName';
+import { ComponentName } from '../../../components/ComponentName';
 
-/**
- * Component description and features
- */
 const meta = {
-  title: 'Rafters/ComponentName',
+  title: 'Components/ComponentName/Accessibility',
   component: ComponentName,
   parameters: {
     layout: 'centered',
     docs: {
       description: {
-        component: 'Component description',
+        component: 'Accessibility compliance testing.',
       },
     },
-  },
-  tags: ['autodocs'],
-  argTypes: {
-    // Define all props
   },
   args: { onClick: fn() },
 } satisfies Meta<typeof ComponentName>;
@@ -828,60 +146,212 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  args: {
-    // Default props
-  },
+export const KeyboardNavigation: Story = {
+  // Tab, Enter, Space, Arrow key support
+};
+
+export const ScreenReaderSupport: Story = {
+  // ARIA labels and announcements
+};
+
+export const HighContrast: Story = {
+  // High contrast mode testing
+};
+
+export const FocusManagement: Story = {
+  // Focus indicators and traps
+};
+```
+
+## Migration from 7-File to 3-File Structure
+
+### What Gets Consolidated
+
+**Into Main Stories File** (`ComponentName.stories.tsx`):
+- `ComponentNameVariants.stories.tsx` → `AllVariants` story
+- `ComponentNameProperties.stories.tsx` → `Sizes` and `States` stories
+- `ComponentNameSemantic.stories.tsx` → `SemanticContexts` story
+- `ComponentNameIntelligence.stories.tsx` → Embedded in story descriptions
+
+**Remains Separate**:
+- `ComponentName.mdx` - Primary documentation
+- `ComponentNameAccessibility.stories.tsx` - Accessibility focus
+
+### Example Migration
+
+**Before** (7 files):
+```
+button/
+  ├── Button.mdx
+  ├── Button.stories.tsx
+  ├── ButtonVariants.stories.tsx
+  ├── ButtonProperties.stories.tsx
+  ├── ButtonSemantic.stories.tsx
+  ├── ButtonIntelligence.stories.tsx
+  └── ButtonAccessibility.stories.tsx
+```
+
+**After** (3 files):
+```
+button/
+  ├── Button.mdx                        # Philosophy & usage
+  ├── Button.stories.tsx                # All variants, states, patterns
+  └── ButtonAccessibility.stories.tsx   # Accessibility testing
+```
+
+## Component Status Annotations
+
+Every main story file MUST include status comments:
+
+```typescript
+// @componentStatus published | draft | deprecated
+// @version 0.1.0
+```
+
+**Status Values**:
+- `published` - Ready for production, included in registry
+- `draft` - In development, excluded from registry
+- `deprecated` - Scheduled for removal
+
+## Design Token Usage Requirements
+
+### NEVER Use Arbitrary Values
+```typescript
+// ❌ WRONG - Teaches bad habits
+className="text-green-600 bg-blue-500"
+className="p-4 m-2"
+```
+
+### ALWAYS Use Semantic Tokens
+```typescript
+// ✅ CORRECT - Teaches proper system usage
+className="text-success bg-primary"
+className="p-md m-sm"
+```
+
+## Story Writing Principles
+
+### 1. Consolidation Over Proliferation
+- Combine related demonstrations into comprehensive stories
+- Each story should showcase multiple related aspects
+- Avoid separate files for minor variations
+
+### 2. Real-World Focus
+- Every story demonstrates practical usage patterns
+- Include context for when to use each variant
+- Show components in realistic combinations
+
+### 3. Intelligence Embedding
+- Include cognitive load ratings in descriptions
+- Document trust-building patterns
+- Explain attention hierarchy decisions
+
+### 4. Interactive Requirements
+- All interactive components must include `onClick: fn()`
+- Stories serve as both documentation AND tests
+- Broken stories corrupt AI training data
+
+## Testing Requirements
+
+All stories run as tests via `@storybook/addon-vitest`:
+
+```bash
+pnpm test              # Run all story tests
+pnpm vitest run        # CI test runner
+```
+
+**Test Coverage Includes**:
+- Component renders without errors
+- Interactive handlers properly connected
+- Props work as documented
+- Accessibility requirements met
+
+## Common Story Patterns
+
+### Trust-Building Pattern
+```typescript
+export const TrustLevels: Story = {
+  render: () => (
+    <div className="space-y-4">
+      <Button variant="outline">Low Trust Action</Button>
+      <Button variant="primary">Medium Trust Action</Button>
+      <Button variant="warning">High Trust Action</Button>
+      <Button variant="destructive" destructiveConfirm>
+        Critical Trust Action
+      </Button>
+    </div>
+  ),
+};
+```
+
+### Attention Hierarchy Pattern
+```typescript
+export const AttentionHierarchy: Story = {
+  render: () => (
+    <div className="flex items-center gap-4">
+      <Button size="sm" variant="ghost">Low Attention</Button>
+      <Button size="md" variant="secondary">Medium Attention</Button>
+      <Button size="lg" variant="primary">High Attention</Button>
+    </div>
+  ),
+};
+```
+
+### Loading States Pattern
+```typescript
+export const LoadingStates: Story = {
+  render: () => (
+    <div className="space-y-4">
+      <Button loading>Processing...</Button>
+      <Input loading placeholder="Loading..." />
+      <Card loading>Loading content...</Card>
+    </div>
+  ),
 };
 ```
 
 ## Quality Checklist
 
-Before committing story changes, verify:
+Before committing component stories:
 
-### File Structure & Imports
-- [ ] Uses `.tsx` extension for JSX content
-- [ ] **Status comments at top**: `// @componentStatus published` and `// @version 0.1.0`
-- [ ] Correct relative import paths (`../../../components/Button`)
-- [ ] Imports `fn` from `storybook/test` for interactive props
-- [ ] Follows proper title hierarchy (`03 Components/Action/Button`)
+- [ ] Status comment included (`// @componentStatus`)
+- [ ] Version comment included (`// @version`)
+- [ ] MDX file with philosophy and usage guidelines
+- [ ] Main stories file with all variants consolidated
+- [ ] Accessibility stories file with keyboard/screen reader tests
+- [ ] All stories render without errors
+- [ ] Interactive components have `fn()` handlers
+- [ ] Only semantic tokens used (no arbitrary values)
+- [ ] Real-world usage patterns demonstrated
+- [ ] High contrast mode tested
+- [ ] Cognitive load documented
 
-### Story Content & Testing
-- [ ] Includes comprehensive JSDoc with design philosophy
-- [ ] Uses semantic tokens (never arbitrary colors)
-- [ ] Interactive stories include `onClick: fn()` in args
-- [ ] Stories render without errors in Vitest
-- [ ] Covers intelligence patterns specific to component
-- [ ] Documents accessibility features and ARIA properties
+## File Naming Conventions
 
-### Design System Compliance
-- [ ] Examples use semantic color tokens (`text-primary`, not `text-blue-500`)
-- [ ] Stories demonstrate proper semantic meaning
-- [ ] Accessibility patterns follow WCAG AAA standards
-- [ ] Intelligence stories show cognitive load considerations
+- **MDX**: `ComponentName.mdx`
+- **Main Stories**: `ComponentName.stories.tsx`
+- **Accessibility**: `ComponentNameAccessibility.stories.tsx`
+- **Titles**: `Components/ComponentName` (no subdirectories)
 
-### Technical Requirements
-- [ ] Compiles without TypeScript errors
-- [ ] Passes Vitest story tests (`pnpm test-storybook`)
-- [ ] Passes accessibility addon checks
-- [ ] Uses proper component categories and naming conventions
-- [ ] Main story includes `tags: ['!autodocs', '!dev', 'test']`
-- [ ] **Status comments present** for registry publishing control
+## Why This Structure?
 
-## Story Development Summary
+### Benefits of 3-File System
+1. **Maintainability**: Less duplication, easier updates
+2. **Discoverability**: Clear purpose for each file
+3. **Focus**: Accessibility never gets buried
+4. **Efficiency**: Faster to create and review
+5. **Testing**: Consolidated tests run faster
 
-**Our Storybook serves dual purposes:**
-1. **Documentation** - Teaching design intelligence and proper component usage
-2. **Testing** - Automated quality assurance via Vitest integration
+### What We Preserve
+- Design philosophy documentation (MDX)
+- Comprehensive variant showcase (Main stories)
+- Accessibility focus (Dedicated file)
+- Real-world patterns
+- Intelligence embedding
 
-**Key Principles:**
-- **Intelligence-First** - Every component includes dedicated intelligence patterns
-- **Semantic Tokens Only** - No arbitrary colors or values in examples
-- **Functional Stories** - All stories must work as tests, not just documentation
-- **Accessibility Focus** - WCAG AAA compliance demonstrated in dedicated stories
-
-**File Organization:**
-- Foundation stories document design system principles
-- Component stories organized by category and type
-- Intelligence stories show cognitive load and attention hierarchy
-- All stories contribute to the component's educational value for AI agents
+### What We Eliminate
+- File proliferation
+- Duplicate content
+- Maintenance overhead
+- Navigation complexity
+- Test fragmentation
