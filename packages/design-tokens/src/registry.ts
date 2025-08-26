@@ -5,10 +5,12 @@
  * Built for AI-first design token system with comprehensive intelligence metadata
  */
 
+import { TokenDependencyGraph } from './dependencies.js';
 import type { Token } from './index.js';
 
 export class TokenRegistry {
   private tokens: Map<string, Token> = new Map();
+  public dependencyGraph: TokenDependencyGraph = new TokenDependencyGraph();
 
   constructor(initialTokens?: Token[]) {
     if (initialTokens) {
@@ -47,5 +49,26 @@ export class TokenRegistry {
 
   size(): number {
     return this.tokens.size;
+  }
+
+  /**
+   * Get all tokens that depend on the specified token
+   */
+  getDependents(tokenName: string): string[] {
+    return this.dependencyGraph.getDependents(tokenName);
+  }
+
+  /**
+   * Get all tokens this token depends on
+   */
+  getDependencies(tokenName: string): string[] {
+    return this.dependencyGraph.getDependencies(tokenName);
+  }
+
+  /**
+   * Add dependency relationship with generation rule
+   */
+  addDependency(tokenName: string, dependsOn: string[], rule: string): void {
+    this.dependencyGraph.addDependency(tokenName, dependsOn, rule);
   }
 }
