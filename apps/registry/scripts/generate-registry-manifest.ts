@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const componentsDir = path.resolve(__dirname, '../../../packages/ui/src/components');
-const manifestPath = path.resolve(__dirname, '../../../registry-manifest.json');
+const manifestPath = path.resolve(__dirname, '../src/registry-manifest.json');
 
 // Rafters intelligence schema
 const IntelligenceSchema = z.object({

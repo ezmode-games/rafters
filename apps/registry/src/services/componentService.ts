@@ -7,7 +7,7 @@
 
 // Import the generated manifest directly as a JSON module
 // @ts-ignore - JSON import is supported in Workers
-import generatedManifest from '../../registry-manifest.json';
+import generatedManifest from '@/registry-manifest.json';
 
 // Type definitions for our generated registry manifest
 interface RaftersIntelligence {

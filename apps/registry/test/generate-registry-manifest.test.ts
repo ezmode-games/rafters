@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
 const scriptPath = path.resolve(__dirname, '../scripts/generate-registry-manifest.ts');
-const manifestPath = path.resolve(__dirname, '../../../registry-manifest.json');
+const manifestPath = path.resolve(__dirname, '../src/registry-manifest.json');
 
 // Use the same schema as the generator script
 const IntelligenceSchema = z.object({
