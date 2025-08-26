@@ -1,5 +1,13 @@
 # MANDATORY REQUIREMENTS - READ FIRST
 
+## NEVER USE EMOJIS - ABSOLUTE BAN:
+**NO EMOJIS ANYWHERE - EVER**
+- NO emojis in code, comments, documentation, commit messages, or GitHub issues
+- NO visual symbols or decorative characters
+- Use clear, descriptive text instead of visual decoration
+- Emojis are uninformative and represent the exact problem this system solves
+- Focus on semantic meaning through words, not visual symbols
+
 ## UI/UX WORK - MANDATORY SAMI CONSULTATION:
 **BEFORE ANY UI/UX WORK - ALWAYS USE SAMI AGENT**
 - Sami enforces systematic Rafters design intelligence consumption
