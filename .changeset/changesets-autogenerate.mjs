@@ -44,13 +44,16 @@ if (packageName && packageName === 'cli') {
 
   const changesetContent = `---
 'rafters': ${changeType}
+'@rafters/design-tokens': patch
+'@rafters/shared': patch
+'@rafters/color-utils': patch
 ---
 ${description}
 `;
 
   const timestamp = Date.now();
   fs.writeFileSync(`.changeset/auto-${timestamp}.md`, changesetContent);
-  console.log(`✅ Changeset file created for package: rafters (CLI)`);
+  console.log(`✅ Changeset file created for CLI and dependencies`);
 } else {
   console.log('⚠️ No valid package scope found in commit message. Valid scope is: cli');
   console.log('📝 Example: feat(cli): add new component scaffolding');

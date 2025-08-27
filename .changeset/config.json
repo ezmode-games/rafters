@@ -9,9 +9,6 @@
 	"updateInternalDependencies": "patch",
 	"ignore": [
 		"@rafters/studio",
-		"@rafters/color-utils",
-		"@rafters/design-tokens", 
-		"@rafters/shared",
 		"rafters-ui",
 		"website"
 	]

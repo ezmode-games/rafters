@@ -14,7 +14,7 @@ import {
   fetchStudioTokens,
   injectCSSImport,
   writeTokenFiles,
-} from '@rafters/design-tokens/src';
+} from '@rafters/design-tokens';
 import {
   type Config,
   configExists,

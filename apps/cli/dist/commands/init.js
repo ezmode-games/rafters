@@ -6,7 +6,7 @@ const { ensureDirSync, writeFileSync, existsSync } = fs;
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkTailwindVersion, createDefaultRegistry, fetchStudioTokens, injectCSSImport, writeTokenFiles, } from '@rafters/design-tokens/src';
+import { checkTailwindVersion, createDefaultRegistry, fetchStudioTokens, injectCSSImport, writeTokenFiles, } from '@rafters/design-tokens';
 import { configExists, defaultConfig, detectPackageManager, hasReact, isNodeProject, saveConfig, } from '../utils/config.js';
 import { getCoreDependencies, installDependencies } from '../utils/dependencies.js';
 import { getRaftersLogo, getRaftersTitle } from '../utils/logo.js';
