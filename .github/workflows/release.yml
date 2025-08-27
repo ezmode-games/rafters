@@ -43,38 +43,10 @@ jobs:
       - name: Build packages for distribution
         run: pnpm build
 
-      # DETECT COMPONENT CHANGES
-      - name: Check for component changes
-        id: component-changes
+      # DEPLOY WEBSITE TO CLOUDFLARE (always deploy on main branch changes)
+      - name: Deploy Website 
         run: |
-          # Get list of changed files in this push
-          CHANGED_FILES=$(git diff --name-only HEAD~1..HEAD || echo "")
-          echo "Files changed in this push:"
-          echo "$CHANGED_FILES" | head -10
-          
-          # Check if any component files have changed
-          if echo "$CHANGED_FILES" | grep -E "^packages/ui/src/components/.*\.tsx$" > /dev/null; then
-            echo "changes=true" >> $GITHUB_OUTPUT
-            echo ""
-            echo "Component changes detected:"
-            echo "$CHANGED_FILES" | grep -E "^packages/ui/src/components/.*\.tsx$"
-            echo "Registry deployment will be triggered"
-          else
-            echo "changes=false" >> $GITHUB_OUTPUT  
-            echo ""
-            echo "No component changes detected - skipping registry deployment"
-            echo "Registry deployment triggers when .tsx files change in packages/ui/src/components/"
-          fi
-
-      # GENERATE REGISTRY MANIFEST (always run to ensure consistency)
-      - name: Generate Registry Manifest
-        run: pnpm manifest:generate
-
-      # DEPLOY WEBSITE WITH REGISTRY ROUTES TO CLOUDFLARE (conditional on component changes)
-      - name: Deploy Website with Registry
-        if: steps.component-changes.outputs.changes == 'true'
-        run: |
-          echo "Deploying website with updated component intelligence and registry routes..."
+          echo "Deploying website with latest changes..."
           cd apps/website
           pnpm deploy
         env:
