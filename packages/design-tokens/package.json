@@ -9,6 +9,7 @@
     "format": "esm"
   },
   "files": [
+    "dist",
     "tokens",
     "README.md"
   ],
