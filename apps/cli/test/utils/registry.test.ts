@@ -29,6 +29,7 @@ describe('registry', () => {
           ],
           meta: {
             rafters: {
+              version: '0.1.0',
               intelligence: {
                 cognitiveLoad: 3,
                 attentionEconomics: 'Size hierarchy: sm=tertiary, md=secondary, lg=primary',
@@ -36,6 +37,12 @@ describe('registry', () => {
                 trustBuilding: 'Destructive actions require confirmation',
                 semanticMeaning: 'Primary=main actions',
               },
+              usagePatterns: {
+                dos: ['Use for primary actions'],
+                nevers: ['Never use for destructive actions without confirmation']
+              },
+              designGuides: [],
+              examples: []
             },
           },
         },
@@ -50,7 +57,7 @@ describe('registry', () => {
 
       const result = await fetchComponentRegistry();
       expect(result.components).toEqual(mockResponse.components);
-      expect(mockFetch).toHaveBeenCalledWith('https://rafters.realhandy.tech/registry/components', {
+      expect(mockFetch).toHaveBeenCalledWith('https://rafters.realhandy.tech/api/registry/components', {
         signal: expect.any(AbortSignal),
         headers: {
           Accept: 'application/json',
@@ -116,6 +123,7 @@ describe('registry', () => {
       ],
       meta: {
         rafters: {
+          version: '0.1.0',
           intelligence: {
             cognitiveLoad: 3,
             attentionEconomics: 'Size hierarchy: sm=tertiary, md=secondary, lg=primary',
@@ -123,6 +131,12 @@ describe('registry', () => {
             trustBuilding: 'Destructive actions require confirmation',
             semanticMeaning: 'Primary=main actions',
           },
+          usagePatterns: {
+            dos: ['Use for primary actions'],
+            nevers: ['Never use for destructive actions without confirmation']
+          },
+          designGuides: [],
+          examples: []
         },
       },
     };
@@ -136,7 +150,7 @@ describe('registry', () => {
       const result = await fetchComponent('button');
       expect(result).toEqual(mockManifest);
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://rafters.realhandy.tech/registry/components/button',
+        'https://rafters.realhandy.tech/api/registry/components/button',
         {
           signal: expect.any(AbortSignal),
           headers: {

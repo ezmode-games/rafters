@@ -95,7 +95,7 @@ export type Registry = z.infer<typeof RegistrySchema>;
 
 // Registry configuration
 function getRegistryBaseUrl(): string {
-  return process.env.RAFTERS_REGISTRY_URL || 'https://rafters.realhandy.tech/registry';
+  return process.env.RAFTERS_REGISTRY_URL || 'https://rafters.realhandy.tech/api/registry';
 }
 const REGISTRY_TIMEOUT = 10000; // 10 seconds
 
