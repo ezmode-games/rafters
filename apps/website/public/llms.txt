@@ -126,4 +126,4 @@ Rafters embeds human design expertise in three layers:
 
 You can ignore all of this and still ship better UIs. When you're ready to level up, the intelligence is there.
 
-Last updated: 2025-08-27T02:22:20.039Z
+Last updated: 2025-08-27T02:35:03.636Z

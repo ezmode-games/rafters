@@ -1,6 +1,6 @@
 {
   "name": "rafters",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "description": "CLI tool for installing AI-first design system components with embedded intelligence",
   "type": "module",
   "main": "./dist/index.js",
