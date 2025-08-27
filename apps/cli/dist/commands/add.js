@@ -82,7 +82,7 @@ export async function addCommand(componentName, options = {}) {
                 await installDependencies(componentManifest.dependencies, config.packageManager, cwd);
                 depsSpinner.succeed('Dependencies installed');
             }
-            catch (error) {
+            catch (_error) {
                 depsSpinner.warn('Failed to install dependencies automatically');
                 console.log(chalk.gray(`  Please install manually: ${config.packageManager} ${config.packageManager === 'npm' ? 'install' : 'add'} ${componentManifest.dependencies.join(' ')}`));
             }

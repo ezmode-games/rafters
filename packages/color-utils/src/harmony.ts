@@ -4,7 +4,6 @@
  */
 
 import type { OKLCH } from '@rafters/shared';
-import Color from 'colorjs.io';
 import { calculateWCAGContrast } from './accessibility.js';
 
 /**
@@ -223,7 +222,7 @@ export function generateSemanticColorSuggestions(baseColor: OKLCH): {
  * Analyzes contrast ratios and suggests optimal pairings - Pure OKLCH
  */
 export function generateColorCombinations(colorScale: Record<string, OKLCH>) {
-  const scaleEntries = Object.entries(colorScale);
+  const _scaleEntries = Object.entries(colorScale);
   const combinations: {
     background: OKLCH;
     foreground: OKLCH;
@@ -358,7 +357,7 @@ export function calculateAtmosphericWeight(color: OKLCH): {
 
   // Higher lightness and lower chroma = more atmospheric (distant)
   const lightnessWeight = color.l; // 0-1, higher = more distant
-  const chromaWeight = 1 - Math.min(1, color.c / 0.3); // Normalize chroma, invert
+  const _chromaWeight = 1 - Math.min(1, color.c / 0.3); // Normalize chroma, invert
 
   // Calculate distance weight (0 = far/background, 1 = near/foreground)
   let distanceWeight = 0;

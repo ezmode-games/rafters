@@ -172,7 +172,7 @@ export async function fetchComponent(componentName: string): Promise<ComponentMa
         registry.components?.find((c) => c.name.toLowerCase() === componentName.toLowerCase()) ||
         null
       );
-    } catch (registryError) {
+    } catch (_registryError) {
       throw new Error(
         `Component '${componentName}' not found: ${error instanceof Error ? error.message : 'Unknown error'}`
       );

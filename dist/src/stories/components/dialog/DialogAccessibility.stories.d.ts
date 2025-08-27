@@ -1,10 +1,10 @@
-import type { StoryObj } from '@storybook/react-vite';
+import type { StoryObj } from "@storybook/react-vite";
 declare const meta: {
-    title: string;
-    component: import("react").FC<import("@radix-ui/react-dialog").DialogProps>;
-    parameters: {
-        layout: string;
-    };
+	title: string;
+	component: import("react").FC<import("@radix-ui/react-dialog").DialogProps>;
+	parameters: {
+		layout: string;
+	};
 };
 export default meta;
 type Story = StoryObj<typeof meta>;

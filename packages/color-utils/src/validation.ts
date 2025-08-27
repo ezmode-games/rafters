@@ -34,7 +34,7 @@ export function parseColorToOKLCH(colorString: string): OKLCH {
       c: oklch.c,
       h: oklch.h || 0, // Handle undefined hue for achromatic colors
     };
-  } catch (error) {
+  } catch (_error) {
     throw new Error(`Invalid color string: ${colorString}`);
   }
 }

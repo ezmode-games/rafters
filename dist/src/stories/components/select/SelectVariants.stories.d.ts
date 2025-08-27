@@ -1,14 +1,16 @@
-import type { StoryObj } from '@storybook/react-vite';
+import type { StoryObj } from "@storybook/react-vite";
 declare const meta: {
-    title: string;
-    component: import("react").FC<import("@radix-ui/react-select").SelectProps>;
-    parameters: {
-        layout: string;
-    };
-    tags: string[];
-    args: {
-        onValueChange: import("storybook/internal/test").Mock<(...args: any[]) => any>;
-    };
+	title: string;
+	component: import("react").FC<import("@radix-ui/react-select").SelectProps>;
+	parameters: {
+		layout: string;
+	};
+	tags: string[];
+	args: {
+		onValueChange: import("storybook/internal/test").Mock<
+			(...args: any[]) => any
+		>;
+	};
 };
 export default meta;
 type Story = StoryObj<typeof meta>;

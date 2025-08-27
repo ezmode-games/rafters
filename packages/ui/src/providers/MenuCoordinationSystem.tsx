@@ -95,7 +95,10 @@ export const MenuCoordinationSystem: React.FC<MenuCoordinationSystemProps> = ({
   const enhancedMenuProvider: MenuProviderProps = {
     ...menuProvider,
     onLoadExceeded: (current, max) => {
-      handleSystemEvent('menu-registered', 'system', { currentLoad: current, maxLoad: max });
+      handleSystemEvent('menu-registered', 'system', {
+        currentLoad: current,
+        maxLoad: max,
+      });
       menuProvider?.onLoadExceeded?.(current, max);
     },
     children: <></>,
@@ -105,7 +108,9 @@ export const MenuCoordinationSystem: React.FC<MenuCoordinationSystemProps> = ({
     ...focusManager,
     onFocusChange: (menuId, element) => {
       if (menuId) {
-        handleSystemEvent('focus-changed', menuId, { element: element?.tagName });
+        handleSystemEvent('focus-changed', menuId, {
+          element: element?.tagName,
+        });
       }
       focusManager?.onFocusChange?.(menuId, element);
     },
@@ -182,7 +187,9 @@ export const useMenuCoordinationSystem = (menuId: string, menuType: string) => {
 /**
  * Debug utility for development
  */
-export const MenuCoordinationDebugger: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const MenuCoordinationDebugger: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
   return (
     <MenuCoordinationSystem
       enableDebugMode={true}
@@ -201,12 +208,12 @@ export const MenuCoordinationDebugger: React.FC<{ children: React.ReactNode }> =
   );
 };
 
-// Export all coordination hooks for convenience
 export {
-  // Core coordination
-  useMenuCoordination,
-  useMenu,
-} from './MenuProvider';
+  MENU_MESSAGES,
+  // Announcements
+  useAnnouncements,
+  useMenuAnnouncements,
+} from './AnnouncementProvider';
 
 export {
   // Focus management
@@ -215,25 +222,24 @@ export {
 } from './FocusManager';
 
 export {
+  DEFAULT_KEY_CONFIGS,
   // Keyboard navigation
   useKeyboardNavigation,
   useMenuKeyboard,
-  DEFAULT_KEY_CONFIGS,
 } from './KeyboardNavigationProvider';
+// Export all coordination hooks for convenience
+export {
+  useMenu,
+  // Core coordination
+  useMenuCoordination,
+} from './MenuProvider';
 
 export {
-  // Announcements
-  useAnnouncements,
-  useMenuAnnouncements,
-  MENU_MESSAGES,
-} from './AnnouncementProvider';
-
-export {
+  MOTION_CLASSES,
+  MOTION_DURATIONS,
+  useMenuMotion,
   // Motion coordination
   useMotionCoordinator,
-  useMenuMotion,
-  MOTION_DURATIONS,
-  MOTION_CLASSES,
 } from './MotionCoordinator';
 
 // Export provider types for TypeScript

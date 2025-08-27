@@ -47,19 +47,14 @@ import React, { useCallback, useEffect } from 'react';
 import { z } from 'zod';
 import { useSidebarNavigation } from '../hooks/useSidebarNavigation';
 import { cn } from '../lib/utils';
-import {
-  useSidebarActions,
-  useSidebarCollapsed,
-  useSidebarCurrentPath,
-  useSidebarStore,
-} from '../stores/sidebarStore';
+import { useSidebarActions, useSidebarCollapsed } from '../stores/sidebarStore';
 
 // Zod validation schemas for external data (CLAUDE.md requirement)
 const NavigationPathSchema = z
   .string()
   .min(1, 'Path cannot be empty')
   .startsWith('/', 'Path must start with /');
-const HrefSchema = z.string().refine((val) => {
+const _HrefSchema = z.string().refine((val) => {
   try {
     new URL(val);
     return true;

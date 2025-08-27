@@ -1,23 +1,26 @@
-import type { StoryObj } from '@storybook/react-vite';
+import type { StoryObj } from "@storybook/react-vite";
 /**
  * Properties shape behavior and interaction patterns.
  * Each property serves the interface's functional requirements.
  */
 declare const meta: {
-    title: string;
-    component: import("react").ForwardRefExoticComponent<import("../../../components").ButtonProps & import("react").RefAttributes<HTMLButtonElement>>;
-    parameters: {
-        layout: string;
-        docs: {
-            description: {
-                component: string;
-            };
-        };
-    };
-    tags: string[];
-    args: {
-        onClick: import("storybook/internal/test").Mock<(...args: any[]) => any>;
-    };
+	title: string;
+	component: import("react").ForwardRefExoticComponent<
+		import("../../../components").ButtonProps &
+			import("react").RefAttributes<HTMLButtonElement>
+	>;
+	parameters: {
+		layout: string;
+		docs: {
+			description: {
+				component: string;
+			};
+		};
+	};
+	tags: string[];
+	args: {
+		onClick: import("storybook/internal/test").Mock<(...args: any[]) => any>;
+	};
 };
 export default meta;
 type Story = StoryObj<typeof meta>;

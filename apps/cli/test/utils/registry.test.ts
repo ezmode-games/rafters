@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fetchComponent, fetchComponentRegistry } from '../../src/utils/registry.js';
 import type { ComponentManifest, Registry } from '../../src/utils/registry.js';
+import { fetchComponent, fetchComponentRegistry } from '../../src/utils/registry.js';
 
 // Mock fetch globally
 const mockFetch = vi.fn();

@@ -132,9 +132,24 @@ const DEFAULT_KEY_CONFIGS = {
       preventDefault: true,
       stopPropagation: true,
     },
-    { key: ' ', action: 'select' as KeyboardAction, preventDefault: true, stopPropagation: true },
-    { key: 'Home', action: 'home' as KeyboardAction, preventDefault: true, stopPropagation: true },
-    { key: 'End', action: 'end' as KeyboardAction, preventDefault: true, stopPropagation: true },
+    {
+      key: ' ',
+      action: 'select' as KeyboardAction,
+      preventDefault: true,
+      stopPropagation: true,
+    },
+    {
+      key: 'Home',
+      action: 'home' as KeyboardAction,
+      preventDefault: true,
+      stopPropagation: true,
+    },
+    {
+      key: 'End',
+      action: 'end' as KeyboardAction,
+      preventDefault: true,
+      stopPropagation: true,
+    },
   ],
   navigation: [
     {
@@ -173,9 +188,24 @@ const DEFAULT_KEY_CONFIGS = {
       preventDefault: true,
       stopPropagation: true,
     },
-    { key: ' ', action: 'select' as KeyboardAction, preventDefault: true, stopPropagation: true },
-    { key: 'Home', action: 'home' as KeyboardAction, preventDefault: true, stopPropagation: true },
-    { key: 'End', action: 'end' as KeyboardAction, preventDefault: true, stopPropagation: true },
+    {
+      key: ' ',
+      action: 'select' as KeyboardAction,
+      preventDefault: true,
+      stopPropagation: true,
+    },
+    {
+      key: 'Home',
+      action: 'home' as KeyboardAction,
+      preventDefault: true,
+      stopPropagation: true,
+    },
+    {
+      key: 'End',
+      action: 'end' as KeyboardAction,
+      preventDefault: true,
+      stopPropagation: true,
+    },
   ],
   dropdown: [
     {
@@ -202,9 +232,24 @@ const DEFAULT_KEY_CONFIGS = {
       preventDefault: true,
       stopPropagation: true,
     },
-    { key: ' ', action: 'toggle' as KeyboardAction, preventDefault: true, stopPropagation: true },
-    { key: 'Home', action: 'home' as KeyboardAction, preventDefault: true, stopPropagation: true },
-    { key: 'End', action: 'end' as KeyboardAction, preventDefault: true, stopPropagation: true },
+    {
+      key: ' ',
+      action: 'toggle' as KeyboardAction,
+      preventDefault: true,
+      stopPropagation: true,
+    },
+    {
+      key: 'Home',
+      action: 'home' as KeyboardAction,
+      preventDefault: true,
+      stopPropagation: true,
+    },
+    {
+      key: 'End',
+      action: 'end' as KeyboardAction,
+      preventDefault: true,
+      stopPropagation: true,
+    },
   ],
   breadcrumb: [
     {
@@ -219,8 +264,18 @@ const DEFAULT_KEY_CONFIGS = {
       preventDefault: true,
       stopPropagation: true,
     },
-    { key: 'Home', action: 'home' as KeyboardAction, preventDefault: true, stopPropagation: true },
-    { key: 'End', action: 'end' as KeyboardAction, preventDefault: true, stopPropagation: true },
+    {
+      key: 'Home',
+      action: 'home' as KeyboardAction,
+      preventDefault: true,
+      stopPropagation: true,
+    },
+    {
+      key: 'End',
+      action: 'end' as KeyboardAction,
+      preventDefault: true,
+      stopPropagation: true,
+    },
     {
       key: 'Enter',
       action: 'select' as KeyboardAction,
@@ -259,10 +314,30 @@ const DEFAULT_KEY_CONFIGS = {
       preventDefault: true,
       stopPropagation: true,
     },
-    { key: ' ', action: 'toggle' as KeyboardAction, preventDefault: true, stopPropagation: true },
-    { key: 'Home', action: 'home' as KeyboardAction, preventDefault: true, stopPropagation: true },
-    { key: 'End', action: 'end' as KeyboardAction, preventDefault: true, stopPropagation: true },
-    { key: '*', action: 'expand' as KeyboardAction, preventDefault: true, stopPropagation: true }, // Expand all
+    {
+      key: ' ',
+      action: 'toggle' as KeyboardAction,
+      preventDefault: true,
+      stopPropagation: true,
+    },
+    {
+      key: 'Home',
+      action: 'home' as KeyboardAction,
+      preventDefault: true,
+      stopPropagation: true,
+    },
+    {
+      key: 'End',
+      action: 'end' as KeyboardAction,
+      preventDefault: true,
+      stopPropagation: true,
+    },
+    {
+      key: '*',
+      action: 'expand' as KeyboardAction,
+      preventDefault: true,
+      stopPropagation: true,
+    }, // Expand all
   ],
   sidebar: [
     {
@@ -283,9 +358,24 @@ const DEFAULT_KEY_CONFIGS = {
       preventDefault: true,
       stopPropagation: true,
     },
-    { key: ' ', action: 'select' as KeyboardAction, preventDefault: true, stopPropagation: true },
-    { key: 'Home', action: 'home' as KeyboardAction, preventDefault: true, stopPropagation: true },
-    { key: 'End', action: 'end' as KeyboardAction, preventDefault: true, stopPropagation: true },
+    {
+      key: ' ',
+      action: 'select' as KeyboardAction,
+      preventDefault: true,
+      stopPropagation: true,
+    },
+    {
+      key: 'Home',
+      action: 'home' as KeyboardAction,
+      preventDefault: true,
+      stopPropagation: true,
+    },
+    {
+      key: 'End',
+      action: 'end' as KeyboardAction,
+      preventDefault: true,
+      stopPropagation: true,
+    },
   ],
 } as const;
 
@@ -342,7 +432,7 @@ export const KeyboardNavigationProvider: React.FC<KeyboardNavigationProviderProp
   typeAheadDelay = 1000,
   onGlobalKeyAction,
 }) => {
-  const coordination = useMenuCoordination();
+  const _coordination = useMenuCoordination();
   const focusManager = useFocusManager();
 
   const [state, setState] = useState<KeyboardNavigationState>({
@@ -425,7 +515,7 @@ export const KeyboardNavigationProvider: React.FC<KeyboardNavigationProviderProp
 
   // Search mode management
   const enableSearchMode = useCallback(
-    (menuId: string) => {
+    (_menuId: string) => {
       setState((prev) => ({
         ...prev,
         searchMode: true,
@@ -525,7 +615,7 @@ export const KeyboardNavigationProvider: React.FC<KeyboardNavigationProviderProp
       const currentFocus = focusManager.getFocusedMenuId();
 
       // Handle global shortcuts first
-      for (const [shortcut, config] of state.globalShortcuts) {
+      for (const [_shortcut, config] of state.globalShortcuts) {
         if (matchesKeyConfig(event, config)) {
           if (config.preventDefault) event.preventDefault();
           if (config.stopPropagation) event.stopPropagation();

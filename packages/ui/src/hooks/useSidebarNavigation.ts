@@ -13,7 +13,7 @@ import { useMenu } from '../providers/MenuProvider';
 import { useSidebarActions, useSidebarStore } from '../stores/sidebarStore';
 
 // Basic validation schema (complex function validation done with TypeScript types)
-const NavigationItemBaseSchema = z.object({
+const _NavigationItemBaseSchema = z.object({
   id: z.string(),
   label: z.string(),
   href: z.string().optional(),

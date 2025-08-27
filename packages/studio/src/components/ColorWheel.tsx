@@ -5,7 +5,7 @@
 
 import { hexToOKLCH, oklchToCSS, oklchToHex } from '@rafters/color-utils';
 import type { OKLCH } from '@rafters/shared';
-import React, { useState, useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 
 interface ColorWheelProps {

@@ -5,6 +5,6 @@
  */
 
 export {
-  useSidebarNavigation,
   useSidebarItem,
+  useSidebarNavigation,
 } from './useSidebarNavigation';

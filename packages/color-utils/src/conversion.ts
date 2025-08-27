@@ -34,7 +34,7 @@ export function hexToOKLCH(hex: string): OKLCH {
       h: oklch.coords[2] || 0, // Handle undefined hue for achromatic colors
       alpha: oklch.alpha || 1,
     };
-  } catch (error) {
+  } catch (_error) {
     throw new Error(`Invalid hex color: ${hex}`);
   }
 }

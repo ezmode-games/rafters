@@ -2,10 +2,11 @@ import chalk from 'chalk';
 import fs from 'fs-extra';
 import inquirer from 'inquirer';
 import ora from 'ora';
+
 const { ensureDirSync, writeFileSync, existsSync } = fs;
+
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { dirname } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   checkTailwindVersion,
@@ -205,7 +206,7 @@ export async function initCommand(): Promise<void> {
     try {
       await installDependencies(coreDeps, packageManager, cwd);
       depsSpinner.succeed('Core dependencies installed');
-    } catch (error) {
+    } catch (_error) {
       depsSpinner.warn('Failed to install dependencies automatically. Please install manually:');
       console.log(
         chalk.gray(

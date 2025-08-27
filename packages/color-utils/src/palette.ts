@@ -21,12 +21,7 @@ function generateAdvancedScale(
     fullScale?: boolean;
   } = {}
 ): OKLCH[] {
-  const {
-    colorspace = 'OKLCH',
-    smooth = true,
-    distributeLightness = 'polynomial',
-    fullScale = true,
-  } = options;
+  const { smooth = true, distributeLightness = 'polynomial', fullScale = true } = options;
 
   // Convert OKLCH to hex for chroma-js compatibility
   const hexKeys = colorKeys.map((oklch) => {
@@ -149,9 +144,17 @@ export function generateHarmoniousPalette(
     case 'monochromatic':
       // Create lightness and chroma variations
       colorKeys = [
-        { ...baseColor, l: Math.min(0.9, baseColor.l + 0.2), c: baseColor.c * 0.8 },
+        {
+          ...baseColor,
+          l: Math.min(0.9, baseColor.l + 0.2),
+          c: baseColor.c * 0.8,
+        },
         baseColor,
-        { ...baseColor, l: Math.max(0.1, baseColor.l - 0.2), c: baseColor.c * 1.2 },
+        {
+          ...baseColor,
+          l: Math.max(0.1, baseColor.l - 0.2),
+          c: baseColor.c * 1.2,
+        },
       ];
       break;
 
@@ -195,7 +198,7 @@ export function generateHarmoniousPalette(
 /**
  * Generate semantic color set (success, warning, danger, info)
  */
-export function generateSemanticColors(brandColor: OKLCH): {
+export function generateSemanticColors(_brandColor: OKLCH): {
   success: OKLCH;
   warning: OKLCH;
   danger: OKLCH;
