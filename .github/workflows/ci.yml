@@ -4,9 +4,10 @@ on:
   pull_request:
     branches:
       - main
-  push:
-    branches:
-      - main
+  # Temporarily disabled push trigger to test release workflow
+  # push:
+  #   branches:
+  #     - main
 
 jobs:
   test:
