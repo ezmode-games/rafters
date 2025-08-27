@@ -17,7 +17,11 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist", "templates", "README.md"],
+  "files": [
+    "dist",
+    "templates",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",

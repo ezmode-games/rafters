@@ -1,23 +1,26 @@
-import type { StoryObj } from '@storybook/react-vite';
+import type { StoryObj } from "@storybook/react-vite";
 /**
  * Accessibility is design quality, not compliance.
  * Every accessibility feature improves the experience for all users.
  */
 declare const meta: {
-    title: string;
-    component: import("react").ForwardRefExoticComponent<import("../../../components").ButtonProps & import("react").RefAttributes<HTMLButtonElement>>;
-    parameters: {
-        layout: string;
-        docs: {
-            description: {
-                component: string;
-            };
-        };
-    };
-    tags: string[];
-    args: {
-        onClick: import("storybook/internal/test").Mock<(...args: any[]) => any>;
-    };
+	title: string;
+	component: import("react").ForwardRefExoticComponent<
+		import("../../../components").ButtonProps &
+			import("react").RefAttributes<HTMLButtonElement>
+	>;
+	parameters: {
+		layout: string;
+		docs: {
+			description: {
+				component: string;
+			};
+		};
+	};
+	tags: string[];
+	args: {
+		onClick: import("storybook/internal/test").Mock<(...args: any[]) => any>;
+	};
 };
 export default meta;
 type Story = StoryObj<typeof meta>;

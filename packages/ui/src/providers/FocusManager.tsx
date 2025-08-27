@@ -117,7 +117,7 @@ export const FocusManager: React.FC<FocusManagerProps> = ({
   onFocusChange,
   announceChanges = true,
 }) => {
-  const coordination = useMenuCoordination();
+  const _coordination = useMenuCoordination();
   const [state, setState] = useState<FocusManagerState>({
     focusStack: [],
     trapActive: false,
@@ -151,20 +151,23 @@ export const FocusManager: React.FC<FocusManagerProps> = ({
   );
 
   // Unregister focus element
-  const unregisterFocusElement = useCallback((menuId: string) => {
-    const focusElement = focusElementsRef.current.get(menuId);
-    if (focusElement?.restoreFocus) {
-      restoreFocus(menuId);
-    }
+  const unregisterFocusElement = useCallback(
+    (menuId: string) => {
+      const focusElement = focusElementsRef.current.get(menuId);
+      if (focusElement?.restoreFocus) {
+        restoreFocus(menuId);
+      }
 
-    focusElementsRef.current.delete(menuId);
+      focusElementsRef.current.delete(menuId);
 
-    // Clean up focus stack
-    setState((prev) => ({
-      ...prev,
-      focusStack: prev.focusStack.filter((entry) => entry.menuId !== menuId),
-    }));
-  }, []);
+      // Clean up focus stack
+      setState((prev) => ({
+        ...prev,
+        focusStack: prev.focusStack.filter((entry) => entry.menuId !== menuId),
+      }));
+    },
+    [restoreFocus]
+  );
 
   // Create focus trap for a menu
   const createFocusTrap = useCallback(
@@ -204,7 +207,13 @@ export const FocusManager: React.FC<FocusManagerProps> = ({
         console.warn('Focus trap creation failed:', error);
       }
     },
-    [state.trapActive, state.currentTrapBoundary, announceChanges]
+    [
+      state.trapActive,
+      state.currentTrapBoundary,
+      announceChanges,
+      announceFocusChange, // Focus first tabbable element in boundary
+      focusFirstTabbable,
+    ]
   );
 
   // Release focus trap
@@ -215,7 +224,7 @@ export const FocusManager: React.FC<FocusManagerProps> = ({
 
       setState((prev) => {
         const newStack = prev.focusStack.filter((entry) => entry.menuId !== menuId);
-        const isLastTrap =
+        const _isLastTrap =
           prev.currentTrapBoundary &&
           prev.focusStack[prev.focusStack.length - 1]?.menuId === menuId;
 
@@ -242,7 +251,7 @@ export const FocusManager: React.FC<FocusManagerProps> = ({
         announceFocusChange(`Menu closed: ${menuId}`, 'polite');
       }
     },
-    [state.focusStack, announceChanges]
+    [state.focusStack, announceChanges, announceFocusChange]
   );
 
   // Capture focus for restoration later

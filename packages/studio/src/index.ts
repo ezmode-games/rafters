@@ -1,2 +1,2 @@
-export { StudioApp } from './StudioApp';
 export * from './components';
+export { StudioApp } from './StudioApp';

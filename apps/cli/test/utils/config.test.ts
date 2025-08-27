@@ -5,7 +5,6 @@ import {
   type Config,
   ConfigSchema,
   configExists,
-  defaultConfig,
   detectPackageManager,
   getConfigPath,
   hasReact,

@@ -14,7 +14,7 @@ vi.mock('../../src/utils/logo.js');
 
 const mockExistsSync = vi.mocked(existsSync);
 const mockReadFileSync = vi.mocked(readFileSync);
-const mockWriteFileSync = vi.mocked(writeFileSync);
+const _mockWriteFileSync = vi.mocked(writeFileSync);
 
 describe('initCommand', () => {
   const mockCwd = '/test/project';

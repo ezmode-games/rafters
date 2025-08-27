@@ -4,8 +4,7 @@ import inquirer from 'inquirer';
 import ora from 'ora';
 const { ensureDirSync, writeFileSync, existsSync } = fs;
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { dirname } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkTailwindVersion, createDefaultRegistry, fetchStudioTokens, injectCSSImport, writeTokenFiles, } from '@rafters/design-tokens/src';
 import { configExists, defaultConfig, detectPackageManager, hasReact, isNodeProject, saveConfig, } from '../utils/config.js';
@@ -163,7 +162,7 @@ export async function initCommand() {
             await installDependencies(coreDeps, packageManager, cwd);
             depsSpinner.succeed('Core dependencies installed');
         }
-        catch (error) {
+        catch (_error) {
             depsSpinner.warn('Failed to install dependencies automatically. Please install manually:');
             console.log(chalk.gray(`  ${packageManager} ${packageManager === 'npm' ? 'install' : 'add'} ${coreDeps.join(' ')}`));
         }

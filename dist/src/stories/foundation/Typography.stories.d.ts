@@ -1,14 +1,14 @@
-import type { StoryObj } from '@storybook/react-vite';
+import type { StoryObj } from "@storybook/react-vite";
 /**
  * Typography guidelines establish clear hierarchies and organize information
  * based on importance. When applied well, typography enables content to be
  * communicated clearly, effectively, and efficiently.
  */
 declare const meta: {
-    title: string;
-    parameters: {
-        layout: string;
-    };
+	title: string;
+	parameters: {
+		layout: string;
+	};
 };
 export default meta;
 type Story = StoryObj<typeof meta>;

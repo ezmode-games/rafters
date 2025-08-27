@@ -3,23 +3,22 @@
  * https://developers.cloudflare.com/workers/wrangler/configuration/
  */
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "rafters-website",
-  "compatibility_date": "2025-04-04",
-  "compatibility_flags": ["nodejs_compat"],
-  "main": "./workers/app.ts",
-  "observability": {
-    "enabled": true
-  },
-  "routes": [
-    {
-      "pattern": "rafters.realhandy.tech",
-      "zone_id": "bad23610704adb1dc65b05bc22d6fb6f",
-      "custom_domain": true
-    }
-  ],
-  "dev": {
-    "port": 3000,
-    "local_protocol": "http"
-  }
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "rafters-website",
+	"compatibility_date": "2025-04-04",
+	"compatibility_flags": ["nodejs_compat"],
+	"main": "./workers/app.ts",
+	"observability": {
+		"enabled": true
+	},
+	"routes": [
+		{
+			"pattern": "rafters.realhandy.tech",
+			"custom_domain": true
+		}
+	],
+	"dev": {
+		"port": 3000,
+		"local_protocol": "http"
+	}
 }

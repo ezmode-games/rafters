@@ -6,7 +6,6 @@ import {
   createStoryPath,
   ensureDir,
   fileExists,
-  readFile,
   writeFile,
 } from '../../src/utils/files.js';
 
@@ -73,7 +72,9 @@ describe('files', () => {
       ensureDir('/new/dir/file.txt');
 
       expect(mockExistsSync).toHaveBeenCalledWith('/new/dir');
-      expect(mockMkdirSync).toHaveBeenCalledWith('/new/dir', { recursive: true });
+      expect(mockMkdirSync).toHaveBeenCalledWith('/new/dir', {
+        recursive: true,
+      });
     });
 
     it('should handle nested directory creation', () => {
@@ -81,7 +82,9 @@ describe('files', () => {
 
       ensureDir('/very/deep/nested/dir/file.txt');
 
-      expect(mockMkdirSync).toHaveBeenCalledWith('/very/deep/nested/dir', { recursive: true });
+      expect(mockMkdirSync).toHaveBeenCalledWith('/very/deep/nested/dir', {
+        recursive: true,
+      });
     });
   });
 
@@ -103,7 +106,9 @@ describe('files', () => {
 
       writeFile(filePath, content);
 
-      expect(mockMkdirSync).toHaveBeenCalledWith(dirname(filePath), { recursive: true });
+      expect(mockMkdirSync).toHaveBeenCalledWith(dirname(filePath), {
+        recursive: true,
+      });
       expect(mockWriteFileSync).toHaveBeenCalledWith(filePath, content, 'utf-8');
     });
 

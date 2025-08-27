@@ -1,5 +1,10 @@
-import type { StoryObj } from '@storybook/react';
-declare const meta: Meta<import("react").ForwardRefExoticComponent<import("../../../components").CardProps & import("react").RefAttributes<HTMLDivElement>>>;
+import type { StoryObj } from "@storybook/react";
+declare const meta: Meta<
+	import("react").ForwardRefExoticComponent<
+		import("../../../components").CardProps &
+			import("react").RefAttributes<HTMLDivElement>
+	>
+>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 export declare const InformationHierarchy: Story;

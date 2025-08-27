@@ -90,7 +90,11 @@ interface MotionCoordinatorContextValue {
 
   // Budget management
   updateBudget: (budget: Partial<MotionBudget>) => void;
-  getBudgetStatus: () => { available: number; used: number; percentage: number };
+  getBudgetStatus: () => {
+    available: number;
+    used: number;
+    percentage: number;
+  };
 
   // Motion utilities
   getMotionClass: (menuId: string, type: MotionType, duration: MotionDuration) => string;
@@ -269,7 +273,7 @@ export const MotionCoordinator: React.FC<MotionCoordinatorProps> = ({
         ) {
           // Try to reduce motion of lower priority animations
           let reducedLoad = 0;
-          for (const [id, animation] of state.activeAnimations) {
+          for (const [_id, animation] of state.activeAnimations) {
             if (animation.request.priority > validated.priority && animation.request.canBeReduced) {
               // This would require actual animation modification - simplified for now
               reducedLoad += 1;
@@ -505,7 +509,7 @@ export const MotionCoordinator: React.FC<MotionCoordinatorProps> = ({
   );
 
   const getReducedMotionClass = useCallback(
-    (baseClass: string, menuId: string): string => {
+    (baseClass: string, _menuId: string): string => {
       // Use existing motion accessibility utilities
       const config: AccessibleMotionConfig = {
         cognitiveLoad: state.currentLoad,
@@ -521,7 +525,7 @@ export const MotionCoordinator: React.FC<MotionCoordinatorProps> = ({
   );
 
   const shouldAnimate = useCallback(
-    (menuId: string, type: MotionType): boolean => {
+    (menuId: string, _type: MotionType): boolean => {
       if (pausedRef.current) return false;
 
       // Check if we have budget

@@ -6,7 +6,7 @@
 
 export {
   MenuProvider,
-  useMenuCoordination,
-  useMenu,
   type MenuProviderProps,
+  useMenu,
+  useMenuCoordination,
 } from './MenuProvider';

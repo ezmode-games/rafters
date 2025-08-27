@@ -1,15 +1,18 @@
-import type { StoryObj } from '@storybook/react-vite';
+import type { StoryObj } from "@storybook/react-vite";
 /**
  * Tabs organize content sections while respecting cognitive limits and enabling efficient
  * navigation. They provide clear visual hierarchy and semantic structure that builds
  * accurate mental models without overwhelming users with too many simultaneous choices.
  */
 declare const meta: {
-    title: string;
-    component: import("react").ForwardRefExoticComponent<import("../../../components/Tabs").TabsProps & import("react").RefAttributes<HTMLDivElement>>;
-    parameters: {
-        layout: string;
-    };
+	title: string;
+	component: import("react").ForwardRefExoticComponent<
+		import("../../../components/Tabs").TabsProps &
+			import("react").RefAttributes<HTMLDivElement>
+	>;
+	parameters: {
+		layout: string;
+	};
 };
 export default meta;
 type Story = StoryObj<typeof meta>;

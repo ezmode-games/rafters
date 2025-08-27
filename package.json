@@ -4,7 +4,10 @@
   "description": "AI-first design intelligence system for systematic UI generation",
   "private": true,
   "type": "module",
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "pnpm --parallel dev",
     "build": "pnpm --recursive --sort build",
@@ -23,7 +26,7 @@
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
     "changeset:check": "changeset status --verbose",
-    "manifest:generate": "pnpm --filter @rafters/registry manifest:generate",
+    "manifest:generate": "pnpm --filter website generate:manifest",
     "release:dry": "pnpm changeset:version && pnpm build && pnpm manifest:generate",
     "release:local": "pnpm preflight && pnpm changeset:publish",
     "deploy:storybook": "pnpm ui:build-storybook",
@@ -45,9 +48,12 @@
     "url": "https://github.com/real-handy/rafters"
   },
   "devDependencies": {
-    "@biomejs/biome": "catalog:",
+    "@biomejs/biome": "^1.9.3",
     "@changesets/cli": "^2.29.5",
     "lefthook": "^1.11.13",
     "typescript": "catalog:"
+  },
+  "dependencies": {
+    "tsx": "^4.20.5"
   }
 }

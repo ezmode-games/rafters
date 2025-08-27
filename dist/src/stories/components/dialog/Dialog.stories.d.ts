@@ -1,42 +1,42 @@
-import type { StoryObj } from '@storybook/react-vite';
+import type { StoryObj } from "@storybook/react-vite";
 /**
  * Critical moments require trust. The dialog is where user confidence meets consequential decisions.
  * Our dialog system is built on progressive disclosure, clear escape hatches, and trust-building
  * patterns that reduce anxiety during important interactions.
  */
 declare const meta: {
-    title: string;
-    component: import("react").FC<import("@radix-ui/react-dialog").DialogProps>;
-    tags: string[];
-    parameters: {
-        layout: string;
-        docs: {
-            description: {
-                component: string;
-            };
-        };
-    };
-    argTypes: {
-        trustLevel: {
-            control: string;
-            options: string[];
-            description: string;
-        };
-        destructive: {
-            control: string;
-            description: string;
-        };
-        size: {
-            control: string;
-            options: string[];
-            description: string;
-        };
-        cognitiveComplexity: {
-            control: string;
-            options: string[];
-            description: string;
-        };
-    };
+	title: string;
+	component: import("react").FC<import("@radix-ui/react-dialog").DialogProps>;
+	tags: string[];
+	parameters: {
+		layout: string;
+		docs: {
+			description: {
+				component: string;
+			};
+		};
+	};
+	argTypes: {
+		trustLevel: {
+			control: string;
+			options: string[];
+			description: string;
+		};
+		destructive: {
+			control: string;
+			description: string;
+		};
+		size: {
+			control: string;
+			options: string[];
+			description: string;
+		};
+		cognitiveComplexity: {
+			control: string;
+			options: string[];
+			description: string;
+		};
+	};
 };
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -377,7 +377,7 @@ export class MenuMotionCoordinator {
     return this.activeMenus.size > 0 ? Array.from(this.activeMenus)[0] : null;
   }
 
-  private getPriorityFor(menuId: string): number {
+  private getPriorityFor(_menuId: string): number {
     // This would return the actual priority for the menu
     // For now, returning a default value
     return 5;

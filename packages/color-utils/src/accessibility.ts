@@ -112,7 +112,7 @@ export function findAccessibleColor(
 
   // Determine if we need to go lighter or darker
   const bgLuminance = getRelativeLuminance(backgroundColor);
-  const targetLuminance = getRelativeLuminance(targetColor);
+  const _targetLuminance = getRelativeLuminance(targetColor);
 
   // Binary search for accessible lightness
   let minL = 0;

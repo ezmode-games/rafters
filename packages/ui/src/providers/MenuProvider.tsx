@@ -14,7 +14,7 @@
  * Token knowledge: .rafters/tokens/registry.json
  */
 
-import React, { createContext, useContext, useCallback, useRef, useState, useMemo } from 'react';
+import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
 
 // Zod schemas for validation

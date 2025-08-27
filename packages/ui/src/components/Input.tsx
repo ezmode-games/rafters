@@ -65,7 +65,7 @@ export function Input({
 
   // Validation intelligence: Choose appropriate feedback timing
   const needsImmediateFeedback = variant === 'error' && validationMode === 'live';
-  const hasValidationState = variant !== 'default';
+  const _hasValidationState = variant !== 'default';
 
   return (
     <div className="relative">

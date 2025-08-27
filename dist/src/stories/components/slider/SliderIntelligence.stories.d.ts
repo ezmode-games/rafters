@@ -1,5 +1,10 @@
-import type { StoryObj } from '@storybook/react';
-declare const meta: Meta<import("react").ForwardRefExoticComponent<import("../../../components/Slider").SliderProps & import("react").RefAttributes<HTMLSpanElement>>>;
+import type { StoryObj } from "@storybook/react";
+declare const meta: Meta<
+	import("react").ForwardRefExoticComponent<
+		import("../../../components/Slider").SliderProps &
+			import("react").RefAttributes<HTMLSpanElement>
+	>
+>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 export declare const MotorAccessibility: Story;

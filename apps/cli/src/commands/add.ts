@@ -105,7 +105,7 @@ export async function addCommand(componentName: string, options: AddOptions = {}
       try {
         await installDependencies(componentManifest.dependencies, config.packageManager, cwd);
         depsSpinner.succeed('Dependencies installed');
-      } catch (error) {
+      } catch (_error) {
         depsSpinner.warn('Failed to install dependencies automatically');
         console.log(
           chalk.gray(

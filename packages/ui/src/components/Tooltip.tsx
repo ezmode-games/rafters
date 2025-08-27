@@ -92,7 +92,7 @@ export const Tooltip = forwardRef<
   React.ComponentProps<typeof TooltipPrimitive.Root> & TooltipProps
 >(function Tooltip(
   { delayDuration, context = 'help', complexity = 'simple', essential = false, ...props },
-  ref
+  _ref
 ) {
   // Timing Intelligence: Smart delays based on context and complexity
   const getIntelligentDelay = () => {

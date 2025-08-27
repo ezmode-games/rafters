@@ -1,16 +1,19 @@
-import type { StoryObj } from '@storybook/react-vite';
+import type { StoryObj } from "@storybook/react-vite";
 declare const meta: {
-    title: string;
-    component: import("react").ForwardRefExoticComponent<import("../../../components").LabelProps & import("react").RefAttributes<HTMLLabelElement>>;
-    parameters: {
-        layout: string;
-        docs: {
-            description: {
-                component: string;
-            };
-        };
-    };
-    tags: string[];
+	title: string;
+	component: import("react").ForwardRefExoticComponent<
+		import("../../../components").LabelProps &
+			import("react").RefAttributes<HTMLLabelElement>
+	>;
+	parameters: {
+		layout: string;
+		docs: {
+			description: {
+				component: string;
+			};
+		};
+	};
+	tags: string[];
 };
 export default meta;
 type Story = StoryObj<typeof meta>;

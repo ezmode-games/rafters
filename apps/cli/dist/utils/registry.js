@@ -82,7 +82,7 @@ export const RegistrySchema = z.object({
 });
 // Registry configuration
 function getRegistryBaseUrl() {
-    return process.env.RAFTERS_REGISTRY_URL || 'https://rafters.realhandy.tech/registry';
+    return process.env.RAFTERS_REGISTRY_URL || 'https://rafters.realhandy.tech/api/registry';
 }
 const REGISTRY_TIMEOUT = 10000; // 10 seconds
 // HTTP client response schema
@@ -147,7 +147,7 @@ export async function fetchComponent(componentName) {
             return (registry.components?.find((c) => c.name.toLowerCase() === componentName.toLowerCase()) ||
                 null);
         }
-        catch (registryError) {
+        catch (_registryError) {
             throw new Error(`Component '${componentName}' not found: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }

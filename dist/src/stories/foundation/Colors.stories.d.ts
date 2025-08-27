@@ -1,19 +1,19 @@
-import type { StoryObj } from '@storybook/react-vite';
+import type { StoryObj } from "@storybook/react-vite";
 /**
  * Colors communicate meaning before words are read. Our color system prioritizes
  * accessibility and semantic clarity over decorative appeal. Every color choice
  * serves purpose, conveys hierarchy, and respects user intent.
  */
 declare const meta: {
-    title: string;
-    parameters: {
-        layout: string;
-        docs: {
-            description: {
-                component: string;
-            };
-        };
-    };
+	title: string;
+	parameters: {
+		layout: string;
+		docs: {
+			description: {
+				component: string;
+			};
+		};
+	};
 };
 export default meta;
 type Story = StoryObj<typeof meta>;

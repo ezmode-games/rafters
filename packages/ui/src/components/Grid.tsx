@@ -331,7 +331,7 @@ const AUTO_FIT_WIDTHS = {
 /**
  * Cognitive load limits by viewport (Miller's Law implementation)
  */
-const COGNITIVE_LIMITS = {
+const _COGNITIVE_LIMITS = {
   mobile: 2, // Small screens, touch interface
   tablet: 4, // Medium screens, mixed interaction
   desktop: 6, // Large screens, precise interaction

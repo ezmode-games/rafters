@@ -181,7 +181,7 @@ export const AnnouncementProvider: React.FC<AnnouncementProviderProps> = ({
   config: initialConfig,
   onAnnouncement,
 }) => {
-  const coordination = useMenuCoordination();
+  const _coordination = useMenuCoordination();
 
   const [state, setState] = useState<AnnouncementProviderState>(() => ({
     announcements: new Map(),
@@ -299,7 +299,7 @@ export const AnnouncementProvider: React.FC<AnnouncementProviderProps> = ({
         return '';
       }
     },
-    [state.config.debounceDelay, onAnnouncement]
+    [state.config.debounceDelay, onAnnouncement, clearAnnouncementById]
   );
 
   // Announce for specific menu
@@ -440,7 +440,10 @@ export const AnnouncementProvider: React.FC<AnnouncementProviderProps> = ({
     try {
       setState((prev) => ({
         ...prev,
-        config: AnnouncementConfigSchema.parse({ ...prev.config, ...newConfig }),
+        config: AnnouncementConfigSchema.parse({
+          ...prev.config,
+          ...newConfig,
+        }),
       }));
     } catch (error) {
       console.warn('Config update validation failed:', error);

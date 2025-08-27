@@ -43,7 +43,7 @@
  * ```
  */
 import { ChevronRight, Home, MoreHorizontal } from 'lucide-react';
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useState } from 'react';
 import { cn } from '../lib/utils';
 
 export type BreadcrumbSeparator =
@@ -107,7 +107,7 @@ export interface BreadcrumbPageProps extends React.HTMLAttributes<HTMLSpanElemen
 }
 
 // Separator intelligence with cognitive load ratings
-const SEPARATOR_INTELLIGENCE = {
+const _SEPARATOR_INTELLIGENCE = {
   'chevron-right': {
     cognitiveLoad: 2,
     contexts: ['general', 'admin', 'dashboard'],
@@ -181,9 +181,9 @@ export function Breadcrumb({
   ref,
   ...props
 }: BreadcrumbProps) {
-  const [expanded, setExpanded] = useState(false);
+  const [_expanded, _setExpanded] = useState(false);
 
-  const renderSeparator = useCallback(() => {
+  const _renderSeparator = useCallback(() => {
     if (typeof separator === 'string') {
       const separatorMap = {
         'chevron-right': <ChevronRight className="w-4 h-4" aria-hidden="true" />,

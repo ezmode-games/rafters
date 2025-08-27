@@ -9,7 +9,6 @@ import { describe, expect, it } from 'vitest';
 import {
   type DesignSystem,
   type Token,
-  TokenSchema,
   exportTokens,
   generateSpacingScale,
   generateTypographyScale,

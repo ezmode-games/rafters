@@ -70,13 +70,13 @@ jobs:
       - name: Generate Registry Manifest
         run: pnpm manifest:generate
 
-      # DEPLOY REGISTRY TO CLOUDFLARE (conditional on component changes)
-      - name: Deploy Registry
+      # DEPLOY WEBSITE WITH REGISTRY ROUTES TO CLOUDFLARE (conditional on component changes)
+      - name: Deploy Website with Registry
         if: steps.component-changes.outputs.changes == 'true'
         run: |
-          echo "Deploying registry with updated component intelligence..."
-          cd apps/registry
-          pnpm cf:deploy
+          echo "Deploying website with updated component intelligence and registry routes..."
+          cd apps/website
+          pnpm deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

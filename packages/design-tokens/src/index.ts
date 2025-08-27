@@ -10,11 +10,10 @@ import * as fs from 'fs-extra';
 import sqids from 'sqids';
 import { z } from 'zod';
 
+// Export dependency tracking system
+export { type TokenDependency, TokenDependencyGraph } from './dependencies.js';
 // Export core TokenRegistry class
 export { TokenRegistry } from './registry.js';
-
-// Export dependency tracking system
-export { TokenDependencyGraph, type TokenDependency } from './dependencies.js';
 
 export const generateShortCode = () => {
   const s = new sqids();
@@ -224,14 +223,18 @@ export function generateSpacingScale(
  * Generate depth/shadow scale (z-index and box-shadow)
  */
 export function generateDepthScale(
-  system: 'linear' | 'exponential' = 'exponential',
-  baseMultiplier = 10
+  _system: 'linear' | 'exponential' = 'exponential',
+  _baseMultiplier = 10
 ): Token[] {
   const tokens: Token[] = [];
 
   // Shadow tokens with semantic names
   const shadowScale = [
-    { name: 'shadow-none', value: 'none', meaning: 'No shadow, flat appearance' },
+    {
+      name: 'shadow-none',
+      value: 'none',
+      meaning: 'No shadow, flat appearance',
+    },
     {
       name: 'shadow-sm',
       value: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
@@ -267,11 +270,19 @@ export function generateDepthScale(
   // Semantic z-index layers
   const zLayers = [
     { name: 'z-base', value: 0, meaning: 'Base content layer' },
-    { name: 'z-sticky', value: 10, meaning: 'Sticky elements (headers, sidebars)' },
+    {
+      name: 'z-sticky',
+      value: 10,
+      meaning: 'Sticky elements (headers, sidebars)',
+    },
     { name: 'z-dropdown', value: 100, meaning: 'Dropdowns and select menus' },
     { name: 'z-modal', value: 1000, meaning: 'Modal dialogs and overlays' },
     { name: 'z-popover', value: 5000, meaning: 'Popovers and tooltips' },
-    { name: 'z-notification', value: 10000, meaning: 'Toast notifications and alerts' },
+    {
+      name: 'z-notification',
+      value: 10000,
+      meaning: 'Toast notifications and alerts',
+    },
     { name: 'z-tooltip', value: 50000, meaning: 'Tooltips (highest priority)' },
     { name: 'z-max', value: 2147483647, meaning: 'Maximum z-index value' },
   ];
@@ -773,14 +784,42 @@ export function generateBorderRadiusTokens(): Token[] {
 
   const radiusScale = [
     { name: 'none', value: '0', meaning: 'No border radius, sharp corners' },
-    { name: 'sm', value: '0.125rem', meaning: 'Small radius for subtle rounding' },
-    { name: 'base', value: '0.25rem', meaning: 'Default radius for most components' },
-    { name: 'md', value: '0.375rem', meaning: 'Medium radius for cards and panels' },
-    { name: 'lg', value: '0.5rem', meaning: 'Large radius for prominent elements' },
-    { name: 'xl', value: '0.75rem', meaning: 'Extra large radius for hero elements' },
+    {
+      name: 'sm',
+      value: '0.125rem',
+      meaning: 'Small radius for subtle rounding',
+    },
+    {
+      name: 'base',
+      value: '0.25rem',
+      meaning: 'Default radius for most components',
+    },
+    {
+      name: 'md',
+      value: '0.375rem',
+      meaning: 'Medium radius for cards and panels',
+    },
+    {
+      name: 'lg',
+      value: '0.5rem',
+      meaning: 'Large radius for prominent elements',
+    },
+    {
+      name: 'xl',
+      value: '0.75rem',
+      meaning: 'Extra large radius for hero elements',
+    },
     { name: '2xl', value: '1rem', meaning: 'Maximum standard radius' },
-    { name: '3xl', value: '1.5rem', meaning: 'Very large radius for special cases' },
-    { name: 'full', value: '9999px', meaning: 'Fully rounded (pills, avatars)' },
+    {
+      name: '3xl',
+      value: '1.5rem',
+      meaning: 'Very large radius for special cases',
+    },
+    {
+      name: 'full',
+      value: '9999px',
+      meaning: 'Fully rounded (pills, avatars)',
+    },
   ];
 
   radiusScale.forEach((radius, index) => {
@@ -831,8 +870,18 @@ export function generateMotionTokens(): Token[] {
       meaning: 'Deliberate timing for important changes',
       cognitive: 5,
     },
-    { name: 'slow', value: '700ms', meaning: 'Slow transitions for large changes', cognitive: 7 },
-    { name: 'dramatic', value: '1000ms', meaning: 'Dramatic timing for emphasis', cognitive: 9 },
+    {
+      name: 'slow',
+      value: '700ms',
+      meaning: 'Slow transitions for large changes',
+      cognitive: 7,
+    },
+    {
+      name: 'dramatic',
+      value: '1000ms',
+      meaning: 'Dramatic timing for emphasis',
+      cognitive: 9,
+    },
   ];
 
   durations.forEach((duration, index) => {
@@ -845,7 +894,7 @@ export function generateMotionTokens(): Token[] {
       scalePosition: index,
       cognitiveLoad: duration.cognitive,
       reducedMotionAware: true,
-      motionDuration: Number.parseInt(duration.value),
+      motionDuration: Number.parseInt(duration.value, 10),
       generateUtilityClass: true,
       applicableComponents: ['all'],
     });
@@ -853,10 +902,26 @@ export function generateMotionTokens(): Token[] {
 
   // Easing tokens
   const easings = [
-    { name: 'linear', value: 'linear', meaning: 'Linear timing for mechanical movement' },
-    { name: 'smooth', value: 'ease-in-out', meaning: 'Smooth natural movement' },
-    { name: 'accelerating', value: 'ease-out', meaning: 'Welcoming entrance animation' },
-    { name: 'decelerating', value: 'ease-in', meaning: 'Graceful exit animation' },
+    {
+      name: 'linear',
+      value: 'linear',
+      meaning: 'Linear timing for mechanical movement',
+    },
+    {
+      name: 'smooth',
+      value: 'ease-in-out',
+      meaning: 'Smooth natural movement',
+    },
+    {
+      name: 'accelerating',
+      value: 'ease-out',
+      meaning: 'Welcoming entrance animation',
+    },
+    {
+      name: 'decelerating',
+      value: 'ease-in',
+      meaning: 'Graceful exit animation',
+    },
     {
       name: 'bouncy',
       value: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
@@ -995,7 +1060,11 @@ export function generateFontWeightTokens(): Token[] {
     { name: 'medium', value: '500', meaning: 'Medium weight for emphasis' },
     { name: 'semibold', value: '600', meaning: 'Semi-bold for subheadings' },
     { name: 'bold', value: '700', meaning: 'Bold for headings and emphasis' },
-    { name: 'extrabold', value: '800', meaning: 'Extra bold for strong emphasis' },
+    {
+      name: 'extrabold',
+      value: '800',
+      meaning: 'Extra bold for strong emphasis',
+    },
     { name: 'black', value: '900', meaning: 'Black weight for maximum impact' },
   ];
 
@@ -1027,12 +1096,24 @@ export function generateLetterSpacingTokens(): Token[] {
   const tokens: Token[] = [];
 
   const spacings = [
-    { name: 'tighter', value: '-0.05em', meaning: 'Tighter letter spacing for large text' },
+    {
+      name: 'tighter',
+      value: '-0.05em',
+      meaning: 'Tighter letter spacing for large text',
+    },
     { name: 'tight', value: '-0.025em', meaning: 'Slightly tighter spacing' },
     { name: 'normal', value: '0em', meaning: 'Normal letter spacing' },
-    { name: 'wide', value: '0.025em', meaning: 'Wider spacing for readability' },
+    {
+      name: 'wide',
+      value: '0.025em',
+      meaning: 'Wider spacing for readability',
+    },
     { name: 'wider', value: '0.05em', meaning: 'Wide spacing for emphasis' },
-    { name: 'widest', value: '0.1em', meaning: 'Maximum spacing for display text' },
+    {
+      name: 'widest',
+      value: '0.1em',
+      meaning: 'Maximum spacing for display text',
+    },
   ];
 
   spacings.forEach((spacing, index) => {
@@ -1120,10 +1201,22 @@ export function generateAspectRatioTokens(): Token[] {
   const tokens: Token[] = [];
 
   const ratios = [
-    { name: 'square', value: '1 / 1', meaning: 'Square aspect ratio for avatars and icons' },
-    { name: 'video', value: '16 / 9', meaning: 'Video aspect ratio for media content' },
+    {
+      name: 'square',
+      value: '1 / 1',
+      meaning: 'Square aspect ratio for avatars and icons',
+    },
+    {
+      name: 'video',
+      value: '16 / 9',
+      meaning: 'Video aspect ratio for media content',
+    },
     { name: 'photo', value: '4 / 3', meaning: 'Photo aspect ratio for images' },
-    { name: 'golden', value: '1.618 / 1', meaning: 'Golden ratio for aesthetic layouts' },
+    {
+      name: 'golden',
+      value: '1.618 / 1',
+      meaning: 'Golden ratio for aesthetic layouts',
+    },
     { name: 'portrait', value: '3 / 4', meaning: 'Portrait orientation' },
     { name: 'landscape', value: '4 / 3', meaning: 'Landscape orientation' },
     { name: 'ultrawide', value: '21 / 9', meaning: 'Ultrawide aspect ratio' },
@@ -1192,9 +1285,21 @@ export function generateGridTokens(): Token[] {
     { name: '2-cols', value: 'repeat(2, 1fr)', meaning: 'Two equal columns' },
     { name: '3-cols', value: 'repeat(3, 1fr)', meaning: 'Three equal columns' },
     { name: '4-cols', value: 'repeat(4, 1fr)', meaning: 'Four equal columns' },
-    { name: '12-cols', value: 'repeat(12, 1fr)', meaning: 'Twelve column layout system' },
-    { name: 'sidebar', value: '250px 1fr', meaning: 'Sidebar with main content' },
-    { name: 'main-sidebar', value: '1fr 250px', meaning: 'Main content with sidebar' },
+    {
+      name: '12-cols',
+      value: 'repeat(12, 1fr)',
+      meaning: 'Twelve column layout system',
+    },
+    {
+      name: 'sidebar',
+      value: '250px 1fr',
+      meaning: 'Sidebar with main content',
+    },
+    {
+      name: 'main-sidebar',
+      value: '1fr 250px',
+      meaning: 'Main content with sidebar',
+    },
   ];
 
   gridColumns.forEach((grid, index) => {
@@ -1253,16 +1358,36 @@ export function generateTransformTokens(): Token[] {
       meaning: 'Subtle hover scale for interactive elements',
       cognitive: 2,
     },
-    { name: 'active', value: '0.98', meaning: 'Active/pressed scale for buttons', cognitive: 1 },
-    { name: 'focus', value: '1.05', meaning: 'Focus scale for accessibility', cognitive: 3 },
-    { name: 'disabled', value: '0.95', meaning: 'Disabled state scale', cognitive: 1 },
+    {
+      name: 'active',
+      value: '0.98',
+      meaning: 'Active/pressed scale for buttons',
+      cognitive: 1,
+    },
+    {
+      name: 'focus',
+      value: '1.05',
+      meaning: 'Focus scale for accessibility',
+      cognitive: 3,
+    },
+    {
+      name: 'disabled',
+      value: '0.95',
+      meaning: 'Disabled state scale',
+      cognitive: 1,
+    },
     {
       name: 'emphasis',
       value: '1.1',
       meaning: 'Emphasis scale for important elements',
       cognitive: 4,
     },
-    { name: 'dramatic', value: '1.25', meaning: 'Dramatic scale for animations', cognitive: 7 },
+    {
+      name: 'dramatic',
+      value: '1.25',
+      meaning: 'Dramatic scale for animations',
+      cognitive: 7,
+    },
   ];
 
   scaleTokens.forEach((scale, index) => {
@@ -1315,10 +1440,18 @@ export function generateTransformTokens(): Token[] {
 
   // Rotate transforms
   const rotateTokens = [
-    { name: 'flip', value: '180deg', meaning: 'Flip rotation for icons and arrows' },
+    {
+      name: 'flip',
+      value: '180deg',
+      meaning: 'Flip rotation for icons and arrows',
+    },
     { name: 'quarter', value: '90deg', meaning: 'Quarter turn rotation' },
     { name: 'half', value: '180deg', meaning: 'Half turn rotation' },
-    { name: 'three-quarter', value: '270deg', meaning: 'Three quarter turn rotation' },
+    {
+      name: 'three-quarter',
+      value: '270deg',
+      meaning: 'Three quarter turn rotation',
+    },
   ];
 
   rotateTokens.forEach((rotate, index) => {
@@ -1391,9 +1524,17 @@ export function generateBackdropTokens(): Token[] {
   const backdropBlurScale = [
     { name: 'none', value: '0', meaning: 'No backdrop blur' },
     { name: 'sm', value: '4px', meaning: 'Small backdrop blur for overlays' },
-    { name: 'DEFAULT', value: '8px', meaning: 'Default backdrop blur for modals' },
+    {
+      name: 'DEFAULT',
+      value: '8px',
+      meaning: 'Default backdrop blur for modals',
+    },
     { name: 'md', value: '12px', meaning: 'Medium backdrop blur for focus' },
-    { name: 'lg', value: '16px', meaning: 'Large backdrop blur for separation' },
+    {
+      name: 'lg',
+      value: '16px',
+      meaning: 'Large backdrop blur for separation',
+    },
     { name: 'xl', value: '24px', meaning: 'Extra large blur for drama' },
     { name: '2xl', value: '40px', meaning: 'Maximum blur for strong effects' },
     { name: '3xl', value: '64px', meaning: 'Ultra blur for artistic effects' },
@@ -1442,14 +1583,14 @@ export function generateBorderWidthTokens(): Token[] {
       mathRelationship:
         border.value === '0px'
           ? 'No border'
-          : `${border.value} (${Number.parseInt(border.value)}x pixel)`,
+          : `${border.value} (${Number.parseInt(border.value, 10)}x pixel)`,
       generateUtilityClass: true,
       applicableComponents:
-        Number.parseInt(border.value) <= 2
+        Number.parseInt(border.value, 10) <= 2
           ? ['input', 'card', 'button']
           : ['decorative', 'emphasis'],
       trustLevel:
-        border.value === '0px' ? 'low' : Number.parseInt(border.value) >= 4 ? 'medium' : 'low',
+        border.value === '0px' ? 'low' : Number.parseInt(border.value, 10) >= 4 ? 'medium' : 'low',
     });
   });
 
@@ -1463,15 +1604,30 @@ export function generateTouchTargetTokens(): Token[] {
   const tokens: Token[] = [];
 
   const touchTargets = [
-    { name: 'min', value: '44px', meaning: 'WCAG AAA minimum touch target', size: 44 },
-    { name: 'comfortable', value: '48px', meaning: 'Comfortable touch target', size: 48 },
+    {
+      name: 'min',
+      value: '44px',
+      meaning: 'WCAG AAA minimum touch target',
+      size: 44,
+    },
+    {
+      name: 'comfortable',
+      value: '48px',
+      meaning: 'Comfortable touch target',
+      size: 48,
+    },
     {
       name: 'generous',
       value: '56px',
       meaning: 'Generous touch target for accessibility',
       size: 56,
     },
-    { name: 'large', value: '64px', meaning: 'Large touch target for primary actions', size: 64 },
+    {
+      name: 'large',
+      value: '64px',
+      meaning: 'Large touch target for primary actions',
+      size: 64,
+    },
   ];
 
   touchTargets.forEach((target, index) => {
@@ -1650,7 +1806,10 @@ export const checkTailwindVersion = async (cwd: string): Promise<string> => {
     if (!fs.existsSync(packageJsonPath)) return 'v4';
 
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-    const deps = { ...packageJson.dependencies, ...packageJson.devDependencies };
+    const deps = {
+      ...packageJson.dependencies,
+      ...packageJson.devDependencies,
+    };
 
     if (deps.tailwindcss) {
       const version = deps.tailwindcss;
@@ -1674,7 +1833,12 @@ export const createDefaultRegistry = (): TokenSet => {
     id: 'default-grayscale',
     name: 'Default Grayscale System',
     tokens: [
-      { name: 'primary', value: 'oklch(0.45 0.12 240)', category: 'color', namespace: 'color' },
+      {
+        name: 'primary',
+        value: 'oklch(0.45 0.12 240)',
+        category: 'color',
+        namespace: 'color',
+      },
       {
         name: 'background',
         value: 'oklch(1 0 0)',

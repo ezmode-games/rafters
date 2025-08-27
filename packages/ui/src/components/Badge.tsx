@@ -42,8 +42,8 @@
  */
 import { AlertTriangle, CheckCircle, Info, Minus, XCircle } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { Chip } from './Chip';
 import type { ChipPosition, ChipVariant } from './Chip';
+import { Chip } from './Chip';
 
 export type BadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'neutral';
 export type BadgeSize = 'sm' | 'md' | 'lg';

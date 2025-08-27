@@ -1,19 +1,19 @@
-import type { StoryObj } from '@storybook/react-vite';
+import type { StoryObj } from "@storybook/react-vite";
 /**
  * Design tokens are the core building blocks of consistent, scalable design systems.
  * They encapsulate design decisions into reusable values that maintain coherence
  * across platforms, themes, and application states.
  */
 declare const meta: {
-    title: string;
-    parameters: {
-        layout: string;
-        docs: {
-            description: {
-                component: string;
-            };
-        };
-    };
+	title: string;
+	parameters: {
+		layout: string;
+		docs: {
+			description: {
+				component: string;
+			};
+		};
+	};
 };
 export default meta;
 type Story = StoryObj<typeof meta>;

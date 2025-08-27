@@ -1,14 +1,17 @@
-import type { StoryObj } from '@storybook/react-vite';
+import type { StoryObj } from "@storybook/react-vite";
 declare const meta: {
-    title: string;
-    component: import("react").ForwardRefExoticComponent<import("../../../components").ButtonProps & import("react").RefAttributes<HTMLButtonElement>>;
-    parameters: {
-        layout: string;
-    };
-    tags: string[];
-    args: {
-        onClick: import("storybook/internal/test").Mock<(...args: any[]) => any>;
-    };
+	title: string;
+	component: import("react").ForwardRefExoticComponent<
+		import("../../../components").ButtonProps &
+			import("react").RefAttributes<HTMLButtonElement>
+	>;
+	parameters: {
+		layout: string;
+	};
+	tags: string[];
+	args: {
+		onClick: import("storybook/internal/test").Mock<(...args: any[]) => any>;
+	};
 };
 export default meta;
 type Story = StoryObj<typeof meta>;
