@@ -1,0 +1,7 @@
+{
+  "version": "1.0.0",
+  "hasStorybook": false,
+  "componentsDir": "./app/components/ui",
+  "storiesDir": "./src/stories",
+  "packageManager": "pnpm"
+}

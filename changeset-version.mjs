@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { exec } from 'node:child_process';
 
 console.log('Running changeset version...');
 exec('pnpm changeset version');

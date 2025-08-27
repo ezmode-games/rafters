@@ -1,5 +1,5 @@
-import { execSync } from 'child_process';
-import fs from 'fs';
+import { execSync } from 'node:child_process';
+import fs from 'node:fs';
 
 // Get the most recent commit message
 const commitMessage = execSync('git log -1 --format=%s').toString().trim();
@@ -53,7 +53,7 @@ ${description}
 
   const timestamp = Date.now();
   fs.writeFileSync(`.changeset/auto-${timestamp}.md`, changesetContent);
-  console.log(`✅ Changeset file created for CLI and dependencies`);
+  console.log('✅ Changeset file created for CLI and dependencies');
 } else {
   console.log('⚠️ No valid package scope found in commit message. Valid scope is: cli');
   console.log('📝 Example: feat(cli): add new component scaffolding');

@@ -67,7 +67,7 @@ catalogs:
       specifier: ^4.1.11
       version: 4.1.11
     typescript:
-      specifier: ^5.7.3
+      specifier: ^5.8.3
       version: 5.8.3
     vite:
       specifier: ^7.0.6
@@ -75,6 +75,9 @@ catalogs:
     vitest:
       specifier: ^3.2.4
       version: 3.2.4
+    wrangler:
+      specifier: ^4.33.0
+      version: 4.33.0
     zod:
       specifier: 4.0.16
       version: 4.0.16
@@ -160,60 +163,69 @@ importers:
 
   apps/website:
     dependencies:
+      '@rafters/shared':
+        specifier: workspace:^
+        version: link:../../packages/shared
+      clsx:
+        specifier: 'catalog:'
+        version: 2.1.1
       isbot:
         specifier: ^5.1.27
         version: 5.1.29
       react:
-        specifier: ^19.1.0
+        specifier: 'catalog:'
         version: 19.1.1
       react-dom:
-        specifier: ^19.1.0
+        specifier: 'catalog:'
         version: 19.1.1(react@19.1.1)
       react-router:
         specifier: ^7.7.1
         version: 7.7.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      tailwind-merge:
+        specifier: 'catalog:'
+        version: 3.3.1
       zod:
         specifier: 'catalog:'
         version: 4.0.16
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.0.12
-        version: 1.10.2(rollup@4.44.0)(vite@6.3.5(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5))(workerd@1.20250823.0)(wrangler@4.33.0)
+        version: 1.10.2(rollup@4.44.0)(vite@7.0.6(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5))(workerd@1.20250823.0)(wrangler@4.33.0)
       '@react-router/dev':
         specifier: ^7.7.1
-        version: 7.7.1(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(react-router@7.7.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(tsx@4.20.5)(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5))(wrangler@4.33.0)
+        version: 7.7.1(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(react-router@7.7.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(tsx@4.20.5)(typescript@5.8.3)(vite@7.0.6(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5))(wrangler@4.33.0)
       '@tailwindcss/vite':
-        specifier: ^4.1.4
-        version: 4.1.11(vite@6.3.5(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5))
+        specifier: 'catalog:'
+        version: 4.1.11(vite@7.0.6(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5))
       '@types/node':
-        specifier: ^20
+        specifier: 'catalog:'
         version: 20.19.1
       '@types/react':
-        specifier: ^19.1.2
+        specifier: 'catalog:'
         version: 19.1.9
       '@types/react-dom':
-        specifier: ^19.1.2
+        specifier: 'catalog:'
         version: 19.1.7(@types/react@19.1.9)
       tailwindcss:
-        specifier: ^4.1.4
+        specifier: 'catalog:'
         version: 4.1.11
       tsx:
         specifier: ^4.20.5
         version: 4.20.5
       typescript:
-        specifier: ^5.8.3
+        specifier: 'catalog:'
         version: 5.8.3
       vite:
-        specifier: ^6.3.3
-        version: 6.3.5(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5)
+        specifier: 'catalog:'
+        version: 7.0.6(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5)
       vite-tsconfig-paths:
         specifier: ^5.1.4
-        version: 5.1.4(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5))
+        version: 5.1.4(typescript@5.8.3)(vite@7.0.6(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5))
       vitest:
         specifier: 'catalog:'
         version: 3.2.4(@types/debug@4.1.12)(@types/node@20.19.1)(@vitest/browser@3.2.4)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.30.1)(tsx@4.20.5)
       wrangler:
-        specifier: ^4.33.0
+        specifier: 'catalog:'
         version: 4.33.0
 
   packages/color-utils:
@@ -5321,7 +5333,7 @@ snapshots:
     optionalDependencies:
       workerd: 1.20250823.0
 
-  '@cloudflare/vite-plugin@1.10.2(rollup@4.44.0)(vite@6.3.5(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5))(workerd@1.20250823.0)(wrangler@4.33.0)':
+  '@cloudflare/vite-plugin@1.10.2(rollup@4.44.0)(vite@7.0.6(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5))(workerd@1.20250823.0)(wrangler@4.33.0)':
     dependencies:
       '@cloudflare/unenv-preset': 2.5.0(unenv@2.0.0-rc.19)(workerd@1.20250823.0)
       '@mjackson/node-fetch-server': 0.6.1
@@ -5331,7 +5343,7 @@ snapshots:
       picocolors: 1.1.1
       tinyglobby: 0.2.14
       unenv: 2.0.0-rc.19
-      vite: 6.3.5(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5)
+      vite: 7.0.6(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5)
       wrangler: 4.33.0
       ws: 8.18.0
     transitivePeerDependencies:
@@ -6360,7 +6372,7 @@ snapshots:
 
   '@radix-ui/rect@1.1.1': {}
 
-  '@react-router/dev@7.7.1(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(react-router@7.7.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(tsx@4.20.5)(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5))(wrangler@4.33.0)':
+  '@react-router/dev@7.7.1(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(react-router@7.7.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(tsx@4.20.5)(typescript@5.8.3)(vite@7.0.6(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5))(wrangler@4.33.0)':
     dependencies:
       '@babel/core': 7.28.0
       '@babel/generator': 7.28.0
@@ -6389,7 +6401,7 @@ snapshots:
       set-cookie-parser: 2.7.1
       tinyglobby: 0.2.14
       valibot: 0.41.0(typescript@5.8.3)
-      vite: 6.3.5(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5)
+      vite: 7.0.6(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5)
       vite-node: 3.2.4(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5)
     optionalDependencies:
       typescript: 5.8.3
@@ -6658,13 +6670,6 @@ snapshots:
       '@tailwindcss/oxide-wasm32-wasi': 4.1.11
       '@tailwindcss/oxide-win32-arm64-msvc': 4.1.11
       '@tailwindcss/oxide-win32-x64-msvc': 4.1.11
-
-  '@tailwindcss/vite@4.1.11(vite@6.3.5(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5))':
-    dependencies:
-      '@tailwindcss/node': 4.1.11
-      '@tailwindcss/oxide': 4.1.11
-      tailwindcss: 4.1.11
-      vite: 6.3.5(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5)
 
   '@tailwindcss/vite@4.1.11(vite@7.0.6(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5))':
     dependencies:
@@ -8926,7 +8931,7 @@ snapshots:
       debug: 4.4.1
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 6.3.5(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5)
+      vite: 7.0.6(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -8941,13 +8946,13 @@ snapshots:
       - tsx
       - yaml
 
-  vite-tsconfig-paths@5.1.4(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5)):
+  vite-tsconfig-paths@5.1.4(typescript@5.8.3)(vite@7.0.6(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5)):
     dependencies:
       debug: 4.4.1
       globrex: 0.1.2
       tsconfck: 3.1.6(typescript@5.8.3)
     optionalDependencies:
-      vite: 6.3.5(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5)
+      vite: 7.0.6(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5)
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -8969,7 +8974,7 @@ snapshots:
 
   vite@7.0.6(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.5):
     dependencies:
-      esbuild: 0.25.5
+      esbuild: 0.25.9
       fdir: 6.4.6(picomatch@4.0.3)
       picomatch: 4.0.3
       postcss: 8.5.6

@@ -1,39 +1,42 @@
 {
-	"name": "website",
-	"private": true,
-	"type": "module",
-	"scripts": {
-		"build": "pnpm generate:manifest && pnpm generate:llms && react-router build",
-		"cf-typegen": "wrangler types",
-		"deploy": "pnpm generate:manifest && pnpm generate:llms && pnpm run build && wrangler deploy",
-		"dev": "react-router dev",
-		"preview": "pnpm run build && vite preview",
-		"generate:manifest": "tsx scripts/generate-registry-manifest.ts",
-		"generate:llms": "tsx scripts/generate-llms-txt.ts",
-		"typecheck": "pnpm run cf-typegen && react-router typegen && tsc -b",
-		"test": "vitest",
-		"test:run": "vitest run"
-	},
-	"dependencies": {
-		"isbot": "^5.1.27",
-		"react": "^19.1.0",
-		"react-dom": "^19.1.0",
-		"react-router": "^7.7.1",
-		"zod": "catalog:"
-	},
-	"devDependencies": {
-		"@cloudflare/vite-plugin": "^1.0.12",
-		"@react-router/dev": "^7.7.1",
-		"@tailwindcss/vite": "^4.1.4",
-		"@types/node": "^20",
-		"@types/react": "^19.1.2",
-		"@types/react-dom": "^19.1.2",
-		"tailwindcss": "^4.1.4",
-		"tsx": "^4.20.5",
-		"typescript": "^5.8.3",
-		"vite": "^6.3.3",
-		"vite-tsconfig-paths": "^5.1.4",
-		"vitest": "catalog:",
-		"wrangler": "^4.33.0"
-	}
+  "name": "website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "pnpm generate:manifest && pnpm generate:llms && react-router build",
+    "cf-typegen": "wrangler types",
+    "deploy": "pnpm generate:manifest && pnpm generate:llms && pnpm run build && wrangler deploy",
+    "dev": "react-router dev",
+    "preview": "pnpm run build && vite preview",
+    "generate:manifest": "tsx scripts/generate-registry-manifest.ts",
+    "generate:llms": "tsx scripts/generate-llms-txt.ts",
+    "typecheck": "pnpm run cf-typegen && react-router typegen && tsc -b",
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "dependencies": {
+    "isbot": "^5.1.27",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-router": "^7.7.1",
+    "zod": "catalog:",
+    "@rafters/shared": "workspace:^",
+    "clsx": "catalog:",
+    "tailwind-merge": "catalog:"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.0.12",
+    "@react-router/dev": "^7.7.1",
+    "@tailwindcss/vite": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "tailwindcss": "catalog:",
+    "tsx": "^4.20.5",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "catalog:",
+    "wrangler": "catalog:"
+  }
 }

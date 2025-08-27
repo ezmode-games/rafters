@@ -13,10 +13,7 @@
       "types": "./dist/components/index.d.ts"
     }
   },
-  "files": [
-    "dist",
-    "README.md"
-  ],
+  "files": ["dist", "README.md"],
   "scripts": {
     "dev": "storybook dev -p 6006",
     "build": "vite build && tsc --emitDeclarationOnly",

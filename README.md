@@ -1,19 +1,24 @@
 ![Rafters](logo.svg)
 
 # Rafters
-## AI-Focused Design System Components
 
-*Intelligent React components with embedded design reasoning that enable AI agents to create exceptional user experiences*
+**Human-AI Design Collaboration System**
 
----
+A design system that bridges human creativity and AI precision through embedded design intelligence, enabling designers to make aesthetic decisions while AI agents handle systematic implementation.
 
-## How It Works
+## System Architecture
 
-**Humans** use Rafters Studio to create design systems with embedded intent and meaning.
+### [@rafters/design-tokens](./packages/design-tokens/README.md)
+Mathematical token generation with AI intelligence metadata. 18 generators create design tokens with embedded reasoning about cognitive load, trust levels, and usage patterns.
 
-**AI agents** use intelligent components and tokens to build user journeys that honor human design expertise.
+### [rafters](./apps/cli/README.md)  
+Command-line tool for initializing design systems and installing components. Creates `.rafters/` folder structure, generates stock tokens, and manages component registry.
 
-**End users** get better experiences because AI agents have access to systematic design knowledge.
+### [@rafters/studio](./docs/STUDIO_SPEC.md)
+Visual design tool for customizing tokens with human taste. Captures designer reasoning when overriding mathematical perfection, creating a complete story of design decisions.
+
+### [@rafters/ui](./packages/ui/)
+Component library with embedded AI intelligence. Components consume design tokens through semantic Tailwind utilities and include cognitive load ratings, trust patterns, and accessibility metadata.
 
 ---
 
@@ -74,19 +79,14 @@ Read component metadata to make informed UX decisions:
 
 ---
 
-## Installation
-
-Install components as source code with embedded intelligence:
+## Quick Start
 
 ```bash
-# Initialize Rafters in your project
+# Initialize design system in your project
 npx rafters init
 
-# Install intelligent components
+# Add components with AI intelligence
 npx rafters add button
-npx rafters add dialog
-npx rafters add toast
-npx rafters add input
 ```
 
 ## Usage

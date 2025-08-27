@@ -1,10 +1,13 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.9.3/schema.json",
   "files": {
-    "include": [
-      "apps/website/app/routes/api.registry*.tsx",
-      "apps/website/scripts/*.ts",
-      "packages/color-utils/src/palette.ts"
+    "ignore": [
+      "**/node_modules",
+      "**/dist",
+      "**/build",
+      "**/worker-configuration.d.ts",
+      "**/.react-router",
+      "**/*.css"
     ]
   },
   "vcs": {

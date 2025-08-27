@@ -13,116 +13,115 @@
 
 /* Blueprint Grid Overlay - Subtle Technical Background */
 .sb-main-padded {
-	background-image:
-		linear-gradient(oklch(0.95 0.01 240) 1px, transparent 1px),
-		linear-gradient(90deg, oklch(0.95 0.01 240) 1px, transparent 1px);
-	background-size: 20px 20px;
-	background-position: -1px -1px;
+  background-image: linear-gradient(oklch(0.95 0.01 240) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.95 0.01 240) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: -1px -1px;
 }
 
 /* Blueprint Technical Headers */
 .sbdocs h1,
 .sbdocs h2,
 .sbdocs h3 {
-	position: relative;
-	color: oklch(0.25 0.08 240);
-	font-weight: 300;
-	letter-spacing: -0.02em;
+  position: relative;
+  color: oklch(0.25 0.08 240);
+  font-weight: 300;
+  letter-spacing: -0.02em;
 }
 
 .sbdocs h1::before {
-	content: "";
-	position: absolute;
-	bottom: -4px;
-	left: 0;
-	width: 60px;
-	height: 2px;
-	background: oklch(0.45 0.12 240);
-	border-radius: 1px;
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: oklch(0.45 0.12 240);
+  border-radius: 1px;
 }
 
 .sbdocs h2::before {
-	content: "";
-	position: absolute;
-	bottom: -2px;
-	left: 0;
-	width: 40px;
-	height: 1px;
-	background: oklch(0.55 0.06 240);
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 40px;
+  height: 1px;
+  background: oklch(0.55 0.06 240);
 }
 
 /* Blueprint Code Blocks - Technical Documentation */
 .sbdocs pre,
 .sbdocs code {
-	background: oklch(0.98 0.005 240);
-	border: 1px solid oklch(0.92 0.01 240);
-	font-family: "JetBrains Mono", "Fira Code", monospace;
-	font-size: 13px;
-	line-height: 1.5;
+  background: oklch(0.98 0.005 240);
+  border: 1px solid oklch(0.92 0.01 240);
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .sbdocs pre {
-	padding: 16px;
-	border-radius: 6px;
-	box-shadow: 0 1px 3px oklch(0.85 0.02 240 / 0.1);
+  padding: 16px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px oklch(0.85 0.02 240 / 0.1);
 }
 
 /* Blueprint Story Canvas - Technical Precision */
 .docs-story {
-	border: 1px solid oklch(0.88 0.02 240);
-	border-radius: 8px;
-	background: oklch(1 0 0);
-	position: relative;
-	overflow: hidden;
+  border: 1px solid oklch(0.88 0.02 240);
+  border-radius: 8px;
+  background: oklch(1 0 0);
+  position: relative;
+  overflow: hidden;
 }
 
 .docs-story::before {
-	content: "";
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	height: 1px;
-	background: linear-gradient(
-		90deg,
-		oklch(0.45 0.12 240 / 0.3) 0%,
-		oklch(0.45 0.12 240 / 0.1) 50%,
-		oklch(0.45 0.12 240 / 0.3) 100%
-	);
-	pointer-events: none;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    oklch(0.45 0.12 240 / 0.3) 0%,
+    oklch(0.45 0.12 240 / 0.1) 50%,
+    oklch(0.45 0.12 240 / 0.3) 100%
+  );
+  pointer-events: none;
 }
 
 /* Blueprint Navigation - Technical Sidebar */
 .sidebar-container {
-	border-right: 2px solid oklch(0.88 0.02 240);
-	background: oklch(0.985 0.005 240);
+  border-right: 2px solid oklch(0.88 0.02 240);
+  background: oklch(0.985 0.005 240);
 }
 
 /* Blueprint Controls Panel - Technical Interface */
 .panel-container {
-	border-top: 2px solid oklch(0.88 0.02 240);
-	background: oklch(0.99 0.002 240);
+  border-top: 2px solid oklch(0.88 0.02 240);
+  background: oklch(0.99 0.002 240);
 }
 
 /* Section 508 Accessibility Enhancements */
 .sb-show-main {
-	/* Ensure sufficient color contrast for government compliance */
-	color: oklch(0.15 0.005 240);
+  /* Ensure sufficient color contrast for government compliance */
+  color: oklch(0.15 0.005 240);
 }
 
 .sb-bar {
-	/* High contrast toolbar for accessibility */
-	background: oklch(0.97 0.01 240);
-	border-bottom: 1px solid oklch(0.85 0.02 240);
+  /* High contrast toolbar for accessibility */
+  background: oklch(0.97 0.01 240);
+  border-bottom: 1px solid oklch(0.85 0.02 240);
 }
 
 /* Focus indicators for keyboard navigation */
 .sidebar-item:focus,
 .tabbutton:focus,
 button:focus {
-	outline: 2px solid oklch(0.45 0.12 240);
-	outline-offset: 2px;
-	border-radius: 4px;
+  outline: 2px solid oklch(0.45 0.12 240);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /**
@@ -142,23 +141,23 @@ button:focus {
 #storybook-docs,
 .sbdocs,
 .sbdocs-wrapper {
-	/* Remove ALL default Storybook layout constraints */
-	max-width: none;
-	padding: 0;
-	margin: 0;
-	width: 100%;
+  /* Remove ALL default Storybook layout constraints */
+  max-width: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
 }
 
 /* Ensure story previews don't have constraints */
 .docs-story > div {
-	width: 100%;
-	max-width: none;
+  width: 100%;
+  max-width: none;
 }
 
 /* MDX content wrapper - applied by our MDX components */
 .mdx-content {
-	/* All layout handled by Container component and MDX components */
-	/* No additional styles needed here */
+  /* All layout handled by Container component and MDX components */
+  /* No additional styles needed here */
 }
 
 /**
@@ -167,9 +166,9 @@ button:focus {
  */
 .sb-story,
 .sb-canvas {
-	/* Reset any Storybook defaults */
-	max-width: none;
-	margin: 0;
+  /* Reset any Storybook defaults */
+  max-width: none;
+  margin: 0;
 }
 
 /**
@@ -179,93 +178,93 @@ button:focus {
 
 /* Center text utility for hero sections */
 .text-center {
-	text-align: center;
+  text-align: center;
 }
 
 /* Gradient backgrounds for hero sections */
 .gradient-hero {
-	@apply bg-gradient-to-b from-background to-muted/20;
+  @apply bg-gradient-to-b from-background to-muted/20;
 }
 
 /* Documentation grid layouts */
 .doc-grid-2 {
-	@apply grid grid-cols-1 md:grid-cols-2 gap-6;
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
 }
 
 .doc-grid-3 {
-	@apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
 }
 
 .doc-grid-4 {
-	@apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
 }
 
 /* Documentation card styling */
 .doc-card {
-	@apply p-6 bg-card border border-border rounded-xl;
+  @apply p-6 bg-card border border-border rounded-xl;
 }
 
 .doc-card-hover {
-	@apply p-6 bg-card border border-border rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200;
+  @apply p-6 bg-card border border-border rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200;
 }
 
 /* Documentation section spacing */
 .doc-section {
-	@apply py-16;
+  @apply py-16;
 }
 
 .doc-section-muted {
-	@apply py-16 bg-muted/30;
+  @apply py-16 bg-muted/30;
 }
 
 /* Documentation content max-widths with auto centering */
 .doc-content-sm {
-	@apply max-w-sm mx-auto;
+  @apply max-w-sm mx-auto;
 }
 
 .doc-content-md {
-	@apply max-w-md mx-auto;
+  @apply max-w-md mx-auto;
 }
 
 .doc-content-lg {
-	@apply max-w-lg mx-auto;
+  @apply max-w-lg mx-auto;
 }
 
 .doc-content-xl {
-	@apply max-w-xl mx-auto;
+  @apply max-w-xl mx-auto;
 }
 
 .doc-content-2xl {
-	@apply max-w-2xl mx-auto;
+  @apply max-w-2xl mx-auto;
 }
 
 .doc-content-3xl {
-	@apply max-w-3xl mx-auto;
+  @apply max-w-3xl mx-auto;
 }
 
 .doc-content-4xl {
-	@apply max-w-4xl mx-auto;
+  @apply max-w-4xl mx-auto;
 }
 
 .doc-content-5xl {
-	@apply max-w-5xl mx-auto;
+  @apply max-w-5xl mx-auto;
 }
 
 .doc-content-prose {
-	@apply max-w-prose mx-auto;
+  @apply max-w-prose mx-auto;
 }
 
 /* Documentation padding utilities */
 .doc-padding-sm {
-	@apply px-6;
+  @apply px-6;
 }
 
 .doc-padding-md {
-	@apply px-8;
+  @apply px-8;
 }
 
 .doc-padding-lg {
-	@apply px-16;
+  @apply px-16;
 }
 
 /**
@@ -280,45 +279,45 @@ button:focus {
 .language-json,
 .language-bash,
 .language-shell {
-	@apply font-mono text-sm;
+  @apply font-mono text-sm;
 }
 
 /**
  * Documentation-specific typography utilities
  */
 .doc-heading-hero {
-	@apply text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-center mb-6;
+  @apply text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-center mb-6;
 }
 
 .doc-heading-section {
-	@apply text-2xl font-semibold text-center mb-8;
+  @apply text-2xl font-semibold text-center mb-8;
 }
 
 .doc-text-lead {
-	@apply text-lg text-muted-foreground leading-relaxed;
+  @apply text-lg text-muted-foreground leading-relaxed;
 }
 
 .doc-text-center {
-	@apply text-center;
+  @apply text-center;
 }
 
 /**
  * Documentation emphasis patterns
  */
 .doc-emphasis-primary {
-	@apply text-primary font-semibold;
+  @apply text-primary font-semibold;
 }
 
 .doc-emphasis-success {
-	@apply text-success font-semibold;
+  @apply text-success font-semibold;
 }
 
 .doc-emphasis-warning {
-	@apply text-warning font-semibold;
+  @apply text-warning font-semibold;
 }
 
 .doc-emphasis-destructive {
-	@apply text-destructive font-semibold;
+  @apply text-destructive font-semibold;
 }
 
 /**
@@ -329,21 +328,21 @@ button:focus {
 /* Remove blueprint decorative underlines from MDX h2 elements */
 .mdx-content h2::before,
 .mdx-content h2::after {
-	display: none;
-	content: none;
+  display: none;
+  content: none;
 }
 
 /* Additional override for direct h2 targeting */
 .sbdocs .mdx-content h2::before,
 .sbdocs .mdx-content h2::after {
-	display: none;
-	content: none;
+  display: none;
+  content: none;
 }
 
 /* Clean h2 styling for MDX components */
 .mdx-content h2 {
-	border: none;
-	text-decoration: none;
-	border-bottom: none;
-	border-top: none;
+  border: none;
+  text-decoration: none;
+  border-bottom: none;
+  border-top: none;
 }

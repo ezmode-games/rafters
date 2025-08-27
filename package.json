@@ -4,10 +4,7 @@
   "description": "AI-first design intelligence system for systematic UI generation",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "dev": "pnpm --parallel dev",
     "build": "pnpm --recursive --sort build",

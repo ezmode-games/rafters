@@ -4,13 +4,13 @@
 
 # Rafters CLI
 
-> CLI tool for installing Rafters design system components with embedded design intelligence for AI agents
+> Command-line tool for initializing design token systems and managing components with embedded AI intelligence
 
-Rafters CLI helps you add React components with built-in AI agent design intelligence patterns including cognitive load optimization, attention economics, accessibility features, and trust-building patterns.
+Rafters CLI helps you initialize a complete design system foundation and add React components with built-in AI agent design intelligence patterns including cognitive load optimization, attention economics, accessibility features, and trust-building patterns.
 
 ## Quick Start
 
-1. **Initialize Rafters in your React project:**
+1. **Initialize Rafters design system in your project:**
    ```bash
    npx rafters init
    ```
@@ -29,16 +29,40 @@ Rafters CLI helps you add React components with built-in AI agent design intelli
 
 ## Commands
 
-### `rafters init`
+### `init` - Initialize Design System
 
-Initialize Rafters in your existing React project. This command:
+Initialize complete design token system and prepare for component installation.
 
-- Checks for React dependencies
-- Detects your package manager (pnpm/yarn/npm)
-- Creates `.rafters/` configuration directory
-- Installs core dependencies
-- Sets up AI agent instructions
-- Configures component and story directories
+**What it does:**
+1. **Checks Tailwind version** - Requires v4+, stops if v3 detected
+2. **Creates `.rafters/` structure** - Configuration and tokens directory
+3. **Generates stock tokens** - Runs all 18 design token generators
+4. **Writes token JSONs** - Saves to `.rafters/tokens/*.json`
+5. **Generates CSS** - Creates Tailwind v4 `@theme` configuration
+6. **Injects into CSS** - Updates `app.css` or `globals.css`
+7. **Creates component registry** - Prepares for component tracking
+
+**Usage:**
+```bash
+npx rafters init
+
+✓ Checking Tailwind version... v4.0.0 ✓
+✓ Creating .rafters/ directory...
+✓ Generating design tokens...
+  → tokens/spacing.json (12 tokens)
+  → tokens/color.json (24 tokens)
+  → tokens/typography.json (8 tokens)
+  ... all 18 generators
+✓ Generating CSS from tokens...
+✓ Injecting into app.css...
+✓ Rafters initialized! Your components now have design intelligence.
+```
+
+**Error States:**
+```bash
+✗ Tailwind v3 detected. Rafters requires Tailwind v4+
+  Please upgrade: npm install tailwindcss@next
+```
 
 **Interactive setup:**
 ```bash
@@ -47,31 +71,53 @@ Initialize Rafters in your existing React project. This command:
 ? Stories directory? (./src/stories)
 ```
 
-### `rafters add <component>`
+### `add` - Install Components
 
-Install a component with embedded design intelligence:
+Install components with embedded AI intelligence patterns.
 
+**What it does:**
+1. **Downloads component** from Rafters registry
+2. **Adds intelligence header** with cognitive load, trust levels
+3. **Installs dependencies** (Radix UI, etc.)
+4. **Updates local registry** in `.rafters/registry/components.json`
+5. **Adds to project** at `src/components/ui/`
+6. **Adds Storybook story** (if configured)
+
+**Usage:**
 ```bash
 npx rafters add button
-npx rafters add input --force  # Overwrite existing
+
+✓ Installing Button component...
+✓ Adding intelligence patterns...
+✓ Installing dependencies: @radix-ui/react-slot
+✓ Updating component registry...
+✓ Button installed with design intelligence
 ```
 
-**What gets installed:**
-- Component with intelligence comments
-- Cognitive load analysis (1-10 scale)
-- Attention economics patterns
-- Accessibility features (WCAG AAA)
-- Trust-building patterns
-- Storybook intelligence story (if enabled)
-- Updated component manifest
+**Multiple components:**
+```bash
+npx rafters add button input select
 
-### `rafters list`
+✓ Installing 3 components...
+✓ Button installed
+✓ Input installed  
+✓ Select installed
+✓ All components installed with design intelligence
+```
 
-Show available and installed components:
+### `list` - Show Available Components
+
+Lists all components available in the Rafters registry.
 
 ```bash
-npx rafters list              # Compact view
-npx rafters list --details    # Detailed view with intelligence
+npx rafters list
+
+Available components:
+  • button - Interactive button with trust patterns
+  • input - Form input with validation states
+  • select - Dropdown with accessibility
+  • dialog - Modal with cognitive load management
+  ... more components
 ```
 
 ## Available Components
@@ -105,20 +151,96 @@ Patterns for secure interactions and sensitive data handling.
 ### **Semantic Meaning**
 How design communicates meaning beyond just aesthetics.
 
-## Project Structure
-
-After initialization, Rafters creates:
+## Project Structure After Init
 
 ```
 your-project/
-├── .rafters/
-│   ├── config.json              # CLI configuration
-│   ├── agent-instructions.md    # AI agent guidance
-│   └── component-manifest.json  # Intelligence metadata
+├── .rafters/                    # Rafters configuration directory
+│   ├── tokens/                  # Design token JSON files
+│   │   ├── color.json          # Color tokens with AI metadata
+│   │   ├── spacing.json        # Spacing scale tokens
+│   │   ├── typography.json     # Typography tokens
+│   │   └── ... (18 files)      # All generator outputs
+│   ├── registry/               # Local component tracking  
+│   │   └── components.json     # Installed components manifest
+│   ├── config.json             # CLI configuration
+│   └── agent-instructions.md  # AI usage patterns
 ├── src/
-│   ├── components/ui/           # Installed components
+│   ├── components/ui/          # Installed components go here
 │   ├── lib/utils.ts            # Utility functions
 │   └── stories/                # Intelligence stories (if Storybook)
+└── app.css or globals.css      # CSS with injected design tokens
+```
+
+## Token System
+
+### Stock Tokens (Grayscale Foundation)
+
+Initial tokens are mathematically perfect grayscale:
+```json
+{
+  "generator": "color",
+  "tokens": [
+    {
+      "name": "primary",
+      "value": "oklch(0.45 0 0)",  // Grayscale default
+      "semanticMeaning": "Primary actions and brand color",
+      "cognitiveLoad": 3,
+      "trustLevel": "high",
+      "usageContext": ["buttons", "links", "brand"]
+    }
+  ]
+}
+```
+
+### Studio Modifications
+
+After Studio customization, tokens include overrides:
+```json
+{
+  "name": "primary",
+  "value": "oklch(0.45 0 0)",           // Stock grayscale
+  "modifiedValue": "oklch(0.45 0.15 260)", // Designer's brand blue
+  "designerReasoning": "Brand blue from company logo",
+  // AI metadata preserved...
+}
+```
+
+### CSS Generation
+
+Reads `.rafters/tokens/*.json` and generates:
+```css
+@theme {
+  /* Uses modifiedValue if exists, else value */
+  --color-primary: oklch(0.45 0.15 260);
+  --color-primary-foreground: oklch(0.98 0 0);
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.618rem;
+  /* ... all tokens */
+}
+```
+
+## Local Component Registry
+
+`.rafters/registry/components.json` tracks installed components:
+```json
+{
+  "version": "1.0.0",
+  "components": {
+    "button": {
+      "name": "button",
+      "installedAt": "2025-01-27T12:00:00Z",
+      "version": "0.1.0",
+      "path": "src/components/ui/button.tsx",
+      "dependencies": ["@radix-ui/react-slot"],
+      "intelligence": {
+        "cognitiveLoad": 3,
+        "trustLevel": "high"
+      }
+    }
+  }
+}
 ```
 
 ## Configuration
@@ -127,11 +249,11 @@ your-project/
 ```json
 {
   "version": "1.0.0",
-  "componentsDir": "./src/components/ui",
-  "storiesDir": "./src/stories",
+  "tailwindVersion": "4.0.0",
+  "cssFile": "app.css",
+  "componentsPath": "src/components/ui",
   "hasStorybook": true,
-  "packageManager": "pnpm",
-  "registry": "https://registry.rafters.dev"
+  "initialized": "2025-01-27T12:00:00Z"
 }
 ```
 
@@ -145,10 +267,28 @@ Rafters creates `.rafters/agent-instructions.md` with guidance for AI coding ass
 - Trust-building interaction patterns
 - Quick reference to component manifest
 
+## Debugging Guide
+
+**Component not working?**
+1. Check `.rafters/registry/components.json` - is it installed?
+2. Check component file has intelligence header
+3. Check dependencies are installed
+
+**Styles not applying?**
+1. Check `.rafters/tokens/` - are tokens generated?
+2. Check CSS file - is `@theme` injected?
+3. Check Tailwind version - must be v4+
+
+**Need to understand a component?**
+1. Check `.rafters/agent-instructions.md` for usage patterns
+2. Check component intelligence header for metadata
+3. Check registry for installation details
+
 ## Requirements
 
 - **Node.js** 18+ 
 - **React** 18+
+- **Tailwind CSS** v4+ (required)
 - **Package Manager**: npm, yarn, or pnpm
 
 ## Design Philosophy
