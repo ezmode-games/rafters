@@ -9,6 +9,7 @@
     "rafters": "./dist/index.js"
   },
   "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
     "access": "public"
   },
   "exports": {
@@ -47,6 +48,10 @@
     "type": "git",
     "url": "https://github.com/real-handy/rafters",
     "directory": "apps/cli"
+  },
+  "homepage": "https://rafters.realhandy.tech",
+  "bugs": {
+    "url": "https://github.com/real-handy/rafters/issues"
   },
   "dependencies": {
     "@rafters/shared": "workspace:*",
