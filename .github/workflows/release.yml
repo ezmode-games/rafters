@@ -53,16 +53,13 @@ jobs:
       - name: Generate Changeset from commit messages
         run: pnpm changeset:autogenerate
 
-      - name: Create Release Pull Request or Publish to npm
+      - name: Create Release Pull Request
         id: changesets
-        uses: changesets/action@v1.4.1
+        uses: changesets/action@v1
         with:
           commit: 'chore(release): version packages'
           title: 'chore(release): version packages'
-          version: node .github/changeset-version.js
-          publish: pnpm changeset publish
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Auto-merge release PR
@@ -101,16 +98,9 @@ jobs:
           git pull origin main
 
       - name: Publish to npm
-        id: changesets
-        uses: changesets/action@v1.4.1
+        uses: changesets/action@v1
         with:
-          run: |
-            git checkout main
-            git pull origin main
-          commit: 'chore(release): version packages'
-          title: 'chore(release): version packages'
-          version: node .github/changeset-version.js
-          publish: pnpm changeset publish
+          publish: pnpm changeset:publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
