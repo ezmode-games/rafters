@@ -1,0 +1,14 @@
+name: Test Basic
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Hello world"
+      - run: ls -la
