@@ -1,11 +1,18 @@
 {
 	"$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
-	"changelog": "@changesets/cli/changelog",
+	"changelog": ["@changesets/changelog-github", { "repo": "real-handy/rafters" }],
 	"commit": false,
 	"fixed": [],
 	"linked": [],
 	"access": "public",
 	"baseBranch": "main",
 	"updateInternalDependencies": "patch",
-	"ignore": ["@rafters/studio"]
+	"ignore": [
+		"@rafters/studio",
+		"@rafters/color-utils",
+		"@rafters/design-tokens", 
+		"@rafters/shared",
+		"rafters-ui",
+		"website"
+	]
 }
