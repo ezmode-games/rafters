@@ -927,7 +927,7 @@ export const registryManifest = {
     }
   ],
   "total": 17,
-  "lastUpdated": "2025-08-27T03:32:08.714Z"
+  "lastUpdated": "2025-08-27T03:42:33.084Z"
 } as const;
 
 export type GeneratedManifest = typeof registryManifest;

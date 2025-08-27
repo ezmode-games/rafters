@@ -23,7 +23,7 @@
     "ui:build-storybook": "pnpm --filter @rafters/ui build-storybook",
     "studio:dev": "pnpm --filter @rafters/studio dev",
     "changeset": "changeset",
-    "changeset:autogenerate": "node .changesets/changesets-autogenerate.mjs",
+    "changeset:autogenerate": "node .changeset/changesets-autogenerate.mjs",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
     "changeset:check": "changeset status --verbose",
