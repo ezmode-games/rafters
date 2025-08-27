@@ -11,17 +11,14 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    if: github.repository_owner != 'dependabot[bot]'
     permissions:
       contents: write
-      id-token: write
       pull-requests: write
-      packages: write
+      id-token: write
     steps:
-      - name: Checkout Repo
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          # Fetch full history for changeset changelog generation
           fetch-depth: 0
 
       - name: Setup pnpm
@@ -36,34 +33,24 @@ jobs:
           cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # BUILD FOR DISTRIBUTION (not validation)
-      - name: Build packages for distribution
+      - name: Build packages
         run: pnpm build
 
-      # DEPLOY WEBSITE TO CLOUDFLARE (always deploy on main branch changes)
-      - name: Deploy Website 
+      - name: Deploy Website
         run: |
-          echo "Deploying website with latest changes..."
           cd apps/website
           pnpm run deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
-      # DELIVERY PIPELINE - No validation, just ship what CI approved
-      - name: Create Release Pull Request or Publish to npm
-        id: changesets
+      - name: Create Release Pull Request or Publish
         uses: changesets/action@v1
         with:
           publish: pnpm changeset:publish
-          version: pnpm changeset:version
-          commit: "chore: release packages"
-          title: "chore: release packages"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
-
