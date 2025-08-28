@@ -132,9 +132,6 @@ importers:
       ora:
         specifier: ^8.1.0
         version: 8.2.0
-      playwright:
-        specifier: ^1.54.1
-        version: 1.54.1
       tailwind-merge:
         specifier: 'catalog:'
         version: 3.3.1
