@@ -1,0 +1,35 @@
+{
+  "files": [],
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "@rafters/shared": ["./packages/shared/src"],
+      "@rafters/shared/*": ["./packages/shared/src/*"],
+      "@rafters/color-utils": ["./packages/color-utils/src"],
+      "@rafters/color-utils/*": ["./packages/color-utils/src/*"],
+      "@rafters/design-tokens": ["./packages/design-tokens/src"],
+      "@rafters/design-tokens/*": ["./packages/design-tokens/src/*"],
+      "@rafters/ui": ["./packages/ui/src"],
+      "@rafters/ui/*": ["./packages/ui/src/*"]
+    }
+  },
+  "references": [
+    { "path": "./packages/shared" },
+    { "path": "./packages/color-utils" },
+    { "path": "./packages/design-tokens" },
+    { "path": "./packages/ui" },
+    { "path": "./apps/cli" },
+    { "path": "./apps/website" }
+  ]
+}

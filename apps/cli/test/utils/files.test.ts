@@ -1,13 +1,7 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  createComponentPath,
-  createStoryPath,
-  ensureDir,
-  fileExists,
-  writeFile,
-} from '../../src/utils/files.js';
+import { createComponentPath, ensureDir, fileExists, writeFile } from '../../src/utils/files.js';
 
 // Mock file system operations
 vi.mock('node:fs');
@@ -37,19 +31,6 @@ describe('files', () => {
       );
       expect(createComponentPath('src\\components', 'button')).toBe(
         join('src\\components', 'button.tsx')
-      );
-    });
-  });
-
-  describe('createStoryPath', () => {
-    it('should create correct story path', () => {
-      const result = createStoryPath('src/stories', 'Button');
-      expect(result).toBe(join('src/stories', 'button-intelligence.stories.tsx'));
-    });
-
-    it('should handle lowercase component names', () => {
-      expect(createStoryPath('./stories', 'input')).toBe(
-        join('./stories', 'input-intelligence.stories.tsx')
       );
     });
   });

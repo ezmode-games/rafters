@@ -31,7 +31,6 @@ describe('config', () => {
       const validConfig = {
         version: '1.0.0',
         componentsDir: 'src/components',
-        hasStorybook: false,
         packageManager: 'npm' as const,
         registry: 'https://registry.rafters.dev',
       };
@@ -43,7 +42,6 @@ describe('config', () => {
       const invalidConfig = {
         version: '1.0.0',
         componentsDir: 'src/components',
-        hasStorybook: false,
         packageManager: 'invalid', // This will fail Zod validation since it's not 'npm' | 'yarn' | 'pnpm'
         registry: 'https://registry.rafters.dev',
       };
@@ -55,7 +53,6 @@ describe('config', () => {
       const invalidConfig = {
         version: '1.0.0',
         componentsDir: 'src/components',
-        hasStorybook: false,
         packageManager: 'npm' as const,
         registry: 'not-a-url',
       };
@@ -108,7 +105,6 @@ describe('config', () => {
     const validConfigJson = JSON.stringify({
       version: '1.0.0',
       componentsDir: 'src/components',
-      hasStorybook: false,
       packageManager: 'npm',
       registry: 'https://registry.rafters.dev',
     });
@@ -121,7 +117,6 @@ describe('config', () => {
       expect(result).toEqual({
         version: '1.0.0',
         componentsDir: 'src/components',
-        hasStorybook: false,
         packageManager: 'npm',
         registry: 'https://registry.rafters.dev',
       });

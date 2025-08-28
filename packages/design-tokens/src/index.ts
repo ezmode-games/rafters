@@ -2089,9 +2089,9 @@ function generateCSSFromTokens(tokens: Token[]): string {
     lines.push(`  /* ${category.toUpperCase()} */`);
 
     for (const token of categoryTokens) {
-      // Namespace variables by category to avoid conflicts
+      // Namespace variables with rafters prefix to avoid circular references
       const prefix = category.replace(/-/g, '');
-      const varName = `--${prefix}-${token.name.replace(/_/g, '-')}`;
+      const varName = `--rafters-${prefix}-${token.name.replace(/_/g, '-')}`;
       if (token.semanticMeaning) {
         lines.push(`  /* ${token.semanticMeaning} */`);
       }
@@ -2136,14 +2136,14 @@ function generateCSSFromTokens(tokens: Token[]): string {
     lines.push(`  /* ${category.toUpperCase()} MAPPINGS */`);
 
     for (const token of categoryTokens) {
-      // Use the same namespaced variable name as defined above
+      // Use rafters prefix for source variables to avoid circular references
       const prefix = category.replace(/-/g, '');
-      const varName = `--${prefix}-${token.name.replace(/_/g, '-')}`;
+      const sourceVarName = `--rafters-${prefix}-${token.name.replace(/_/g, '-')}`;
 
       // Map to appropriate Tailwind theme keys
       const mappedKey = mapCategoryToTheme(category, token.name);
       if (mappedKey) {
-        lines.push(`  ${mappedKey}: var(${varName});`);
+        lines.push(`  ${mappedKey}: var(${sourceVarName});`);
       }
     }
     lines.push('');

@@ -9,8 +9,6 @@ const ConfigSchema = z
   .object({
     componentsDir: z.string(),
     packageManager: z.string(),
-    hasStorybook: z.boolean(),
-    storiesDir: z.string().optional(),
   })
   .nullable();
 
@@ -21,7 +19,6 @@ interface ListOptions {
 interface InstalledComponent {
   name: string;
   path: string;
-  story?: string;
   installed: string;
   version: string;
   intelligence: {
@@ -72,9 +69,6 @@ export async function listCommand(options: ListOptions = {}): Promise<void> {
         for (const component of installedComponents) {
           console.log(`${component.name} (v${component.version})`);
           console.log(`  Path: ${component.path}`);
-          if (component.story) {
-            console.log(`  Story: ${component.story}`);
-          }
           console.log(
             `  Intelligence: Cognitive load=${component.intelligence.cognitiveLoad}, ${component.intelligence.attentionEconomics.split(':')[0]}`
           );
