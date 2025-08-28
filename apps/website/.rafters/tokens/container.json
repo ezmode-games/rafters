@@ -1,0 +1,149 @@
+{
+  "category": "container",
+  "generatedAt": "2025-08-28T17:20:34.075Z",
+  "tokens": [
+    {
+      "name": "xs",
+      "value": "20rem",
+      "category": "container",
+      "namespace": "container",
+      "semanticMeaning": "Extra small container (320px)",
+      "scalePosition": 0,
+      "generateUtilityClass": true,
+      "applicableComponents": ["layout", "wrapper", "max-width"],
+      "containerQueryAware": true
+    },
+    {
+      "name": "sm",
+      "value": "24rem",
+      "category": "container",
+      "namespace": "container",
+      "semanticMeaning": "Small container (384px)",
+      "scalePosition": 1,
+      "generateUtilityClass": true,
+      "applicableComponents": ["layout", "wrapper", "max-width"],
+      "containerQueryAware": true
+    },
+    {
+      "name": "md",
+      "value": "28rem",
+      "category": "container",
+      "namespace": "container",
+      "semanticMeaning": "Medium container (448px)",
+      "scalePosition": 2,
+      "generateUtilityClass": true,
+      "applicableComponents": ["layout", "wrapper", "max-width"],
+      "containerQueryAware": true
+    },
+    {
+      "name": "lg",
+      "value": "32rem",
+      "category": "container",
+      "namespace": "container",
+      "semanticMeaning": "Large container (512px)",
+      "scalePosition": 3,
+      "generateUtilityClass": true,
+      "applicableComponents": ["layout", "wrapper", "max-width"],
+      "containerQueryAware": true
+    },
+    {
+      "name": "xl",
+      "value": "36rem",
+      "category": "container",
+      "namespace": "container",
+      "semanticMeaning": "Extra large container (576px)",
+      "scalePosition": 4,
+      "generateUtilityClass": true,
+      "applicableComponents": ["layout", "wrapper", "max-width"],
+      "containerQueryAware": true
+    },
+    {
+      "name": "2xl",
+      "value": "42rem",
+      "category": "container",
+      "namespace": "container",
+      "semanticMeaning": "2XL container (672px)",
+      "scalePosition": 5,
+      "generateUtilityClass": true,
+      "applicableComponents": ["layout", "wrapper", "max-width"],
+      "containerQueryAware": true
+    },
+    {
+      "name": "3xl",
+      "value": "48rem",
+      "category": "container",
+      "namespace": "container",
+      "semanticMeaning": "3XL container (768px)",
+      "scalePosition": 6,
+      "generateUtilityClass": true,
+      "applicableComponents": ["layout", "wrapper", "max-width"],
+      "containerQueryAware": true
+    },
+    {
+      "name": "4xl",
+      "value": "56rem",
+      "category": "container",
+      "namespace": "container",
+      "semanticMeaning": "4XL container (896px)",
+      "scalePosition": 7,
+      "generateUtilityClass": true,
+      "applicableComponents": ["layout", "wrapper", "max-width"],
+      "containerQueryAware": true
+    },
+    {
+      "name": "5xl",
+      "value": "64rem",
+      "category": "container",
+      "namespace": "container",
+      "semanticMeaning": "5XL container (1024px)",
+      "scalePosition": 8,
+      "generateUtilityClass": true,
+      "applicableComponents": ["layout", "wrapper", "max-width"],
+      "containerQueryAware": true
+    },
+    {
+      "name": "6xl",
+      "value": "72rem",
+      "category": "container",
+      "namespace": "container",
+      "semanticMeaning": "6XL container (1152px)",
+      "scalePosition": 9,
+      "generateUtilityClass": true,
+      "applicableComponents": ["layout", "wrapper", "max-width"],
+      "containerQueryAware": true
+    },
+    {
+      "name": "7xl",
+      "value": "80rem",
+      "category": "container",
+      "namespace": "container",
+      "semanticMeaning": "7XL container (1280px)",
+      "scalePosition": 10,
+      "generateUtilityClass": true,
+      "applicableComponents": ["layout", "wrapper", "max-width"],
+      "containerQueryAware": true
+    },
+    {
+      "name": "8xl",
+      "value": "90rem",
+      "category": "container",
+      "namespace": "container",
+      "semanticMeaning": "8XL container (1440px)",
+      "scalePosition": 11,
+      "generateUtilityClass": true,
+      "applicableComponents": ["layout", "wrapper", "max-width"],
+      "containerQueryAware": true
+    },
+    {
+      "name": "9xl",
+      "value": "100rem",
+      "category": "container",
+      "namespace": "container",
+      "semanticMeaning": "9XL container (1600px)",
+      "scalePosition": 12,
+      "generateUtilityClass": true,
+      "applicableComponents": ["layout", "wrapper", "max-width"],
+      "containerQueryAware": true
+    }
+  ]
+}

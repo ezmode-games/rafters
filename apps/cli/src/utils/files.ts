@@ -22,7 +22,7 @@ export function readFile(path: string): string {
 }
 
 export function createComponentPath(componentsDir: string, componentName: string): string {
-  return join(componentsDir, 'ui', `${componentName}.tsx`);
+  return join(componentsDir, `${componentName}.tsx`);
 }
 
 export function createStoryPath(storiesDir: string, componentName: string): string {

@@ -1,0 +1,102 @@
+{
+  "category": "height",
+  "generatedAt": "2025-08-28T17:20:34.073Z",
+  "tokens": [
+    {
+      "name": "xs",
+      "value": "2.5rem",
+      "category": "height",
+      "namespace": "height",
+      "semanticMeaning": "Component height xs for linear scale",
+      "mathRelationship": "2.5 + 0",
+      "scalePosition": 0,
+      "touchTargetSize": 40,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "input", "select", "card"]
+    },
+    {
+      "name": "sm",
+      "value": "3rem",
+      "category": "height",
+      "namespace": "height",
+      "semanticMeaning": "Component height sm for linear scale",
+      "mathRelationship": "2.5 + 0.5",
+      "scalePosition": 1,
+      "touchTargetSize": 48,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "input", "select", "card"]
+    },
+    {
+      "name": "md",
+      "value": "3.5rem",
+      "category": "height",
+      "namespace": "height",
+      "semanticMeaning": "Component height md for linear scale",
+      "mathRelationship": "2.5 + 1",
+      "scalePosition": 2,
+      "touchTargetSize": 56,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "input", "select", "card"]
+    },
+    {
+      "name": "lg",
+      "value": "4rem",
+      "category": "height",
+      "namespace": "height",
+      "semanticMeaning": "Component height lg for linear scale",
+      "mathRelationship": "2.5 + 1.5",
+      "scalePosition": 3,
+      "touchTargetSize": 64,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "input", "select", "card"]
+    },
+    {
+      "name": "xl",
+      "value": "4.5rem",
+      "category": "height",
+      "namespace": "height",
+      "semanticMeaning": "Component height xl for linear scale",
+      "mathRelationship": "2.5 + 2",
+      "scalePosition": 4,
+      "touchTargetSize": 72,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "input", "select", "card"]
+    },
+    {
+      "name": "2xl",
+      "value": "5rem",
+      "category": "height",
+      "namespace": "height",
+      "semanticMeaning": "Component height 2xl for linear scale",
+      "mathRelationship": "2.5 + 2.5",
+      "scalePosition": 5,
+      "touchTargetSize": 80,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "input", "select", "card"]
+    },
+    {
+      "name": "3xl",
+      "value": "5.5rem",
+      "category": "height",
+      "namespace": "height",
+      "semanticMeaning": "Component height 3xl for linear scale",
+      "mathRelationship": "2.5 + 3",
+      "scalePosition": 6,
+      "touchTargetSize": 88,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "input", "select", "card"]
+    },
+    {
+      "name": "4xl",
+      "value": "6rem",
+      "category": "height",
+      "namespace": "height",
+      "semanticMeaning": "Component height 4xl for linear scale",
+      "mathRelationship": "2.5 + 3.5",
+      "scalePosition": 7,
+      "touchTargetSize": 96,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "input", "select", "card"]
+    }
+  ]
+}

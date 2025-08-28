@@ -1,0 +1,46 @@
+{
+  "category": "font-family",
+  "generatedAt": "2025-08-28T17:20:34.075Z",
+  "tokens": [
+    {
+      "name": "sans",
+      "value": "\"Inter\", system-ui, sans-serif",
+      "category": "font-family",
+      "namespace": "font",
+      "semanticMeaning": "Primary sans-serif for UI and body text",
+      "scalePosition": 0,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "serif",
+      "value": "\"Crimson Text\", Georgia, serif",
+      "category": "font-family",
+      "namespace": "font",
+      "semanticMeaning": "Serif font for editorial content",
+      "scalePosition": 1,
+      "generateUtilityClass": true,
+      "applicableComponents": ["article", "blog"]
+    },
+    {
+      "name": "mono",
+      "value": "\"JetBrains Mono\", \"Fira Code\", monospace",
+      "category": "font-family",
+      "namespace": "font",
+      "semanticMeaning": "Monospace font for code and data",
+      "scalePosition": 2,
+      "generateUtilityClass": true,
+      "applicableComponents": ["code", "pre", "kbd"]
+    },
+    {
+      "name": "display",
+      "value": "\"Inter Display\", system-ui, sans-serif",
+      "category": "font-family",
+      "namespace": "font",
+      "semanticMeaning": "Display font for headings and marketing",
+      "scalePosition": 3,
+      "generateUtilityClass": true,
+      "applicableComponents": ["h1", "h2", "hero"]
+    }
+  ]
+}

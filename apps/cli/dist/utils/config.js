@@ -141,3 +141,80 @@ export function getDefaultCssFile(framework, cwd = process.cwd()) {
             return 'src/globals.css'; // Generic fallback
     }
 }
+/**
+ * Detect import alias configuration from tsconfig.json or jsconfig.json
+ * Returns the detected alias or null if none found
+ */
+export function detectImportAlias(cwd = process.cwd()) {
+    // Check for any tsconfig.* or jsconfig.* files
+    const configPatterns = [
+        'tsconfig.json',
+        'jsconfig.json',
+        'tsconfig.app.json',
+        'tsconfig.cloudflare.json',
+        'tsconfig.node.json',
+        'tsconfig.web.json',
+        'tsconfig.server.json',
+        'tsconfig.build.json',
+    ];
+    for (const configFile of configPatterns) {
+        const configPath = join(cwd, configFile);
+        if (existsSync(configPath)) {
+            try {
+                const configContent = readFileSync(configPath, 'utf-8');
+                const config = JSON.parse(configContent);
+                const paths = config.compilerOptions?.paths;
+                if (!paths)
+                    continue;
+                // Common alias patterns to check
+                const commonAliases = ['@/*', '~/*', '#/*', '$/*'];
+                for (const alias of commonAliases) {
+                    if (paths[alias] && Array.isArray(paths[alias]) && paths[alias].length > 0) {
+                        // Extract the alias prefix (e.g., "@" from "@/*")
+                        return alias.replace('/*', '');
+                    }
+                }
+            }
+            catch { }
+        }
+    }
+    return null;
+}
+/**
+ * Transform component imports to use the detected alias or relative paths
+ */
+export function transformImports(componentContent, componentsDir, cwd = process.cwd()) {
+    const alias = detectImportAlias(cwd);
+    let transformedContent = componentContent;
+    if (alias) {
+        // Transform relative imports to use alias
+        // Replace "../lib/utils" with "@/lib/utils" (or detected alias)
+        transformedContent = transformedContent.replace(/from\s+['"]\.\.\/lib\/utils['"];?/g, `from '${alias}/lib/utils';`);
+        // Transform other common relative imports
+        transformedContent = transformedContent.replace(/from\s+['"]\.\.\/([^'"]+)['"];?/g, `from '${alias}/$1';`);
+    }
+    else {
+        // No alias detected, use relative paths
+        // This is already the default in our components, so no transformation needed
+        // But we should ensure the relative path is correct based on componentsDir
+        // If componentsDir is not the standard "./src/components/ui", adjust the relative path
+        if (componentsDir !== './src/components/ui') {
+            // Calculate the relative path from componentsDir to src/lib/utils
+            const srcLibPath = join(cwd, 'src/lib');
+            const componentsDirPath = join(cwd, componentsDir);
+            // Simple heuristic: if componentsDir is deeper, add more "../"
+            const relativeDepth = componentsDir.split('/').length - 2; // -2 for "./" and "src"
+            const relativePath = relativeDepth > 2 ? `${'../'.repeat(relativeDepth - 2)}../lib/utils` : '../lib/utils';
+            transformedContent = transformedContent.replace(/from\s+['"]\.\.\/lib\/utils['"];?/g, `from '${relativePath}';`);
+        }
+    }
+    // Remove invalid imports like @rafters/design-tokens/motion
+    transformedContent = transformedContent.replace(/import.*from\s+['"]@rafters\/design-tokens\/motion['"];?\n?/g, '');
+    // Remove references to motion classes that don't exist
+    transformedContent = transformedContent.replace(/'motion-hover'[\s,]*/g, '');
+    transformedContent = transformedContent.replace(/'easing-snappy'[\s,]*/g, '');
+    // Clean up any double commas or trailing commas in className strings
+    transformedContent = transformedContent.replace(/,\s*,/g, ',');
+    transformedContent = transformedContent.replace(/,\s*\)/g, ')');
+    return transformedContent;
+}

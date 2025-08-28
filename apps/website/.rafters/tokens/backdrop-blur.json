@@ -1,0 +1,94 @@
+{
+  "category": "backdrop-blur",
+  "generatedAt": "2025-08-28T17:20:34.077Z",
+  "tokens": [
+    {
+      "name": "none",
+      "value": "0",
+      "category": "backdrop-blur",
+      "namespace": "backdrop-blur",
+      "semanticMeaning": "No backdrop blur",
+      "scalePosition": 0,
+      "mathRelationship": "No blur",
+      "generateUtilityClass": true,
+      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"]
+    },
+    {
+      "name": "sm",
+      "value": "4px",
+      "category": "backdrop-blur",
+      "namespace": "backdrop-blur",
+      "semanticMeaning": "Small backdrop blur for overlays",
+      "scalePosition": 1,
+      "mathRelationship": "blur(4px)",
+      "generateUtilityClass": true,
+      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"]
+    },
+    {
+      "name": "DEFAULT",
+      "value": "8px",
+      "category": "backdrop-blur",
+      "namespace": "backdrop-blur",
+      "semanticMeaning": "Default backdrop blur for modals",
+      "scalePosition": 2,
+      "mathRelationship": "blur(8px)",
+      "generateUtilityClass": true,
+      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"]
+    },
+    {
+      "name": "md",
+      "value": "12px",
+      "category": "backdrop-blur",
+      "namespace": "backdrop-blur",
+      "semanticMeaning": "Medium backdrop blur for focus",
+      "scalePosition": 3,
+      "mathRelationship": "blur(12px)",
+      "generateUtilityClass": true,
+      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"]
+    },
+    {
+      "name": "lg",
+      "value": "16px",
+      "category": "backdrop-blur",
+      "namespace": "backdrop-blur",
+      "semanticMeaning": "Large backdrop blur for separation",
+      "scalePosition": 4,
+      "mathRelationship": "blur(16px)",
+      "generateUtilityClass": true,
+      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"]
+    },
+    {
+      "name": "xl",
+      "value": "24px",
+      "category": "backdrop-blur",
+      "namespace": "backdrop-blur",
+      "semanticMeaning": "Extra large blur for drama",
+      "scalePosition": 5,
+      "mathRelationship": "blur(24px)",
+      "generateUtilityClass": true,
+      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"]
+    },
+    {
+      "name": "2xl",
+      "value": "40px",
+      "category": "backdrop-blur",
+      "namespace": "backdrop-blur",
+      "semanticMeaning": "Maximum blur for strong effects",
+      "scalePosition": 6,
+      "mathRelationship": "blur(40px)",
+      "generateUtilityClass": true,
+      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"]
+    },
+    {
+      "name": "3xl",
+      "value": "64px",
+      "category": "backdrop-blur",
+      "namespace": "backdrop-blur",
+      "semanticMeaning": "Ultra blur for artistic effects",
+      "scalePosition": 7,
+      "mathRelationship": "blur(64px)",
+      "generateUtilityClass": true,
+      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"]
+    }
+  ]
+}

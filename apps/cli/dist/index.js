@@ -15,9 +15,9 @@ program
     .version(packageJson.version);
 program.command('init').description('Initialize Rafters in your project').action(initCommand);
 program
-    .command('add <component>')
-    .description('Add a Rafters component with design intelligence')
-    .option('-f, --force', 'Overwrite existing component')
+    .command('add <components...>')
+    .description('Add Rafters components with design intelligence')
+    .option('-f, --force', 'Overwrite existing components')
     .action(addCommand);
 program
     .command('list')

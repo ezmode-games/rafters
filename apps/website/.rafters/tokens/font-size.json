@@ -1,0 +1,162 @@
+{
+  "category": "font-size",
+  "generatedAt": "2025-08-28T17:20:34.073Z",
+  "tokens": [
+    {
+      "name": "xs",
+      "value": "0.382rem",
+      "lineHeight": "1.25",
+      "category": "font-size",
+      "namespace": "font-size",
+      "semanticMeaning": "Typography size xs using golden ratio",
+      "mathRelationship": "1 * 1.618033988749^-2",
+      "scalePosition": 0,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "label", "button"]
+    },
+    {
+      "name": "sm",
+      "value": "0.618rem",
+      "lineHeight": "1.375",
+      "category": "font-size",
+      "namespace": "font-size",
+      "semanticMeaning": "Typography size sm using golden ratio",
+      "mathRelationship": "1 * 1.618033988749^-1",
+      "scalePosition": 1,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "label", "button"]
+    },
+    {
+      "name": "base",
+      "value": "1rem",
+      "lineHeight": "1.5",
+      "category": "font-size",
+      "namespace": "font-size",
+      "semanticMeaning": "Typography size base using golden ratio",
+      "mathRelationship": "1 * 1.618033988749^0",
+      "scalePosition": 2,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "label", "button"]
+    },
+    {
+      "name": "lg",
+      "value": "1.618rem",
+      "lineHeight": "1.6",
+      "category": "font-size",
+      "namespace": "font-size",
+      "semanticMeaning": "Typography size lg using golden ratio",
+      "mathRelationship": "1 * 1.618033988749^1",
+      "scalePosition": 3,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "label", "button"]
+    },
+    {
+      "name": "xl",
+      "value": "2.618rem",
+      "lineHeight": "1.75",
+      "category": "font-size",
+      "namespace": "font-size",
+      "semanticMeaning": "Typography size xl using golden ratio",
+      "mathRelationship": "1 * 1.618033988749^2",
+      "scalePosition": 4,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "label", "button"]
+    },
+    {
+      "name": "2xl",
+      "value": "4.236rem",
+      "lineHeight": "1.8",
+      "category": "font-size",
+      "namespace": "font-size",
+      "semanticMeaning": "Typography size 2xl using golden ratio",
+      "mathRelationship": "1 * 1.618033988749^3",
+      "scalePosition": 5,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "label", "button"]
+    },
+    {
+      "name": "3xl",
+      "value": "6.854rem",
+      "lineHeight": "1.8",
+      "category": "font-size",
+      "namespace": "font-size",
+      "semanticMeaning": "Typography size 3xl using golden ratio",
+      "mathRelationship": "1 * 1.618033988749^4",
+      "scalePosition": 6,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "label", "button"]
+    },
+    {
+      "name": "4xl",
+      "value": "11.09rem",
+      "lineHeight": "1.1",
+      "category": "font-size",
+      "namespace": "font-size",
+      "semanticMeaning": "Typography size 4xl using golden ratio",
+      "mathRelationship": "1 * 1.618033988749^5",
+      "scalePosition": 7,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "label", "button"]
+    },
+    {
+      "name": "5xl",
+      "value": "17.944rem",
+      "lineHeight": "1.1",
+      "category": "font-size",
+      "namespace": "font-size",
+      "semanticMeaning": "Typography size 5xl using golden ratio",
+      "mathRelationship": "1 * 1.618033988749^6",
+      "scalePosition": 8,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "label", "button"]
+    },
+    {
+      "name": "6xl",
+      "value": "29.034rem",
+      "lineHeight": "1.05",
+      "category": "font-size",
+      "namespace": "font-size",
+      "semanticMeaning": "Typography size 6xl using golden ratio",
+      "mathRelationship": "1 * 1.618033988749^7",
+      "scalePosition": 9,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "label", "button"]
+    },
+    {
+      "name": "7xl",
+      "value": "46.979rem",
+      "lineHeight": "1.05",
+      "category": "font-size",
+      "namespace": "font-size",
+      "semanticMeaning": "Typography size 7xl using golden ratio",
+      "mathRelationship": "1 * 1.618033988749^8",
+      "scalePosition": 10,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "label", "button"]
+    },
+    {
+      "name": "8xl",
+      "value": "76.013rem",
+      "lineHeight": "1",
+      "category": "font-size",
+      "namespace": "font-size",
+      "semanticMeaning": "Typography size 8xl using golden ratio",
+      "mathRelationship": "1 * 1.618033988749^9",
+      "scalePosition": 11,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "label", "button"]
+    },
+    {
+      "name": "9xl",
+      "value": "122.992rem",
+      "lineHeight": "1",
+      "category": "font-size",
+      "namespace": "font-size",
+      "semanticMeaning": "Typography size 9xl using golden ratio",
+      "mathRelationship": "1 * 1.618033988749^10",
+      "scalePosition": 12,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "label", "button"]
+    }
+  ]
+}

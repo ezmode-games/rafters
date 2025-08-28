@@ -3,3 +3,7 @@ pre-commit:
     preflight:
       run: pnpm preflight
       stage_fixed: true
+    visual-tests:
+      root: "apps/website/"
+      run: pnpm test:e2e --reporter=line
+      stage_fixed: false

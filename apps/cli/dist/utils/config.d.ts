@@ -33,3 +33,12 @@ export declare function hasReact(cwd?: string): boolean;
 export declare function detectFramework(cwd?: string): string | null;
 export declare function findCssFile(cwd?: string): string | null;
 export declare function getDefaultCssFile(framework: string | null, cwd?: string): string;
+/**
+ * Detect import alias configuration from tsconfig.json or jsconfig.json
+ * Returns the detected alias or null if none found
+ */
+export declare function detectImportAlias(cwd?: string): string | null;
+/**
+ * Transform component imports to use the detected alias or relative paths
+ */
+export declare function transformImports(componentContent: string, componentsDir: string, cwd?: string): string;

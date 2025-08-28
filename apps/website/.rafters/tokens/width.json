@@ -1,0 +1,136 @@
+{
+  "category": "width",
+  "generatedAt": "2025-08-28T17:20:34.077Z",
+  "tokens": [
+    {
+      "name": "min",
+      "value": "min-content",
+      "category": "width",
+      "namespace": "w",
+      "semanticMeaning": "Minimum content width",
+      "scalePosition": 0,
+      "generateUtilityClass": true,
+      "applicableComponents": ["layout"]
+    },
+    {
+      "name": "max",
+      "value": "max-content",
+      "category": "width",
+      "namespace": "w",
+      "semanticMeaning": "Maximum content width",
+      "scalePosition": 1,
+      "generateUtilityClass": true,
+      "applicableComponents": ["layout"]
+    },
+    {
+      "name": "fit",
+      "value": "fit-content",
+      "category": "width",
+      "namespace": "w",
+      "semanticMeaning": "Fit content width",
+      "scalePosition": 2,
+      "generateUtilityClass": true,
+      "applicableComponents": ["layout"]
+    },
+    {
+      "name": "full",
+      "value": "100%",
+      "category": "width",
+      "namespace": "w",
+      "semanticMeaning": "Full width",
+      "scalePosition": 3,
+      "generateUtilityClass": true,
+      "applicableComponents": ["layout"]
+    },
+    {
+      "name": "screen",
+      "value": "100vw",
+      "category": "width",
+      "namespace": "w",
+      "semanticMeaning": "Full viewport width",
+      "scalePosition": 4,
+      "generateUtilityClass": true,
+      "applicableComponents": ["layout"]
+    },
+    {
+      "name": "prose",
+      "value": "65ch",
+      "category": "width",
+      "namespace": "w",
+      "semanticMeaning": "Optimal reading width",
+      "scalePosition": 5,
+      "generateUtilityClass": true,
+      "applicableComponents": ["content", "article"]
+    },
+    {
+      "name": "dialog-sm",
+      "value": "320px",
+      "category": "width",
+      "namespace": "w",
+      "semanticMeaning": "Small dialog width",
+      "scalePosition": 6,
+      "generateUtilityClass": true,
+      "applicableComponents": ["dialog", "modal"]
+    },
+    {
+      "name": "dialog-md",
+      "value": "480px",
+      "category": "width",
+      "namespace": "w",
+      "semanticMeaning": "Medium dialog width",
+      "scalePosition": 7,
+      "generateUtilityClass": true,
+      "applicableComponents": ["dialog", "modal"]
+    },
+    {
+      "name": "dialog-lg",
+      "value": "640px",
+      "category": "width",
+      "namespace": "w",
+      "semanticMeaning": "Large dialog width",
+      "scalePosition": 8,
+      "generateUtilityClass": true,
+      "applicableComponents": ["dialog", "modal"]
+    },
+    {
+      "name": "dialog-xl",
+      "value": "800px",
+      "category": "width",
+      "namespace": "w",
+      "semanticMeaning": "Extra large dialog width",
+      "scalePosition": 9,
+      "generateUtilityClass": true,
+      "applicableComponents": ["dialog", "modal"]
+    },
+    {
+      "name": "sidebar",
+      "value": "280px",
+      "category": "width",
+      "namespace": "w",
+      "semanticMeaning": "Standard sidebar width",
+      "scalePosition": 10,
+      "generateUtilityClass": true,
+      "applicableComponents": ["sidebar", "navigation"]
+    },
+    {
+      "name": "sidebar-sm",
+      "value": "240px",
+      "category": "width",
+      "namespace": "w",
+      "semanticMeaning": "Compact sidebar width",
+      "scalePosition": 11,
+      "generateUtilityClass": true,
+      "applicableComponents": ["sidebar", "navigation"]
+    },
+    {
+      "name": "sidebar-lg",
+      "value": "320px",
+      "category": "width",
+      "namespace": "w",
+      "semanticMeaning": "Wide sidebar width",
+      "scalePosition": 12,
+      "generateUtilityClass": true,
+      "applicableComponents": ["sidebar", "navigation"]
+    }
+  ]
+}

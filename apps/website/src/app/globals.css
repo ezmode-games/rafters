@@ -1,0 +1,893 @@
+/**
+ * Rafters Design System
+ * Complete design system installation with AI-embedded design intelligence
+ * 
+ * This file contains the complete Rafters design system including:
+ * - Design tokens with semantic meaning
+ * - Accessibility-first patterns  
+ * - Cognitive load optimizations
+ * - Trust-building color hierarchies
+ * - Progressive enhancement support
+ */
+
+@import "tailwindcss";
+
+/**
+ * Rafters Design Tokens
+ * Generated following shadcn/ui pattern with embedded design intelligence
+ */
+
+:root {
+  /* SPACING */
+  /* Spacing step 0 in linear scale */
+  --spacing-0: 0rem;
+  /* Spacing step 1 in linear scale */
+  --spacing-1: 1rem;
+  /* Spacing step 2 in linear scale */
+  --spacing-2: 2rem;
+  /* Spacing step 3 in linear scale */
+  --spacing-3: 3rem;
+  /* Spacing step 4 in linear scale */
+  --spacing-4: 4rem;
+  /* Spacing step 5 in linear scale */
+  --spacing-5: 5rem;
+  /* Spacing step 6 in linear scale */
+  --spacing-6: 6rem;
+  /* Spacing step 7 in linear scale */
+  --spacing-7: 7rem;
+  /* Spacing step 8 in linear scale */
+  --spacing-8: 8rem;
+  /* Spacing step 9 in linear scale */
+  --spacing-9: 9rem;
+  /* Spacing step 10 in linear scale */
+  --spacing-10: 10rem;
+  /* Spacing step 11 in linear scale */
+  --spacing-11: 11rem;
+  /* Spacing step 12 in linear scale */
+  --spacing-12: 12rem;
+
+  /* SHADOW */
+  /* No shadow, flat appearance */
+  --shadow-none: none;
+  /* Subtle depth for cards */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  /* Standard card shadow */
+  --shadow-base: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  /* Elevated components */
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  /* Floating elements */
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  /* Modal/dialog shadow */
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  /* Maximum elevation */
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+
+  /* Z-INDEX */
+  /* Base content layer */
+  --zindex-base: 0;
+  /* Sticky elements (headers, sidebars) */
+  --zindex-sticky: 10;
+  /* Dropdowns and select menus */
+  --zindex-dropdown: 100;
+  /* Modal dialogs and overlays */
+  --zindex-modal: 1000;
+  /* Popovers and tooltips */
+  --zindex-popover: 5000;
+  /* Toast notifications and alerts */
+  --zindex-notification: 10000;
+  /* Tooltips (highest priority) */
+  --zindex-tooltip: 50000;
+  /* Maximum z-index value */
+  --zindex-max: 2147483647;
+
+  /* HEIGHT */
+  /* Component height xs for linear scale */
+  --height-xs: 2.5rem;
+  /* Component height sm for linear scale */
+  --height-sm: 3rem;
+  /* Component height md for linear scale */
+  --height-md: 3.5rem;
+  /* Component height lg for linear scale */
+  --height-lg: 4rem;
+  /* Component height xl for linear scale */
+  --height-xl: 4.5rem;
+  /* Component height 2xl for linear scale */
+  --height-2xl: 5rem;
+  /* Component height 3xl for linear scale */
+  --height-3xl: 5.5rem;
+  /* Component height 4xl for linear scale */
+  --height-4xl: 6rem;
+
+  /* FONT-SIZE */
+  /* Typography size xs using golden ratio */
+  --fontsize-xs: 0.382rem;
+  /* Typography size sm using golden ratio */
+  --fontsize-sm: 0.618rem;
+  /* Typography size base using golden ratio */
+  --fontsize-base: 1rem;
+  /* Typography size lg using golden ratio */
+  --fontsize-lg: 1.618rem;
+  /* Typography size xl using golden ratio */
+  --fontsize-xl: 2.618rem;
+  /* Typography size 2xl using golden ratio */
+  --fontsize-2xl: 4.236rem;
+  /* Typography size 3xl using golden ratio */
+  --fontsize-3xl: 6.854rem;
+  /* Typography size 4xl using golden ratio */
+  --fontsize-4xl: 11.09rem;
+  /* Typography size 5xl using golden ratio */
+  --fontsize-5xl: 17.944rem;
+  /* Typography size 6xl using golden ratio */
+  --fontsize-6xl: 29.034rem;
+  /* Typography size 7xl using golden ratio */
+  --fontsize-7xl: 46.979rem;
+  /* Typography size 8xl using golden ratio */
+  --fontsize-8xl: 76.013rem;
+  /* Typography size 9xl using golden ratio */
+  --fontsize-9xl: 122.992rem;
+
+  /* LINE-HEIGHT */
+  /* Line height optimized for xs text */
+  --lineheight-xs: 1.6;
+  /* Line height optimized for sm text */
+  --lineheight-sm: 1.6;
+  /* Line height optimized for base text */
+  --lineheight-base: 1.5;
+  /* Line height optimized for lg text */
+  --lineheight-lg: 1.5;
+  /* Line height optimized for xl text */
+  --lineheight-xl: 1.2;
+  /* Line height optimized for 2xl text */
+  --lineheight-2xl: 1.2;
+  /* Line height optimized for 3xl text */
+  --lineheight-3xl: 1.2;
+  /* Line height optimized for 4xl text */
+  --lineheight-4xl: 1.2;
+  /* Line height optimized for 5xl text */
+  --lineheight-5xl: 1.2;
+  /* Line height optimized for 6xl text */
+  --lineheight-6xl: 1.2;
+  /* Line height optimized for 7xl text */
+  --lineheight-7xl: 1.2;
+  /* Line height optimized for 8xl text */
+  --lineheight-8xl: 1.2;
+  /* Line height optimized for 9xl text */
+  --lineheight-9xl: 1.2;
+
+  /* COLOR */
+  /* Primary brand color for main actions */
+  --color-primary: oklch(0.45 0.12 240);
+  /* Text on primary background */
+  --color-primary-foreground: oklch(0.98 0.002 240);
+  /* Secondary actions and elements */
+  --color-secondary: oklch(0.35 0.08 240);
+  /* Text on secondary background */
+  --color-secondary-foreground: oklch(0.95 0.005 240);
+  /* Accent color for highlights */
+  --color-accent: oklch(0.45 0.1 270);
+  /* Text on accent background */
+  --color-accent-foreground: oklch(0.98 0.002 270);
+  /* Informational states and messages */
+  --color-info: oklch(0.45 0.1 210);
+  /* Text on info background */
+  --color-info-foreground: oklch(0.98 0.002 210);
+  /* Success states and confirmations */
+  --color-success: oklch(0.45 0.1 150);
+  /* Text on success background */
+  --color-success-foreground: oklch(0.98 0.002 150);
+  /* Warning states and cautions */
+  --color-warning: oklch(0.55 0.12 60);
+  /* Text on warning background */
+  --color-warning-foreground: oklch(0.15 0.02 60);
+  /* Destructive actions and errors */
+  --color-destructive: oklch(0.4 0.15 20);
+  /* Text on destructive background */
+  --color-destructive-foreground: oklch(0.98 0.002 20);
+  /* Text highlighting and selection */
+  --color-highlight: oklch(0.55 0.15 90);
+  /* Text on highlight background */
+  --color-highlight-foreground: oklch(0.15 0.02 90);
+  /* Main background color */
+  --color-background: oklch(1 0 0);
+  /* Main text color */
+  --color-foreground: oklch(0.15 0.005 240);
+  /* Muted background for secondary content */
+  --color-muted: oklch(0.96 0.005 240);
+  /* Muted text color */
+  --color-muted-foreground: oklch(0.45 0.02 240);
+  /* Border color for components */
+  --color-border: oklch(0.88 0.02 240);
+  /* Input field borders */
+  --color-input: oklch(0.88 0.02 240);
+  /* Focus ring color */
+  --color-ring: oklch(0.45 0.12 240);
+  /* Card background color */
+  --color-card: oklch(1 0 0);
+  /* Text on card background */
+  --color-card-foreground: oklch(0.15 0.005 240);
+  /* Popover background color */
+  --color-popover: oklch(1 0 0);
+  /* Text on popover background */
+  --color-popover-foreground: oklch(0.15 0.005 240);
+
+  /* MOTION */
+  /* Instant feedback for immediate response */
+  --motion-instant: 75ms;
+  /* Fast animations for interactive elements */
+  --motion-fast: 150ms;
+  /* Standard duration for most transitions */
+  --motion-standard: 300ms;
+  /* Deliberate timing for important changes */
+  --motion-deliberate: 500ms;
+  /* Slow transitions for large changes */
+  --motion-slow: 700ms;
+  /* Dramatic timing for emphasis */
+  --motion-dramatic: 1000ms;
+
+  /* EASING */
+  /* Linear timing for mechanical movement */
+  --easing-linear: linear;
+  /* Smooth natural movement */
+  --easing-smooth: ease-in-out;
+  /* Welcoming entrance animation */
+  --easing-accelerating: ease-out;
+  /* Graceful exit animation */
+  --easing-decelerating: ease-in;
+  /* Playful bounce for celebrations */
+  --easing-bouncy: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  /* Sharp responsive feedback */
+  --easing-snappy: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* BORDER-RADIUS */
+  /* No border radius, sharp corners */
+  --borderradius-none: 0;
+  /* Small radius for subtle rounding */
+  --borderradius-sm: 0.125rem;
+  /* Default radius for most components */
+  --borderradius-base: 0.25rem;
+  /* Medium radius for cards and panels */
+  --borderradius-md: 0.375rem;
+  /* Large radius for prominent elements */
+  --borderradius-lg: 0.5rem;
+  /* Extra large radius for hero elements */
+  --borderradius-xl: 0.75rem;
+  /* Maximum standard radius */
+  --borderradius-2xl: 1rem;
+  /* Very large radius for special cases */
+  --borderradius-3xl: 1.5rem;
+  /* Fully rounded (pills, avatars) */
+  --borderradius-full: 9999px;
+
+  /* TOUCH-TARGET */
+  /* WCAG AAA minimum touch target */
+  --touchtarget-min: 44px;
+  /* Comfortable touch target */
+  --touchtarget-comfortable: 48px;
+  /* Generous touch target for accessibility */
+  --touchtarget-generous: 56px;
+  /* Large touch target for primary actions */
+  --touchtarget-large: 64px;
+
+  /* OPACITY */
+  /* Disabled state opacity */
+  --opacity-disabled: 0.5;
+  /* Loading state opacity */
+  --opacity-loading: 0.7;
+  /* Modal overlay background */
+  --opacity-overlay: 0.8;
+  /* Subtle backdrop opacity */
+  --opacity-backdrop: 0.25;
+  /* Hover state opacity */
+  --opacity-hover: 0.9;
+  /* Focus state (full opacity) */
+  --opacity-focus: 1;
+
+  /* FONT-FAMILY */
+  /* Primary sans-serif for UI and body text */
+  --fontfamily-sans: "Inter", system-ui, sans-serif;
+  /* Serif font for editorial content */
+  --fontfamily-serif: "Crimson Text", Georgia, serif;
+  /* Monospace font for code and data */
+  --fontfamily-mono: "JetBrains Mono", "Fira Code", monospace;
+  /* Display font for headings and marketing */
+  --fontfamily-display: "Inter Display", system-ui, sans-serif;
+
+  /* FONT-WEIGHT */
+  /* Thin weight for delicate text */
+  --fontweight-thin: 100;
+  /* Extra light weight */
+  --fontweight-extralight: 200;
+  /* Light weight for subtle text */
+  --fontweight-light: 300;
+  /* Normal weight for body text */
+  --fontweight-normal: 400;
+  /* Medium weight for emphasis */
+  --fontweight-medium: 500;
+  /* Semi-bold for subheadings */
+  --fontweight-semibold: 600;
+  /* Bold for headings and emphasis */
+  --fontweight-bold: 700;
+  /* Extra bold for strong emphasis */
+  --fontweight-extrabold: 800;
+  /* Black weight for maximum impact */
+  --fontweight-black: 900;
+
+  /* LETTER-SPACING */
+  /* Tighter letter spacing for large text */
+  --letterspacing-tighter: -0.05em;
+  /* Slightly tighter spacing */
+  --letterspacing-tight: -0.025em;
+  /* Normal letter spacing */
+  --letterspacing-normal: 0em;
+  /* Wider spacing for readability */
+  --letterspacing-wide: 0.025em;
+  /* Wide spacing for emphasis */
+  --letterspacing-wider: 0.05em;
+  /* Maximum spacing for display text */
+  --letterspacing-widest: 0.1em;
+
+  /* BREAKPOINT */
+  /* Extra small mobile devices */
+  --breakpoint-xs: 320px;
+  /* Small tablets and large phones */
+  --breakpoint-sm: 640px;
+  /* Medium tablets */
+  --breakpoint-md: 768px;
+  /* Large tablets and small laptops */
+  --breakpoint-lg: 1024px;
+  /* Large laptops and desktops */
+  --breakpoint-xl: 1280px;
+  /* Large desktops and ultrawide */
+  --breakpoint-2xl: 1536px;
+
+  /* CONTAINER */
+  /* Extra small container (320px) */
+  --container-xs: 20rem;
+  /* Small container (384px) */
+  --container-sm: 24rem;
+  /* Medium container (448px) */
+  --container-md: 28rem;
+  /* Large container (512px) */
+  --container-lg: 32rem;
+  /* Extra large container (576px) */
+  --container-xl: 36rem;
+  /* 2XL container (672px) */
+  --container-2xl: 42rem;
+  /* 3XL container (768px) */
+  --container-3xl: 48rem;
+  /* 4XL container (896px) */
+  --container-4xl: 56rem;
+  /* 5XL container (1024px) */
+  --container-5xl: 64rem;
+  /* 6XL container (1152px) */
+  --container-6xl: 72rem;
+  /* 7XL container (1280px) */
+  --container-7xl: 80rem;
+  /* 8XL container (1440px) */
+  --container-8xl: 90rem;
+  /* 9XL container (1600px) */
+  --container-9xl: 100rem;
+
+  /* ASPECT-RATIO */
+  /* Square aspect ratio for avatars and icons */
+  --aspectratio-square: 1 / 1;
+  /* Video aspect ratio for media content */
+  --aspectratio-video: 16 / 9;
+  /* Photo aspect ratio for images */
+  --aspectratio-photo: 4 / 3;
+  /* Golden ratio for aesthetic layouts */
+  --aspectratio-golden: 1.618 / 1;
+  /* Portrait orientation */
+  --aspectratio-portrait: 3 / 4;
+  /* Landscape orientation */
+  --aspectratio-landscape: 4 / 3;
+  /* Ultrawide aspect ratio */
+  --aspectratio-ultrawide: 21 / 9;
+
+  /* GRID-TEMPLATE-COLUMNS */
+  /* Auto-fit grid for small cards */
+  --gridtemplatecolumns-auto-fit-sm: repeat(auto-fit, minmax(var(--container-xs), 1fr));
+  /* Auto-fit grid for medium cards */
+  --gridtemplatecolumns-auto-fit-md: repeat(auto-fit, minmax(var(--container-sm), 1fr));
+  /* Auto-fit grid for large cards */
+  --gridtemplatecolumns-auto-fit-lg: repeat(auto-fit, minmax(var(--container-md), 1fr));
+  /* Auto-fill grid for small items */
+  --gridtemplatecolumns-auto-fill-sm: repeat(auto-fill, minmax(var(--container-xs), 1fr));
+  /* Auto-fill grid for medium items */
+  --gridtemplatecolumns-auto-fill-md: repeat(auto-fill, minmax(var(--container-sm), 1fr));
+  /* Auto-fill grid for large items */
+  --gridtemplatecolumns-auto-fill-lg: repeat(auto-fill, minmax(var(--container-md), 1fr));
+  /* Two equal columns */
+  --gridtemplatecolumns-2-cols: repeat(2, 1fr);
+  /* Three equal columns */
+  --gridtemplatecolumns-3-cols: repeat(3, 1fr);
+  /* Four equal columns */
+  --gridtemplatecolumns-4-cols: repeat(4, 1fr);
+  /* Twelve column layout system */
+  --gridtemplatecolumns-12-cols: repeat(12, 1fr);
+  /* Sidebar with main content */
+  --gridtemplatecolumns-sidebar: 250px 1fr;
+  /* Main content with sidebar */
+  --gridtemplatecolumns-main-sidebar: 1fr 250px;
+
+  /* GRID-TEMPLATE-ROWS */
+  /* Auto-sizing rows */
+  --gridtemplaterows-auto: auto;
+  /* Header, main content, footer layout */
+  --gridtemplaterows-header-main-footer: auto 1fr auto;
+  /* Two equal rows */
+  --gridtemplaterows-equal-2: repeat(2, 1fr);
+  /* Three equal rows */
+  --gridtemplaterows-equal-3: repeat(3, 1fr);
+  /* Masonry layout rows */
+  --gridtemplaterows-masonry: masonry;
+
+  /* SCALE */
+  /* Subtle hover scale for interactive elements */
+  --scale-hover: 1.02;
+  /* Active/pressed scale for buttons */
+  --scale-active: 0.98;
+  /* Focus scale for accessibility */
+  --scale-focus: 1.05;
+  /* Disabled state scale */
+  --scale-disabled: 0.95;
+  /* Emphasis scale for important elements */
+  --scale-emphasis: 1.1;
+  /* Dramatic scale for animations */
+  --scale-dramatic: 1.25;
+
+  /* TRANSLATE */
+  /* Center positioning transform */
+  --translate-center: -50%;
+  /* Center horizontally */
+  --translate-center-x: -50%, 0;
+  /* Center vertically */
+  --translate-center-y: 0, -50%;
+  /* Slide up animation */
+  --translate-slide-up: 0, -100%;
+  /* Slide down animation */
+  --translate-slide-down: 0, 100%;
+  /* Slide left animation */
+  --translate-slide-left: -100%, 0;
+  /* Slide right animation */
+  --translate-slide-right: 100%, 0;
+
+  /* ROTATE */
+  /* Flip rotation for icons and arrows */
+  --rotate-flip: 180deg;
+  /* Quarter turn rotation */
+  --rotate-quarter: 90deg;
+  /* Half turn rotation */
+  --rotate-half: 180deg;
+  /* Three quarter turn rotation */
+  --rotate-three-quarter: 270deg;
+
+  /* WIDTH */
+  /* Minimum content width */
+  --width-min: min-content;
+  /* Maximum content width */
+  --width-max: max-content;
+  /* Fit content width */
+  --width-fit: fit-content;
+  /* Full width */
+  --width-full: 100%;
+  /* Full viewport width */
+  --width-screen: 100vw;
+  /* Optimal reading width */
+  --width-prose: 65ch;
+  /* Small dialog width */
+  --width-dialog-sm: 320px;
+  /* Medium dialog width */
+  --width-dialog-md: 480px;
+  /* Large dialog width */
+  --width-dialog-lg: 640px;
+  /* Extra large dialog width */
+  --width-dialog-xl: 800px;
+  /* Standard sidebar width */
+  --width-sidebar: 280px;
+  /* Compact sidebar width */
+  --width-sidebar-sm: 240px;
+  /* Wide sidebar width */
+  --width-sidebar-lg: 320px;
+
+  /* BACKDROP-BLUR */
+  /* No backdrop blur */
+  --backdropblur-none: 0;
+  /* Small backdrop blur for overlays */
+  --backdropblur-sm: 4px;
+  /* Default backdrop blur for modals */
+  --backdropblur-DEFAULT: 8px;
+  /* Medium backdrop blur for focus */
+  --backdropblur-md: 12px;
+  /* Large backdrop blur for separation */
+  --backdropblur-lg: 16px;
+  /* Extra large blur for drama */
+  --backdropblur-xl: 24px;
+  /* Maximum blur for strong effects */
+  --backdropblur-2xl: 40px;
+  /* Ultra blur for artistic effects */
+  --backdropblur-3xl: 64px;
+
+  /* BORDER-WIDTH */
+  /* No border */
+  --borderwidth-0: 0px;
+  /* Default border width */
+  --borderwidth-DEFAULT: 1px;
+  /* Medium border for emphasis */
+  --borderwidth-2: 2px;
+  /* Thick border for strong emphasis */
+  --borderwidth-4: 4px;
+  /* Extra thick decorative border */
+  --borderwidth-8: 8px;
+
+}
+
+@theme inline {
+  /* SPACING MAPPINGS */
+  --spacing-0: var(--spacing-0);
+  --spacing-1: var(--spacing-1);
+  --spacing-2: var(--spacing-2);
+  --spacing-3: var(--spacing-3);
+  --spacing-4: var(--spacing-4);
+  --spacing-5: var(--spacing-5);
+  --spacing-6: var(--spacing-6);
+  --spacing-7: var(--spacing-7);
+  --spacing-8: var(--spacing-8);
+  --spacing-9: var(--spacing-9);
+  --spacing-10: var(--spacing-10);
+  --spacing-11: var(--spacing-11);
+  --spacing-12: var(--spacing-12);
+
+  /* SHADOW MAPPINGS */
+  --box-shadow-none: var(--shadow-none);
+  --box-shadow-sm: var(--shadow-sm);
+  --box-shadow-base: var(--shadow-base);
+  --box-shadow-md: var(--shadow-md);
+  --box-shadow-lg: var(--shadow-lg);
+  --box-shadow-xl: var(--shadow-xl);
+  --box-shadow-2xl: var(--shadow-2xl);
+
+  /* Z-INDEX MAPPINGS */
+  --z-index-base: var(--zindex-base);
+  --z-index-sticky: var(--zindex-sticky);
+  --z-index-dropdown: var(--zindex-dropdown);
+  --z-index-modal: var(--zindex-modal);
+  --z-index-popover: var(--zindex-popover);
+  --z-index-notification: var(--zindex-notification);
+  --z-index-tooltip: var(--zindex-tooltip);
+  --z-index-max: var(--zindex-max);
+
+  /* HEIGHT MAPPINGS */
+  --height-xs: var(--height-xs);
+  --height-sm: var(--height-sm);
+  --height-md: var(--height-md);
+  --height-lg: var(--height-lg);
+  --height-xl: var(--height-xl);
+  --height-2xl: var(--height-2xl);
+  --height-3xl: var(--height-3xl);
+  --height-4xl: var(--height-4xl);
+
+  /* FONT-SIZE MAPPINGS */
+  --font-size-xs: var(--fontsize-xs);
+  --font-size-sm: var(--fontsize-sm);
+  --font-size-base: var(--fontsize-base);
+  --font-size-lg: var(--fontsize-lg);
+  --font-size-xl: var(--fontsize-xl);
+  --font-size-2xl: var(--fontsize-2xl);
+  --font-size-3xl: var(--fontsize-3xl);
+  --font-size-4xl: var(--fontsize-4xl);
+  --font-size-5xl: var(--fontsize-5xl);
+  --font-size-6xl: var(--fontsize-6xl);
+  --font-size-7xl: var(--fontsize-7xl);
+  --font-size-8xl: var(--fontsize-8xl);
+  --font-size-9xl: var(--fontsize-9xl);
+
+  /* LINE-HEIGHT MAPPINGS */
+  --line-height-xs: var(--lineheight-xs);
+  --line-height-sm: var(--lineheight-sm);
+  --line-height-base: var(--lineheight-base);
+  --line-height-lg: var(--lineheight-lg);
+  --line-height-xl: var(--lineheight-xl);
+  --line-height-2xl: var(--lineheight-2xl);
+  --line-height-3xl: var(--lineheight-3xl);
+  --line-height-4xl: var(--lineheight-4xl);
+  --line-height-5xl: var(--lineheight-5xl);
+  --line-height-6xl: var(--lineheight-6xl);
+  --line-height-7xl: var(--lineheight-7xl);
+  --line-height-8xl: var(--lineheight-8xl);
+  --line-height-9xl: var(--lineheight-9xl);
+
+  /* COLOR MAPPINGS */
+  --color-primary: var(--color-primary);
+  --color-primary-foreground: var(--color-primary-foreground);
+  --color-secondary: var(--color-secondary);
+  --color-secondary-foreground: var(--color-secondary-foreground);
+  --color-accent: var(--color-accent);
+  --color-accent-foreground: var(--color-accent-foreground);
+  --color-info: var(--color-info);
+  --color-info-foreground: var(--color-info-foreground);
+  --color-success: var(--color-success);
+  --color-success-foreground: var(--color-success-foreground);
+  --color-warning: var(--color-warning);
+  --color-warning-foreground: var(--color-warning-foreground);
+  --color-destructive: var(--color-destructive);
+  --color-destructive-foreground: var(--color-destructive-foreground);
+  --color-highlight: var(--color-highlight);
+  --color-highlight-foreground: var(--color-highlight-foreground);
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --color-muted: var(--color-muted);
+  --color-muted-foreground: var(--color-muted-foreground);
+  --color-border: var(--color-border);
+  --color-input: var(--color-input);
+  --color-ring: var(--color-ring);
+  --color-card: var(--color-card);
+  --color-card-foreground: var(--color-card-foreground);
+  --color-popover: var(--color-popover);
+  --color-popover-foreground: var(--color-popover-foreground);
+
+  /* MOTION MAPPINGS */
+  --motion-instant: var(--motion-instant);
+  --motion-fast: var(--motion-fast);
+  --motion-standard: var(--motion-standard);
+  --motion-deliberate: var(--motion-deliberate);
+  --motion-slow: var(--motion-slow);
+  --motion-dramatic: var(--motion-dramatic);
+
+  /* EASING MAPPINGS */
+  --easing-linear: var(--easing-linear);
+  --easing-smooth: var(--easing-smooth);
+  --easing-accelerating: var(--easing-accelerating);
+  --easing-decelerating: var(--easing-decelerating);
+  --easing-bouncy: var(--easing-bouncy);
+  --easing-snappy: var(--easing-snappy);
+
+  /* BORDER-RADIUS MAPPINGS */
+  --border-radius-none: var(--borderradius-none);
+  --border-radius-sm: var(--borderradius-sm);
+  --border-radius-base: var(--borderradius-base);
+  --border-radius-md: var(--borderradius-md);
+  --border-radius-lg: var(--borderradius-lg);
+  --border-radius-xl: var(--borderradius-xl);
+  --border-radius-2xl: var(--borderradius-2xl);
+  --border-radius-3xl: var(--borderradius-3xl);
+  --border-radius-full: var(--borderradius-full);
+
+  /* TOUCH-TARGET MAPPINGS */
+  --touch-target-min: var(--touchtarget-min);
+  --touch-target-comfortable: var(--touchtarget-comfortable);
+  --touch-target-generous: var(--touchtarget-generous);
+  --touch-target-large: var(--touchtarget-large);
+
+  /* OPACITY MAPPINGS */
+  --opacity-disabled: var(--opacity-disabled);
+  --opacity-loading: var(--opacity-loading);
+  --opacity-overlay: var(--opacity-overlay);
+  --opacity-backdrop: var(--opacity-backdrop);
+  --opacity-hover: var(--opacity-hover);
+  --opacity-focus: var(--opacity-focus);
+
+  /* FONT-FAMILY MAPPINGS */
+  --font-family-sans: var(--fontfamily-sans);
+  --font-family-serif: var(--fontfamily-serif);
+  --font-family-mono: var(--fontfamily-mono);
+  --font-family-display: var(--fontfamily-display);
+
+  /* FONT-WEIGHT MAPPINGS */
+  --font-weight-thin: var(--fontweight-thin);
+  --font-weight-extralight: var(--fontweight-extralight);
+  --font-weight-light: var(--fontweight-light);
+  --font-weight-normal: var(--fontweight-normal);
+  --font-weight-medium: var(--fontweight-medium);
+  --font-weight-semibold: var(--fontweight-semibold);
+  --font-weight-bold: var(--fontweight-bold);
+  --font-weight-extrabold: var(--fontweight-extrabold);
+  --font-weight-black: var(--fontweight-black);
+
+  /* LETTER-SPACING MAPPINGS */
+  --letter-spacing-tighter: var(--letterspacing-tighter);
+  --letter-spacing-tight: var(--letterspacing-tight);
+  --letter-spacing-normal: var(--letterspacing-normal);
+  --letter-spacing-wide: var(--letterspacing-wide);
+  --letter-spacing-wider: var(--letterspacing-wider);
+  --letter-spacing-widest: var(--letterspacing-widest);
+
+  /* BREAKPOINT MAPPINGS */
+  --breakpoint-xs: var(--breakpoint-xs);
+  --breakpoint-sm: var(--breakpoint-sm);
+  --breakpoint-md: var(--breakpoint-md);
+  --breakpoint-lg: var(--breakpoint-lg);
+  --breakpoint-xl: var(--breakpoint-xl);
+  --breakpoint-2xl: var(--breakpoint-2xl);
+
+  /* CONTAINER MAPPINGS */
+  --container-xs: var(--container-xs);
+  --container-sm: var(--container-sm);
+  --container-md: var(--container-md);
+  --container-lg: var(--container-lg);
+  --container-xl: var(--container-xl);
+  --container-2xl: var(--container-2xl);
+  --container-3xl: var(--container-3xl);
+  --container-4xl: var(--container-4xl);
+  --container-5xl: var(--container-5xl);
+  --container-6xl: var(--container-6xl);
+  --container-7xl: var(--container-7xl);
+  --container-8xl: var(--container-8xl);
+  --container-9xl: var(--container-9xl);
+
+  /* ASPECT-RATIO MAPPINGS */
+  --aspect-ratio-square: var(--aspectratio-square);
+  --aspect-ratio-video: var(--aspectratio-video);
+  --aspect-ratio-photo: var(--aspectratio-photo);
+  --aspect-ratio-golden: var(--aspectratio-golden);
+  --aspect-ratio-portrait: var(--aspectratio-portrait);
+  --aspect-ratio-landscape: var(--aspectratio-landscape);
+  --aspect-ratio-ultrawide: var(--aspectratio-ultrawide);
+
+  /* GRID-TEMPLATE-COLUMNS MAPPINGS */
+  --grid-template-columns-auto-fit-sm: var(--gridtemplatecolumns-auto-fit-sm);
+  --grid-template-columns-auto-fit-md: var(--gridtemplatecolumns-auto-fit-md);
+  --grid-template-columns-auto-fit-lg: var(--gridtemplatecolumns-auto-fit-lg);
+  --grid-template-columns-auto-fill-sm: var(--gridtemplatecolumns-auto-fill-sm);
+  --grid-template-columns-auto-fill-md: var(--gridtemplatecolumns-auto-fill-md);
+  --grid-template-columns-auto-fill-lg: var(--gridtemplatecolumns-auto-fill-lg);
+  --grid-template-columns-2-cols: var(--gridtemplatecolumns-2-cols);
+  --grid-template-columns-3-cols: var(--gridtemplatecolumns-3-cols);
+  --grid-template-columns-4-cols: var(--gridtemplatecolumns-4-cols);
+  --grid-template-columns-12-cols: var(--gridtemplatecolumns-12-cols);
+  --grid-template-columns-sidebar: var(--gridtemplatecolumns-sidebar);
+  --grid-template-columns-main-sidebar: var(--gridtemplatecolumns-main-sidebar);
+
+  /* GRID-TEMPLATE-ROWS MAPPINGS */
+  --grid-template-rows-auto: var(--gridtemplaterows-auto);
+  --grid-template-rows-header-main-footer: var(--gridtemplaterows-header-main-footer);
+  --grid-template-rows-equal-2: var(--gridtemplaterows-equal-2);
+  --grid-template-rows-equal-3: var(--gridtemplaterows-equal-3);
+  --grid-template-rows-masonry: var(--gridtemplaterows-masonry);
+
+  /* SCALE MAPPINGS */
+  --scale-hover: var(--scale-hover);
+  --scale-active: var(--scale-active);
+  --scale-focus: var(--scale-focus);
+  --scale-disabled: var(--scale-disabled);
+  --scale-emphasis: var(--scale-emphasis);
+  --scale-dramatic: var(--scale-dramatic);
+
+  /* TRANSLATE MAPPINGS */
+  --translate-center: var(--translate-center);
+  --translate-center-x: var(--translate-center-x);
+  --translate-center-y: var(--translate-center-y);
+  --translate-slide-up: var(--translate-slide-up);
+  --translate-slide-down: var(--translate-slide-down);
+  --translate-slide-left: var(--translate-slide-left);
+  --translate-slide-right: var(--translate-slide-right);
+
+  /* ROTATE MAPPINGS */
+  --rotate-flip: var(--rotate-flip);
+  --rotate-quarter: var(--rotate-quarter);
+  --rotate-half: var(--rotate-half);
+  --rotate-three-quarter: var(--rotate-three-quarter);
+
+  /* WIDTH MAPPINGS */
+  --width-min: var(--width-min);
+  --width-max: var(--width-max);
+  --width-fit: var(--width-fit);
+  --width-full: var(--width-full);
+  --width-screen: var(--width-screen);
+  --width-prose: var(--width-prose);
+  --width-dialog-sm: var(--width-dialog-sm);
+  --width-dialog-md: var(--width-dialog-md);
+  --width-dialog-lg: var(--width-dialog-lg);
+  --width-dialog-xl: var(--width-dialog-xl);
+  --width-sidebar: var(--width-sidebar);
+  --width-sidebar-sm: var(--width-sidebar-sm);
+  --width-sidebar-lg: var(--width-sidebar-lg);
+
+  /* BACKDROP-BLUR MAPPINGS */
+  --backdrop-blur-none: var(--backdropblur-none);
+  --backdrop-blur-sm: var(--backdropblur-sm);
+  --backdrop-blur-DEFAULT: var(--backdropblur-DEFAULT);
+  --backdrop-blur-md: var(--backdropblur-md);
+  --backdrop-blur-lg: var(--backdropblur-lg);
+  --backdrop-blur-xl: var(--backdropblur-xl);
+  --backdrop-blur-2xl: var(--backdropblur-2xl);
+  --backdrop-blur-3xl: var(--backdropblur-3xl);
+
+  /* BORDER-WIDTH MAPPINGS */
+  --border-width-0: var(--borderwidth-0);
+  --border-width-DEFAULT: var(--borderwidth-DEFAULT);
+  --border-width-2: var(--borderwidth-2);
+  --border-width-4: var(--borderwidth-4);
+  --border-width-8: var(--borderwidth-8);
+
+}
+
+
+/**
+ * Base layer styles with design intelligence
+ */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Accessibility: Respect user motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+  
+  /* Typography intelligence: Optimized reading experience */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: var(--font-weight-semibold, 600);
+    line-height: 1.2;
+  }
+  
+  p {
+    line-height: 1.6;
+  }
+  
+  /* Focus management for accessibility */
+  [data-focus-visible-added]:focus {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+  
+  /* Trust building: Clear interactive states */
+  button, [role="button"] {
+    cursor: pointer;
+    transition: all 150ms ease;
+  }
+  
+  button:disabled, [role="button"][aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+/**
+ * Component layer: Systematic design patterns
+ */
+@layer components {
+  /* Attention economics: Visual hierarchy utilities */
+  .attention-primary {
+    @apply bg-primary text-primary-foreground font-semibold;
+  }
+  
+  .attention-secondary {
+    @apply bg-secondary text-secondary-foreground;
+  }
+  
+  .attention-subtle {
+    @apply bg-muted text-muted-foreground;
+  }
+  
+  /* Cognitive load: Progressive disclosure patterns */
+  .cognitive-simple {
+    @apply space-y-2;
+  }
+  
+  .cognitive-moderate {
+    @apply space-y-4;
+  }
+  
+  .cognitive-complex {
+    @apply space-y-6;
+  }
+}
+
+/**
+ * Your custom styles go here
+ * Add project-specific overrides below this comment
+ */

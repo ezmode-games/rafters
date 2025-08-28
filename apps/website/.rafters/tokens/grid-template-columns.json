@@ -1,0 +1,126 @@
+{
+  "category": "grid-template-columns",
+  "generatedAt": "2025-08-28T17:20:34.076Z",
+  "tokens": [
+    {
+      "name": "auto-fit-sm",
+      "value": "repeat(auto-fit, minmax(var(--container-xs), 1fr))",
+      "category": "grid-template-columns",
+      "namespace": "grid-cols",
+      "semanticMeaning": "Auto-fit grid for small cards",
+      "scalePosition": 0,
+      "generateUtilityClass": true,
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+    },
+    {
+      "name": "auto-fit-md",
+      "value": "repeat(auto-fit, minmax(var(--container-sm), 1fr))",
+      "category": "grid-template-columns",
+      "namespace": "grid-cols",
+      "semanticMeaning": "Auto-fit grid for medium cards",
+      "scalePosition": 1,
+      "generateUtilityClass": true,
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+    },
+    {
+      "name": "auto-fit-lg",
+      "value": "repeat(auto-fit, minmax(var(--container-md), 1fr))",
+      "category": "grid-template-columns",
+      "namespace": "grid-cols",
+      "semanticMeaning": "Auto-fit grid for large cards",
+      "scalePosition": 2,
+      "generateUtilityClass": true,
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+    },
+    {
+      "name": "auto-fill-sm",
+      "value": "repeat(auto-fill, minmax(var(--container-xs), 1fr))",
+      "category": "grid-template-columns",
+      "namespace": "grid-cols",
+      "semanticMeaning": "Auto-fill grid for small items",
+      "scalePosition": 3,
+      "generateUtilityClass": true,
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+    },
+    {
+      "name": "auto-fill-md",
+      "value": "repeat(auto-fill, minmax(var(--container-sm), 1fr))",
+      "category": "grid-template-columns",
+      "namespace": "grid-cols",
+      "semanticMeaning": "Auto-fill grid for medium items",
+      "scalePosition": 4,
+      "generateUtilityClass": true,
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+    },
+    {
+      "name": "auto-fill-lg",
+      "value": "repeat(auto-fill, minmax(var(--container-md), 1fr))",
+      "category": "grid-template-columns",
+      "namespace": "grid-cols",
+      "semanticMeaning": "Auto-fill grid for large items",
+      "scalePosition": 5,
+      "generateUtilityClass": true,
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+    },
+    {
+      "name": "2-cols",
+      "value": "repeat(2, 1fr)",
+      "category": "grid-template-columns",
+      "namespace": "grid-cols",
+      "semanticMeaning": "Two equal columns",
+      "scalePosition": 6,
+      "generateUtilityClass": true,
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+    },
+    {
+      "name": "3-cols",
+      "value": "repeat(3, 1fr)",
+      "category": "grid-template-columns",
+      "namespace": "grid-cols",
+      "semanticMeaning": "Three equal columns",
+      "scalePosition": 7,
+      "generateUtilityClass": true,
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+    },
+    {
+      "name": "4-cols",
+      "value": "repeat(4, 1fr)",
+      "category": "grid-template-columns",
+      "namespace": "grid-cols",
+      "semanticMeaning": "Four equal columns",
+      "scalePosition": 8,
+      "generateUtilityClass": true,
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+    },
+    {
+      "name": "12-cols",
+      "value": "repeat(12, 1fr)",
+      "category": "grid-template-columns",
+      "namespace": "grid-cols",
+      "semanticMeaning": "Twelve column layout system",
+      "scalePosition": 9,
+      "generateUtilityClass": true,
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+    },
+    {
+      "name": "sidebar",
+      "value": "250px 1fr",
+      "category": "grid-template-columns",
+      "namespace": "grid-cols",
+      "semanticMeaning": "Sidebar with main content",
+      "scalePosition": 10,
+      "generateUtilityClass": true,
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+    },
+    {
+      "name": "main-sidebar",
+      "value": "1fr 250px",
+      "category": "grid-template-columns",
+      "namespace": "grid-cols",
+      "semanticMeaning": "Main content with sidebar",
+      "scalePosition": 11,
+      "generateUtilityClass": true,
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+    }
+  ]
+}

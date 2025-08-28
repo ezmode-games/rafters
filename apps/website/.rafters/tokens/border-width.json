@@ -1,0 +1,66 @@
+{
+  "category": "border-width",
+  "generatedAt": "2025-08-28T17:20:34.077Z",
+  "tokens": [
+    {
+      "name": "0",
+      "value": "0px",
+      "category": "border-width",
+      "namespace": "border",
+      "semanticMeaning": "No border",
+      "scalePosition": 0,
+      "mathRelationship": "No border",
+      "generateUtilityClass": true,
+      "applicableComponents": ["input", "card", "button"],
+      "trustLevel": "low"
+    },
+    {
+      "name": "DEFAULT",
+      "value": "1px",
+      "category": "border-width",
+      "namespace": "border",
+      "semanticMeaning": "Default border width",
+      "scalePosition": 1,
+      "mathRelationship": "1px (1x pixel)",
+      "generateUtilityClass": true,
+      "applicableComponents": ["input", "card", "button"],
+      "trustLevel": "low"
+    },
+    {
+      "name": "2",
+      "value": "2px",
+      "category": "border-width",
+      "namespace": "border",
+      "semanticMeaning": "Medium border for emphasis",
+      "scalePosition": 2,
+      "mathRelationship": "2px (2x pixel)",
+      "generateUtilityClass": true,
+      "applicableComponents": ["input", "card", "button"],
+      "trustLevel": "low"
+    },
+    {
+      "name": "4",
+      "value": "4px",
+      "category": "border-width",
+      "namespace": "border",
+      "semanticMeaning": "Thick border for strong emphasis",
+      "scalePosition": 3,
+      "mathRelationship": "4px (4x pixel)",
+      "generateUtilityClass": true,
+      "applicableComponents": ["decorative", "emphasis"],
+      "trustLevel": "medium"
+    },
+    {
+      "name": "8",
+      "value": "8px",
+      "category": "border-width",
+      "namespace": "border",
+      "semanticMeaning": "Extra thick decorative border",
+      "scalePosition": 4,
+      "mathRelationship": "8px (8x pixel)",
+      "generateUtilityClass": true,
+      "applicableComponents": ["decorative", "emphasis"],
+      "trustLevel": "medium"
+    }
+  ]
+}

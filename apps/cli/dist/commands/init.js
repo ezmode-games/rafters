@@ -1,9 +1,7 @@
-import chalk from 'chalk';
 import fs from 'fs-extra';
 import inquirer from 'inquirer';
 import ora from 'ora';
 const { ensureDirSync, writeFileSync, existsSync } = fs;
-import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkTailwindVersion, createDefaultRegistry, fetchStudioTokens, injectCSSImport, writeTokenFiles, } from '@rafters/design-tokens';
@@ -16,7 +14,6 @@ export async function initCommand() {
     // Display ASCII logo
     console.log(getRaftersLogo());
     console.log(`\n${getRaftersTitle()}`);
-    console.log(chalk.blue('\n🏗️  Initializing Rafters...'));
     // Check prerequisites
     const spinner = ora('Checking prerequisites...').start();
     if (!isNodeProject(cwd)) {
@@ -36,26 +33,14 @@ export async function initCommand() {
     const tailwindVersion = await checkTailwindVersion(cwd);
     if (tailwindVersion === 'v3') {
         console.log();
-        console.log(chalk.red.bold('🚨 TAILWIND V3 DETECTED! 🚨'));
-        console.log(chalk.yellow('YAH NHO V3! UPGRADE BITCHES!'));
-        console.log(chalk.gray('Rafters requires Tailwind CSS v4 for @theme support.'));
-        console.log(chalk.blue('Run: npm install tailwindcss@next'));
-        console.log();
+        console.log('Tailwind v3 detected. Rafters requires Tailwind CSS v4.');
+        console.log('Run: npm install tailwindcss@next');
         process.exit(1);
     }
     // Detect framework and CSS file for better defaults
     const framework = detectFramework(cwd);
     const existingCssFile = findCssFile(cwd);
     const defaultCssFile = getDefaultCssFile(framework, cwd);
-    if (framework) {
-        console.log(chalk.gray(`Detected ${framework} project`));
-    }
-    if (existingCssFile) {
-        console.log(chalk.gray(`Found CSS file: ${existingCssFile}`));
-    }
-    else {
-        console.log(chalk.yellow(`No existing CSS file found. Will suggest: ${defaultCssFile}`));
-    }
     // Interactive setup
     const answers = await inquirer.prompt([
         {
@@ -115,8 +100,18 @@ export async function initCommand() {
             ],
             default: 'tailwind',
         },
+        {
+            type: 'list',
+            name: 'packageManager',
+            message: 'Package manager:',
+            choices: [
+                { name: 'pnpm', value: 'pnpm' },
+                { name: 'npm', value: 'npm' },
+                { name: 'yarn', value: 'yarn' },
+            ],
+            default: detectPackageManager(cwd),
+        },
     ]);
-    const packageManager = detectPackageManager(cwd);
     const config = {
         ...defaultConfig,
         hasStorybook: answers.hasStorybook,
@@ -125,7 +120,7 @@ export async function initCommand() {
         cssFile: answers.cssFile,
         tailwindVersion: tailwindVersion,
         tokenFormat: answers.tokenFormat,
-        packageManager,
+        packageManager: answers.packageManager,
     };
     // Get design tokens from Studio or create default
     let tokenSet;
@@ -137,7 +132,6 @@ export async function initCommand() {
         }
         catch (error) {
             tokenSpinner.warn(`Failed to fetch Studio tokens: ${error instanceof Error ? error.message : 'Unknown error'}`);
-            console.log(chalk.gray('  Falling back to default grayscale theme'));
             tokenSet = createDefaultRegistry();
         }
     }
@@ -152,10 +146,48 @@ export async function initCommand() {
         ensureDirSync(raftersDir);
         // Save config
         saveConfig(config, cwd);
-        // Create agent instructions
+        // Fetch agent instructions from registry
         const agentInstructionsPath = join(raftersDir, 'agent-instructions.md');
-        const agentInstructions = readFileSync(join(__dirname, '../templates/agent-instructions.md'), 'utf-8');
-        writeFileSync(agentInstructionsPath, agentInstructions);
+        try {
+            const response = await fetch(`${config.registry}/templates/agent-instructions`);
+            if (response.ok) {
+                const agentInstructions = await response.text();
+                writeFileSync(agentInstructionsPath, agentInstructions);
+            }
+            else {
+                // Fallback to basic instructions
+                const fallbackInstructions = `# Rafters AI Agent Instructions
+
+This project uses Rafters design system components with embedded intelligence.
+
+## Component Usage Guidelines
+- Always read component intelligence before using components
+- Use semantic tokens instead of arbitrary values
+- Follow trust-building patterns for user actions
+- Apply accessibility standards systematically
+
+## Key Principles
+- Cognitive Load: Choose components appropriate for user mental capacity
+- Trust Building: Follow patterns that build user confidence
+- Attention Economics: Understand visual hierarchy and component priority
+- Progressive Enhancement: Build from core experience outward
+
+## Resources
+- Component Registry: ${config.registry}/components
+- Design Intelligence: https://rafters.realhandy.tech
+`;
+                writeFileSync(agentInstructionsPath, fallbackInstructions);
+            }
+        }
+        catch {
+            // Fallback if registry is unavailable
+            const fallbackInstructions = `# Rafters AI Agent Instructions
+
+This project uses Rafters design system components with embedded intelligence.
+Visit https://rafters.realhandy.tech for complete documentation.
+`;
+            writeFileSync(agentInstructionsPath, fallbackInstructions);
+        }
         // Create component manifest
         const manifestPath = join(raftersDir, 'component-manifest.json');
         const manifest = {
@@ -171,8 +203,35 @@ export async function initCommand() {
         ensureDirSync(libDir);
         const utilsPath = join(libDir, 'utils.ts');
         if (!existsSync(utilsPath)) {
-            const utilsContent = readFileSync(join(__dirname, '../templates/utils.ts'), 'utf-8');
-            writeFileSync(utilsPath, utilsContent);
+            try {
+                const response = await fetch(`${config.registry}/templates/utils`);
+                if (response.ok) {
+                    const utilsContent = await response.text();
+                    writeFileSync(utilsPath, utilsContent);
+                }
+                else {
+                    // Fallback to basic utils
+                    const fallbackUtils = `import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+`;
+                    writeFileSync(utilsPath, fallbackUtils);
+                }
+            }
+            catch {
+                // Fallback if registry is unavailable
+                const fallbackUtils = `import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+`;
+                writeFileSync(utilsPath, fallbackUtils);
+            }
         }
         // Create stories directory if using Storybook
         if (config.hasStorybook && config.storiesDir) {
@@ -180,37 +239,30 @@ export async function initCommand() {
         }
         // Write design tokens and registry
         await writeTokenFiles(tokenSet, answers.tokenFormat, cwd);
-        // Inject CSS import if needed
+        // Install complete design system CSS
         if (answers.tokenFormat === 'css' || answers.tokenFormat === 'tailwind') {
-            await injectCSSImport(config.cssFile, cwd);
+            const cssResult = await injectCSSImport(config.cssFile, cwd);
+            if (cssResult.action === 'replaced' && cssResult.backupPath) {
+                console.log(`Backed up existing ${config.cssFile} to ${cssResult.backupPath}`);
+            }
         }
         setupSpinner.succeed('Rafters setup complete');
         // Install dependencies
         const depsSpinner = ora('Installing core dependencies...').start();
         const coreDeps = getCoreDependencies();
         try {
-            await installDependencies(coreDeps, packageManager, cwd);
+            await installDependencies(coreDeps, config.packageManager, cwd);
             depsSpinner.succeed('Core dependencies installed');
         }
         catch (_error) {
             depsSpinner.warn('Failed to install dependencies automatically. Please install manually:');
-            console.log(chalk.gray(`  ${packageManager} ${packageManager === 'npm' ? 'install' : 'add'} ${coreDeps.join(' ')}`));
+            console.log(`${config.packageManager} ${config.packageManager === 'npm' ? 'install' : 'add'} ${coreDeps.join(' ')}`);
         }
-        // Success message
-        console.log();
-        console.log(chalk.green('✅ Rafters initialized successfully!'));
-        console.log();
-        console.log('Next steps:');
-        console.log(chalk.gray('  • Add components: ') + chalk.blue('rafters add button'));
-        console.log(chalk.gray('  • List available: ') + chalk.blue('rafters list'));
-        console.log(chalk.gray('  • Design tokens: ') +
-            chalk.blue(`src/design-tokens.${answers.tokenFormat === 'react-native' ? 'ts' : 'css'}`));
-        console.log(chalk.gray('  • Token intelligence: ') + chalk.blue('.rafters/tokens/registry.json'));
-        console.log(chalk.gray('  • AI instructions: ') + chalk.blue('.rafters/agent-instructions.md'));
+        console.log('Rafters initialized.');
     }
     catch (error) {
         setupSpinner.fail('Failed to setup Rafters');
-        console.error(chalk.red(error));
+        console.error(error);
         process.exit(1);
     }
 }

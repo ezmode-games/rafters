@@ -1,0 +1,86 @@
+{
+  "category": "z-index",
+  "generatedAt": "2025-08-28T17:20:34.073Z",
+  "tokens": [
+    {
+      "name": "base",
+      "value": "0",
+      "category": "z-index",
+      "namespace": "z",
+      "semanticMeaning": "Base content layer",
+      "scalePosition": 0,
+      "generateUtilityClass": true,
+      "applicableComponents": ["overlay"]
+    },
+    {
+      "name": "sticky",
+      "value": "10",
+      "category": "z-index",
+      "namespace": "z",
+      "semanticMeaning": "Sticky elements (headers, sidebars)",
+      "scalePosition": 1,
+      "generateUtilityClass": true,
+      "applicableComponents": ["overlay"]
+    },
+    {
+      "name": "dropdown",
+      "value": "100",
+      "category": "z-index",
+      "namespace": "z",
+      "semanticMeaning": "Dropdowns and select menus",
+      "scalePosition": 2,
+      "generateUtilityClass": true,
+      "applicableComponents": ["dropdown", "select", "menu"]
+    },
+    {
+      "name": "modal",
+      "value": "1000",
+      "category": "z-index",
+      "namespace": "z",
+      "semanticMeaning": "Modal dialogs and overlays",
+      "scalePosition": 3,
+      "generateUtilityClass": true,
+      "applicableComponents": ["modal", "dialog", "sheet"]
+    },
+    {
+      "name": "popover",
+      "value": "5000",
+      "category": "z-index",
+      "namespace": "z",
+      "semanticMeaning": "Popovers and tooltips",
+      "scalePosition": 4,
+      "generateUtilityClass": true,
+      "applicableComponents": ["overlay"]
+    },
+    {
+      "name": "notification",
+      "value": "10000",
+      "category": "z-index",
+      "namespace": "z",
+      "semanticMeaning": "Toast notifications and alerts",
+      "scalePosition": 5,
+      "generateUtilityClass": true,
+      "applicableComponents": ["toast", "alert", "snackbar"]
+    },
+    {
+      "name": "tooltip",
+      "value": "50000",
+      "category": "z-index",
+      "namespace": "z",
+      "semanticMeaning": "Tooltips (highest priority)",
+      "scalePosition": 6,
+      "generateUtilityClass": true,
+      "applicableComponents": ["tooltip", "hint"]
+    },
+    {
+      "name": "max",
+      "value": "2147483647",
+      "category": "z-index",
+      "namespace": "z",
+      "semanticMeaning": "Maximum z-index value",
+      "scalePosition": 7,
+      "generateUtilityClass": true,
+      "applicableComponents": ["overlay"]
+    }
+  ]
+}

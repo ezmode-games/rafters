@@ -17,7 +17,7 @@ export function readFile(path) {
     return readFileSync(path, 'utf-8');
 }
 export function createComponentPath(componentsDir, componentName) {
-    return join(componentsDir, 'ui', `${componentName}.tsx`);
+    return join(componentsDir, `${componentName}.tsx`);
 }
 export function createStoryPath(storiesDir, componentName) {
     return join(storiesDir, `${componentName.toLowerCase()}-intelligence.stories.tsx`);

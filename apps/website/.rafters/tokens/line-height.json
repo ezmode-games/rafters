@@ -1,0 +1,136 @@
+{
+  "category": "line-height",
+  "generatedAt": "2025-08-28T17:20:34.074Z",
+  "tokens": [
+    {
+      "name": "xs",
+      "value": "1.6",
+      "category": "line-height",
+      "namespace": "line-height",
+      "semanticMeaning": "Line height optimized for xs text",
+      "pairedWith": ["xs"],
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "paragraph"]
+    },
+    {
+      "name": "sm",
+      "value": "1.6",
+      "category": "line-height",
+      "namespace": "line-height",
+      "semanticMeaning": "Line height optimized for sm text",
+      "pairedWith": ["sm"],
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "paragraph"]
+    },
+    {
+      "name": "base",
+      "value": "1.5",
+      "category": "line-height",
+      "namespace": "line-height",
+      "semanticMeaning": "Line height optimized for base text",
+      "pairedWith": ["base"],
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "paragraph"]
+    },
+    {
+      "name": "lg",
+      "value": "1.5",
+      "category": "line-height",
+      "namespace": "line-height",
+      "semanticMeaning": "Line height optimized for lg text",
+      "pairedWith": ["lg"],
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "paragraph"]
+    },
+    {
+      "name": "xl",
+      "value": "1.2",
+      "category": "line-height",
+      "namespace": "line-height",
+      "semanticMeaning": "Line height optimized for xl text",
+      "pairedWith": ["xl"],
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "paragraph"]
+    },
+    {
+      "name": "2xl",
+      "value": "1.2",
+      "category": "line-height",
+      "namespace": "line-height",
+      "semanticMeaning": "Line height optimized for 2xl text",
+      "pairedWith": ["2xl"],
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "paragraph"]
+    },
+    {
+      "name": "3xl",
+      "value": "1.2",
+      "category": "line-height",
+      "namespace": "line-height",
+      "semanticMeaning": "Line height optimized for 3xl text",
+      "pairedWith": ["3xl"],
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "paragraph"]
+    },
+    {
+      "name": "4xl",
+      "value": "1.2",
+      "category": "line-height",
+      "namespace": "line-height",
+      "semanticMeaning": "Line height optimized for 4xl text",
+      "pairedWith": ["4xl"],
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "paragraph"]
+    },
+    {
+      "name": "5xl",
+      "value": "1.2",
+      "category": "line-height",
+      "namespace": "line-height",
+      "semanticMeaning": "Line height optimized for 5xl text",
+      "pairedWith": ["5xl"],
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "paragraph"]
+    },
+    {
+      "name": "6xl",
+      "value": "1.2",
+      "category": "line-height",
+      "namespace": "line-height",
+      "semanticMeaning": "Line height optimized for 6xl text",
+      "pairedWith": ["6xl"],
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "paragraph"]
+    },
+    {
+      "name": "7xl",
+      "value": "1.2",
+      "category": "line-height",
+      "namespace": "line-height",
+      "semanticMeaning": "Line height optimized for 7xl text",
+      "pairedWith": ["7xl"],
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "paragraph"]
+    },
+    {
+      "name": "8xl",
+      "value": "1.2",
+      "category": "line-height",
+      "namespace": "line-height",
+      "semanticMeaning": "Line height optimized for 8xl text",
+      "pairedWith": ["8xl"],
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "paragraph"]
+    },
+    {
+      "name": "9xl",
+      "value": "1.2",
+      "category": "line-height",
+      "namespace": "line-height",
+      "semanticMeaning": "Line height optimized for 9xl text",
+      "pairedWith": ["9xl"],
+      "generateUtilityClass": true,
+      "applicableComponents": ["text", "heading", "paragraph"]
+    }
+  ]
+}

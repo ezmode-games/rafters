@@ -31,7 +31,7 @@ import { Button } from './Button';
  * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
  * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
  *
- * @dependencies @radix-ui/react-progress, @rafters/design-tokens/motion, class-variance-authority
+ * @dependencies @radix-ui/react-progress, class-variance-authority
  *
  * @example
  * ```tsx

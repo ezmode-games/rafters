@@ -1,0 +1,56 @@
+{
+  "category": "grid-template-rows",
+  "generatedAt": "2025-08-28T17:20:34.076Z",
+  "tokens": [
+    {
+      "name": "auto",
+      "value": "auto",
+      "category": "grid-template-rows",
+      "namespace": "grid-rows",
+      "semanticMeaning": "Auto-sizing rows",
+      "scalePosition": 0,
+      "generateUtilityClass": true,
+      "applicableComponents": ["grid", "layout", "card-grid"]
+    },
+    {
+      "name": "header-main-footer",
+      "value": "auto 1fr auto",
+      "category": "grid-template-rows",
+      "namespace": "grid-rows",
+      "semanticMeaning": "Header, main content, footer layout",
+      "scalePosition": 1,
+      "generateUtilityClass": true,
+      "applicableComponents": ["grid", "layout", "card-grid"]
+    },
+    {
+      "name": "equal-2",
+      "value": "repeat(2, 1fr)",
+      "category": "grid-template-rows",
+      "namespace": "grid-rows",
+      "semanticMeaning": "Two equal rows",
+      "scalePosition": 2,
+      "generateUtilityClass": true,
+      "applicableComponents": ["grid", "layout", "card-grid"]
+    },
+    {
+      "name": "equal-3",
+      "value": "repeat(3, 1fr)",
+      "category": "grid-template-rows",
+      "namespace": "grid-rows",
+      "semanticMeaning": "Three equal rows",
+      "scalePosition": 3,
+      "generateUtilityClass": true,
+      "applicableComponents": ["grid", "layout", "card-grid"]
+    },
+    {
+      "name": "masonry",
+      "value": "masonry",
+      "category": "grid-template-rows",
+      "namespace": "grid-rows",
+      "semanticMeaning": "Masonry layout rows",
+      "scalePosition": 4,
+      "generateUtilityClass": true,
+      "applicableComponents": ["grid", "layout", "card-grid"]
+    }
+  ]
+}
