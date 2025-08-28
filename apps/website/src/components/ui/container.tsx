@@ -42,7 +42,6 @@
  * ```
  */
 import { cn } from '@/lib/utils';
-import './article-prose.css';
 
 /**
  * Type map for polymorphic elements
