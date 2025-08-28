@@ -20,7 +20,6 @@
     "@rafters/shared": "workspace:^",
     "class-variance-authority": "^0.7.1",
     "clsx": "catalog:",
-    "motion": "link:@rafters/design-tokens/motion",
     "next": "15.4.6",
     "none": "^1.0.0",
     "react": "19.1.0",
