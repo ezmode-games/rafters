@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkTailwindVersion, createDefaultRegistry, fetchStudioTokens, injectCSSImport, writeTokenFiles, } from '@rafters/design-tokens';
-import { configExists, defaultConfig, detectPackageManager, hasReact, isNodeProject, saveConfig, } from '../utils/config.js';
+import { configExists, defaultConfig, detectFramework, detectPackageManager, findCssFile, getDefaultCssFile, hasReact, isNodeProject, saveConfig, } from '../utils/config.js';
 import { getCoreDependencies, installDependencies } from '../utils/dependencies.js';
 import { getRaftersLogo, getRaftersTitle } from '../utils/logo.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -43,6 +43,19 @@ export async function initCommand() {
         console.log();
         process.exit(1);
     }
+    // Detect framework and CSS file for better defaults
+    const framework = detectFramework(cwd);
+    const existingCssFile = findCssFile(cwd);
+    const defaultCssFile = getDefaultCssFile(framework, cwd);
+    if (framework) {
+        console.log(chalk.gray(`Detected ${framework} project`));
+    }
+    if (existingCssFile) {
+        console.log(chalk.gray(`Found CSS file: ${existingCssFile}`));
+    }
+    else {
+        console.log(chalk.yellow(`No existing CSS file found. Will suggest: ${defaultCssFile}`));
+    }
     // Interactive setup
     const answers = await inquirer.prompt([
         {
@@ -66,6 +79,20 @@ export async function initCommand() {
         },
         {
             type: 'input',
+            name: 'cssFile',
+            message: existingCssFile
+                ? `CSS file to inject design tokens (found: ${existingCssFile}):`
+                : 'CSS file to inject design tokens (will create if missing):',
+            default: defaultCssFile,
+            validate: (input) => {
+                if (!input.endsWith('.css')) {
+                    return 'CSS file must end with .css';
+                }
+                return true;
+            },
+        },
+        {
+            type: 'input',
             name: 'studioShortcode',
             message: 'Studio shortcode (leave blank for default grayscale):',
             validate: (input) => {
@@ -82,11 +109,11 @@ export async function initCommand() {
             name: 'tokenFormat',
             message: 'Design token format:',
             choices: [
-                { name: 'Vanilla CSS', value: 'css' },
                 { name: 'Tailwind CSS v4', value: 'tailwind' },
+                { name: 'Vanilla CSS', value: 'css' },
                 { name: 'React Native', value: 'react-native' },
             ],
-            default: 'css',
+            default: 'tailwind',
         },
     ]);
     const packageManager = detectPackageManager(cwd);
@@ -95,6 +122,9 @@ export async function initCommand() {
         hasStorybook: answers.hasStorybook,
         componentsDir: answers.componentsDir,
         storiesDir: answers.storiesDir || defaultConfig.storiesDir,
+        cssFile: answers.cssFile,
+        tailwindVersion: tailwindVersion,
+        tokenFormat: answers.tokenFormat,
         packageManager,
     };
     // Get design tokens from Studio or create default
@@ -152,7 +182,7 @@ export async function initCommand() {
         await writeTokenFiles(tokenSet, answers.tokenFormat, cwd);
         // Inject CSS import if needed
         if (answers.tokenFormat === 'css' || answers.tokenFormat === 'tailwind') {
-            await injectCSSImport(answers.tokenFormat, cwd);
+            await injectCSSImport(config.cssFile, cwd);
         }
         setupSpinner.succeed('Rafters setup complete');
         // Install dependencies

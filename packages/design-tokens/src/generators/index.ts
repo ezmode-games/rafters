@@ -13,26 +13,28 @@
  * - Responsive and container query variants where relevant
  */
 
-import { generateAspectRatioTokens } from './aspect-ratio.js';
-import { generateBackdropTokens } from './backdrop.js';
-import { generateBorderRadiusTokens } from './border-radius.js';
-import { generateBorderWidthTokens } from './border-width.js';
-import { generateBreakpointTokens } from './breakpoint.js';
-import { generateColorTokens } from './color.js';
-import { generateDepthScale } from './depth.js';
-import { generateFontFamilyTokens } from './font-family.js';
-import { generateFontWeightTokens } from './font-weight.js';
-import { generateGridTokens } from './grid.js';
-import { generateHeightScale } from './height.js';
-import { generateLetterSpacingTokens } from './letter-spacing.js';
-import { generateMotionTokens } from './motion.js';
-import { generateOpacityTokens } from './opacity.js';
-// Import all generators for use in generateAllTokens
-import { generateSpacingScale } from './spacing.js';
-import { generateTouchTargetTokens } from './touch-target.js';
-import { generateTransformTokens } from './transform.js';
-import { generateTypographyScale } from './typography.js';
-import { generateWidthTokens } from './width.js';
+// Import all generators from the main index file
+import {
+  generateAspectRatioTokens,
+  generateBackdropTokens,
+  generateBorderRadiusTokens,
+  generateBorderWidthTokens,
+  generateBreakpointTokens,
+  generateColorTokens,
+  generateDepthScale,
+  generateFontFamilyTokens,
+  generateFontWeightTokens,
+  generateGridTokens,
+  generateHeightScale,
+  generateLetterSpacingTokens,
+  generateMotionTokens,
+  generateOpacityTokens,
+  generateSpacingScale,
+  generateTouchTargetTokens,
+  generateTransformTokens,
+  generateTypographyScale,
+  generateWidthTokens,
+} from '../index.js';
 
 // Re-export all generators for external use
 export { generateSpacingScale };
