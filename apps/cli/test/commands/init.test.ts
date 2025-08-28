@@ -51,6 +51,7 @@ describe('initCommand', () => {
       vi.mocked(inquirer.prompt).mockResolvedValue({
         hasStorybook: false,
         componentsDir: './src/components/ui',
+        cssFile: './src/app/globals.css',
         studioShortcode: '', // No shortcode = default tokens
         tokenFormat: 'css',
       });
@@ -101,10 +102,14 @@ describe('initCommand', () => {
         reactNative: 'export const tokens = { primary: "gray" };',
       };
 
-      vi.mocked(designTokens.checkTailwindVersion).mockResolvedValue(null);
-      vi.mocked(designTokens.createDefaultRegistry).mockReturnValue(mockTokenSet);
-      vi.mocked(designTokens.writeTokenFiles).mockResolvedValue();
-      vi.mocked(designTokens.injectCSSImport).mockResolvedValue();
+      vi.spyOn(designTokens, 'checkTailwindVersion').mockResolvedValue(null);
+      vi.spyOn(designTokens, 'createDefaultRegistry').mockReturnValue(mockTokenSet);
+      vi.spyOn(designTokens, 'fetchStudioTokens').mockResolvedValue(mockTokenSet);
+      vi.spyOn(designTokens, 'writeTokenFiles').mockResolvedValue();
+      vi.spyOn(designTokens, 'injectCSSImport').mockResolvedValue({
+        action: 'created',
+        message: 'CSS file created',
+      });
 
       // Execute the command
       await initCommand();
@@ -113,7 +118,7 @@ describe('initCommand', () => {
       expect(designTokens.createDefaultRegistry).toHaveBeenCalled();
       expect(designTokens.fetchStudioTokens).not.toHaveBeenCalled();
       expect(designTokens.writeTokenFiles).toHaveBeenCalledWith(mockTokenSet, 'css', mockCwd);
-      expect(designTokens.injectCSSImport).toHaveBeenCalledWith('css', mockCwd);
+      expect(designTokens.injectCSSImport).toHaveBeenCalledWith('./src/app/globals.css', mockCwd);
     });
 
     it('should fetch Studio tokens when shortcode provided', async () => {
@@ -142,6 +147,7 @@ describe('initCommand', () => {
       vi.mocked(inquirer.prompt).mockResolvedValue({
         hasStorybook: false,
         componentsDir: './src/components/ui',
+        cssFile: './src/app/globals.css',
         studioShortcode: 'ABC123XY', // Studio shortcode provided
         tokenFormat: 'tailwind',
       });
@@ -192,10 +198,13 @@ describe('initCommand', () => {
         reactNative: 'export const tokens = { primary: "blue" };',
       };
 
-      vi.mocked(designTokens.checkTailwindVersion).mockResolvedValue('v4');
-      vi.mocked(designTokens.fetchStudioTokens).mockResolvedValue(mockStudioTokenSet);
-      vi.mocked(designTokens.writeTokenFiles).mockResolvedValue();
-      vi.mocked(designTokens.injectCSSImport).mockResolvedValue();
+      vi.spyOn(designTokens, 'checkTailwindVersion').mockResolvedValue('v4');
+      vi.spyOn(designTokens, 'fetchStudioTokens').mockResolvedValue(mockStudioTokenSet);
+      vi.spyOn(designTokens, 'writeTokenFiles').mockResolvedValue();
+      vi.spyOn(designTokens, 'injectCSSImport').mockResolvedValue({
+        action: 'created',
+        message: 'CSS file created',
+      });
 
       // Execute the command
       await initCommand();
@@ -208,7 +217,7 @@ describe('initCommand', () => {
         'tailwind',
         mockCwd
       );
-      expect(designTokens.injectCSSImport).toHaveBeenCalledWith('tailwind', mockCwd);
+      expect(designTokens.injectCSSImport).toHaveBeenCalledWith('./src/app/globals.css', mockCwd);
     });
 
     it('should fallback to default tokens when Studio API fails', async () => {
@@ -287,13 +296,16 @@ describe('initCommand', () => {
         reactNative: 'export const tokens = { primary: "gray" };',
       };
 
-      vi.mocked(designTokens.checkTailwindVersion).mockResolvedValue(null);
-      vi.mocked(designTokens.fetchStudioTokens).mockRejectedValue(
+      vi.spyOn(designTokens, 'checkTailwindVersion').mockResolvedValue(null);
+      vi.spyOn(designTokens, 'fetchStudioTokens').mockRejectedValue(
         new Error('Studio API error: 404 Not Found')
       );
-      vi.mocked(designTokens.createDefaultRegistry).mockReturnValue(mockDefaultTokenSet);
-      vi.mocked(designTokens.writeTokenFiles).mockResolvedValue();
-      vi.mocked(designTokens.injectCSSImport).mockResolvedValue();
+      vi.spyOn(designTokens, 'createDefaultRegistry').mockReturnValue(mockDefaultTokenSet);
+      vi.spyOn(designTokens, 'writeTokenFiles').mockResolvedValue();
+      vi.spyOn(designTokens, 'injectCSSImport').mockResolvedValue({
+        action: 'created',
+        message: 'CSS file created',
+      });
 
       // Execute the command
       await initCommand();
@@ -352,7 +364,7 @@ describe('initCommand', () => {
       vi.mocked(logo.getRaftersLogo).mockReturnValue('ASCII LOGO');
       vi.mocked(logo.getRaftersTitle).mockReturnValue('RAFTERS TITLE');
 
-      vi.mocked(designTokens.checkTailwindVersion).mockResolvedValue('v3'); // Tailwind v3 detected
+      vi.spyOn(designTokens, 'checkTailwindVersion').mockResolvedValue('v3'); // Tailwind v3 detected
 
       // Execute and expect process.exit to be called
       await expect(initCommand()).rejects.toThrow('process.exit called');
