@@ -8,6 +8,28 @@
 
 Rafters CLI helps you initialize a complete design system foundation and add React components with built-in AI agent design intelligence patterns including cognitive load optimization, attention economics, accessibility features, and trust-building patterns.
 
+## ⚠️ CRITICAL: How Rafters Works ⚠️
+
+**JSON FILES ARE THE SINGLE SOURCE OF TRUTH**
+
+Rafters uses a **Generator → JSON Files → CLI** architecture:
+
+1. **`rafters init`** → Generators create `.rafters/tokens/*.json` files with sane defaults
+2. **Studio modifies JSON files** → Humans edit design tokens through Studio interface  
+3. **All CLI operations** → Read from `.rafters/tokens/*.json` files (never hardcoded values)
+
+**The `.rafters/tokens/` directory contains your complete design system:**
+```
+.rafters/tokens/
+├── color.json          # Color system with semantic meaning
+├── spacing.json        # Mathematical spacing scales  
+├── z-index.json        # Layering system
+├── typography.json     # Type scales and hierarchy
+└── ... (18+ token files)
+```
+
+**Never edit these JSON files manually** - use Rafters Studio or regenerate with `rafters init`.
+
 ## Quick Start
 
 1. **Initialize Rafters design system in your project:**

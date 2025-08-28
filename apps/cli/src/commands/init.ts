@@ -9,8 +9,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   checkTailwindVersion,
-  createDefaultRegistry,
   fetchStudioTokens,
+  generateAllTokens,
   injectCSSImport,
   writeTokenFiles,
 } from '@rafters/design-tokens';
@@ -150,10 +150,22 @@ export async function initCommand(): Promise<void> {
       tokenSpinner.warn(
         `Failed to fetch Studio tokens: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
-      tokenSet = createDefaultRegistry();
+      // Generate default tokens using generators
+      const tokens = generateAllTokens();
+      tokenSet = {
+        id: 'default',
+        name: 'Generated Design System',
+        tokens,
+      };
     }
   } else {
-    tokenSet = createDefaultRegistry();
+    // Generate default tokens using generators
+    const tokens = generateAllTokens();
+    tokenSet = {
+      id: 'default',
+      name: 'Generated Design System',
+      tokens,
+    };
   }
 
   // Create directories and files

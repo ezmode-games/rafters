@@ -1,8 +1,6 @@
 {
   "version": "1.0.0",
   "componentsDir": "./src/components/ui",
-  "storiesDir": "./src/stories",
-  "hasStorybook": false,
   "packageManager": "pnpm",
   "registry": "https://rafters.realhandy.tech/api/registry",
   "cssFile": "src/app/globals.css",

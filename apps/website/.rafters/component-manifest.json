@@ -1,10 +1,10 @@
 {
   "version": "1.0.0",
-  "initialized": "2025-08-28T17:20:34.068Z",
+  "initialized": "2025-08-28T19:21:05.014Z",
   "components": {
     "button": {
       "path": "src/components/ui/button.tsx",
-      "installed": "2025-08-28T17:20:57.638Z",
+      "installed": "2025-08-28T19:22:18.094Z",
       "version": "0.1.0",
       "intelligence": {
         "cognitiveLoad": 3,
@@ -17,7 +17,7 @@
     },
     "container": {
       "path": "src/components/ui/container.tsx",
-      "installed": "2025-08-28T17:21:32.055Z",
+      "installed": "2025-08-28T19:22:22.932Z",
       "version": "0.1.0",
       "intelligence": {
         "cognitiveLoad": 0,
@@ -30,7 +30,7 @@
     },
     "grid": {
       "path": "src/components/ui/grid.tsx",
-      "installed": "2025-08-28T17:21:35.699Z",
+      "installed": "2025-08-28T19:22:27.716Z",
       "version": "0.1.0",
       "intelligence": {
         "cognitiveLoad": 4,
@@ -41,22 +41,9 @@
       },
       "dependencies": ["class-variance-authority", "clsx"]
     },
-    "tabs": {
-      "path": "src/components/ui/tabs.tsx",
-      "installed": "2025-08-28T17:22:09.969Z",
-      "version": "0.1.0",
-      "intelligence": {
-        "cognitiveLoad": 4,
-        "attentionEconomics": "Content organization: visible=current context, hidden=available contexts, active=user focus",
-        "accessibility": "Arrow key navigation, tab focus management, panel association, screen reader support",
-        "trustBuilding": "Persistent selection, clear active indication, predictable navigation patterns",
-        "semanticMeaning": "Structure: tablist=navigation, tab=option, tabpanel=content, selected=current view"
-      },
-      "dependencies": ["@radix-ui/react-tabs", "@rafters/design-tokens/motion"]
-    },
     "select": {
       "path": "src/components/ui/select.tsx",
-      "installed": "2025-08-28T17:22:13.872Z",
+      "installed": "2025-08-28T19:22:31.848Z",
       "version": "0.1.0",
       "intelligence": {
         "cognitiveLoad": 5,
@@ -70,6 +57,19 @@
         "@radix-ui/react-icons",
         "@rafters/design-tokens/motion"
       ]
+    },
+    "tabs": {
+      "path": "src/components/ui/tabs.tsx",
+      "installed": "2025-08-28T19:22:36.421Z",
+      "version": "0.1.0",
+      "intelligence": {
+        "cognitiveLoad": 4,
+        "attentionEconomics": "Content organization: visible=current context, hidden=available contexts, active=user focus",
+        "accessibility": "Arrow key navigation, tab focus management, panel association, screen reader support",
+        "trustBuilding": "Persistent selection, clear active indication, predictable navigation patterns",
+        "semanticMeaning": "Structure: tablist=navigation, tab=option, tabpanel=content, selected=current view"
+      },
+      "dependencies": ["@radix-ui/react-tabs", "@rafters/design-tokens/motion"]
     }
   }
 }

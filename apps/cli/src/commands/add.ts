@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { ComponentManifest } from '@rafters/shared';
+import { IntelligenceSchema } from '@rafters/shared';
 import ora from 'ora';
 import { z } from 'zod';
 import { type Config, loadConfig, transformImports } from '../utils/config.js';
@@ -22,13 +23,7 @@ const ComponentManifestFileSchema = z.object({
       path: z.string(),
       installed: z.string(),
       version: z.string(),
-      intelligence: z.object({
-        cognitiveLoad: z.number(),
-        attentionEconomics: z.string(),
-        accessibility: z.string(),
-        trustBuilding: z.string(),
-        semanticMeaning: z.string(),
-      }),
+      intelligence: IntelligenceSchema,
       dependencies: z.array(z.string()),
     })
   ),
