@@ -1,4 +1,5 @@
-import { Logo } from '@rafters/shared';
+import { Footer } from '../components/Footer';
+import { Header } from '../components/Header';
 import type { Route } from './+types/home';
 
 export function meta(_: Route.MetaArgs) {
@@ -15,10 +16,7 @@ export function loader({ context }: Route.LoaderArgs) {
 export default function Home({ loaderData }: Route.ComponentProps) {
   return (
     <main className="mx-auto w-7xl flex min-h-screen flex-col items-center justify-center gap-8 p-4">
-      <header className="mx-auto flex flex-col justify-center items-center gap-4">
-        <Logo className="size-32 mb-16 fill-current" />
-        <h1 className="text-4xl leading-3 tracking-wide">Your AI-First Design System</h1>
-      </header>
+      <Header title="Your AI-First Design System" titleClasses="text-4xl leading-3 tracking-wide" />
       <section className="max-w-4xl font-sans text-lg leading-relaxed">
         <p className="mb-6">
           Designers pick a color. We handle the math. AI agents build interfaces that actually work.
@@ -153,50 +151,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         </div>
       </section>
 
-      <section className="max-w-4xl font-sans text-sm leading-snug mt-24 mb-16">
-        <p className="mb-6">
-          Rafters hold up buildings. Simple triangular geometry that builders figured out thousands
-          of years ago. The angles distribute weight. The structure creates space. Everything stays
-          standing because the math works.
-        </p>
-        <p className="mb-6">
-          Software needs the same foundational support. In the age of AI agents building interfaces
-          for humans, we need a new kind of rafters. Not wooden beams, but mathematical rules and
-          human judgment serialized into machine-readable formats. The geometry is different -
-          golden ratios instead of roof pitches, OKLCH color space instead of load calculations -
-          but the principle is the same.
-        </p>
-        <p>
-          Good structure lets you build with confidence. Whether you're framing a house or shipping
-          an interface, rafters give you the foundation to create something that lasts.
-        </p>
-      </section>
-
-      <footer className="w-full max-w-6xl border-t border-gray-200 pt-8 pb-16 mt-24">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-4">
-          <div className="text-sm text-gray-600">
-            © {new Date().getFullYear()}{' '}
-            <a href="https://realhandy.tech" className="underline hover:no-underline">
-              Real Handy
-            </a>
-            . All rights reserved.
-          </div>
-          <div className="flex gap-6 text-sm text-gray-600">
-            <a
-              href="https://github.com/real-handy/rafters"
-              className="underline hover:no-underline"
-            >
-              GitHub
-            </a>
-            <a href="/docs" className="underline hover:no-underline">
-              Docs
-            </a>
-            <a href="https://realhandy.tech" className="underline hover:no-underline">
-              realhandy.tech
-            </a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </main>
   );
 }

@@ -30,7 +30,7 @@ export const ContrastLevelSchema = z.enum(['AA', 'AAA']);
 
 export type ContrastLevel = z.infer<typeof ContrastLevelSchema>;
 
-// Component Intelligence for AI consumption
+// Component Intelligence for AI consumption (original schema)
 export const ComponentIntelligenceSchema = z.object({
   cognitiveLoad: z.number().min(1).max(5), // 1=simple, 5=complex
   attentionHierarchy: z.string(), // How this component fits in attention economy
@@ -41,6 +41,33 @@ export const ComponentIntelligenceSchema = z.object({
 });
 
 export type ComponentIntelligence = z.infer<typeof ComponentIntelligenceSchema>;
+
+// Rafters intelligence schemas for CLI compatibility
+export const IntelligenceSchema = z.object({
+  cognitiveLoad: z.number().min(0).max(10),
+  attentionEconomics: z.string(),
+  accessibility: z.string(),
+  trustBuilding: z.string(),
+  semanticMeaning: z.string(),
+});
+
+export const UsagePatternsSchema = z.object({
+  dos: z.array(z.string()),
+  nevers: z.array(z.string()),
+});
+
+export const DesignGuideSchema = z.object({
+  name: z.string(),
+  url: z.string(),
+});
+
+export const ExampleSchema = z.object({
+  title: z.string().optional(),
+  code: z.string(),
+  description: z.string().optional(),
+});
+
+export type Intelligence = z.infer<typeof IntelligenceSchema>;
 
 // Design Token for AI systems
 export const SemanticTokenSchema = z.object({
@@ -158,14 +185,11 @@ export const ComponentManifestSchema = z.object({
     .object({
       rafters: z
         .object({
-          intelligence: z.object({
-            cognitiveLoad: z.number().min(1).max(10),
-            attentionEconomics: z.string(),
-            accessibility: z.string(),
-            trustBuilding: z.string(),
-            semanticMeaning: z.string(),
-          }),
-          version: z.string().optional(),
+          version: z.string(),
+          intelligence: IntelligenceSchema,
+          usagePatterns: UsagePatternsSchema.optional(),
+          designGuides: z.array(DesignGuideSchema).optional(),
+          examples: z.array(ExampleSchema).optional(),
         })
         .optional(),
     })

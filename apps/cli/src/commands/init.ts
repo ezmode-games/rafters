@@ -19,7 +19,10 @@ import {
   type Config,
   configExists,
   defaultConfig,
+  detectFramework,
   detectPackageManager,
+  findCssFile,
+  getDefaultCssFile,
   hasReact,
   isNodeProject,
   saveConfig,
@@ -69,6 +72,21 @@ export async function initCommand(): Promise<void> {
     process.exit(1);
   }
 
+  // Detect framework and CSS file for better defaults
+  const framework = detectFramework(cwd);
+  const existingCssFile = findCssFile(cwd);
+  const defaultCssFile = getDefaultCssFile(framework, cwd);
+
+  if (framework) {
+    console.log(chalk.gray(`Detected ${framework} project`));
+  }
+
+  if (existingCssFile) {
+    console.log(chalk.gray(`Found CSS file: ${existingCssFile}`));
+  } else {
+    console.log(chalk.yellow(`No existing CSS file found. Will suggest: ${defaultCssFile}`));
+  }
+
   // Interactive setup
   const answers = await inquirer.prompt([
     {
@@ -92,6 +110,20 @@ export async function initCommand(): Promise<void> {
     },
     {
       type: 'input',
+      name: 'cssFile',
+      message: existingCssFile
+        ? `CSS file to inject design tokens (found: ${existingCssFile}):`
+        : 'CSS file to inject design tokens (will create if missing):',
+      default: defaultCssFile,
+      validate: (input) => {
+        if (!input.endsWith('.css')) {
+          return 'CSS file must end with .css';
+        }
+        return true;
+      },
+    },
+    {
+      type: 'input',
       name: 'studioShortcode',
       message: 'Studio shortcode (leave blank for default grayscale):',
       validate: (input) => {
@@ -107,11 +139,11 @@ export async function initCommand(): Promise<void> {
       name: 'tokenFormat',
       message: 'Design token format:',
       choices: [
-        { name: 'Vanilla CSS', value: 'css' },
         { name: 'Tailwind CSS v4', value: 'tailwind' },
+        { name: 'Vanilla CSS', value: 'css' },
         { name: 'React Native', value: 'react-native' },
       ],
-      default: 'css',
+      default: 'tailwind',
     },
   ]);
 
@@ -122,6 +154,9 @@ export async function initCommand(): Promise<void> {
     hasStorybook: answers.hasStorybook,
     componentsDir: answers.componentsDir,
     storiesDir: answers.storiesDir || defaultConfig.storiesDir,
+    cssFile: answers.cssFile,
+    tailwindVersion: tailwindVersion as 'v3' | 'v4',
+    tokenFormat: answers.tokenFormat,
     packageManager,
   };
 
@@ -194,7 +229,7 @@ export async function initCommand(): Promise<void> {
 
     // Inject CSS import if needed
     if (answers.tokenFormat === 'css' || answers.tokenFormat === 'tailwind') {
-      await injectCSSImport(answers.tokenFormat, cwd);
+      await injectCSSImport(config.cssFile!, cwd);
     }
 
     setupSpinner.succeed('Rafters setup complete');

@@ -5,8 +5,9 @@
  * Built from Sami (UX) and Sally (Accessibility) requirements
  */
 
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import * as fs from 'fs-extra';
+import { ensureDirSync } from 'fs-extra';
 import sqids from 'sqids';
 import { z } from 'zod';
 
@@ -31,6 +32,9 @@ export const TokenSchema = z.object({
   darkValue: z.string().optional(),
   category: z.string(),
   namespace: z.string(),
+
+  // Typography-specific properties
+  lineHeight: z.string().optional(),
 
   // AI Intelligence (comprehensive)
   semanticMeaning: z.string().optional(),
@@ -128,11 +132,9 @@ export function generateSpacingScale(
   baseUnit = 4,
   multiplier = 1.25,
   steps = 12,
-  generateResponsive = true
+  generateResponsive = false // Don't generate responsive variants - Tailwind v4 handles this
 ): Token[] {
   const tokens: Token[] = [];
-  const breakpoints = generateResponsive ? ['sm', 'md', 'lg', 'xl'] : [];
-  const containerSizes = generateResponsive ? ['xs', 'sm', 'md', 'lg', 'xl'] : [];
 
   for (let i = 0; i <= steps; i++) {
     let value: number;
@@ -140,20 +142,20 @@ export function generateSpacingScale(
 
     switch (system) {
       case 'linear':
-        value = baseUnit * (i === 0 ? 0 : i);
+        value = baseUnit * (i === 0 ? 0 : i / 4); // Use Tailwind's actual spacing scale: 0, 0.25, 0.5, 0.75, 1, etc.
         name = i === 0 ? '0' : `${i}`;
         break;
       case 'golden':
-        value = i === 0 ? 0 : baseUnit * GOLDEN_RATIO ** (i - 1);
+        value = i === 0 ? 0 : (baseUnit * GOLDEN_RATIO ** (i - 1)) / 4;
         name = i === 0 ? '0' : `golden-${i}`;
         break;
       case 'custom':
-        value = i === 0 ? 0 : baseUnit * multiplier ** (i - 1);
+        value = i === 0 ? 0 : (baseUnit * multiplier ** (i - 1)) / 4;
         name = i === 0 ? '0' : `scale-${i}`;
         break;
     }
 
-    // Base token
+    // Only base tokens - Tailwind v4 will generate responsive variants automatically
     tokens.push({
       name,
       value: `${Math.round(value * 100) / 100}rem`,
@@ -161,59 +163,15 @@ export function generateSpacingScale(
       namespace: 'spacing',
       semanticMeaning: `Spacing step ${i} in ${system} scale`,
       mathRelationship:
-        system === 'linear' ? `${baseUnit} * ${i}` : `${baseUnit} * ${multiplier}^${i - 1}`,
+        system === 'linear'
+          ? `${baseUnit} * ${i} / 4`
+          : system === 'golden'
+            ? `${baseUnit} * ${GOLDEN_RATIO}^${i - 1} / 4`
+            : `${baseUnit} * ${multiplier}^${i - 1} / 4`,
       scalePosition: i,
       generateUtilityClass: true,
       applicableComponents: ['all'],
-      containerQueryAware: generateResponsive,
-      viewportAware: generateResponsive,
     });
-
-    // Responsive variants (viewport-based)
-    if (generateResponsive) {
-      let bpIndex = 0;
-      for (const bp of breakpoints) {
-        const responsiveMultiplier = 1 + bpIndex * 0.125; // 1, 1.125, 1.25, 1.375, 1.5
-        const responsiveValue = value * responsiveMultiplier;
-
-        tokens.push({
-          name: `${bp}-${name}`,
-          value: `${Math.round(responsiveValue * 100) / 100}rem`,
-          category: 'spacing',
-          namespace: 'spacing',
-          semanticMeaning: `Responsive spacing ${name} for ${bp} breakpoint`,
-          mathRelationship: `(${system === 'linear' ? `${baseUnit} * ${i}` : `${baseUnit} * ${multiplier}^${i - 1}`}) * ${responsiveMultiplier}`,
-          scalePosition: i,
-          generateUtilityClass: true,
-          applicableComponents: ['all'],
-          viewportAware: true,
-          generatedFrom: name,
-        });
-        bpIndex++;
-      }
-
-      // Container query variants
-      let containerIndex = 0;
-      for (const container of containerSizes) {
-        const containerMultiplier = 0.75 + containerIndex * 0.1875; // 0.75, 0.9375, 1.125, 1.3125, 1.5
-        const containerValue = value * containerMultiplier;
-
-        tokens.push({
-          name: `@${container}-${name}`,
-          value: `${Math.round(containerValue * 100) / 100}rem`,
-          category: 'spacing',
-          namespace: 'spacing',
-          semanticMeaning: `Container-aware spacing ${name} for ${container} container`,
-          mathRelationship: `(${system === 'linear' ? `${baseUnit} * ${i}` : `${baseUnit} * ${multiplier}^${i - 1}`}) * ${containerMultiplier}`,
-          scalePosition: i,
-          generateUtilityClass: true,
-          applicableComponents: ['all'],
-          containerQueryAware: true,
-          generatedFrom: name,
-        });
-        containerIndex++;
-      }
-    }
   }
 
   return tokens;
@@ -337,12 +295,10 @@ export function generateHeightScale(
   system: 'linear' | 'golden' | 'custom' = 'linear',
   baseUnit = 2.5, // rem
   multiplier = 1.25,
-  generateResponsive = true
+  generateResponsive = false // Don't generate responsive variants - Tailwind v4 handles this
 ): Token[] {
   const tokens: Token[] = [];
   const sizes = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl'];
-  const breakpoints = generateResponsive ? ['sm', 'md', 'lg', 'xl'] : [];
-  const containerSizes = generateResponsive ? ['xs', 'sm', 'md', 'lg', 'xl'] : [];
 
   for (let i = 0; i < sizes.length; i++) {
     let value: number;
@@ -359,9 +315,9 @@ export function generateHeightScale(
         break;
     }
 
-    // Base token
+    // Only base tokens - Tailwind v4 will generate responsive variants automatically
     tokens.push({
-      name: `h-${sizes[i]}`,
+      name: sizes[i], // Remove the h- prefix - that's added by Tailwind
       value: `${Math.round(value * 100) / 100}rem`,
       category: 'height',
       namespace: 'height',
@@ -372,53 +328,7 @@ export function generateHeightScale(
       touchTargetSize: value * 16, // Convert rem to px for validation
       generateUtilityClass: true,
       applicableComponents: ['button', 'input', 'select', 'card'],
-      containerQueryAware: generateResponsive,
-      viewportAware: generateResponsive,
     });
-
-    // Responsive variants - heights grow on larger screens
-    if (generateResponsive) {
-      breakpoints.forEach((bp, bpIndex) => {
-        const responsiveMultiplier = 1 + bpIndex * 0.1; // 1, 1.1, 1.2, 1.3, 1.4
-        const responsiveValue = value * responsiveMultiplier;
-
-        tokens.push({
-          name: `${bp}-h-${sizes[i]}`,
-          value: `${Math.round(responsiveValue * 100) / 100}rem`,
-          category: 'height',
-          namespace: 'height',
-          semanticMeaning: `Responsive height ${sizes[i]} for ${bp} breakpoint`,
-          mathRelationship: `(${system === 'linear' ? `${baseUnit} + ${i * 0.5}` : `${baseUnit} * ${multiplier}^${i * 0.5}`}) * ${responsiveMultiplier}`,
-          scalePosition: i,
-          touchTargetSize: responsiveValue * 16,
-          generateUtilityClass: true,
-          applicableComponents: ['button', 'input', 'select', 'card'],
-          viewportAware: true,
-          generatedFrom: `h-${sizes[i]}`,
-        });
-      });
-
-      // Container query variants - adapt to container size
-      containerSizes.forEach((container, containerIndex) => {
-        const containerMultiplier = 0.8 + containerIndex * 0.1; // 0.8, 0.9, 1.0, 1.1, 1.2
-        const containerValue = value * containerMultiplier;
-
-        tokens.push({
-          name: `@${container}-h-${sizes[i]}`,
-          value: `${Math.round(containerValue * 100) / 100}rem`,
-          category: 'height',
-          namespace: 'height',
-          semanticMeaning: `Container-aware height ${sizes[i]} for ${container} container`,
-          mathRelationship: `(${system === 'linear' ? `${baseUnit} + ${i * 0.5}` : `${baseUnit} * ${multiplier}^${i * 0.5}`}) * ${containerMultiplier}`,
-          scalePosition: i,
-          touchTargetSize: containerValue * 16,
-          generateUtilityClass: true,
-          applicableComponents: ['button', 'input', 'select', 'card'],
-          containerQueryAware: true,
-          generatedFrom: `h-${sizes[i]}`,
-        });
-      });
-    }
   }
 
   return tokens;
@@ -436,7 +346,7 @@ export function generateTypographyScale(
     | 'perfect-fourth'
     | 'perfect-fifth' = 'golden',
   baseSize = 1, // rem
-  generateResponsive = true
+  generateResponsive = false // Don't generate responsive variants - Tailwind v4 handles this
 ): Token[] {
   const tokens: Token[] = [];
   const sizes = [
@@ -454,8 +364,6 @@ export function generateTypographyScale(
     '8xl',
     '9xl',
   ];
-  const breakpoints = generateResponsive ? ['sm', 'md', 'lg', 'xl'] : [];
-  const containerSizes = generateResponsive ? ['xs', 'sm', 'md', 'lg', 'xl'] : [];
 
   let ratio: number;
   switch (system) {
@@ -479,79 +387,54 @@ export function generateTypographyScale(
       break;
   }
 
+  // Line height mapping for optimal typography
+  const lineHeights: Record<string, string> = {
+    xs: '1.25', // 20px line height
+    sm: '1.375', // 22px line height
+    base: '1.5', // 24px line height
+    lg: '1.6', // 25.6px line height
+    xl: '1.75', // 28px line height
+    '2xl': '1.8', // Larger text needs tighter leading
+    '3xl': '1.8',
+    '4xl': '1.1', // Display text needs much tighter leading
+    '5xl': '1.1',
+    '6xl': '1.05',
+    '7xl': '1.05',
+    '8xl': '1', // Massive display text
+    '9xl': '1',
+  };
+
   // Start from base (index 2), go down for xs/sm, up for lg+
   for (let i = 0; i < sizes.length; i++) {
     const steps = i - 2; // -2, -1, 0, 1, 2, 3, 4, 5, 6, 7
     const value = baseSize * ratio ** steps;
+    const size = sizes[i];
 
-    // Base font size token
+    // Only base font size tokens - Tailwind v4 will generate responsive variants automatically
     tokens.push({
-      name: `text-${sizes[i]}`,
+      name: size, // Remove text- prefix - Tailwind adds it
       value: `${Math.round(value * 1000) / 1000}rem`,
+      lineHeight: lineHeights[size],
       category: 'font-size',
       namespace: 'font-size',
-      semanticMeaning: `Typography size ${sizes[i]} using ${system} ratio`,
+      semanticMeaning: `Typography size ${size} using ${system} ratio`,
       mathRelationship: `${baseSize} * ${ratio}^${steps}`,
       scalePosition: i,
       generateUtilityClass: true,
       applicableComponents: ['text', 'heading', 'label', 'button'],
-      containerQueryAware: generateResponsive,
-      viewportAware: generateResponsive,
     });
-
-    // Responsive font size variants - typography scales up on larger screens
-    if (generateResponsive) {
-      breakpoints.forEach((bp, bpIndex) => {
-        const responsiveMultiplier = 1 + bpIndex * 0.1; // 1, 1.1, 1.2, 1.3, 1.4
-        const responsiveValue = value * responsiveMultiplier;
-
-        tokens.push({
-          name: `${bp}-text-${sizes[i]}`,
-          value: `${Math.round(responsiveValue * 1000) / 1000}rem`,
-          category: 'font-size',
-          namespace: 'font-size',
-          semanticMeaning: `Responsive typography ${sizes[i]} for ${bp} breakpoint`,
-          mathRelationship: `(${baseSize} * ${ratio}^${steps}) * ${responsiveMultiplier}`,
-          scalePosition: i,
-          generateUtilityClass: true,
-          applicableComponents: ['text', 'heading', 'label', 'button'],
-          viewportAware: true,
-          generatedFrom: `text-${sizes[i]}`,
-        });
-      });
-
-      // Container query variants - typography adapts to container width
-      containerSizes.forEach((container, containerIndex) => {
-        const containerMultiplier = 0.85 + containerIndex * 0.075; // 0.85, 0.925, 1.0, 1.075, 1.15
-        const containerValue = value * containerMultiplier;
-
-        tokens.push({
-          name: `@${container}-text-${sizes[i]}`,
-          value: `${Math.round(containerValue * 1000) / 1000}rem`,
-          category: 'font-size',
-          namespace: 'font-size',
-          semanticMeaning: `Container-aware typography ${sizes[i]} for ${container} container`,
-          mathRelationship: `(${baseSize} * ${ratio}^${steps}) * ${containerMultiplier}`,
-          scalePosition: i,
-          generateUtilityClass: true,
-          applicableComponents: ['text', 'heading', 'label', 'button'],
-          containerQueryAware: true,
-          generatedFrom: `text-${sizes[i]}`,
-        });
-      });
-    }
 
     // Base line height token
     const fontSize = value;
     const lineHeight = fontSize < 1 ? 1.6 : fontSize > 2 ? 1.2 : 1.5;
 
     tokens.push({
-      name: `leading-${sizes[i]}`,
+      name: size, // Remove leading- prefix - Tailwind adds it
       value: lineHeight.toString(),
       category: 'line-height',
       namespace: 'line-height',
-      semanticMeaning: `Line height optimized for ${sizes[i]} text`,
-      pairedWith: [`text-${sizes[i]}`],
+      semanticMeaning: `Line height optimized for ${size} text`,
+      pairedWith: [size], // Reference the size directly
       generateUtilityClass: true,
       applicableComponents: ['text', 'heading', 'paragraph'],
     });
@@ -1172,9 +1055,14 @@ export function generateBreakpointTokens(): Token[] {
     { name: 'md', value: '28rem', meaning: 'Medium container (448px)' },
     { name: 'lg', value: '32rem', meaning: 'Large container (512px)' },
     { name: 'xl', value: '36rem', meaning: 'Extra large container (576px)' },
-    { name: '2xl', value: '42rem', meaning: 'Max width container (672px)' },
-    { name: '3xl', value: '48rem', meaning: 'Ultra wide container (768px)' },
-    { name: '4xl', value: '56rem', meaning: 'Maximum container (896px)' },
+    { name: '2xl', value: '42rem', meaning: '2XL container (672px)' },
+    { name: '3xl', value: '48rem', meaning: '3XL container (768px)' },
+    { name: '4xl', value: '56rem', meaning: '4XL container (896px)' },
+    { name: '5xl', value: '64rem', meaning: '5XL container (1024px)' },
+    { name: '6xl', value: '72rem', meaning: '6XL container (1152px)' },
+    { name: '7xl', value: '80rem', meaning: '7XL container (1280px)' },
+    { name: '8xl', value: '90rem', meaning: '8XL container (1440px)' },
+    { name: '9xl', value: '100rem', meaning: '9XL container (1600px)' },
   ];
 
   containers.forEach((container, index) => {
@@ -1250,36 +1138,36 @@ export function generateAspectRatioTokens(): Token[] {
 export function generateGridTokens(): Token[] {
   const tokens: Token[] = [];
 
-  // Grid template columns
+  // Grid template columns - using variables instead of hardcoded values
   const gridColumns = [
     {
       name: 'auto-fit-sm',
-      value: 'repeat(auto-fit, minmax(200px, 1fr))',
+      value: 'repeat(auto-fit, minmax(var(--container-xs), 1fr))',
       meaning: 'Auto-fit grid for small cards',
     },
     {
       name: 'auto-fit-md',
-      value: 'repeat(auto-fit, minmax(280px, 1fr))',
+      value: 'repeat(auto-fit, minmax(var(--container-sm), 1fr))',
       meaning: 'Auto-fit grid for medium cards',
     },
     {
       name: 'auto-fit-lg',
-      value: 'repeat(auto-fit, minmax(360px, 1fr))',
+      value: 'repeat(auto-fit, minmax(var(--container-md), 1fr))',
       meaning: 'Auto-fit grid for large cards',
     },
     {
       name: 'auto-fill-sm',
-      value: 'repeat(auto-fill, minmax(200px, 1fr))',
+      value: 'repeat(auto-fill, minmax(var(--container-xs), 1fr))',
       meaning: 'Auto-fill grid for small items',
     },
     {
       name: 'auto-fill-md',
-      value: 'repeat(auto-fill, minmax(280px, 1fr))',
+      value: 'repeat(auto-fill, minmax(var(--container-sm), 1fr))',
       meaning: 'Auto-fill grid for medium items',
     },
     {
       name: 'auto-fill-lg',
-      value: 'repeat(auto-fill, minmax(360px, 1fr))',
+      value: 'repeat(auto-fill, minmax(var(--container-md), 1fr))',
       meaning: 'Auto-fill grid for large items',
     },
     { name: '2-cols', value: 'repeat(2, 1fr)', meaning: 'Two equal columns' },
@@ -1709,78 +1597,376 @@ function generateCssCustomProperties(designSystem: DesignSystem): string {
  * Generate Tailwind CSS v4 stylesheet (complex implementation)
  */
 function generateTailwindStylesheet(designSystem: DesignSystem): string {
-  const header = `/**
- * Generated Tailwind CSS v4 Stylesheet
- * 
- * Design System: ${designSystem.name}
- * Generated: ${new Date().toISOString()}
- * DO NOT EDIT MANUALLY - Changes will be overwritten
- */
-
-@import "tailwindcss";
-
-@theme {`;
-
-  const lightTokens: string[] = [];
-  const darkTokens: string[] = [];
-  const motionTokens: string[] = [];
-  const containerQueries: string[] = [];
-
+  // Group tokens by category for organized generation
+  const tokensByCategory: Record<string, Token[]> = {};
   for (const token of designSystem.tokens) {
-    const cssVar = `  --${token.namespace}-${token.name}: ${token.value};`;
-    lightTokens.push(cssVar);
-
-    if (token.darkValue) {
-      const darkVar = `  --${token.namespace}-${token.name}: ${token.darkValue};`;
-      darkTokens.push(darkVar);
+    if (!tokensByCategory[token.category]) {
+      tokensByCategory[token.category] = [];
     }
+    tokensByCategory[token.category].push(token);
+  }
 
-    // Handle reduced motion for motion tokens
-    if (token.category === 'motion' && token.reducedMotionAware) {
-      motionTokens.push(
-        `  --${token.namespace}-${token.name}: ${token.motionDuration === 0 ? '0ms' : token.value};`
-      );
+  let stylesheet = '/* biome-ignore-all: Tailwind v4 syntax not supported yet */\n';
+  stylesheet += '/* Generated by Rafters Design System */\n';
+  stylesheet += `/* ${designSystem.name} - ${designSystem.tokens.length} tokens with AI intelligence */\n\n`;
+
+  // Essential imports - no external dependencies
+  stylesheet += `@import "tailwindcss";\n`;
+
+  // Custom variants for dark mode
+  stylesheet += '@custom-variant dark (@media (prefers-color-scheme: dark));\n\n';
+
+  // Main @theme block
+  stylesheet += '@theme {\n';
+
+  // Font families
+  if (tokensByCategory['font-family']) {
+    stylesheet += '    /* Font Families */\n';
+    for (const token of tokensByCategory['font-family']) {
+      stylesheet += `    --font-${token.name}: ${token.value};\n`;
     }
+    stylesheet += '\n';
+  }
 
-    // In Tailwind v4, spacing utilities are automatically generated from --spacing
-    // No need to manually create @utility classes for spacing
+  // Colors with semantic naming and OKLCH values
+  if (tokensByCategory.color) {
+    stylesheet += `    /* ${(designSystem.primaryColorSpace || 'oklch').toUpperCase()} Color Palette */\n`;
+    // Only generate base color tokens - filter out responsive variants
+    const baseColorTokens = tokensByCategory.color.filter(
+      (token) =>
+        !token.name.includes('-sm-') &&
+        !token.name.includes('-md-') &&
+        !token.name.includes('-lg-') &&
+        !token.name.includes('-xl-') &&
+        !token.name.includes('@xs-') &&
+        !token.name.includes('@sm-') &&
+        !token.name.includes('@md-') &&
+        !token.name.includes('@lg-') &&
+        !token.name.includes('@xl-')
+    );
 
-    // Handle container queries for container-aware tokens
-    if (token.containerQueryAware) {
-      containerQueries.push(
-        `@container (min-width: 768px) { .container-${token.name} { --value: var(--${token.namespace}-${token.name}); } }`
-      );
+    for (const token of baseColorTokens) {
+      // Light mode color
+      stylesheet += `    --color-${token.name}: ${token.value};\n`;
+
+      // Generate proper dark token if darkValue exists
+      if (token.darkValue) {
+        stylesheet += `    --color-${token.name}-dark: ${token.darkValue};\n`;
+      }
+    }
+    stylesheet += '\n';
+  }
+
+  // Typography scale (font sizes with line heights)
+  if (tokensByCategory['font-size']) {
+    stylesheet += '    /* Typography Scale */\n';
+    for (const token of tokensByCategory['font-size']) {
+      stylesheet += `    --text-${token.name}: ${token.value};\n`;
+      // Add line height if available
+      if (token.lineHeight) {
+        stylesheet += `    --text-${token.name}--line-height: ${token.lineHeight};\n`;
+      }
+    }
+    stylesheet += '\n';
+  }
+
+  // Spacing scale - only base tokens (Tailwind generates responsive variants)
+  if (tokensByCategory.spacing) {
+    stylesheet += `    /* Mathematical Spacing Scale (${designSystem.spacingSystem}) */\n`;
+    // Only generate base spacing tokens - filter out responsive variants
+    const baseSpacingTokens = tokensByCategory.spacing.filter(
+      (token) => !token.name.includes('-') && !token.name.includes('@')
+    );
+
+    for (const token of baseSpacingTokens) {
+      stylesheet += `    --spacing-${token.name}: ${token.value};\n`;
+    }
+    stylesheet += '\n';
+  }
+
+  // Border radius scale
+  if (tokensByCategory['border-radius']) {
+    stylesheet += '    /* Border Radius Scale */\n';
+    for (const token of tokensByCategory['border-radius']) {
+      stylesheet += `    --radius-${token.name}: ${token.value};\n`;
+    }
+    stylesheet += '\n';
+  }
+
+  // Motion tokens (durations and easings)
+  if (tokensByCategory.motion || tokensByCategory.easing) {
+    stylesheet += '    /* Motion & Animation */\n';
+    if (tokensByCategory.motion) {
+      for (const token of tokensByCategory.motion) {
+        stylesheet += `    --duration-${token.name}: ${token.value};\n`;
+      }
+    }
+    if (tokensByCategory.easing) {
+      for (const token of tokensByCategory.easing) {
+        stylesheet += `    --ease-${token.name}: ${token.value};\n`;
+      }
+    }
+    stylesheet += '\n';
+  }
+
+  // Other token categories
+  const otherCategories = [
+    'font-weight',
+    'opacity',
+    'shadow',
+    'backdrop-blur',
+    'z-index',
+    'letter-spacing',
+    'line-height',
+    'height',
+    'width',
+    'container',
+    'aspect-ratio',
+    'grid-template-columns',
+    'grid-template-rows',
+    'scale',
+    'translate',
+    'rotate',
+    'border-width',
+    'touch-target',
+  ];
+  for (const category of otherCategories) {
+    if (tokensByCategory[category]) {
+      const categoryName = category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ');
+      stylesheet += `    /* ${categoryName} */\n`;
+      for (const token of tokensByCategory[category]) {
+        let prefix = category;
+        // Custom prefix mapping for better CSS variable names
+        switch (category) {
+          case 'font-weight':
+            prefix = 'font-weight';
+            break;
+          case 'letter-spacing':
+            prefix = 'tracking';
+            break;
+          case 'line-height':
+            prefix = 'leading';
+            break;
+          case 'aspect-ratio':
+            prefix = 'aspect';
+            break;
+          case 'grid-template-columns':
+            prefix = 'grid-cols';
+            break;
+          case 'grid-template-rows':
+            prefix = 'grid-rows';
+            break;
+          case 'touch-target':
+            prefix = 'touch';
+            break;
+          case 'z-index':
+            prefix = 'z';
+            break;
+        }
+        stylesheet += `    --${prefix}-${token.name}: ${token.value};\n`;
+      }
+      stylesheet += '\n';
     }
   }
 
-  let stylesheet = `${header}\n`;
-  stylesheet += lightTokens.join('\n');
-  stylesheet += '\n}\n';
+  stylesheet += '}\n\n';
 
-  // Dark theme
-  if (darkTokens.length > 0) {
-    stylesheet += '\n@media (prefers-color-scheme: dark) {\n  @theme {\n';
-    stylesheet += darkTokens.join('\n');
-    stylesheet += '\n  }\n}\n';
+  // Semantic token mapping in :root for shadcn compatibility
+  stylesheet += ':root {\n';
+  stylesheet += '    /* Base radius for consistent rounded corners */\n';
+  stylesheet += '    --radius: 0.5rem;\n\n';
+  // Colors are handled in @theme inline and :root sections below
+
+  stylesheet += '}\n\n';
+
+  // Base HTML styling
+  stylesheet += 'html, body {\n';
+  stylesheet += '    background-color: var(--background);\n';
+  stylesheet += '    color: var(--foreground);\n';
+  stylesheet += '\n';
+  stylesheet += '    @media (prefers-color-scheme: dark) {\n';
+  stylesheet += '        color-scheme: dark;\n';
+  stylesheet += '    }\n';
+  stylesheet += '}\n\n';
+
+  // Accessibility and reduced motion
+  if (designSystem.enforceMotionSafety) {
+    stylesheet += '@media (prefers-reduced-motion: reduce) {\n';
+    stylesheet += '    *,\n';
+    stylesheet += '    ::before,\n';
+    stylesheet += '    ::after {\n';
+    stylesheet += '        animation-duration: 0.01ms !important;\n';
+    stylesheet += '        animation-iteration-count: 1 !important;\n';
+    stylesheet += '        transition-duration: 0.01ms !important;\n';
+    stylesheet += '        scroll-behavior: auto !important;\n';
+    stylesheet += '    }\n';
+    stylesheet += '}\n\n';
   }
 
-  // Reduced motion
-  if (motionTokens.length > 0) {
-    stylesheet += '\n@media (prefers-reduced-motion: reduce) {\n  @theme {\n';
-    stylesheet += motionTokens
-      .map((token) => token.replace(token.split(': ')[1], '0ms;'))
-      .join('\n');
-    stylesheet += '\n  }\n}\n';
+  // Base layer for consistent defaults
+  stylesheet += '@layer base {\n';
+  stylesheet += '    * {\n';
+  stylesheet += '        @apply border-border outline-ring/50;\n';
+  stylesheet += '    }\n';
+  stylesheet += '    body {\n';
+  stylesheet += '        @apply bg-background text-foreground;\n';
+  if (designSystem.accessibilityTarget === 'AAA') {
+    stylesheet += '        line-height: 1.5; /* WCAG AAA line height requirement */\n';
+  }
+  stylesheet += '    }\n';
+  stylesheet += '}\n\n';
+
+  // Semantic color mappings for shadcn compatibility
+  const semanticMappings = [
+    'background',
+    'foreground',
+    'primary',
+    'primary-foreground',
+    'secondary',
+    'secondary-foreground',
+    'muted',
+    'muted-foreground',
+    'accent',
+    'accent-foreground',
+    'destructive',
+    'destructive-foreground',
+    'info',
+    'info-foreground',
+    'success',
+    'success-foreground',
+    'warning',
+    'warning-foreground',
+    'highlight',
+    'highlight-foreground',
+    'border',
+    'input',
+    'ring',
+    'card',
+    'card-foreground',
+    'popover',
+    'popover-foreground',
+  ];
+
+  // Tailwind v4 inline theme for semantic token mapping
+  stylesheet += '@theme inline {\n';
+  for (const semantic of semanticMappings) {
+    stylesheet += `    --color-${semantic}: var(--${semantic});\n`;
+  }
+  stylesheet += '}\n\n';
+
+  // Root semantic tokens with dark mode support using tokens, not hardcoded values
+  stylesheet += ':root {\n';
+  stylesheet += '    --radius: 0.5rem;\n\n';
+
+  // Light mode semantic mappings
+  for (const semantic of semanticMappings) {
+    const token = tokensByCategory.color?.find((t) => t.name === semantic);
+    if (token) {
+      stylesheet += `    --${semantic}: var(--color-${token.name});\n`;
+    }
   }
 
-  // In Tailwind v4, most utilities are automatically generated from theme variables
-  // Only add custom utilities if there are any (which there shouldn't be for standard tokens)
+  // Dark mode using proper dark tokens - NO hardcoded values, only token references
+  stylesheet += '\n    @media (prefers-color-scheme: dark) {\n';
+  for (const semantic of semanticMappings) {
+    // Look for dark variant tokens first
+    const darkToken = tokensByCategory.color?.find((t) => t.name === `${semantic}-dark`);
+    const lightToken = tokensByCategory.color?.find((t) => t.name === semantic);
 
-  // Container queries
-  if (containerQueries.length > 0) {
-    stylesheet += '\n/* Container Queries */\n';
-    stylesheet += `${containerQueries.join('\n')}\n`;
+    if (darkToken) {
+      // Use dark variant token reference directly
+      stylesheet += `        --${semantic}: var(--color-${darkToken.name});\n`;
+    } else if (lightToken?.darkValue) {
+      // Reference the dark token we generated in @theme - NO fallback to hardcoded values
+      stylesheet += `        --${semantic}: var(--color-${semantic}-dark);\n`;
+    }
   }
+  stylesheet += '    }\n';
+  stylesheet += '}\n\n';
+
+  // Custom utility classes that don't exist in standard Tailwind
+  stylesheet += '@layer utilities {\n';
+
+  // Semantic z-index utilities
+  stylesheet += '    /* Semantic Z-index utilities */\n';
+  if (tokensByCategory['z-index']) {
+    for (const token of tokensByCategory['z-index']) {
+      stylesheet += `    .z-${token.name} { z-index: var(--z-${token.name}); }\n`;
+    }
+  }
+
+  // Motion utilities - no external dependencies
+  stylesheet += '\n    /* Motion utilities */\n';
+  if (tokensByCategory.motion || tokensByCategory.easing) {
+    stylesheet +=
+      '    .transition-standard { transition: all var(--duration-standard) var(--ease-smooth); }\n';
+    stylesheet +=
+      '    .transition-fast { transition: all var(--duration-fast) var(--ease-smooth); }\n';
+    stylesheet +=
+      '    .transition-deliberate { transition: all var(--duration-deliberate) var(--ease-smooth); }\n';
+    stylesheet += '    .motion-reduce { transition: none !important; }\n';
+  }
+
+  // Container utilities up to 9xl
+  stylesheet += '\n    /* Container utilities */\n';
+  const containerSizes = [
+    'xs',
+    'sm',
+    'md',
+    'lg',
+    'xl',
+    '2xl',
+    '3xl',
+    '4xl',
+    '5xl',
+    '6xl',
+    '7xl',
+    '8xl',
+    '9xl',
+  ];
+  for (const size of containerSizes) {
+    if (tokensByCategory.width?.find((t) => t.name === `container-${size}`)) {
+      stylesheet += `    .container-${size} { max-width: var(--container-${size}); }\n`;
+    }
+  }
+
+  // Grid utilities with variables instead of hardcoded values
+  stylesheet += '\n    /* Grid utilities with variables */\n';
+  stylesheet += '    .grid-auto-fit-sm { grid-template-columns: var(--grid-cols-auto-fit-sm); }\n';
+  stylesheet += '    .grid-auto-fit-md { grid-template-columns: var(--grid-cols-auto-fit-md); }\n';
+  stylesheet += '    .grid-auto-fit-lg { grid-template-columns: var(--grid-cols-auto-fit-lg); }\n';
+
+  // Keyframes for motion - self-contained
+  stylesheet += '\n    /* Self-contained keyframes */\n';
+  stylesheet += '    @keyframes rafters-spin {\n';
+  stylesheet += '        from { transform: rotate(0deg); }\n';
+  stylesheet += '        to { transform: rotate(360deg); }\n';
+  stylesheet += '    }\n';
+  stylesheet += '    @keyframes rafters-pulse {\n';
+  stylesheet += '        0%, 100% { opacity: 1; }\n';
+  stylesheet += '        50% { opacity: 0.5; }\n';
+  stylesheet += '    }\n';
+  stylesheet += '    @keyframes rafters-bounce {\n';
+  stylesheet += '        0%, 100% { transform: translateY(-25%); }\n';
+  stylesheet += '        50% { transform: translateY(0); }\n';
+  stylesheet += '    }\n';
+
+  stylesheet += '    .animate-rafters-spin { animation: rafters-spin 1s linear infinite; }\n';
+  stylesheet +=
+    '    .animate-rafters-pulse { animation: rafters-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }\n';
+  stylesheet += '    .animate-rafters-bounce { animation: rafters-bounce 1s infinite; }\n';
+
+  stylesheet += '}\n\n';
+
+  // AI intelligence footer comment
+  stylesheet += '/*\n';
+  stylesheet += ' * Generated with Rafters Design Intelligence\n';
+  stylesheet += ` * - ${designSystem.tokens.length} tokens with embedded AI metadata\n`;
+  stylesheet += ` * - ${designSystem.accessibilityTarget} accessibility compliance built-in\n`;
+  stylesheet += ` * - Mathematical relationships: ${designSystem.spacingSystem} scale\n`;
+  stylesheet += ` * - Color science: ${(designSystem.primaryColorSpace || 'oklch').toUpperCase()} color space\n`;
+  stylesheet += ' * - Complete design reasoning in .rafters/tokens/ JSON files\n';
+  stylesheet += ' */\n';
 
   return stylesheet;
 }
@@ -1803,9 +1989,9 @@ export type TokenSet = {
 export const checkTailwindVersion = async (cwd: string): Promise<string> => {
   try {
     const packageJsonPath = join(cwd, 'package.json');
-    if (!fs.existsSync(packageJsonPath)) return 'v4';
+    if (!existsSync(packageJsonPath)) return 'v4';
 
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+    const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
     const deps = {
       ...packageJson.dependencies,
       ...packageJson.devDependencies,
@@ -1830,7 +2016,7 @@ export const checkTailwindVersion = async (cwd: string): Promise<string> => {
  */
 export const createDefaultRegistry = (): TokenSet => {
   return {
-    id: 'default-grayscale',
+    id: '000000',
     name: 'Default Grayscale System',
     tokens: [
       {
@@ -1874,7 +2060,7 @@ export const fetchStudioTokens = async (shortcode: string): Promise<TokenSet> =>
 };
 
 /**
- * Write token files to project (stub implementation)
+ * Write token files to project (real implementation)
  */
 export const writeTokenFiles = async (
   tokenSet: TokenSet,
@@ -1883,34 +2069,148 @@ export const writeTokenFiles = async (
 ): Promise<void> => {
   console.log(`Writing ${format} tokens for ${tokenSet.name} to ${cwd}`);
 
-  // In real implementation:
-  // 1. Convert TokenSet to full DesignSystem
-  // 2. Generate CSS custom properties with intelligence metadata
-  // 3. Create utility classes where specified
-  // 4. Handle dark theme variants
-  // 5. Generate accessibility documentation
+  // Import all generators and create complete token set
+  const { generateAllTokens } = await import('./generators/index.js');
+  const allTokens = generateAllTokens();
 
-  const tokenCount = tokenSet.tokens.length;
-  console.log(`  - ${tokenCount} tokens would be written`);
-  console.log(`  - Format: ${format}`);
-  console.log(`  - Target directory: ${cwd}`);
+  // Convert to DesignSystem format
+  const designSystem: DesignSystem = {
+    id: tokenSet.id,
+    name: tokenSet.name,
+    tokens: allTokens,
+    accessibilityTarget: 'AAA',
+    section508Compliant: true,
+    cognitiveLoadBudget: 15,
+    primaryColorSpace: 'oklch',
+    generateDarkTheme: true,
+    enforceContrast: true,
+    enforceMotionSafety: true,
+    spacingSystem: 'linear',
+    spacingMultiplier: 1.25,
+    spacingBaseUnit: 4,
+  };
+
+  // Write tokens directory for Studio consumption - THIS IS THE MAIN PURPOSE
+  const raftersDir = join(cwd, '.rafters');
+  const tokensDir = join(raftersDir, 'tokens');
+  ensureDirSync(tokensDir);
+
+  // Group tokens by category for easier AI consumption
+  const tokensByCategory: Record<string, Token[]> = {};
+  for (const token of allTokens) {
+    if (!tokensByCategory[token.category]) {
+      tokensByCategory[token.category] = [];
+    }
+    tokensByCategory[token.category].push(token);
+  }
+
+  // Write individual category files
+  for (const [category, tokens] of Object.entries(tokensByCategory)) {
+    const categoryFile = join(tokensDir, `${category}.json`);
+    const categoryData = {
+      category,
+      generatedAt: new Date().toISOString(),
+      tokens: tokens.map((token) => ({
+        ...token,
+        // Clean up undefined values for JSON
+        ...Object.fromEntries(Object.entries(token).filter(([_, v]) => v !== undefined)),
+      })),
+    };
+    writeFileSync(categoryFile, JSON.stringify(categoryData, null, 2));
+  }
+
+  // Write complete registry
+  const registryFile = join(tokensDir, 'registry.json');
+  const registryData = {
+    ...designSystem,
+    generatedAt: new Date().toISOString(),
+    tokenCount: allTokens.length,
+    categoryCount: Object.keys(tokensByCategory).length,
+  };
+  writeFileSync(registryFile, JSON.stringify(registryData, null, 2));
+
+  console.log(`  ✓ Generated ${allTokens.length} design tokens for Studio`);
+  console.log(
+    `  ✓ Created ${Object.keys(tokensByCategory).length} category files in .rafters/tokens/`
+  );
+  console.log('  ✓ Generated registry.json with AI intelligence metadata');
 };
 
 /**
- * Inject CSS import into project files (stub implementation)
+ * Inject CSS import into project files (robust implementation)
  */
-export const injectCSSImport = async (format: string, cwd: string): Promise<void> => {
-  console.log(`Injecting ${format} import in ${cwd}`);
+export const injectCSSImport = async (cssFilePath: string, cwd: string): Promise<void> => {
+  console.log(`Injecting design token import into ${cssFilePath}`);
 
-  const importStatements = {
-    css: '@import "./design-tokens.css";',
-    tailwind: '@import "./design-tokens.css";',
-    'react-native': '// Import design-tokens.ts in your root component',
-  };
+  const fullCssPath = join(cwd, cssFilePath);
+  const raftersImport = '@import "./.rafters/design-tokens.css";';
 
-  const statement =
-    importStatements[format as keyof typeof importStatements] || importStatements.css;
-  console.log(`  - Would add: ${statement}`);
+  try {
+    // Check if CSS file exists
+    if (existsSync(fullCssPath)) {
+      const existingContent = readFileSync(fullCssPath, 'utf-8');
+
+      // Check if import already exists (various formats)
+      const importPatterns = ['.rafters/design-tokens.css', 'design-tokens.css'];
+
+      const hasExistingImport = importPatterns.some((pattern) => existingContent.includes(pattern));
+
+      if (hasExistingImport) {
+        console.log(`  - Import already exists in ${cssFilePath}`);
+        return;
+      }
+
+      // Find the best place to add the import
+      const lines = existingContent.split('\n');
+      let insertIndex = 0;
+
+      // Look for existing @import statements and add after them
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line.startsWith('@import')) {
+          insertIndex = i + 1;
+        } else if (
+          line.startsWith('@tailwind') ||
+          line.startsWith('@theme') ||
+          (line.startsWith('/*') && line.includes('Tailwind'))
+        ) {
+          // Insert before Tailwind directives
+          break;
+        } else if (line.length > 0 && !line.startsWith('@import') && insertIndex === 0) {
+          // If we haven't found imports, insert at the very top
+          insertIndex = i;
+          break;
+        }
+      }
+
+      // Insert the import
+      lines.splice(insertIndex, 0, raftersImport);
+      const newContent = lines.join('\n');
+
+      writeFileSync(fullCssPath, newContent);
+      console.log(`  ✓ Added import to existing ${cssFilePath}`);
+    } else {
+      // Create the CSS file with basic Tailwind v4 setup
+      const basicContent = `${raftersImport}
+
+@import "tailwindcss";
+
+/* Your custom styles go here */
+`;
+
+      // Ensure directory exists
+      const dir = join(cwd, ...cssFilePath.split('/').slice(0, -1));
+      if (dir !== cwd) {
+        ensureDirSync(dir);
+      }
+
+      writeFileSync(fullCssPath, basicContent);
+      console.log(`  ✓ Created ${cssFilePath} with design token import`);
+    }
+  } catch (error) {
+    console.error(`  ✗ Failed to inject import: ${error}`);
+    throw error;
+  }
 };
 
 // Export for CLI compatibility

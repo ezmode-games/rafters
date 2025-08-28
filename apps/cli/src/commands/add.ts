@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import type { ComponentManifest } from '@rafters/shared';
 import chalk from 'chalk';
 import ora from 'ora';
 import { z } from 'zod';
@@ -7,7 +8,7 @@ import { loadConfig } from '../utils/config.js';
 import { installDependencies } from '../utils/dependencies.js';
 import { createComponentPath, fileExists, writeFile } from '../utils/files.js';
 import { getRaftersTitle } from '../utils/logo.js';
-import { type ComponentManifestSchema, fetchComponent } from '../utils/registry.js';
+import { fetchComponent } from '../utils/registry.js';
 
 interface AddOptions {
   force?: boolean;
@@ -215,7 +216,7 @@ export async function addCommand(componentName: string, options: AddOptions = {}
   }
 }
 
-function createBasicStory(componentManifest: z.infer<typeof ComponentManifestSchema>): string {
+function createBasicStory(componentManifest: ComponentManifest): string {
   const componentName = componentManifest.name;
   const intelligence = componentManifest.meta?.rafters?.intelligence;
 

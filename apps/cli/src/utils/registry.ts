@@ -2,96 +2,17 @@
  * Registry API client for fetching components from rafters.realhandy.tech
  */
 
+import {
+  type ComponentManifest,
+  ComponentManifestSchema,
+  type RegistryResponse,
+  RegistryResponseSchema,
+} from '@rafters/shared';
 import { z } from 'zod';
 
-// Rafters intelligence schemas
-export const IntelligenceSchema = z.object({
-  cognitiveLoad: z.number().min(0).max(10),
-  attentionEconomics: z.string(),
-  accessibility: z.string(),
-  trustBuilding: z.string(),
-  semanticMeaning: z.string(),
-});
-
-export const UsagePatternsSchema = z.object({
-  dos: z.array(z.string()),
-  nevers: z.array(z.string()),
-});
-
-export const DesignGuideSchema = z.object({
-  name: z.string(),
-  url: z.string(),
-});
-
-export const ExampleSchema = z.object({
-  title: z.string().optional(),
-  code: z.string(),
-  description: z.string().optional(),
-});
-
-// Shadcn registry file schema
-const RegistryFileSchema = z.object({
-  path: z.string(),
-  content: z.string(),
-  type: z.string(),
-  target: z.string().optional(),
-});
-
-// Main component manifest schema - matches shadcn registry-item.json with Rafters extensions
-export const ComponentManifestSchema = z.object({
-  $schema: z.string().optional(),
-  name: z.string(),
-  type: z.enum([
-    'registry:component',
-    'registry:lib',
-    'registry:style',
-    'registry:block',
-    'registry:page',
-    'registry:hook',
-  ]),
-  description: z.string().optional(),
-  title: z.string().optional(),
-  author: z.string().optional(),
-  dependencies: z.array(z.string()).optional().default([]),
-  devDependencies: z.array(z.string()).optional(),
-  registryDependencies: z.array(z.string()).optional(),
-  files: z.array(RegistryFileSchema).optional(),
-  content: z.string().optional(), // For simple single-file components
-  path: z.string().optional(), // Component file path
-  tailwind: z.record(z.string(), z.unknown()).optional(),
-  cssVars: z.record(z.string(), z.unknown()).optional(),
-  css: z.array(z.string()).optional(),
-  envVars: z.record(z.string(), z.string()).optional(),
-  categories: z.array(z.string()).optional(),
-  docs: z.string().optional(),
-  // Expanded Rafters intelligence metadata in the meta field
-  meta: z
-    .object({
-      rafters: z
-        .object({
-          version: z.string(),
-          intelligence: IntelligenceSchema,
-          usagePatterns: UsagePatternsSchema,
-          designGuides: z.array(DesignGuideSchema),
-          examples: z.array(ExampleSchema),
-        })
-        .optional(),
-    })
-    .optional(),
-});
-
-// Registry response schema - matches shadcn format
-export const RegistrySchema = z.object({
-  $schema: z.string().optional(),
-  name: z.string().optional(),
-  homepage: z.string().optional(),
-  components: z.array(ComponentManifestSchema).optional(),
-  items: z.array(ComponentManifestSchema).optional(),
-});
-
-export type Intelligence = z.infer<typeof IntelligenceSchema>;
-export type ComponentManifest = z.infer<typeof ComponentManifestSchema>;
-export type Registry = z.infer<typeof RegistrySchema>;
+// Re-export types from shared package
+export type { ComponentManifest } from '@rafters/shared';
+export type Registry = RegistryResponse;
 
 // Registry configuration
 function getRegistryBaseUrl(): string {
@@ -99,13 +20,8 @@ function getRegistryBaseUrl(): string {
 }
 const REGISTRY_TIMEOUT = 10000; // 10 seconds
 
-// HTTP client response schema
-const RegistryResponseSchema = z.unknown();
-
 // HTTP client with error handling
-async function fetchFromRegistry(
-  endpoint: string
-): Promise<z.infer<typeof RegistryResponseSchema>> {
+async function fetchFromRegistry(endpoint: string): Promise<unknown> {
   const url = `${getRegistryBaseUrl()}${endpoint}`;
 
   try {
@@ -127,7 +43,7 @@ async function fetchFromRegistry(
     }
 
     const data = await response.json();
-    return RegistryResponseSchema.parse(data);
+    return data;
   } catch (error) {
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
@@ -154,7 +70,7 @@ export async function fetchComponentRegistry(): Promise<Registry> {
     };
   }
 
-  return RegistrySchema.parse(data);
+  return RegistryResponseSchema.parse(data);
 }
 
 /**

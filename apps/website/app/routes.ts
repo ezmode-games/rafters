@@ -2,6 +2,7 @@ import { type RouteConfig, index, route } from '@react-router/dev/routes';
 
 export default [
   index('routes/home.tsx'),
+  route('huh', 'routes/huh.tsx'),
 
   // Registry API routes
   route('api/registry', 'routes/api.registry.tsx'),

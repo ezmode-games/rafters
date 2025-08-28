@@ -134,12 +134,6 @@ describe('registry', () => {
             trustBuilding: 'Destructive actions require confirmation',
             semanticMeaning: 'Primary=main actions',
           },
-          usagePatterns: {
-            dos: ['Use for primary actions'],
-            nevers: ['Never use for destructive actions without confirmation'],
-          },
-          designGuides: [],
-          examples: [],
         },
       },
     };
