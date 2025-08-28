@@ -1,0 +1,84 @@
+{
+  "category": "motion",
+  "generatedAt": "2025-08-28T17:20:34.074Z",
+  "tokens": [
+    {
+      "name": "instant",
+      "value": "75ms",
+      "category": "motion",
+      "namespace": "duration",
+      "semanticMeaning": "Instant feedback for immediate response",
+      "scalePosition": 0,
+      "cognitiveLoad": 1,
+      "reducedMotionAware": true,
+      "motionDuration": 75,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "fast",
+      "value": "150ms",
+      "category": "motion",
+      "namespace": "duration",
+      "semanticMeaning": "Fast animations for interactive elements",
+      "scalePosition": 1,
+      "cognitiveLoad": 2,
+      "reducedMotionAware": true,
+      "motionDuration": 150,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "standard",
+      "value": "300ms",
+      "category": "motion",
+      "namespace": "duration",
+      "semanticMeaning": "Standard duration for most transitions",
+      "scalePosition": 2,
+      "cognitiveLoad": 3,
+      "reducedMotionAware": true,
+      "motionDuration": 300,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "deliberate",
+      "value": "500ms",
+      "category": "motion",
+      "namespace": "duration",
+      "semanticMeaning": "Deliberate timing for important changes",
+      "scalePosition": 3,
+      "cognitiveLoad": 5,
+      "reducedMotionAware": true,
+      "motionDuration": 500,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "slow",
+      "value": "700ms",
+      "category": "motion",
+      "namespace": "duration",
+      "semanticMeaning": "Slow transitions for large changes",
+      "scalePosition": 4,
+      "cognitiveLoad": 7,
+      "reducedMotionAware": true,
+      "motionDuration": 700,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "dramatic",
+      "value": "1000ms",
+      "category": "motion",
+      "namespace": "duration",
+      "semanticMeaning": "Dramatic timing for emphasis",
+      "scalePosition": 5,
+      "cognitiveLoad": 9,
+      "reducedMotionAware": true,
+      "motionDuration": 1000,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    }
+  ]
+}

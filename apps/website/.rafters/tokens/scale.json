@@ -1,0 +1,76 @@
+{
+  "category": "scale",
+  "generatedAt": "2025-08-28T17:20:34.076Z",
+  "tokens": [
+    {
+      "name": "hover",
+      "value": "1.02",
+      "category": "scale",
+      "namespace": "scale",
+      "semanticMeaning": "Subtle hover scale for interactive elements",
+      "scalePosition": 0,
+      "cognitiveLoad": 2,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "card", "interactive"],
+      "interactionType": "hover"
+    },
+    {
+      "name": "active",
+      "value": "0.98",
+      "category": "scale",
+      "namespace": "scale",
+      "semanticMeaning": "Active/pressed scale for buttons",
+      "scalePosition": 1,
+      "cognitiveLoad": 1,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "card", "interactive"],
+      "interactionType": "active"
+    },
+    {
+      "name": "focus",
+      "value": "1.05",
+      "category": "scale",
+      "namespace": "scale",
+      "semanticMeaning": "Focus scale for accessibility",
+      "scalePosition": 2,
+      "cognitiveLoad": 3,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "card", "interactive"],
+      "interactionType": "focus"
+    },
+    {
+      "name": "disabled",
+      "value": "0.95",
+      "category": "scale",
+      "namespace": "scale",
+      "semanticMeaning": "Disabled state scale",
+      "scalePosition": 3,
+      "cognitiveLoad": 1,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "card", "interactive"],
+      "interactionType": "disabled"
+    },
+    {
+      "name": "emphasis",
+      "value": "1.1",
+      "category": "scale",
+      "namespace": "scale",
+      "semanticMeaning": "Emphasis scale for important elements",
+      "scalePosition": 4,
+      "cognitiveLoad": 4,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "card", "interactive"]
+    },
+    {
+      "name": "dramatic",
+      "value": "1.25",
+      "category": "scale",
+      "namespace": "scale",
+      "semanticMeaning": "Dramatic scale for animations",
+      "scalePosition": 5,
+      "cognitiveLoad": 7,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "card", "interactive"]
+    }
+  ]
+}

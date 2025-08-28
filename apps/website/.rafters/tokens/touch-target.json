@@ -1,0 +1,54 @@
+{
+  "category": "touch-target",
+  "generatedAt": "2025-08-28T17:20:34.075Z",
+  "tokens": [
+    {
+      "name": "min",
+      "value": "44px",
+      "category": "touch-target",
+      "namespace": "touch",
+      "semanticMeaning": "WCAG AAA minimum touch target",
+      "scalePosition": 0,
+      "touchTargetSize": 44,
+      "accessibilityLevel": "AAA",
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "link", "interactive", "icon-button"]
+    },
+    {
+      "name": "comfortable",
+      "value": "48px",
+      "category": "touch-target",
+      "namespace": "touch",
+      "semanticMeaning": "Comfortable touch target",
+      "scalePosition": 1,
+      "touchTargetSize": 48,
+      "accessibilityLevel": "AA",
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "link", "interactive", "icon-button"]
+    },
+    {
+      "name": "generous",
+      "value": "56px",
+      "category": "touch-target",
+      "namespace": "touch",
+      "semanticMeaning": "Generous touch target for accessibility",
+      "scalePosition": 2,
+      "touchTargetSize": 56,
+      "accessibilityLevel": "AA",
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "link", "interactive", "icon-button"]
+    },
+    {
+      "name": "large",
+      "value": "64px",
+      "category": "touch-target",
+      "namespace": "touch",
+      "semanticMeaning": "Large touch target for primary actions",
+      "scalePosition": 3,
+      "touchTargetSize": 64,
+      "accessibilityLevel": "AA",
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "link", "interactive", "icon-button"]
+    }
+  ]
+}

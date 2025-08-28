@@ -1,0 +1,76 @@
+{
+  "category": "shadow",
+  "generatedAt": "2025-08-28T17:20:34.073Z",
+  "tokens": [
+    {
+      "name": "none",
+      "value": "none",
+      "category": "shadow",
+      "namespace": "shadow",
+      "semanticMeaning": "No shadow, flat appearance",
+      "scalePosition": 0,
+      "generateUtilityClass": true,
+      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"]
+    },
+    {
+      "name": "sm",
+      "value": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+      "category": "shadow",
+      "namespace": "shadow",
+      "semanticMeaning": "Subtle depth for cards",
+      "scalePosition": 1,
+      "generateUtilityClass": true,
+      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"]
+    },
+    {
+      "name": "base",
+      "value": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+      "category": "shadow",
+      "namespace": "shadow",
+      "semanticMeaning": "Standard card shadow",
+      "scalePosition": 2,
+      "generateUtilityClass": true,
+      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"]
+    },
+    {
+      "name": "md",
+      "value": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+      "category": "shadow",
+      "namespace": "shadow",
+      "semanticMeaning": "Elevated components",
+      "scalePosition": 3,
+      "generateUtilityClass": true,
+      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"]
+    },
+    {
+      "name": "lg",
+      "value": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+      "category": "shadow",
+      "namespace": "shadow",
+      "semanticMeaning": "Floating elements",
+      "scalePosition": 4,
+      "generateUtilityClass": true,
+      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"]
+    },
+    {
+      "name": "xl",
+      "value": "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+      "category": "shadow",
+      "namespace": "shadow",
+      "semanticMeaning": "Modal/dialog shadow",
+      "scalePosition": 5,
+      "generateUtilityClass": true,
+      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"]
+    },
+    {
+      "name": "2xl",
+      "value": "0 25px 50px -12px rgb(0 0 0 / 0.25)",
+      "category": "shadow",
+      "namespace": "shadow",
+      "semanticMeaning": "Maximum elevation",
+      "scalePosition": 6,
+      "generateUtilityClass": true,
+      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"]
+    }
+  ]
+}

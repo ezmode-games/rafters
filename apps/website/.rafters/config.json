@@ -1,7 +1,11 @@
 {
   "version": "1.0.0",
-  "hasStorybook": false,
-  "componentsDir": "./app/components/ui",
+  "componentsDir": "./src/components/ui",
   "storiesDir": "./src/stories",
-  "packageManager": "pnpm"
+  "hasStorybook": false,
+  "packageManager": "pnpm",
+  "registry": "https://rafters.realhandy.tech/api/registry",
+  "cssFile": "src/app/globals.css",
+  "tailwindVersion": "v4",
+  "tokenFormat": "tailwind"
 }

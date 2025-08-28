@@ -25,7 +25,7 @@
  * - Cognitive Load: https://rafters.realhandy.tech/docs/llm/cognitive-load
  * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
  *
- * @dependencies @radix-ui/react-tabs, @rafters/design-tokens/motion
+ * @dependencies @radix-ui/react-tabs
  *
  * @example
  * ```tsx

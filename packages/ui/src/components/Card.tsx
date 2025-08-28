@@ -26,7 +26,7 @@ import { cn } from '../lib/utils';
  * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
  * - Spatial Relationships: https://rafters.realhandy.tech/docs/llm/spatial-relationships
  *
- * @dependencies @rafters/design-tokens/motion
+ * @dependencies none
  *
  * @example
  * ```tsx

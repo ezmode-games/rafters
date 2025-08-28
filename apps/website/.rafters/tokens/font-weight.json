@@ -1,0 +1,96 @@
+{
+  "category": "font-weight",
+  "generatedAt": "2025-08-28T17:20:34.075Z",
+  "tokens": [
+    {
+      "name": "thin",
+      "value": "100",
+      "category": "font-weight",
+      "namespace": "font-weight",
+      "semanticMeaning": "Thin weight for delicate text",
+      "scalePosition": 0,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text"]
+    },
+    {
+      "name": "extralight",
+      "value": "200",
+      "category": "font-weight",
+      "namespace": "font-weight",
+      "semanticMeaning": "Extra light weight",
+      "scalePosition": 1,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text"]
+    },
+    {
+      "name": "light",
+      "value": "300",
+      "category": "font-weight",
+      "namespace": "font-weight",
+      "semanticMeaning": "Light weight for subtle text",
+      "scalePosition": 2,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text"]
+    },
+    {
+      "name": "normal",
+      "value": "400",
+      "category": "font-weight",
+      "namespace": "font-weight",
+      "semanticMeaning": "Normal weight for body text",
+      "scalePosition": 3,
+      "generateUtilityClass": true,
+      "applicableComponents": ["p", "span", "body"]
+    },
+    {
+      "name": "medium",
+      "value": "500",
+      "category": "font-weight",
+      "namespace": "font-weight",
+      "semanticMeaning": "Medium weight for emphasis",
+      "scalePosition": 4,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text"]
+    },
+    {
+      "name": "semibold",
+      "value": "600",
+      "category": "font-weight",
+      "namespace": "font-weight",
+      "semanticMeaning": "Semi-bold for subheadings",
+      "scalePosition": 5,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text"]
+    },
+    {
+      "name": "bold",
+      "value": "700",
+      "category": "font-weight",
+      "namespace": "font-weight",
+      "semanticMeaning": "Bold for headings and emphasis",
+      "scalePosition": 6,
+      "generateUtilityClass": true,
+      "applicableComponents": ["h1", "h2", "h3", "strong"]
+    },
+    {
+      "name": "extrabold",
+      "value": "800",
+      "category": "font-weight",
+      "namespace": "font-weight",
+      "semanticMeaning": "Extra bold for strong emphasis",
+      "scalePosition": 7,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text"]
+    },
+    {
+      "name": "black",
+      "value": "900",
+      "category": "font-weight",
+      "namespace": "font-weight",
+      "semanticMeaning": "Black weight for maximum impact",
+      "scalePosition": 8,
+      "generateUtilityClass": true,
+      "applicableComponents": ["text"]
+    }
+  ]
+}

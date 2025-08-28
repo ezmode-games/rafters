@@ -1,0 +1,96 @@
+{
+  "category": "border-radius",
+  "generatedAt": "2025-08-28T17:20:34.074Z",
+  "tokens": [
+    {
+      "name": "none",
+      "value": "0",
+      "category": "border-radius",
+      "namespace": "radius",
+      "semanticMeaning": "No border radius, sharp corners",
+      "scalePosition": 0,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "input", "card", "modal", "badge", "avatar"]
+    },
+    {
+      "name": "sm",
+      "value": "0.125rem",
+      "category": "border-radius",
+      "namespace": "radius",
+      "semanticMeaning": "Small radius for subtle rounding",
+      "scalePosition": 1,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "input", "card", "modal", "badge", "avatar"]
+    },
+    {
+      "name": "base",
+      "value": "0.25rem",
+      "category": "border-radius",
+      "namespace": "radius",
+      "semanticMeaning": "Default radius for most components",
+      "scalePosition": 2,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "input", "card", "modal", "badge", "avatar"]
+    },
+    {
+      "name": "md",
+      "value": "0.375rem",
+      "category": "border-radius",
+      "namespace": "radius",
+      "semanticMeaning": "Medium radius for cards and panels",
+      "scalePosition": 3,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "input", "card", "modal", "badge", "avatar"]
+    },
+    {
+      "name": "lg",
+      "value": "0.5rem",
+      "category": "border-radius",
+      "namespace": "radius",
+      "semanticMeaning": "Large radius for prominent elements",
+      "scalePosition": 4,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "input", "card", "modal", "badge", "avatar"]
+    },
+    {
+      "name": "xl",
+      "value": "0.75rem",
+      "category": "border-radius",
+      "namespace": "radius",
+      "semanticMeaning": "Extra large radius for hero elements",
+      "scalePosition": 5,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "input", "card", "modal", "badge", "avatar"]
+    },
+    {
+      "name": "2xl",
+      "value": "1rem",
+      "category": "border-radius",
+      "namespace": "radius",
+      "semanticMeaning": "Maximum standard radius",
+      "scalePosition": 6,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "input", "card", "modal", "badge", "avatar"]
+    },
+    {
+      "name": "3xl",
+      "value": "1.5rem",
+      "category": "border-radius",
+      "namespace": "radius",
+      "semanticMeaning": "Very large radius for special cases",
+      "scalePosition": 7,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "input", "card", "modal", "badge", "avatar"]
+    },
+    {
+      "name": "full",
+      "value": "9999px",
+      "category": "border-radius",
+      "namespace": "radius",
+      "semanticMeaning": "Fully rounded (pills, avatars)",
+      "scalePosition": 8,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "input", "card", "modal", "badge", "avatar"]
+    }
+  ]
+}

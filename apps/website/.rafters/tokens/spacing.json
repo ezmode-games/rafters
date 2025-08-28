@@ -1,0 +1,149 @@
+{
+  "category": "spacing",
+  "generatedAt": "2025-08-28T17:20:34.072Z",
+  "tokens": [
+    {
+      "name": "0",
+      "value": "0rem",
+      "category": "spacing",
+      "namespace": "spacing",
+      "semanticMeaning": "Spacing step 0 in linear scale",
+      "mathRelationship": "4 * 0 / 4",
+      "scalePosition": 0,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "1",
+      "value": "1rem",
+      "category": "spacing",
+      "namespace": "spacing",
+      "semanticMeaning": "Spacing step 1 in linear scale",
+      "mathRelationship": "4 * 1 / 4",
+      "scalePosition": 1,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "2",
+      "value": "2rem",
+      "category": "spacing",
+      "namespace": "spacing",
+      "semanticMeaning": "Spacing step 2 in linear scale",
+      "mathRelationship": "4 * 2 / 4",
+      "scalePosition": 2,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "3",
+      "value": "3rem",
+      "category": "spacing",
+      "namespace": "spacing",
+      "semanticMeaning": "Spacing step 3 in linear scale",
+      "mathRelationship": "4 * 3 / 4",
+      "scalePosition": 3,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "4",
+      "value": "4rem",
+      "category": "spacing",
+      "namespace": "spacing",
+      "semanticMeaning": "Spacing step 4 in linear scale",
+      "mathRelationship": "4 * 4 / 4",
+      "scalePosition": 4,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "5",
+      "value": "5rem",
+      "category": "spacing",
+      "namespace": "spacing",
+      "semanticMeaning": "Spacing step 5 in linear scale",
+      "mathRelationship": "4 * 5 / 4",
+      "scalePosition": 5,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "6",
+      "value": "6rem",
+      "category": "spacing",
+      "namespace": "spacing",
+      "semanticMeaning": "Spacing step 6 in linear scale",
+      "mathRelationship": "4 * 6 / 4",
+      "scalePosition": 6,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "7",
+      "value": "7rem",
+      "category": "spacing",
+      "namespace": "spacing",
+      "semanticMeaning": "Spacing step 7 in linear scale",
+      "mathRelationship": "4 * 7 / 4",
+      "scalePosition": 7,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "8",
+      "value": "8rem",
+      "category": "spacing",
+      "namespace": "spacing",
+      "semanticMeaning": "Spacing step 8 in linear scale",
+      "mathRelationship": "4 * 8 / 4",
+      "scalePosition": 8,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "9",
+      "value": "9rem",
+      "category": "spacing",
+      "namespace": "spacing",
+      "semanticMeaning": "Spacing step 9 in linear scale",
+      "mathRelationship": "4 * 9 / 4",
+      "scalePosition": 9,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "10",
+      "value": "10rem",
+      "category": "spacing",
+      "namespace": "spacing",
+      "semanticMeaning": "Spacing step 10 in linear scale",
+      "mathRelationship": "4 * 10 / 4",
+      "scalePosition": 10,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "11",
+      "value": "11rem",
+      "category": "spacing",
+      "namespace": "spacing",
+      "semanticMeaning": "Spacing step 11 in linear scale",
+      "mathRelationship": "4 * 11 / 4",
+      "scalePosition": 11,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "12",
+      "value": "12rem",
+      "category": "spacing",
+      "namespace": "spacing",
+      "semanticMeaning": "Spacing step 12 in linear scale",
+      "mathRelationship": "4 * 12 / 4",
+      "scalePosition": 12,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "category": "opacity",
+  "generatedAt": "2025-08-28T17:20:34.075Z",
+  "tokens": [
+    {
+      "name": "disabled",
+      "value": "0.5",
+      "category": "opacity",
+      "namespace": "opacity",
+      "semanticMeaning": "Disabled state opacity",
+      "scalePosition": 0,
+      "generateUtilityClass": true,
+      "applicableComponents": ["button", "input", "text"],
+      "interactionType": "disabled"
+    },
+    {
+      "name": "loading",
+      "value": "0.7",
+      "category": "opacity",
+      "namespace": "opacity",
+      "semanticMeaning": "Loading state opacity",
+      "scalePosition": 1,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"],
+      "interactionType": "loading"
+    },
+    {
+      "name": "overlay",
+      "value": "0.8",
+      "category": "opacity",
+      "namespace": "opacity",
+      "semanticMeaning": "Modal overlay background",
+      "scalePosition": 2,
+      "generateUtilityClass": true,
+      "applicableComponents": ["modal", "dialog"]
+    },
+    {
+      "name": "backdrop",
+      "value": "0.25",
+      "category": "opacity",
+      "namespace": "opacity",
+      "semanticMeaning": "Subtle backdrop opacity",
+      "scalePosition": 3,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "hover",
+      "value": "0.9",
+      "category": "opacity",
+      "namespace": "opacity",
+      "semanticMeaning": "Hover state opacity",
+      "scalePosition": 4,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"],
+      "interactionType": "hover"
+    },
+    {
+      "name": "focus",
+      "value": "1",
+      "category": "opacity",
+      "namespace": "opacity",
+      "semanticMeaning": "Focus state (full opacity)",
+      "scalePosition": 5,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"],
+      "interactionType": "focus"
+    }
+  ]
+}

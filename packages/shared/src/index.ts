@@ -7,7 +7,7 @@
  */
 
 // Export all types and schemas
-export * from './types.js';
+export * from './types';
 
 // Utility functions for AI intelligence
 export const DEFAULT_COGNITIVE_LOADS = {
@@ -62,21 +62,12 @@ export const AI_COMPONENT_PATTERNS = {
 } as const;
 
 export const ASCII_LOGO = `
-                    ██▓▓░░                              
-                    ▓▓████▓▓░░                          
-                ░░▓▓████████▓▓░░                      
-            ░░▓▓████▓▓░░▓▓████▓▓░░                  
-        ░░▓▓████▓▓░░    ░░▓▓████▓▓░░              
-    ░░▓▓████▓▓░░            ░░▓▓████▓▓░░          
-░░▓▓████▓▓░░                    ░░▓▓████▓▓░░      
-████▓▓░░                            ░░▓▓████      
-░░░░                                      ░░░░    
-
- ▄▄▄▄ ▄▄▄▄ ▄▄▄▄▄▄▄▄ ▄▄▄▄ ▄▄▄▄ ▄▄▄▄
- ████ ████ ████ ███ ████ ████ ████
- ▓▓▓▓ ▓▓▓▓ ▓▓▓▓     ▓▓▓▓ ▓▓▓▓ ▓▓▓▓
- ▒▒▒▒▒▒▒▒  ▒▒▒▒     ▒▒▒▒▒▒▒▒  ▒▒▒▒
- ░░░░░░    ░░░░     ░░░░░░    ░░░░`;
+██████   █████  ███████ ████████ ███████ ██████  ███████
+██   ██ ██   ██ ██         ██    ██      ██   ██ ██     
+██████  ███████ █████      ██    █████   ██████  ███████
+██   ██ ██   ██ ██         ██    ██      ██   ██      ██
+██   ██ ██   ██ ██         ██    ███████ ██   ██ ███████
+`;
 
 // Export React components from separate file
-export * from './components.js';
+export * from './components';

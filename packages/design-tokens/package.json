@@ -1,15 +1,17 @@
 {
   "name": "@rafters/design-tokens",
-  "version": "0.1.1",
+  "version": "0.1.13",
   "description": "Generated design systems and semantic tokens for Rafters AI intelligence system",
   "type": "module",
-  "private": true,
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "dist": {
     "directory": "dist",
     "format": "esm"
   },
   "files": ["dist", "tokens", "README.md"],
-
   "main": "./dist/index.js",
   "types": "./dist/index.d.js",
   "scripts": {
@@ -24,6 +26,7 @@
   "devDependencies": {
     "@types/fs-extra": "catalog:",
     "@types/node": "catalog:",
+    "tsup": "^8.5.0",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },

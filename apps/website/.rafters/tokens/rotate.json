@@ -1,0 +1,46 @@
+{
+  "category": "rotate",
+  "generatedAt": "2025-08-28T17:20:34.077Z",
+  "tokens": [
+    {
+      "name": "flip",
+      "value": "180deg",
+      "category": "rotate",
+      "namespace": "rotate",
+      "semanticMeaning": "Flip rotation for icons and arrows",
+      "scalePosition": 0,
+      "generateUtilityClass": true,
+      "applicableComponents": ["icon", "arrow", "dropdown"]
+    },
+    {
+      "name": "quarter",
+      "value": "90deg",
+      "category": "rotate",
+      "namespace": "rotate",
+      "semanticMeaning": "Quarter turn rotation",
+      "scalePosition": 1,
+      "generateUtilityClass": true,
+      "applicableComponents": ["icon", "arrow", "dropdown"]
+    },
+    {
+      "name": "half",
+      "value": "180deg",
+      "category": "rotate",
+      "namespace": "rotate",
+      "semanticMeaning": "Half turn rotation",
+      "scalePosition": 2,
+      "generateUtilityClass": true,
+      "applicableComponents": ["icon", "arrow", "dropdown"]
+    },
+    {
+      "name": "three-quarter",
+      "value": "270deg",
+      "category": "rotate",
+      "namespace": "rotate",
+      "semanticMeaning": "Three quarter turn rotation",
+      "scalePosition": 3,
+      "generateUtilityClass": true,
+      "applicableComponents": ["icon", "arrow", "dropdown"]
+    }
+  ]
+}

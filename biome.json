@@ -7,7 +7,8 @@
       "**/build",
       "**/worker-configuration.d.ts",
       "**/.react-router",
-      "**/*.css"
+      "**/*.css",
+      "**/*.d.ts"
     ]
   },
   "vcs": {

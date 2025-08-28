@@ -1999,7 +1999,7 @@ export const checkTailwindVersion = async (cwd: string): Promise<string> => {
 
     if (deps.tailwindcss) {
       const version = deps.tailwindcss;
-      if (version.includes('4.') || version.includes('next')) {
+      if (version.includes('4') || version.includes('next') || version.includes('beta')) {
         return 'v4';
       }
       return 'v3';
@@ -2062,6 +2062,163 @@ export const fetchStudioTokens = async (shortcode: string): Promise<TokenSet> =>
 /**
  * Write token files to project (real implementation)
  */
+/**
+ * Generate CSS following shadcn/ui pattern with CSS variables and @theme inline
+ */
+function generateCSSFromTokens(tokens: Token[]): string {
+  const lines = [
+    '/**',
+    ' * Rafters Design Tokens',
+    ' * Generated following shadcn/ui pattern with embedded design intelligence',
+    ' */',
+    '',
+  ];
+
+  // Group tokens by category
+  const tokensByCategory: Record<string, Token[]> = {};
+  for (const token of tokens) {
+    if (!tokensByCategory[token.category]) {
+      tokensByCategory[token.category] = [];
+    }
+    tokensByCategory[token.category].push(token);
+  }
+
+  // Generate CSS variables in :root with proper namespacing
+  lines.push(':root {');
+  for (const [category, categoryTokens] of Object.entries(tokensByCategory)) {
+    lines.push(`  /* ${category.toUpperCase()} */`);
+
+    for (const token of categoryTokens) {
+      // Namespace variables by category to avoid conflicts
+      const prefix = category.replace(/-/g, '');
+      const varName = `--${prefix}-${token.name.replace(/_/g, '-')}`;
+      if (token.semanticMeaning) {
+        lines.push(`  /* ${token.semanticMeaning} */`);
+      }
+      lines.push(`  ${varName}: ${token.value};`);
+    }
+    lines.push('');
+  }
+  lines.push('}');
+  lines.push('');
+
+  // Generate dark mode overrides (if we have dark variants)
+  const darkTokens = tokens.filter((t) => t.name.includes('dark') || t.value.includes('dark'));
+  if (darkTokens.length > 0) {
+    lines.push('.dark {');
+    lines.push('  /* Dark mode overrides */');
+    for (const token of darkTokens) {
+      const varName = `--${token.name.replace(/_dark/g, '').replace(/_/g, '-')}`;
+      lines.push(`  ${varName}: ${token.value};`);
+    }
+    lines.push('}');
+    lines.push('');
+  }
+
+  // Generate @theme inline mapping (shadcn v4 pattern)
+  lines.push('@theme inline {');
+
+  // Handle breakpoints specially - use actual values, not CSS variables
+  const breakpointTokens = tokensByCategory.breakpoint;
+  if (breakpointTokens && breakpointTokens.length > 0) {
+    lines.push('  /* BREAKPOINT MAPPINGS */');
+    for (const token of breakpointTokens) {
+      const name = token.name.replace(/_/g, '-');
+      lines.push(`  --breakpoint-${name}: ${token.value};`);
+    }
+    lines.push('');
+  }
+
+  // Handle all other categories with CSS variable references
+  for (const [category, categoryTokens] of Object.entries(tokensByCategory)) {
+    if (category === 'breakpoint') continue; // Already handled above
+
+    lines.push(`  /* ${category.toUpperCase()} MAPPINGS */`);
+
+    for (const token of categoryTokens) {
+      // Use the same namespaced variable name as defined above
+      const prefix = category.replace(/-/g, '');
+      const varName = `--${prefix}-${token.name.replace(/_/g, '-')}`;
+
+      // Map to appropriate Tailwind theme keys
+      const mappedKey = mapCategoryToTheme(category, token.name);
+      if (mappedKey) {
+        lines.push(`  ${mappedKey}: var(${varName});`);
+      }
+    }
+    lines.push('');
+  }
+  lines.push('}');
+  lines.push('');
+
+  return lines.join('\n');
+}
+
+/**
+ * Map token categories to Tailwind theme keys
+ */
+function mapCategoryToTheme(category: string, tokenName: string): string | null {
+  const name = tokenName.replace(/_/g, '-');
+
+  switch (category) {
+    case 'color':
+      return `--color-${name}`;
+    case 'spacing':
+      return `--spacing-${name}`;
+    case 'font-size':
+      return `--font-size-${name}`;
+    case 'line-height':
+      return `--line-height-${name}`;
+    case 'font-family':
+      return `--font-family-${name}`;
+    case 'font-weight':
+      return `--font-weight-${name}`;
+    case 'letter-spacing':
+      return `--letter-spacing-${name}`;
+    case 'border-radius':
+      return `--border-radius-${name}`;
+    case 'border-width':
+      return `--border-width-${name}`;
+    case 'shadow':
+      return `--box-shadow-${name}`;
+    case 'z-index':
+      return `--z-index-${name}`;
+    case 'opacity':
+      return `--opacity-${name}`;
+    case 'height':
+      return `--height-${name}`;
+    case 'width':
+      return `--width-${name}`;
+    case 'motion':
+      return `--motion-${name}`;
+    case 'easing':
+      return `--easing-${name}`;
+    case 'backdrop-blur':
+      return `--backdrop-blur-${name}`;
+    case 'scale':
+      return `--scale-${name}`;
+    case 'rotate':
+      return `--rotate-${name}`;
+    case 'translate':
+      return `--translate-${name}`;
+    case 'aspect-ratio':
+      return `--aspect-ratio-${name}`;
+    case 'grid-template-columns':
+      return `--grid-template-columns-${name}`;
+    case 'grid-template-rows':
+      return `--grid-template-rows-${name}`;
+    case 'container':
+      return `--container-${name}`;
+    case 'touch-target':
+      return `--touch-target-${name}`;
+    case 'breakpoint':
+      // Breakpoints need special handling - return actual values, not var() references
+      return null; // We'll handle breakpoints separately
+    default:
+      return `--${category}-${name}`;
+  }
+}
+
 export const writeTokenFiles = async (
   tokenSet: TokenSet,
   format: string,
@@ -2129,6 +2286,14 @@ export const writeTokenFiles = async (
   };
   writeFileSync(registryFile, JSON.stringify(registryData, null, 2));
 
+  // Generate CSS file for the requested format
+  if (format === 'tailwind' || format === 'css') {
+    const cssContent = generateCSSFromTokens(allTokens);
+    const cssFile = join(raftersDir, 'design-tokens.css');
+    writeFileSync(cssFile, cssContent);
+    console.log(`  ✓ Generated design-tokens.css with ${format} format`);
+  }
+
   console.log(`  ✓ Generated ${allTokens.length} design tokens for Studio`);
   console.log(
     `  ✓ Created ${Object.keys(tokensByCategory).length} category files in .rafters/tokens/`
@@ -2137,81 +2302,183 @@ export const writeTokenFiles = async (
 };
 
 /**
- * Inject CSS import into project files (robust implementation)
+ * Install Rafters design system CSS (complete replacement with backup)
+ * Returns information about what was done for CLI to format
  */
-export const injectCSSImport = async (cssFilePath: string, cwd: string): Promise<void> => {
-  console.log(`Injecting design token import into ${cssFilePath}`);
-
+export const injectCSSImport = async (
+  cssFilePath: string,
+  cwd: string
+): Promise<{
+  action: 'created' | 'replaced' | 'skipped';
+  backupPath?: string;
+  message: string;
+}> => {
   const fullCssPath = join(cwd, cssFilePath);
-  const raftersImport = '@import "./.rafters/design-tokens.css";';
+  const tokensFilePath = join(cwd, '.rafters', 'design-tokens.css');
 
-  try {
-    // Check if CSS file exists
-    if (existsSync(fullCssPath)) {
-      const existingContent = readFileSync(fullCssPath, 'utf-8');
+  // Read the generated tokens
+  if (!existsSync(tokensFilePath)) {
+    throw new Error('Design tokens file not found. Run writeTokenFiles first.');
+  }
 
-      // Check if import already exists (various formats)
-      const importPatterns = ['.rafters/design-tokens.css', 'design-tokens.css'];
+  const tokensContent = readFileSync(tokensFilePath, 'utf-8');
 
-      const hasExistingImport = importPatterns.some((pattern) => existingContent.includes(pattern));
+  // Check if CSS file exists
+  if (existsSync(fullCssPath)) {
+    const existingContent = readFileSync(fullCssPath, 'utf-8');
 
-      if (hasExistingImport) {
-        console.log(`  - Import already exists in ${cssFilePath}`);
-        return;
-      }
+    // Check if already installed
+    if (existingContent.includes('Rafters Design System')) {
+      return {
+        action: 'skipped',
+        message: `Rafters design system already installed in ${cssFilePath}`,
+      };
+    }
 
-      // Find the best place to add the import
-      const lines = existingContent.split('\n');
-      let insertIndex = 0;
+    // Create backup of existing file
+    const backupPath = `${fullCssPath}.bak`;
+    writeFileSync(backupPath, existingContent);
 
-      // Look for existing @import statements and add after them
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (line.startsWith('@import')) {
-          insertIndex = i + 1;
-        } else if (
-          line.startsWith('@tailwind') ||
-          line.startsWith('@theme') ||
-          (line.startsWith('/*') && line.includes('Tailwind'))
-        ) {
-          // Insert before Tailwind directives
-          break;
-        } else if (line.length > 0 && !line.startsWith('@import') && insertIndex === 0) {
-          // If we haven't found imports, insert at the very top
-          insertIndex = i;
-          break;
-        }
-      }
+    // Create complete Rafters design system CSS
+    const raftersCSS = generateCompleteDesignSystemCSS(tokensContent);
 
-      // Insert the import
-      lines.splice(insertIndex, 0, raftersImport);
-      const newContent = lines.join('\n');
+    // Write the complete design system
+    writeFileSync(fullCssPath, raftersCSS);
 
-      writeFileSync(fullCssPath, newContent);
-      console.log(`  ✓ Added import to existing ${cssFilePath}`);
-    } else {
-      // Create the CSS file with basic Tailwind v4 setup
-      const basicContent = `${raftersImport}
+    return {
+      action: 'replaced',
+      backupPath: `${cssFilePath}.bak`,
+      message: `Installed complete Rafters design system into ${cssFilePath}`,
+    };
+  }
+  // Create new file
+  const raftersCSS = generateCompleteDesignSystemCSS(tokensContent);
+
+  // Ensure directory exists
+  const dir = join(cwd, ...cssFilePath.split('/').slice(0, -1));
+  if (dir !== cwd) {
+    ensureDirSync(dir);
+  }
+
+  // Write the complete design system
+  writeFileSync(fullCssPath, raftersCSS);
+
+  return {
+    action: 'created',
+    message: `Created ${cssFilePath} with Rafters design system`,
+  };
+};
+
+/**
+ * Generate complete design system CSS file
+ */
+function generateCompleteDesignSystemCSS(tokensContent: string): string {
+  return `/**
+ * Rafters Design System
+ * Complete design system installation with AI-embedded design intelligence
+ * 
+ * This file contains the complete Rafters design system including:
+ * - Design tokens with semantic meaning
+ * - Accessibility-first patterns  
+ * - Cognitive load optimizations
+ * - Trust-building color hierarchies
+ * - Progressive enhancement support
+ */
 
 @import "tailwindcss";
 
-/* Your custom styles go here */
-`;
+${tokensContent}
 
-      // Ensure directory exists
-      const dir = join(cwd, ...cssFilePath.split('/').slice(0, -1));
-      if (dir !== cwd) {
-        ensureDirSync(dir);
-      }
-
-      writeFileSync(fullCssPath, basicContent);
-      console.log(`  ✓ Created ${cssFilePath} with design token import`);
-    }
-  } catch (error) {
-    console.error(`  ✗ Failed to inject import: ${error}`);
-    throw error;
+/**
+ * Base layer styles with design intelligence
+ */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-};
+  
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Accessibility: Respect user motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+  
+  /* Typography intelligence: Optimized reading experience */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: var(--font-weight-semibold, 600);
+    line-height: 1.2;
+  }
+  
+  p {
+    line-height: 1.6;
+  }
+  
+  /* Focus management for accessibility */
+  [data-focus-visible-added]:focus {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+  
+  /* Trust building: Clear interactive states */
+  button, [role="button"] {
+    cursor: pointer;
+    transition: all 150ms ease;
+  }
+  
+  button:disabled, [role="button"][aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+/**
+ * Component layer: Systematic design patterns
+ */
+@layer components {
+  /* Attention economics: Visual hierarchy utilities */
+  .attention-primary {
+    @apply bg-primary text-primary-foreground font-semibold;
+  }
+  
+  .attention-secondary {
+    @apply bg-secondary text-secondary-foreground;
+  }
+  
+  .attention-subtle {
+    @apply bg-muted text-muted-foreground;
+  }
+  
+  /* Cognitive load: Progressive disclosure patterns */
+  .cognitive-simple {
+    @apply space-y-2;
+  }
+  
+  .cognitive-moderate {
+    @apply space-y-4;
+  }
+  
+  .cognitive-complex {
+    @apply space-y-6;
+  }
+}
+
+/**
+ * Your custom styles go here
+ * Add project-specific overrides below this comment
+ */
+`;
+}
 
 // Export for CLI compatibility
 export default {

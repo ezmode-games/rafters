@@ -25,7 +25,7 @@
  * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
  * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
  *
- * @dependencies @radix-ui/react-select, @radix-ui/react-icons, @rafters/design-tokens/motion
+ * @dependencies @radix-ui/react-select, @radix-ui/react-icons
  *
  * @example
  * ```tsx

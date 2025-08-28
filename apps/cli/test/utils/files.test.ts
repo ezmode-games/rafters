@@ -23,22 +23,20 @@ describe('files', () => {
   describe('createComponentPath', () => {
     it('should create correct component path', () => {
       const result = createComponentPath('src/components', 'button');
-      expect(result).toBe(join('src/components', 'ui', 'button.tsx'));
+      expect(result).toBe(join('src/components', 'button.tsx'));
     });
 
     it('should handle different component names', () => {
-      expect(createComponentPath('components', 'input')).toBe(
-        join('components', 'ui', 'input.tsx')
-      );
-      expect(createComponentPath('./lib', 'card')).toBe(join('./lib', 'ui', 'card.tsx'));
+      expect(createComponentPath('components', 'input')).toBe(join('components', 'input.tsx'));
+      expect(createComponentPath('./lib', 'card')).toBe(join('./lib', 'card.tsx'));
     });
 
     it('should normalize paths correctly', () => {
       expect(createComponentPath('src/components/', 'button')).toBe(
-        join('src/components', 'ui', 'button.tsx')
+        join('src/components', 'button.tsx')
       );
       expect(createComponentPath('src\\components', 'button')).toBe(
-        join('src\\components', 'ui', 'button.tsx')
+        join('src\\components', 'button.tsx')
       );
     });
   });

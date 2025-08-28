@@ -1,24 +1,14 @@
-/**
- * For more details on how to configure Wrangler, refer to:
- * https://developers.cloudflare.com/workers/wrangler/configuration/
- */
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "rafters-website",
-  "compatibility_date": "2025-04-04",
-  "compatibility_flags": ["nodejs_compat"],
-  "main": "./workers/app.ts",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-03-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".open-next/assets"
+  },
   "observability": {
     "enabled": true
-  },
-  "routes": [
-    {
-      "pattern": "rafters.realhandy.tech",
-      "custom_domain": true
-    }
-  ],
-  "dev": {
-    "port": 3000,
-    "local_protocol": "http"
   }
 }

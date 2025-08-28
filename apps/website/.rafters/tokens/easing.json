@@ -1,0 +1,66 @@
+{
+  "category": "easing",
+  "generatedAt": "2025-08-28T17:20:34.074Z",
+  "tokens": [
+    {
+      "name": "linear",
+      "value": "linear",
+      "category": "easing",
+      "namespace": "ease",
+      "semanticMeaning": "Linear timing for mechanical movement",
+      "scalePosition": 0,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "smooth",
+      "value": "ease-in-out",
+      "category": "easing",
+      "namespace": "ease",
+      "semanticMeaning": "Smooth natural movement",
+      "scalePosition": 1,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "accelerating",
+      "value": "ease-out",
+      "category": "easing",
+      "namespace": "ease",
+      "semanticMeaning": "Welcoming entrance animation",
+      "scalePosition": 2,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "decelerating",
+      "value": "ease-in",
+      "category": "easing",
+      "namespace": "ease",
+      "semanticMeaning": "Graceful exit animation",
+      "scalePosition": 3,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "bouncy",
+      "value": "cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+      "category": "easing",
+      "namespace": "ease",
+      "semanticMeaning": "Playful bounce for celebrations",
+      "scalePosition": 4,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    },
+    {
+      "name": "snappy",
+      "value": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+      "category": "easing",
+      "namespace": "ease",
+      "semanticMeaning": "Sharp responsive feedback",
+      "scalePosition": 5,
+      "generateUtilityClass": true,
+      "applicableComponents": ["all"]
+    }
+  ]
+}

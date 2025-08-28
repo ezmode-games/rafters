@@ -1,0 +1,72 @@
+{
+  "category": "breakpoint",
+  "generatedAt": "2025-08-28T17:20:34.075Z",
+  "tokens": [
+    {
+      "name": "xs",
+      "value": "320px",
+      "category": "breakpoint",
+      "namespace": "screen",
+      "semanticMeaning": "Extra small mobile devices",
+      "scalePosition": 0,
+      "generateUtilityClass": false,
+      "applicableComponents": ["layout", "grid", "responsive"],
+      "viewportAware": true
+    },
+    {
+      "name": "sm",
+      "value": "640px",
+      "category": "breakpoint",
+      "namespace": "screen",
+      "semanticMeaning": "Small tablets and large phones",
+      "scalePosition": 1,
+      "generateUtilityClass": false,
+      "applicableComponents": ["layout", "grid", "responsive"],
+      "viewportAware": true
+    },
+    {
+      "name": "md",
+      "value": "768px",
+      "category": "breakpoint",
+      "namespace": "screen",
+      "semanticMeaning": "Medium tablets",
+      "scalePosition": 2,
+      "generateUtilityClass": false,
+      "applicableComponents": ["layout", "grid", "responsive"],
+      "viewportAware": true
+    },
+    {
+      "name": "lg",
+      "value": "1024px",
+      "category": "breakpoint",
+      "namespace": "screen",
+      "semanticMeaning": "Large tablets and small laptops",
+      "scalePosition": 3,
+      "generateUtilityClass": false,
+      "applicableComponents": ["layout", "grid", "responsive"],
+      "viewportAware": true
+    },
+    {
+      "name": "xl",
+      "value": "1280px",
+      "category": "breakpoint",
+      "namespace": "screen",
+      "semanticMeaning": "Large laptops and desktops",
+      "scalePosition": 4,
+      "generateUtilityClass": false,
+      "applicableComponents": ["layout", "grid", "responsive"],
+      "viewportAware": true
+    },
+    {
+      "name": "2xl",
+      "value": "1536px",
+      "category": "breakpoint",
+      "namespace": "screen",
+      "semanticMeaning": "Large desktops and ultrawide",
+      "scalePosition": 5,
+      "generateUtilityClass": false,
+      "applicableComponents": ["layout", "grid", "responsive"],
+      "viewportAware": true
+    }
+  ]
+}
