@@ -14,6 +14,26 @@ Cognitive Load      --color-primary      text-destructive   Trust patterns
 Trust Levels        oklch(0.45 0.12...)  hover:bg-primary/90  Usage rules
 ```
 
+## ⚠️ CRITICAL ARCHITECTURAL PRINCIPLE ⚠️
+
+**JSON FILES ARE THE SINGLE SOURCE OF TRUTH**
+
+- **NO defaults in code** - generators create initial JSON files, then JSON files are the truth
+- **NO hardcoded token values** - always read from `.rafters/tokens/*.json` files  
+- **NO fallback token generation** - if JSON files don't exist, create them first, then read them
+- **Studio modifies JSON files** - humans edit tokens through Studio interface
+- **CLI only reads JSON files** - `createRegistry()` reads existing JSON, never creates tokens
+
+**Correct Flow:**
+1. **CLI init** → Generators create `.rafters/tokens/*.json` files → `createRegistry()` reads JSON files
+2. **Studio usage** → Humans modify JSON files → `createRegistry()` reads updated JSON files  
+3. **CLI operations** → Always `createRegistry()` reads JSON files
+
+**NEVER:**
+- ❌ `createDefaultRegistry()` with hardcoded values
+- ❌ Bypassing JSON files with in-memory token generation
+- ❌ Fallback to hardcoded tokens when JSON files exist
+
 ## Core Concept
 
 **Every token is more than a value - it's embedded design reasoning.**

@@ -69,16 +69,92 @@ export const ExampleSchema = z.object({
 
 export type Intelligence = z.infer<typeof IntelligenceSchema>;
 
-// Design Token for AI systems
-export const SemanticTokenSchema = z.object({
-  name: z.string(),
-  value: z.string(), // CSS value (OKLCH, px, rem, etc.)
-  type: z.enum(['color', 'spacing', 'typography', 'shadow', 'border']),
-  semantic: z.string(), // Semantic meaning for AI understanding
-  aiIntelligence: z.string().optional(), // AI-specific usage guidance
+// Color Value Schema for complex color structures
+export const ColorValueSchema = z.object({
+  values: z.array(z.string()).optional(), // OKLCH values array [50, 100, 200...900] positions
+  darkValues: z.array(z.string()).optional(), // Dark mode OKLCH values array
+  baseColor: z.string().optional(), // "blue-800" reference for semantic tokens
+  states: z.record(z.string(), z.string()).optional(), // { hover: "blue-900", focus: "blue-700", ... }
+  darkStates: z.record(z.string(), z.string()).optional(), // Dark mode states
 });
 
-export type SemanticToken = z.infer<typeof SemanticTokenSchema>;
+export type ColorValue = z.infer<typeof ColorValueSchema>;
+
+// Comprehensive Design Token Schema - Single Source of Truth
+export const TokenSchema = z.object({
+  // Core token data
+  name: z.string(),
+  value: z.union([z.string(), ColorValueSchema]), // Simple string OR complex color structure
+  darkValue: z.union([z.string(), ColorValueSchema]).optional(), // Same for dark mode
+  category: z.string(),
+  namespace: z.string(),
+
+  // Typography-specific properties
+  lineHeight: z.string().optional(),
+
+  // AI Intelligence (comprehensive)
+  semanticMeaning: z.string().optional(),
+  usageContext: z.array(z.string()).optional(),
+  trustLevel: z.enum(['low', 'medium', 'high', 'critical']).optional(),
+  cognitiveLoad: z.number().min(1).max(10).optional(),
+  accessibilityLevel: z.enum(['AA', 'AAA']).optional(),
+  consequence: z.enum(['reversible', 'significant', 'permanent', 'destructive']).optional(),
+
+  // Mathematical relationships
+  generatedFrom: z.string().optional(),
+  mathRelationship: z.string().optional(),
+  scalePosition: z.number().optional(), // Position in color/spacing scale
+
+  // Responsive behavior
+  containerQueryAware: z.boolean().optional(),
+  pointerTypeAware: z.boolean().optional(),
+  reducedMotionAware: z.boolean().optional(),
+  viewportAware: z.boolean().optional(), // Should generate responsive variants
+
+  // Component associations
+  applicableComponents: z.array(z.string()).optional(), // ["button", "input", "card"]
+  requiredForComponents: z.array(z.string()).optional(), // Critical dependencies
+
+  // Interaction patterns
+  interactionType: z.enum(['hover', 'focus', 'active', 'disabled', 'loading']).optional(),
+  animationSafe: z.boolean().optional(), // Safe for vestibular disorders
+  highContrastMode: z.string().optional(), // Value for high contrast mode
+
+  // Export behavior
+  generateUtilityClass: z.boolean().optional(), // Should create @utility class
+  tailwindOverride: z.boolean().optional(), // Overrides default TW value
+  customPropertyOnly: z.boolean().optional(), // CSS var only, no utility
+
+  // Validation hints (for human Studio validation)
+  contrastRatio: z.number().optional(), // Pre-calculated contrast
+  touchTargetSize: z.number().optional(), // Pre-calculated size in px
+  motionDuration: z.number().optional(), // Duration in ms
+
+  // Design system relationships
+  pairedWith: z.array(z.string()).optional(), // Other tokens used together
+  conflictsWith: z.array(z.string()).optional(), // Tokens that shouldn't be used together
+
+  // Meta information
+  description: z.string().optional(),
+  deprecated: z.boolean().optional(),
+  version: z.string().optional(),
+  lastModified: z.string().optional(),
+});
+
+export type Token = z.infer<typeof TokenSchema>;
+
+// Legacy alias for backward compatibility
+export const SemanticTokenSchema = TokenSchema;
+export type SemanticToken = Token;
+
+// Token Set Schema - Collection of tokens with metadata
+export const TokenSetSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  tokens: z.array(TokenSchema),
+});
+
+export type TokenSet = z.infer<typeof TokenSetSchema>;
 
 // Design System Configuration
 export const DesignSystemSchema = z.object({

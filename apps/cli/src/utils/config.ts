@@ -5,8 +5,6 @@ import { z } from 'zod';
 export const ConfigSchema = z.object({
   version: z.string(),
   componentsDir: z.string(),
-  storiesDir: z.string().optional(),
-  hasStorybook: z.boolean(),
   packageManager: z.enum(['npm', 'yarn', 'pnpm']),
   registry: z.string().url(),
   cssFile: z.string().optional(), // CSS file to inject imports into
@@ -19,8 +17,6 @@ export type Config = z.infer<typeof ConfigSchema>;
 export const defaultConfig: Config = {
   version: '1.0.0',
   componentsDir: './src/components/ui',
-  storiesDir: './src/stories',
-  hasStorybook: false,
   packageManager: 'npm',
   registry: 'https://rafters.realhandy.tech/api/registry',
   cssFile: 'globals.css', // Default CSS file for Tailwind v4

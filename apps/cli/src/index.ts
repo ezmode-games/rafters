@@ -5,6 +5,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Command } from 'commander';
 import { addCommand } from './commands/add.js';
+import { cleanCommand } from './commands/clean.js';
 import { initCommand } from './commands/init.js';
 import { listCommand } from './commands/list.js';
 
@@ -31,5 +32,11 @@ program
   .description('List available and installed components')
   .option('-d, --details', 'Show detailed component information')
   .action(listCommand);
+
+program
+  .command('clean')
+  .description('Remove all Rafters configuration and files')
+  .option('-f, --force', 'Skip confirmation prompt')
+  .action(cleanCommand);
 
 program.parse();

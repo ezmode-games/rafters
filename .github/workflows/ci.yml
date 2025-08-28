@@ -31,9 +31,6 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install Playwright Browsers
-        run: pnpm --filter rafters-ui exec playwright install chromium
-
       - name: Run Full Preflight Check
         run: pnpm preflight
 

@@ -1,20 +1,14 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "ES2020",
     "lib": ["ES2020", "DOM"],
-    "module": "ESNext",
     "moduleResolution": "bundler",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "declaration": true,
     "outDir": "./dist",
     "rootDir": "./src",
     "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "composite": true
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.test.ts", "**/*.spec.ts"]
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.spec.ts"],
+  "references": [{ "path": "../shared" }, { "path": "../color-utils" }]
 }

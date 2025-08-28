@@ -5,6 +5,8 @@
       "**/node_modules",
       "**/dist",
       "**/build",
+      "**/.open-next",
+      "**/.wrangler",
       "**/worker-configuration.d.ts",
       "**/.react-router",
       "**/*.css",

@@ -9,8 +9,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   checkTailwindVersion,
-  createDefaultRegistry,
   fetchStudioTokens,
+  generateAllTokens,
   injectCSSImport,
   writeTokenFiles,
 } from '@rafters/design-tokens';
@@ -75,23 +75,10 @@ export async function initCommand(): Promise<void> {
   // Interactive setup
   const answers = await inquirer.prompt([
     {
-      type: 'confirm',
-      name: 'hasStorybook',
-      message: 'Do you use Storybook?',
-      default: false,
-    },
-    {
       type: 'input',
       name: 'componentsDir',
       message: 'Components directory:',
       default: './src/components/ui',
-    },
-    {
-      type: 'input',
-      name: 'storiesDir',
-      message: 'Stories directory:',
-      default: './src/stories',
-      when: (answers) => answers.hasStorybook,
     },
     {
       type: 'input',
@@ -145,9 +132,7 @@ export async function initCommand(): Promise<void> {
 
   const config: Config = {
     ...defaultConfig,
-    hasStorybook: answers.hasStorybook,
     componentsDir: answers.componentsDir,
-    storiesDir: answers.storiesDir || defaultConfig.storiesDir,
     cssFile: answers.cssFile,
     tailwindVersion: tailwindVersion as 'v3' | 'v4',
     tokenFormat: answers.tokenFormat,
@@ -165,10 +150,22 @@ export async function initCommand(): Promise<void> {
       tokenSpinner.warn(
         `Failed to fetch Studio tokens: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
-      tokenSet = createDefaultRegistry();
+      // Generate default tokens using generators
+      const tokens = generateAllTokens();
+      tokenSet = {
+        id: 'default',
+        name: 'Generated Design System',
+        tokens,
+      };
     }
   } else {
-    tokenSet = createDefaultRegistry();
+    // Generate default tokens using generators
+    const tokens = generateAllTokens();
+    tokenSet = {
+      id: 'default',
+      name: 'Generated Design System',
+      tokens,
+    };
   }
 
   // Create directories and files
@@ -268,11 +265,6 @@ export function cn(...inputs: ClassValue[]) {
 `;
         writeFileSync(utilsPath, fallbackUtils);
       }
-    }
-
-    // Create stories directory if using Storybook
-    if (config.hasStorybook && config.storiesDir) {
-      ensureDirSync(join(cwd, config.storiesDir));
     }
 
     // Write design tokens and registry
