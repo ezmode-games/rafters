@@ -1,6 +1,6 @@
 {
   "category": "shadow",
-  "generatedAt": "2025-08-28T19:21:05.020Z",
+  "generatedAt": "2025-08-29T01:22:14.655Z",
   "tokens": [
     {
       "name": "none",
@@ -10,7 +10,11 @@
       "semanticMeaning": "No shadow, flat appearance",
       "scalePosition": 0,
       "generateUtilityClass": true,
-      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"]
+      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"],
+      "cognitiveLoad": 1,
+      "trustLevel": "low",
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible"
     },
     {
       "name": "sm",
@@ -20,7 +24,11 @@
       "semanticMeaning": "Subtle depth for cards",
       "scalePosition": 1,
       "generateUtilityClass": true,
-      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"]
+      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"],
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible"
     },
     {
       "name": "base",
@@ -30,7 +38,11 @@
       "semanticMeaning": "Standard card shadow",
       "scalePosition": 2,
       "generateUtilityClass": true,
-      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"]
+      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"],
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible"
     },
     {
       "name": "md",
@@ -40,7 +52,11 @@
       "semanticMeaning": "Elevated components",
       "scalePosition": 3,
       "generateUtilityClass": true,
-      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"]
+      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"],
+      "cognitiveLoad": 3,
+      "trustLevel": "medium",
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible"
     },
     {
       "name": "lg",
@@ -50,7 +66,11 @@
       "semanticMeaning": "Floating elements",
       "scalePosition": 4,
       "generateUtilityClass": true,
-      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"]
+      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"],
+      "cognitiveLoad": 4,
+      "trustLevel": "medium",
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible"
     },
     {
       "name": "xl",
@@ -60,7 +80,11 @@
       "semanticMeaning": "Modal/dialog shadow",
       "scalePosition": 5,
       "generateUtilityClass": true,
-      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"]
+      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"],
+      "cognitiveLoad": 5,
+      "trustLevel": "high",
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible"
     },
     {
       "name": "2xl",
@@ -70,7 +94,11 @@
       "semanticMeaning": "Maximum elevation",
       "scalePosition": 6,
       "generateUtilityClass": true,
-      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"]
+      "applicableComponents": ["card", "modal", "dropdown", "tooltip", "popover"],
+      "cognitiveLoad": 6,
+      "trustLevel": "high",
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible"
     }
   ]
 }

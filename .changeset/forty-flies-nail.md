@@ -5,4 +5,4 @@
 "rafters": major
 ---
 
-1. Fixed TypeScript errors in TokenRegistry recompose method ✅
+fixes

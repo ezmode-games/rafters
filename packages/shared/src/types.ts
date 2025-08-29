@@ -1,3 +1,4 @@
+import { use } from 'react';
 import { z } from 'zod';
 
 /**
@@ -69,13 +70,77 @@ export const ExampleSchema = z.object({
 
 export type Intelligence = z.infer<typeof IntelligenceSchema>;
 
+// Color Intelligence Schema (from API)
+export const ColorIntelligenceSchema = z.object({
+  reasoning: z.string(),
+  emotionalImpact: z.string(),
+  culturalContext: z.string(),
+  accessibilityNotes: z.string(),
+  usageGuidance: z.string(),
+});
+
+export type ColorIntelligence = z.infer<typeof ColorIntelligenceSchema>;
+
+// Color Harmonies Schema (calculated by color-utils)
+export const ColorHarmoniesSchema = z.object({
+  complementary: OKLCHSchema,
+  triadic: z.array(OKLCHSchema),
+  analogous: z.array(OKLCHSchema),
+  tetradic: z.array(OKLCHSchema),
+  monochromatic: z.array(OKLCHSchema),
+});
+
+export type ColorHarmonies = z.infer<typeof ColorHarmoniesSchema>;
+
+// Color Accessibility Schema (calculated by color-utils)
+export const ColorAccessibilitySchema = z.object({
+  onWhite: z.object({
+    wcagAA: z.boolean(),
+    wcagAAA: z.boolean(),
+    contrastRatio: z.number(),
+  }),
+  onBlack: z.object({
+    wcagAA: z.boolean(),
+    wcagAAA: z.boolean(),
+    contrastRatio: z.number(),
+  }),
+});
+
+export type ColorAccessibility = z.infer<typeof ColorAccessibilitySchema>;
+
+// Color Analysis Schema (calculated by color-utils)
+export const ColorAnalysisSchema = z.object({
+  temperature: z.enum(['warm', 'cool', 'neutral']),
+  isLight: z.boolean(),
+  name: z.string(),
+});
+
+export type ColorAnalysis = z.infer<typeof ColorAnalysisSchema>;
+
+// Complete API Response Schema
+export const ColorIntelligenceResponseSchema = z.object({
+  intelligence: ColorIntelligenceSchema,
+  harmonies: ColorHarmoniesSchema,
+  accessibility: ColorAccessibilitySchema,
+  analysis: ColorAnalysisSchema,
+});
+
+export type ColorIntelligenceResponse = z.infer<typeof ColorIntelligenceResponseSchema>;
+
 // Color Value Schema for complex color structures
 export const ColorValueSchema = z.object({
-  values: z.array(z.string()).optional(), // OKLCH values array [50, 100, 200...900] positions
-  darkValues: z.array(z.string()).optional(), // Dark mode OKLCH values array
-  baseColor: z.string().optional(), // "blue-800" reference for semantic tokens
+  name: z.string(), // the fancy name from color-utils, IE ocean-blue
+  scale: z.array(OKLCHSchema), // OKLCH values array [50, 100, 200...900] positions - index maps to standard scale
+  token: z.string().optional(), // the semantic assignment IE, primary
+  value: z.string().optional(), // the string of the position in the scale IE 400
+  use: z.string().optional(), // any reasons the human notes for the color choice and assignment
   states: z.record(z.string(), z.string()).optional(), // { hover: "blue-900", focus: "blue-700", ... }
-  darkStates: z.record(z.string(), z.string()).optional(), // Dark mode states
+
+  // Complete intelligence data (from /api/color-intel)
+  intelligence: ColorIntelligenceSchema.optional(),
+  harmonies: ColorHarmoniesSchema.optional(),
+  accessibility: ColorAccessibilitySchema.optional(),
+  analysis: ColorAnalysisSchema.optional(),
 });
 
 export type ColorValue = z.infer<typeof ColorValueSchema>;
@@ -84,8 +149,8 @@ export type ColorValue = z.infer<typeof ColorValueSchema>;
 export const TokenSchema = z.object({
   // Core token data
   name: z.string(),
-  value: z.union([z.string(), ColorValueSchema]), // Simple string OR complex color structure
-  darkValue: z.union([z.string(), ColorValueSchema]).optional(), // Same for dark mode
+  value: z.string(), // Simple string value (oklch, hex, rem, etc.)
+  darkValue: z.string().optional(), // Simple dark mode value
   category: z.string(),
   namespace: z.string(),
 

@@ -1,6 +1,6 @@
 {
   "category": "scale",
-  "generatedAt": "2025-08-28T19:21:05.023Z",
+  "generatedAt": "2025-08-29T01:22:14.658Z",
   "tokens": [
     {
       "name": "hover",
@@ -9,10 +9,14 @@
       "namespace": "scale",
       "semanticMeaning": "Subtle hover scale for interactive elements",
       "scalePosition": 0,
-      "cognitiveLoad": 2,
       "generateUtilityClass": true,
       "applicableComponents": ["button", "card", "interactive"],
-      "interactionType": "hover"
+      "interactionType": "hover",
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["button-hover", "card-hover", "interactive-feedback"]
     },
     {
       "name": "active",
@@ -21,10 +25,14 @@
       "namespace": "scale",
       "semanticMeaning": "Active/pressed scale for buttons",
       "scalePosition": 1,
-      "cognitiveLoad": 1,
       "generateUtilityClass": true,
       "applicableComponents": ["button", "card", "interactive"],
-      "interactionType": "active"
+      "interactionType": "active",
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 1,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["button-active", "pressed-state", "click-feedback"]
     },
     {
       "name": "focus",
@@ -33,10 +41,14 @@
       "namespace": "scale",
       "semanticMeaning": "Focus scale for accessibility",
       "scalePosition": 2,
-      "cognitiveLoad": 3,
       "generateUtilityClass": true,
       "applicableComponents": ["button", "card", "interactive"],
-      "interactionType": "focus"
+      "interactionType": "focus",
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 3,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["focus-states", "accessibility", "keyboard-navigation"]
     },
     {
       "name": "disabled",
@@ -45,10 +57,14 @@
       "namespace": "scale",
       "semanticMeaning": "Disabled state scale",
       "scalePosition": 3,
-      "cognitiveLoad": 1,
       "generateUtilityClass": true,
       "applicableComponents": ["button", "card", "interactive"],
-      "interactionType": "disabled"
+      "interactionType": "disabled",
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 1,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["disabled-elements", "inactive-state", "unavailable"]
     },
     {
       "name": "emphasis",
@@ -57,9 +73,13 @@
       "namespace": "scale",
       "semanticMeaning": "Emphasis scale for important elements",
       "scalePosition": 4,
-      "cognitiveLoad": 4,
       "generateUtilityClass": true,
-      "applicableComponents": ["button", "card", "interactive"]
+      "applicableComponents": ["button", "card", "interactive"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 4,
+      "trustLevel": "medium",
+      "consequence": "reversible",
+      "usageContext": ["call-to-action", "important-buttons", "emphasis"]
     },
     {
       "name": "dramatic",
@@ -68,9 +88,13 @@
       "namespace": "scale",
       "semanticMeaning": "Dramatic scale for animations",
       "scalePosition": 5,
-      "cognitiveLoad": 7,
       "generateUtilityClass": true,
-      "applicableComponents": ["button", "card", "interactive"]
+      "applicableComponents": ["button", "card", "interactive"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 7,
+      "trustLevel": "high",
+      "consequence": "significant",
+      "usageContext": ["hero-animations", "dramatic-effects", "attention-grabbing"]
     }
   ]
 }

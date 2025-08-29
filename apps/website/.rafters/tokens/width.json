@@ -1,6 +1,6 @@
 {
   "category": "width",
-  "generatedAt": "2025-08-28T19:21:05.023Z",
+  "generatedAt": "2025-08-29T01:22:14.659Z",
   "tokens": [
     {
       "name": "min",
@@ -10,7 +10,12 @@
       "semanticMeaning": "Minimum content width",
       "scalePosition": 0,
       "generateUtilityClass": true,
-      "applicableComponents": ["layout"]
+      "applicableComponents": ["layout"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 3,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["intrinsic-sizing", "content-driven", "flexible-layouts"]
     },
     {
       "name": "max",
@@ -20,7 +25,12 @@
       "semanticMeaning": "Maximum content width",
       "scalePosition": 1,
       "generateUtilityClass": true,
-      "applicableComponents": ["layout"]
+      "applicableComponents": ["layout"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 4,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["natural-width", "content-expansion", "inline-content"]
     },
     {
       "name": "fit",
@@ -30,7 +40,12 @@
       "semanticMeaning": "Fit content width",
       "scalePosition": 2,
       "generateUtilityClass": true,
-      "applicableComponents": ["layout"]
+      "applicableComponents": ["layout"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 3,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["adaptive-sizing", "responsive-content", "dynamic-width"]
     },
     {
       "name": "full",
@@ -40,7 +55,12 @@
       "semanticMeaning": "Full width",
       "scalePosition": 3,
       "generateUtilityClass": true,
-      "applicableComponents": ["layout"]
+      "applicableComponents": ["layout"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 1,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["full-width", "container-fill", "block-elements"]
     },
     {
       "name": "screen",
@@ -50,7 +70,12 @@
       "semanticMeaning": "Full viewport width",
       "scalePosition": 4,
       "generateUtilityClass": true,
-      "applicableComponents": ["layout"]
+      "applicableComponents": ["layout"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 5,
+      "trustLevel": "medium",
+      "consequence": "reversible",
+      "usageContext": ["viewport-width", "full-screen", "edge-to-edge"]
     },
     {
       "name": "prose",
@@ -60,7 +85,12 @@
       "semanticMeaning": "Optimal reading width",
       "scalePosition": 5,
       "generateUtilityClass": true,
-      "applicableComponents": ["content", "article"]
+      "applicableComponents": ["content", "article"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["reading-content", "articles", "typography", "readability"]
     },
     {
       "name": "dialog-sm",
@@ -70,7 +100,12 @@
       "semanticMeaning": "Small dialog width",
       "scalePosition": 6,
       "generateUtilityClass": true,
-      "applicableComponents": ["dialog", "modal"]
+      "applicableComponents": ["dialog", "modal"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 3,
+      "trustLevel": "medium",
+      "consequence": "reversible",
+      "usageContext": ["small-modals", "confirmations", "simple-dialogs"]
     },
     {
       "name": "dialog-md",
@@ -80,7 +115,12 @@
       "semanticMeaning": "Medium dialog width",
       "scalePosition": 7,
       "generateUtilityClass": true,
-      "applicableComponents": ["dialog", "modal"]
+      "applicableComponents": ["dialog", "modal"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 4,
+      "trustLevel": "medium",
+      "consequence": "reversible",
+      "usageContext": ["standard-modals", "forms", "content-dialogs"]
     },
     {
       "name": "dialog-lg",
@@ -90,7 +130,12 @@
       "semanticMeaning": "Large dialog width",
       "scalePosition": 8,
       "generateUtilityClass": true,
-      "applicableComponents": ["dialog", "modal"]
+      "applicableComponents": ["dialog", "modal"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 5,
+      "trustLevel": "medium",
+      "consequence": "reversible",
+      "usageContext": ["large-modals", "detailed-forms", "rich-content"]
     },
     {
       "name": "dialog-xl",
@@ -100,7 +145,12 @@
       "semanticMeaning": "Extra large dialog width",
       "scalePosition": 9,
       "generateUtilityClass": true,
-      "applicableComponents": ["dialog", "modal"]
+      "applicableComponents": ["dialog", "modal"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 6,
+      "trustLevel": "high",
+      "consequence": "significant",
+      "usageContext": ["complex-modals", "multi-column", "advanced-interfaces"]
     },
     {
       "name": "sidebar",
@@ -110,7 +160,12 @@
       "semanticMeaning": "Standard sidebar width",
       "scalePosition": 10,
       "generateUtilityClass": true,
-      "applicableComponents": ["sidebar", "navigation"]
+      "applicableComponents": ["sidebar", "navigation"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 3,
+      "trustLevel": "medium",
+      "consequence": "reversible",
+      "usageContext": ["navigation-sidebar", "standard-nav", "side-panels"]
     },
     {
       "name": "sidebar-sm",
@@ -120,7 +175,12 @@
       "semanticMeaning": "Compact sidebar width",
       "scalePosition": 11,
       "generateUtilityClass": true,
-      "applicableComponents": ["sidebar", "navigation"]
+      "applicableComponents": ["sidebar", "navigation"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["compact-nav", "minimal-sidebar", "icon-nav"]
     },
     {
       "name": "sidebar-lg",
@@ -130,7 +190,12 @@
       "semanticMeaning": "Wide sidebar width",
       "scalePosition": 12,
       "generateUtilityClass": true,
-      "applicableComponents": ["sidebar", "navigation"]
+      "applicableComponents": ["sidebar", "navigation"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 4,
+      "trustLevel": "medium",
+      "consequence": "reversible",
+      "usageContext": ["wide-navigation", "rich-sidebar", "detailed-nav"]
     }
   ]
 }

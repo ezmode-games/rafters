@@ -7,7 +7,7 @@
  */
 
 // Export all types and schemas
-export * from './types';
+export * from './types.js';
 
 // Utility functions for AI intelligence
 export const DEFAULT_COGNITIVE_LOADS = {
@@ -70,4 +70,4 @@ export const ASCII_LOGO = `
 `;
 
 // Export React components from separate file
-export * from './components';
+export * from './components.js';

@@ -77,32 +77,35 @@ export class TokenRegistry {
    * Studio sends rich color object, registry stores as simple tokens
    */
   decomposeColor(colorToken: Token): void {
-    if (typeof colorToken.value !== 'object') {
+    if (
+      typeof colorToken.value !== 'object' ||
+      colorToken.value === null ||
+      !('name' in colorToken.value)
+    ) {
       // Simple token, just store as-is
       this.tokens.set(colorToken.name, colorToken);
       return;
     }
 
-    const colorValue = colorToken.value;
+    const colorValue = colorToken.value as ColorValue;
 
-    // Store base token with reference to base color if available
+    // Store base token with reference to value
     const baseToken: Token = {
       ...colorToken,
-      value: colorValue.baseColor || `${colorToken.name}-base`,
+      value: (colorValue as ColorValue).value || `${colorToken.name}-base`,
       // Preserve darkValue from original token if it exists
       ...(colorToken.darkValue && { darkValue: colorToken.darkValue }),
     };
     this.tokens.set(colorToken.name, baseToken);
 
     // Generate state tokens if states are defined
-    if (colorValue.states) {
+    if ('states' in colorValue && colorValue.states) {
       for (const [state, stateValue] of Object.entries(colorValue.states)) {
         const stateTokenName = `${colorToken.name}-${state}`;
         const stateToken: Token = {
           name: stateTokenName,
-          value: stateValue,
-          // Add dark mode state value if darkStates exist
-          ...(colorValue.darkStates?.[state] && { darkValue: colorValue.darkStates[state] }),
+          value: stateValue as string,
+          // Note: Dark states handled separately in new schema architecture
           category: colorToken.category,
           namespace: colorToken.namespace,
           semanticMeaning: `${state} state for ${colorToken.name}`,
@@ -117,20 +120,21 @@ export class TokenRegistry {
       }
     }
 
-    // Handle scale values if present
-    if (colorValue.values && colorValue.values.length > 0) {
+    // Handle scale values if present (using new flat scale property)
+    if ('scale' in colorValue && colorValue.scale && colorValue.scale.length > 0) {
       const standardScale = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
 
-      for (let i = 0; i < Math.min(colorValue.values.length, standardScale.length); i++) {
+      for (let i = 0; i < Math.min(colorValue.scale.length, standardScale.length); i++) {
         const scaleNumber = standardScale[i];
-        const scaleValue = colorValue.values[i];
+        const oklch = (colorValue as ColorValue).scale[i];
+        if (!oklch) continue;
+        const scaleValue = `oklch(${oklch.l} ${oklch.c} ${oklch.h}${oklch.alpha !== undefined && oklch.alpha !== 1 ? ` / ${oklch.alpha}` : ''})`;
         const scaleTokenName = `${colorToken.name}-${scaleNumber}`;
 
         const scaleToken: Token = {
           name: scaleTokenName,
           value: scaleValue,
-          // Add dark mode scale value if darkValues exist
-          ...(colorValue.darkValues?.[i] && { darkValue: colorValue.darkValues[i] }),
+          // Note: darkValues property doesn't exist in new schema, dark mode handled through darkStates
           category: colorToken.category,
           namespace: colorToken.namespace,
           semanticMeaning: `${colorToken.name} shade ${scaleNumber}`,
@@ -206,17 +210,37 @@ export class TokenRegistry {
 
     // Build complex color object if we have states or scale data
     if (Object.keys(stateTokens).length > 0 || scaleValues.length > 0) {
+      // Convert string values back to OKLCH scale format if needed
+      const scale: Array<{ l: number; c: number; h: number; alpha?: number }> = [];
+      if (scaleValues.length > 0) {
+        for (const scaleValue of scaleValues) {
+          if (scaleValue?.includes('oklch')) {
+            // Parse OKLCH string back to object (simplified parsing)
+            const match = scaleValue.match(
+              /oklch\(([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)(?:\s*\/\s*([0-9.]+))?\)/
+            );
+            if (match) {
+              const l = Number.parseFloat(match[1]);
+              const c = Number.parseFloat(match[2]);
+              const h = Number.parseFloat(match[3]);
+              const alpha = match[4] ? Number.parseFloat(match[4]) : 1;
+              scale.push({ l, c, h, alpha });
+            }
+          }
+        }
+      }
+
       const colorValue: ColorValue = {
-        baseColor: baseToken.value as string,
-        ...(scaleValues.length > 0 ? { values: scaleValues } : {}),
-        ...(darkScaleValues.length > 0 ? { darkValues: darkScaleValues } : {}),
+        name: baseToken.name,
+        scale: scale,
+        value: baseToken.name, // The semantic token name
+        use: baseToken.semanticMeaning || baseToken.name,
         ...(Object.keys(stateTokens).length > 0 ? { states: stateTokens } : {}),
-        ...(Object.keys(darkStateTokens).length > 0 ? { darkStates: darkStateTokens } : {}),
       };
 
       return {
         ...baseToken,
-        value: colorValue,
+        value: baseToken.value as string, // Keep string value, not ColorValue object
       };
     }
 

@@ -1,6 +1,6 @@
 {
   "category": "backdrop-blur",
-  "generatedAt": "2025-08-28T19:21:05.024Z",
+  "generatedAt": "2025-08-29T01:22:14.659Z",
   "tokens": [
     {
       "name": "none",
@@ -11,7 +11,12 @@
       "scalePosition": 0,
       "mathRelationship": "No blur",
       "generateUtilityClass": true,
-      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"]
+      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 1,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["no-blur", "clear-background", "transparent"]
     },
     {
       "name": "sm",
@@ -22,7 +27,12 @@
       "scalePosition": 1,
       "mathRelationship": "blur(4px)",
       "generateUtilityClass": true,
-      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"]
+      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["subtle-overlay", "light-separation", "minimal-blur"]
     },
     {
       "name": "DEFAULT",
@@ -33,7 +43,12 @@
       "scalePosition": 2,
       "mathRelationship": "blur(8px)",
       "generateUtilityClass": true,
-      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"]
+      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 3,
+      "trustLevel": "medium",
+      "consequence": "reversible",
+      "usageContext": ["modal-backdrop", "standard-overlay", "focus-creation"]
     },
     {
       "name": "md",
@@ -44,7 +59,12 @@
       "scalePosition": 3,
       "mathRelationship": "blur(12px)",
       "generateUtilityClass": true,
-      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"]
+      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 4,
+      "trustLevel": "medium",
+      "consequence": "reversible",
+      "usageContext": ["dialog-backdrop", "attention-focus", "medium-separation"]
     },
     {
       "name": "lg",
@@ -55,7 +75,12 @@
       "scalePosition": 4,
       "mathRelationship": "blur(16px)",
       "generateUtilityClass": true,
-      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"]
+      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 5,
+      "trustLevel": "medium",
+      "consequence": "reversible",
+      "usageContext": ["strong-focus", "clear-separation", "modal-emphasis"]
     },
     {
       "name": "xl",
@@ -66,7 +91,12 @@
       "scalePosition": 5,
       "mathRelationship": "blur(24px)",
       "generateUtilityClass": true,
-      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"]
+      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 6,
+      "trustLevel": "high",
+      "consequence": "significant",
+      "usageContext": ["dramatic-effect", "strong-blur", "artistic-backdrop"]
     },
     {
       "name": "2xl",
@@ -77,7 +107,12 @@
       "scalePosition": 6,
       "mathRelationship": "blur(40px)",
       "generateUtilityClass": true,
-      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"]
+      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 7,
+      "trustLevel": "high",
+      "consequence": "significant",
+      "usageContext": ["maximum-blur", "strong-effects", "heavy-separation"]
     },
     {
       "name": "3xl",
@@ -88,7 +123,12 @@
       "scalePosition": 7,
       "mathRelationship": "blur(64px)",
       "generateUtilityClass": true,
-      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"]
+      "applicableComponents": ["modal", "dialog", "overlay", "backdrop"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 8,
+      "trustLevel": "high",
+      "consequence": "significant",
+      "usageContext": ["ultra-blur", "artistic-effects", "extreme-separation"]
     }
   ]
 }

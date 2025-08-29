@@ -1,6 +1,6 @@
 {
   "category": "z-index",
-  "generatedAt": "2025-08-28T19:21:05.020Z",
+  "generatedAt": "2025-08-29T01:22:14.655Z",
   "tokens": [
     {
       "name": "base",
@@ -10,7 +10,11 @@
       "semanticMeaning": "Base content layer",
       "scalePosition": 0,
       "generateUtilityClass": true,
-      "applicableComponents": ["overlay"]
+      "applicableComponents": ["overlay"],
+      "cognitiveLoad": 1,
+      "trustLevel": "low",
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible"
     },
     {
       "name": "sticky",
@@ -20,7 +24,11 @@
       "semanticMeaning": "Sticky elements (headers, sidebars)",
       "scalePosition": 1,
       "generateUtilityClass": true,
-      "applicableComponents": ["overlay"]
+      "applicableComponents": ["overlay"],
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible"
     },
     {
       "name": "dropdown",
@@ -30,7 +38,11 @@
       "semanticMeaning": "Dropdowns and select menus",
       "scalePosition": 2,
       "generateUtilityClass": true,
-      "applicableComponents": ["dropdown", "select", "menu"]
+      "applicableComponents": ["dropdown", "select", "menu"],
+      "cognitiveLoad": 4,
+      "trustLevel": "medium",
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible"
     },
     {
       "name": "modal",
@@ -40,7 +52,11 @@
       "semanticMeaning": "Modal dialogs and overlays",
       "scalePosition": 3,
       "generateUtilityClass": true,
-      "applicableComponents": ["modal", "dialog", "sheet"]
+      "applicableComponents": ["modal", "dialog", "sheet"],
+      "cognitiveLoad": 7,
+      "trustLevel": "high",
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible"
     },
     {
       "name": "popover",
@@ -50,7 +66,11 @@
       "semanticMeaning": "Popovers and tooltips",
       "scalePosition": 4,
       "generateUtilityClass": true,
-      "applicableComponents": ["overlay"]
+      "applicableComponents": ["overlay"],
+      "cognitiveLoad": 3,
+      "trustLevel": "medium",
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible"
     },
     {
       "name": "notification",
@@ -60,7 +80,11 @@
       "semanticMeaning": "Toast notifications and alerts",
       "scalePosition": 5,
       "generateUtilityClass": true,
-      "applicableComponents": ["toast", "alert", "snackbar"]
+      "applicableComponents": ["toast", "alert", "snackbar"],
+      "cognitiveLoad": 5,
+      "trustLevel": "medium",
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible"
     },
     {
       "name": "tooltip",
@@ -70,7 +94,11 @@
       "semanticMeaning": "Tooltips (highest priority)",
       "scalePosition": 6,
       "generateUtilityClass": true,
-      "applicableComponents": ["tooltip", "hint"]
+      "applicableComponents": ["tooltip", "hint"],
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible"
     },
     {
       "name": "max",
@@ -80,7 +108,11 @@
       "semanticMeaning": "Maximum z-index value",
       "scalePosition": 7,
       "generateUtilityClass": true,
-      "applicableComponents": ["overlay"]
+      "applicableComponents": ["overlay"],
+      "cognitiveLoad": 8,
+      "trustLevel": "critical",
+      "accessibilityLevel": "AAA",
+      "consequence": "significant"
     }
   ]
 }

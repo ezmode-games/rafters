@@ -1,6 +1,6 @@
 {
   "category": "grid-template-rows",
-  "generatedAt": "2025-08-28T19:21:05.023Z",
+  "generatedAt": "2025-08-29T01:22:14.658Z",
   "tokens": [
     {
       "name": "auto",
@@ -10,7 +10,12 @@
       "semanticMeaning": "Auto-sizing rows",
       "scalePosition": 0,
       "generateUtilityClass": true,
-      "applicableComponents": ["grid", "layout", "card-grid"]
+      "applicableComponents": ["grid", "layout", "card-grid"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 1,
+      "trustLevel": "low",
+      "consequence": "significant",
+      "usageContext": ["dynamic-content", "flexible-height", "content-driven"]
     },
     {
       "name": "header-main-footer",
@@ -20,7 +25,12 @@
       "semanticMeaning": "Header, main content, footer layout",
       "scalePosition": 1,
       "generateUtilityClass": true,
-      "applicableComponents": ["grid", "layout", "card-grid"]
+      "applicableComponents": ["grid", "layout", "card-grid"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 4,
+      "trustLevel": "medium",
+      "consequence": "significant",
+      "usageContext": ["page-layout", "app-structure", "standard-layout"]
     },
     {
       "name": "equal-2",
@@ -30,7 +40,12 @@
       "semanticMeaning": "Two equal rows",
       "scalePosition": 2,
       "generateUtilityClass": true,
-      "applicableComponents": ["grid", "layout", "card-grid"]
+      "applicableComponents": ["grid", "layout", "card-grid"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "consequence": "significant",
+      "usageContext": ["split-view", "two-tier", "before-after"]
     },
     {
       "name": "equal-3",
@@ -40,7 +55,12 @@
       "semanticMeaning": "Three equal rows",
       "scalePosition": 3,
       "generateUtilityClass": true,
-      "applicableComponents": ["grid", "layout", "card-grid"]
+      "applicableComponents": ["grid", "layout", "card-grid"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 3,
+      "trustLevel": "low",
+      "consequence": "significant",
+      "usageContext": ["three-tier", "section-grid", "timeline"]
     },
     {
       "name": "masonry",
@@ -50,7 +70,12 @@
       "semanticMeaning": "Masonry layout rows",
       "scalePosition": 4,
       "generateUtilityClass": true,
-      "applicableComponents": ["grid", "layout", "card-grid"]
+      "applicableComponents": ["grid", "layout", "card-grid"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 7,
+      "trustLevel": "high",
+      "consequence": "significant",
+      "usageContext": ["pinterest-style", "dynamic-heights", "gallery-masonry"]
     }
   ]
 }

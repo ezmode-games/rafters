@@ -63,10 +63,10 @@ import { generateWidthTokens } from './width.js';
  */
 export function generateAllTokens(): Token[] {
   return [
-    ...generateSpacingScale('linear', 4, 1.25, 12, true),
+    ...generateSpacingScale('linear', 4, 1.25, 12),
     ...generateDepthScale('exponential', 10),
-    ...generateHeightScale('linear', 2.5, 1.25, true),
-    ...generateTypographyScale('golden', 1, true),
+    ...generateHeightScale('linear', 2.5, 1.25),
+    ...generateTypographyScale('golden', 1),
     ...generateColorTokens(),
     ...generateMotionTokens(),
     ...generateBorderRadiusTokens(),

@@ -1,6 +1,6 @@
 {
   "category": "translate",
-  "generatedAt": "2025-08-28T19:21:05.023Z",
+  "generatedAt": "2025-08-29T01:22:14.658Z",
   "tokens": [
     {
       "name": "center",
@@ -10,7 +10,12 @@
       "semanticMeaning": "Center positioning transform",
       "scalePosition": 0,
       "generateUtilityClass": true,
-      "applicableComponents": ["modal", "dialog", "tooltip", "animations"]
+      "applicableComponents": ["modal", "dialog", "tooltip", "animations"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["absolute-center", "modal-center", "tooltip-position"]
     },
     {
       "name": "center-x",
@@ -20,7 +25,12 @@
       "semanticMeaning": "Center horizontally",
       "scalePosition": 1,
       "generateUtilityClass": true,
-      "applicableComponents": ["modal", "dialog", "tooltip", "animations"]
+      "applicableComponents": ["modal", "dialog", "tooltip", "animations"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 3,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["horizontal-center", "x-axis-center", "left-right-center"]
     },
     {
       "name": "center-y",
@@ -30,7 +40,12 @@
       "semanticMeaning": "Center vertically",
       "scalePosition": 2,
       "generateUtilityClass": true,
-      "applicableComponents": ["modal", "dialog", "tooltip", "animations"]
+      "applicableComponents": ["modal", "dialog", "tooltip", "animations"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 3,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["vertical-center", "y-axis-center", "top-bottom-center"]
     },
     {
       "name": "slide-up",
@@ -40,7 +55,12 @@
       "semanticMeaning": "Slide up animation",
       "scalePosition": 3,
       "generateUtilityClass": true,
-      "applicableComponents": ["modal", "dialog", "tooltip", "animations"]
+      "applicableComponents": ["modal", "dialog", "tooltip", "animations"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 4,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["slide-animations", "reveal-up", "drawer-slide"]
     },
     {
       "name": "slide-down",
@@ -50,7 +70,12 @@
       "semanticMeaning": "Slide down animation",
       "scalePosition": 4,
       "generateUtilityClass": true,
-      "applicableComponents": ["modal", "dialog", "tooltip", "animations"]
+      "applicableComponents": ["modal", "dialog", "tooltip", "animations"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 4,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["dropdown-reveal", "slide-down", "menu-animations"]
     },
     {
       "name": "slide-left",
@@ -60,7 +85,12 @@
       "semanticMeaning": "Slide left animation",
       "scalePosition": 5,
       "generateUtilityClass": true,
-      "applicableComponents": ["modal", "dialog", "tooltip", "animations"]
+      "applicableComponents": ["modal", "dialog", "tooltip", "animations"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 4,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["sidebar-slide", "left-reveal", "navigation"]
     },
     {
       "name": "slide-right",
@@ -70,7 +100,12 @@
       "semanticMeaning": "Slide right animation",
       "scalePosition": 6,
       "generateUtilityClass": true,
-      "applicableComponents": ["modal", "dialog", "tooltip", "animations"]
+      "applicableComponents": ["modal", "dialog", "tooltip", "animations"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 4,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["right-reveal", "slide-right", "panel-animations"]
     }
   ]
 }

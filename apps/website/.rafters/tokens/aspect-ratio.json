@@ -1,6 +1,6 @@
 {
   "category": "aspect-ratio",
-  "generatedAt": "2025-08-28T19:21:05.022Z",
+  "generatedAt": "2025-08-29T01:22:14.658Z",
   "tokens": [
     {
       "name": "square",
@@ -10,7 +10,12 @@
       "semanticMeaning": "Square aspect ratio for avatars and icons",
       "scalePosition": 0,
       "generateUtilityClass": true,
-      "applicableComponents": ["avatar", "icon", "logo"]
+      "applicableComponents": ["avatar", "icon", "logo"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 1,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["avatars", "icons", "logos", "buttons", "thumbnails"]
     },
     {
       "name": "video",
@@ -20,7 +25,12 @@
       "semanticMeaning": "Video aspect ratio for media content",
       "scalePosition": 1,
       "generateUtilityClass": true,
-      "applicableComponents": ["video", "iframe", "embed"]
+      "applicableComponents": ["video", "iframe", "embed"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["video", "media", "hero-images", "presentations"]
     },
     {
       "name": "photo",
@@ -30,7 +40,12 @@
       "semanticMeaning": "Photo aspect ratio for images",
       "scalePosition": 2,
       "generateUtilityClass": true,
-      "applicableComponents": ["img", "figure"]
+      "applicableComponents": ["img", "figure"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["photos", "images", "galleries", "previews"]
     },
     {
       "name": "golden",
@@ -40,7 +55,12 @@
       "semanticMeaning": "Golden ratio for aesthetic layouts",
       "scalePosition": 3,
       "generateUtilityClass": true,
-      "applicableComponents": ["media"]
+      "applicableComponents": ["media"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 4,
+      "trustLevel": "medium",
+      "consequence": "reversible",
+      "usageContext": ["aesthetic-layouts", "artistic", "design-focused"]
     },
     {
       "name": "portrait",
@@ -50,7 +70,12 @@
       "semanticMeaning": "Portrait orientation",
       "scalePosition": 4,
       "generateUtilityClass": true,
-      "applicableComponents": ["media"]
+      "applicableComponents": ["media"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 3,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["portraits", "mobile-media", "vertical-content"]
     },
     {
       "name": "landscape",
@@ -60,7 +85,12 @@
       "semanticMeaning": "Landscape orientation",
       "scalePosition": 5,
       "generateUtilityClass": true,
-      "applicableComponents": ["media"]
+      "applicableComponents": ["media"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 3,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["landscapes", "horizontal-media", "wide-content"]
     },
     {
       "name": "ultrawide",
@@ -70,7 +100,12 @@
       "semanticMeaning": "Ultrawide aspect ratio",
       "scalePosition": 6,
       "generateUtilityClass": true,
-      "applicableComponents": ["media"]
+      "applicableComponents": ["media"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 5,
+      "trustLevel": "medium",
+      "consequence": "reversible",
+      "usageContext": ["ultrawide", "cinematic", "banner", "header-images"]
     }
   ]
 }

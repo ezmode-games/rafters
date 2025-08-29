@@ -8,25 +8,26 @@ import { type ColorValue, ColorValueSchema, type Token, TokenSchema } from '../s
 describe('ColorValueSchema', () => {
   it('should validate a valid color value structure', () => {
     const validColorValue = {
-      scale: [50, 100, 200, 300, 400, 500, 600, 700, 800, 900],
-      values: [
-        'oklch(0.95 0.02 240)',
-        'oklch(0.9 0.04 240)',
-        'oklch(0.85 0.06 240)',
-        'oklch(0.8 0.08 240)',
-        'oklch(0.7 0.1 240)',
-        'oklch(0.6 0.12 240)',
-        'oklch(0.5 0.14 240)',
-        'oklch(0.4 0.16 240)',
-        'oklch(0.3 0.18 240)',
-        'oklch(0.2 0.2 240)',
+      name: 'Ocean Blue',
+      scale: [
+        { l: 0.95, c: 0.02, h: 240 }, // 50
+        { l: 0.9, c: 0.04, h: 240 }, // 100
+        { l: 0.85, c: 0.06, h: 240 }, // 200
+        { l: 0.8, c: 0.08, h: 240 }, // 300
+        { l: 0.7, c: 0.1, h: 240 }, // 400
+        { l: 0.6, c: 0.12, h: 240 }, // 500
+        { l: 0.5, c: 0.14, h: 240 }, // 600
+        { l: 0.4, c: 0.16, h: 240 }, // 700
+        { l: 0.3, c: 0.18, h: 240 }, // 800
+        { l: 0.2, c: 0.2, h: 240 }, // 900
       ],
-      baseColor: 'blue-800',
+      token: 'primary',
+      value: '500',
       states: {
-        hover: 'blue-900',
-        focus: 'blue-700',
-        active: 'blue-950',
-        disabled: 'blue-400',
+        hover: 'ocean-blue-600',
+        focus: 'ocean-blue-700',
+        active: 'ocean-blue-800',
+        disabled: 'ocean-blue-400',
       },
     };
 
@@ -34,27 +35,30 @@ describe('ColorValueSchema', () => {
     expect(result.success).toBe(true);
 
     if (result.success) {
-      expect(result.data.scale).toEqual([50, 100, 200, 300, 400, 500, 600, 700, 800, 900]);
-      expect(result.data.values).toHaveLength(10);
-      expect(result.data.baseColor).toBe('blue-800');
-      expect(result.data.states?.hover).toBe('blue-900');
+      expect(result.data.scale).toHaveLength(10);
+      expect(result.data.scale[0]).toEqual({ l: 0.95, c: 0.02, h: 240 }); // shade 50
+      expect(result.data.scale[5]).toEqual({ l: 0.6, c: 0.12, h: 240 }); // shade 500
+      expect(result.data.token).toBe('primary');
+      expect(result.data.states?.hover).toBe('ocean-blue-600');
     }
   });
 
-  it('should validate minimal color value (just scale and values)', () => {
+  it('should validate minimal color value (required fields only)', () => {
     const minimalColorValue = {
-      scale: [500],
-      values: ['oklch(0.6 0.12 240)'],
+      name: 'Brand Blue',
+      scale: [
+        { l: 0.6, c: 0.12, h: 240 }, // Just one color in scale
+      ],
     };
 
     const result = ColorValueSchema.safeParse(minimalColorValue);
     expect(result.success).toBe(true);
   });
 
-  it('should reject invalid scale (non-numbers)', () => {
+  it('should reject invalid scale (non-OKLCH objects)', () => {
     const invalidColorValue = {
-      scale: ['50', '100'], // strings instead of numbers
-      values: ['oklch(0.95 0.02 240)', 'oklch(0.9 0.04 240)'],
+      name: 'Bad Blue',
+      scale: ['50', '100'], // strings instead of OKLCH objects
     };
 
     const result = ColorValueSchema.safeParse(invalidColorValue);
@@ -63,7 +67,8 @@ describe('ColorValueSchema', () => {
 
   it('should reject missing required fields', () => {
     const invalidColorValue = {
-      baseColor: 'blue-800', // missing scale and values
+      baseColor: 'blue-800',
+      // missing name, value, and scale
     };
 
     const result = ColorValueSchema.safeParse(invalidColorValue);
@@ -89,29 +94,10 @@ describe('TokenSchema with Union Types', () => {
     }
   });
 
-  it('should validate complex color token', () => {
+  it('should validate simple color token', () => {
     const colorToken = {
       name: 'primary',
-      value: {
-        scale: [50, 100, 200, 300, 400, 500, 600, 700, 800, 900],
-        values: [
-          'oklch(0.95 0.02 240)',
-          'oklch(0.9 0.04 240)',
-          'oklch(0.85 0.06 240)',
-          'oklch(0.8 0.08 240)',
-          'oklch(0.7 0.1 240)',
-          'oklch(0.6 0.12 240)',
-          'oklch(0.5 0.14 240)',
-          'oklch(0.4 0.16 240)',
-          'oklch(0.3 0.18 240)',
-          'oklch(0.2 0.2 240)',
-        ],
-        baseColor: 'blue-600',
-        states: {
-          hover: 'blue-700',
-          focus: 'blue-500',
-        },
-      },
+      value: 'oklch(0.6 0.12 240)', // Simple OKLCH string value
       category: 'color',
       namespace: 'color',
       semanticMeaning: 'Primary brand color for main actions',
@@ -123,53 +109,49 @@ describe('TokenSchema with Union Types', () => {
     expect(result.success).toBe(true);
 
     if (result.success) {
-      expect(typeof result.data.value).toBe('object');
-      expect(result.data.value).toHaveProperty('scale');
-      expect(result.data.value).toHaveProperty('values');
-      expect(result.data.value).toHaveProperty('baseColor');
-      expect(result.data.value).toHaveProperty('states');
+      expect(typeof result.data.value).toBe('string');
+      expect(result.data.value).toBe('oklch(0.6 0.12 240)');
+      expect(result.data.semanticMeaning).toBe('Primary brand color for main actions');
+      expect(result.data.cognitiveLoad).toBe(3);
     }
   });
 
-  it('should validate token with complex darkValue', () => {
-    const tokenWithComplexDark = {
+  it('should validate token with simple darkValue', () => {
+    const tokenWithDark = {
       name: 'background',
       value: 'oklch(1 0 0)', // light mode - white
-      darkValue: {
-        scale: [50, 100],
-        values: ['oklch(0.1 0 0)', 'oklch(0.05 0 0)'],
-        baseColor: 'gray-900',
-      },
+      darkValue: 'oklch(0.05 0 0)', // dark mode - near black
       category: 'color',
       namespace: 'color',
     };
 
-    const result = TokenSchema.safeParse(tokenWithComplexDark);
+    const result = TokenSchema.safeParse(tokenWithDark);
     expect(result.success).toBe(true);
 
     if (result.success) {
       expect(typeof result.data.value).toBe('string');
-      expect(typeof result.data.darkValue).toBe('object');
-      expect(result.data.darkValue).toHaveProperty('scale');
-      expect(result.data.darkValue).toHaveProperty('values');
+      expect(typeof result.data.darkValue).toBe('string');
+      expect(result.data.value).toBe('oklch(1 0 0)');
+      expect(result.data.darkValue).toBe('oklch(0.05 0 0)');
     }
   });
 
-  it('should validate mixed simple and complex values', () => {
-    const mixedToken = {
+  it('should validate simple string values only', () => {
+    const simpleToken = {
       name: 'accent',
       value: 'oklch(0.65 0.15 300)', // simple light mode
-      darkValue: {
-        scale: [400, 500, 600],
-        values: ['oklch(0.7 0.12 300)', 'oklch(0.65 0.15 300)', 'oklch(0.6 0.18 300)'],
-        baseColor: 'purple-500',
-      },
+      darkValue: 'oklch(0.6 0.18 300)', // simple dark mode
       category: 'color',
       namespace: 'color',
     };
 
-    const result = TokenSchema.safeParse(mixedToken);
+    const result = TokenSchema.safeParse(simpleToken);
     expect(result.success).toBe(true);
+
+    if (result.success) {
+      expect(typeof result.data.value).toBe('string');
+      expect(typeof result.data.darkValue).toBe('string');
+    }
   });
 
   it('should reject invalid union values', () => {

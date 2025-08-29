@@ -46,8 +46,7 @@ export function generateTypographyScale(
     | 'major-third'
     | 'perfect-fourth'
     | 'perfect-fifth' = 'golden',
-  baseSize = 1, // rem
-  generateResponsive = true
+  baseSize = 1 // rem
 ): Token[] {
   const tokens: Token[] = [];
   const sizes = [
@@ -65,8 +64,6 @@ export function generateTypographyScale(
     '8xl', // Hero text
     '9xl', // Massive display
   ];
-  const breakpoints = generateResponsive ? ['sm', 'md', 'lg', 'xl'] : [];
-  const containerSizes = generateResponsive ? ['xs', 'sm', 'md', 'lg', 'xl'] : [];
 
   let ratio: number;
   switch (system) {
@@ -111,8 +108,6 @@ export function generateTypographyScale(
       scalePosition: i,
       generateUtilityClass: true,
       applicableComponents: ['text', 'heading', 'label', 'button'],
-      containerQueryAware: generateResponsive,
-      viewportAware: generateResponsive,
       accessibilityLevel: 'AAA',
       cognitiveLoad: isDisplay ? 8 : isHeading ? 5 : isBodyText ? 2 : 3,
       trustLevel: 'low',
@@ -124,56 +119,6 @@ export function generateTypographyScale(
         ...(isDisplay ? ['hero', 'display', 'marketing'] : []),
       ],
     });
-
-    // Responsive font size variants - typography scales up on larger screens
-    if (generateResponsive) {
-      breakpoints.forEach((bp, bpIndex) => {
-        const responsiveMultiplier = 1 + bpIndex * 0.1; // 1, 1.1, 1.2, 1.3, 1.4
-        const responsiveValue = value * responsiveMultiplier;
-
-        tokens.push({
-          name: `${bp}-text-${sizes[i]}`,
-          value: `${Math.round(responsiveValue * 1000) / 1000}rem`,
-          category: 'font-size',
-          namespace: 'font-size',
-          semanticMeaning: `Responsive typography ${sizes[i]} for ${bp} breakpoint`,
-          mathRelationship: `(${baseSize} * ${ratio}^${steps}) * ${responsiveMultiplier}`,
-          scalePosition: i,
-          generateUtilityClass: true,
-          applicableComponents: ['text', 'heading', 'label', 'button'],
-          viewportAware: true,
-          generatedFrom: `text-${sizes[i]}`,
-          accessibilityLevel: 'AAA',
-          cognitiveLoad: isDisplay ? 8 : isHeading ? 5 : isBodyText ? 2 : 3,
-          trustLevel: 'low',
-          consequence: 'reversible',
-        });
-      });
-
-      // Container query variants - typography adapts to container width
-      containerSizes.forEach((container, containerIndex) => {
-        const containerMultiplier = 0.85 + containerIndex * 0.075; // 0.85, 0.925, 1.0, 1.075, 1.15
-        const containerValue = value * containerMultiplier;
-
-        tokens.push({
-          name: `@${container}-text-${sizes[i]}`,
-          value: `${Math.round(containerValue * 1000) / 1000}rem`,
-          category: 'font-size',
-          namespace: 'font-size',
-          semanticMeaning: `Container-aware typography ${sizes[i]} for ${container} container`,
-          mathRelationship: `(${baseSize} * ${ratio}^${steps}) * ${containerMultiplier}`,
-          scalePosition: i,
-          generateUtilityClass: true,
-          applicableComponents: ['text', 'heading', 'label', 'button'],
-          containerQueryAware: true,
-          generatedFrom: `text-${sizes[i]}`,
-          accessibilityLevel: 'AAA',
-          cognitiveLoad: isDisplay ? 8 : isHeading ? 5 : isBodyText ? 2 : 3,
-          trustLevel: 'low',
-          consequence: 'reversible',
-        });
-      });
-    }
 
     // Base line height token - optimized for readability
     const fontSize = value;

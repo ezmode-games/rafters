@@ -1,84 +1,108 @@
 {
   "category": "motion",
-  "generatedAt": "2025-08-28T19:21:05.021Z",
+  "generatedAt": "2025-08-29T01:22:14.657Z",
   "tokens": [
     {
       "name": "instant",
       "value": "75ms",
       "category": "motion",
       "namespace": "duration",
-      "semanticMeaning": "Instant feedback for immediate response",
+      "semanticMeaning": "Instant feedback for immediate response - hover states, button presses",
       "scalePosition": 0,
       "cognitiveLoad": 1,
+      "trustLevel": "low",
       "reducedMotionAware": true,
       "motionDuration": 75,
       "generateUtilityClass": true,
-      "applicableComponents": ["all"]
+      "applicableComponents": ["all"],
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible",
+      "usageContext": ["hover", "focus", "active", "immediate-feedback"]
     },
     {
       "name": "fast",
       "value": "150ms",
       "category": "motion",
       "namespace": "duration",
-      "semanticMeaning": "Fast animations for interactive elements",
+      "semanticMeaning": "Fast animations for interactive elements - dropdowns, tooltips",
       "scalePosition": 1,
       "cognitiveLoad": 2,
+      "trustLevel": "low",
       "reducedMotionAware": true,
       "motionDuration": 150,
       "generateUtilityClass": true,
-      "applicableComponents": ["all"]
+      "applicableComponents": ["all"],
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible",
+      "usageContext": ["dropdown", "tooltip", "menu", "quick-reveal"]
     },
     {
       "name": "standard",
       "value": "300ms",
       "category": "motion",
       "namespace": "duration",
-      "semanticMeaning": "Standard duration for most transitions",
+      "semanticMeaning": "Standard duration for most transitions - page changes, modal open",
       "scalePosition": 2,
       "cognitiveLoad": 3,
+      "trustLevel": "medium",
       "reducedMotionAware": true,
       "motionDuration": 300,
       "generateUtilityClass": true,
-      "applicableComponents": ["all"]
+      "applicableComponents": ["all"],
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible",
+      "usageContext": ["page-transition", "modal", "tab-switch", "accordion"]
     },
     {
       "name": "deliberate",
       "value": "500ms",
       "category": "motion",
       "namespace": "duration",
-      "semanticMeaning": "Deliberate timing for important changes",
+      "semanticMeaning": "Deliberate timing for important changes - form submission, loading",
       "scalePosition": 3,
       "cognitiveLoad": 5,
+      "trustLevel": "medium",
       "reducedMotionAware": true,
       "motionDuration": 500,
       "generateUtilityClass": true,
-      "applicableComponents": ["all"]
+      "applicableComponents": ["all"],
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible",
+      "usageContext": ["form-submit", "loading", "important-change", "confirmation"]
     },
     {
       "name": "slow",
       "value": "700ms",
       "category": "motion",
       "namespace": "duration",
-      "semanticMeaning": "Slow transitions for large changes",
+      "semanticMeaning": "Slow transitions for large changes - layout shifts, major updates",
       "scalePosition": 4,
       "cognitiveLoad": 7,
+      "trustLevel": "high",
       "reducedMotionAware": true,
       "motionDuration": 700,
       "generateUtilityClass": true,
-      "applicableComponents": ["all"]
+      "applicableComponents": ["all"],
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible",
+      "usageContext": ["layout-change", "major-update", "onboarding", "tutorial"]
     },
     {
       "name": "dramatic",
       "value": "1000ms",
       "category": "motion",
       "namespace": "duration",
-      "semanticMeaning": "Dramatic timing for emphasis",
+      "semanticMeaning": "Dramatic timing for emphasis - celebrations, achievements, errors",
       "scalePosition": 5,
       "cognitiveLoad": 9,
+      "trustLevel": "high",
       "reducedMotionAware": true,
       "motionDuration": 1000,
       "generateUtilityClass": true,
-      "applicableComponents": ["all"]
+      "applicableComponents": ["all"],
+      "accessibilityLevel": "AAA",
+      "consequence": "reversible",
+      "usageContext": ["celebration", "achievement", "error-state", "hero-entrance"]
     }
   ]
 }

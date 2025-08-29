@@ -1,6 +1,6 @@
 {
   "category": "container",
-  "generatedAt": "2025-08-28T19:21:05.022Z",
+  "generatedAt": "2025-08-29T01:22:14.658Z",
   "tokens": [
     {
       "name": "xs",
@@ -11,7 +11,12 @@
       "scalePosition": 0,
       "generateUtilityClass": true,
       "applicableComponents": ["layout", "wrapper", "max-width"],
-      "containerQueryAware": true
+      "containerQueryAware": true,
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 2,
+      "trustLevel": "medium",
+      "consequence": "significant",
+      "usageContext": ["mobile-content", "narrow-layouts", "constrained"]
     },
     {
       "name": "sm",
@@ -22,7 +27,12 @@
       "scalePosition": 1,
       "generateUtilityClass": true,
       "applicableComponents": ["layout", "wrapper", "max-width"],
-      "containerQueryAware": true
+      "containerQueryAware": true,
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 3,
+      "trustLevel": "medium",
+      "consequence": "significant",
+      "usageContext": ["tablet-content", "forms", "modals"]
     },
     {
       "name": "md",
@@ -33,7 +43,12 @@
       "scalePosition": 2,
       "generateUtilityClass": true,
       "applicableComponents": ["layout", "wrapper", "max-width"],
-      "containerQueryAware": true
+      "containerQueryAware": true,
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 4,
+      "trustLevel": "medium",
+      "consequence": "significant",
+      "usageContext": ["content-blocks", "cards", "articles"]
     },
     {
       "name": "lg",
@@ -44,7 +59,12 @@
       "scalePosition": 3,
       "generateUtilityClass": true,
       "applicableComponents": ["layout", "wrapper", "max-width"],
-      "containerQueryAware": true
+      "containerQueryAware": true,
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 5,
+      "trustLevel": "medium",
+      "consequence": "significant",
+      "usageContext": ["main-content", "sidebars", "panels"]
     },
     {
       "name": "xl",
@@ -55,95 +75,60 @@
       "scalePosition": 4,
       "generateUtilityClass": true,
       "applicableComponents": ["layout", "wrapper", "max-width"],
-      "containerQueryAware": true
+      "containerQueryAware": true,
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 6,
+      "trustLevel": "medium",
+      "consequence": "significant",
+      "usageContext": ["wide-content", "dashboards", "complex-ui"]
     },
     {
       "name": "2xl",
       "value": "42rem",
       "category": "container",
       "namespace": "container",
-      "semanticMeaning": "2XL container (672px)",
+      "semanticMeaning": "Max width container (672px)",
       "scalePosition": 5,
       "generateUtilityClass": true,
       "applicableComponents": ["layout", "wrapper", "max-width"],
-      "containerQueryAware": true
+      "containerQueryAware": true,
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 7,
+      "trustLevel": "medium",
+      "consequence": "significant",
+      "usageContext": ["reading-width", "optimal-line-length", "typography"]
     },
     {
       "name": "3xl",
       "value": "48rem",
       "category": "container",
       "namespace": "container",
-      "semanticMeaning": "3XL container (768px)",
+      "semanticMeaning": "Ultra wide container (768px)",
       "scalePosition": 6,
       "generateUtilityClass": true,
       "applicableComponents": ["layout", "wrapper", "max-width"],
-      "containerQueryAware": true
+      "containerQueryAware": true,
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 8,
+      "trustLevel": "medium",
+      "consequence": "significant",
+      "usageContext": ["wide-layouts", "data-tables", "expansive-content"]
     },
     {
       "name": "4xl",
       "value": "56rem",
       "category": "container",
       "namespace": "container",
-      "semanticMeaning": "4XL container (896px)",
+      "semanticMeaning": "Maximum container (896px)",
       "scalePosition": 7,
       "generateUtilityClass": true,
       "applicableComponents": ["layout", "wrapper", "max-width"],
-      "containerQueryAware": true
-    },
-    {
-      "name": "5xl",
-      "value": "64rem",
-      "category": "container",
-      "namespace": "container",
-      "semanticMeaning": "5XL container (1024px)",
-      "scalePosition": 8,
-      "generateUtilityClass": true,
-      "applicableComponents": ["layout", "wrapper", "max-width"],
-      "containerQueryAware": true
-    },
-    {
-      "name": "6xl",
-      "value": "72rem",
-      "category": "container",
-      "namespace": "container",
-      "semanticMeaning": "6XL container (1152px)",
-      "scalePosition": 9,
-      "generateUtilityClass": true,
-      "applicableComponents": ["layout", "wrapper", "max-width"],
-      "containerQueryAware": true
-    },
-    {
-      "name": "7xl",
-      "value": "80rem",
-      "category": "container",
-      "namespace": "container",
-      "semanticMeaning": "7XL container (1280px)",
-      "scalePosition": 10,
-      "generateUtilityClass": true,
-      "applicableComponents": ["layout", "wrapper", "max-width"],
-      "containerQueryAware": true
-    },
-    {
-      "name": "8xl",
-      "value": "90rem",
-      "category": "container",
-      "namespace": "container",
-      "semanticMeaning": "8XL container (1440px)",
-      "scalePosition": 11,
-      "generateUtilityClass": true,
-      "applicableComponents": ["layout", "wrapper", "max-width"],
-      "containerQueryAware": true
-    },
-    {
-      "name": "9xl",
-      "value": "100rem",
-      "category": "container",
-      "namespace": "container",
-      "semanticMeaning": "9XL container (1600px)",
-      "scalePosition": 12,
-      "generateUtilityClass": true,
-      "applicableComponents": ["layout", "wrapper", "max-width"],
-      "containerQueryAware": true
+      "containerQueryAware": true,
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 9,
+      "trustLevel": "medium",
+      "consequence": "significant",
+      "usageContext": ["full-width", "hero-sections", "maximum-content"]
     }
   ]
 }

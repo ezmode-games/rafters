@@ -1,6 +1,6 @@
 {
   "category": "letter-spacing",
-  "generatedAt": "2025-08-28T19:21:05.022Z",
+  "generatedAt": "2025-08-29T01:22:14.657Z",
   "tokens": [
     {
       "name": "tighter",
@@ -10,7 +10,12 @@
       "semanticMeaning": "Tighter letter spacing for large text",
       "scalePosition": 0,
       "generateUtilityClass": true,
-      "applicableComponents": ["body", "caption"]
+      "applicableComponents": ["body", "caption"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 3,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["headings", "display-text", "tight-layouts"]
     },
     {
       "name": "tight",
@@ -20,7 +25,12 @@
       "semanticMeaning": "Slightly tighter spacing",
       "scalePosition": 1,
       "generateUtilityClass": true,
-      "applicableComponents": ["body", "caption"]
+      "applicableComponents": ["body", "caption"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["subheadings", "labels", "compact-text"]
     },
     {
       "name": "normal",
@@ -30,7 +40,12 @@
       "semanticMeaning": "Normal letter spacing",
       "scalePosition": 2,
       "generateUtilityClass": true,
-      "applicableComponents": ["text"]
+      "applicableComponents": ["text"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 1,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["body-text", "paragraphs", "default"]
     },
     {
       "name": "wide",
@@ -40,7 +55,12 @@
       "semanticMeaning": "Wider spacing for readability",
       "scalePosition": 3,
       "generateUtilityClass": true,
-      "applicableComponents": ["h1", "h2", "display"]
+      "applicableComponents": ["h1", "h2", "display"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["captions", "small-text", "readability"]
     },
     {
       "name": "wider",
@@ -50,7 +70,12 @@
       "semanticMeaning": "Wide spacing for emphasis",
       "scalePosition": 4,
       "generateUtilityClass": true,
-      "applicableComponents": ["h1", "h2", "display"]
+      "applicableComponents": ["h1", "h2", "display"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 3,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["emphasis", "buttons", "call-to-action"]
     },
     {
       "name": "widest",
@@ -60,7 +85,12 @@
       "semanticMeaning": "Maximum spacing for display text",
       "scalePosition": 5,
       "generateUtilityClass": true,
-      "applicableComponents": ["h1", "h2", "display"]
+      "applicableComponents": ["h1", "h2", "display"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 4,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["display", "hero-text", "branding"]
     }
   ]
 }

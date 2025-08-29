@@ -1,66 +1,96 @@
 {
   "category": "grid-template-columns",
-  "generatedAt": "2025-08-28T19:21:05.023Z",
+  "generatedAt": "2025-08-29T01:22:14.658Z",
   "tokens": [
     {
       "name": "auto-fit-sm",
-      "value": "repeat(auto-fit, minmax(var(--container-xs), 1fr))",
+      "value": "repeat(auto-fit, minmax(200px, 1fr))",
       "category": "grid-template-columns",
       "namespace": "grid-cols",
       "semanticMeaning": "Auto-fit grid for small cards",
       "scalePosition": 0,
       "generateUtilityClass": true,
-      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 4,
+      "trustLevel": "low",
+      "consequence": "significant",
+      "usageContext": ["small-cards", "thumbnails", "compact-layouts"]
     },
     {
       "name": "auto-fit-md",
-      "value": "repeat(auto-fit, minmax(var(--container-sm), 1fr))",
+      "value": "repeat(auto-fit, minmax(280px, 1fr))",
       "category": "grid-template-columns",
       "namespace": "grid-cols",
       "semanticMeaning": "Auto-fit grid for medium cards",
       "scalePosition": 1,
       "generateUtilityClass": true,
-      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 5,
+      "trustLevel": "low",
+      "consequence": "significant",
+      "usageContext": ["medium-cards", "product-grids", "content-blocks"]
     },
     {
       "name": "auto-fit-lg",
-      "value": "repeat(auto-fit, minmax(var(--container-md), 1fr))",
+      "value": "repeat(auto-fit, minmax(360px, 1fr))",
       "category": "grid-template-columns",
       "namespace": "grid-cols",
       "semanticMeaning": "Auto-fit grid for large cards",
       "scalePosition": 2,
       "generateUtilityClass": true,
-      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 6,
+      "trustLevel": "medium",
+      "consequence": "significant",
+      "usageContext": ["large-cards", "feature-sections", "hero-grids"]
     },
     {
       "name": "auto-fill-sm",
-      "value": "repeat(auto-fill, minmax(var(--container-xs), 1fr))",
+      "value": "repeat(auto-fill, minmax(200px, 1fr))",
       "category": "grid-template-columns",
       "namespace": "grid-cols",
       "semanticMeaning": "Auto-fill grid for small items",
       "scalePosition": 3,
       "generateUtilityClass": true,
-      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 4,
+      "trustLevel": "low",
+      "consequence": "significant",
+      "usageContext": ["gallery", "thumbnails", "icon-grids"]
     },
     {
       "name": "auto-fill-md",
-      "value": "repeat(auto-fill, minmax(var(--container-sm), 1fr))",
+      "value": "repeat(auto-fill, minmax(280px, 1fr))",
       "category": "grid-template-columns",
       "namespace": "grid-cols",
       "semanticMeaning": "Auto-fill grid for medium items",
       "scalePosition": 4,
       "generateUtilityClass": true,
-      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 5,
+      "trustLevel": "low",
+      "consequence": "significant",
+      "usageContext": ["portfolio", "blog-grid", "product-display"]
     },
     {
       "name": "auto-fill-lg",
-      "value": "repeat(auto-fill, minmax(var(--container-md), 1fr))",
+      "value": "repeat(auto-fill, minmax(360px, 1fr))",
       "category": "grid-template-columns",
       "namespace": "grid-cols",
       "semanticMeaning": "Auto-fill grid for large items",
       "scalePosition": 5,
       "generateUtilityClass": true,
-      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 6,
+      "trustLevel": "medium",
+      "consequence": "significant",
+      "usageContext": ["feature-showcase", "large-content", "dashboard-widgets"]
     },
     {
       "name": "2-cols",
@@ -70,7 +100,12 @@
       "semanticMeaning": "Two equal columns",
       "scalePosition": 6,
       "generateUtilityClass": true,
-      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "consequence": "significant",
+      "usageContext": ["two-column", "side-by-side", "comparison"]
     },
     {
       "name": "3-cols",
@@ -80,7 +115,12 @@
       "semanticMeaning": "Three equal columns",
       "scalePosition": 7,
       "generateUtilityClass": true,
-      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 3,
+      "trustLevel": "low",
+      "consequence": "significant",
+      "usageContext": ["three-column", "feature-trio", "service-grid"]
     },
     {
       "name": "4-cols",
@@ -90,7 +130,12 @@
       "semanticMeaning": "Four equal columns",
       "scalePosition": 8,
       "generateUtilityClass": true,
-      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 4,
+      "trustLevel": "low",
+      "consequence": "significant",
+      "usageContext": ["four-column", "team-grid", "stats-display"]
     },
     {
       "name": "12-cols",
@@ -100,7 +145,12 @@
       "semanticMeaning": "Twelve column layout system",
       "scalePosition": 9,
       "generateUtilityClass": true,
-      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 8,
+      "trustLevel": "high",
+      "consequence": "significant",
+      "usageContext": ["complex-layouts", "bootstrap-like", "detailed-grids"]
     },
     {
       "name": "sidebar",
@@ -110,7 +160,12 @@
       "semanticMeaning": "Sidebar with main content",
       "scalePosition": 10,
       "generateUtilityClass": true,
-      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 5,
+      "trustLevel": "medium",
+      "consequence": "significant",
+      "usageContext": ["sidebar-layout", "navigation", "admin-panels"]
     },
     {
       "name": "main-sidebar",
@@ -120,7 +175,12 @@
       "semanticMeaning": "Main content with sidebar",
       "scalePosition": 11,
       "generateUtilityClass": true,
-      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"]
+      "applicableComponents": ["grid", "layout", "card-grid", "dashboard"],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 5,
+      "trustLevel": "medium",
+      "consequence": "significant",
+      "usageContext": ["content-first", "article-sidebar", "blog-layouts"]
     }
   ]
 }

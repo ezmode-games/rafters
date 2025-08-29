@@ -1,6 +1,6 @@
 {
   "category": "border-width",
-  "generatedAt": "2025-08-28T19:21:05.024Z",
+  "generatedAt": "2025-08-29T01:22:14.659Z",
   "tokens": [
     {
       "name": "0",
@@ -12,7 +12,11 @@
       "mathRelationship": "No border",
       "generateUtilityClass": true,
       "applicableComponents": ["input", "card", "button"],
-      "trustLevel": "low"
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 1,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["borderless", "clean-design", "minimal"]
     },
     {
       "name": "DEFAULT",
@@ -24,7 +28,11 @@
       "mathRelationship": "1px (1x pixel)",
       "generateUtilityClass": true,
       "applicableComponents": ["input", "card", "button"],
-      "trustLevel": "low"
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 1,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["standard-border", "input-fields", "cards", "buttons"]
     },
     {
       "name": "2",
@@ -36,7 +44,11 @@
       "mathRelationship": "2px (2x pixel)",
       "generateUtilityClass": true,
       "applicableComponents": ["input", "card", "button"],
-      "trustLevel": "low"
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": ["emphasis", "focus-states", "highlighted-elements"]
     },
     {
       "name": "4",
@@ -48,7 +60,11 @@
       "mathRelationship": "4px (4x pixel)",
       "generateUtilityClass": true,
       "applicableComponents": ["decorative", "emphasis"],
-      "trustLevel": "medium"
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 3,
+      "trustLevel": "medium",
+      "consequence": "significant",
+      "usageContext": ["strong-emphasis", "call-to-action", "important-sections"]
     },
     {
       "name": "8",
@@ -60,7 +76,11 @@
       "mathRelationship": "8px (8x pixel)",
       "generateUtilityClass": true,
       "applicableComponents": ["decorative", "emphasis"],
-      "trustLevel": "medium"
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 5,
+      "trustLevel": "medium",
+      "consequence": "significant",
+      "usageContext": ["decorative", "artistic", "brand-elements", "hero-sections"]
     }
   ]
 }

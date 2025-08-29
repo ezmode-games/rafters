@@ -37,13 +37,10 @@ const GOLDEN_RATIO = 1.618033988749;
 export function generateHeightScale(
   system: 'linear' | 'golden' | 'custom' = 'linear',
   baseUnit = 2.5, // rem
-  multiplier = 1.25,
-  generateResponsive = true
+  multiplier = 1.25
 ): Token[] {
   const tokens: Token[] = [];
   const sizes = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl'];
-  const breakpoints = generateResponsive ? ['sm', 'md', 'lg', 'xl'] : [];
-  const containerSizes = generateResponsive ? ['xs', 'sm', 'md', 'lg', 'xl'] : [];
 
   for (let i = 0; i < sizes.length; i++) {
     let value: number;
@@ -63,7 +60,7 @@ export function generateHeightScale(
     const touchTargetSizePx = value * 16; // Convert rem to px
     const meetsAccessibility = touchTargetSizePx >= 44; // WCAG AAA minimum
 
-    // Base token
+    // Base token only - Tailwind handles responsive variants automatically
     tokens.push({
       name: `h-${sizes[i]}`,
       value: `${Math.round(value * 100) / 100}rem`,
@@ -76,8 +73,6 @@ export function generateHeightScale(
       touchTargetSize: touchTargetSizePx,
       generateUtilityClass: true,
       applicableComponents: ['button', 'input', 'select', 'card'],
-      containerQueryAware: generateResponsive,
-      viewportAware: generateResponsive,
       accessibilityLevel: meetsAccessibility ? 'AAA' : 'AA',
       cognitiveLoad: i < 2 ? 2 : i < 4 ? 3 : 4, // Smaller = simpler
       trustLevel: 'low',
@@ -88,62 +83,6 @@ export function generateHeightScale(
         ...(i >= 5 ? ['hero-elements', 'prominent-cta'] : []),
       ],
     });
-
-    // Responsive variants - heights grow on larger screens
-    if (generateResponsive) {
-      breakpoints.forEach((bp, bpIndex) => {
-        const responsiveMultiplier = 1 + bpIndex * 0.1; // 1, 1.1, 1.2, 1.3, 1.4
-        const responsiveValue = value * responsiveMultiplier;
-        const responsiveTouchTarget = responsiveValue * 16;
-        const responsiveMeetsAccessibility = responsiveTouchTarget >= 44;
-
-        tokens.push({
-          name: `${bp}-h-${sizes[i]}`,
-          value: `${Math.round(responsiveValue * 100) / 100}rem`,
-          category: 'height',
-          namespace: 'height',
-          semanticMeaning: `Responsive height ${sizes[i]} for ${bp} breakpoint - ${responsiveMeetsAccessibility ? 'meets' : 'below'} touch target guidelines`,
-          mathRelationship: `(${system === 'linear' ? `${baseUnit} + ${i * 0.5}` : `${baseUnit} * ${multiplier}^${i * 0.5}`}) * ${responsiveMultiplier}`,
-          scalePosition: i,
-          touchTargetSize: responsiveTouchTarget,
-          generateUtilityClass: true,
-          applicableComponents: ['button', 'input', 'select', 'card'],
-          viewportAware: true,
-          generatedFrom: `h-${sizes[i]}`,
-          accessibilityLevel: responsiveMeetsAccessibility ? 'AAA' : 'AA',
-          cognitiveLoad: i < 2 ? 2 : i < 4 ? 3 : 4,
-          trustLevel: 'low',
-          consequence: 'reversible',
-        });
-      });
-
-      // Container query variants - adapt to container size
-      containerSizes.forEach((container, containerIndex) => {
-        const containerMultiplier = 0.8 + containerIndex * 0.1; // 0.8, 0.9, 1.0, 1.1, 1.2
-        const containerValue = value * containerMultiplier;
-        const containerTouchTarget = containerValue * 16;
-        const containerMeetsAccessibility = containerTouchTarget >= 44;
-
-        tokens.push({
-          name: `@${container}-h-${sizes[i]}`,
-          value: `${Math.round(containerValue * 100) / 100}rem`,
-          category: 'height',
-          namespace: 'height',
-          semanticMeaning: `Container-aware height ${sizes[i]} for ${container} container - ${containerMeetsAccessibility ? 'meets' : 'below'} touch target guidelines`,
-          mathRelationship: `(${system === 'linear' ? `${baseUnit} + ${i * 0.5}` : `${baseUnit} * ${multiplier}^${i * 0.5}`}) * ${containerMultiplier}`,
-          scalePosition: i,
-          touchTargetSize: containerTouchTarget,
-          generateUtilityClass: true,
-          applicableComponents: ['button', 'input', 'select', 'card'],
-          containerQueryAware: true,
-          generatedFrom: `h-${sizes[i]}`,
-          accessibilityLevel: containerMeetsAccessibility ? 'AAA' : 'AA',
-          cognitiveLoad: i < 2 ? 2 : i < 4 ? 3 : 4,
-          trustLevel: 'low',
-          consequence: 'reversible',
-        });
-      });
-    }
   }
 
   return tokens;

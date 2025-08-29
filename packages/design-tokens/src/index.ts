@@ -7,26 +7,104 @@
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { type Token, TokenSchema, type TokenSet, TokenSetSchema } from '@rafters/shared';
+import {
+  type ColorValue,
+  type Token,
+  TokenSchema,
+  type TokenSet,
+  TokenSetSchema,
+} from '@rafters/shared';
 import { ensureDirSync } from 'fs-extra';
 import sqids from 'sqids';
 import { z } from 'zod';
 
 // Export dependency tracking system
-export { type TokenDependency, TokenDependencyGraph } from './dependencies';
+export { type TokenDependency, TokenDependencyGraph } from './dependencies.js';
 // Export core TokenRegistry class
-export { TokenRegistry } from './registry';
+export { TokenRegistry } from './registry.js';
 
 // Import for internal use
-import { TokenRegistry } from './registry';
+import { TokenRegistry } from './registry.js';
 
 export const generateShortCode = () => {
   const s = new sqids();
   return s.encode([Date.now()]);
 };
 
+/**
+ * Type guard to check if a value is a ColorValue object
+ */
+function isColorValue(value: unknown): value is ColorValue {
+  return typeof value === 'object' && value !== null && 'name' in value && 'scale' in value;
+}
+
 // Re-export from shared for backward compatibility
 export { Token, TokenSchema } from '@rafters/shared';
+
+/**
+ * Convert a token value (string or ColorValue object) to a CSS string
+ * For ColorValue objects, extracts the appropriate CSS value for usage
+ */
+function tokenValueToCss(value: string | ColorValue): string {
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  // Handle ColorValue object - prioritize the main value field first
+  if (value.value) {
+    return value.value;
+  }
+
+  // If has scale values, find the value position or use 500 equivalent (index 5)
+  if (value.scale && value.scale.length > 0) {
+    let targetIndex = 5; // Default to 500 position
+
+    // If value is specified, try to map it to scale position
+    if (value.value && !Number.isNaN(Number.parseInt(value.value))) {
+      const scaleValue = Number.parseInt(value.value);
+      const scalePositions = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
+      targetIndex = scalePositions.indexOf(scaleValue);
+      if (targetIndex === -1) targetIndex = 5; // Fallback to 500
+    }
+
+    const targetOklch = value.scale[targetIndex] || value.scale[5] || value.scale[0];
+    if (targetOklch) {
+      return `oklch(${targetOklch.l} ${targetOklch.c} ${targetOklch.h}${targetOklch.alpha !== undefined && targetOklch.alpha !== 1 ? ` / ${targetOklch.alpha}` : ''})`;
+    }
+  }
+
+  // Final fallback
+  console.warn('Unable to extract CSS value from ColorValue:', value);
+  return 'transparent';
+}
+
+/**
+ * Convert a token value to CSS string for dark mode
+ * For ColorValue objects, uses states when available, otherwise falls back to light value
+ */
+function tokenValueToCssDark(value: string | ColorValue, stateName = 'default'): string {
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  // Handle ColorValue object for dark mode
+  // If we have states, try to use the specified state or any available state
+  if (value.states && Object.keys(value.states).length > 0) {
+    // First try the specific state requested
+    if (stateName !== 'default' && value.states[stateName]) {
+      return value.states[stateName];
+    }
+
+    // Fall back to any available state (prefer hover as it's most common)
+    const state = value.states.hover || Object.values(value.states)[0];
+    if (state) {
+      return state;
+    }
+  }
+
+  // If no states available, fall back to light value
+  return tokenValueToCss(value);
+}
 
 /**
  * Design system schema - simple collection of tokens with accessibility settings
@@ -87,11 +165,25 @@ function generateCssCustomProperties(designSystem: DesignSystem): string {
   const darkTokens: string[] = [];
 
   for (const token of designSystem.tokens) {
-    const cssVar = `--${token.namespace}-${token.name}: ${token.value};`;
+    // Use tokenValueToCss to handle both string and ColorValue tokens
+    const lightValue = tokenValueToCss(token.value);
+    const cssVar = `--${token.namespace}-${token.name}: ${lightValue};`;
     lightTokens.push(cssVar);
 
     if (token.darkValue) {
-      const darkVar = `--${token.namespace}-${token.name}: ${token.darkValue};`;
+      // Handle both string and ColorValue darkValue
+      const darkValue =
+        typeof token.darkValue === 'string' ? token.darkValue : tokenValueToCss(token.darkValue);
+      const darkVar = `--${token.namespace}-${token.name}: ${darkValue};`;
+      darkTokens.push(darkVar);
+    } else if (
+      isColorValue(token.value) &&
+      token.value.states &&
+      Object.keys(token.value.states).length > 0
+    ) {
+      // If no explicit darkValue but ColorValue has states, use the first available state
+      const darkValue = tokenValueToCssDark(token.value);
+      const darkVar = `--${token.namespace}-${token.name}: ${darkValue};`;
       darkTokens.push(darkVar);
     }
   }
@@ -162,12 +254,23 @@ function generateTailwindStylesheet(designSystem: DesignSystem): string {
     );
 
     for (const token of baseColorTokens) {
-      // Light mode color
-      stylesheet += `    --color-${token.name}: ${token.value};\n`;
+      // Light mode color - use tokenValueToCss to handle ColorValue objects
+      const lightValue = tokenValueToCss(token.value);
+      stylesheet += `    --color-${token.name}: ${lightValue};\n`;
 
-      // Generate proper dark token if darkValue exists
+      // Generate proper dark token if darkValue exists or token has ColorValue with darkStates
       if (token.darkValue) {
-        stylesheet += `    --color-${token.name}-dark: ${token.darkValue};\n`;
+        const darkValue =
+          typeof token.darkValue === 'string' ? token.darkValue : tokenValueToCss(token.darkValue);
+        stylesheet += `    --color-${token.name}-dark: ${darkValue};\n`;
+      } else if (
+        isColorValue(token.value) &&
+        token.value.states &&
+        Object.keys(token.value.states).length > 0
+      ) {
+        // If no explicit darkValue but ColorValue has states, use the first available state
+        const darkValue = tokenValueToCssDark(token.value);
+        stylesheet += `    --color-${token.name}-dark: ${darkValue};\n`;
       }
     }
     stylesheet += '\n';
@@ -672,31 +775,52 @@ function generateCSSFromTokens(tokens: Token[]): string {
     lines.push(`  /* ${category.toUpperCase()} */`);
 
     for (const token of categoryTokens) {
-      // Namespace variables with rafters prefix to avoid circular references
-      const prefix = category.replace(/-/g, '');
-      const varName = `--rafters-${prefix}-${token.name.replace(/_/g, '-')}`;
+      // Clean token names without prefixes
+      const varName = `--${token.name.replace(/_/g, '-')}`;
       if (token.semanticMeaning) {
         lines.push(`  /* ${token.semanticMeaning} */`);
       }
-      lines.push(`  ${varName}: ${token.value};`);
+      // Use tokenValueToCss to handle ColorValue objects
+      const cssValue = tokenValueToCss(token.value);
+      lines.push(`  ${varName}: ${cssValue};`);
     }
     lines.push('');
   }
   lines.push('}');
   lines.push('');
 
-  // Generate dark mode overrides (if we have darkValue properties)
-  const tokensWithDarkValues = tokens.filter((t) => t.darkValue);
+  // Generate dark mode overrides (if we have darkValue properties or ColorValue with states)
+  const tokensWithDarkValues = tokens.filter(
+    (t) =>
+      t.darkValue ||
+      (isColorValue(t.value) && t.value.states && Object.keys(t.value.states).length > 0)
+  );
   if (tokensWithDarkValues.length > 0) {
     lines.push('.dark {');
     lines.push('  /* Dark mode overrides */');
     for (const token of tokensWithDarkValues) {
-      const prefix = token.category.replace(/-/g, '');
-      const varName = `--rafters-${prefix}-${token.name.replace(/_/g, '-')}`;
+      const varName = `--${token.name.replace(/_/g, '-')}`;
       if (token.semanticMeaning) {
         lines.push(`  /* Dark: ${token.semanticMeaning} */`);
       }
-      lines.push(`  ${varName}: ${token.darkValue};`);
+
+      let darkValue: string;
+      if (token.darkValue) {
+        // Handle explicit darkValue (string or ColorValue)
+        darkValue =
+          typeof token.darkValue === 'string' ? token.darkValue : tokenValueToCss(token.darkValue);
+      } else if (
+        isColorValue(token.value) &&
+        token.value.states &&
+        Object.keys(token.value.states).length > 0
+      ) {
+        // Handle ColorValue with states
+        darkValue = tokenValueToCssDark(token.value);
+      } else {
+        continue; // Skip if no dark value available
+      }
+
+      lines.push(`  ${varName}: ${darkValue};`);
     }
     lines.push('}');
     lines.push('');
@@ -723,9 +847,8 @@ function generateCSSFromTokens(tokens: Token[]): string {
     lines.push(`  /* ${category.toUpperCase()} MAPPINGS */`);
 
     for (const token of categoryTokens) {
-      // Use rafters prefix for source variables to avoid circular references
-      const prefix = category.replace(/-/g, '');
-      const sourceVarName = `--rafters-${prefix}-${token.name.replace(/_/g, '-')}`;
+      // Use clean token names directly
+      const sourceVarName = `--${token.name.replace(/_/g, '-')}`;
 
       // Map to appropriate Tailwind theme keys
       const mappedKey = mapCategoryToTheme(category, token.name);
