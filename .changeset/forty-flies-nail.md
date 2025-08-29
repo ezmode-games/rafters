@@ -1,8 +1,8 @@
 ---
-"@rafters/design-tokens": minor
-"@rafters/color-utils": minor
-"@rafters/shared": minor
-"rafters": minor
+"@rafters/design-tokens": patch
+"@rafters/color-utils": patch
+"@rafters/shared": patch
+"rafters": patch
 ---
 
 Enhanced ColorValue schema with AI intelligence support
