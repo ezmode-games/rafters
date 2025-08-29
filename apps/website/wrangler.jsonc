@@ -10,5 +10,11 @@
   },
   "observability": {
     "enabled": true
-  }
+  },
+  "kv_namespaces": [
+    {
+      "binding": "RAFTERS_INTEL",
+      "id": "d740cdf6f7e649cdb53e43a61ce75df5"
+    }
+  ]
 }
