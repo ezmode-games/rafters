@@ -108,7 +108,6 @@ Return only valid JSON, no additional text.`;
 
     return intelligence;
   } catch (error) {
-    console.error('Claude API error:', error);
     throw new Error(
       `Intelligence generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
     );

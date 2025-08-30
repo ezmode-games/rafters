@@ -39,7 +39,6 @@ export class ClaudeClient {
 
       return content.text;
     } catch (error) {
-      console.error('Claude API error:', error);
       throw new Error(
         `Claude API request failed: ${error instanceof Error ? error.message : 'Unknown error'}`
       );

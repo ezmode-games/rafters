@@ -71,7 +71,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // Generate intelligence and calculate mathematical data
     console.log(`Generating intelligence: ${cacheKey}`);
 
-    const apiKey = process.env.CLAUDE_API_KEY || '';
+    const apiKey = process.env.CLAUDE_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: 'Missing API key', message: 'CLAUDE_API_KEY environment variable is not set' },
+        { status: 500 }
+      );
+    }
     const [intelligence, { harmonies, accessibility, analysis }] = await Promise.all([
       generateColorIntelligence(oklch, { token: body.token, name: body.name }, apiKey),
       Promise.resolve(calculateColorData(oklch)),

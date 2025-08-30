@@ -2,18 +2,22 @@ import Anthropic from '@anthropic-ai/sdk';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ClaudeClient, getClaudeClient } from '../../../../src/lib/ai/claude/client';
 
-// Mock the Anthropic SDK
-vi.mock('@anthropic-ai/sdk', () => {
-  return {
-    default: vi.fn(),
-  };
-});
-
 interface MockAnthropicInstance {
   messages: {
     create: ReturnType<typeof vi.fn>;
   };
 }
+
+class MockAnthropic {
+  messages = {
+    create: vi.fn(),
+  };
+}
+
+// Mock the Anthropic SDK
+vi.mock('@anthropic-ai/sdk', () => ({
+  default: vi.fn().mockImplementation(() => new MockAnthropic({})),
+}));
 
 const MockedAnthropic = vi.mocked(Anthropic);
 

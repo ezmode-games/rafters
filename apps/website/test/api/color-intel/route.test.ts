@@ -19,8 +19,6 @@ vi.mock('@rafters/color-utils', () => ({
   generateColorName: vi.fn(),
 }));
 
-const mockedColorUtils = vi.mocked(ColorUtils);
-
 describe('Color Intelligence API Units', () => {
   describe('validateOKLCH', () => {
     it('should validate correct OKLCH values', () => {
@@ -181,6 +179,8 @@ describe('Color Intelligence API Units', () => {
     });
 
     it('should call color-utils functions with correct parameters', () => {
+      const mockedColorUtils = vi.mocked(ColorUtils);
+
       mockedColorUtils.generateHarmoniousPalette.mockReturnValue([{ l: 0.5, c: 0.1, h: 0 }]);
       mockedColorUtils.meetsWCAGStandard.mockReturnValue(true);
       mockedColorUtils.calculateWCAGContrast.mockReturnValue(4.5);
@@ -204,6 +204,8 @@ describe('Color Intelligence API Units', () => {
     });
 
     it('should return structured color data', () => {
+      const mockedColorUtils = vi.mocked(ColorUtils);
+
       mockedColorUtils.generateHarmoniousPalette.mockReturnValue([{ l: 0.5, c: 0.1, h: 0 }]);
       mockedColorUtils.meetsWCAGStandard.mockReturnValue(true);
       mockedColorUtils.calculateWCAGContrast.mockReturnValue(4.5);
