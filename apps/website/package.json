@@ -10,8 +10,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:integration": "vitest run --config vitest.config.cloudflare.mts",
+    "test:spec": "playwright test --grep spec",
     "test:e2e": "playwright test --grep e2e",
+    "test:preflight": "vitest run && playwright test --reporter=list",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts"

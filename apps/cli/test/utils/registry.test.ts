@@ -57,16 +57,13 @@ describe('registry', () => {
 
       const result = await fetchComponentRegistry();
       expect(result.components).toEqual(mockResponse.components);
-      expect(mockFetch).toHaveBeenCalledWith(
-        'https://rafters.realhandy.tech/api/registry/components',
-        {
-          signal: expect.any(AbortSignal),
-          headers: {
-            Accept: 'application/json',
-            'User-Agent': 'rafters-cli/1.0.0',
-          },
-        }
-      );
+      expect(mockFetch).toHaveBeenCalledWith('https://rafters.realhandy.tech/registry/components', {
+        signal: expect.any(AbortSignal),
+        headers: {
+          Accept: 'application/json',
+          'User-Agent': 'rafters-cli/1.0.0',
+        },
+      });
     });
 
     it('should use custom registry URL from environment', async () => {
@@ -147,7 +144,7 @@ describe('registry', () => {
       const result = await fetchComponent('button');
       expect(result).toEqual(mockManifest);
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://rafters.realhandy.tech/api/registry/components/button',
+        'https://rafters.realhandy.tech/registry/components/button',
         {
           signal: expect.any(AbortSignal),
           headers: {

@@ -8,7 +8,6 @@ import {
   type RegistryResponse,
   RegistryResponseSchema,
 } from '@rafters/shared';
-import { z } from 'zod';
 
 // Re-export types from shared package
 export type { ComponentManifest } from '@rafters/shared';
@@ -16,7 +15,7 @@ export type Registry = RegistryResponse;
 
 // Registry configuration
 function getRegistryBaseUrl(): string {
-  return process.env.RAFTERS_REGISTRY_URL || 'https://rafters.realhandy.tech/api/registry';
+  return process.env.RAFTERS_REGISTRY_URL || 'https://rafters.realhandy.tech/registry';
 }
 const REGISTRY_TIMEOUT = 10000; // 10 seconds
 

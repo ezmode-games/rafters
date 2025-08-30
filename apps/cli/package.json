@@ -1,6 +1,6 @@
 {
   "name": "rafters",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Rafters - Design System for AI Agents",
   "type": "module",
   "main": "./dist/index.js",
@@ -26,6 +26,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:preflight": "vitest run",
     "lint": "biome check .",
     "format": "biome format --write .",
     "clean": "rm -rf dist"

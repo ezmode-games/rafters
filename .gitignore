@@ -13,6 +13,14 @@ build/
 # Generated files
 storybook-static/
 coverage/
+**/dist/
+**/build/
+**/.next/
+**/.vercel/
+**/coverage/
+**/storybook-static/
+**/node_modules/
+**/playwright-report/
 
 # IDE
 .vscode/
@@ -34,6 +42,7 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+**/.env*
 
 # TypeScript
 *.tsbuildinfo

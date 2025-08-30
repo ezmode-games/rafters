@@ -18,7 +18,7 @@ export const defaultConfig: Config = {
   version: '1.0.0',
   componentsDir: './src/components/ui',
   packageManager: 'npm',
-  registry: 'https://rafters.realhandy.tech/api/registry',
+  registry: 'https://rafters.realhandy.tech/registry',
   cssFile: 'globals.css', // Default CSS file for Tailwind v4
   tailwindVersion: 'v4',
   tokenFormat: 'tailwind',
@@ -110,6 +110,8 @@ export function findCssFile(cwd = process.cwd()): string | null {
   const possibleFiles = [
     'app/globals.css', // Next.js App Router
     'src/globals.css', // Next.js Pages Router / Generic
+    'src/app/globals.css', // Next.js App Router (v13+)
+    'src/app/styles/globals.css', // Next.js App Router (v13+) with styles dir
     'app/app.css', // React Router v7
     'app/root.css', // Remix
     'src/index.css', // Vite / CRA

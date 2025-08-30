@@ -75,7 +75,7 @@ describe('initCommand', () => {
         storiesDir: './src/stories',
         hasStorybook: false,
         packageManager: 'npm',
-        registry: 'https://registry.rafters.dev',
+        registry: 'https://rafters.realhandy.tech/registry',
       });
 
       vi.mocked(dependencies.getCoreDependencies).mockReturnValue(['react', 'typescript']);
@@ -171,7 +171,7 @@ describe('initCommand', () => {
         storiesDir: './src/stories',
         hasStorybook: false,
         packageManager: 'pnpm',
-        registry: 'https://registry.rafters.dev',
+        registry: 'https://rafters.realhandy.tech/registry',
       });
 
       vi.mocked(dependencies.getCoreDependencies).mockReturnValue(['react', 'typescript']);
@@ -269,7 +269,7 @@ describe('initCommand', () => {
         storiesDir: './src/stories',
         hasStorybook: false,
         packageManager: 'npm',
-        registry: 'https://registry.rafters.dev',
+        registry: 'https://rafters.realhandy.tech/registry',
       });
 
       vi.mocked(dependencies.getCoreDependencies).mockReturnValue(['react', 'typescript']);

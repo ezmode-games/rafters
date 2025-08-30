@@ -9,6 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run --passWithNoTests",
+    "test:preflight": "vitest run --passWithNoTests",
     "lint": "biome check .",
     "format": "biome format --write .",
     "type-check": "echo 'Studio type-check skipped - no implementation yet'",

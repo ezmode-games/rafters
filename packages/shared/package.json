@@ -20,7 +20,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "test": "vitest run --passWithNoTests",
+    "test": "vitest run",
+    "test:preflight": "vitest run",
     "lint": "biome check .",
     "format": "biome format --write .",
     "type-check": "tsc --noEmit",

@@ -1,6 +1,5 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { ComponentManifest } from '@rafters/shared';
 import { IntelligenceSchema } from '@rafters/shared';
 import ora from 'ora';
 import { z } from 'zod';

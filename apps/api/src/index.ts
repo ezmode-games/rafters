@@ -1,7 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { colorIntel } from './routes/color-intel';
-import { test } from './routes/test';
 
 interface CloudflareBindings {
   RAFTERS_INTEL: KVNamespace;
@@ -22,6 +21,5 @@ app.use(
 
 // Mount routes
 app.route('/api/color-intel', colorIntel);
-app.route('/api/test', test);
 
 export default app;
