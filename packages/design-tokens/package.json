@@ -18,6 +18,7 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "test": "vitest run",
+    "test:preflight": "vitest run --passWithNoTests",
     "lint": "biome check .",
     "format": "biome format --write .",
     "type-check": "tsc --noEmit",

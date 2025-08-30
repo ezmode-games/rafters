@@ -32,7 +32,7 @@ describe('config', () => {
         version: '1.0.0',
         componentsDir: 'src/components',
         packageManager: 'npm' as const,
-        registry: 'https://registry.rafters.dev',
+        registry: 'https://rafters.realhandy.tech/registry',
       };
 
       expect(() => ConfigSchema.parse(validConfig)).not.toThrow();
@@ -43,7 +43,7 @@ describe('config', () => {
         version: '1.0.0',
         componentsDir: 'src/components',
         packageManager: 'invalid', // This will fail Zod validation since it's not 'npm' | 'yarn' | 'pnpm'
-        registry: 'https://registry.rafters.dev',
+        registry: 'https://rafters.realhandy.tech/registry',
       };
 
       expect(() => ConfigSchema.parse(invalidConfig)).toThrow();
@@ -67,7 +67,7 @@ describe('config', () => {
         storiesDir: 'src/stories',
         hasStorybook: true,
         packageManager: 'pnpm' as const,
-        registry: 'https://registry.rafters.dev',
+        registry: 'https://rafters.realhandy.tech/registry',
       };
 
       expect(() => ConfigSchema.parse(configWithStories)).not.toThrow();
@@ -106,7 +106,7 @@ describe('config', () => {
       version: '1.0.0',
       componentsDir: 'src/components',
       packageManager: 'npm',
-      registry: 'https://registry.rafters.dev',
+      registry: 'https://rafters.realhandy.tech/registry',
     });
 
     it('should load valid config', () => {
@@ -118,7 +118,7 @@ describe('config', () => {
         version: '1.0.0',
         componentsDir: 'src/components',
         packageManager: 'npm',
-        registry: 'https://registry.rafters.dev',
+        registry: 'https://rafters.realhandy.tech/registry',
       });
     });
 
@@ -152,7 +152,7 @@ describe('config', () => {
         componentsDir: 'src/components',
         hasStorybook: true,
         packageManager: 'pnpm',
-        registry: 'https://registry.rafters.dev',
+        registry: 'https://rafters.realhandy.tech/registry',
       };
 
       saveConfig(config, mockCwd);

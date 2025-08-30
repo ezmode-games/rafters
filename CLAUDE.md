@@ -664,3 +664,98 @@ This system enables you to create better user experiences by understanding the h
 
 - **Prefer SpyOn over Mock in tests** - SpyOn provides more natural and transparent test behavior
 - look for /llms.txt files for software, services, etc
+
+# TECHNICAL INSIGHTS FROM DEVELOPMENT
+
+## Critical Issues and Solutions
+
+### KV Cache Issue with OpenNext
+**Problem**: OpenNext doesn't provide Cloudflare KV bindings via `process.env` - KV operations silently fail
+**Solution**: Migrate APIs requiring KV to Hono where KV works properly via `c.env.RAFTERS_INTEL`
+**Impact**: Color intelligence API had to move from Next.js to dedicated Hono app
+
+### Test Structure Architecture
+**Pattern**: Mirror app structure in test directory
+```
+test/
+├── app/           # E2E tests (.e2e.ts) - mirror src/app/
+├── lib/           # Unit tests (.test.ts) 
+├── integration/   # Integration tests (.spec.ts)
+└── setup.ts
+```
+**Website Testing**: Requires three test types:
+- Unit: `vitest run`  
+- Integration: `vitest run --config vitest.config.cloudflare.mts`
+- E2E: `playwright test`
+
+### TypeScript Standards Enforcement
+**Never use `any` types** - Biome will fail the build
+**Proper patterns**:
+```typescript
+// Good: Proper typing
+vi.mocked(mockFunction).mockReturnValue(...)
+(mockInstance.method as Mock).mockResolvedValue(...)
+
+// Good: Documented type assertion
+// @ts-expect-error - accessing private property for testing
+client.privateProperty = mockValue
+
+// Bad: Any type
+(client as any).privateProperty = mockValue
+```
+
+### Color Intelligence System
+**Standard Colors**: 306 colors across Tailwind, Material, brands, semantic, accessibility, grayscale
+**Spectrum Matrix**: 540 strategic OKLCH points (9L × 5C × 12H) for complete color space exploration
+**Cost**: $0.54 for 306 standard colors using Claude 3.5 Haiku
+**Strategy**: Encourage users to explore unique colors rather than preset palettes
+
+### Test Preflight Commands
+**Purpose**: Comprehensive testing for each package/app
+**Implementation**: Added `test:preflight` to all packages
+- Most packages: `vitest run`
+- Website: `vitest run && vitest run --config vitest.config.cloudflare.mts && playwright test`
+- Color-utils/shared: Removed `--passWithNoTests` to enforce real tests
+
+### Biome Configuration Standards
+**File naming**: Integration tests must use `.spec.ts` not `.test.ts`
+**Import ordering**: Type imports first, then regular imports
+**No missing newlines**: All files must end with newline
+
+## Architecture Decisions
+
+### Registry Strategy
+**Decision**: Keep registry in Next.js at `/registry` (not `/api/registry`)  
+**Reasoning**: Registry is 99% static content, changes infrequently
+**API Separation**: Move dynamic APIs (color-intel) to Hono for proper KV access
+
+### Color API Architecture
+**Hono App**: Dedicated API at `apps/api/` for color intelligence
+**KV Caching**: Works properly in Hono via `c.env.RAFTERS_INTEL`
+**Testing**: Uses `@cloudflare/vitest-pool-workers` for Workers runtime testing
+
+### Component Intelligence Strategy
+**Embedded Reasoning**: Components carry design intelligence in JSDoc comments
+**AI Training**: Storybook stories function as both documentation AND test cases
+**Systematic Usage**: Semantic tokens over arbitrary values for AI decision-making
+
+## Development Workflow Insights
+
+### Session Pattern Recognition
+1. **Discovery Phase**: 20+ minutes understanding what Rafters actually does
+2. **Implementation Phase**: Building features with embedded intelligence
+3. **Testing Phase**: Comprehensive test coverage across environments
+4. **Integration Phase**: Ensuring all systems work together
+
+### Common Pitfalls
+- Assuming KV works in OpenNext (it doesn't)
+- Using `any` types (breaks build)
+- Wrong test file naming conventions
+- Missing newlines (biome fails)
+- Incomplete test coverage patterns
+
+### Success Patterns  
+- Always run `pnpm preflight` before commit
+- Use proper TypeScript typing throughout
+- Follow test structure mirroring app structure
+- Separate concerns: static content (Next.js) vs dynamic APIs (Hono)
