@@ -1,7 +1,7 @@
 {
   "name": "rafters",
-  "version": "1.0.1",
-  "description": "Rafters - Design System for AI Agents",
+  "version": "1.0.2",
+  "description": "Beautiful, thoughtful, complete design system for AI Agents",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
