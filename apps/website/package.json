@@ -7,16 +7,23 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:integration": "vitest run --config vitest.config.cloudflare.mts",
+    "test:e2e": "playwright test --grep e2e",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.60.0",
     "@opennextjs/cloudflare": "^1.6.5",
     "@radix-ui/react-icons": "^1.3.2",
     "@radix-ui/react-select": "^2.2.5",
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tabs": "^1.1.12",
+    "@rafters/color-utils": "^1.0.0",
     "@rafters/shared": "workspace:^",
     "class-variance-authority": "^0.7.1",
     "clsx": "catalog:",
@@ -28,12 +35,21 @@
     "tailwind-merge": "catalog:"
   },
   "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.8.68",
+    "@playwright/test": "^1.55.0",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "catalog:",
+    "@testing-library/react": "catalog:",
     "@types/node": "^20.19.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "catalog:",
+    "jsdom": "catalog:",
     "tailwindcss": "^4",
     "typescript": "^5",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "catalog:",
     "wrangler": "^4.33.0"
   }
 }
