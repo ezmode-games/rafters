@@ -135,13 +135,22 @@ describe('ClaudeClient', () => {
       expect(client1).toBe(client2);
     });
 
-    it('should reuse singleton instance regardless of API key', () => {
-      // First call creates the singleton
+    it('should create different instances for different API keys', () => {
+      // First call creates instance for key1
       const client1 = getClaudeClient('key1');
-      // Second call reuses the same singleton (ignoring new API key)
+      // Second call creates different instance for key2
       const client2 = getClaudeClient('key2');
 
-      expect(client1).toBe(client2); // Same singleton instance
+      expect(client1).not.toBe(client2); // Different instances for different keys
+    });
+
+    it('should reuse cached instance for same API key', () => {
+      // First call creates instance for the key
+      const client1 = getClaudeClient('same-key');
+      // Second call reuses the cached instance
+      const client2 = getClaudeClient('same-key');
+
+      expect(client1).toBe(client2); // Same instance for same key
     });
   });
 });

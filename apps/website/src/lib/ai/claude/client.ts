@@ -47,11 +47,12 @@ export class ClaudeClient {
   }
 }
 
-let claudeClient: ClaudeClient | null = null;
+// Cache client instances by API key to reuse connections
+const claudeClients: Map<string, ClaudeClient> = new Map();
 
 export function getClaudeClient(apiKey: string): ClaudeClient {
-  if (!claudeClient) {
-    claudeClient = new ClaudeClient({ apiKey });
+  if (!claudeClients.has(apiKey)) {
+    claudeClients.set(apiKey, new ClaudeClient({ apiKey }));
   }
-  return claudeClient;
+  return claudeClients.get(apiKey)!;
 }

@@ -52,10 +52,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const cacheKey = generateCacheKey(oklch);
 
     // Check cache first
-    const env = process.env as unknown as CloudflareEnv;
-    if (env.RAFTERS_INTEL) {
+    // In Cloudflare Workers with OpenNext, KV bindings are available on process.env
+    const kvNamespace = (process.env as unknown as CloudflareEnv)?.RAFTERS_INTEL;
+    if (kvNamespace) {
       try {
-        const cached = await env.RAFTERS_INTEL.get(cacheKey);
+        const cached = await kvNamespace.get(cacheKey);
         if (cached) {
           console.log(`Cache hit: ${cacheKey}`);
           const cachedResponse = JSON.parse(cached);
@@ -70,8 +71,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // Generate intelligence and calculate mathematical data
     console.log(`Generating intelligence: ${cacheKey}`);
 
+    const apiKey = process.env.CLAUDE_API_KEY || '';
     const [intelligence, { harmonies, accessibility, analysis }] = await Promise.all([
-      generateColorIntelligence(oklch, { token: body.token, name: body.name }, env.CLAUDE_API_KEY),
+      generateColorIntelligence(oklch, { token: body.token, name: body.name }, apiKey),
       Promise.resolve(calculateColorData(oklch)),
     ]);
 
@@ -87,9 +89,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const validatedResponse = ColorIntelligenceResponseSchema.parse(response);
 
     // Cache the response
-    if (env.RAFTERS_INTEL) {
+    if (kvNamespace) {
       try {
-        await env.RAFTERS_INTEL.put(cacheKey, JSON.stringify(validatedResponse));
+        await kvNamespace.put(cacheKey, JSON.stringify(validatedResponse));
         console.log(`Cached response: ${cacheKey}`);
       } catch (cacheError) {
         console.warn('KV cache write failed:', cacheError);
