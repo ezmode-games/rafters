@@ -15,7 +15,22 @@ export type Registry = RegistryResponse;
 
 // Registry configuration
 function getRegistryBaseUrl(): string {
-  return process.env.RAFTERS_REGISTRY_URL || 'https://rafters.realhandy.tech/registry';
+  // Prefer explicit environment variable, fallback to old endpoint if set, else use new default
+  if (process.env.RAFTERS_REGISTRY_URL) {
+    return process.env.RAFTERS_REGISTRY_URL;
+  }
+  if (process.env.RAFTERS_REGISTRY_API_URL) {
+    // Warn about deprecated usage
+    console.warn(
+      '[rafters-cli] RAFTERS_REGISTRY_API_URL is deprecated. Please use RAFTERS_REGISTRY_URL for /registry endpoint.'
+    );
+    return process.env.RAFTERS_REGISTRY_API_URL;
+  }
+  // Warn if using new default
+  console.warn(
+    '[rafters-cli] Default registry URL changed to /registry. If you experience issues, set RAFTERS_REGISTRY_URL to the previous /api/registry endpoint.'
+  );
+  return 'https://rafters.realhandy.tech/registry';
 }
 const REGISTRY_TIMEOUT = 10000; // 10 seconds
 
