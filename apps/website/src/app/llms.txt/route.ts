@@ -4,7 +4,7 @@
  * Generates static AI agent documentation during build
  */
 
-import { registryManifest } from '../../lib/registry/registryData';
+import { registryManifest } from '@/lib/registry/registryData';
 
 // Force static generation
 export const dynamic = 'force-static';
