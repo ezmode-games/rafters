@@ -25,6 +25,60 @@ pnpm preflight
 ** NEVER expect CI to catch what you should fix locally**
 ** Preflight MUST pass before commit - NO EXCEPTIONS**
 
+## CLOUDFLARE TESTING REQUIREMENTS - MANDATORY:
+**ALL APPS RUN ON CLOUDFLARE - TEST ACCORDINGLY**
+
+### Testing Infrastructure:
+1. **Unit Tests** (`*.test.ts`): `pnpm test`
+   - Use Vitest with Node environment for isolated unit testing
+   - Mock external dependencies with `vi.mock()` and `vi.spyOn()`
+   - Test individual functions in isolation
+   - Pass API keys and config as parameters, not environment variables
+
+2. **Integration Tests** (`*.spec.ts`): `pnpm test:integration`
+   - Use `@cloudflare/vitest-pool-workers` for Cloudflare Workers runtime
+   - Tests run inside actual Workers environment with Miniflare
+   - Access to KV, R2, D1, and other Cloudflare bindings
+   - Configure in `vitest.config.cloudflare.mts`:
+   ```typescript
+   export default defineWorkersConfig({
+     test: {
+       poolOptions: {
+         workers: {
+           wrangler: { configPath: './wrangler.jsonc' },
+           bindings: {
+             RAFTERS_INTEL: { type: 'kv' },
+             CLAUDE_API_KEY: 'test-api-key',
+           }
+         }
+       }
+     }
+   })
+   ```
+
+3. **E2E Tests** (`*.e2e.ts`): `pnpm test:e2e`
+   - Use Playwright for full browser testing
+   - Test complete user workflows
+
+### Test File Organization:
+```
+apps/website/
+├── src/                    # Source code
+│   └── app/api/route.ts
+└── test/                   # Mirror structure of src
+    └── api/
+        ├── route.test.ts   # Unit tests
+        ├── route.spec.ts   # Integration tests (Cloudflare runtime)
+        └── route.e2e.ts    # E2E tests (Playwright)
+```
+
+### Cloudflare Testing Patterns:
+- Import from `cloudflare:test` for Workers test utilities
+- Use `env` object for bindings, NOT `process.env`
+- Mock Claude/external APIs at module level
+- Each test runs in isolated KV namespace
+- Tests have access to all Cloudflare APIs (KV, R2, D1, etc.)
+
 ## ACCESSIBILITY CONSULTATION - MANDATORY SALLY:
 **BEFORE PREFLIGHT - ALWAYS CONSULT SALLY FOR ACCESSIBILITY REVIEW**
 - Sally ensures WCAG AAA compliance and Section 508 requirements
