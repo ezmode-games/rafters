@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@rafters/studio", "rafters-ui", "website"]
+  "ignore": ["@rafters/studio", "rafters-ui", "website", "api"]
 }
