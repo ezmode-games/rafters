@@ -1,0 +1,493 @@
+{
+  "tailwind": [
+    { "oklch": { "l": 0.984, "c": 0.003, "h": 247.858 }, "token": "muted", "name": "Slate 50" },
+    { "oklch": { "l": 0.968, "c": 0.007, "h": 247.896 }, "token": "muted", "name": "Slate 100" },
+    { "oklch": { "l": 0.929, "c": 0.013, "h": 255.508 }, "token": "muted", "name": "Slate 200" },
+    { "oklch": { "l": 0.869, "c": 0.022, "h": 252.894 }, "token": "muted", "name": "Slate 300" },
+    { "oklch": { "l": 0.704, "c": 0.04, "h": 256.788 }, "token": "muted", "name": "Slate 400" },
+    {
+      "oklch": { "l": 0.554, "c": 0.046, "h": 257.417 },
+      "token": "muted-foreground",
+      "name": "Slate 500"
+    },
+    {
+      "oklch": { "l": 0.446, "c": 0.043, "h": 257.281 },
+      "token": "foreground",
+      "name": "Slate 600"
+    },
+    {
+      "oklch": { "l": 0.372, "c": 0.044, "h": 257.287 },
+      "token": "foreground",
+      "name": "Slate 700"
+    },
+    {
+      "oklch": { "l": 0.279, "c": 0.041, "h": 260.031 },
+      "token": "foreground",
+      "name": "Slate 800"
+    },
+    {
+      "oklch": { "l": 0.208, "c": 0.042, "h": 265.755 },
+      "token": "foreground",
+      "name": "Slate 900"
+    },
+    {
+      "oklch": { "l": 0.129, "c": 0.042, "h": 264.695 },
+      "token": "foreground",
+      "name": "Slate 950"
+    },
+
+    { "oklch": { "l": 0.985, "c": 0.002, "h": 247.839 }, "token": "muted", "name": "Gray 50" },
+    { "oklch": { "l": 0.967, "c": 0.003, "h": 264.542 }, "token": "muted", "name": "Gray 100" },
+    { "oklch": { "l": 0.928, "c": 0.006, "h": 264.531 }, "token": "muted", "name": "Gray 200" },
+    { "oklch": { "l": 0.872, "c": 0.01, "h": 258.338 }, "token": "muted", "name": "Gray 300" },
+    { "oklch": { "l": 0.707, "c": 0.022, "h": 261.325 }, "token": "muted", "name": "Gray 400" },
+    {
+      "oklch": { "l": 0.551, "c": 0.027, "h": 264.364 },
+      "token": "muted-foreground",
+      "name": "Gray 500"
+    },
+    { "oklch": { "l": 0.446, "c": 0.03, "h": 256.802 }, "token": "foreground", "name": "Gray 600" },
+    {
+      "oklch": { "l": 0.373, "c": 0.034, "h": 259.733 },
+      "token": "foreground",
+      "name": "Gray 700"
+    },
+    {
+      "oklch": { "l": 0.278, "c": 0.033, "h": 256.848 },
+      "token": "foreground",
+      "name": "Gray 800"
+    },
+    { "oklch": { "l": 0.21, "c": 0.034, "h": 264.665 }, "token": "foreground", "name": "Gray 900" },
+    { "oklch": { "l": 0.13, "c": 0.028, "h": 261.692 }, "token": "foreground", "name": "Gray 950" },
+
+    { "oklch": { "l": 0.985, "c": 0.001, "h": 286.38 }, "token": "muted", "name": "Zinc 50" },
+    { "oklch": { "l": 0.967, "c": 0.002, "h": 286.38 }, "token": "muted", "name": "Zinc 100" },
+    { "oklch": { "l": 0.93, "c": 0.004, "h": 286.38 }, "token": "muted", "name": "Zinc 200" },
+    { "oklch": { "l": 0.872, "c": 0.007, "h": 286.38 }, "token": "muted", "name": "Zinc 300" },
+    { "oklch": { "l": 0.709, "c": 0.014, "h": 286.38 }, "token": "muted", "name": "Zinc 400" },
+    {
+      "oklch": { "l": 0.553, "c": 0.017, "h": 286.38 },
+      "token": "muted-foreground",
+      "name": "Zinc 500"
+    },
+    { "oklch": { "l": 0.449, "c": 0.015, "h": 286.38 }, "token": "foreground", "name": "Zinc 600" },
+    { "oklch": { "l": 0.374, "c": 0.013, "h": 286.38 }, "token": "foreground", "name": "Zinc 700" },
+    { "oklch": { "l": 0.279, "c": 0.011, "h": 286.38 }, "token": "foreground", "name": "Zinc 800" },
+    { "oklch": { "l": 0.21, "c": 0.009, "h": 286.38 }, "token": "foreground", "name": "Zinc 900" },
+    { "oklch": { "l": 0.141, "c": 0.006, "h": 286.38 }, "token": "foreground", "name": "Zinc 950" },
+
+    { "oklch": { "l": 0.985, "c": 0.0, "h": 0 }, "token": "muted", "name": "Neutral 50" },
+    { "oklch": { "l": 0.97, "c": 0.001, "h": 30 }, "token": "muted", "name": "Neutral 100" },
+    { "oklch": { "l": 0.933, "c": 0.003, "h": 30 }, "token": "muted", "name": "Neutral 200" },
+    { "oklch": { "l": 0.875, "c": 0.005, "h": 30 }, "token": "muted", "name": "Neutral 300" },
+    { "oklch": { "l": 0.715, "c": 0.008, "h": 30 }, "token": "muted", "name": "Neutral 400" },
+    {
+      "oklch": { "l": 0.558, "c": 0.01, "h": 30 },
+      "token": "muted-foreground",
+      "name": "Neutral 500"
+    },
+    { "oklch": { "l": 0.453, "c": 0.009, "h": 30 }, "token": "foreground", "name": "Neutral 600" },
+    { "oklch": { "l": 0.378, "c": 0.007, "h": 30 }, "token": "foreground", "name": "Neutral 700" },
+    { "oklch": { "l": 0.283, "c": 0.006, "h": 30 }, "token": "foreground", "name": "Neutral 800" },
+    { "oklch": { "l": 0.213, "c": 0.004, "h": 30 }, "token": "foreground", "name": "Neutral 900" },
+    { "oklch": { "l": 0.145, "c": 0.003, "h": 30 }, "token": "foreground", "name": "Neutral 950" },
+
+    { "oklch": { "l": 0.985, "c": 0.001, "h": 60 }, "token": "muted", "name": "Stone 50" },
+    { "oklch": { "l": 0.972, "c": 0.003, "h": 60 }, "token": "muted", "name": "Stone 100" },
+    { "oklch": { "l": 0.938, "c": 0.006, "h": 60 }, "token": "muted", "name": "Stone 200" },
+    { "oklch": { "l": 0.882, "c": 0.011, "h": 60 }, "token": "muted", "name": "Stone 300" },
+    { "oklch": { "l": 0.725, "c": 0.018, "h": 60 }, "token": "muted", "name": "Stone 400" },
+    {
+      "oklch": { "l": 0.57, "c": 0.022, "h": 60 },
+      "token": "muted-foreground",
+      "name": "Stone 500"
+    },
+    { "oklch": { "l": 0.465, "c": 0.02, "h": 60 }, "token": "foreground", "name": "Stone 600" },
+    { "oklch": { "l": 0.389, "c": 0.017, "h": 60 }, "token": "foreground", "name": "Stone 700" },
+    { "oklch": { "l": 0.294, "c": 0.014, "h": 60 }, "token": "foreground", "name": "Stone 800" },
+    { "oklch": { "l": 0.223, "c": 0.012, "h": 60 }, "token": "foreground", "name": "Stone 900" },
+    { "oklch": { "l": 0.147, "c": 0.009, "h": 60 }, "token": "foreground", "name": "Stone 950" },
+
+    { "oklch": { "l": 0.971, "c": 0.013, "h": 17.686 }, "token": "destructive", "name": "Red 50" },
+    { "oklch": { "l": 0.936, "c": 0.032, "h": 17.917 }, "token": "destructive", "name": "Red 100" },
+    { "oklch": { "l": 0.885, "c": 0.058, "h": 17.372 }, "token": "destructive", "name": "Red 200" },
+    { "oklch": { "l": 0.808, "c": 0.087, "h": 17.372 }, "token": "destructive", "name": "Red 300" },
+    { "oklch": { "l": 0.704, "c": 0.129, "h": 17.686 }, "token": "destructive", "name": "Red 400" },
+    { "oklch": { "l": 0.588, "c": 0.15, "h": 17.686 }, "token": "destructive", "name": "Red 500" },
+    { "oklch": { "l": 0.489, "c": 0.159, "h": 17.543 }, "token": "destructive", "name": "Red 600" },
+    { "oklch": { "l": 0.42, "c": 0.153, "h": 17.686 }, "token": "destructive", "name": "Red 700" },
+    { "oklch": { "l": 0.358, "c": 0.138, "h": 17.917 }, "token": "destructive", "name": "Red 800" },
+    { "oklch": { "l": 0.31, "c": 0.118, "h": 18.279 }, "token": "destructive", "name": "Red 900" },
+    { "oklch": { "l": 0.258, "c": 0.09, "h": 18.279 }, "token": "destructive", "name": "Red 950" },
+
+    { "oklch": { "l": 0.98, "c": 0.008, "h": 83.214 }, "token": "warning", "name": "Orange 50" },
+    { "oklch": { "l": 0.951, "c": 0.023, "h": 83.214 }, "token": "warning", "name": "Orange 100" },
+    { "oklch": { "l": 0.902, "c": 0.048, "h": 83.214 }, "token": "warning", "name": "Orange 200" },
+    { "oklch": { "l": 0.838, "c": 0.08, "h": 83.214 }, "token": "warning", "name": "Orange 300" },
+    { "oklch": { "l": 0.75, "c": 0.114, "h": 83.214 }, "token": "warning", "name": "Orange 400" },
+    { "oklch": { "l": 0.672, "c": 0.141, "h": 83.214 }, "token": "warning", "name": "Orange 500" },
+    { "oklch": { "l": 0.585, "c": 0.153, "h": 83.214 }, "token": "warning", "name": "Orange 600" },
+    { "oklch": { "l": 0.5, "c": 0.148, "h": 83.214 }, "token": "warning", "name": "Orange 700" },
+    { "oklch": { "l": 0.425, "c": 0.125, "h": 83.214 }, "token": "warning", "name": "Orange 800" },
+    { "oklch": { "l": 0.362, "c": 0.1, "h": 83.214 }, "token": "warning", "name": "Orange 900" },
+    { "oklch": { "l": 0.266, "c": 0.074, "h": 83.214 }, "token": "warning", "name": "Orange 950" },
+
+    { "oklch": { "l": 0.987, "c": 0.005, "h": 102.212 }, "token": "warning", "name": "Amber 50" },
+    { "oklch": { "l": 0.969, "c": 0.014, "h": 102.212 }, "token": "warning", "name": "Amber 100" },
+    { "oklch": { "l": 0.935, "c": 0.03, "h": 102.212 }, "token": "warning", "name": "Amber 200" },
+    { "oklch": { "l": 0.884, "c": 0.055, "h": 102.212 }, "token": "warning", "name": "Amber 300" },
+    { "oklch": { "l": 0.82, "c": 0.086, "h": 102.212 }, "token": "warning", "name": "Amber 400" },
+    { "oklch": { "l": 0.756, "c": 0.108, "h": 102.212 }, "token": "warning", "name": "Amber 500" },
+    { "oklch": { "l": 0.672, "c": 0.124, "h": 102.212 }, "token": "warning", "name": "Amber 600" },
+    { "oklch": { "l": 0.567, "c": 0.131, "h": 102.212 }, "token": "warning", "name": "Amber 700" },
+    { "oklch": { "l": 0.481, "c": 0.123, "h": 102.212 }, "token": "warning", "name": "Amber 800" },
+    { "oklch": { "l": 0.414, "c": 0.107, "h": 102.212 }, "token": "warning", "name": "Amber 900" },
+    { "oklch": { "l": 0.279, "c": 0.081, "h": 102.212 }, "token": "warning", "name": "Amber 950" },
+
+    { "oklch": { "l": 0.987, "c": 0.007, "h": 107.824 }, "token": "warning", "name": "Yellow 50" },
+    { "oklch": { "l": 0.972, "c": 0.017, "h": 107.824 }, "token": "warning", "name": "Yellow 100" },
+    { "oklch": { "l": 0.946, "c": 0.04, "h": 107.824 }, "token": "warning", "name": "Yellow 200" },
+    { "oklch": { "l": 0.909, "c": 0.071, "h": 107.824 }, "token": "warning", "name": "Yellow 300" },
+    { "oklch": { "l": 0.854, "c": 0.103, "h": 107.824 }, "token": "warning", "name": "Yellow 400" },
+    { "oklch": { "l": 0.802, "c": 0.125, "h": 107.824 }, "token": "warning", "name": "Yellow 500" },
+    { "oklch": { "l": 0.716, "c": 0.138, "h": 107.824 }, "token": "warning", "name": "Yellow 600" },
+    { "oklch": { "l": 0.609, "c": 0.138, "h": 107.824 }, "token": "warning", "name": "Yellow 700" },
+    { "oklch": { "l": 0.519, "c": 0.123, "h": 107.824 }, "token": "warning", "name": "Yellow 800" },
+    { "oklch": { "l": 0.447, "c": 0.105, "h": 107.824 }, "token": "warning", "name": "Yellow 900" },
+    { "oklch": { "l": 0.286, "c": 0.076, "h": 107.824 }, "token": "warning", "name": "Yellow 950" },
+
+    { "oklch": { "l": 0.986, "c": 0.009, "h": 124.076 }, "token": "success", "name": "Lime 50" },
+    { "oklch": { "l": 0.968, "c": 0.022, "h": 124.076 }, "token": "success", "name": "Lime 100" },
+    { "oklch": { "l": 0.938, "c": 0.046, "h": 124.076 }, "token": "success", "name": "Lime 200" },
+    { "oklch": { "l": 0.892, "c": 0.08, "h": 124.076 }, "token": "success", "name": "Lime 300" },
+    { "oklch": { "l": 0.831, "c": 0.121, "h": 124.076 }, "token": "success", "name": "Lime 400" },
+    { "oklch": { "l": 0.764, "c": 0.154, "h": 124.076 }, "token": "success", "name": "Lime 500" },
+    { "oklch": { "l": 0.681, "c": 0.171, "h": 124.076 }, "token": "success", "name": "Lime 600" },
+    { "oklch": { "l": 0.591, "c": 0.169, "h": 124.076 }, "token": "success", "name": "Lime 700" },
+    { "oklch": { "l": 0.506, "c": 0.149, "h": 124.076 }, "token": "success", "name": "Lime 800" },
+    { "oklch": { "l": 0.433, "c": 0.125, "h": 124.076 }, "token": "success", "name": "Lime 900" },
+    { "oklch": { "l": 0.274, "c": 0.089, "h": 124.076 }, "token": "success", "name": "Lime 950" },
+
+    { "oklch": { "l": 0.982, "c": 0.013, "h": 138.337 }, "token": "success", "name": "Green 50" },
+    { "oklch": { "l": 0.952, "c": 0.04, "h": 138.337 }, "token": "success", "name": "Green 100" },
+    { "oklch": { "l": 0.906, "c": 0.077, "h": 138.337 }, "token": "success", "name": "Green 200" },
+    { "oklch": { "l": 0.839, "c": 0.124, "h": 138.337 }, "token": "success", "name": "Green 300" },
+    { "oklch": { "l": 0.748, "c": 0.157, "h": 138.337 }, "token": "success", "name": "Green 400" },
+    { "oklch": { "l": 0.664, "c": 0.177, "h": 138.337 }, "token": "success", "name": "Green 500" },
+    { "oklch": { "l": 0.583, "c": 0.181, "h": 138.337 }, "token": "success", "name": "Green 600" },
+    { "oklch": { "l": 0.516, "c": 0.171, "h": 138.337 }, "token": "success", "name": "Green 700" },
+    { "oklch": { "l": 0.453, "c": 0.15, "h": 138.337 }, "token": "success", "name": "Green 800" },
+    { "oklch": { "l": 0.39, "c": 0.124, "h": 138.337 }, "token": "success", "name": "Green 900" },
+    { "oklch": { "l": 0.266, "c": 0.093, "h": 138.337 }, "token": "success", "name": "Green 950" },
+
+    { "oklch": { "l": 0.979, "c": 0.016, "h": 155.233 }, "token": "success", "name": "Emerald 50" },
+    {
+      "oklch": { "l": 0.947, "c": 0.042, "h": 155.233 },
+      "token": "success",
+      "name": "Emerald 100"
+    },
+    {
+      "oklch": { "l": 0.895, "c": 0.082, "h": 155.233 },
+      "token": "success",
+      "name": "Emerald 200"
+    },
+    {
+      "oklch": { "l": 0.825, "c": 0.127, "h": 155.233 },
+      "token": "success",
+      "name": "Emerald 300"
+    },
+    {
+      "oklch": { "l": 0.732, "c": 0.158, "h": 155.233 },
+      "token": "success",
+      "name": "Emerald 400"
+    },
+    {
+      "oklch": { "l": 0.652, "c": 0.177, "h": 155.233 },
+      "token": "success",
+      "name": "Emerald 500"
+    },
+    { "oklch": { "l": 0.57, "c": 0.181, "h": 155.233 }, "token": "success", "name": "Emerald 600" },
+    { "oklch": { "l": 0.508, "c": 0.17, "h": 155.233 }, "token": "success", "name": "Emerald 700" },
+    { "oklch": { "l": 0.444, "c": 0.15, "h": 155.233 }, "token": "success", "name": "Emerald 800" },
+    {
+      "oklch": { "l": 0.385, "c": 0.126, "h": 155.233 },
+      "token": "success",
+      "name": "Emerald 900"
+    },
+    {
+      "oklch": { "l": 0.262, "c": 0.094, "h": 155.233 },
+      "token": "success",
+      "name": "Emerald 950"
+    },
+
+    { "oklch": { "l": 0.984, "c": 0.014, "h": 180.637 }, "token": "info", "name": "Teal 50" },
+    { "oklch": { "l": 0.956, "c": 0.04, "h": 180.637 }, "token": "info", "name": "Teal 100" },
+    { "oklch": { "l": 0.912, "c": 0.076, "h": 180.637 }, "token": "info", "name": "Teal 200" },
+    { "oklch": { "l": 0.85, "c": 0.118, "h": 180.637 }, "token": "info", "name": "Teal 300" },
+    { "oklch": { "l": 0.761, "c": 0.15, "h": 180.637 }, "token": "info", "name": "Teal 400" },
+    { "oklch": { "l": 0.684, "c": 0.169, "h": 180.637 }, "token": "info", "name": "Teal 500" },
+    { "oklch": { "l": 0.603, "c": 0.174, "h": 180.637 }, "token": "info", "name": "Teal 600" },
+    { "oklch": { "l": 0.539, "c": 0.166, "h": 180.637 }, "token": "info", "name": "Teal 700" },
+    { "oklch": { "l": 0.473, "c": 0.146, "h": 180.637 }, "token": "info", "name": "Teal 800" },
+    { "oklch": { "l": 0.414, "c": 0.123, "h": 180.637 }, "token": "info", "name": "Teal 900" },
+    { "oklch": { "l": 0.277, "c": 0.09, "h": 180.637 }, "token": "info", "name": "Teal 950" },
+
+    { "oklch": { "l": 0.984, "c": 0.012, "h": 194.769 }, "token": "info", "name": "Cyan 50" },
+    { "oklch": { "l": 0.958, "c": 0.033, "h": 194.769 }, "token": "info", "name": "Cyan 100" },
+    { "oklch": { "l": 0.92, "c": 0.067, "h": 194.769 }, "token": "info", "name": "Cyan 200" },
+    { "oklch": { "l": 0.866, "c": 0.108, "h": 194.769 }, "token": "info", "name": "Cyan 300" },
+    { "oklch": { "l": 0.787, "c": 0.142, "h": 194.769 }, "token": "info", "name": "Cyan 400" },
+    { "oklch": { "l": 0.72, "c": 0.159, "h": 194.769 }, "token": "info", "name": "Cyan 500" },
+    { "oklch": { "l": 0.64, "c": 0.166, "h": 194.769 }, "token": "info", "name": "Cyan 600" },
+    { "oklch": { "l": 0.569, "c": 0.159, "h": 194.769 }, "token": "info", "name": "Cyan 700" },
+    { "oklch": { "l": 0.502, "c": 0.142, "h": 194.769 }, "token": "info", "name": "Cyan 800" },
+    { "oklch": { "l": 0.443, "c": 0.12, "h": 194.769 }, "token": "info", "name": "Cyan 900" },
+    { "oklch": { "l": 0.302, "c": 0.088, "h": 194.769 }, "token": "info", "name": "Cyan 950" },
+
+    { "oklch": { "l": 0.977, "c": 0.013, "h": 218.8 }, "token": "info", "name": "Sky 50" },
+    { "oklch": { "l": 0.946, "c": 0.033, "h": 218.8 }, "token": "info", "name": "Sky 100" },
+    { "oklch": { "l": 0.901, "c": 0.067, "h": 218.8 }, "token": "info", "name": "Sky 200" },
+    { "oklch": { "l": 0.839, "c": 0.108, "h": 218.8 }, "token": "info", "name": "Sky 300" },
+    { "oklch": { "l": 0.756, "c": 0.142, "h": 218.8 }, "token": "info", "name": "Sky 400" },
+    { "oklch": { "l": 0.685, "c": 0.159, "h": 218.8 }, "token": "info", "name": "Sky 500" },
+    { "oklch": { "l": 0.603, "c": 0.166, "h": 218.8 }, "token": "info", "name": "Sky 600" },
+    { "oklch": { "l": 0.532, "c": 0.159, "h": 218.8 }, "token": "info", "name": "Sky 700" },
+    { "oklch": { "l": 0.465, "c": 0.142, "h": 218.8 }, "token": "info", "name": "Sky 800" },
+    { "oklch": { "l": 0.408, "c": 0.12, "h": 218.8 }, "token": "info", "name": "Sky 900" },
+    { "oklch": { "l": 0.293, "c": 0.088, "h": 218.8 }, "token": "info", "name": "Sky 950" },
+
+    { "oklch": { "l": 0.97, "c": 0.013, "h": 238.756 }, "token": "primary", "name": "Blue 50" },
+    { "oklch": { "l": 0.929, "c": 0.039, "h": 238.756 }, "token": "primary", "name": "Blue 100" },
+    { "oklch": { "l": 0.867, "c": 0.077, "h": 238.756 }, "token": "primary", "name": "Blue 200" },
+    { "oklch": { "l": 0.776, "c": 0.123, "h": 238.756 }, "token": "primary", "name": "Blue 300" },
+    { "oklch": { "l": 0.678, "c": 0.159, "h": 238.756 }, "token": "primary", "name": "Blue 400" },
+    { "oklch": { "l": 0.588, "c": 0.186, "h": 238.756 }, "token": "primary", "name": "Blue 500" },
+    { "oklch": { "l": 0.508, "c": 0.208, "h": 238.756 }, "token": "primary", "name": "Blue 600" },
+    { "oklch": { "l": 0.446, "c": 0.218, "h": 238.756 }, "token": "primary", "name": "Blue 700" },
+    { "oklch": { "l": 0.392, "c": 0.206, "h": 238.756 }, "token": "primary", "name": "Blue 800" },
+    { "oklch": { "l": 0.346, "c": 0.172, "h": 238.756 }, "token": "primary", "name": "Blue 900" },
+    { "oklch": { "l": 0.282, "c": 0.124, "h": 238.756 }, "token": "primary", "name": "Blue 950" },
+
+    { "oklch": { "l": 0.962, "c": 0.02, "h": 262.881 }, "token": "primary", "name": "Indigo 50" },
+    { "oklch": { "l": 0.915, "c": 0.052, "h": 262.881 }, "token": "primary", "name": "Indigo 100" },
+    { "oklch": { "l": 0.852, "c": 0.092, "h": 262.881 }, "token": "primary", "name": "Indigo 200" },
+    { "oklch": { "l": 0.768, "c": 0.138, "h": 262.881 }, "token": "primary", "name": "Indigo 300" },
+    { "oklch": { "l": 0.67, "c": 0.173, "h": 262.881 }, "token": "primary", "name": "Indigo 400" },
+    { "oklch": { "l": 0.582, "c": 0.196, "h": 262.881 }, "token": "primary", "name": "Indigo 500" },
+    { "oklch": { "l": 0.51, "c": 0.214, "h": 262.881 }, "token": "primary", "name": "Indigo 600" },
+    { "oklch": { "l": 0.456, "c": 0.215, "h": 262.881 }, "token": "primary", "name": "Indigo 700" },
+    { "oklch": { "l": 0.398, "c": 0.192, "h": 262.881 }, "token": "primary", "name": "Indigo 800" },
+    { "oklch": { "l": 0.353, "c": 0.156, "h": 262.881 }, "token": "primary", "name": "Indigo 900" },
+    { "oklch": { "l": 0.257, "c": 0.111, "h": 262.881 }, "token": "primary", "name": "Indigo 950" },
+
+    { "oklch": { "l": 0.969, "c": 0.018, "h": 293.135 }, "token": "accent", "name": "Violet 50" },
+    { "oklch": { "l": 0.929, "c": 0.049, "h": 293.135 }, "token": "accent", "name": "Violet 100" },
+    { "oklch": { "l": 0.875, "c": 0.091, "h": 293.135 }, "token": "accent", "name": "Violet 200" },
+    { "oklch": { "l": 0.802, "c": 0.141, "h": 293.135 }, "token": "accent", "name": "Violet 300" },
+    { "oklch": { "l": 0.716, "c": 0.18, "h": 293.135 }, "token": "accent", "name": "Violet 400" },
+    { "oklch": { "l": 0.63, "c": 0.207, "h": 293.135 }, "token": "accent", "name": "Violet 500" },
+    { "oklch": { "l": 0.56, "c": 0.226, "h": 293.135 }, "token": "accent", "name": "Violet 600" },
+    { "oklch": { "l": 0.508, "c": 0.224, "h": 293.135 }, "token": "accent", "name": "Violet 700" },
+    { "oklch": { "l": 0.451, "c": 0.2, "h": 293.135 }, "token": "accent", "name": "Violet 800" },
+    { "oklch": { "l": 0.401, "c": 0.168, "h": 293.135 }, "token": "accent", "name": "Violet 900" },
+    { "oklch": { "l": 0.283, "c": 0.121, "h": 293.135 }, "token": "accent", "name": "Violet 950" },
+
+    { "oklch": { "l": 0.977, "c": 0.015, "h": 308.322 }, "token": "accent", "name": "Purple 50" },
+    { "oklch": { "l": 0.944, "c": 0.042, "h": 308.322 }, "token": "accent", "name": "Purple 100" },
+    { "oklch": { "l": 0.898, "c": 0.081, "h": 308.322 }, "token": "accent", "name": "Purple 200" },
+    { "oklch": { "l": 0.835, "c": 0.126, "h": 308.322 }, "token": "accent", "name": "Purple 300" },
+    { "oklch": { "l": 0.755, "c": 0.162, "h": 308.322 }, "token": "accent", "name": "Purple 400" },
+    { "oklch": { "l": 0.679, "c": 0.184, "h": 308.322 }, "token": "accent", "name": "Purple 500" },
+    { "oklch": { "l": 0.608, "c": 0.196, "h": 308.322 }, "token": "accent", "name": "Purple 600" },
+    { "oklch": { "l": 0.555, "c": 0.19, "h": 308.322 }, "token": "accent", "name": "Purple 700" },
+    { "oklch": { "l": 0.494, "c": 0.171, "h": 308.322 }, "token": "accent", "name": "Purple 800" },
+    { "oklch": { "l": 0.44, "c": 0.145, "h": 308.322 }, "token": "accent", "name": "Purple 900" },
+    { "oklch": { "l": 0.291, "c": 0.106, "h": 308.322 }, "token": "accent", "name": "Purple 950" },
+
+    { "oklch": { "l": 0.98, "c": 0.017, "h": 325.882 }, "token": "accent", "name": "Fuchsia 50" },
+    { "oklch": { "l": 0.952, "c": 0.049, "h": 325.882 }, "token": "accent", "name": "Fuchsia 100" },
+    { "oklch": { "l": 0.91, "c": 0.096, "h": 325.882 }, "token": "accent", "name": "Fuchsia 200" },
+    { "oklch": { "l": 0.852, "c": 0.153, "h": 325.882 }, "token": "accent", "name": "Fuchsia 300" },
+    { "oklch": { "l": 0.774, "c": 0.2, "h": 325.882 }, "token": "accent", "name": "Fuchsia 400" },
+    { "oklch": { "l": 0.701, "c": 0.221, "h": 325.882 }, "token": "accent", "name": "Fuchsia 500" },
+    { "oklch": { "l": 0.624, "c": 0.223, "h": 325.882 }, "token": "accent", "name": "Fuchsia 600" },
+    { "oklch": { "l": 0.562, "c": 0.206, "h": 325.882 }, "token": "accent", "name": "Fuchsia 700" },
+    { "oklch": { "l": 0.495, "c": 0.179, "h": 325.882 }, "token": "accent", "name": "Fuchsia 800" },
+    { "oklch": { "l": 0.436, "c": 0.15, "h": 325.882 }, "token": "accent", "name": "Fuchsia 900" },
+    { "oklch": { "l": 0.292, "c": 0.106, "h": 325.882 }, "token": "accent", "name": "Fuchsia 950" },
+
+    { "oklch": { "l": 0.977, "c": 0.014, "h": 347.967 }, "token": "accent", "name": "Pink 50" },
+    { "oklch": { "l": 0.946, "c": 0.038, "h": 347.967 }, "token": "accent", "name": "Pink 100" },
+    { "oklch": { "l": 0.902, "c": 0.075, "h": 347.967 }, "token": "accent", "name": "Pink 200" },
+    { "oklch": { "l": 0.838, "c": 0.12, "h": 347.967 }, "token": "accent", "name": "Pink 300" },
+    { "oklch": { "l": 0.756, "c": 0.155, "h": 347.967 }, "token": "accent", "name": "Pink 400" },
+    { "oklch": { "l": 0.685, "c": 0.173, "h": 347.967 }, "token": "accent", "name": "Pink 500" },
+    { "oklch": { "l": 0.614, "c": 0.175, "h": 347.967 }, "token": "accent", "name": "Pink 600" },
+    { "oklch": { "l": 0.558, "c": 0.164, "h": 347.967 }, "token": "accent", "name": "Pink 700" },
+    { "oklch": { "l": 0.495, "c": 0.146, "h": 347.967 }, "token": "accent", "name": "Pink 800" },
+    { "oklch": { "l": 0.442, "c": 0.125, "h": 347.967 }, "token": "accent", "name": "Pink 900" },
+    { "oklch": { "l": 0.295, "c": 0.089, "h": 347.967 }, "token": "accent", "name": "Pink 950" },
+
+    { "oklch": { "l": 0.98, "c": 0.01, "h": 7.627 }, "token": "accent", "name": "Rose 50" },
+    { "oklch": { "l": 0.954, "c": 0.026, "h": 7.627 }, "token": "accent", "name": "Rose 100" },
+    { "oklch": { "l": 0.916, "c": 0.051, "h": 7.627 }, "token": "accent", "name": "Rose 200" },
+    { "oklch": { "l": 0.862, "c": 0.081, "h": 7.627 }, "token": "accent", "name": "Rose 300" },
+    { "oklch": { "l": 0.786, "c": 0.114, "h": 7.627 }, "token": "accent", "name": "Rose 400" },
+    { "oklch": { "l": 0.713, "c": 0.138, "h": 7.627 }, "token": "accent", "name": "Rose 500" },
+    { "oklch": { "l": 0.639, "c": 0.149, "h": 7.627 }, "token": "accent", "name": "Rose 600" },
+    { "oklch": { "l": 0.575, "c": 0.149, "h": 7.627 }, "token": "accent", "name": "Rose 700" },
+    { "oklch": { "l": 0.51, "c": 0.134, "h": 7.627 }, "token": "accent", "name": "Rose 800" },
+    { "oklch": { "l": 0.457, "c": 0.114, "h": 7.627 }, "token": "accent", "name": "Rose 900" },
+    { "oklch": { "l": 0.309, "c": 0.082, "h": 7.627 }, "token": "accent", "name": "Rose 950" }
+  ],
+  "material": [
+    {
+      "oklch": { "l": 0.59, "c": 0.24, "h": 259 },
+      "token": "primary",
+      "name": "Material Blue Main"
+    },
+    {
+      "oklch": { "l": 0.75, "c": 0.18, "h": 259 },
+      "token": "primary",
+      "name": "Material Blue Light"
+    },
+    {
+      "oklch": { "l": 0.45, "c": 0.28, "h": 259 },
+      "token": "primary",
+      "name": "Material Blue Dark"
+    },
+    {
+      "oklch": { "l": 0.87, "c": 0.02, "h": 259 },
+      "token": "secondary",
+      "name": "Material Secondary Main"
+    },
+    {
+      "oklch": { "l": 0.9, "c": 0.015, "h": 259 },
+      "token": "secondary",
+      "name": "Material Secondary Light"
+    },
+    {
+      "oklch": { "l": 0.61, "c": 0.025, "h": 259 },
+      "token": "secondary",
+      "name": "Material Secondary Dark"
+    },
+    {
+      "oklch": { "l": 0.69, "c": 0.21, "h": 12 },
+      "token": "destructive",
+      "name": "Material Error Main"
+    },
+    {
+      "oklch": { "l": 0.82, "c": 0.16, "h": 12 },
+      "token": "destructive",
+      "name": "Material Error Light"
+    },
+    {
+      "oklch": { "l": 0.48, "c": 0.25, "h": 12 },
+      "token": "destructive",
+      "name": "Material Error Dark"
+    },
+    {
+      "oklch": { "l": 0.74, "c": 0.15, "h": 79 },
+      "token": "warning",
+      "name": "Material Warning Main"
+    },
+    {
+      "oklch": { "l": 0.84, "c": 0.12, "h": 79 },
+      "token": "warning",
+      "name": "Material Warning Light"
+    },
+    {
+      "oklch": { "l": 0.54, "c": 0.18, "h": 79 },
+      "token": "warning",
+      "name": "Material Warning Dark"
+    },
+    {
+      "oklch": { "l": 0.6, "c": 0.15, "h": 145 },
+      "token": "success",
+      "name": "Material Success Main"
+    },
+    {
+      "oklch": { "l": 0.75, "c": 0.12, "h": 145 },
+      "token": "success",
+      "name": "Material Success Light"
+    },
+    {
+      "oklch": { "l": 0.45, "c": 0.18, "h": 145 },
+      "token": "success",
+      "name": "Material Success Dark"
+    },
+    { "oklch": { "l": 0.65, "c": 0.18, "h": 220 }, "token": "info", "name": "Material Info Main" },
+    { "oklch": { "l": 0.78, "c": 0.14, "h": 220 }, "token": "info", "name": "Material Info Light" },
+    { "oklch": { "l": 0.42, "c": 0.22, "h": 220 }, "token": "info", "name": "Material Info Dark" }
+  ],
+  "brands": [
+    { "oklch": { "l": 0.45, "c": 0.25, "h": 221 }, "token": "brand", "name": "Facebook Blue" },
+    { "oklch": { "l": 0.55, "c": 0.22, "h": 240 }, "token": "brand", "name": "Google Blue" },
+    { "oklch": { "l": 0.62, "c": 0.19, "h": 132 }, "token": "brand", "name": "Google Green" },
+    { "oklch": { "l": 0.68, "c": 0.21, "h": 27 }, "token": "brand", "name": "Google Red" },
+    { "oklch": { "l": 0.78, "c": 0.18, "h": 64 }, "token": "brand", "name": "Google Yellow" },
+    { "oklch": { "l": 0.13, "c": 0.02, "h": 286 }, "token": "brand", "name": "GitHub Black" },
+    { "oklch": { "l": 0.52, "c": 0.32, "h": 212 }, "token": "brand", "name": "Twitter Blue" },
+    { "oklch": { "l": 0.45, "c": 0.28, "h": 259 }, "token": "brand", "name": "LinkedIn Blue" },
+    { "oklch": { "l": 0.58, "c": 0.2, "h": 320 }, "token": "brand", "name": "Instagram Pink" },
+    { "oklch": { "l": 0.42, "c": 0.24, "h": 12 }, "token": "brand", "name": "YouTube Red" },
+    { "oklch": { "l": 0.58, "c": 0.26, "h": 350 }, "token": "brand", "name": "Pinterest Red" },
+    { "oklch": { "l": 0.48, "c": 0.22, "h": 285 }, "token": "brand", "name": "Twitch Purple" },
+    { "oklch": { "l": 0.38, "c": 0.18, "h": 285 }, "token": "brand", "name": "Discord Purple" },
+    { "oklch": { "l": 0.55, "c": 0.24, "h": 25 }, "token": "brand", "name": "Slack Red" }
+  ],
+  "semantic": [
+    { "oklch": { "l": 0.75, "c": 0.15, "h": 135 }, "token": "success", "name": "Success Light" },
+    { "oklch": { "l": 0.6, "c": 0.18, "h": 135 }, "token": "success", "name": "Success Medium" },
+    { "oklch": { "l": 0.45, "c": 0.2, "h": 135 }, "token": "success", "name": "Success Dark" },
+    { "oklch": { "l": 0.88, "c": 0.08, "h": 135 }, "token": "success", "name": "Success Subtle" },
+    { "oklch": { "l": 0.8, "c": 0.16, "h": 75 }, "token": "warning", "name": "Warning Light" },
+    { "oklch": { "l": 0.7, "c": 0.2, "h": 75 }, "token": "warning", "name": "Warning Medium" },
+    { "oklch": { "l": 0.55, "c": 0.24, "h": 75 }, "token": "warning", "name": "Warning Dark" },
+    { "oklch": { "l": 0.92, "c": 0.08, "h": 75 }, "token": "warning", "name": "Warning Subtle" },
+    { "oklch": { "l": 0.72, "c": 0.18, "h": 15 }, "token": "destructive", "name": "Error Light" },
+    { "oklch": { "l": 0.58, "c": 0.22, "h": 15 }, "token": "destructive", "name": "Error Medium" },
+    { "oklch": { "l": 0.44, "c": 0.25, "h": 15 }, "token": "destructive", "name": "Error Dark" },
+    { "oklch": { "l": 0.89, "c": 0.09, "h": 15 }, "token": "destructive", "name": "Error Subtle" },
+    { "oklch": { "l": 0.78, "c": 0.14, "h": 220 }, "token": "info", "name": "Info Light" },
+    { "oklch": { "l": 0.64, "c": 0.18, "h": 220 }, "token": "info", "name": "Info Medium" },
+    { "oklch": { "l": 0.5, "c": 0.22, "h": 220 }, "token": "info", "name": "Info Dark" },
+    { "oklch": { "l": 0.9, "c": 0.07, "h": 220 }, "token": "info", "name": "Info Subtle" }
+  ],
+  "accessibility": [
+    {
+      "oklch": { "l": 0.95, "c": 0.005, "h": 240 },
+      "token": "background",
+      "name": "Light Background AAA"
+    },
+    { "oklch": { "l": 0.12, "c": 0.02, "h": 240 }, "token": "foreground", "name": "Dark Text AAA" },
+    {
+      "oklch": { "l": 0.85, "c": 0.01, "h": 240 },
+      "token": "muted",
+      "name": "Muted Background AA"
+    },
+    {
+      "oklch": { "l": 0.25, "c": 0.03, "h": 240 },
+      "token": "foreground",
+      "name": "High Contrast Text"
+    },
+    {
+      "oklch": { "l": 0.75, "c": 0.05, "h": 240 },
+      "token": "muted-foreground",
+      "name": "Medium Contrast Text"
+    }
+  ],
+  "grayscale": [
+    { "oklch": { "l": 0.0, "c": 0.0, "h": 0 }, "token": "foreground", "name": "Pure Black" },
+    { "oklch": { "l": 0.1, "c": 0.0, "h": 0 }, "token": "foreground", "name": "Gray 10" },
+    { "oklch": { "l": 0.2, "c": 0.0, "h": 0 }, "token": "foreground", "name": "Gray 20" },
+    { "oklch": { "l": 0.3, "c": 0.0, "h": 0 }, "token": "foreground", "name": "Gray 30" },
+    { "oklch": { "l": 0.4, "c": 0.0, "h": 0 }, "token": "muted-foreground", "name": "Gray 40" },
+    { "oklch": { "l": 0.5, "c": 0.0, "h": 0 }, "token": "muted-foreground", "name": "Gray 50" },
+    { "oklch": { "l": 0.6, "c": 0.0, "h": 0 }, "token": "muted", "name": "Gray 60" },
+    { "oklch": { "l": 0.7, "c": 0.0, "h": 0 }, "token": "muted", "name": "Gray 70" },
+    { "oklch": { "l": 0.8, "c": 0.0, "h": 0 }, "token": "muted", "name": "Gray 80" },
+    { "oklch": { "l": 0.9, "c": 0.0, "h": 0 }, "token": "background", "name": "Gray 90" },
+    { "oklch": { "l": 1.0, "c": 0.0, "h": 0 }, "token": "background", "name": "Pure White" }
+  ]
+}

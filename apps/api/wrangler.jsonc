@@ -1,0 +1,28 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rafters-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-08-30",
+  "observability": {
+    "enabled": true
+  },
+  "routes": [
+    {
+      "pattern": "rafters.realhandy.tech/api/*",
+      "zone_id": "bad23610704adb1dc65b05bc22d6fb6f"
+    }
+  ],
+  "vars": {
+    "CLAUDE_API_KEY": "test-key"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "RAFTERS_INTEL",
+      "id": "d740cdf6f7e649cdb53e43a61ce75df5"
+    }
+  ]
+}
