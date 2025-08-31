@@ -5,31 +5,34 @@
  */
 
 import { spawn } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-describe('rafters mcp', () => {
-  const testDir = '/tmp/rafters-mcp-test';
+import { ensureCLIBuilt, runCLI } from '../helpers/cliRunner.js';
+import { createTempTestApp } from '../helpers/testApp.js';
+import type { TestFixtureInfo } from '../types.js';
 
-  function setupTestProject() {
-    if (existsSync(testDir)) {
-      rmSync(testDir, { recursive: true, force: true });
-    }
-    mkdirSync(testDir, { recursive: true });
-    writeFileSync(
-      join(testDir, 'package.json'),
-      JSON.stringify({
-        name: 'mcp-test-app',
-        dependencies: { react: '^19.0.0' },
-      })
-    );
-  }
+describe('rafters mcp', { timeout: 30000 }, () => {
+  let testApp: TestFixtureInfo;
 
-  function runRaftersCommand(args: string[]) {
+  beforeEach(async () => {
+    // Ensure CLI is built
+    await ensureCLIBuilt();
+
+    // Create a temporary test app using the initialized-project fixture for most tests
+    // This fixture already has .rafters/tokens directory set up
+    testApp = await createTempTestApp('initialized-project');
+  });
+
+  afterEach(async () => {
+    // Clean up the temporary test app
+    await testApp.cleanup();
+  });
+
+  function runMCPCommand(args: string[]) {
     const cliPath = join(process.cwd(), 'dist', 'index.js');
     return spawn('node', [cliPath, ...args], {
-      cwd: testDir,
+      cwd: testApp.path,
       env: { ...process.env, CI: 'true' },
       stdio: ['pipe', 'pipe', 'pipe'],
     });
@@ -38,7 +41,7 @@ describe('rafters mcp', () => {
   /**
    * Create an MCP client that can communicate with the server via stdio
    */
-  function createMCPClient(process: ReturnType<typeof runRaftersCommand>) {
+  function createMCPClient(process: ReturnType<typeof runMCPCommand>) {
     let messageId = 1;
 
     const sendRequest = (method: string, params?: Record<string, unknown>): Promise<unknown> => {
@@ -61,11 +64,11 @@ describe('rafters mcp', () => {
 
           // Try to parse complete JSON responses
           const lines = responseBuffer.split('\n');
-          for (let i = 0; i < lines.length - 1; i++) {
-            const line = lines[i].trim();
-            if (line.startsWith('{')) {
+          for (const line of lines.slice(0, -1)) {
+            const trimmedLine = line.trim();
+            if (trimmedLine.startsWith('{')) {
               try {
-                const response = JSON.parse(line);
+                const response = JSON.parse(trimmedLine);
                 if (response.id === request.id) {
                   clearTimeout(timeout);
                   process.stdout?.off('data', onData);
@@ -119,18 +122,9 @@ describe('rafters mcp', () => {
     return { initialize, listTools, callTool, sendRequest };
   }
 
-  afterEach(async () => {
-    // Clean up any test directories
-    if (existsSync(testDir)) {
-      rmSync(testDir, { recursive: true, force: true });
-    }
-  });
-
   describe('MCP server startup and communication', () => {
     it('should start MCP server and establish stdio communication', async () => {
-      setupTestProject();
-
-      const serverProcess = runRaftersCommand(['mcp']);
+      const serverProcess = runMCPCommand(['mcp']);
       const client = createMCPClient(serverProcess);
 
       try {
@@ -150,9 +144,7 @@ describe('rafters mcp', () => {
     }, 10000);
 
     it('should list all 7 design intelligence tools', async () => {
-      setupTestProject();
-
-      const serverProcess = runRaftersCommand(['mcp']);
+      const serverProcess = runMCPCommand(['mcp']);
       const client = createMCPClient(serverProcess);
 
       try {
@@ -170,9 +162,7 @@ describe('rafters mcp', () => {
           'calculate_cognitive_load',
         ];
 
-        for (const expectedTool of expectedTools) {
-          expect(toolNames).toContain(expectedTool);
-        }
+        expect(toolNames).toEqual(expect.arrayContaining(expectedTools));
       } finally {
         serverProcess.kill('SIGTERM');
       }
@@ -181,10 +171,19 @@ describe('rafters mcp', () => {
 
   describe('token registry integration', () => {
     it('should handle missing .rafters directory gracefully', async () => {
-      setupTestProject();
-      // Don't run init, so no .rafters directory exists
+      // Use empty-project fixture which has no .rafters directory
+      const emptyTestApp = await createTempTestApp('empty-project');
 
-      const serverProcess = runRaftersCommand(['mcp']);
+      function runEmptyMCPCommand(args: string[]) {
+        const cliPath = join(process.cwd(), 'dist', 'index.js');
+        return spawn('node', [cliPath, ...args], {
+          cwd: emptyTestApp.path,
+          env: { ...process.env, CI: 'true' },
+          stdio: ['pipe', 'pipe', 'pipe'],
+        });
+      }
+
+      const serverProcess = runEmptyMCPCommand(['mcp']);
       const client = createMCPClient(serverProcess);
 
       try {
@@ -197,19 +196,12 @@ describe('rafters mcp', () => {
         expect(data.error).toContain('Token registry not found');
       } finally {
         serverProcess.kill('SIGTERM');
+        await emptyTestApp.cleanup();
       }
     }, 10000);
 
     it('should access token registry after initialization', async () => {
-      setupTestProject();
-
-      // Initialize project first
-      const initProcess = runRaftersCommand(['init', '--yes']);
-      await new Promise((resolve) => {
-        initProcess.on('close', resolve);
-      });
-
-      const serverProcess = runRaftersCommand(['mcp']);
+      const serverProcess = runMCPCommand(['mcp']);
       const client = createMCPClient(serverProcess);
 
       try {
@@ -234,15 +226,7 @@ describe('rafters mcp', () => {
     }, 15000);
 
     it('should get color intelligence for existing tokens', async () => {
-      setupTestProject();
-
-      // Initialize project first
-      const initProcess = runRaftersCommand(['init', '--yes']);
-      await new Promise((resolve) => {
-        initProcess.on('close', resolve);
-      });
-
-      const serverProcess = runRaftersCommand(['mcp']);
+      const serverProcess = runMCPCommand(['mcp']);
       const client = createMCPClient(serverProcess);
 
       try {
@@ -267,15 +251,7 @@ describe('rafters mcp', () => {
     }, 15000);
 
     it('should validate color combinations with cognitive load analysis', async () => {
-      setupTestProject();
-
-      // Initialize project first
-      const initProcess = runRaftersCommand(['init', '--yes']);
-      await new Promise((resolve) => {
-        initProcess.on('close', resolve);
-      });
-
-      const serverProcess = runRaftersCommand(['mcp']);
+      const serverProcess = runMCPCommand(['mcp']);
       const client = createMCPClient(serverProcess);
 
       try {
@@ -300,15 +276,7 @@ describe('rafters mcp', () => {
     }, 15000);
 
     it('should filter tokens by trust level', async () => {
-      setupTestProject();
-
-      // Initialize project first
-      const initProcess = runRaftersCommand(['init', '--yes']);
-      await new Promise((resolve) => {
-        initProcess.on('close', resolve);
-      });
-
-      const serverProcess = runRaftersCommand(['mcp']);
+      const serverProcess = runMCPCommand(['mcp']);
       const client = createMCPClient(serverProcess);
 
       try {
@@ -331,9 +299,9 @@ describe('rafters mcp', () => {
         expect(data.count).toBeGreaterThan(0);
 
         // All returned tokens should have high trust level
-        for (const token of data.tokens) {
-          expect(token.trustLevel).toBe('high');
-        }
+        expect(
+          data.tokens.every((token: { trustLevel: string }) => token.trustLevel === 'high')
+        ).toBe(true);
       } finally {
         serverProcess.kill('SIGTERM');
       }
@@ -342,9 +310,7 @@ describe('rafters mcp', () => {
 
   describe('component intelligence integration', () => {
     it('should fetch component intelligence with network requests', async () => {
-      setupTestProject();
-
-      const serverProcess = runRaftersCommand(['mcp']);
+      const serverProcess = runMCPCommand(['mcp']);
       const client = createMCPClient(serverProcess);
 
       try {
@@ -366,9 +332,7 @@ describe('rafters mcp', () => {
     }, 15000);
 
     it('should calculate cognitive load for components', async () => {
-      setupTestProject();
-
-      const serverProcess = runRaftersCommand(['mcp']);
+      const serverProcess = runMCPCommand(['mcp']);
       const client = createMCPClient(serverProcess);
 
       try {
@@ -396,15 +360,7 @@ describe('rafters mcp', () => {
 
   describe('error handling and edge cases', () => {
     it('should handle nonexistent token requests gracefully', async () => {
-      setupTestProject();
-
-      // Initialize project first
-      const initProcess = runRaftersCommand(['init', '--yes']);
-      await new Promise((resolve) => {
-        initProcess.on('close', resolve);
-      });
-
-      const serverProcess = runRaftersCommand(['mcp']);
+      const serverProcess = runMCPCommand(['mcp']);
       const client = createMCPClient(serverProcess);
 
       try {
@@ -425,9 +381,7 @@ describe('rafters mcp', () => {
     }, 15000);
 
     it('should handle invalid tool calls gracefully', async () => {
-      setupTestProject();
-
-      const serverProcess = runRaftersCommand(['mcp']);
+      const serverProcess = runMCPCommand(['mcp']);
       const client = createMCPClient(serverProcess);
 
       try {
@@ -444,9 +398,7 @@ describe('rafters mcp', () => {
     }, 10000);
 
     it('should handle malformed requests properly', async () => {
-      setupTestProject();
-
-      const serverProcess = runRaftersCommand(['mcp']);
+      const serverProcess = runMCPCommand(['mcp']);
       const client = createMCPClient(serverProcess);
 
       try {
@@ -466,10 +418,8 @@ describe('rafters mcp', () => {
 
   describe('performance and reliability', () => {
     it('should start server within performance requirements', async () => {
-      setupTestProject();
-
       const startTime = Date.now();
-      const serverProcess = runRaftersCommand(['mcp']);
+      const serverProcess = runMCPCommand(['mcp']);
       const client = createMCPClient(serverProcess);
 
       try {
@@ -484,15 +434,7 @@ describe('rafters mcp', () => {
     }, 10000);
 
     it('should respond to tool calls within performance requirements', async () => {
-      setupTestProject();
-
-      // Initialize project first
-      const initProcess = runRaftersCommand(['init', '--yes']);
-      await new Promise((resolve) => {
-        initProcess.on('close', resolve);
-      });
-
-      const serverProcess = runRaftersCommand(['mcp']);
+      const serverProcess = runMCPCommand(['mcp']);
       const client = createMCPClient(serverProcess);
 
       try {

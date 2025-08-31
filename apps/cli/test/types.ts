@@ -4,7 +4,7 @@
 
 export interface TestAppOptions {
   /** Type of test fixture to create */
-  type: 'nextjs-app' | 'rr7-app' | 'vite-react' | 'empty-project';
+  type: 'nextjs-app' | 'rr7-app' | 'vite-react' | 'empty-project' | 'initialized-project';
   /** Custom temporary directory name */
   name?: string;
   /** Whether to preserve the test app after cleanup (for debugging) */
