@@ -7,7 +7,7 @@
  * Based on shadcn's approach - embedded directly in CLI for single source of truth.
  */
 
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
@@ -18,8 +18,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { createTokenRegistry } from '@rafters/design-tokens';
 import type { ColorValue, Token } from '@rafters/shared';
-import { z } from 'zod';
-import { fetchComponent, fetchComponentRegistry } from '../utils/registry.js';
+import { fetchComponent } from '../utils/registry.js';
 
 // Tool definitions for design intelligence queries
 const TOOLS: Tool[] = [
