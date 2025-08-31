@@ -146,6 +146,10 @@ describe('rafters init', { timeout: 30000 }, () => {
         env: { CI: 'true' },
       });
 
+      if (result.exitCode !== 0) {
+        console.log('Vite project init STDERR:', result.stderr);
+        console.log('Vite project init STDOUT:', result.stdout);
+      }
       expect(result.exitCode).toBe(0);
 
       // Verify basic directory structure
@@ -292,6 +296,10 @@ describe('rafters init', { timeout: 30000 }, () => {
         env: { CI: 'true' },
       });
 
+      if (result.exitCode !== 0) {
+        console.log('CSS format init STDERR:', result.stderr);
+        console.log('CSS format init STDOUT:', result.stdout);
+      }
       expect(result.exitCode).toBe(0);
 
       // For CSS format, tokens should be embedded in CSS files
