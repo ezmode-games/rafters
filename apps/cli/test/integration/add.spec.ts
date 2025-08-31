@@ -3,7 +3,7 @@
  */
 
 import { execSync } from 'node:child_process';
-import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -58,7 +58,8 @@ describe('rafters add', () => {
   });
 
   it('should show version', () => {
+    const packageJson = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf8'));
     const output = runRaftersCommand(['--version']);
-    expect(output).toContain('1.0.2');
+    expect(output).toContain(packageJson.version);
   });
 });
