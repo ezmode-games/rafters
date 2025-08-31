@@ -40,8 +40,12 @@ describe('rafters add', () => {
     try {
       runRaftersCommand(['add']);
     } catch (error: unknown) {
-      const execError = error as { stdout?: string; message?: string };
-      expect(execError.stdout || execError.message).toContain('error');
+      if (error && typeof error === 'object' && ('stdout' in error || 'message' in error)) {
+        const execError = error as { stdout?: string; message?: string };
+        expect(execError.stdout || execError.message).toContain('error');
+      } else {
+        throw error;
+      }
     }
   });
 
@@ -51,9 +55,13 @@ describe('rafters add', () => {
     try {
       runRaftersCommand(['add', 'button']);
     } catch (error: unknown) {
-      const execError = error as { status?: number; stderr?: string };
-      expect(execError.status).toBe(1);
-      expect(execError.stderr).toContain('not initialized');
+      if (error && typeof error === 'object' && ('status' in error || 'stderr' in error)) {
+        const execError = error as { status?: number; stderr?: string };
+        expect(execError.status).toBe(1);
+        expect(execError.stderr).toContain('not initialized');
+      } else {
+        throw error;
+      }
     }
   });
 
