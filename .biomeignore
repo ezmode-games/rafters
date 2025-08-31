@@ -27,3 +27,6 @@
 # Temporary files
 **/tmp/**
 **/temp/**
+
+# CLI test fixtures - these are real project files with their own linting rules
+apps/cli/test/fixtures/**
