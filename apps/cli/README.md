@@ -56,41 +56,62 @@ Rafters uses a **Generator → JSON Files → CLI** architecture:
 Initialize complete design token system and prepare for component installation.
 
 **What it does:**
-1. **Checks Tailwind version** - Requires v4+, stops if v3 detected
+1. **Checks prerequisites** - Validates Node.js project, React 18+, Tailwind v4+
 2. **Creates `.rafters/` structure** - Configuration and tokens directory
-3. **Generates stock tokens** - Runs all 18 design token generators
-4. **Writes token JSONs** - Saves to `.rafters/tokens/*.json`
-5. **Generates CSS** - Creates Tailwind v4 `@theme` configuration
-6. **Injects into CSS** - Updates `app.css` or `globals.css`
-7. **Creates component registry** - Prepares for component tracking
+3. **Generates design tokens** - Creates complete token system or fetches from Studio
+4. **Writes token files** - Saves tokens in chosen format (Tailwind, CSS, React Native)
+5. **Injects CSS imports** - Updates your CSS file with design token imports
+6. **Creates utils and directories** - Sets up component structure and utilities
+7. **Installs dependencies** - Adds required packages (clsx, tailwind-merge, etc.)
 
 **Usage:**
 ```bash
+# Interactive mode (default)
 npx rafters init
 
-✓ Checking Tailwind version... v4.0.0 ✓
-✓ Creating .rafters/ directory...
-✓ Generating design tokens...
-  → tokens/spacing.json (12 tokens)
-  → tokens/color.json (24 tokens)
-  → tokens/typography.json (8 tokens)
-  ... all 18 generators
-✓ Generating CSS from tokens...
-✓ Injecting into app.css...
-✓ Rafters initialized! Your components now have design intelligence.
-```
+# Non-interactive with defaults
+npx rafters init --yes
 
-**Error States:**
-```bash
-✗ Tailwind v3 detected. Rafters requires Tailwind v4+
-  Please upgrade: npm install tailwindcss@next
+# Use configuration file
+npx rafters init --config ./rafters-config.json
 ```
 
 **Interactive setup:**
 ```bash
-? Do you use Storybook? (y/N)
-? Components directory? (./src/components/ui)
-? Stories directory? (./src/stories)
+? Components directory: ./src/components/ui
+? CSS file to inject design tokens: ./src/app/globals.css  
+? Studio shortcode (leave blank for default grayscale): 
+? Design token format: Tailwind CSS v4
+? Package manager: pnpm
+```
+
+**Options:**
+- `--yes, -y` - Use default values for all prompts (non-interactive)
+- `--config <file>, -c <file>` - Use configuration from JSON answers file
+
+**Answers File Format:**
+```json
+{
+  "componentsDir": "./src/components/ui",
+  "cssFile": "./src/app/globals.css",
+  "studioShortcode": "",
+  "tokenFormat": "tailwind",
+  "packageManager": "pnpm"
+}
+```
+
+**Framework Detection:**
+Automatically detects your framework and suggests appropriate defaults:
+- **Next.js**: `./src/app/globals.css`
+- **Vite**: `./src/index.css`
+- **React Router 7**: `./app/root.css`
+
+**Error States:**
+```bash
+✗ No package.json found. Run this in a Node.js project.
+✗ React not found in dependencies. Rafters requires React 18+.
+✗ Tailwind v3 detected. Rafters requires Tailwind CSS v4.
+✗ Rafters already initialized. Remove .rafters directory to reinitialize.
 ```
 
 ### `add` - Install Components
@@ -135,11 +156,47 @@ Lists all components available in the Rafters registry.
 npx rafters list
 
 Available components:
-  • button - Interactive button with trust patterns
-  • input - Form input with validation states
-  • select - Dropdown with accessibility
-  • dialog - Modal with cognitive load management
-  ... more components
+  - button - Interactive button with trust patterns
+  - input - Form input with validation states
+  - select - Dropdown with accessibility
+  - dialog - Modal with cognitive load management
+  - card - Container component with cognitive load optimization
+  - label - Form labels with semantic relationships
+```
+
+### `clean` - Remove Rafters Installation
+
+Completely removes Rafters from your project, including all generated files and directories.
+
+**What it does:**
+1. **Removes `.rafters/` directory** - Deletes configuration, tokens, and registry
+2. **Removes CSS imports** - Cleans up design token imports from CSS files
+3. **Removes components** - Optionally removes installed UI components
+4. **Clean slate** - Restores project to pre-Rafters state
+
+**Usage:**
+```bash
+# Remove everything (interactive confirmation)
+npx rafters clean
+
+# Remove only configuration (keep components)
+npx rafters clean --config-only
+
+# Force removal without confirmation
+npx rafters clean --force
+```
+
+**Options:**
+- `--config-only` - Only remove `.rafters/` directory, keep installed components
+- `--force` - Skip confirmation prompts
+- `--dry-run` - Show what would be removed without actually removing
+
+**Interactive cleanup:**
+```bash
+? Remove .rafters/ directory? (Y/n)
+? Remove CSS token imports? (Y/n) 
+? Remove installed components from src/components/ui/? (Y/n)
+? Remove utils.ts file? (y/N)
 ```
 
 ## Available Components
@@ -182,16 +239,36 @@ your-project/
 │   │   ├── color.json          # Color tokens with AI metadata
 │   │   ├── spacing.json        # Spacing scale tokens
 │   │   ├── typography.json     # Typography tokens
-│   │   └── ... (18 files)      # All generator outputs
-│   ├── registry/               # Local component tracking  
-│   │   └── components.json     # Installed components manifest
+│   │   └── ... (18+ files)     # All generator outputs
+│   ├── component-manifest.json # Installed components tracking
 │   ├── config.json             # CLI configuration
-│   └── agent-instructions.md  # AI usage patterns
+│   └── agent-instructions.md   # AI usage patterns and guidelines
 ├── src/
 │   ├── components/ui/          # Installed components go here
-│   ├── lib/utils.ts            # Utility functions
+│   ├── lib/utils.ts            # Utility functions (clsx + tailwind-merge)
 │   └── stories/                # Intelligence stories (if Storybook)
 └── app.css or globals.css      # CSS with injected design tokens
+```
+
+## Template Files
+
+The CLI includes template answer files for common project setups:
+
+```
+apps/cli/templates/
+├── answers-default.json        # Basic setup with npm
+├── answers-nextjs.json         # Next.js optimized setup  
+├── answers-vite.json           # Vite project setup
+└── answers-test.json           # Testing environment setup
+```
+
+**Usage with templates:**
+```bash
+# Use Next.js optimized setup
+npx rafters init --config ./node_modules/rafters/templates/answers-nextjs.json
+
+# Use for automated CI/CD
+npx rafters init --config ./scripts/rafters-production.json
 ```
 
 ## Token System
@@ -243,12 +320,13 @@ Reads `.rafters/tokens/*.json` and generates:
 }
 ```
 
-## Local Component Registry
+## Component Manifest
 
-`.rafters/registry/components.json` tracks installed components:
+`.rafters/component-manifest.json` tracks installed components:
 ```json
 {
   "version": "1.0.0",
+  "initialized": "2025-01-27T12:00:00Z",
   "components": {
     "button": {
       "name": "button",
@@ -271,13 +349,22 @@ Reads `.rafters/tokens/*.json` and generates:
 ```json
 {
   "version": "1.0.0",
-  "tailwindVersion": "4.0.0",
-  "cssFile": "app.css",
-  "componentsPath": "src/components/ui",
-  "hasStorybook": true,
-  "initialized": "2025-01-27T12:00:00Z"
+  "registry": "https://rafters.realhandy.tech/registry",
+  "componentsDir": "./src/components/ui",
+  "cssFile": "./src/app/globals.css",
+  "tailwindVersion": "v4",
+  "tokenFormat": "tailwind",
+  "packageManager": "pnpm"
 }
 ```
+
+**Configuration Options:**
+- `registry` - URL to Rafters component registry
+- `componentsDir` - Directory where components are installed
+- `cssFile` - CSS file for design token injection
+- `tailwindVersion` - Detected Tailwind CSS version (v3/v4)
+- `tokenFormat` - Format for design tokens (tailwind/css/react-native)
+- `packageManager` - Detected package manager (npm/yarn/pnpm)
 
 ## AI Agent Integration
 
@@ -292,19 +379,92 @@ Rafters creates `.rafters/agent-instructions.md` with guidance for AI coding ass
 ## Debugging Guide
 
 **Component not working?**
-1. Check `.rafters/registry/components.json` - is it installed?
+1. Check `.rafters/component-manifest.json` - is it installed?
 2. Check component file has intelligence header
-3. Check dependencies are installed
+3. Check dependencies are installed: `pnpm install`
 
 **Styles not applying?**
 1. Check `.rafters/tokens/` - are tokens generated?
-2. Check CSS file - is `@theme` injected?
+2. Check CSS file - are design token imports present?
 3. Check Tailwind version - must be v4+
+4. Restart your dev server after token changes
+
+**Init command failing?**
+1. Check Node.js version - must be 18+
+2. Check React dependencies - must be 18+
+3. Check Tailwind version - v3 is not supported
+4. Remove `.rafters/` directory and try again
 
 **Need to understand a component?**
 1. Check `.rafters/agent-instructions.md` for usage patterns
 2. Check component intelligence header for metadata
-3. Check registry for installation details
+3. Check component manifest for installation details
+
+**Testing configuration?**
+Use the clean command to reset and try different configurations:
+```bash
+npx rafters clean --force
+npx rafters init --config ./different-config.json
+```
+
+## Development and Testing
+
+### Running Tests
+
+The CLI includes comprehensive integration tests that validate real-world usage scenarios:
+
+```bash
+# Run all tests
+pnpm test
+
+# Run integration tests only  
+pnpm test:integration
+
+# Run tests in watch mode
+pnpm test:watch
+```
+
+### Test Coverage
+
+- **Integration Tests**: Real filesystem operations with framework detection
+- **Command Tests**: All CLI commands with various options and error cases  
+- **Template Tests**: Answer file configurations for different project types
+- **Cleanup Tests**: Proper cleanup and error handling
+
+### Development Commands
+
+```bash
+# Build the CLI
+pnpm build
+
+# Run type checking
+pnpm type-check  
+
+# Run linting
+pnpm biome check
+
+# Run all quality checks
+pnpm preflight
+```
+
+### Testing with Answer Files
+
+Create custom answer files for testing different scenarios:
+
+```json
+{
+  "componentsDir": "./components",
+  "cssFile": "./styles/main.css", 
+  "studioShortcode": "ABC123",
+  "tokenFormat": "css",
+  "packageManager": "yarn"
+}
+```
+
+Then test with:
+```bash
+npx rafters init --config ./test-answers.json
+```
 
 ## Requirements
 

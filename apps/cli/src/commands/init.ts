@@ -331,18 +331,25 @@ export function cn(...inputs: ClassValue[]) {
 
     setupSpinner.succeed('Rafters setup complete');
 
-    // Install dependencies
-    const depsSpinner = ora('Installing core dependencies...').start();
-    const coreDeps = getCoreDependencies();
+    // Install dependencies (skip in test/CI environments)
+    const isTestMode =
+      process.env.NODE_ENV === 'test' || process.env.CI === 'true' || process.env.VITEST === 'true';
 
-    try {
-      await installDependencies(coreDeps, config.packageManager, cwd);
-      depsSpinner.succeed('Core dependencies installed');
-    } catch (_error) {
-      depsSpinner.warn('Failed to install dependencies automatically. Please install manually:');
-      console.log(
-        `${config.packageManager} ${config.packageManager === 'npm' ? 'install' : 'add'} ${coreDeps.join(' ')}`
-      );
+    if (isTestMode) {
+      console.log('Skipping dependency installation in test mode');
+    } else {
+      const depsSpinner = ora('Installing core dependencies...').start();
+      const coreDeps = getCoreDependencies();
+
+      try {
+        await installDependencies(coreDeps, config.packageManager, cwd);
+        depsSpinner.succeed('Core dependencies installed');
+      } catch (_error) {
+        depsSpinner.warn('Failed to install dependencies automatically. Please install manually:');
+        console.log(
+          `${config.packageManager} ${config.packageManager === 'npm' ? 'install' : 'add'} ${coreDeps.join(' ')}`
+        );
+      }
     }
 
     console.log('Rafters initialized.');
