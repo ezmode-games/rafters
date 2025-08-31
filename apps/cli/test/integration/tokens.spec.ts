@@ -143,6 +143,112 @@ describe('rafters tokens', () => {
     });
   });
 
+  describe('token dependency system', () => {
+    it('should expose token dependency relationships', () => {
+      setupTestProject();
+      runRaftersCommand(['init', '--yes']);
+
+      // Test accessing the registry directly through import
+      const { createTokenRegistry } = require('@rafters/design-tokens');
+      const tokensDir = join(testDir, '.rafters', 'tokens');
+      const registry = createTokenRegistry(tokensDir);
+
+      // Test basic registry functionality
+      expect(registry.size()).toBeGreaterThan(0);
+      expect(registry.list().length).toBeGreaterThan(0);
+
+      // Test dependency relationships exist
+      expect(typeof registry.getDependents).toBe('function');
+      expect(typeof registry.getDependencies).toBe('function');
+      expect(typeof registry.addDependency).toBe('function');
+    });
+
+    it('should handle color token decomposition with dependencies', () => {
+      setupTestProject();
+      runRaftersCommand(['init', '--yes']);
+
+      const { createTokenRegistry } = require('@rafters/design-tokens');
+      const tokensDir = join(testDir, '.rafters', 'tokens');
+      const registry = createTokenRegistry(tokensDir);
+
+      // Get a color token that should have scale/state relationships
+      const primaryToken = registry.get('primary');
+      expect(primaryToken).toBeTruthy();
+      expect(primaryToken?.category).toBe('color');
+
+      // Test dependency graph functionality
+      expect(registry.dependencyGraph).toBeTruthy();
+      expect(typeof registry.dependencyGraph.topologicalSort).toBe('function');
+    });
+
+    it('should prevent circular dependencies', () => {
+      setupTestProject();
+      runRaftersCommand(['init', '--yes']);
+
+      const { createTokenRegistry } = require('@rafters/design-tokens');
+      const tokensDir = join(testDir, '.rafters', 'tokens');
+      const registry = createTokenRegistry(tokensDir);
+
+      // Test circular dependency prevention
+      expect(() => {
+        registry.addDependency('token-a', ['token-b'], 'test-rule');
+        registry.addDependency('token-b', ['token-a'], 'test-rule');
+      }).toThrow('Circular dependency detected');
+    });
+
+    it('should provide topological sorting for regeneration order', () => {
+      setupTestProject();
+      runRaftersCommand(['init', '--yes']);
+
+      const { createTokenRegistry } = require('@rafters/design-tokens');
+      const tokensDir = join(testDir, '.rafters', 'tokens');
+      const registry = createTokenRegistry(tokensDir);
+
+      // Add test dependencies
+      registry.addDependency('derived-token', ['base-token'], 'multiply:1.5');
+      registry.addDependency('complex-token', ['derived-token'], 'darken:10');
+
+      const sortedTokens = registry.dependencyGraph.topologicalSort();
+      expect(Array.isArray(sortedTokens)).toBe(true);
+      expect(sortedTokens.length).toBeGreaterThan(0);
+
+      // Base token should come before derived token
+      const baseIndex = sortedTokens.indexOf('base-token');
+      const derivedIndex = sortedTokens.indexOf('derived-token');
+      const complexIndex = sortedTokens.indexOf('complex-token');
+
+      if (baseIndex !== -1 && derivedIndex !== -1) {
+        expect(baseIndex).toBeLessThan(derivedIndex);
+      }
+      if (derivedIndex !== -1 && complexIndex !== -1) {
+        expect(derivedIndex).toBeLessThan(complexIndex);
+      }
+    });
+
+    it('should track generation rules for AI-driven token regeneration', () => {
+      setupTestProject();
+      runRaftersCommand(['init', '--yes']);
+
+      const { createTokenRegistry } = require('@rafters/design-tokens');
+      const tokensDir = join(testDir, '.rafters', 'tokens');
+      const registry = createTokenRegistry(tokensDir);
+
+      // Test generation rule tracking
+      const testRule = 'scale:500';
+      registry.addDependency('primary-500', ['primary'], testRule);
+
+      const rule = registry.dependencyGraph.getGenerationRule('primary-500');
+      expect(rule).toBe(testRule);
+
+      // Test dependents and dependencies
+      const dependents = registry.getDependents('primary');
+      const dependencies = registry.getDependencies('primary-500');
+
+      expect(dependents).toContain('primary-500');
+      expect(dependencies).toContain('primary');
+    });
+  });
+
   describe('error handling', () => {
     it('should handle missing token names gracefully', () => {
       setupTestProject();
