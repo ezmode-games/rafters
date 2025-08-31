@@ -87,7 +87,9 @@ export async function initCommand(options: { yes?: boolean; config?: string } = 
     try {
       const configPath = join(cwd, options.config);
       if (!existsSync(configPath)) {
-        console.error(`Config file not found: ${configPath}`);
+        console.error(
+          `Config file not found at ${configPath}. Please check the file path and ensure the file exists.`
+        );
         process.exit(1);
       }
 
@@ -106,7 +108,7 @@ export async function initCommand(options: { yes?: boolean; config?: string } = 
       console.log(`Using configuration from: ${options.config}`);
     } catch (error) {
       console.error(
-        `Failed to load config file: ${error instanceof Error ? error.message : error}`
+        `Failed to parse config file '${options.config}': ${error instanceof Error ? error.message : error}. Please ensure the file contains valid JSON.`
       );
       process.exit(1);
     }

@@ -39,6 +39,24 @@ describe('rafters init', { timeout: 30000 }, () => {
     return 'rafters-answers.json';
   };
 
+  // Helper function to check if token files exist
+  const hasTokenFiles = (testAppPath: string): boolean => {
+    const raftersDir = join(testAppPath, '.rafters');
+    const possibleTokenPaths = [
+      join(raftersDir, 'tokens.json'),
+      join(raftersDir, 'tokens'),
+      join(testAppPath, 'design-tokens'),
+      join(testAppPath, 'tokens.json'),
+    ];
+
+    for (const path of possibleTokenPaths) {
+      if (existsSync(path)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   beforeEach(async () => {
     // Ensure CLI is built before running tests
     await ensureCLIBuilt();
@@ -153,11 +171,7 @@ describe('rafters init', { timeout: 30000 }, () => {
       expect(existsSync(raftersDir)).toBe(true);
 
       // Check for token files (location may vary based on token format)
-      const files = ['tokens.json', 'tokens', 'design-tokens'];
-      const hasTokenFiles = files.some(
-        (file) => existsSync(join(raftersDir, file)) || existsSync(join(testApp.path, file))
-      );
-      expect(hasTokenFiles).toBe(true);
+      expect(hasTokenFiles(testApp.path)).toBe(true);
     });
   });
 
@@ -262,15 +276,7 @@ describe('rafters init', { timeout: 30000 }, () => {
       expect(result.exitCode).toBe(0);
 
       // Check for token files in various possible locations
-      const possibleTokenPaths = [
-        join(testApp.path, '.rafters', 'tokens.json'),
-        join(testApp.path, '.rafters', 'tokens'),
-        join(testApp.path, 'design-tokens'),
-        join(testApp.path, 'tokens.json'),
-      ];
-
-      const tokenFileExists = possibleTokenPaths.some((path) => existsSync(path));
-      expect(tokenFileExists).toBe(true);
+      expect(hasTokenFiles(testApp.path)).toBe(true);
     });
 
     it('should create design token files for CSS format', async () => {
