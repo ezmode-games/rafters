@@ -21,7 +21,12 @@ program
   .description('CLI for installing Rafters design system components with embedded intelligence')
   .version(packageJson.version);
 
-program.command('init').description('Initialize Rafters in your project').action(initCommand);
+program
+  .command('init')
+  .description('Initialize Rafters in your project')
+  .option('-y, --yes', 'Use default values for all prompts (non-interactive)')
+  .option('-c, --config <file>', 'Use configuration from answers file (JSON)')
+  .action(initCommand);
 
 program
   .command('add <components...>')

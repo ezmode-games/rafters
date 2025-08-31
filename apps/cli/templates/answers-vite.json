@@ -1,0 +1,7 @@
+{
+  "componentsDir": "./src/components/ui",
+  "cssFile": "./src/index.css",
+  "studioShortcode": "",
+  "tokenFormat": "tailwind",
+  "packageManager": "pnpm"
+}
