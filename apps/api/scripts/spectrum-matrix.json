@@ -1,0 +1,5415 @@
+{
+  "metadata": {
+    "title": "OKLCH Full Spectrum Exploration Matrix",
+    "description": "Strategic coverage of OKLCH color space for user exploration",
+    "totalColors": 540,
+    "coverage": {
+      "lightness": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+      "chroma": [0.05, 0.1, 0.15, 0.2, 0.25],
+      "hue": [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]
+    },
+    "generatedAt": "2025-08-30T06:16:47.866Z"
+  },
+  "colors": [
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.05,
+        "h": 0
+      },
+      "token": "spectrum-red-muted-dark",
+      "name": "Red muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.05,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-muted-dark",
+      "name": "Red-orange muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.05,
+        "h": 60
+      },
+      "token": "spectrum-orange-muted-dark",
+      "name": "Orange muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.05,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-muted-dark",
+      "name": "Yellow-orange muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.05,
+        "h": 120
+      },
+      "token": "spectrum-yellow-muted-dark",
+      "name": "Yellow muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.05,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-muted-dark",
+      "name": "Yellow-green muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.05,
+        "h": 180
+      },
+      "token": "spectrum-green-muted-dark",
+      "name": "Green muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.05,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-muted-dark",
+      "name": "Green-cyan muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.05,
+        "h": 240
+      },
+      "token": "spectrum-cyan-muted-dark",
+      "name": "Cyan muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.05,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-muted-dark",
+      "name": "Cyan-blue muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.05,
+        "h": 300
+      },
+      "token": "spectrum-blue-muted-dark",
+      "name": "Blue muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.05,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-muted-dark",
+      "name": "Blue-magenta muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.1,
+        "h": 0
+      },
+      "token": "spectrum-red-muted-dark",
+      "name": "Red muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.1,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-muted-dark",
+      "name": "Red-orange muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.1,
+        "h": 60
+      },
+      "token": "spectrum-orange-muted-dark",
+      "name": "Orange muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.1,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-muted-dark",
+      "name": "Yellow-orange muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.1,
+        "h": 120
+      },
+      "token": "spectrum-yellow-muted-dark",
+      "name": "Yellow muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.1,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-muted-dark",
+      "name": "Yellow-green muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.1,
+        "h": 180
+      },
+      "token": "spectrum-green-muted-dark",
+      "name": "Green muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.1,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-muted-dark",
+      "name": "Green-cyan muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.1,
+        "h": 240
+      },
+      "token": "spectrum-cyan-muted-dark",
+      "name": "Cyan muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.1,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-muted-dark",
+      "name": "Cyan-blue muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.1,
+        "h": 300
+      },
+      "token": "spectrum-blue-muted-dark",
+      "name": "Blue muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.1,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-muted-dark",
+      "name": "Blue-magenta muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.15,
+        "h": 0
+      },
+      "token": "spectrum-red-vibrant-dark",
+      "name": "Red vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.15,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-vibrant-dark",
+      "name": "Red-orange vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.15,
+        "h": 60
+      },
+      "token": "spectrum-orange-vibrant-dark",
+      "name": "Orange vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.15,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-vibrant-dark",
+      "name": "Yellow-orange vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.15,
+        "h": 120
+      },
+      "token": "spectrum-yellow-vibrant-dark",
+      "name": "Yellow vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.15,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-vibrant-dark",
+      "name": "Yellow-green vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.15,
+        "h": 180
+      },
+      "token": "spectrum-green-vibrant-dark",
+      "name": "Green vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.15,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-vibrant-dark",
+      "name": "Green-cyan vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.15,
+        "h": 240
+      },
+      "token": "spectrum-cyan-vibrant-dark",
+      "name": "Cyan vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.15,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-vibrant-dark",
+      "name": "Cyan-blue vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.15,
+        "h": 300
+      },
+      "token": "spectrum-blue-vibrant-dark",
+      "name": "Blue vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.15,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-vibrant-dark",
+      "name": "Blue-magenta vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.2,
+        "h": 0
+      },
+      "token": "spectrum-red-vibrant-dark",
+      "name": "Red vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.2,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-vibrant-dark",
+      "name": "Red-orange vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.2,
+        "h": 60
+      },
+      "token": "spectrum-orange-vibrant-dark",
+      "name": "Orange vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.2,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-vibrant-dark",
+      "name": "Yellow-orange vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.2,
+        "h": 120
+      },
+      "token": "spectrum-yellow-vibrant-dark",
+      "name": "Yellow vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.2,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-vibrant-dark",
+      "name": "Yellow-green vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.2,
+        "h": 180
+      },
+      "token": "spectrum-green-vibrant-dark",
+      "name": "Green vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.2,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-vibrant-dark",
+      "name": "Green-cyan vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.2,
+        "h": 240
+      },
+      "token": "spectrum-cyan-vibrant-dark",
+      "name": "Cyan vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.2,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-vibrant-dark",
+      "name": "Cyan-blue vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.2,
+        "h": 300
+      },
+      "token": "spectrum-blue-vibrant-dark",
+      "name": "Blue vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.2,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-vibrant-dark",
+      "name": "Blue-magenta vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.25,
+        "h": 0
+      },
+      "token": "spectrum-red-intense-dark",
+      "name": "Red intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.25,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-intense-dark",
+      "name": "Red-orange intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.25,
+        "h": 60
+      },
+      "token": "spectrum-orange-intense-dark",
+      "name": "Orange intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.25,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-intense-dark",
+      "name": "Yellow-orange intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.25,
+        "h": 120
+      },
+      "token": "spectrum-yellow-intense-dark",
+      "name": "Yellow intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.25,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-intense-dark",
+      "name": "Yellow-green intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.25,
+        "h": 180
+      },
+      "token": "spectrum-green-intense-dark",
+      "name": "Green intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.25,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-intense-dark",
+      "name": "Green-cyan intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.25,
+        "h": 240
+      },
+      "token": "spectrum-cyan-intense-dark",
+      "name": "Cyan intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.25,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-intense-dark",
+      "name": "Cyan-blue intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.25,
+        "h": 300
+      },
+      "token": "spectrum-blue-intense-dark",
+      "name": "Blue intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.1,
+        "c": 0.25,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-intense-dark",
+      "name": "Blue-magenta intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.05,
+        "h": 0
+      },
+      "token": "spectrum-red-muted-dark",
+      "name": "Red muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.05,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-muted-dark",
+      "name": "Red-orange muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.05,
+        "h": 60
+      },
+      "token": "spectrum-orange-muted-dark",
+      "name": "Orange muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.05,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-muted-dark",
+      "name": "Yellow-orange muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.05,
+        "h": 120
+      },
+      "token": "spectrum-yellow-muted-dark",
+      "name": "Yellow muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.05,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-muted-dark",
+      "name": "Yellow-green muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.05,
+        "h": 180
+      },
+      "token": "spectrum-green-muted-dark",
+      "name": "Green muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.05,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-muted-dark",
+      "name": "Green-cyan muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.05,
+        "h": 240
+      },
+      "token": "spectrum-cyan-muted-dark",
+      "name": "Cyan muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.05,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-muted-dark",
+      "name": "Cyan-blue muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.05,
+        "h": 300
+      },
+      "token": "spectrum-blue-muted-dark",
+      "name": "Blue muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.05,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-muted-dark",
+      "name": "Blue-magenta muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.1,
+        "h": 0
+      },
+      "token": "spectrum-red-muted-dark",
+      "name": "Red muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.1,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-muted-dark",
+      "name": "Red-orange muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.1,
+        "h": 60
+      },
+      "token": "spectrum-orange-muted-dark",
+      "name": "Orange muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.1,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-muted-dark",
+      "name": "Yellow-orange muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.1,
+        "h": 120
+      },
+      "token": "spectrum-yellow-muted-dark",
+      "name": "Yellow muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.1,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-muted-dark",
+      "name": "Yellow-green muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.1,
+        "h": 180
+      },
+      "token": "spectrum-green-muted-dark",
+      "name": "Green muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.1,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-muted-dark",
+      "name": "Green-cyan muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.1,
+        "h": 240
+      },
+      "token": "spectrum-cyan-muted-dark",
+      "name": "Cyan muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.1,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-muted-dark",
+      "name": "Cyan-blue muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.1,
+        "h": 300
+      },
+      "token": "spectrum-blue-muted-dark",
+      "name": "Blue muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.1,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-muted-dark",
+      "name": "Blue-magenta muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.15,
+        "h": 0
+      },
+      "token": "spectrum-red-vibrant-dark",
+      "name": "Red vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.15,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-vibrant-dark",
+      "name": "Red-orange vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.15,
+        "h": 60
+      },
+      "token": "spectrum-orange-vibrant-dark",
+      "name": "Orange vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.15,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-vibrant-dark",
+      "name": "Yellow-orange vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.15,
+        "h": 120
+      },
+      "token": "spectrum-yellow-vibrant-dark",
+      "name": "Yellow vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.15,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-vibrant-dark",
+      "name": "Yellow-green vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.15,
+        "h": 180
+      },
+      "token": "spectrum-green-vibrant-dark",
+      "name": "Green vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.15,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-vibrant-dark",
+      "name": "Green-cyan vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.15,
+        "h": 240
+      },
+      "token": "spectrum-cyan-vibrant-dark",
+      "name": "Cyan vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.15,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-vibrant-dark",
+      "name": "Cyan-blue vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.15,
+        "h": 300
+      },
+      "token": "spectrum-blue-vibrant-dark",
+      "name": "Blue vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.15,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-vibrant-dark",
+      "name": "Blue-magenta vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.2,
+        "h": 0
+      },
+      "token": "spectrum-red-vibrant-dark",
+      "name": "Red vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.2,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-vibrant-dark",
+      "name": "Red-orange vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.2,
+        "h": 60
+      },
+      "token": "spectrum-orange-vibrant-dark",
+      "name": "Orange vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.2,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-vibrant-dark",
+      "name": "Yellow-orange vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.2,
+        "h": 120
+      },
+      "token": "spectrum-yellow-vibrant-dark",
+      "name": "Yellow vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.2,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-vibrant-dark",
+      "name": "Yellow-green vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.2,
+        "h": 180
+      },
+      "token": "spectrum-green-vibrant-dark",
+      "name": "Green vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.2,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-vibrant-dark",
+      "name": "Green-cyan vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.2,
+        "h": 240
+      },
+      "token": "spectrum-cyan-vibrant-dark",
+      "name": "Cyan vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.2,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-vibrant-dark",
+      "name": "Cyan-blue vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.2,
+        "h": 300
+      },
+      "token": "spectrum-blue-vibrant-dark",
+      "name": "Blue vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.2,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-vibrant-dark",
+      "name": "Blue-magenta vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.25,
+        "h": 0
+      },
+      "token": "spectrum-red-intense-dark",
+      "name": "Red intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.25,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-intense-dark",
+      "name": "Red-orange intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.25,
+        "h": 60
+      },
+      "token": "spectrum-orange-intense-dark",
+      "name": "Orange intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.25,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-intense-dark",
+      "name": "Yellow-orange intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.25,
+        "h": 120
+      },
+      "token": "spectrum-yellow-intense-dark",
+      "name": "Yellow intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.25,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-intense-dark",
+      "name": "Yellow-green intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.25,
+        "h": 180
+      },
+      "token": "spectrum-green-intense-dark",
+      "name": "Green intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.25,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-intense-dark",
+      "name": "Green-cyan intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.25,
+        "h": 240
+      },
+      "token": "spectrum-cyan-intense-dark",
+      "name": "Cyan intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.25,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-intense-dark",
+      "name": "Cyan-blue intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.25,
+        "h": 300
+      },
+      "token": "spectrum-blue-intense-dark",
+      "name": "Blue intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.2,
+        "c": 0.25,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-intense-dark",
+      "name": "Blue-magenta intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.05,
+        "h": 0
+      },
+      "token": "spectrum-red-muted-dark",
+      "name": "Red muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.05,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-muted-dark",
+      "name": "Red-orange muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.05,
+        "h": 60
+      },
+      "token": "spectrum-orange-muted-dark",
+      "name": "Orange muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.05,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-muted-dark",
+      "name": "Yellow-orange muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.05,
+        "h": 120
+      },
+      "token": "spectrum-yellow-muted-dark",
+      "name": "Yellow muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.05,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-muted-dark",
+      "name": "Yellow-green muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.05,
+        "h": 180
+      },
+      "token": "spectrum-green-muted-dark",
+      "name": "Green muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.05,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-muted-dark",
+      "name": "Green-cyan muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.05,
+        "h": 240
+      },
+      "token": "spectrum-cyan-muted-dark",
+      "name": "Cyan muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.05,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-muted-dark",
+      "name": "Cyan-blue muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.05,
+        "h": 300
+      },
+      "token": "spectrum-blue-muted-dark",
+      "name": "Blue muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.05,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-muted-dark",
+      "name": "Blue-magenta muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.1,
+        "h": 0
+      },
+      "token": "spectrum-red-muted-dark",
+      "name": "Red muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.1,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-muted-dark",
+      "name": "Red-orange muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.1,
+        "h": 60
+      },
+      "token": "spectrum-orange-muted-dark",
+      "name": "Orange muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.1,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-muted-dark",
+      "name": "Yellow-orange muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.1,
+        "h": 120
+      },
+      "token": "spectrum-yellow-muted-dark",
+      "name": "Yellow muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.1,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-muted-dark",
+      "name": "Yellow-green muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.1,
+        "h": 180
+      },
+      "token": "spectrum-green-muted-dark",
+      "name": "Green muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.1,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-muted-dark",
+      "name": "Green-cyan muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.1,
+        "h": 240
+      },
+      "token": "spectrum-cyan-muted-dark",
+      "name": "Cyan muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.1,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-muted-dark",
+      "name": "Cyan-blue muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.1,
+        "h": 300
+      },
+      "token": "spectrum-blue-muted-dark",
+      "name": "Blue muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.1,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-muted-dark",
+      "name": "Blue-magenta muted dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.15,
+        "h": 0
+      },
+      "token": "spectrum-red-vibrant-dark",
+      "name": "Red vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.15,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-vibrant-dark",
+      "name": "Red-orange vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.15,
+        "h": 60
+      },
+      "token": "spectrum-orange-vibrant-dark",
+      "name": "Orange vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.15,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-vibrant-dark",
+      "name": "Yellow-orange vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.15,
+        "h": 120
+      },
+      "token": "spectrum-yellow-vibrant-dark",
+      "name": "Yellow vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.15,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-vibrant-dark",
+      "name": "Yellow-green vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.15,
+        "h": 180
+      },
+      "token": "spectrum-green-vibrant-dark",
+      "name": "Green vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.15,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-vibrant-dark",
+      "name": "Green-cyan vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.15,
+        "h": 240
+      },
+      "token": "spectrum-cyan-vibrant-dark",
+      "name": "Cyan vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.15,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-vibrant-dark",
+      "name": "Cyan-blue vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.15,
+        "h": 300
+      },
+      "token": "spectrum-blue-vibrant-dark",
+      "name": "Blue vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.15,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-vibrant-dark",
+      "name": "Blue-magenta vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.2,
+        "h": 0
+      },
+      "token": "spectrum-red-vibrant-dark",
+      "name": "Red vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.2,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-vibrant-dark",
+      "name": "Red-orange vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.2,
+        "h": 60
+      },
+      "token": "spectrum-orange-vibrant-dark",
+      "name": "Orange vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.2,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-vibrant-dark",
+      "name": "Yellow-orange vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.2,
+        "h": 120
+      },
+      "token": "spectrum-yellow-vibrant-dark",
+      "name": "Yellow vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.2,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-vibrant-dark",
+      "name": "Yellow-green vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.2,
+        "h": 180
+      },
+      "token": "spectrum-green-vibrant-dark",
+      "name": "Green vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.2,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-vibrant-dark",
+      "name": "Green-cyan vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.2,
+        "h": 240
+      },
+      "token": "spectrum-cyan-vibrant-dark",
+      "name": "Cyan vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.2,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-vibrant-dark",
+      "name": "Cyan-blue vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.2,
+        "h": 300
+      },
+      "token": "spectrum-blue-vibrant-dark",
+      "name": "Blue vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.2,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-vibrant-dark",
+      "name": "Blue-magenta vibrant dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.25,
+        "h": 0
+      },
+      "token": "spectrum-red-intense-dark",
+      "name": "Red intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.25,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-intense-dark",
+      "name": "Red-orange intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.25,
+        "h": 60
+      },
+      "token": "spectrum-orange-intense-dark",
+      "name": "Orange intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.25,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-intense-dark",
+      "name": "Yellow-orange intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.25,
+        "h": 120
+      },
+      "token": "spectrum-yellow-intense-dark",
+      "name": "Yellow intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.25,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-intense-dark",
+      "name": "Yellow-green intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.25,
+        "h": 180
+      },
+      "token": "spectrum-green-intense-dark",
+      "name": "Green intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.25,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-intense-dark",
+      "name": "Green-cyan intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.25,
+        "h": 240
+      },
+      "token": "spectrum-cyan-intense-dark",
+      "name": "Cyan intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.25,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-intense-dark",
+      "name": "Cyan-blue intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.25,
+        "h": 300
+      },
+      "token": "spectrum-blue-intense-dark",
+      "name": "Blue intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.3,
+        "c": 0.25,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-intense-dark",
+      "name": "Blue-magenta intense dark",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.05,
+        "h": 0
+      },
+      "token": "spectrum-red-muted-medium",
+      "name": "Red muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.05,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-muted-medium",
+      "name": "Red-orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.05,
+        "h": 60
+      },
+      "token": "spectrum-orange-muted-medium",
+      "name": "Orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.05,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-muted-medium",
+      "name": "Yellow-orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.05,
+        "h": 120
+      },
+      "token": "spectrum-yellow-muted-medium",
+      "name": "Yellow muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.05,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-muted-medium",
+      "name": "Yellow-green muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.05,
+        "h": 180
+      },
+      "token": "spectrum-green-muted-medium",
+      "name": "Green muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.05,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-muted-medium",
+      "name": "Green-cyan muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.05,
+        "h": 240
+      },
+      "token": "spectrum-cyan-muted-medium",
+      "name": "Cyan muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.05,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-muted-medium",
+      "name": "Cyan-blue muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.05,
+        "h": 300
+      },
+      "token": "spectrum-blue-muted-medium",
+      "name": "Blue muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.05,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-muted-medium",
+      "name": "Blue-magenta muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.1,
+        "h": 0
+      },
+      "token": "spectrum-red-muted-medium",
+      "name": "Red muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.1,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-muted-medium",
+      "name": "Red-orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.1,
+        "h": 60
+      },
+      "token": "spectrum-orange-muted-medium",
+      "name": "Orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.1,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-muted-medium",
+      "name": "Yellow-orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.1,
+        "h": 120
+      },
+      "token": "spectrum-yellow-muted-medium",
+      "name": "Yellow muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.1,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-muted-medium",
+      "name": "Yellow-green muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.1,
+        "h": 180
+      },
+      "token": "spectrum-green-muted-medium",
+      "name": "Green muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.1,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-muted-medium",
+      "name": "Green-cyan muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.1,
+        "h": 240
+      },
+      "token": "spectrum-cyan-muted-medium",
+      "name": "Cyan muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.1,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-muted-medium",
+      "name": "Cyan-blue muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.1,
+        "h": 300
+      },
+      "token": "spectrum-blue-muted-medium",
+      "name": "Blue muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.1,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-muted-medium",
+      "name": "Blue-magenta muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.15,
+        "h": 0
+      },
+      "token": "spectrum-red-vibrant-medium",
+      "name": "Red vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.15,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-vibrant-medium",
+      "name": "Red-orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.15,
+        "h": 60
+      },
+      "token": "spectrum-orange-vibrant-medium",
+      "name": "Orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.15,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-vibrant-medium",
+      "name": "Yellow-orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.15,
+        "h": 120
+      },
+      "token": "spectrum-yellow-vibrant-medium",
+      "name": "Yellow vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.15,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-vibrant-medium",
+      "name": "Yellow-green vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.15,
+        "h": 180
+      },
+      "token": "spectrum-green-vibrant-medium",
+      "name": "Green vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.15,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-vibrant-medium",
+      "name": "Green-cyan vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.15,
+        "h": 240
+      },
+      "token": "spectrum-cyan-vibrant-medium",
+      "name": "Cyan vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.15,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-vibrant-medium",
+      "name": "Cyan-blue vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.15,
+        "h": 300
+      },
+      "token": "spectrum-blue-vibrant-medium",
+      "name": "Blue vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.15,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-vibrant-medium",
+      "name": "Blue-magenta vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.2,
+        "h": 0
+      },
+      "token": "spectrum-red-vibrant-medium",
+      "name": "Red vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.2,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-vibrant-medium",
+      "name": "Red-orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.2,
+        "h": 60
+      },
+      "token": "spectrum-orange-vibrant-medium",
+      "name": "Orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.2,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-vibrant-medium",
+      "name": "Yellow-orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.2,
+        "h": 120
+      },
+      "token": "spectrum-yellow-vibrant-medium",
+      "name": "Yellow vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.2,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-vibrant-medium",
+      "name": "Yellow-green vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.2,
+        "h": 180
+      },
+      "token": "spectrum-green-vibrant-medium",
+      "name": "Green vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.2,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-vibrant-medium",
+      "name": "Green-cyan vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.2,
+        "h": 240
+      },
+      "token": "spectrum-cyan-vibrant-medium",
+      "name": "Cyan vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.2,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-vibrant-medium",
+      "name": "Cyan-blue vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.2,
+        "h": 300
+      },
+      "token": "spectrum-blue-vibrant-medium",
+      "name": "Blue vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.2,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-vibrant-medium",
+      "name": "Blue-magenta vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.25,
+        "h": 0
+      },
+      "token": "spectrum-red-intense-medium",
+      "name": "Red intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.25,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-intense-medium",
+      "name": "Red-orange intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.25,
+        "h": 60
+      },
+      "token": "spectrum-orange-intense-medium",
+      "name": "Orange intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.25,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-intense-medium",
+      "name": "Yellow-orange intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.25,
+        "h": 120
+      },
+      "token": "spectrum-yellow-intense-medium",
+      "name": "Yellow intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.25,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-intense-medium",
+      "name": "Yellow-green intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.25,
+        "h": 180
+      },
+      "token": "spectrum-green-intense-medium",
+      "name": "Green intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.25,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-intense-medium",
+      "name": "Green-cyan intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.25,
+        "h": 240
+      },
+      "token": "spectrum-cyan-intense-medium",
+      "name": "Cyan intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.25,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-intense-medium",
+      "name": "Cyan-blue intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.25,
+        "h": 300
+      },
+      "token": "spectrum-blue-intense-medium",
+      "name": "Blue intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.4,
+        "c": 0.25,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-intense-medium",
+      "name": "Blue-magenta intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.05,
+        "h": 0
+      },
+      "token": "spectrum-red-muted-medium",
+      "name": "Red muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.05,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-muted-medium",
+      "name": "Red-orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.05,
+        "h": 60
+      },
+      "token": "spectrum-orange-muted-medium",
+      "name": "Orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.05,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-muted-medium",
+      "name": "Yellow-orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.05,
+        "h": 120
+      },
+      "token": "spectrum-yellow-muted-medium",
+      "name": "Yellow muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.05,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-muted-medium",
+      "name": "Yellow-green muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.05,
+        "h": 180
+      },
+      "token": "spectrum-green-muted-medium",
+      "name": "Green muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.05,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-muted-medium",
+      "name": "Green-cyan muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.05,
+        "h": 240
+      },
+      "token": "spectrum-cyan-muted-medium",
+      "name": "Cyan muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.05,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-muted-medium",
+      "name": "Cyan-blue muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.05,
+        "h": 300
+      },
+      "token": "spectrum-blue-muted-medium",
+      "name": "Blue muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.05,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-muted-medium",
+      "name": "Blue-magenta muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.1,
+        "h": 0
+      },
+      "token": "spectrum-red-muted-medium",
+      "name": "Red muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.1,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-muted-medium",
+      "name": "Red-orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.1,
+        "h": 60
+      },
+      "token": "spectrum-orange-muted-medium",
+      "name": "Orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.1,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-muted-medium",
+      "name": "Yellow-orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.1,
+        "h": 120
+      },
+      "token": "spectrum-yellow-muted-medium",
+      "name": "Yellow muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.1,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-muted-medium",
+      "name": "Yellow-green muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.1,
+        "h": 180
+      },
+      "token": "spectrum-green-muted-medium",
+      "name": "Green muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.1,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-muted-medium",
+      "name": "Green-cyan muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.1,
+        "h": 240
+      },
+      "token": "spectrum-cyan-muted-medium",
+      "name": "Cyan muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.1,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-muted-medium",
+      "name": "Cyan-blue muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.1,
+        "h": 300
+      },
+      "token": "spectrum-blue-muted-medium",
+      "name": "Blue muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.1,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-muted-medium",
+      "name": "Blue-magenta muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.15,
+        "h": 0
+      },
+      "token": "spectrum-red-vibrant-medium",
+      "name": "Red vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.15,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-vibrant-medium",
+      "name": "Red-orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.15,
+        "h": 60
+      },
+      "token": "spectrum-orange-vibrant-medium",
+      "name": "Orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.15,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-vibrant-medium",
+      "name": "Yellow-orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.15,
+        "h": 120
+      },
+      "token": "spectrum-yellow-vibrant-medium",
+      "name": "Yellow vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.15,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-vibrant-medium",
+      "name": "Yellow-green vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.15,
+        "h": 180
+      },
+      "token": "spectrum-green-vibrant-medium",
+      "name": "Green vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.15,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-vibrant-medium",
+      "name": "Green-cyan vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.15,
+        "h": 240
+      },
+      "token": "spectrum-cyan-vibrant-medium",
+      "name": "Cyan vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.15,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-vibrant-medium",
+      "name": "Cyan-blue vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.15,
+        "h": 300
+      },
+      "token": "spectrum-blue-vibrant-medium",
+      "name": "Blue vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.15,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-vibrant-medium",
+      "name": "Blue-magenta vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.2,
+        "h": 0
+      },
+      "token": "spectrum-red-vibrant-medium",
+      "name": "Red vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.2,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-vibrant-medium",
+      "name": "Red-orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.2,
+        "h": 60
+      },
+      "token": "spectrum-orange-vibrant-medium",
+      "name": "Orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.2,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-vibrant-medium",
+      "name": "Yellow-orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.2,
+        "h": 120
+      },
+      "token": "spectrum-yellow-vibrant-medium",
+      "name": "Yellow vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.2,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-vibrant-medium",
+      "name": "Yellow-green vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.2,
+        "h": 180
+      },
+      "token": "spectrum-green-vibrant-medium",
+      "name": "Green vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.2,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-vibrant-medium",
+      "name": "Green-cyan vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.2,
+        "h": 240
+      },
+      "token": "spectrum-cyan-vibrant-medium",
+      "name": "Cyan vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.2,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-vibrant-medium",
+      "name": "Cyan-blue vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.2,
+        "h": 300
+      },
+      "token": "spectrum-blue-vibrant-medium",
+      "name": "Blue vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.2,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-vibrant-medium",
+      "name": "Blue-magenta vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.25,
+        "h": 0
+      },
+      "token": "spectrum-red-intense-medium",
+      "name": "Red intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.25,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-intense-medium",
+      "name": "Red-orange intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.25,
+        "h": 60
+      },
+      "token": "spectrum-orange-intense-medium",
+      "name": "Orange intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.25,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-intense-medium",
+      "name": "Yellow-orange intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.25,
+        "h": 120
+      },
+      "token": "spectrum-yellow-intense-medium",
+      "name": "Yellow intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.25,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-intense-medium",
+      "name": "Yellow-green intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.25,
+        "h": 180
+      },
+      "token": "spectrum-green-intense-medium",
+      "name": "Green intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.25,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-intense-medium",
+      "name": "Green-cyan intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.25,
+        "h": 240
+      },
+      "token": "spectrum-cyan-intense-medium",
+      "name": "Cyan intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.25,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-intense-medium",
+      "name": "Cyan-blue intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.25,
+        "h": 300
+      },
+      "token": "spectrum-blue-intense-medium",
+      "name": "Blue intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.5,
+        "c": 0.25,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-intense-medium",
+      "name": "Blue-magenta intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.05,
+        "h": 0
+      },
+      "token": "spectrum-red-muted-medium",
+      "name": "Red muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.05,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-muted-medium",
+      "name": "Red-orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.05,
+        "h": 60
+      },
+      "token": "spectrum-orange-muted-medium",
+      "name": "Orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.05,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-muted-medium",
+      "name": "Yellow-orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.05,
+        "h": 120
+      },
+      "token": "spectrum-yellow-muted-medium",
+      "name": "Yellow muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.05,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-muted-medium",
+      "name": "Yellow-green muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.05,
+        "h": 180
+      },
+      "token": "spectrum-green-muted-medium",
+      "name": "Green muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.05,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-muted-medium",
+      "name": "Green-cyan muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.05,
+        "h": 240
+      },
+      "token": "spectrum-cyan-muted-medium",
+      "name": "Cyan muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.05,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-muted-medium",
+      "name": "Cyan-blue muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.05,
+        "h": 300
+      },
+      "token": "spectrum-blue-muted-medium",
+      "name": "Blue muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.05,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-muted-medium",
+      "name": "Blue-magenta muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.1,
+        "h": 0
+      },
+      "token": "spectrum-red-muted-medium",
+      "name": "Red muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.1,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-muted-medium",
+      "name": "Red-orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.1,
+        "h": 60
+      },
+      "token": "spectrum-orange-muted-medium",
+      "name": "Orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.1,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-muted-medium",
+      "name": "Yellow-orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.1,
+        "h": 120
+      },
+      "token": "spectrum-yellow-muted-medium",
+      "name": "Yellow muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.1,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-muted-medium",
+      "name": "Yellow-green muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.1,
+        "h": 180
+      },
+      "token": "spectrum-green-muted-medium",
+      "name": "Green muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.1,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-muted-medium",
+      "name": "Green-cyan muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.1,
+        "h": 240
+      },
+      "token": "spectrum-cyan-muted-medium",
+      "name": "Cyan muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.1,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-muted-medium",
+      "name": "Cyan-blue muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.1,
+        "h": 300
+      },
+      "token": "spectrum-blue-muted-medium",
+      "name": "Blue muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.1,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-muted-medium",
+      "name": "Blue-magenta muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.15,
+        "h": 0
+      },
+      "token": "spectrum-red-vibrant-medium",
+      "name": "Red vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.15,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-vibrant-medium",
+      "name": "Red-orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.15,
+        "h": 60
+      },
+      "token": "spectrum-orange-vibrant-medium",
+      "name": "Orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.15,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-vibrant-medium",
+      "name": "Yellow-orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.15,
+        "h": 120
+      },
+      "token": "spectrum-yellow-vibrant-medium",
+      "name": "Yellow vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.15,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-vibrant-medium",
+      "name": "Yellow-green vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.15,
+        "h": 180
+      },
+      "token": "spectrum-green-vibrant-medium",
+      "name": "Green vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.15,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-vibrant-medium",
+      "name": "Green-cyan vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.15,
+        "h": 240
+      },
+      "token": "spectrum-cyan-vibrant-medium",
+      "name": "Cyan vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.15,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-vibrant-medium",
+      "name": "Cyan-blue vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.15,
+        "h": 300
+      },
+      "token": "spectrum-blue-vibrant-medium",
+      "name": "Blue vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.15,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-vibrant-medium",
+      "name": "Blue-magenta vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.2,
+        "h": 0
+      },
+      "token": "spectrum-red-vibrant-medium",
+      "name": "Red vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.2,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-vibrant-medium",
+      "name": "Red-orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.2,
+        "h": 60
+      },
+      "token": "spectrum-orange-vibrant-medium",
+      "name": "Orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.2,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-vibrant-medium",
+      "name": "Yellow-orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.2,
+        "h": 120
+      },
+      "token": "spectrum-yellow-vibrant-medium",
+      "name": "Yellow vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.2,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-vibrant-medium",
+      "name": "Yellow-green vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.2,
+        "h": 180
+      },
+      "token": "spectrum-green-vibrant-medium",
+      "name": "Green vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.2,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-vibrant-medium",
+      "name": "Green-cyan vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.2,
+        "h": 240
+      },
+      "token": "spectrum-cyan-vibrant-medium",
+      "name": "Cyan vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.2,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-vibrant-medium",
+      "name": "Cyan-blue vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.2,
+        "h": 300
+      },
+      "token": "spectrum-blue-vibrant-medium",
+      "name": "Blue vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.2,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-vibrant-medium",
+      "name": "Blue-magenta vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.25,
+        "h": 0
+      },
+      "token": "spectrum-red-intense-medium",
+      "name": "Red intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.25,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-intense-medium",
+      "name": "Red-orange intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.25,
+        "h": 60
+      },
+      "token": "spectrum-orange-intense-medium",
+      "name": "Orange intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.25,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-intense-medium",
+      "name": "Yellow-orange intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.25,
+        "h": 120
+      },
+      "token": "spectrum-yellow-intense-medium",
+      "name": "Yellow intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.25,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-intense-medium",
+      "name": "Yellow-green intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.25,
+        "h": 180
+      },
+      "token": "spectrum-green-intense-medium",
+      "name": "Green intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.25,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-intense-medium",
+      "name": "Green-cyan intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.25,
+        "h": 240
+      },
+      "token": "spectrum-cyan-intense-medium",
+      "name": "Cyan intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.25,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-intense-medium",
+      "name": "Cyan-blue intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.25,
+        "h": 300
+      },
+      "token": "spectrum-blue-intense-medium",
+      "name": "Blue intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.6,
+        "c": 0.25,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-intense-medium",
+      "name": "Blue-magenta intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.05,
+        "h": 0
+      },
+      "token": "spectrum-red-muted-medium",
+      "name": "Red muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.05,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-muted-medium",
+      "name": "Red-orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.05,
+        "h": 60
+      },
+      "token": "spectrum-orange-muted-medium",
+      "name": "Orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.05,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-muted-medium",
+      "name": "Yellow-orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.05,
+        "h": 120
+      },
+      "token": "spectrum-yellow-muted-medium",
+      "name": "Yellow muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.05,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-muted-medium",
+      "name": "Yellow-green muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.05,
+        "h": 180
+      },
+      "token": "spectrum-green-muted-medium",
+      "name": "Green muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.05,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-muted-medium",
+      "name": "Green-cyan muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.05,
+        "h": 240
+      },
+      "token": "spectrum-cyan-muted-medium",
+      "name": "Cyan muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.05,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-muted-medium",
+      "name": "Cyan-blue muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.05,
+        "h": 300
+      },
+      "token": "spectrum-blue-muted-medium",
+      "name": "Blue muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.05,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-muted-medium",
+      "name": "Blue-magenta muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.1,
+        "h": 0
+      },
+      "token": "spectrum-red-muted-medium",
+      "name": "Red muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.1,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-muted-medium",
+      "name": "Red-orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.1,
+        "h": 60
+      },
+      "token": "spectrum-orange-muted-medium",
+      "name": "Orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.1,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-muted-medium",
+      "name": "Yellow-orange muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.1,
+        "h": 120
+      },
+      "token": "spectrum-yellow-muted-medium",
+      "name": "Yellow muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.1,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-muted-medium",
+      "name": "Yellow-green muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.1,
+        "h": 180
+      },
+      "token": "spectrum-green-muted-medium",
+      "name": "Green muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.1,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-muted-medium",
+      "name": "Green-cyan muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.1,
+        "h": 240
+      },
+      "token": "spectrum-cyan-muted-medium",
+      "name": "Cyan muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.1,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-muted-medium",
+      "name": "Cyan-blue muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.1,
+        "h": 300
+      },
+      "token": "spectrum-blue-muted-medium",
+      "name": "Blue muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.1,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-muted-medium",
+      "name": "Blue-magenta muted medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.15,
+        "h": 0
+      },
+      "token": "spectrum-red-vibrant-medium",
+      "name": "Red vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.15,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-vibrant-medium",
+      "name": "Red-orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.15,
+        "h": 60
+      },
+      "token": "spectrum-orange-vibrant-medium",
+      "name": "Orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.15,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-vibrant-medium",
+      "name": "Yellow-orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.15,
+        "h": 120
+      },
+      "token": "spectrum-yellow-vibrant-medium",
+      "name": "Yellow vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.15,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-vibrant-medium",
+      "name": "Yellow-green vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.15,
+        "h": 180
+      },
+      "token": "spectrum-green-vibrant-medium",
+      "name": "Green vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.15,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-vibrant-medium",
+      "name": "Green-cyan vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.15,
+        "h": 240
+      },
+      "token": "spectrum-cyan-vibrant-medium",
+      "name": "Cyan vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.15,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-vibrant-medium",
+      "name": "Cyan-blue vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.15,
+        "h": 300
+      },
+      "token": "spectrum-blue-vibrant-medium",
+      "name": "Blue vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.15,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-vibrant-medium",
+      "name": "Blue-magenta vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.2,
+        "h": 0
+      },
+      "token": "spectrum-red-vibrant-medium",
+      "name": "Red vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.2,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-vibrant-medium",
+      "name": "Red-orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.2,
+        "h": 60
+      },
+      "token": "spectrum-orange-vibrant-medium",
+      "name": "Orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.2,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-vibrant-medium",
+      "name": "Yellow-orange vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.2,
+        "h": 120
+      },
+      "token": "spectrum-yellow-vibrant-medium",
+      "name": "Yellow vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.2,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-vibrant-medium",
+      "name": "Yellow-green vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.2,
+        "h": 180
+      },
+      "token": "spectrum-green-vibrant-medium",
+      "name": "Green vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.2,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-vibrant-medium",
+      "name": "Green-cyan vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.2,
+        "h": 240
+      },
+      "token": "spectrum-cyan-vibrant-medium",
+      "name": "Cyan vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.2,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-vibrant-medium",
+      "name": "Cyan-blue vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.2,
+        "h": 300
+      },
+      "token": "spectrum-blue-vibrant-medium",
+      "name": "Blue vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.2,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-vibrant-medium",
+      "name": "Blue-magenta vibrant medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.25,
+        "h": 0
+      },
+      "token": "spectrum-red-intense-medium",
+      "name": "Red intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.25,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-intense-medium",
+      "name": "Red-orange intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.25,
+        "h": 60
+      },
+      "token": "spectrum-orange-intense-medium",
+      "name": "Orange intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.25,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-intense-medium",
+      "name": "Yellow-orange intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.25,
+        "h": 120
+      },
+      "token": "spectrum-yellow-intense-medium",
+      "name": "Yellow intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.25,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-intense-medium",
+      "name": "Yellow-green intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.25,
+        "h": 180
+      },
+      "token": "spectrum-green-intense-medium",
+      "name": "Green intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.25,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-intense-medium",
+      "name": "Green-cyan intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.25,
+        "h": 240
+      },
+      "token": "spectrum-cyan-intense-medium",
+      "name": "Cyan intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.25,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-intense-medium",
+      "name": "Cyan-blue intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.25,
+        "h": 300
+      },
+      "token": "spectrum-blue-intense-medium",
+      "name": "Blue intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.7,
+        "c": 0.25,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-intense-medium",
+      "name": "Blue-magenta intense medium",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.05,
+        "h": 0
+      },
+      "token": "spectrum-red-muted-light",
+      "name": "Red muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.05,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-muted-light",
+      "name": "Red-orange muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.05,
+        "h": 60
+      },
+      "token": "spectrum-orange-muted-light",
+      "name": "Orange muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.05,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-muted-light",
+      "name": "Yellow-orange muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.05,
+        "h": 120
+      },
+      "token": "spectrum-yellow-muted-light",
+      "name": "Yellow muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.05,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-muted-light",
+      "name": "Yellow-green muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.05,
+        "h": 180
+      },
+      "token": "spectrum-green-muted-light",
+      "name": "Green muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.05,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-muted-light",
+      "name": "Green-cyan muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.05,
+        "h": 240
+      },
+      "token": "spectrum-cyan-muted-light",
+      "name": "Cyan muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.05,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-muted-light",
+      "name": "Cyan-blue muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.05,
+        "h": 300
+      },
+      "token": "spectrum-blue-muted-light",
+      "name": "Blue muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.05,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-muted-light",
+      "name": "Blue-magenta muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.1,
+        "h": 0
+      },
+      "token": "spectrum-red-muted-light",
+      "name": "Red muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.1,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-muted-light",
+      "name": "Red-orange muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.1,
+        "h": 60
+      },
+      "token": "spectrum-orange-muted-light",
+      "name": "Orange muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.1,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-muted-light",
+      "name": "Yellow-orange muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.1,
+        "h": 120
+      },
+      "token": "spectrum-yellow-muted-light",
+      "name": "Yellow muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.1,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-muted-light",
+      "name": "Yellow-green muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.1,
+        "h": 180
+      },
+      "token": "spectrum-green-muted-light",
+      "name": "Green muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.1,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-muted-light",
+      "name": "Green-cyan muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.1,
+        "h": 240
+      },
+      "token": "spectrum-cyan-muted-light",
+      "name": "Cyan muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.1,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-muted-light",
+      "name": "Cyan-blue muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.1,
+        "h": 300
+      },
+      "token": "spectrum-blue-muted-light",
+      "name": "Blue muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.1,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-muted-light",
+      "name": "Blue-magenta muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.15,
+        "h": 0
+      },
+      "token": "spectrum-red-vibrant-light",
+      "name": "Red vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.15,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-vibrant-light",
+      "name": "Red-orange vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.15,
+        "h": 60
+      },
+      "token": "spectrum-orange-vibrant-light",
+      "name": "Orange vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.15,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-vibrant-light",
+      "name": "Yellow-orange vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.15,
+        "h": 120
+      },
+      "token": "spectrum-yellow-vibrant-light",
+      "name": "Yellow vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.15,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-vibrant-light",
+      "name": "Yellow-green vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.15,
+        "h": 180
+      },
+      "token": "spectrum-green-vibrant-light",
+      "name": "Green vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.15,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-vibrant-light",
+      "name": "Green-cyan vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.15,
+        "h": 240
+      },
+      "token": "spectrum-cyan-vibrant-light",
+      "name": "Cyan vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.15,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-vibrant-light",
+      "name": "Cyan-blue vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.15,
+        "h": 300
+      },
+      "token": "spectrum-blue-vibrant-light",
+      "name": "Blue vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.15,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-vibrant-light",
+      "name": "Blue-magenta vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.2,
+        "h": 0
+      },
+      "token": "spectrum-red-vibrant-light",
+      "name": "Red vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.2,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-vibrant-light",
+      "name": "Red-orange vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.2,
+        "h": 60
+      },
+      "token": "spectrum-orange-vibrant-light",
+      "name": "Orange vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.2,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-vibrant-light",
+      "name": "Yellow-orange vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.2,
+        "h": 120
+      },
+      "token": "spectrum-yellow-vibrant-light",
+      "name": "Yellow vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.2,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-vibrant-light",
+      "name": "Yellow-green vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.2,
+        "h": 180
+      },
+      "token": "spectrum-green-vibrant-light",
+      "name": "Green vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.2,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-vibrant-light",
+      "name": "Green-cyan vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.2,
+        "h": 240
+      },
+      "token": "spectrum-cyan-vibrant-light",
+      "name": "Cyan vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.2,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-vibrant-light",
+      "name": "Cyan-blue vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.2,
+        "h": 300
+      },
+      "token": "spectrum-blue-vibrant-light",
+      "name": "Blue vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.2,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-vibrant-light",
+      "name": "Blue-magenta vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.25,
+        "h": 0
+      },
+      "token": "spectrum-red-intense-light",
+      "name": "Red intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.25,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-intense-light",
+      "name": "Red-orange intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.25,
+        "h": 60
+      },
+      "token": "spectrum-orange-intense-light",
+      "name": "Orange intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.25,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-intense-light",
+      "name": "Yellow-orange intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.25,
+        "h": 120
+      },
+      "token": "spectrum-yellow-intense-light",
+      "name": "Yellow intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.25,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-intense-light",
+      "name": "Yellow-green intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.25,
+        "h": 180
+      },
+      "token": "spectrum-green-intense-light",
+      "name": "Green intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.25,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-intense-light",
+      "name": "Green-cyan intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.25,
+        "h": 240
+      },
+      "token": "spectrum-cyan-intense-light",
+      "name": "Cyan intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.25,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-intense-light",
+      "name": "Cyan-blue intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.25,
+        "h": 300
+      },
+      "token": "spectrum-blue-intense-light",
+      "name": "Blue intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.8,
+        "c": 0.25,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-intense-light",
+      "name": "Blue-magenta intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.05,
+        "h": 0
+      },
+      "token": "spectrum-red-muted-light",
+      "name": "Red muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.05,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-muted-light",
+      "name": "Red-orange muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.05,
+        "h": 60
+      },
+      "token": "spectrum-orange-muted-light",
+      "name": "Orange muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.05,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-muted-light",
+      "name": "Yellow-orange muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.05,
+        "h": 120
+      },
+      "token": "spectrum-yellow-muted-light",
+      "name": "Yellow muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.05,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-muted-light",
+      "name": "Yellow-green muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.05,
+        "h": 180
+      },
+      "token": "spectrum-green-muted-light",
+      "name": "Green muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.05,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-muted-light",
+      "name": "Green-cyan muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.05,
+        "h": 240
+      },
+      "token": "spectrum-cyan-muted-light",
+      "name": "Cyan muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.05,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-muted-light",
+      "name": "Cyan-blue muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.05,
+        "h": 300
+      },
+      "token": "spectrum-blue-muted-light",
+      "name": "Blue muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.05,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-muted-light",
+      "name": "Blue-magenta muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.1,
+        "h": 0
+      },
+      "token": "spectrum-red-muted-light",
+      "name": "Red muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.1,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-muted-light",
+      "name": "Red-orange muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.1,
+        "h": 60
+      },
+      "token": "spectrum-orange-muted-light",
+      "name": "Orange muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.1,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-muted-light",
+      "name": "Yellow-orange muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.1,
+        "h": 120
+      },
+      "token": "spectrum-yellow-muted-light",
+      "name": "Yellow muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.1,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-muted-light",
+      "name": "Yellow-green muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.1,
+        "h": 180
+      },
+      "token": "spectrum-green-muted-light",
+      "name": "Green muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.1,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-muted-light",
+      "name": "Green-cyan muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.1,
+        "h": 240
+      },
+      "token": "spectrum-cyan-muted-light",
+      "name": "Cyan muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.1,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-muted-light",
+      "name": "Cyan-blue muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.1,
+        "h": 300
+      },
+      "token": "spectrum-blue-muted-light",
+      "name": "Blue muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.1,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-muted-light",
+      "name": "Blue-magenta muted light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.15,
+        "h": 0
+      },
+      "token": "spectrum-red-vibrant-light",
+      "name": "Red vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.15,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-vibrant-light",
+      "name": "Red-orange vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.15,
+        "h": 60
+      },
+      "token": "spectrum-orange-vibrant-light",
+      "name": "Orange vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.15,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-vibrant-light",
+      "name": "Yellow-orange vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.15,
+        "h": 120
+      },
+      "token": "spectrum-yellow-vibrant-light",
+      "name": "Yellow vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.15,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-vibrant-light",
+      "name": "Yellow-green vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.15,
+        "h": 180
+      },
+      "token": "spectrum-green-vibrant-light",
+      "name": "Green vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.15,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-vibrant-light",
+      "name": "Green-cyan vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.15,
+        "h": 240
+      },
+      "token": "spectrum-cyan-vibrant-light",
+      "name": "Cyan vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.15,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-vibrant-light",
+      "name": "Cyan-blue vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.15,
+        "h": 300
+      },
+      "token": "spectrum-blue-vibrant-light",
+      "name": "Blue vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.15,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-vibrant-light",
+      "name": "Blue-magenta vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.2,
+        "h": 0
+      },
+      "token": "spectrum-red-vibrant-light",
+      "name": "Red vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.2,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-vibrant-light",
+      "name": "Red-orange vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.2,
+        "h": 60
+      },
+      "token": "spectrum-orange-vibrant-light",
+      "name": "Orange vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.2,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-vibrant-light",
+      "name": "Yellow-orange vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.2,
+        "h": 120
+      },
+      "token": "spectrum-yellow-vibrant-light",
+      "name": "Yellow vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.2,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-vibrant-light",
+      "name": "Yellow-green vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.2,
+        "h": 180
+      },
+      "token": "spectrum-green-vibrant-light",
+      "name": "Green vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.2,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-vibrant-light",
+      "name": "Green-cyan vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.2,
+        "h": 240
+      },
+      "token": "spectrum-cyan-vibrant-light",
+      "name": "Cyan vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.2,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-vibrant-light",
+      "name": "Cyan-blue vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.2,
+        "h": 300
+      },
+      "token": "spectrum-blue-vibrant-light",
+      "name": "Blue vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.2,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-vibrant-light",
+      "name": "Blue-magenta vibrant light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.25,
+        "h": 0
+      },
+      "token": "spectrum-red-intense-light",
+      "name": "Red intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.25,
+        "h": 30
+      },
+      "token": "spectrum-red-orange-intense-light",
+      "name": "Red-orange intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.25,
+        "h": 60
+      },
+      "token": "spectrum-orange-intense-light",
+      "name": "Orange intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.25,
+        "h": 90
+      },
+      "token": "spectrum-yellow-orange-intense-light",
+      "name": "Yellow-orange intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.25,
+        "h": 120
+      },
+      "token": "spectrum-yellow-intense-light",
+      "name": "Yellow intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.25,
+        "h": 150
+      },
+      "token": "spectrum-yellow-green-intense-light",
+      "name": "Yellow-green intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.25,
+        "h": 180
+      },
+      "token": "spectrum-green-intense-light",
+      "name": "Green intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.25,
+        "h": 210
+      },
+      "token": "spectrum-green-cyan-intense-light",
+      "name": "Green-cyan intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.25,
+        "h": 240
+      },
+      "token": "spectrum-cyan-intense-light",
+      "name": "Cyan intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.25,
+        "h": 270
+      },
+      "token": "spectrum-cyan-blue-intense-light",
+      "name": "Cyan-blue intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.25,
+        "h": 300
+      },
+      "token": "spectrum-blue-intense-light",
+      "name": "Blue intense light",
+      "category": "spectrum-exploration"
+    },
+    {
+      "oklch": {
+        "l": 0.9,
+        "c": 0.25,
+        "h": 330
+      },
+      "token": "spectrum-blue-magenta-intense-light",
+      "name": "Blue-magenta intense light",
+      "category": "spectrum-exploration"
+    }
+  ]
+}

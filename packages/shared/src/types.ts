@@ -149,8 +149,7 @@ export type ColorValue = z.infer<typeof ColorValueSchema>;
 export const TokenSchema = z.object({
   // Core token data
   name: z.string(),
-  value: z.string(), // Simple string value (oklch, hex, rem, etc.)
-  darkValue: z.string().optional(), // Simple dark mode value
+  value: z.union([z.string(), ColorValueSchema]), // String for most tokens, ColorValue for colors
   category: z.string(),
   namespace: z.string(),
 
