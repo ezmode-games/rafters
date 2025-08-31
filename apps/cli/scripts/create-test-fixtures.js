@@ -9,7 +9,7 @@
  */
 
 import { execSync } from 'node:child_process';
-import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const FIXTURES_DIR = join(process.cwd(), 'test', 'fixtures');
@@ -33,10 +33,10 @@ function createNextjsApp() {
 
   // Use exact command users run, with TypeScript + Tailwind (most common setup)
   execSync(
-    'npx create-next-app@latest nextjs-app --typescript --tailwind --eslint --app --src-dir --import-alias "@/*"',
+    `pnpx create-next-app@latest ${appPath} --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --yes`,
     {
-      cwd: FIXTURES_DIR,
       stdio: 'inherit',
+      env: { ...process.env, CI: 'true' },
     }
   );
 
@@ -46,7 +46,7 @@ function createNextjsApp() {
 # Rafters CLI test artifacts
 .rafters/
 `;
-  execSync(`echo "${gitignoreContent}" >> ${gitignorePath}`);
+  appendFileSync(gitignorePath, gitignoreContent);
 
   console.log('✅ Next.js fixture created\n');
 }
@@ -58,23 +58,13 @@ function createReactRouter7App() {
   console.log('🛣️  Creating React Router 7 app fixture...');
 
   // React Router 7 is the latest - use their official generator
-  execSync('npx create-react-router@latest rr7-app --template basic --typescript', {
-    cwd: FIXTURES_DIR,
-    stdio: 'inherit',
-  });
-
   const appPath = join(FIXTURES_DIR, 'rr7-app');
-
-  // Add Tailwind since that's what most people add
-  execSync('npm install -D tailwindcss postcss autoprefixer', {
-    cwd: appPath,
+  execSync(`pnpx create-react-router@latest ${appPath} --typescript --yes`, {
     stdio: 'inherit',
+    env: { ...process.env, CI: 'true' },
   });
 
-  execSync('npx tailwindcss init -p', {
-    cwd: appPath,
-    stdio: 'inherit',
-  });
+  // React Router 7 already includes Tailwind, no need to set it up again
 
   console.log('✅ React Router 7 fixture created\n');
 }
@@ -86,29 +76,47 @@ function createViteReactApp() {
   console.log('⚡ Creating Vite + React app fixture...');
 
   // Use create-vite with React + TypeScript template (most common)
-  execSync('npm create vite@latest vite-react -- --template react-ts', {
+  const appPath = join(FIXTURES_DIR, 'vite-react');
+  execSync('pnpm create vite@latest vite-react --template react-ts', {
     cwd: FIXTURES_DIR,
     stdio: 'inherit',
+    env: { ...process.env, CI: 'true' },
   });
-
-  const appPath = join(FIXTURES_DIR, 'vite-react');
 
   // Install dependencies
-  execSync('npm install', {
+  execSync('pnpm install', {
     cwd: appPath,
     stdio: 'inherit',
   });
 
-  // Add Tailwind (very common with Vite)
-  execSync('npm install -D tailwindcss postcss autoprefixer', {
+  // Add Tailwind (very common with Vite) and initialize it
+  execSync('pnpm install -D tailwindcss postcss autoprefixer', {
     cwd: appPath,
     stdio: 'inherit',
   });
 
-  execSync('npx tailwindcss init -p', {
-    cwd: appPath,
-    stdio: 'inherit',
-  });
+  // Create tailwind config manually since exec is having issues
+  const tailwindConfig = `/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}`;
+
+  const postcssConfig = `export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}`;
+
+  writeFileSync(join(appPath, 'tailwind.config.js'), tailwindConfig);
+  writeFileSync(join(appPath, 'postcss.config.js'), postcssConfig);
 
   console.log('✅ Vite + React fixture created\n');
 }
