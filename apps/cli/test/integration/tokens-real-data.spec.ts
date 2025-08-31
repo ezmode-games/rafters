@@ -15,7 +15,7 @@ import { createTempTestApp } from '../helpers/testApp';
 
 describe('Real Design System Token Integration', () => {
   let testApp: TestFixtureInfo;
-  let realTokens: any;
+  let realTokens: { category: string; generatedAt: string; tokens: unknown[] } | undefined;
 
   beforeEach(async () => {
     await ensureCLIBuilt();
@@ -309,8 +309,12 @@ describe('Real Design System Token Integration', () => {
         expect(Array.isArray(categoryData.tokens)).toBe(true);
 
         // Should contain primary token
-        const hasPrimary = categoryData.tokens.some((token: unknown) => 
-          typeof token === 'object' && token !== null && 'name' in token && token.name === 'primary'
+        const hasPrimary = categoryData.tokens.some(
+          (token: unknown) =>
+            typeof token === 'object' &&
+            token !== null &&
+            'name' in token &&
+            token.name === 'primary'
         );
         expect(hasPrimary).toBe(true);
       } finally {
