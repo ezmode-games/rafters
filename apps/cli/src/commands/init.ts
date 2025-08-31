@@ -31,7 +31,7 @@ import { getRaftersLogo, getRaftersTitle } from '../utils/logo.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export async function initCommand(): Promise<void> {
+export async function initCommand(options: { yes?: boolean; config?: string } = {}): Promise<void> {
   const cwd = process.cwd();
 
   // Display ASCII logo
@@ -72,71 +72,123 @@ export async function initCommand(): Promise<void> {
   const existingCssFile = findCssFile(cwd);
   const defaultCssFile = getDefaultCssFile(framework, cwd);
 
-  // Interactive setup
-  const answers = await inquirer.prompt([
-    {
-      type: 'input',
-      name: 'componentsDir',
-      message: 'Components directory:',
-      default: './src/components/ui',
-    },
-    {
-      type: 'input',
-      name: 'cssFile',
-      message: existingCssFile
-        ? `CSS file to inject design tokens (found: ${existingCssFile}):`
-        : 'CSS file to inject design tokens (will create if missing):',
-      default: defaultCssFile,
-      validate: (input) => {
-        if (!input.endsWith('.css')) {
-          return 'CSS file must end with .css';
-        }
-        return true;
+  // Setup configuration - interactive, config file, or use defaults
+  interface InitAnswers {
+    componentsDir: string;
+    cssFile: string;
+    studioShortcode: string;
+    tokenFormat: string;
+    packageManager: string;
+  }
+  let answers: InitAnswers;
+
+  if (options.config) {
+    // Load configuration from file
+    try {
+      const configPath = join(cwd, options.config);
+      if (!existsSync(configPath)) {
+        console.error(
+          `Config file not found at ${configPath}. Please check the file path and ensure the file exists.`
+        );
+        process.exit(1);
+      }
+
+      const configContent = readFileSync(configPath, 'utf8');
+      const configAnswers = JSON.parse(configContent);
+
+      // Validate required fields and provide defaults
+      answers = {
+        componentsDir: configAnswers.componentsDir || './src/components/ui',
+        cssFile: configAnswers.cssFile || defaultCssFile,
+        studioShortcode: configAnswers.studioShortcode || '',
+        tokenFormat: configAnswers.tokenFormat || 'tailwind',
+        packageManager: configAnswers.packageManager || detectPackageManager(cwd),
+      };
+
+      console.log(`Using configuration from: ${options.config}`);
+    } catch (error) {
+      console.error(
+        `Failed to parse config file '${options.config}': ${error instanceof Error ? error.message : error}. Please ensure the file contains valid JSON.`
+      );
+      process.exit(1);
+    }
+  } else if (options.yes) {
+    // Non-interactive mode - use defaults
+    answers = {
+      componentsDir: './src/components/ui',
+      cssFile: defaultCssFile,
+      studioShortcode: '', // Default to empty (use generated tokens)
+      tokenFormat: 'tailwind',
+      packageManager: detectPackageManager(cwd),
+    };
+    console.log('Using default configuration (non-interactive mode)');
+  } else {
+    // Interactive setup
+    answers = await inquirer.prompt([
+      {
+        type: 'input',
+        name: 'componentsDir',
+        message: 'Components directory:',
+        default: './src/components/ui',
       },
-    },
-    {
-      type: 'input',
-      name: 'studioShortcode',
-      message: 'Studio shortcode (leave blank for default grayscale):',
-      validate: (input) => {
-        if (!input) return true; // Allow blank for default
-        if (!/^[A-Z0-9]{6,8}$/i.test(input)) {
-          return 'Shortcode must be 6-8 characters (letters and numbers only)';
-        }
-        return true;
+      {
+        type: 'input',
+        name: 'cssFile',
+        message: existingCssFile
+          ? `CSS file to inject design tokens (found: ${existingCssFile}):`
+          : 'CSS file to inject design tokens (will create if missing):',
+        default: defaultCssFile,
+        validate: (input) => {
+          if (!input.endsWith('.css')) {
+            return 'CSS file must end with .css';
+          }
+          return true;
+        },
       },
-    },
-    {
-      type: 'list',
-      name: 'tokenFormat',
-      message: 'Design token format:',
-      choices: [
-        { name: 'Tailwind CSS v4', value: 'tailwind' },
-        { name: 'Vanilla CSS', value: 'css' },
-        { name: 'React Native', value: 'react-native' },
-      ],
-      default: 'tailwind',
-    },
-    {
-      type: 'list',
-      name: 'packageManager',
-      message: 'Package manager:',
-      choices: [
-        { name: 'pnpm', value: 'pnpm' },
-        { name: 'npm', value: 'npm' },
-        { name: 'yarn', value: 'yarn' },
-      ],
-      default: detectPackageManager(cwd),
-    },
-  ]);
+      {
+        type: 'input',
+        name: 'studioShortcode',
+        message: 'Studio shortcode (leave blank for default grayscale):',
+        validate: (input) => {
+          if (!input) return true; // Allow blank for default
+          if (!/^[A-Z0-9]{6,8}$/i.test(input)) {
+            return 'Shortcode must be 6-8 characters (letters and numbers only)';
+          }
+          return true;
+        },
+      },
+      {
+        type: 'list',
+        name: 'tokenFormat',
+        message: 'Design token format:',
+        choices: [
+          { name: 'Tailwind CSS v4', value: 'tailwind' },
+          { name: 'Vanilla CSS', value: 'css' },
+          { name: 'React Native', value: 'react-native' },
+        ],
+        default: 'tailwind',
+      },
+      {
+        type: 'list',
+        name: 'packageManager',
+        message: 'Package manager:',
+        choices: [
+          { name: 'pnpm', value: 'pnpm' },
+          { name: 'npm', value: 'npm' },
+          { name: 'yarn', value: 'yarn' },
+        ],
+        default: detectPackageManager(cwd),
+      },
+    ]);
+  }
 
   const config: Config = {
     ...defaultConfig,
     componentsDir: answers.componentsDir,
     cssFile: answers.cssFile,
     tailwindVersion: tailwindVersion as 'v3' | 'v4',
-    tokenFormat: answers.tokenFormat,
-    packageManager: answers.packageManager,
+    tokenFormat: answers.tokenFormat as 'css' | 'tailwind' | 'react-native',
+    packageManager: answers.packageManager as 'npm' | 'yarn' | 'pnpm',
   };
 
   // Get design tokens from Studio or create default
@@ -281,18 +333,25 @@ export function cn(...inputs: ClassValue[]) {
 
     setupSpinner.succeed('Rafters setup complete');
 
-    // Install dependencies
-    const depsSpinner = ora('Installing core dependencies...').start();
-    const coreDeps = getCoreDependencies();
+    // Install dependencies (skip in test/CI environments)
+    const isTestMode =
+      process.env.NODE_ENV === 'test' || process.env.CI === 'true' || process.env.VITEST === 'true';
 
-    try {
-      await installDependencies(coreDeps, config.packageManager, cwd);
-      depsSpinner.succeed('Core dependencies installed');
-    } catch (_error) {
-      depsSpinner.warn('Failed to install dependencies automatically. Please install manually:');
-      console.log(
-        `${config.packageManager} ${config.packageManager === 'npm' ? 'install' : 'add'} ${coreDeps.join(' ')}`
-      );
+    if (isTestMode) {
+      console.log('Skipping dependency installation in test mode');
+    } else {
+      const depsSpinner = ora('Installing core dependencies...').start();
+      const coreDeps = getCoreDependencies();
+
+      try {
+        await installDependencies(coreDeps, config.packageManager, cwd);
+        depsSpinner.succeed('Core dependencies installed');
+      } catch (_error) {
+        depsSpinner.warn('Failed to install dependencies automatically. Please install manually:');
+        console.log(
+          `${config.packageManager} ${config.packageManager === 'npm' ? 'install' : 'add'} ${coreDeps.join(' ')}`
+        );
+      }
     }
 
     console.log('Rafters initialized.');
