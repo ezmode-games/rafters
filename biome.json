@@ -10,7 +10,13 @@
       "**/worker-configuration.d.ts",
       "**/.react-router",
       "**/*.css",
-      "**/*.d.ts"
+      "**/*.d.ts",
+      "apps/cli/test/fixtures/**/*",
+      "apps/cli/test/fixtures/**/*.json",
+      "apps/cli/test/fixtures/**/*.ts",
+      "apps/cli/test/fixtures/**/*.tsx",
+      "apps/cli/test/fixtures/**/*.js",
+      "apps/cli/test/fixtures/**/*.jsx"
     ]
   },
   "vcs": {

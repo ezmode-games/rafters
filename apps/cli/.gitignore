@@ -23,3 +23,7 @@ pnpm-debug.log*
 # Testing
 coverage/
 .nyc_output/
+test/fixtures/*/node_modules/
+test/fixtures/*/.next/
+test/fixtures/*/dist/
+test/fixtures/*/.vite/
