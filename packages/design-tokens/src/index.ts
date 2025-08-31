@@ -43,27 +43,22 @@ export { Token, TokenSchema } from '@rafters/shared';
 
 /**
  * Convert a token value (string or ColorValue object) to a CSS string
- * For ColorValue objects, extracts the appropriate CSS value for usage
+ * For ColorValue objects, extracts the appropriate CSS value from scale
  */
 function tokenValueToCss(value: string | ColorValue): string {
   if (typeof value === 'string') {
     return value;
   }
 
-  // Handle ColorValue object - prioritize the main value field first
-  if (value.value) {
-    return value.value;
-  }
-
-  // If has scale values, find the value position or use 500 equivalent (index 5)
+  // Handle ColorValue object - extract from scale using value position
   if (value.scale && value.scale.length > 0) {
-    let targetIndex = 5; // Default to 500 position
+    let targetIndex = 5; // Default to 500 position (index 5)
 
-    // If value is specified, try to map it to scale position
+    // If value field specifies a scale position, use that
     if (value.value && !Number.isNaN(Number.parseInt(value.value))) {
-      const scaleValue = Number.parseInt(value.value);
+      const scalePosition = Number.parseInt(value.value);
       const scalePositions = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
-      targetIndex = scalePositions.indexOf(scaleValue);
+      targetIndex = scalePositions.indexOf(scalePosition);
       if (targetIndex === -1) targetIndex = 5; // Fallback to 500
     }
 
@@ -102,7 +97,7 @@ function tokenValueToCssDark(value: string | ColorValue, stateName = 'default'):
     }
   }
 
-  // If no states available, fall back to light value
+  // If no states available, fall back to extracting from light value scale
   return tokenValueToCss(value);
 }
 
@@ -166,25 +161,17 @@ function generateCssCustomProperties(designSystem: DesignSystem): string {
 
   for (const token of designSystem.tokens) {
     // Use tokenValueToCss to handle both string and ColorValue tokens
-    const lightValue = tokenValueToCss(token.value);
-    const cssVar = `--${token.namespace}-${token.name}: ${lightValue};`;
-    lightTokens.push(cssVar);
+    const tokenValue = tokenValueToCss(token.value);
 
-    if (token.darkValue) {
-      // Handle both string and ColorValue darkValue
-      const darkValue =
-        typeof token.darkValue === 'string' ? token.darkValue : tokenValueToCss(token.darkValue);
-      const darkVar = `--${token.namespace}-${token.name}: ${darkValue};`;
+    if (token.name.endsWith('-dark')) {
+      // This is a dark mode token - add to dark tokens with light name
+      const lightName = token.name.replace('-dark', '');
+      const darkVar = `--${token.namespace}-${lightName}: ${tokenValue};`;
       darkTokens.push(darkVar);
-    } else if (
-      isColorValue(token.value) &&
-      token.value.states &&
-      Object.keys(token.value.states).length > 0
-    ) {
-      // If no explicit darkValue but ColorValue has states, use the first available state
-      const darkValue = tokenValueToCssDark(token.value);
-      const darkVar = `--${token.namespace}-${token.name}: ${darkValue};`;
-      darkTokens.push(darkVar);
+    } else {
+      // This is a light mode token - add to light tokens
+      const cssVar = `--${token.namespace}-${token.name}: ${tokenValue};`;
+      lightTokens.push(cssVar);
     }
   }
 
@@ -239,40 +226,25 @@ function generateTailwindStylesheet(designSystem: DesignSystem): string {
   // Colors with semantic naming and OKLCH values
   if (tokensByCategory.color) {
     stylesheet += `    /* ${(designSystem.primaryColorSpace || 'oklch').toUpperCase()} Color Palette */\n`;
-    // Only generate base color tokens - filter out responsive variants
-    const baseColorTokens = tokensByCategory.color.filter(
-      (token) =>
-        !token.name.includes('-sm-') &&
-        !token.name.includes('-md-') &&
-        !token.name.includes('-lg-') &&
-        !token.name.includes('-xl-') &&
-        !token.name.includes('@xs-') &&
-        !token.name.includes('@sm-') &&
-        !token.name.includes('@md-') &&
-        !token.name.includes('@lg-') &&
-        !token.name.includes('@xl-')
+
+    // Separate normal and dark tokens
+    const normalColorTokens = tokensByCategory.color.filter(
+      (token) => !token.name.includes('-dark')
     );
+    const darkColorTokens = tokensByCategory.color.filter((token) => token.name.includes('-dark'));
 
-    for (const token of baseColorTokens) {
-      // Light mode color - use tokenValueToCss to handle ColorValue objects
-      const lightValue = tokenValueToCss(token.value);
-      stylesheet += `    --color-${token.name}: ${lightValue};\n`;
-
-      // Generate proper dark token if darkValue exists or token has ColorValue with darkStates
-      if (token.darkValue) {
-        const darkValue =
-          typeof token.darkValue === 'string' ? token.darkValue : tokenValueToCss(token.darkValue);
-        stylesheet += `    --color-${token.name}-dark: ${darkValue};\n`;
-      } else if (
-        isColorValue(token.value) &&
-        token.value.states &&
-        Object.keys(token.value.states).length > 0
-      ) {
-        // If no explicit darkValue but ColorValue has states, use the first available state
-        const darkValue = tokenValueToCssDark(token.value);
-        stylesheet += `    --color-${token.name}-dark: ${darkValue};\n`;
-      }
+    // Generate normal color tokens
+    for (const token of normalColorTokens) {
+      const cssValue = tokenValueToCss(token.value);
+      stylesheet += `    --color-${token.name}: ${cssValue};\n`;
     }
+
+    // Generate dark color tokens (they'll be referenced in dark mode)
+    for (const token of darkColorTokens) {
+      const cssValue = tokenValueToCss(token.value);
+      stylesheet += `    --color-${token.name}: ${cssValue};\n`;
+    }
+
     stylesheet += '\n';
   }
 
@@ -488,17 +460,14 @@ function generateTailwindStylesheet(designSystem: DesignSystem): string {
   // Dark mode using proper dark tokens - NO hardcoded values, only token references
   stylesheet += '\n    @media (prefers-color-scheme: dark) {\n';
   for (const semantic of semanticMappings) {
-    // Look for dark variant tokens first
+    // Look for dark variant tokens (semantic-dark naming)
     const darkToken = tokensByCategory.color?.find((t) => t.name === `${semantic}-dark`);
-    const lightToken = tokensByCategory.color?.find((t) => t.name === semantic);
 
     if (darkToken) {
-      // Use dark variant token reference directly
-      stylesheet += `        --${semantic}: var(--color-${darkToken.name});\n`;
-    } else if (lightToken?.darkValue) {
-      // Reference the dark token we generated in @theme - NO fallback to hardcoded values
+      // Reference the dark variant token
       stylesheet += `        --${semantic}: var(--color-${semantic}-dark);\n`;
     }
+    // If no dark token exists, light value remains (like for pure white/black)
   }
   stylesheet += '    }\n';
   stylesheet += '}\n\n';
@@ -699,14 +668,14 @@ export const createRegistry = (tokensDir: string): TokenSet => {
           value: 'oklch(1 0 0)',
           category: 'color',
           namespace: 'color',
-          darkValue: 'oklch(0.09 0 0)',
+          // darkValue: 'oklch(0.09 0 0)', // deprecated, use separate dark token
         },
         {
           name: 'foreground',
           value: 'oklch(0.15 0.005 240)',
           category: 'color',
           namespace: 'color',
-          darkValue: 'oklch(0.95 0 0)',
+          // darkValue: 'oklch(0.95 0 0)', // deprecated, use separate dark token
         },
       ],
     };
@@ -789,37 +758,19 @@ function generateCSSFromTokens(tokens: Token[]): string {
   lines.push('}');
   lines.push('');
 
-  // Generate dark mode overrides (if we have darkValue properties or ColorValue with states)
-  const tokensWithDarkValues = tokens.filter(
-    (t) =>
-      t.darkValue ||
-      (isColorValue(t.value) && t.value.states && Object.keys(t.value.states).length > 0)
-  );
-  if (tokensWithDarkValues.length > 0) {
+  // Generate dark mode overrides (new pattern: look for -dark suffix tokens)
+  const darkTokens = tokens.filter((t) => t.name.endsWith('-dark'));
+  if (darkTokens.length > 0) {
     lines.push('.dark {');
     lines.push('  /* Dark mode overrides */');
-    for (const token of tokensWithDarkValues) {
-      const varName = `--${token.name.replace(/_/g, '-')}`;
+    for (const token of darkTokens) {
+      const lightName = token.name.replace('-dark', '');
+      const varName = `--${lightName.replace(/_/g, '-')}`;
       if (token.semanticMeaning) {
         lines.push(`  /* Dark: ${token.semanticMeaning} */`);
       }
 
-      let darkValue: string;
-      if (token.darkValue) {
-        // Handle explicit darkValue (string or ColorValue)
-        darkValue =
-          typeof token.darkValue === 'string' ? token.darkValue : tokenValueToCss(token.darkValue);
-      } else if (
-        isColorValue(token.value) &&
-        token.value.states &&
-        Object.keys(token.value.states).length > 0
-      ) {
-        // Handle ColorValue with states
-        darkValue = tokenValueToCssDark(token.value);
-      } else {
-        continue; // Skip if no dark value available
-      }
-
+      const darkValue = tokenValueToCss(token.value);
       lines.push(`  ${varName}: ${darkValue};`);
     }
     lines.push('}');

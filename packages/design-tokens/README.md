@@ -98,11 +98,10 @@ Every token conforms to this TypeScript interface:
 
 ```typescript
 interface Token {
-  name: string                    // Semantic name (not color-based)
-  value: string                   // Primary value (light mode)
-  darkValue?: string              // Dark mode override
-  category: string                // Token category
-  namespace?: string              // Grouping namespace
+  name: string                    // Semantic name (e.g., 'primary', 'primary-dark')
+  value: string | ColorValue      // Simple string OR rich ColorValue object
+  category: string                // Token category ('color', 'spacing', etc.)
+  namespace: string               // Grouping namespace
   
   // AI Intelligence Metadata
   semanticMeaning: string         // What this token communicates
@@ -121,6 +120,41 @@ interface Token {
   contrastCompliant?: boolean    // Meets contrast requirements
 }
 ```
+
+### Color Tokens Are Special
+
+While most tokens have simple string values (`"4px"`, `"300ms"`), **color tokens** use `ColorValue` objects with rich intelligence:
+
+```typescript
+interface ColorValue {
+  name: string                    // Fancy name (e.g., 'ocean-blue')
+  scale: OKLCH[]                  // Array of OKLCH values [50,100,200...900]
+  token?: string                  // Semantic assignment (e.g., 'primary')
+  value?: string                  // Scale position (e.g., '500')
+  use?: string                    // Human reasoning for color choice
+  states?: Record<string, string> // Interaction states {hover: '600', focus: '700'}
+  
+  // Intelligence from color-intel API (populated from cache)
+  intelligence?: {
+    reasoning: string             // Why this OKLCH combination works
+    emotionalImpact: string       // Psychological responses
+    culturalContext: string       // Cross-cultural meanings
+    accessibilityNotes: string    // WCAG guidance
+    usageGuidance: string         // When/how to use
+  }
+  harmonies?: { ... }            // Mathematical color relationships
+  accessibility?: { ... }        // Contrast ratios and compliance
+  analysis?: { ... }             // Temperature, lightness, etc.
+}
+```
+
+### Dark Mode Pattern
+
+Dark mode uses separate tokens with `-dark` suffix:
+- Light: `{ name: 'primary', value: ColorValueObject }`
+- Dark: `{ name: 'primary-dark', value: ColorValueObject }`
+
+This keeps tokens self-contained and explicit. The CSS handles switching via media queries.
 
 ## Usage Patterns
 
