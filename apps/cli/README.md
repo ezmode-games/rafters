@@ -431,6 +431,12 @@ pnpm test:watch
 - **Template Tests**: Answer file configurations for different project types
 - **Cleanup Tests**: Proper cleanup and error handling
 
+**Test Performance Optimizations:**
+- Dependency installation is automatically skipped in test/CI environments
+- Integration tests run in ~6 seconds (down from 50+ seconds)
+- Tests use isolated temporary directories with proper cleanup
+- Real filesystem operations ensure accurate test coverage
+
 ### Development Commands
 
 ```bash
