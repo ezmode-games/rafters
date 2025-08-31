@@ -271,7 +271,9 @@ export async function startMCPServer() {
           }
 
           const { colors } = args as { colors: string[] };
-          const colorTokens = colors.map((c) => tokenRegistry.get(c)).filter(Boolean);
+          const colorTokens = colors
+            .map((c) => tokenRegistry.get(c))
+            .filter((t): t is NonNullable<typeof t> => Boolean(t));
 
           const totalCognitiveLoad = colorTokens.reduce(
             (sum, t) => sum + (t.cognitiveLoad || 0),
