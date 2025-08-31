@@ -83,7 +83,7 @@ export function generateColorTokens(): Token[] {
     {
       name: 'primary',
       lightValue: 'oklch(0.45 0.12 240)', // Blue
-      darkValue: 'oklch(0.7 0.12 240)',
+      darkValue: 'oklch(0.7 0.12 240)', // deprecated, use separate dark token
       lightness: 0.45,
       chroma: 0.12,
       hue: 240,
@@ -305,23 +305,25 @@ export function generateColorTokens(): Token[] {
         ? {} // Skip states for non-interactive colors
         : createStates(color.lightness, color.chroma, color.hue);
 
-    // Create ColorValue object
-    const colorValue: ColorValue = {
-      name: color.name,
-      scale: scale,
+    // Create light mode token with ColorValue object
+    const lightColorValue: ColorValue = {
+      name: color.name, // Will get proper color name from color-utils later
+      scale: scale, // Full OKLCH scale array
+      token: color.name, // Semantic assignment
       value: '500', // Default scale position
-      use: color.meaning,
+      use: color.meaning, // Human reasoning for color choice
       ...(Object.keys(states).length > 0 && { states }),
+      // Intelligence fields left empty - populated from API cache later
     };
 
+    // Push light mode token
     tokens.push({
       name: color.name,
-      value: color.lightValue, // Use the actual OKLCH light value for the token
-      darkValue: color.darkValue,
+      value: lightColorValue, // ColorValue object with full intelligence structure
       category: 'color',
       namespace: 'color',
       semanticMeaning: color.meaning,
-      scalePosition: index,
+      scalePosition: index * 2, // Double spacing for light/dark pairs
       trustLevel: color.trustLevel,
       cognitiveLoad: color.cognitiveLoad,
       generateUtilityClass: true,
@@ -339,6 +341,53 @@ export function generateColorTokens(): Token[] {
         trustLevel: 'critical',
       }),
     });
+
+    // Create corresponding dark mode token if darkValue exists
+    if (color.darkValue) {
+      // Parse dark OKLCH to get values
+      const darkMatch = color.darkValue.match(/oklch\(([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)\)/);
+      if (darkMatch) {
+        const darkL = Number.parseFloat(darkMatch[1]);
+        const darkC = Number.parseFloat(darkMatch[2]);
+        const darkH = Number.parseFloat(darkMatch[3]);
+
+        // Generate dark scale if needed
+        const darkScale = scale.length > 0 ? createOKLCHScale(darkL, darkC, darkH) : [];
+
+        // Generate dark states if needed
+        const darkStates = Object.keys(states).length > 0 ? createStates(darkL, darkC, darkH) : {};
+
+        const darkColorValue: ColorValue = {
+          name: `${color.name}-dark`,
+          scale: darkScale,
+          token: `${color.name}-dark`,
+          value: '500',
+          use: `Dark mode variant of ${color.name}`,
+          ...(Object.keys(darkStates).length > 0 && { states: darkStates }),
+        };
+
+        tokens.push({
+          name: `${color.name}-dark`,
+          value: darkColorValue,
+          category: 'color',
+          namespace: 'color',
+          semanticMeaning: `Dark mode: ${color.meaning}`,
+          scalePosition: index * 2 + 1, // Interleave with light tokens
+          trustLevel: color.trustLevel,
+          cognitiveLoad: color.cognitiveLoad,
+          generateUtilityClass: false, // Dark variants use CSS vars, not utility classes
+          applicableComponents: color.components,
+          accessibilityLevel: 'AAA',
+          consequence:
+            color.trustLevel === 'critical'
+              ? 'destructive'
+              : color.trustLevel === 'high'
+                ? 'significant'
+                : 'reversible',
+          usageContext: color.usage.map((u) => `dark-${u}`),
+        });
+      }
+    }
   });
 
   return tokens;

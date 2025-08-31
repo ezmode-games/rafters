@@ -8,6 +8,15 @@
 import type { ColorValue, Token } from '@rafters/shared';
 import { TokenDependencyGraph } from './dependencies.js';
 
+// Helper function to convert token values to CSS (simple inline implementation)
+function tokenValueToCss(value: string | ColorValue): string {
+  if (typeof value === 'string') {
+    return value;
+  }
+  // For ColorValue objects, return the base value
+  return value.value || 'inherit';
+}
+
 export class TokenRegistry {
   private tokens: Map<string, Token> = new Map();
   public dependencyGraph: TokenDependencyGraph = new TokenDependencyGraph();
@@ -94,7 +103,7 @@ export class TokenRegistry {
       ...colorToken,
       value: (colorValue as ColorValue).value || `${colorToken.name}-base`,
       // Preserve darkValue from original token if it exists
-      ...(colorToken.darkValue && { darkValue: colorToken.darkValue }),
+      // darkValue no longer used - dark mode handled via separate -dark suffix tokens
     };
     this.tokens.set(colorToken.name, baseToken);
 
@@ -178,8 +187,13 @@ export class TokenRegistry {
       if (rule.startsWith('state:')) {
         const stateName = rule.replace('state:', '');
         stateTokens[stateName] = dependentToken.value as string;
-        if (dependentToken.darkValue) {
-          darkStateTokens[stateName] = dependentToken.darkValue as string;
+        // Check for corresponding dark state token
+        const darkStateToken = this.tokens.get(`${dependentToken.name}-dark`);
+        if (darkStateToken) {
+          darkStateTokens[stateName] =
+            typeof darkStateToken.value === 'string'
+              ? darkStateToken.value
+              : tokenValueToCss(darkStateToken.value);
         }
       } else if (rule.startsWith('scale:')) {
         const scaleNumber = Number.parseInt(rule.replace('scale:', ''));
@@ -193,8 +207,13 @@ export class TokenRegistry {
             darkScaleValues.push('');
           }
           scaleValues[scaleIndex] = dependentToken.value as string;
-          if (dependentToken.darkValue) {
-            darkScaleValues[scaleIndex] = dependentToken.darkValue as string;
+          // Check for corresponding dark scale token
+          const darkScaleToken = this.tokens.get(`${dependentToken.name}-dark`);
+          if (darkScaleToken) {
+            darkScaleValues[scaleIndex] =
+              typeof darkScaleToken.value === 'string'
+                ? darkScaleToken.value
+                : tokenValueToCss(darkScaleToken.value);
           }
         }
       }

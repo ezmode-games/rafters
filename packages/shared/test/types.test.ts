@@ -116,23 +116,22 @@ describe('TokenSchema with Union Types', () => {
     }
   });
 
-  it('should validate token with simple darkValue', () => {
-    const tokenWithDark = {
+  it('should validate light token (new pattern: no darkValue)', () => {
+    const lightToken = {
       name: 'background',
       value: 'oklch(1 0 0)', // light mode - white
-      darkValue: 'oklch(0.05 0 0)', // dark mode - near black
       category: 'color',
       namespace: 'color',
     };
 
-    const result = TokenSchema.safeParse(tokenWithDark);
+    const result = TokenSchema.safeParse(lightToken);
     expect(result.success).toBe(true);
 
     if (result.success) {
       expect(typeof result.data.value).toBe('string');
-      expect(typeof result.data.darkValue).toBe('string');
       expect(result.data.value).toBe('oklch(1 0 0)');
-      expect(result.data.darkValue).toBe('oklch(0.05 0 0)');
+      // darkValue no longer exists - dark mode handled via separate -dark tokens
+      expect(result.data.darkValue).toBeUndefined();
     }
   });
 
@@ -140,7 +139,6 @@ describe('TokenSchema with Union Types', () => {
     const simpleToken = {
       name: 'accent',
       value: 'oklch(0.65 0.15 300)', // simple light mode
-      darkValue: 'oklch(0.6 0.18 300)', // simple dark mode
       category: 'color',
       namespace: 'color',
     };
@@ -150,7 +148,8 @@ describe('TokenSchema with Union Types', () => {
 
     if (result.success) {
       expect(typeof result.data.value).toBe('string');
-      expect(typeof result.data.darkValue).toBe('string');
+      // darkValue no longer exists - dark mode handled via separate -dark tokens
+      expect(result.data.darkValue).toBeUndefined();
     }
   });
 

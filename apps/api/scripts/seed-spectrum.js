@@ -17,7 +17,8 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const API_URL = 'https://rafters.realhandy.tech/api/color-intel';
+// Use local API for seeding during development
+const API_URL = process.env.API_URL || 'https://rafters.realhandy.tech/api/color-intel';
 const DELAY_MS = 750; // Slightly longer delay for spectrum seeding
 
 // Load spectrum matrix
