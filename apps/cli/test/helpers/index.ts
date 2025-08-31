@@ -29,6 +29,9 @@ export {
   getFrameworkPaths,
 } from './frameworkDetection.js';
 
+// Mock registry for testing
+export { MockRegistryServer } from './mockRegistry.js';
+
 // Re-export types for convenience
 export type {
   TestAppOptions,
