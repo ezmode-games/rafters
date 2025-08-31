@@ -11,10 +11,11 @@
   "observability": {
     "enabled": true
   },
-  "kv_namespaces": [
+  "routes": [
     {
-      "binding": "RAFTERS_INTEL",
-      "id": "d740cdf6f7e649cdb53e43a61ce75df5"
+      "pattern": "rafters.realhandy.tech",
+      "zone_id": "bad23610704adb1dc65b05bc22d6fb6f",
+      "custom_domain": true
     }
   ]
 }

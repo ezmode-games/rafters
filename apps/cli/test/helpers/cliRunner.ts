@@ -5,12 +5,18 @@
  * with proper isolation and error handling.
  */
 
-import { spawn } from 'node:child_process';
+import { execSync, spawn } from 'node:child_process';
 import { join } from 'node:path';
 import type { CLIRunOptions, CLIRunResult } from '../types.js';
 
 const CLI_ROOT = join(process.cwd());
 const CLI_DIST = join(CLI_ROOT, 'dist', 'index.js');
+
+// Get the absolute path to node executable
+function getNodePath(): string {
+  // Use process.execPath which is the most reliable
+  return process.execPath;
+}
 
 /**
  * Run a CLI command and return the result
@@ -33,7 +39,8 @@ export async function runCLI(args: string[], options: CLIRunOptions): Promise<CL
 
   return new Promise<CLIRunResult>((resolve, reject) => {
     // Run the CLI using Node.js to execute the built CLI
-    const child = spawn('node', [CLI_DIST, ...args], {
+    const nodePath = getNodePath();
+    const child = spawn(nodePath, [CLI_DIST, ...args], {
       cwd,
       env: commandEnv,
       stdio: ['pipe', 'pipe', 'pipe'],

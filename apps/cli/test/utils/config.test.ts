@@ -199,7 +199,7 @@ describe('config', () => {
   describe('hasReact', () => {
     it('should return true when React is in dependencies', () => {
       const packageJson = JSON.stringify({
-        dependencies: { react: '^18.0.0' },
+        dependencies: { react: '^19.0.0' },
       });
 
       mockReadFileSync.mockReturnValue(packageJson);
@@ -208,7 +208,7 @@ describe('config', () => {
 
     it('should return true when React is in devDependencies', () => {
       const packageJson = JSON.stringify({
-        devDependencies: { react: '^18.0.0' },
+        devDependencies: { react: '^19.0.0' },
       });
 
       mockReadFileSync.mockReturnValue(packageJson);

@@ -296,4 +296,3 @@ export class MockRegistryServer {
     return `http://localhost:${this.port}`;
   }
 }
-
