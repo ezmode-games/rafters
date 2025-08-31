@@ -1,0 +1,139 @@
+{
+  "category": "opacity",
+  "generatedAt": "2025-08-31T19:28:20.675Z",
+  "tokens": [
+    {
+      "name": "disabled",
+      "value": "0.5",
+      "category": "opacity",
+      "namespace": "opacity",
+      "semanticMeaning": "Disabled state opacity - clearly indicates non-interactive state",
+      "scalePosition": 0,
+      "generateUtilityClass": true,
+      "applicableComponents": [
+        "button",
+        "input",
+        "text"
+      ],
+      "interactionType": "disabled",
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 3,
+      "trustLevel": "medium",
+      "consequence": "reversible",
+      "usageContext": [
+        "disabled-buttons",
+        "inactive-elements",
+        "unavailable"
+      ]
+    },
+    {
+      "name": "loading",
+      "value": "0.7",
+      "category": "opacity",
+      "namespace": "opacity",
+      "semanticMeaning": "Loading state opacity - indicates temporary unavailability",
+      "scalePosition": 1,
+      "generateUtilityClass": true,
+      "applicableComponents": [
+        "all"
+      ],
+      "interactionType": "loading",
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 4,
+      "trustLevel": "medium",
+      "consequence": "reversible",
+      "usageContext": [
+        "loading-states",
+        "processing",
+        "pending"
+      ]
+    },
+    {
+      "name": "overlay",
+      "value": "0.8",
+      "category": "opacity",
+      "namespace": "opacity",
+      "semanticMeaning": "Modal overlay background - creates focus without complete blocking",
+      "scalePosition": 2,
+      "generateUtilityClass": true,
+      "applicableComponents": [
+        "modal",
+        "dialog"
+      ],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 6,
+      "trustLevel": "high",
+      "consequence": "significant",
+      "usageContext": [
+        "modal-backdrop",
+        "dialog-overlay",
+        "focus-trap"
+      ]
+    },
+    {
+      "name": "backdrop",
+      "value": "0.25",
+      "category": "opacity",
+      "namespace": "opacity",
+      "semanticMeaning": "Subtle backdrop opacity - gentle layering effect",
+      "scalePosition": 3,
+      "generateUtilityClass": true,
+      "applicableComponents": [
+        "all"
+      ],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": [
+        "subtle-overlay",
+        "image-overlay",
+        "text-backdrop"
+      ]
+    },
+    {
+      "name": "hover",
+      "value": "0.9",
+      "category": "opacity",
+      "namespace": "opacity",
+      "semanticMeaning": "Hover state opacity - subtle interaction feedback",
+      "scalePosition": 4,
+      "generateUtilityClass": true,
+      "applicableComponents": [
+        "all"
+      ],
+      "interactionType": "hover",
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": [
+        "hover-effects",
+        "interactive-feedback",
+        "button-hover"
+      ]
+    },
+    {
+      "name": "focus",
+      "value": "1",
+      "category": "opacity",
+      "namespace": "opacity",
+      "semanticMeaning": "Focus state (full opacity) - maximum visibility for accessibility",
+      "scalePosition": 5,
+      "generateUtilityClass": true,
+      "applicableComponents": [
+        "all"
+      ],
+      "interactionType": "focus",
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 1,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": [
+        "focus-states",
+        "active-elements",
+        "selected"
+      ]
+    }
+  ]
+}

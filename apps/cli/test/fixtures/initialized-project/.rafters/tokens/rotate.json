@@ -1,0 +1,98 @@
+{
+  "category": "rotate",
+  "generatedAt": "2025-08-31T19:28:20.675Z",
+  "tokens": [
+    {
+      "name": "flip",
+      "value": "180deg",
+      "category": "rotate",
+      "namespace": "rotate",
+      "semanticMeaning": "Flip rotation for icons and arrows",
+      "scalePosition": 0,
+      "generateUtilityClass": true,
+      "applicableComponents": [
+        "icon",
+        "arrow",
+        "dropdown"
+      ],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": [
+        "icon-flip",
+        "arrow-rotation",
+        "toggle-states"
+      ]
+    },
+    {
+      "name": "quarter",
+      "value": "90deg",
+      "category": "rotate",
+      "namespace": "rotate",
+      "semanticMeaning": "Quarter turn rotation",
+      "scalePosition": 1,
+      "generateUtilityClass": true,
+      "applicableComponents": [
+        "icon",
+        "arrow",
+        "dropdown"
+      ],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 3,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": [
+        "quarter-turn",
+        "icon-rotate",
+        "chevron-rotation"
+      ]
+    },
+    {
+      "name": "half",
+      "value": "180deg",
+      "category": "rotate",
+      "namespace": "rotate",
+      "semanticMeaning": "Half turn rotation",
+      "scalePosition": 2,
+      "generateUtilityClass": true,
+      "applicableComponents": [
+        "icon",
+        "arrow",
+        "dropdown"
+      ],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": [
+        "half-turn",
+        "flip-animation",
+        "state-toggle"
+      ]
+    },
+    {
+      "name": "three-quarter",
+      "value": "270deg",
+      "category": "rotate",
+      "namespace": "rotate",
+      "semanticMeaning": "Three quarter turn rotation",
+      "scalePosition": 3,
+      "generateUtilityClass": true,
+      "applicableComponents": [
+        "icon",
+        "arrow",
+        "dropdown"
+      ],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 4,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": [
+        "three-quarter-turn",
+        "complex-rotation",
+        "advanced-animations"
+      ]
+    }
+  ]
+}

@@ -81,6 +81,7 @@ async function ensureFixturesExist(): Promise<void> {
     'rr7-app',
     'vite-react',
     'empty-project',
+    'initialized-project',
   ];
 
   const missingFixtures = expectedFixtures.filter(
@@ -129,6 +130,7 @@ export function getAvailableFixtures(): TestAppOptions['type'][] {
     'rr7-app',
     'vite-react',
     'empty-project',
+    'initialized-project',
   ];
 
   for (const type of expectedTypes) {
@@ -194,6 +196,19 @@ export function validateTestAppStructure(testApp: TestFixtureInfo): {
 
     case 'empty-project':
       // Minimal validation for empty project
+      break;
+
+    case 'initialized-project':
+      // Check for .rafters directory and tokens
+      if (!existsSync(join(path, '.rafters'))) {
+        errors.push('.rafters directory not found');
+      }
+      if (!existsSync(join(path, '.rafters', 'tokens'))) {
+        errors.push('.rafters/tokens directory not found');
+      }
+      if (!existsSync(join(path, '.rafters', 'config.json'))) {
+        errors.push('.rafters/config.json not found');
+      }
       break;
   }
 

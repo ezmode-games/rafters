@@ -1,0 +1,814 @@
+/**
+ * Rafters Design Tokens
+ * Generated following shadcn/ui pattern with embedded design intelligence
+ */
+
+:root {
+  /* SPACING */
+  /* Spacing step 0 in linear scale */
+  --0: 0rem;
+  /* Spacing step 1 in linear scale */
+  --1: 4rem;
+  /* Spacing step 2 in linear scale */
+  --2: 8rem;
+  /* Spacing step 3 in linear scale */
+  --3: 12rem;
+  /* Spacing step 4 in linear scale */
+  --4: 16rem;
+  /* Spacing step 5 in linear scale */
+  --5: 20rem;
+  /* Spacing step 6 in linear scale */
+  --6: 24rem;
+  /* Spacing step 7 in linear scale */
+  --7: 28rem;
+  /* Spacing step 8 in linear scale */
+  --8: 32rem;
+  /* Spacing step 9 in linear scale */
+  --9: 36rem;
+  /* Spacing step 10 in linear scale */
+  --10: 40rem;
+  /* Spacing step 11 in linear scale */
+  --11: 44rem;
+  /* Spacing step 12 in linear scale */
+  --12: 48rem;
+
+  /* SHADOW */
+  /* No shadow, flat appearance */
+  --none: none;
+  /* Subtle depth for cards */
+  --sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  /* Standard card shadow */
+  --base: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  /* Elevated components */
+  --md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  /* Floating elements */
+  --lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  /* Modal/dialog shadow */
+  --xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  /* Maximum elevation */
+  --2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+
+  /* Z-INDEX */
+  /* Base content layer */
+  --base: 0;
+  /* Sticky elements (headers, sidebars) */
+  --sticky: 10;
+  /* Dropdowns and select menus */
+  --dropdown: 100;
+  /* Modal dialogs and overlays */
+  --modal: 1000;
+  /* Popovers and tooltips */
+  --popover: 5000;
+  /* Toast notifications and alerts */
+  --notification: 10000;
+  /* Tooltips (highest priority) */
+  --tooltip: 50000;
+  /* Maximum z-index value */
+  --max: 2147483647;
+
+  /* HEIGHT */
+  /* Component height xs for linear scale - below touch target guidelines */
+  --h-xs: 2.5rem;
+  /* Component height sm for linear scale - meets touch target guidelines */
+  --h-sm: 3rem;
+  /* Component height md for linear scale - meets touch target guidelines */
+  --h-md: 3.5rem;
+  /* Component height lg for linear scale - meets touch target guidelines */
+  --h-lg: 4rem;
+  /* Component height xl for linear scale - meets touch target guidelines */
+  --h-xl: 4.5rem;
+  /* Component height 2xl for linear scale - meets touch target guidelines */
+  --h-2xl: 5rem;
+  /* Component height 3xl for linear scale - meets touch target guidelines */
+  --h-3xl: 5.5rem;
+  /* Component height 4xl for linear scale - meets touch target guidelines */
+  --h-4xl: 6rem;
+
+  /* FONT-SIZE */
+  /* Typography size xs using golden ratio - body/ui text */
+  --text-xs: 0.382rem;
+  /* Typography size sm using golden ratio - body/ui text */
+  --text-sm: 0.618rem;
+  /* Typography size base using golden ratio - body/ui text */
+  --text-base: 1rem;
+  /* Typography size lg using golden ratio - body/ui text */
+  --text-lg: 1.618rem;
+  /* Typography size xl using golden ratio - heading text */
+  --text-xl: 2.618rem;
+  /* Typography size 2xl using golden ratio - heading text */
+  --text-2xl: 4.236rem;
+  /* Typography size 3xl using golden ratio - heading text */
+  --text-3xl: 6.854rem;
+  /* Typography size 4xl using golden ratio - heading text */
+  --text-4xl: 11.09rem;
+  /* Typography size 5xl using golden ratio - heading text */
+  --text-5xl: 17.944rem;
+  /* Typography size 6xl using golden ratio - display/hero text */
+  --text-6xl: 29.034rem;
+  /* Typography size 7xl using golden ratio - display/hero text */
+  --text-7xl: 46.979rem;
+  /* Typography size 8xl using golden ratio - display/hero text */
+  --text-8xl: 76.013rem;
+  /* Typography size 9xl using golden ratio - display/hero text */
+  --text-9xl: 122.992rem;
+
+  /* LINE-HEIGHT */
+  /* Line height optimized for xs text readability - comfortable spacing */
+  --leading-xs: 1.6;
+  /* Line height optimized for sm text readability - comfortable spacing */
+  --leading-sm: 1.6;
+  /* Line height optimized for base text readability - comfortable spacing */
+  --leading-base: 1.5;
+  /* Line height optimized for lg text readability - comfortable spacing */
+  --leading-lg: 1.5;
+  /* Line height optimized for xl text readability - tight spacing */
+  --leading-xl: 1.2;
+  /* Line height optimized for 2xl text readability - tight spacing */
+  --leading-2xl: 1.2;
+  /* Line height optimized for 3xl text readability - tight spacing */
+  --leading-3xl: 1.2;
+  /* Line height optimized for 4xl text readability - tight spacing */
+  --leading-4xl: 1.2;
+  /* Line height optimized for 5xl text readability - tight spacing */
+  --leading-5xl: 1.2;
+  /* Line height optimized for 6xl text readability - tight spacing */
+  --leading-6xl: 1.2;
+  /* Line height optimized for 7xl text readability - tight spacing */
+  --leading-7xl: 1.2;
+  /* Line height optimized for 8xl text readability - tight spacing */
+  --leading-8xl: 1.2;
+  /* Line height optimized for 9xl text readability - tight spacing */
+  --leading-9xl: 1.2;
+
+  /* COLOR */
+  /* Primary brand color for main actions and focus states */
+  --primary: oklch(0.45 0.12 240);
+  /* Dark mode: Primary brand color for main actions and focus states */
+  --primary-dark: oklch(0.7 0.12 240);
+  /* Text color for primary backgrounds */
+  --primary-foreground: transparent;
+  /* Dark mode: Text color for primary backgrounds */
+  --primary-foreground-dark: transparent;
+  /* Success states, confirmations, positive feedback */
+  --success: oklch(0.62 0.17 145);
+  /* Dark mode: Success states, confirmations, positive feedback */
+  --success-dark: oklch(0.55 0.15 145);
+  /* Text color for success backgrounds */
+  --success-foreground: transparent;
+  /* Dark mode: Text color for success backgrounds */
+  --success-foreground-dark: transparent;
+  /* Warning states, caution, important information */
+  --warning: oklch(0.7 0.15 75);
+  /* Dark mode: Warning states, caution, important information */
+  --warning-dark: oklch(0.65 0.13 75);
+  /* Text color for warning backgrounds */
+  --warning-foreground: transparent;
+  /* Dark mode: Text color for warning backgrounds */
+  --warning-foreground-dark: transparent;
+  /* Destructive actions, errors, danger - REQUIRES confirmation UX */
+  --destructive: oklch(0.53 0.24 27);
+  /* Dark mode: Destructive actions, errors, danger - REQUIRES confirmation UX */
+  --destructive-dark: oklch(0.58 0.22 27);
+  /* Text color for destructive backgrounds */
+  --destructive-foreground: transparent;
+  /* Dark mode: Text color for destructive backgrounds */
+  --destructive-foreground-dark: transparent;
+  /* Informational messages, neutral notifications */
+  --info: oklch(0.66 0.15 240);
+  /* Dark mode: Informational messages, neutral notifications */
+  --info-dark: oklch(0.6 0.12 240);
+  /* Text color for info backgrounds */
+  --info-foreground: transparent;
+  /* Dark mode: Text color for info backgrounds */
+  --info-foreground-dark: transparent;
+  /* Primary background for content areas */
+  --background: transparent;
+  /* Dark mode: Primary background for content areas */
+  --background-dark: transparent;
+  /* Primary text color for body content */
+  --foreground: transparent;
+  /* Dark mode: Primary text color for body content */
+  --foreground-dark: transparent;
+  /* Muted backgrounds for secondary content areas */
+  --muted: oklch(0.95 0.01 240);
+  /* Dark mode: Muted backgrounds for secondary content areas */
+  --muted-dark: oklch(0.17 0.01 240);
+  /* Muted text for secondary information */
+  --muted-foreground: transparent;
+  /* Dark mode: Muted text for secondary information */
+  --muted-foreground-dark: transparent;
+  /* Default border color for components */
+  --border: transparent;
+  /* Dark mode: Default border color for components */
+  --border-dark: transparent;
+
+  /* MOTION */
+  /* Instant feedback for immediate response - hover states, button presses */
+  --instant: 75ms;
+  /* Fast animations for interactive elements - dropdowns, tooltips */
+  --fast: 150ms;
+  /* Standard duration for most transitions - page changes, modal open */
+  --standard: 300ms;
+  /* Deliberate timing for important changes - form submission, loading */
+  --deliberate: 500ms;
+  /* Slow transitions for large changes - layout shifts, major updates */
+  --slow: 700ms;
+  /* Dramatic timing for emphasis - celebrations, achievements, errors */
+  --dramatic: 1000ms;
+
+  /* EASING */
+  /* Linear timing for mechanical movement - progress bars, loading */
+  --linear: linear;
+  /* Smooth natural movement - standard transitions, page changes */
+  --smooth: ease-in-out;
+  /* Welcoming entrance animation - elements appearing, reveals */
+  --accelerating: ease-out;
+  /* Graceful exit animation - elements disappearing, collapses */
+  --decelerating: ease-in;
+  /* Playful bounce for celebrations - success states, achievements */
+  --bouncy: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  /* Sharp responsive feedback - button presses, selections */
+  --snappy: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* BORDER-RADIUS */
+  /* Sharp corners for technical/precise feel */
+  --none: 0px;
+  /* Subtle rounding for buttons and inputs */
+  --sm: 2px;
+  /* Standard rounding for most components */
+  --base: 4px;
+  /* Medium rounding for cards and containers */
+  --md: 6px;
+  /* Large rounding for prominent elements */
+  --lg: 8px;
+  /* Extra large for hero sections */
+  --xl: 12px;
+  /* Very large for special components */
+  --2xl: 16px;
+  /* Fully rounded for pills and circles */
+  --full: 9999px;
+
+  /* TOUCH-TARGET */
+  /* Compact touch target - below accessibility guidelines */
+  --compact: 32px;
+  /* Standard touch target - meets WCAG AAA guidelines */
+  --standard: 44px;
+  /* Comfortable touch target - exceeds guidelines */
+  --comfortable: 48px;
+  /* Large touch target - excellent for accessibility */
+  --large: 56px;
+
+  /* OPACITY */
+  /* Disabled state opacity - clearly indicates non-interactive state */
+  --disabled: 0.5;
+  /* Loading state opacity - indicates temporary unavailability */
+  --loading: 0.7;
+  /* Modal overlay background - creates focus without complete blocking */
+  --overlay: 0.8;
+  /* Subtle backdrop opacity - gentle layering effect */
+  --backdrop: 0.25;
+  /* Hover state opacity - subtle interaction feedback */
+  --hover: 0.9;
+  /* Focus state (full opacity) - maximum visibility for accessibility */
+  --focus: 1;
+
+  /* FONT-FAMILY */
+  /* Primary sans-serif for UI and body text - optimized for readability */
+  --sans: "Inter", system-ui, sans-serif;
+  /* Serif font for editorial content - traditional, trustworthy feel */
+  --serif: "Crimson Text", Georgia, serif;
+  /* Monospace font for code and data - technical precision */
+  --mono: "JetBrains Mono", "Fira Code", monospace;
+  /* Display font for headings and marketing - optimized for large sizes */
+  --display: "Inter Display", system-ui, sans-serif;
+
+  /* FONT-WEIGHT */
+  /* Thin weight for delicate text - use sparingly */
+  --thin: 100;
+  /* Extra light weight - elegant but less readable */
+  --extralight: 200;
+  /* Light weight for subtle text - good readability */
+  --light: 300;
+  /* Normal weight for body text - optimal readability */
+  --normal: 400;
+  /* Medium weight for emphasis - balanced visibility */
+  --medium: 500;
+  /* Semi-bold for subheadings - clear hierarchy */
+  --semibold: 600;
+  /* Bold for headings and emphasis - strong hierarchy */
+  --bold: 700;
+  /* Extra bold for strong emphasis - high impact */
+  --extrabold: 800;
+  /* Black weight for maximum impact - use sparingly */
+  --black: 900;
+
+  /* LETTER-SPACING */
+  /* Tighter letter spacing for large text */
+  --tighter: -0.05em;
+  /* Slightly tighter spacing */
+  --tight: -0.025em;
+  /* Normal letter spacing */
+  --normal: 0em;
+  /* Wider spacing for readability */
+  --wide: 0.025em;
+  /* Wide spacing for emphasis */
+  --wider: 0.05em;
+  /* Maximum spacing for display text */
+  --widest: 0.1em;
+
+  /* BREAKPOINT */
+  /* Extra small mobile devices */
+  --xs: 320px;
+  /* Small tablets and large phones */
+  --sm: 640px;
+  /* Medium tablets */
+  --md: 768px;
+  /* Large tablets and small laptops */
+  --lg: 1024px;
+  /* Large laptops and desktops */
+  --xl: 1280px;
+  /* Large desktops and ultrawide */
+  --2xl: 1536px;
+
+  /* CONTAINER */
+  /* Extra small container (320px) */
+  --xs: 20rem;
+  /* Small container (384px) */
+  --sm: 24rem;
+  /* Medium container (448px) */
+  --md: 28rem;
+  /* Large container (512px) */
+  --lg: 32rem;
+  /* Extra large container (576px) */
+  --xl: 36rem;
+  /* Max width container (672px) */
+  --2xl: 42rem;
+  /* Ultra wide container (768px) */
+  --3xl: 48rem;
+  /* Maximum container (896px) */
+  --4xl: 56rem;
+
+  /* ASPECT-RATIO */
+  /* Square aspect ratio for avatars and icons */
+  --square: 1 / 1;
+  /* Video aspect ratio for media content */
+  --video: 16 / 9;
+  /* Photo aspect ratio for images */
+  --photo: 4 / 3;
+  /* Golden ratio for aesthetic layouts */
+  --golden: 1.618 / 1;
+  /* Portrait orientation */
+  --portrait: 3 / 4;
+  /* Landscape orientation */
+  --landscape: 4 / 3;
+  /* Ultrawide aspect ratio */
+  --ultrawide: 21 / 9;
+
+  /* GRID-TEMPLATE-COLUMNS */
+  /* Auto-fit grid for small cards */
+  --auto-fit-sm: repeat(auto-fit, minmax(200px, 1fr));
+  /* Auto-fit grid for medium cards */
+  --auto-fit-md: repeat(auto-fit, minmax(280px, 1fr));
+  /* Auto-fit grid for large cards */
+  --auto-fit-lg: repeat(auto-fit, minmax(360px, 1fr));
+  /* Auto-fill grid for small items */
+  --auto-fill-sm: repeat(auto-fill, minmax(200px, 1fr));
+  /* Auto-fill grid for medium items */
+  --auto-fill-md: repeat(auto-fill, minmax(280px, 1fr));
+  /* Auto-fill grid for large items */
+  --auto-fill-lg: repeat(auto-fill, minmax(360px, 1fr));
+  /* Two equal columns */
+  --2-cols: repeat(2, 1fr);
+  /* Three equal columns */
+  --3-cols: repeat(3, 1fr);
+  /* Four equal columns */
+  --4-cols: repeat(4, 1fr);
+  /* Twelve column layout system */
+  --12-cols: repeat(12, 1fr);
+  /* Sidebar with main content */
+  --sidebar: 250px 1fr;
+  /* Main content with sidebar */
+  --main-sidebar: 1fr 250px;
+
+  /* GRID-TEMPLATE-ROWS */
+  /* Auto-sizing rows */
+  --auto: auto;
+  /* Header, main content, footer layout */
+  --header-main-footer: auto 1fr auto;
+  /* Two equal rows */
+  --equal-2: repeat(2, 1fr);
+  /* Three equal rows */
+  --equal-3: repeat(3, 1fr);
+  /* Masonry layout rows */
+  --masonry: masonry;
+
+  /* SCALE */
+  /* Subtle hover scale for interactive elements */
+  --hover: 1.02;
+  /* Active/pressed scale for buttons */
+  --active: 0.98;
+  /* Focus scale for accessibility */
+  --focus: 1.05;
+  /* Disabled state scale */
+  --disabled: 0.95;
+  /* Emphasis scale for important elements */
+  --emphasis: 1.1;
+  /* Dramatic scale for animations */
+  --dramatic: 1.25;
+
+  /* TRANSLATE */
+  /* Center positioning transform */
+  --center: -50%;
+  /* Center horizontally */
+  --center-x: -50%, 0;
+  /* Center vertically */
+  --center-y: 0, -50%;
+  /* Slide up animation */
+  --slide-up: 0, -100%;
+  /* Slide down animation */
+  --slide-down: 0, 100%;
+  /* Slide left animation */
+  --slide-left: -100%, 0;
+  /* Slide right animation */
+  --slide-right: 100%, 0;
+
+  /* ROTATE */
+  /* Flip rotation for icons and arrows */
+  --flip: 180deg;
+  /* Quarter turn rotation */
+  --quarter: 90deg;
+  /* Half turn rotation */
+  --half: 180deg;
+  /* Three quarter turn rotation */
+  --three-quarter: 270deg;
+
+  /* WIDTH */
+  /* Minimum content width */
+  --min: min-content;
+  /* Maximum content width */
+  --max: max-content;
+  /* Fit content width */
+  --fit: fit-content;
+  /* Full width */
+  --full: 100%;
+  /* Full viewport width */
+  --screen: 100vw;
+  /* Optimal reading width */
+  --prose: 65ch;
+  /* Small dialog width */
+  --dialog-sm: 320px;
+  /* Medium dialog width */
+  --dialog-md: 480px;
+  /* Large dialog width */
+  --dialog-lg: 640px;
+  /* Extra large dialog width */
+  --dialog-xl: 800px;
+  /* Standard sidebar width */
+  --sidebar: 280px;
+  /* Compact sidebar width */
+  --sidebar-sm: 240px;
+  /* Wide sidebar width */
+  --sidebar-lg: 320px;
+
+  /* BACKDROP-BLUR */
+  /* No backdrop blur */
+  --none: 0;
+  /* Small backdrop blur for overlays */
+  --sm: 4px;
+  /* Default backdrop blur for modals */
+  --DEFAULT: 8px;
+  /* Medium backdrop blur for focus */
+  --md: 12px;
+  /* Large backdrop blur for separation */
+  --lg: 16px;
+  /* Extra large blur for drama */
+  --xl: 24px;
+  /* Maximum blur for strong effects */
+  --2xl: 40px;
+  /* Ultra blur for artistic effects */
+  --3xl: 64px;
+
+  /* BORDER-WIDTH */
+  /* No border */
+  --0: 0px;
+  /* Default border width */
+  --DEFAULT: 1px;
+  /* Medium border for emphasis */
+  --2: 2px;
+  /* Thick border for strong emphasis */
+  --4: 4px;
+  /* Extra thick decorative border */
+  --8: 8px;
+
+}
+
+.dark {
+  /* Dark mode overrides */
+  /* Dark: Dark mode: Primary brand color for main actions and focus states */
+  --primary: oklch(0.7 0.12 240);
+  /* Dark: Dark mode: Text color for primary backgrounds */
+  --primary-foreground: transparent;
+  /* Dark: Dark mode: Success states, confirmations, positive feedback */
+  --success: oklch(0.55 0.15 145);
+  /* Dark: Dark mode: Text color for success backgrounds */
+  --success-foreground: transparent;
+  /* Dark: Dark mode: Warning states, caution, important information */
+  --warning: oklch(0.65 0.13 75);
+  /* Dark: Dark mode: Text color for warning backgrounds */
+  --warning-foreground: transparent;
+  /* Dark: Dark mode: Destructive actions, errors, danger - REQUIRES confirmation UX */
+  --destructive: oklch(0.58 0.22 27);
+  /* Dark: Dark mode: Text color for destructive backgrounds */
+  --destructive-foreground: transparent;
+  /* Dark: Dark mode: Informational messages, neutral notifications */
+  --info: oklch(0.6 0.12 240);
+  /* Dark: Dark mode: Text color for info backgrounds */
+  --info-foreground: transparent;
+  /* Dark: Dark mode: Primary background for content areas */
+  --background: transparent;
+  /* Dark: Dark mode: Primary text color for body content */
+  --foreground: transparent;
+  /* Dark: Dark mode: Muted backgrounds for secondary content areas */
+  --muted: oklch(0.17 0.01 240);
+  /* Dark: Dark mode: Muted text for secondary information */
+  --muted-foreground: transparent;
+  /* Dark: Dark mode: Default border color for components */
+  --border: transparent;
+}
+
+@theme inline {
+  /* BREAKPOINT MAPPINGS */
+  --breakpoint-xs: 320px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
+  /* SPACING MAPPINGS */
+  --spacing-0: var(--0);
+  --spacing-1: var(--1);
+  --spacing-2: var(--2);
+  --spacing-3: var(--3);
+  --spacing-4: var(--4);
+  --spacing-5: var(--5);
+  --spacing-6: var(--6);
+  --spacing-7: var(--7);
+  --spacing-8: var(--8);
+  --spacing-9: var(--9);
+  --spacing-10: var(--10);
+  --spacing-11: var(--11);
+  --spacing-12: var(--12);
+
+  /* SHADOW MAPPINGS */
+  --box-shadow-none: var(--none);
+  --box-shadow-sm: var(--sm);
+  --box-shadow-base: var(--base);
+  --box-shadow-md: var(--md);
+  --box-shadow-lg: var(--lg);
+  --box-shadow-xl: var(--xl);
+  --box-shadow-2xl: var(--2xl);
+
+  /* Z-INDEX MAPPINGS */
+  --z-index-base: var(--base);
+  --z-index-sticky: var(--sticky);
+  --z-index-dropdown: var(--dropdown);
+  --z-index-modal: var(--modal);
+  --z-index-popover: var(--popover);
+  --z-index-notification: var(--notification);
+  --z-index-tooltip: var(--tooltip);
+  --z-index-max: var(--max);
+
+  /* HEIGHT MAPPINGS */
+  --height-h-xs: var(--h-xs);
+  --height-h-sm: var(--h-sm);
+  --height-h-md: var(--h-md);
+  --height-h-lg: var(--h-lg);
+  --height-h-xl: var(--h-xl);
+  --height-h-2xl: var(--h-2xl);
+  --height-h-3xl: var(--h-3xl);
+  --height-h-4xl: var(--h-4xl);
+
+  /* FONT-SIZE MAPPINGS */
+  --font-size-text-xs: var(--text-xs);
+  --font-size-text-sm: var(--text-sm);
+  --font-size-text-base: var(--text-base);
+  --font-size-text-lg: var(--text-lg);
+  --font-size-text-xl: var(--text-xl);
+  --font-size-text-2xl: var(--text-2xl);
+  --font-size-text-3xl: var(--text-3xl);
+  --font-size-text-4xl: var(--text-4xl);
+  --font-size-text-5xl: var(--text-5xl);
+  --font-size-text-6xl: var(--text-6xl);
+  --font-size-text-7xl: var(--text-7xl);
+  --font-size-text-8xl: var(--text-8xl);
+  --font-size-text-9xl: var(--text-9xl);
+
+  /* LINE-HEIGHT MAPPINGS */
+  --line-height-leading-xs: var(--leading-xs);
+  --line-height-leading-sm: var(--leading-sm);
+  --line-height-leading-base: var(--leading-base);
+  --line-height-leading-lg: var(--leading-lg);
+  --line-height-leading-xl: var(--leading-xl);
+  --line-height-leading-2xl: var(--leading-2xl);
+  --line-height-leading-3xl: var(--leading-3xl);
+  --line-height-leading-4xl: var(--leading-4xl);
+  --line-height-leading-5xl: var(--leading-5xl);
+  --line-height-leading-6xl: var(--leading-6xl);
+  --line-height-leading-7xl: var(--leading-7xl);
+  --line-height-leading-8xl: var(--leading-8xl);
+  --line-height-leading-9xl: var(--leading-9xl);
+
+  /* COLOR MAPPINGS */
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-foreground-dark: var(--primary-foreground-dark);
+  --color-success: var(--success);
+  --color-success-dark: var(--success-dark);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-foreground-dark: var(--success-foreground-dark);
+  --color-warning: var(--warning);
+  --color-warning-dark: var(--warning-dark);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-foreground-dark: var(--warning-foreground-dark);
+  --color-destructive: var(--destructive);
+  --color-destructive-dark: var(--destructive-dark);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-foreground-dark: var(--destructive-foreground-dark);
+  --color-info: var(--info);
+  --color-info-dark: var(--info-dark);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-foreground-dark: var(--info-foreground-dark);
+  --color-background: var(--background);
+  --color-background-dark: var(--background-dark);
+  --color-foreground: var(--foreground);
+  --color-foreground-dark: var(--foreground-dark);
+  --color-muted: var(--muted);
+  --color-muted-dark: var(--muted-dark);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted-foreground-dark: var(--muted-foreground-dark);
+  --color-border: var(--border);
+  --color-border-dark: var(--border-dark);
+
+  /* MOTION MAPPINGS */
+  --motion-instant: var(--instant);
+  --motion-fast: var(--fast);
+  --motion-standard: var(--standard);
+  --motion-deliberate: var(--deliberate);
+  --motion-slow: var(--slow);
+  --motion-dramatic: var(--dramatic);
+
+  /* EASING MAPPINGS */
+  --easing-linear: var(--linear);
+  --easing-smooth: var(--smooth);
+  --easing-accelerating: var(--accelerating);
+  --easing-decelerating: var(--decelerating);
+  --easing-bouncy: var(--bouncy);
+  --easing-snappy: var(--snappy);
+
+  /* BORDER-RADIUS MAPPINGS */
+  --border-radius-none: var(--none);
+  --border-radius-sm: var(--sm);
+  --border-radius-base: var(--base);
+  --border-radius-md: var(--md);
+  --border-radius-lg: var(--lg);
+  --border-radius-xl: var(--xl);
+  --border-radius-2xl: var(--2xl);
+  --border-radius-full: var(--full);
+
+  /* TOUCH-TARGET MAPPINGS */
+  --touch-target-compact: var(--compact);
+  --touch-target-standard: var(--standard);
+  --touch-target-comfortable: var(--comfortable);
+  --touch-target-large: var(--large);
+
+  /* OPACITY MAPPINGS */
+  --opacity-disabled: var(--disabled);
+  --opacity-loading: var(--loading);
+  --opacity-overlay: var(--overlay);
+  --opacity-backdrop: var(--backdrop);
+  --opacity-hover: var(--hover);
+  --opacity-focus: var(--focus);
+
+  /* FONT-FAMILY MAPPINGS */
+  --font-family-sans: var(--sans);
+  --font-family-serif: var(--serif);
+  --font-family-mono: var(--mono);
+  --font-family-display: var(--display);
+
+  /* FONT-WEIGHT MAPPINGS */
+  --font-weight-thin: var(--thin);
+  --font-weight-extralight: var(--extralight);
+  --font-weight-light: var(--light);
+  --font-weight-normal: var(--normal);
+  --font-weight-medium: var(--medium);
+  --font-weight-semibold: var(--semibold);
+  --font-weight-bold: var(--bold);
+  --font-weight-extrabold: var(--extrabold);
+  --font-weight-black: var(--black);
+
+  /* LETTER-SPACING MAPPINGS */
+  --letter-spacing-tighter: var(--tighter);
+  --letter-spacing-tight: var(--tight);
+  --letter-spacing-normal: var(--normal);
+  --letter-spacing-wide: var(--wide);
+  --letter-spacing-wider: var(--wider);
+  --letter-spacing-widest: var(--widest);
+
+  /* CONTAINER MAPPINGS */
+  --container-xs: var(--xs);
+  --container-sm: var(--sm);
+  --container-md: var(--md);
+  --container-lg: var(--lg);
+  --container-xl: var(--xl);
+  --container-2xl: var(--2xl);
+  --container-3xl: var(--3xl);
+  --container-4xl: var(--4xl);
+
+  /* ASPECT-RATIO MAPPINGS */
+  --aspect-ratio-square: var(--square);
+  --aspect-ratio-video: var(--video);
+  --aspect-ratio-photo: var(--photo);
+  --aspect-ratio-golden: var(--golden);
+  --aspect-ratio-portrait: var(--portrait);
+  --aspect-ratio-landscape: var(--landscape);
+  --aspect-ratio-ultrawide: var(--ultrawide);
+
+  /* GRID-TEMPLATE-COLUMNS MAPPINGS */
+  --grid-template-columns-auto-fit-sm: var(--auto-fit-sm);
+  --grid-template-columns-auto-fit-md: var(--auto-fit-md);
+  --grid-template-columns-auto-fit-lg: var(--auto-fit-lg);
+  --grid-template-columns-auto-fill-sm: var(--auto-fill-sm);
+  --grid-template-columns-auto-fill-md: var(--auto-fill-md);
+  --grid-template-columns-auto-fill-lg: var(--auto-fill-lg);
+  --grid-template-columns-2-cols: var(--2-cols);
+  --grid-template-columns-3-cols: var(--3-cols);
+  --grid-template-columns-4-cols: var(--4-cols);
+  --grid-template-columns-12-cols: var(--12-cols);
+  --grid-template-columns-sidebar: var(--sidebar);
+  --grid-template-columns-main-sidebar: var(--main-sidebar);
+
+  /* GRID-TEMPLATE-ROWS MAPPINGS */
+  --grid-template-rows-auto: var(--auto);
+  --grid-template-rows-header-main-footer: var(--header-main-footer);
+  --grid-template-rows-equal-2: var(--equal-2);
+  --grid-template-rows-equal-3: var(--equal-3);
+  --grid-template-rows-masonry: var(--masonry);
+
+  /* SCALE MAPPINGS */
+  --scale-hover: var(--hover);
+  --scale-active: var(--active);
+  --scale-focus: var(--focus);
+  --scale-disabled: var(--disabled);
+  --scale-emphasis: var(--emphasis);
+  --scale-dramatic: var(--dramatic);
+
+  /* TRANSLATE MAPPINGS */
+  --translate-center: var(--center);
+  --translate-center-x: var(--center-x);
+  --translate-center-y: var(--center-y);
+  --translate-slide-up: var(--slide-up);
+  --translate-slide-down: var(--slide-down);
+  --translate-slide-left: var(--slide-left);
+  --translate-slide-right: var(--slide-right);
+
+  /* ROTATE MAPPINGS */
+  --rotate-flip: var(--flip);
+  --rotate-quarter: var(--quarter);
+  --rotate-half: var(--half);
+  --rotate-three-quarter: var(--three-quarter);
+
+  /* WIDTH MAPPINGS */
+  --width-min: var(--min);
+  --width-max: var(--max);
+  --width-fit: var(--fit);
+  --width-full: var(--full);
+  --width-screen: var(--screen);
+  --width-prose: var(--prose);
+  --width-dialog-sm: var(--dialog-sm);
+  --width-dialog-md: var(--dialog-md);
+  --width-dialog-lg: var(--dialog-lg);
+  --width-dialog-xl: var(--dialog-xl);
+  --width-sidebar: var(--sidebar);
+  --width-sidebar-sm: var(--sidebar-sm);
+  --width-sidebar-lg: var(--sidebar-lg);
+
+  /* BACKDROP-BLUR MAPPINGS */
+  --backdrop-blur-none: var(--none);
+  --backdrop-blur-sm: var(--sm);
+  --backdrop-blur-DEFAULT: var(--DEFAULT);
+  --backdrop-blur-md: var(--md);
+  --backdrop-blur-lg: var(--lg);
+  --backdrop-blur-xl: var(--xl);
+  --backdrop-blur-2xl: var(--2xl);
+  --backdrop-blur-3xl: var(--3xl);
+
+  /* BORDER-WIDTH MAPPINGS */
+  --border-width-0: var(--0);
+  --border-width-DEFAULT: var(--DEFAULT);
+  --border-width-2: var(--2);
+  --border-width-4: var(--4);
+  --border-width-8: var(--8);
+
+}

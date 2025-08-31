@@ -1,0 +1,200 @@
+{
+  "category": "font-weight",
+  "generatedAt": "2025-08-31T19:28:20.675Z",
+  "tokens": [
+    {
+      "name": "thin",
+      "value": "100",
+      "category": "font-weight",
+      "namespace": "font-weight",
+      "semanticMeaning": "Thin weight for delicate text - use sparingly",
+      "scalePosition": 0,
+      "generateUtilityClass": true,
+      "applicableComponents": [
+        "text"
+      ],
+      "accessibilityLevel": "AA",
+      "cognitiveLoad": 3,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": [
+        "fine-print",
+        "subtle-text"
+      ]
+    },
+    {
+      "name": "extralight",
+      "value": "200",
+      "category": "font-weight",
+      "namespace": "font-weight",
+      "semanticMeaning": "Extra light weight - elegant but less readable",
+      "scalePosition": 1,
+      "generateUtilityClass": true,
+      "applicableComponents": [
+        "text"
+      ],
+      "accessibilityLevel": "AA",
+      "cognitiveLoad": 3,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": [
+        "decorative",
+        "large-text"
+      ]
+    },
+    {
+      "name": "light",
+      "value": "300",
+      "category": "font-weight",
+      "namespace": "font-weight",
+      "semanticMeaning": "Light weight for subtle text - good readability",
+      "scalePosition": 2,
+      "generateUtilityClass": true,
+      "applicableComponents": [
+        "text"
+      ],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": [
+        "captions",
+        "metadata",
+        "secondary-text"
+      ]
+    },
+    {
+      "name": "normal",
+      "value": "400",
+      "category": "font-weight",
+      "namespace": "font-weight",
+      "semanticMeaning": "Normal weight for body text - optimal readability",
+      "scalePosition": 3,
+      "generateUtilityClass": true,
+      "applicableComponents": [
+        "p",
+        "span",
+        "body",
+        "text"
+      ],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 1,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": [
+        "body-text",
+        "paragraphs",
+        "default"
+      ]
+    },
+    {
+      "name": "medium",
+      "value": "500",
+      "category": "font-weight",
+      "namespace": "font-weight",
+      "semanticMeaning": "Medium weight for emphasis - balanced visibility",
+      "scalePosition": 4,
+      "generateUtilityClass": true,
+      "applicableComponents": [
+        "text"
+      ],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 2,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": [
+        "labels",
+        "form-text",
+        "emphasis"
+      ]
+    },
+    {
+      "name": "semibold",
+      "value": "600",
+      "category": "font-weight",
+      "namespace": "font-weight",
+      "semanticMeaning": "Semi-bold for subheadings - clear hierarchy",
+      "scalePosition": 5,
+      "generateUtilityClass": true,
+      "applicableComponents": [
+        "text"
+      ],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 3,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": [
+        "subheadings",
+        "section-titles",
+        "ui-labels"
+      ]
+    },
+    {
+      "name": "bold",
+      "value": "700",
+      "category": "font-weight",
+      "namespace": "font-weight",
+      "semanticMeaning": "Bold for headings and emphasis - strong hierarchy",
+      "scalePosition": 6,
+      "generateUtilityClass": true,
+      "applicableComponents": [
+        "h1",
+        "h2",
+        "h3",
+        "strong",
+        "button"
+      ],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 4,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": [
+        "headings",
+        "important-text",
+        "buttons"
+      ]
+    },
+    {
+      "name": "extrabold",
+      "value": "800",
+      "category": "font-weight",
+      "namespace": "font-weight",
+      "semanticMeaning": "Extra bold for strong emphasis - high impact",
+      "scalePosition": 7,
+      "generateUtilityClass": true,
+      "applicableComponents": [
+        "text"
+      ],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 6,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": [
+        "hero-text",
+        "display",
+        "emphasis"
+      ]
+    },
+    {
+      "name": "black",
+      "value": "900",
+      "category": "font-weight",
+      "namespace": "font-weight",
+      "semanticMeaning": "Black weight for maximum impact - use sparingly",
+      "scalePosition": 8,
+      "generateUtilityClass": true,
+      "applicableComponents": [
+        "text"
+      ],
+      "accessibilityLevel": "AAA",
+      "cognitiveLoad": 8,
+      "trustLevel": "low",
+      "consequence": "reversible",
+      "usageContext": [
+        "brand-text",
+        "hero",
+        "maximum-impact"
+      ]
+    }
+  ]
+}

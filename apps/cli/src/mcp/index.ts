@@ -376,6 +376,7 @@ export async function startMCPServer() {
                       category: t.category,
                       semanticMeaning: t.semanticMeaning,
                       cognitiveLoad: t.cognitiveLoad,
+                      trustLevel: t.trustLevel,
                     })),
                   },
                   null,

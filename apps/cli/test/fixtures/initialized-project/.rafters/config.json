@@ -1,0 +1,9 @@
+{
+  "version": "1.0.0",
+  "componentsDir": "./src/components/ui",
+  "packageManager": "npm",
+  "registry": "https://rafters.realhandy.tech/registry",
+  "cssFile": "src/globals.css",
+  "tailwindVersion": "v4",
+  "tokenFormat": "tailwind"
+}

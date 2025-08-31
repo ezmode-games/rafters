@@ -2,72 +2,41 @@
  * Simple integration tests for the 'rafters add' command
  */
 
-import { execSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { ensureCLIBuilt, runCLI } from '../helpers/cliRunner';
+import type { TestFixtureInfo } from '../helpers/testApp';
+import { createTempTestApp } from '../helpers/testApp';
 
 describe('rafters add', () => {
-  const testDir = '/tmp/rafters-add-test';
+  let testApp: TestFixtureInfo;
 
-  function setupTestProject() {
-    if (existsSync(testDir)) {
-      rmSync(testDir, { recursive: true, force: true });
-    }
-    mkdirSync(testDir, { recursive: true });
-    writeFileSync(
-      join(testDir, 'package.json'),
-      JSON.stringify({
-        name: 'test-app',
-        dependencies: { react: '^19.0.0' },
-      })
-    );
-  }
-
-  function runRaftersCommand(args: string[]) {
-    const cliPath = join(process.cwd(), 'dist', 'index.js');
-    return execSync(`node "${cliPath}" ${args.join(' ')}`, {
-      cwd: testDir,
-      env: { ...process.env, CI: 'true' },
-      encoding: 'utf8',
-      timeout: 30000,
-    });
-  }
-
-  it('should show help when no component specified', () => {
-    setupTestProject();
-
-    try {
-      runRaftersCommand(['add']);
-    } catch (error: unknown) {
-      if (error && typeof error === 'object' && ('stdout' in error || 'message' in error)) {
-        const execError = error as { stdout?: string; message?: string };
-        expect(execError.stdout || execError.message).toContain('error');
-      } else {
-        throw error;
-      }
-    }
+  beforeEach(async () => {
+    await ensureCLIBuilt();
+    testApp = await createTempTestApp('empty-project');
   });
 
-  it('should fail when project not initialized', () => {
-    setupTestProject();
-
-    try {
-      runRaftersCommand(['add', 'button']);
-    } catch (error: unknown) {
-      if (error && typeof error === 'object' && ('status' in error || 'stderr' in error)) {
-        const execError = error as { status?: number; stderr?: string };
-        expect(execError.status).toBe(1);
-        expect(execError.stderr).toContain('not initialized');
-      } else {
-        throw error;
-      }
-    }
+  afterEach(async () => {
+    await testApp.cleanup();
   });
 
-  it('should show version', () => {
+  it('should show help when no component specified', async () => {
+    const result = await runCLI(['add'], testApp.path);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('error');
+  });
+
+  it('should fail when project not initialized', async () => {
+    const result = await runCLI(['add', 'button'], testApp.path);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('not initialized');
+  });
+
+  it('should show version', async () => {
     const packageJson = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf8'));
-    const output = runRaftersCommand(['--version']);
-    expect(output).toContain(packageJson.version);
+    const result = await runCLI(['--version'], testApp.path);
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain(packageJson.version);
   });
 });

@@ -144,6 +144,46 @@ function createEmptyProject() {
 }
 
 /**
+ * Create initialized project with Rafters already set up (for MCP testing)
+ */
+function createInitializedProject() {
+  console.log('🎯 Creating initialized project fixture...');
+
+  const appPath = join(FIXTURES_DIR, 'initialized-project');
+  mkdirSync(appPath);
+
+  // Same package.json as empty project
+  const packageJson = {
+    name: 'initialized-test-project',
+    version: '1.0.0',
+    private: true,
+    type: 'module',
+    dependencies: {
+      react: '^19.1.1',
+      'react-dom': '^19.1.1',
+    },
+  };
+
+  writeFileSync(join(appPath, 'package.json'), JSON.stringify(packageJson, null, 2));
+
+  // Initialize Rafters in this project
+  console.log('  🛠️  Running rafters init...');
+  const cliPath = join(process.cwd(), 'dist', 'index.js');
+
+  try {
+    execSync(`node "${cliPath}" init --yes`, {
+      cwd: appPath,
+      stdio: 'inherit',
+      env: { ...process.env, CI: 'true' },
+    });
+    console.log('✅ Initialized project fixture created\n');
+  } catch (error) {
+    console.error('❌ Failed to initialize project fixture:', error.message);
+    throw error;
+  }
+}
+
+/**
  * Create all fixtures
  */
 async function createAllFixtures() {
@@ -152,6 +192,7 @@ async function createAllFixtures() {
     createReactRouter7App();
     createViteReactApp();
     createEmptyProject();
+    createInitializedProject();
 
     console.log('🎉 All test fixtures created successfully!');
     console.log(`📁 Fixtures location: ${FIXTURES_DIR}`);
