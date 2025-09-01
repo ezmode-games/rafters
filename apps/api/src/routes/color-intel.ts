@@ -1,11 +1,7 @@
+import { generateColorCacheKey, validateOKLCH } from '@rafters/color-utils';
 import { type ColorIntelligenceResponse, ColorIntelligenceResponseSchema } from '@rafters/shared';
 import { Hono } from 'hono';
-import {
-  calculateColorData,
-  generateCacheKey,
-  generateColorIntelligence,
-  validateOKLCH,
-} from '../lib/color-intel/utils';
+import { calculateColorData, generateColorIntelligence } from '../lib/color-intel/utils';
 
 interface CloudflareBindings {
   RAFTERS_INTEL: KVNamespace;
@@ -42,7 +38,7 @@ colorIntel.post('/', async (c) => {
     }
 
     const oklch = body.oklch;
-    const cacheKey = generateCacheKey(oklch);
+    const cacheKey = generateColorCacheKey(oklch, { token: body.token, name: body.name });
 
     // Check cache first
     const kvNamespace = c.env.RAFTERS_INTEL;
