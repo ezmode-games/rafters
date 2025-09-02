@@ -592,11 +592,7 @@ export const checkTailwindVersion = async (cwd: string): Promise<string> => {
 
     if (deps.tailwindcss) {
       const version = deps.tailwindcss;
-      if (
-        version.includes('4') ||
-        version.includes('next') ||
-        version.includes('beta') ||
-        version.includes('catalog:')
+        version.startsWith('catalog:')
       ) {
         return 'v4';
       }
