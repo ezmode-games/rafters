@@ -49,3 +49,17 @@ export function adjustHue(color: OKLCH, degrees: number): OKLCH {
     h: newHue,
   };
 }
+
+/**
+ * Generate surface color from base color
+ */
+export function generateSurfaceColor(baseColor: OKLCH): OKLCH {
+  const surface: OKLCH = {
+    ...baseColor,
+    h: (baseColor.h + 15) % 360, // Slight hue shift
+    l: 0.85, // More usable lightness than 0.95
+    c: Math.max(0.02, baseColor.c * 0.15), // Very low chroma for surfaces
+  };
+
+  return surface;
+}

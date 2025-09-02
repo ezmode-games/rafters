@@ -58,6 +58,7 @@ import { generateWidthTokens } from './width.js';
 
 /**
  * Generate all design tokens using all generators
+ * AI intelligence enrichment happens separately via TokenRegistry
  *
  * @returns Complete set of design tokens for a design system
  */
@@ -65,9 +66,9 @@ export function generateAllTokens(): Token[] {
   return [
     ...generateSpacingScale('linear', 4, 1.25, 12),
     ...generateDepthScale('exponential', 10),
-    ...generateHeightScale('linear', 2.5, 1.25),
+    // Height tokens removed - spacing scale generates h-* utilities automatically
     ...generateTypographyScale('golden', 1),
-    ...generateColorTokens(),
+    ...generateColorTokens(), // Mathematical color tokens, AI enhancement happens later
     ...generateMotionTokens(),
     ...generateBorderRadiusTokens(),
     ...generateTouchTargetTokens(),

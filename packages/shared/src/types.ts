@@ -72,6 +72,7 @@ export type Intelligence = z.infer<typeof IntelligenceSchema>;
 
 // Color Intelligence Schema (from API)
 export const ColorIntelligenceSchema = z.object({
+  suggestedName: z.string(),
   reasoning: z.string(),
   emotionalImpact: z.string(),
   culturalContext: z.string(),
@@ -141,6 +142,9 @@ export const ColorValueSchema = z.object({
   harmonies: ColorHarmoniesSchema.optional(),
   accessibility: ColorAccessibilitySchema.optional(),
   analysis: ColorAnalysisSchema.optional(),
+
+  // Unique token ID for quick color lookups (e.g., "color-0.500-0.120-240.0")
+  tokenId: z.string().optional(),
 });
 
 export type ColorValue = z.infer<typeof ColorValueSchema>;
@@ -203,6 +207,8 @@ export const TokenSchema = z.object({
   deprecated: z.boolean().optional(),
   version: z.string().optional(),
   lastModified: z.string().optional(),
+  generatedAt: z.string().optional(), // ISO timestamp when token was generated
+  requiresConfirmation: z.boolean().optional(), // UI pattern requirement for destructive actions
 });
 
 export type Token = z.infer<typeof TokenSchema>;

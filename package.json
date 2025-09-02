@@ -8,9 +8,9 @@
   "scripts": {
     "dev": "pnpm --parallel dev",
     "build": "pnpm --recursive --sort build",
-    "test": "pnpm --recursive test",
-    "test:run": "pnpm --recursive test:run",
-    "test:preflight": "pnpm --recursive test:preflight",
+    "test": "pnpm --recursive --parallel test",
+    "test:run": "pnpm --recursive --parallel test:run",
+    "test:preflight": "pnpm --recursive --parallel test:preflight",
     "biome:lint": "pnpm --recursive lint",
     "biome:format": "pnpm --recursive format",
     "biome:check": "pnpm biome check --fix --unsafe",

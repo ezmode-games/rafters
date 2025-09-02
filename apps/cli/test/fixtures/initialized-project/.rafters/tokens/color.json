@@ -1,69 +1,75 @@
 {
   "category": "color",
-  "generatedAt": "2025-08-31T19:28:20.674Z",
+  "generatedAt": "2025-09-02T08:06:15.535Z",
   "tokens": [
     {
       "name": "primary",
       "value": {
-        "name": "primary",
+        "name": "oklch-240-26",
         "scale": [
           {
-            "l": 0.95,
-            "c": 0.06,
+            "l": 0.96,
+            "c": 0.01,
             "h": 240,
             "alpha": 1
           },
           {
-            "l": 0.8944444444444444,
-            "c": 0.06,
+            "l": 0.92,
+            "c": 0.01,
             "h": 240,
             "alpha": 1
           },
           {
-            "l": 0.7833333333333332,
-            "c": 0.12,
+            "l": 0.84,
+            "c": 0.02,
             "h": 240,
             "alpha": 1
           },
           {
-            "l": 0.6722222222222222,
-            "c": 0.12,
+            "l": 0.76,
+            "c": 0.02,
             "h": 240,
             "alpha": 1
           },
           {
-            "l": 0.5611111111111111,
-            "c": 0.12,
+            "l": 0.64,
+            "c": 0.02,
             "h": 240,
             "alpha": 1
           },
           {
-            "l": 0.45,
-            "c": 0.12,
+            "l": 0.26,
+            "c": 0.02,
             "h": 240,
             "alpha": 1
           },
           {
-            "l": 0.375,
-            "c": 0.12,
+            "l": 0.11,
+            "c": 0.01,
             "h": 240,
             "alpha": 1
           },
           {
-            "l": 0.3,
-            "c": 0.12,
+            "l": 0.08,
+            "c": 0.01,
             "h": 240,
             "alpha": 1
           },
           {
-            "l": 0.22499999999999998,
-            "c": 0.12,
+            "l": 0.06,
+            "c": 0.01,
             "h": 240,
             "alpha": 1
           },
           {
-            "l": 0.14999999999999997,
-            "c": 0.12,
+            "l": 0.04,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.04,
+            "c": 0.01,
             "h": 240,
             "alpha": 1
           }
@@ -72,10 +78,10 @@
         "value": "500",
         "use": "Primary brand color for main actions and focus states",
         "states": {
-          "hover": "oklch(0.4 0.12 240)",
-          "focus": "oklch(0.42000000000000004 0.12 240)",
-          "active": "oklch(0.37 0.12 240)",
-          "disabled": "oklch(0.225 0.036 240)"
+          "hover": "oklch(0.21 0.02 240)",
+          "focus": "oklch(0.18 0.02 240)",
+          "active": "oklch(0.14 0.02 240)",
+          "disabled": "oklch(0.16 0.01 240)"
         }
       },
       "category": "color",
@@ -94,227 +100,177 @@
       "accessibilityLevel": "AAA",
       "consequence": "significant",
       "usageContext": [
-        "cta",
-        "primary-button",
-        "brand",
-        "focus"
-      ]
-    },
-    {
-      "name": "primary-dark",
-      "value": {
-        "name": "primary-dark",
-        "scale": [
-          {
-            "l": 0.95,
-            "c": 0.06,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.9222222222222222,
-            "c": 0.06,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.8666666666666666,
-            "c": 0.12,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.8111111111111111,
-            "c": 0.12,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.7555555555555555,
-            "c": 0.12,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.7,
-            "c": 0.12,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.5625,
-            "c": 0.12,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.425,
-            "c": 0.12,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.2875,
-            "c": 0.12,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.15000000000000002,
-            "c": 0.12,
-            "h": 240,
-            "alpha": 1
-          }
-        ],
-        "token": "primary-dark",
-        "value": "500",
-        "use": "Dark mode variant of primary",
-        "states": {
-          "hover": "oklch(0.6499999999999999 0.12 240)",
-          "focus": "oklch(0.6699999999999999 0.12 240)",
-          "active": "oklch(0.62 0.12 240)",
-          "disabled": "oklch(0.35 0.036 240)"
-        }
-      },
-      "category": "color",
-      "namespace": "color",
-      "semanticMeaning": "Dark mode: Primary brand color for main actions and focus states",
-      "scalePosition": 1,
-      "trustLevel": "high",
-      "cognitiveLoad": 3,
-      "generateUtilityClass": false,
-      "applicableComponents": [
-        "button",
-        "link",
-        "badge",
-        "progress"
-      ],
-      "accessibilityLevel": "AAA",
-      "consequence": "significant",
-      "usageContext": [
-        "dark-cta",
-        "dark-primary-button",
-        "dark-brand",
-        "dark-focus"
+        "primary"
       ]
     },
     {
       "name": "primary-foreground",
       "value": {
-        "name": "primary-foreground",
-        "scale": [],
+        "name": "oklch-240-95",
+        "scale": [
+          {
+            "l": 0.96,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.92,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.84,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.76,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.64,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.95,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.8,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.7,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.6,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.5,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.5,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          }
+        ],
         "token": "primary-foreground",
         "value": "500",
-        "use": "Text color for primary backgrounds"
+        "use": "Text color for primary backgrounds",
+        "states": {
+          "hover": "oklch(0.45 0.02 240)",
+          "focus": "oklch(0.44 0.02 240)",
+          "active": "oklch(0.42 0.02 240)",
+          "disabled": "oklch(0.57 0.01 240)"
+        }
       },
       "category": "color",
       "namespace": "color",
       "semanticMeaning": "Text color for primary backgrounds",
-      "scalePosition": 2,
+      "scalePosition": 1,
       "trustLevel": "high",
       "cognitiveLoad": 1,
       "generateUtilityClass": true,
       "applicableComponents": [
-        "button",
-        "badge"
+        "text",
+        "icon"
       ],
       "accessibilityLevel": "AAA",
-      "consequence": "significant",
+      "consequence": "reversible",
       "usageContext": [
-        "text-on-primary",
-        "button-text"
-      ]
-    },
-    {
-      "name": "primary-foreground-dark",
-      "value": {
-        "name": "primary-foreground-dark",
-        "scale": [],
-        "token": "primary-foreground-dark",
-        "value": "500",
-        "use": "Dark mode variant of primary-foreground"
-      },
-      "category": "color",
-      "namespace": "color",
-      "semanticMeaning": "Dark mode: Text color for primary backgrounds",
-      "scalePosition": 3,
-      "trustLevel": "high",
-      "cognitiveLoad": 1,
-      "generateUtilityClass": false,
-      "applicableComponents": [
-        "button",
-        "badge"
-      ],
-      "accessibilityLevel": "AAA",
-      "consequence": "significant",
-      "usageContext": [
-        "dark-text-on-primary",
-        "dark-button-text"
+        "text-on-primary"
       ]
     },
     {
       "name": "success",
       "value": {
-        "name": "success",
+        "name": "oklch-135-68",
         "scale": [
           {
-            "l": 0.95,
-            "c": 0.085,
-            "h": 145,
+            "l": 0.96,
+            "c": 0.05,
+            "h": 135,
             "alpha": 1
           },
           {
-            "l": 0.9133333333333333,
-            "c": 0.085,
-            "h": 145,
+            "l": 0.92,
+            "c": 0.05,
+            "h": 135,
             "alpha": 1
           },
           {
             "l": 0.84,
-            "c": 0.17,
-            "h": 145,
+            "c": 0.15,
+            "h": 135,
             "alpha": 1
           },
           {
-            "l": 0.7666666666666666,
-            "c": 0.17,
-            "h": 145,
+            "l": 0.76,
+            "c": 0.15,
+            "h": 135,
             "alpha": 1
           },
           {
-            "l": 0.6933333333333334,
-            "c": 0.17,
-            "h": 145,
+            "l": 0.64,
+            "c": 0.15,
+            "h": 135,
             "alpha": 1
           },
           {
-            "l": 0.62,
-            "c": 0.17,
-            "h": 145,
+            "l": 0.68,
+            "c": 0.15,
+            "h": 135,
             "alpha": 1
           },
           {
-            "l": 0.5025,
-            "c": 0.17,
-            "h": 145,
+            "l": 0.53,
+            "c": 0.15,
+            "h": 135,
             "alpha": 1
           },
           {
-            "l": 0.385,
-            "c": 0.17,
-            "h": 145,
+            "l": 0.43,
+            "c": 0.15,
+            "h": 135,
             "alpha": 1
           },
           {
-            "l": 0.2675,
-            "c": 0.17,
-            "h": 145,
+            "l": 0.33,
+            "c": 0.15,
+            "h": 135,
             "alpha": 1
           },
           {
-            "l": 0.15000000000000002,
-            "c": 0.17,
-            "h": 145,
+            "l": 0.23,
+            "c": 0.15,
+            "h": 135,
+            "alpha": 1
+          },
+          {
+            "l": 0.23,
+            "c": 0.15,
+            "h": 135,
             "alpha": 1
           }
         ],
@@ -322,16 +278,16 @@
         "value": "500",
         "use": "Success states, confirmations, positive feedback",
         "states": {
-          "hover": "oklch(0.57 0.17 145)",
-          "focus": "oklch(0.59 0.17 145)",
-          "active": "oklch(0.54 0.17 145)",
-          "disabled": "oklch(0.31 0.051000000000000004 145)"
+          "hover": "oklch(0.32 0.15 135)",
+          "focus": "oklch(0.3 0.15 135)",
+          "active": "oklch(0.28 0.15 135)",
+          "disabled": "oklch(0.41 0.05 135)"
         }
       },
       "category": "color",
       "namespace": "color",
       "semanticMeaning": "Success states, confirmations, positive feedback",
-      "scalePosition": 4,
+      "scalePosition": 2,
       "trustLevel": "low",
       "cognitiveLoad": 2,
       "generateUtilityClass": true,
@@ -344,127 +300,101 @@
       "accessibilityLevel": "AAA",
       "consequence": "reversible",
       "usageContext": [
-        "success-message",
-        "confirmation",
-        "complete"
-      ]
-    },
-    {
-      "name": "success-dark",
-      "value": {
-        "name": "success-dark",
-        "scale": [
-          {
-            "l": 0.95,
-            "c": 0.075,
-            "h": 145,
-            "alpha": 1
-          },
-          {
-            "l": 0.9055555555555554,
-            "c": 0.075,
-            "h": 145,
-            "alpha": 1
-          },
-          {
-            "l": 0.8166666666666667,
-            "c": 0.15,
-            "h": 145,
-            "alpha": 1
-          },
-          {
-            "l": 0.7277777777777777,
-            "c": 0.15,
-            "h": 145,
-            "alpha": 1
-          },
-          {
-            "l": 0.638888888888889,
-            "c": 0.15,
-            "h": 145,
-            "alpha": 1
-          },
-          {
-            "l": 0.55,
-            "c": 0.15,
-            "h": 145,
-            "alpha": 1
-          },
-          {
-            "l": 0.45000000000000007,
-            "c": 0.15,
-            "h": 145,
-            "alpha": 1
-          },
-          {
-            "l": 0.35000000000000003,
-            "c": 0.15,
-            "h": 145,
-            "alpha": 1
-          },
-          {
-            "l": 0.25,
-            "c": 0.15,
-            "h": 145,
-            "alpha": 1
-          },
-          {
-            "l": 0.15000000000000002,
-            "c": 0.15,
-            "h": 145,
-            "alpha": 1
-          }
-        ],
-        "token": "success-dark",
-        "value": "500",
-        "use": "Dark mode variant of success",
-        "states": {
-          "hover": "oklch(0.5 0.15 145)",
-          "focus": "oklch(0.52 0.15 145)",
-          "active": "oklch(0.47000000000000003 0.15 145)",
-          "disabled": "oklch(0.275 0.045 145)"
-        }
-      },
-      "category": "color",
-      "namespace": "color",
-      "semanticMeaning": "Dark mode: Success states, confirmations, positive feedback",
-      "scalePosition": 5,
-      "trustLevel": "low",
-      "cognitiveLoad": 2,
-      "generateUtilityClass": false,
-      "applicableComponents": [
-        "alert",
-        "toast",
-        "badge",
-        "progress"
-      ],
-      "accessibilityLevel": "AAA",
-      "consequence": "reversible",
-      "usageContext": [
-        "dark-success-message",
-        "dark-confirmation",
-        "dark-complete"
+        "success"
       ]
     },
     {
       "name": "success-foreground",
       "value": {
-        "name": "success-foreground",
-        "scale": [],
+        "name": "oklch-135-5",
+        "scale": [
+          {
+            "l": 0.96,
+            "c": 0.05,
+            "h": 135,
+            "alpha": 1
+          },
+          {
+            "l": 0.92,
+            "c": 0.05,
+            "h": 135,
+            "alpha": 1
+          },
+          {
+            "l": 0.84,
+            "c": 0.15,
+            "h": 135,
+            "alpha": 1
+          },
+          {
+            "l": 0.76,
+            "c": 0.15,
+            "h": 135,
+            "alpha": 1
+          },
+          {
+            "l": 0.64,
+            "c": 0.15,
+            "h": 135,
+            "alpha": 1
+          },
+          {
+            "l": 0.05,
+            "c": 0.09,
+            "h": 135,
+            "alpha": 1
+          },
+          {
+            "l": 0.1,
+            "c": 0.09,
+            "h": 135,
+            "alpha": 1
+          },
+          {
+            "l": 0.08,
+            "c": 0.09,
+            "h": 135,
+            "alpha": 1
+          },
+          {
+            "l": 0.06,
+            "c": 0.09,
+            "h": 135,
+            "alpha": 1
+          },
+          {
+            "l": 0.04,
+            "c": 0.09,
+            "h": 135,
+            "alpha": 1
+          },
+          {
+            "l": 0.04,
+            "c": 0.09,
+            "h": 135,
+            "alpha": 1
+          }
+        ],
         "token": "success-foreground",
         "value": "500",
-        "use": "Text color for success backgrounds"
+        "use": "Text color for success backgrounds",
+        "states": {
+          "hover": "oklch(0.1 0.15 135)",
+          "focus": "oklch(0.1 0.15 135)",
+          "active": "oklch(0.1 0.15 135)",
+          "disabled": "oklch(0.03 0.05 135)"
+        }
       },
       "category": "color",
       "namespace": "color",
       "semanticMeaning": "Text color for success backgrounds",
-      "scalePosition": 6,
+      "scalePosition": 3,
       "trustLevel": "low",
       "cognitiveLoad": 1,
       "generateUtilityClass": true,
       "applicableComponents": [
-        "alert",
-        "badge"
+        "text",
+        "icon"
       ],
       "accessibilityLevel": "AAA",
       "consequence": "reversible",
@@ -473,94 +403,74 @@
       ]
     },
     {
-      "name": "success-foreground-dark",
-      "value": {
-        "name": "success-foreground-dark",
-        "scale": [],
-        "token": "success-foreground-dark",
-        "value": "500",
-        "use": "Dark mode variant of success-foreground"
-      },
-      "category": "color",
-      "namespace": "color",
-      "semanticMeaning": "Dark mode: Text color for success backgrounds",
-      "scalePosition": 7,
-      "trustLevel": "low",
-      "cognitiveLoad": 1,
-      "generateUtilityClass": false,
-      "applicableComponents": [
-        "alert",
-        "badge"
-      ],
-      "accessibilityLevel": "AAA",
-      "consequence": "reversible",
-      "usageContext": [
-        "dark-text-on-success"
-      ]
-    },
-    {
       "name": "warning",
       "value": {
-        "name": "warning",
+        "name": "oklch-45-69",
         "scale": [
           {
-            "l": 0.95,
-            "c": 0.075,
-            "h": 75,
+            "l": 0.96,
+            "c": 0.05,
+            "h": 45,
             "alpha": 1
           },
           {
-            "l": 0.9222222222222222,
-            "c": 0.075,
-            "h": 75,
+            "l": 0.92,
+            "c": 0.05,
+            "h": 45,
             "alpha": 1
           },
           {
-            "l": 0.8666666666666666,
-            "c": 0.15,
-            "h": 75,
+            "l": 0.84,
+            "c": 0.18,
+            "h": 45,
             "alpha": 1
           },
           {
-            "l": 0.8111111111111111,
-            "c": 0.15,
-            "h": 75,
+            "l": 0.76,
+            "c": 0.18,
+            "h": 45,
             "alpha": 1
           },
           {
-            "l": 0.7555555555555555,
-            "c": 0.15,
-            "h": 75,
+            "l": 0.64,
+            "c": 0.18,
+            "h": 45,
             "alpha": 1
           },
           {
-            "l": 0.7,
-            "c": 0.15,
-            "h": 75,
+            "l": 0.69,
+            "c": 0.18,
+            "h": 45,
             "alpha": 1
           },
           {
-            "l": 0.5625,
-            "c": 0.15,
-            "h": 75,
+            "l": 0.54,
+            "c": 0.18,
+            "h": 45,
             "alpha": 1
           },
           {
-            "l": 0.425,
-            "c": 0.15,
-            "h": 75,
+            "l": 0.44,
+            "c": 0.18,
+            "h": 45,
             "alpha": 1
           },
           {
-            "l": 0.2875,
-            "c": 0.15,
-            "h": 75,
+            "l": 0.34,
+            "c": 0.18,
+            "h": 45,
             "alpha": 1
           },
           {
-            "l": 0.15000000000000002,
-            "c": 0.15,
-            "h": 75,
+            "l": 0.24,
+            "c": 0.18,
+            "h": 45,
+            "alpha": 1
+          },
+          {
+            "l": 0.24,
+            "c": 0.18,
+            "h": 45,
             "alpha": 1
           }
         ],
@@ -568,16 +478,16 @@
         "value": "500",
         "use": "Warning states, caution, important information",
         "states": {
-          "hover": "oklch(0.6499999999999999 0.15 75)",
-          "focus": "oklch(0.6699999999999999 0.15 75)",
-          "active": "oklch(0.62 0.15 75)",
-          "disabled": "oklch(0.35 0.045 75)"
+          "hover": "oklch(0.32 0.18 45)",
+          "focus": "oklch(0.31 0.18 45)",
+          "active": "oklch(0.57 0.18 45)",
+          "disabled": "oklch(0.41 0.05 45)"
         }
       },
       "category": "color",
       "namespace": "color",
       "semanticMeaning": "Warning states, caution, important information",
-      "scalePosition": 8,
+      "scalePosition": 4,
       "trustLevel": "medium",
       "cognitiveLoad": 5,
       "generateUtilityClass": true,
@@ -589,126 +499,101 @@
       "accessibilityLevel": "AAA",
       "consequence": "reversible",
       "usageContext": [
-        "warning-message",
-        "caution",
-        "important"
-      ]
-    },
-    {
-      "name": "warning-dark",
-      "value": {
-        "name": "warning-dark",
-        "scale": [
-          {
-            "l": 0.95,
-            "c": 0.065,
-            "h": 75,
-            "alpha": 1
-          },
-          {
-            "l": 0.9166666666666666,
-            "c": 0.065,
-            "h": 75,
-            "alpha": 1
-          },
-          {
-            "l": 0.85,
-            "c": 0.13,
-            "h": 75,
-            "alpha": 1
-          },
-          {
-            "l": 0.7833333333333333,
-            "c": 0.13,
-            "h": 75,
-            "alpha": 1
-          },
-          {
-            "l": 0.7166666666666667,
-            "c": 0.13,
-            "h": 75,
-            "alpha": 1
-          },
-          {
-            "l": 0.65,
-            "c": 0.13,
-            "h": 75,
-            "alpha": 1
-          },
-          {
-            "l": 0.525,
-            "c": 0.13,
-            "h": 75,
-            "alpha": 1
-          },
-          {
-            "l": 0.4,
-            "c": 0.13,
-            "h": 75,
-            "alpha": 1
-          },
-          {
-            "l": 0.275,
-            "c": 0.13,
-            "h": 75,
-            "alpha": 1
-          },
-          {
-            "l": 0.15000000000000002,
-            "c": 0.13,
-            "h": 75,
-            "alpha": 1
-          }
-        ],
-        "token": "warning-dark",
-        "value": "500",
-        "use": "Dark mode variant of warning",
-        "states": {
-          "hover": "oklch(0.6 0.13 75)",
-          "focus": "oklch(0.62 0.13 75)",
-          "active": "oklch(0.5700000000000001 0.13 75)",
-          "disabled": "oklch(0.325 0.039 75)"
-        }
-      },
-      "category": "color",
-      "namespace": "color",
-      "semanticMeaning": "Dark mode: Warning states, caution, important information",
-      "scalePosition": 9,
-      "trustLevel": "medium",
-      "cognitiveLoad": 5,
-      "generateUtilityClass": false,
-      "applicableComponents": [
-        "alert",
-        "toast",
-        "badge"
-      ],
-      "accessibilityLevel": "AAA",
-      "consequence": "reversible",
-      "usageContext": [
-        "dark-warning-message",
-        "dark-caution",
-        "dark-important"
+        "warning"
       ]
     },
     {
       "name": "warning-foreground",
       "value": {
-        "name": "warning-foreground",
-        "scale": [],
+        "name": "oklch-45-5",
+        "scale": [
+          {
+            "l": 0.96,
+            "c": 0.05,
+            "h": 45,
+            "alpha": 1
+          },
+          {
+            "l": 0.92,
+            "c": 0.05,
+            "h": 45,
+            "alpha": 1
+          },
+          {
+            "l": 0.84,
+            "c": 0.18,
+            "h": 45,
+            "alpha": 1
+          },
+          {
+            "l": 0.76,
+            "c": 0.18,
+            "h": 45,
+            "alpha": 1
+          },
+          {
+            "l": 0.64,
+            "c": 0.18,
+            "h": 45,
+            "alpha": 1
+          },
+          {
+            "l": 0.05,
+            "c": 0.11,
+            "h": 45,
+            "alpha": 1
+          },
+          {
+            "l": 0.1,
+            "c": 0.11,
+            "h": 45,
+            "alpha": 1
+          },
+          {
+            "l": 0.08,
+            "c": 0.11,
+            "h": 45,
+            "alpha": 1
+          },
+          {
+            "l": 0.06,
+            "c": 0.11,
+            "h": 45,
+            "alpha": 1
+          },
+          {
+            "l": 0.04,
+            "c": 0.11,
+            "h": 45,
+            "alpha": 1
+          },
+          {
+            "l": 0.04,
+            "c": 0.11,
+            "h": 45,
+            "alpha": 1
+          }
+        ],
         "token": "warning-foreground",
         "value": "500",
-        "use": "Text color for warning backgrounds"
+        "use": "Text color for warning backgrounds",
+        "states": {
+          "hover": "oklch(0.1 0.18 45)",
+          "focus": "oklch(0.1 0.18 45)",
+          "active": "oklch(0.1 0.18 45)",
+          "disabled": "oklch(0.03 0.05 45)"
+        }
       },
       "category": "color",
       "namespace": "color",
       "semanticMeaning": "Text color for warning backgrounds",
-      "scalePosition": 10,
+      "scalePosition": 5,
       "trustLevel": "medium",
       "cognitiveLoad": 1,
       "generateUtilityClass": true,
       "applicableComponents": [
-        "alert",
-        "badge"
+        "text",
+        "icon"
       ],
       "accessibilityLevel": "AAA",
       "consequence": "reversible",
@@ -717,94 +602,74 @@
       ]
     },
     {
-      "name": "warning-foreground-dark",
-      "value": {
-        "name": "warning-foreground-dark",
-        "scale": [],
-        "token": "warning-foreground-dark",
-        "value": "500",
-        "use": "Dark mode variant of warning-foreground"
-      },
-      "category": "color",
-      "namespace": "color",
-      "semanticMeaning": "Dark mode: Text color for warning backgrounds",
-      "scalePosition": 11,
-      "trustLevel": "medium",
-      "cognitiveLoad": 1,
-      "generateUtilityClass": false,
-      "applicableComponents": [
-        "alert",
-        "badge"
-      ],
-      "accessibilityLevel": "AAA",
-      "consequence": "reversible",
-      "usageContext": [
-        "dark-text-on-warning"
-      ]
-    },
-    {
       "name": "destructive",
       "value": {
-        "name": "destructive",
+        "name": "oklch-15-65",
         "scale": [
           {
-            "l": 0.95,
-            "c": 0.12,
-            "h": 27,
+            "l": 0.96,
+            "c": 0.06,
+            "h": 15,
             "alpha": 1
           },
           {
-            "l": 0.9033333333333333,
-            "c": 0.12,
-            "h": 27,
+            "l": 0.92,
+            "c": 0.06,
+            "h": 15,
             "alpha": 1
           },
           {
-            "l": 0.8099999999999999,
-            "c": 0.24,
-            "h": 27,
+            "l": 0.84,
+            "c": 0.2,
+            "h": 15,
             "alpha": 1
           },
           {
-            "l": 0.7166666666666667,
-            "c": 0.24,
-            "h": 27,
+            "l": 0.76,
+            "c": 0.2,
+            "h": 15,
             "alpha": 1
           },
           {
-            "l": 0.6233333333333333,
-            "c": 0.24,
-            "h": 27,
+            "l": 0.64,
+            "c": 0.2,
+            "h": 15,
             "alpha": 1
           },
           {
-            "l": 0.53,
-            "c": 0.24,
-            "h": 27,
+            "l": 0.65,
+            "c": 0.2,
+            "h": 15,
             "alpha": 1
           },
           {
-            "l": 0.43500000000000005,
-            "c": 0.24,
-            "h": 27,
+            "l": 0.5,
+            "c": 0.2,
+            "h": 15,
             "alpha": 1
           },
           {
-            "l": 0.34,
-            "c": 0.24,
-            "h": 27,
+            "l": 0.4,
+            "c": 0.2,
+            "h": 15,
             "alpha": 1
           },
           {
-            "l": 0.245,
-            "c": 0.24,
-            "h": 27,
+            "l": 0.3,
+            "c": 0.2,
+            "h": 15,
             "alpha": 1
           },
           {
-            "l": 0.15000000000000002,
-            "c": 0.24,
-            "h": 27,
+            "l": 0.2,
+            "c": 0.2,
+            "h": 15,
+            "alpha": 1
+          },
+          {
+            "l": 0.2,
+            "c": 0.2,
+            "h": 15,
             "alpha": 1
           }
         ],
@@ -812,16 +677,16 @@
         "value": "500",
         "use": "Destructive actions, errors, danger - REQUIRES confirmation UX",
         "states": {
-          "hover": "oklch(0.48000000000000004 0.24 27)",
-          "focus": "oklch(0.5 0.24 27)",
-          "active": "oklch(0.45 0.24 27)",
-          "disabled": "oklch(0.265 0.072 27)"
+          "hover": "oklch(0.3 0.2 15)",
+          "focus": "oklch(0.57 0.2 15)",
+          "active": "oklch(0.53 0.2 15)",
+          "disabled": "oklch(0.39 0.06 15)"
         }
       },
       "category": "color",
       "namespace": "color",
       "semanticMeaning": "Destructive actions, errors, danger - REQUIRES confirmation UX",
-      "scalePosition": 12,
+      "scalePosition": 6,
       "trustLevel": "critical",
       "cognitiveLoad": 8,
       "generateUtilityClass": true,
@@ -833,225 +698,178 @@
       "accessibilityLevel": "AAA",
       "consequence": "destructive",
       "usageContext": [
-        "error",
-        "delete",
-        "danger",
-        "critical"
+        "destructive"
       ],
       "requiresConfirmation": true
     },
     {
-      "name": "destructive-dark",
+      "name": "destructive-foreground",
       "value": {
-        "name": "destructive-dark",
+        "name": "oklch-15-5",
         "scale": [
           {
-            "l": 0.95,
-            "c": 0.11,
-            "h": 27,
+            "l": 0.96,
+            "c": 0.06,
+            "h": 15,
             "alpha": 1
           },
           {
-            "l": 0.9088888888888889,
-            "c": 0.11,
-            "h": 27,
+            "l": 0.92,
+            "c": 0.06,
+            "h": 15,
             "alpha": 1
           },
           {
-            "l": 0.8266666666666667,
-            "c": 0.22,
-            "h": 27,
+            "l": 0.84,
+            "c": 0.2,
+            "h": 15,
             "alpha": 1
           },
           {
-            "l": 0.7444444444444444,
-            "c": 0.22,
-            "h": 27,
+            "l": 0.76,
+            "c": 0.2,
+            "h": 15,
             "alpha": 1
           },
           {
-            "l": 0.6622222222222222,
-            "c": 0.22,
-            "h": 27,
+            "l": 0.64,
+            "c": 0.2,
+            "h": 15,
             "alpha": 1
           },
           {
-            "l": 0.58,
-            "c": 0.22,
-            "h": 27,
+            "l": 0.05,
+            "c": 0.12,
+            "h": 15,
             "alpha": 1
           },
           {
-            "l": 0.4725,
-            "c": 0.22,
-            "h": 27,
+            "l": 0.1,
+            "c": 0.12,
+            "h": 15,
             "alpha": 1
           },
           {
-            "l": 0.365,
-            "c": 0.22,
-            "h": 27,
+            "l": 0.08,
+            "c": 0.12,
+            "h": 15,
             "alpha": 1
           },
           {
-            "l": 0.2575,
-            "c": 0.22,
-            "h": 27,
+            "l": 0.06,
+            "c": 0.12,
+            "h": 15,
             "alpha": 1
           },
           {
-            "l": 0.15000000000000002,
-            "c": 0.22,
-            "h": 27,
+            "l": 0.04,
+            "c": 0.12,
+            "h": 15,
+            "alpha": 1
+          },
+          {
+            "l": 0.04,
+            "c": 0.12,
+            "h": 15,
             "alpha": 1
           }
         ],
-        "token": "destructive-dark",
+        "token": "destructive-foreground",
         "value": "500",
-        "use": "Dark mode variant of destructive",
+        "use": "Text color for destructive backgrounds",
         "states": {
-          "hover": "oklch(0.5299999999999999 0.22 27)",
-          "focus": "oklch(0.5499999999999999 0.22 27)",
-          "active": "oklch(0.49999999999999994 0.22 27)",
-          "disabled": "oklch(0.29 0.066 27)"
+          "hover": "oklch(0.1 0.2 15)",
+          "focus": "oklch(0.1 0.2 15)",
+          "active": "oklch(0.1 0.2 15)",
+          "disabled": "oklch(0.03 0.06 15)"
         }
       },
       "category": "color",
       "namespace": "color",
-      "semanticMeaning": "Dark mode: Destructive actions, errors, danger - REQUIRES confirmation UX",
-      "scalePosition": 13,
-      "trustLevel": "critical",
-      "cognitiveLoad": 8,
-      "generateUtilityClass": false,
-      "applicableComponents": [
-        "button",
-        "alert",
-        "toast"
-      ],
-      "accessibilityLevel": "AAA",
-      "consequence": "destructive",
-      "usageContext": [
-        "dark-error",
-        "dark-delete",
-        "dark-danger",
-        "dark-critical"
-      ]
-    },
-    {
-      "name": "destructive-foreground",
-      "value": {
-        "name": "destructive-foreground",
-        "scale": [],
-        "token": "destructive-foreground",
-        "value": "500",
-        "use": "Text color for destructive backgrounds"
-      },
-      "category": "color",
-      "namespace": "color",
       "semanticMeaning": "Text color for destructive backgrounds",
-      "scalePosition": 14,
+      "scalePosition": 7,
       "trustLevel": "critical",
       "cognitiveLoad": 1,
       "generateUtilityClass": true,
       "applicableComponents": [
-        "button",
-        "alert"
+        "text",
+        "icon"
       ],
       "accessibilityLevel": "AAA",
-      "consequence": "destructive",
+      "consequence": "reversible",
       "usageContext": [
         "text-on-destructive"
       ]
     },
     {
-      "name": "destructive-foreground-dark",
-      "value": {
-        "name": "destructive-foreground-dark",
-        "scale": [],
-        "token": "destructive-foreground-dark",
-        "value": "500",
-        "use": "Dark mode variant of destructive-foreground"
-      },
-      "category": "color",
-      "namespace": "color",
-      "semanticMeaning": "Dark mode: Text color for destructive backgrounds",
-      "scalePosition": 15,
-      "trustLevel": "critical",
-      "cognitiveLoad": 1,
-      "generateUtilityClass": false,
-      "applicableComponents": [
-        "button",
-        "alert"
-      ],
-      "accessibilityLevel": "AAA",
-      "consequence": "destructive",
-      "usageContext": [
-        "dark-text-on-destructive"
-      ]
-    },
-    {
       "name": "info",
       "value": {
-        "name": "info",
+        "name": "oklch-220-67",
         "scale": [
           {
-            "l": 0.95,
-            "c": 0.075,
-            "h": 240,
+            "l": 0.96,
+            "c": 0.06,
+            "h": 220,
             "alpha": 1
           },
           {
-            "l": 0.9177777777777778,
-            "c": 0.075,
-            "h": 240,
+            "l": 0.92,
+            "c": 0.06,
+            "h": 220,
             "alpha": 1
           },
           {
-            "l": 0.8533333333333333,
-            "c": 0.15,
-            "h": 240,
+            "l": 0.84,
+            "c": 0.2,
+            "h": 220,
             "alpha": 1
           },
           {
-            "l": 0.7888888888888889,
-            "c": 0.15,
-            "h": 240,
+            "l": 0.76,
+            "c": 0.2,
+            "h": 220,
             "alpha": 1
           },
           {
-            "l": 0.7244444444444444,
-            "c": 0.15,
-            "h": 240,
+            "l": 0.64,
+            "c": 0.2,
+            "h": 220,
             "alpha": 1
           },
           {
-            "l": 0.66,
-            "c": 0.15,
-            "h": 240,
+            "l": 0.67,
+            "c": 0.2,
+            "h": 220,
             "alpha": 1
           },
           {
-            "l": 0.5325,
-            "c": 0.15,
-            "h": 240,
+            "l": 0.52,
+            "c": 0.2,
+            "h": 220,
             "alpha": 1
           },
           {
-            "l": 0.405,
-            "c": 0.15,
-            "h": 240,
+            "l": 0.42,
+            "c": 0.2,
+            "h": 220,
             "alpha": 1
           },
           {
-            "l": 0.2775,
-            "c": 0.15,
-            "h": 240,
+            "l": 0.32,
+            "c": 0.2,
+            "h": 220,
             "alpha": 1
           },
           {
-            "l": 0.15000000000000002,
-            "c": 0.15,
-            "h": 240,
+            "l": 0.22,
+            "c": 0.2,
+            "h": 220,
+            "alpha": 1
+          },
+          {
+            "l": 0.22,
+            "c": 0.2,
+            "h": 220,
             "alpha": 1
           }
         ],
@@ -1059,16 +877,16 @@
         "value": "500",
         "use": "Informational messages, neutral notifications",
         "states": {
-          "hover": "oklch(0.61 0.15 240)",
-          "focus": "oklch(0.63 0.15 240)",
-          "active": "oklch(0.5800000000000001 0.15 240)",
-          "disabled": "oklch(0.33 0.045 240)"
+          "hover": "oklch(0.31 0.2 220)",
+          "focus": "oklch(0.3 0.2 220)",
+          "active": "oklch(0.28 0.2 220)",
+          "disabled": "oklch(0.4 0.06 220)"
         }
       },
       "category": "color",
       "namespace": "color",
       "semanticMeaning": "Informational messages, neutral notifications",
-      "scalePosition": 16,
+      "scalePosition": 8,
       "trustLevel": "low",
       "cognitiveLoad": 2,
       "generateUtilityClass": true,
@@ -1080,126 +898,101 @@
       "accessibilityLevel": "AAA",
       "consequence": "reversible",
       "usageContext": [
-        "info-message",
-        "notification",
-        "neutral"
-      ]
-    },
-    {
-      "name": "info-dark",
-      "value": {
-        "name": "info-dark",
-        "scale": [
-          {
-            "l": 0.95,
-            "c": 0.06,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.911111111111111,
-            "c": 0.06,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.8333333333333333,
-            "c": 0.12,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.7555555555555555,
-            "c": 0.12,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.6777777777777777,
-            "c": 0.12,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.6,
-            "c": 0.12,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.4875,
-            "c": 0.12,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.375,
-            "c": 0.12,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.2625,
-            "c": 0.12,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.15000000000000002,
-            "c": 0.12,
-            "h": 240,
-            "alpha": 1
-          }
-        ],
-        "token": "info-dark",
-        "value": "500",
-        "use": "Dark mode variant of info",
-        "states": {
-          "hover": "oklch(0.5499999999999999 0.12 240)",
-          "focus": "oklch(0.57 0.12 240)",
-          "active": "oklch(0.52 0.12 240)",
-          "disabled": "oklch(0.3 0.036 240)"
-        }
-      },
-      "category": "color",
-      "namespace": "color",
-      "semanticMeaning": "Dark mode: Informational messages, neutral notifications",
-      "scalePosition": 17,
-      "trustLevel": "low",
-      "cognitiveLoad": 2,
-      "generateUtilityClass": false,
-      "applicableComponents": [
-        "alert",
-        "toast",
-        "badge"
-      ],
-      "accessibilityLevel": "AAA",
-      "consequence": "reversible",
-      "usageContext": [
-        "dark-info-message",
-        "dark-notification",
-        "dark-neutral"
+        "info"
       ]
     },
     {
       "name": "info-foreground",
       "value": {
-        "name": "info-foreground",
-        "scale": [],
+        "name": "oklch-220-5",
+        "scale": [
+          {
+            "l": 0.96,
+            "c": 0.06,
+            "h": 220,
+            "alpha": 1
+          },
+          {
+            "l": 0.92,
+            "c": 0.06,
+            "h": 220,
+            "alpha": 1
+          },
+          {
+            "l": 0.84,
+            "c": 0.2,
+            "h": 220,
+            "alpha": 1
+          },
+          {
+            "l": 0.76,
+            "c": 0.2,
+            "h": 220,
+            "alpha": 1
+          },
+          {
+            "l": 0.64,
+            "c": 0.2,
+            "h": 220,
+            "alpha": 1
+          },
+          {
+            "l": 0.05,
+            "c": 0.12,
+            "h": 220,
+            "alpha": 1
+          },
+          {
+            "l": 0.1,
+            "c": 0.12,
+            "h": 220,
+            "alpha": 1
+          },
+          {
+            "l": 0.08,
+            "c": 0.12,
+            "h": 220,
+            "alpha": 1
+          },
+          {
+            "l": 0.06,
+            "c": 0.12,
+            "h": 220,
+            "alpha": 1
+          },
+          {
+            "l": 0.04,
+            "c": 0.12,
+            "h": 220,
+            "alpha": 1
+          },
+          {
+            "l": 0.04,
+            "c": 0.12,
+            "h": 220,
+            "alpha": 1
+          }
+        ],
         "token": "info-foreground",
         "value": "500",
-        "use": "Text color for info backgrounds"
+        "use": "Text color for info backgrounds",
+        "states": {
+          "hover": "oklch(0.1 0.2 220)",
+          "focus": "oklch(0.1 0.2 220)",
+          "active": "oklch(0.1 0.2 220)",
+          "disabled": "oklch(0.03 0.06 220)"
+        }
       },
       "category": "color",
       "namespace": "color",
       "semanticMeaning": "Text color for info backgrounds",
-      "scalePosition": 18,
+      "scalePosition": 9,
       "trustLevel": "low",
       "cognitiveLoad": 1,
       "generateUtilityClass": true,
       "applicableComponents": [
-        "alert",
-        "badge"
+        "text",
+        "icon"
       ],
       "accessibilityLevel": "AAA",
       "consequence": "reversible",
@@ -1208,44 +1001,91 @@
       ]
     },
     {
-      "name": "info-foreground-dark",
-      "value": {
-        "name": "info-foreground-dark",
-        "scale": [],
-        "token": "info-foreground-dark",
-        "value": "500",
-        "use": "Dark mode variant of info-foreground"
-      },
-      "category": "color",
-      "namespace": "color",
-      "semanticMeaning": "Dark mode: Text color for info backgrounds",
-      "scalePosition": 19,
-      "trustLevel": "low",
-      "cognitiveLoad": 1,
-      "generateUtilityClass": false,
-      "applicableComponents": [
-        "alert",
-        "badge"
-      ],
-      "accessibilityLevel": "AAA",
-      "consequence": "reversible",
-      "usageContext": [
-        "dark-text-on-info"
-      ]
-    },
-    {
       "name": "background",
       "value": {
-        "name": "background",
-        "scale": [],
+        "name": "oklch-240-96",
+        "scale": [
+          {
+            "l": 0.96,
+            "c": 0,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.92,
+            "c": 0,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.84,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.76,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.64,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.96,
+            "c": 0,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.81,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.71,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.61,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.51,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.51,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          }
+        ],
         "token": "background",
         "value": "500",
-        "use": "Primary background for content areas"
+        "use": "Primary background for content areas",
+        "states": {
+          "hover": "oklch(0.45 0.01 240)",
+          "focus": "oklch(0.44 0.01 240)",
+          "active": "oklch(0.42 0.01 240)",
+          "disabled": "oklch(0.58 0 240)"
+        }
       },
       "category": "color",
       "namespace": "color",
       "semanticMeaning": "Primary background for content areas",
-      "scalePosition": 20,
+      "scalePosition": 10,
       "trustLevel": "low",
       "cognitiveLoad": 1,
       "generateUtilityClass": true,
@@ -1255,153 +1095,174 @@
       "accessibilityLevel": "AAA",
       "consequence": "reversible",
       "usageContext": [
-        "page-background",
-        "content-area"
-      ]
-    },
-    {
-      "name": "background-dark",
-      "value": {
-        "name": "background-dark",
-        "scale": [],
-        "token": "background-dark",
-        "value": "500",
-        "use": "Dark mode variant of background"
-      },
-      "category": "color",
-      "namespace": "color",
-      "semanticMeaning": "Dark mode: Primary background for content areas",
-      "scalePosition": 21,
-      "trustLevel": "low",
-      "cognitiveLoad": 1,
-      "generateUtilityClass": false,
-      "applicableComponents": [
-        "all"
-      ],
-      "accessibilityLevel": "AAA",
-      "consequence": "reversible",
-      "usageContext": [
-        "dark-page-background",
-        "dark-content-area"
+        "background"
       ]
     },
     {
       "name": "foreground",
       "value": {
-        "name": "foreground",
-        "scale": [],
+        "name": "oklch-240-5",
+        "scale": [
+          {
+            "l": 0.96,
+            "c": 0,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.92,
+            "c": 0,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.84,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.76,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.64,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.05,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.1,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.08,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.06,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.04,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.04,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          }
+        ],
         "token": "foreground",
         "value": "500",
-        "use": "Primary text color for body content"
+        "use": "Primary text color for body content",
+        "states": {
+          "hover": "oklch(0.1 0.01 240)",
+          "focus": "oklch(0.1 0.01 240)",
+          "active": "oklch(0.1 0.01 240)",
+          "disabled": "oklch(0.03 0 240)"
+        }
       },
       "category": "color",
       "namespace": "color",
       "semanticMeaning": "Primary text color for body content",
-      "scalePosition": 22,
+      "scalePosition": 11,
       "trustLevel": "low",
       "cognitiveLoad": 1,
       "generateUtilityClass": true,
       "applicableComponents": [
-        "text",
-        "heading",
-        "paragraph"
+        "all"
       ],
       "accessibilityLevel": "AAA",
       "consequence": "reversible",
       "usageContext": [
-        "body-text",
-        "primary-text"
-      ]
-    },
-    {
-      "name": "foreground-dark",
-      "value": {
-        "name": "foreground-dark",
-        "scale": [],
-        "token": "foreground-dark",
-        "value": "500",
-        "use": "Dark mode variant of foreground"
-      },
-      "category": "color",
-      "namespace": "color",
-      "semanticMeaning": "Dark mode: Primary text color for body content",
-      "scalePosition": 23,
-      "trustLevel": "low",
-      "cognitiveLoad": 1,
-      "generateUtilityClass": false,
-      "applicableComponents": [
-        "text",
-        "heading",
-        "paragraph"
-      ],
-      "accessibilityLevel": "AAA",
-      "consequence": "reversible",
-      "usageContext": [
-        "dark-body-text",
-        "dark-primary-text"
+        "foreground"
       ]
     },
     {
       "name": "muted",
       "value": {
-        "name": "muted",
+        "name": "oklch-240-92",
         "scale": [
           {
-            "l": 0.95,
-            "c": 0.005,
+            "l": 0.96,
+            "c": 0,
             "h": 240,
             "alpha": 1
           },
           {
-            "l": 0.95,
-            "c": 0.005,
+            "l": 0.92,
+            "c": 0,
             "h": 240,
             "alpha": 1
           },
           {
-            "l": 0.95,
+            "l": 0.84,
             "c": 0.01,
             "h": 240,
             "alpha": 1
           },
           {
-            "l": 0.95,
+            "l": 0.76,
             "c": 0.01,
             "h": 240,
             "alpha": 1
           },
           {
-            "l": 0.95,
+            "l": 0.64,
             "c": 0.01,
             "h": 240,
             "alpha": 1
           },
           {
-            "l": 0.95,
+            "l": 0.92,
+            "c": 0,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.77,
             "c": 0.01,
             "h": 240,
             "alpha": 1
           },
           {
-            "l": 0.75,
+            "l": 0.67,
             "c": 0.01,
             "h": 240,
             "alpha": 1
           },
           {
-            "l": 0.55,
+            "l": 0.57,
             "c": 0.01,
             "h": 240,
             "alpha": 1
           },
           {
-            "l": 0.35,
+            "l": 0.47,
             "c": 0.01,
             "h": 240,
             "alpha": 1
           },
           {
-            "l": 0.15000000000000002,
+            "l": 0.47,
             "c": 0.01,
             "h": 240,
             "alpha": 1
@@ -1411,240 +1272,222 @@
         "value": "500",
         "use": "Muted backgrounds for secondary content areas",
         "states": {
-          "hover": "oklch(0.8999999999999999 0.01 240)",
-          "focus": "oklch(0.9199999999999999 0.01 240)",
-          "active": "oklch(0.87 0.01 240)",
-          "disabled": "oklch(0.475 0.003 240)"
+          "hover": "oklch(0.44 0.01 240)",
+          "focus": "oklch(0.42 0.01 240)",
+          "active": "oklch(0.4 0.01 240)",
+          "disabled": "oklch(0.55 0 240)"
         }
       },
       "category": "color",
       "namespace": "color",
       "semanticMeaning": "Muted backgrounds for secondary content areas",
-      "scalePosition": 24,
+      "scalePosition": 12,
       "trustLevel": "low",
       "cognitiveLoad": 1,
       "generateUtilityClass": true,
       "applicableComponents": [
-        "card",
-        "sidebar",
-        "section"
+        "all"
       ],
       "accessibilityLevel": "AAA",
       "consequence": "reversible",
       "usageContext": [
-        "secondary-background",
-        "subtle-areas"
-      ]
-    },
-    {
-      "name": "muted-dark",
-      "value": {
-        "name": "muted-dark",
-        "scale": [
-          {
-            "l": 0.95,
-            "c": 0.005,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.8633333333333333,
-            "c": 0.005,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.69,
-            "c": 0.01,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.5166666666666666,
-            "c": 0.01,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.3433333333333333,
-            "c": 0.01,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.17,
-            "c": 0.01,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.165,
-            "c": 0.01,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.16,
-            "c": 0.01,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.155,
-            "c": 0.01,
-            "h": 240,
-            "alpha": 1
-          },
-          {
-            "l": 0.15,
-            "c": 0.01,
-            "h": 240,
-            "alpha": 1
-          }
-        ],
-        "token": "muted-dark",
-        "value": "500",
-        "use": "Dark mode variant of muted",
-        "states": {
-          "hover": "oklch(0.12000000000000001 0.01 240)",
-          "focus": "oklch(0.14 0.01 240)",
-          "active": "oklch(0.1 0.01 240)",
-          "disabled": "oklch(0.085 0.003 240)"
-        }
-      },
-      "category": "color",
-      "namespace": "color",
-      "semanticMeaning": "Dark mode: Muted backgrounds for secondary content areas",
-      "scalePosition": 25,
-      "trustLevel": "low",
-      "cognitiveLoad": 1,
-      "generateUtilityClass": false,
-      "applicableComponents": [
-        "card",
-        "sidebar",
-        "section"
-      ],
-      "accessibilityLevel": "AAA",
-      "consequence": "reversible",
-      "usageContext": [
-        "dark-secondary-background",
-        "dark-subtle-areas"
+        "muted"
       ]
     },
     {
       "name": "muted-foreground",
       "value": {
-        "name": "muted-foreground",
-        "scale": [],
+        "name": "oklch-240-35",
+        "scale": [
+          {
+            "l": 0.96,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.92,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.84,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.76,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.64,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.35,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.2,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.1,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.06,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.04,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.04,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          }
+        ],
         "token": "muted-foreground",
         "value": "500",
-        "use": "Muted text for secondary information"
+        "use": "Muted text for secondary information",
+        "states": {
+          "hover": "oklch(0.3 0.02 240)",
+          "focus": "oklch(0.27 0.02 240)",
+          "active": "oklch(0.23 0.02 240)",
+          "disabled": "oklch(0.21 0.01 240)"
+        }
       },
       "category": "color",
       "namespace": "color",
       "semanticMeaning": "Muted text for secondary information",
-      "scalePosition": 26,
+      "scalePosition": 13,
       "trustLevel": "low",
       "cognitiveLoad": 1,
       "generateUtilityClass": true,
       "applicableComponents": [
-        "text",
-        "label",
-        "caption"
+        "all"
       ],
       "accessibilityLevel": "AAA",
       "consequence": "reversible",
       "usageContext": [
-        "secondary-text",
-        "metadata",
-        "captions"
-      ]
-    },
-    {
-      "name": "muted-foreground-dark",
-      "value": {
-        "name": "muted-foreground-dark",
-        "scale": [],
-        "token": "muted-foreground-dark",
-        "value": "500",
-        "use": "Dark mode variant of muted-foreground"
-      },
-      "category": "color",
-      "namespace": "color",
-      "semanticMeaning": "Dark mode: Muted text for secondary information",
-      "scalePosition": 27,
-      "trustLevel": "low",
-      "cognitiveLoad": 1,
-      "generateUtilityClass": false,
-      "applicableComponents": [
-        "text",
-        "label",
-        "caption"
-      ],
-      "accessibilityLevel": "AAA",
-      "consequence": "reversible",
-      "usageContext": [
-        "dark-secondary-text",
-        "dark-metadata",
-        "dark-captions"
+        "muted_foreground"
       ]
     },
     {
       "name": "border",
       "value": {
-        "name": "border",
-        "scale": [],
+        "name": "oklch-240-84",
+        "scale": [
+          {
+            "l": 0.96,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.92,
+            "c": 0.01,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.84,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.76,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.64,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.84,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.69,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.59,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.49,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.39,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          },
+          {
+            "l": 0.39,
+            "c": 0.02,
+            "h": 240,
+            "alpha": 1
+          }
+        ],
         "token": "border",
         "value": "500",
-        "use": "Default border color for components"
+        "use": "Default border color for components",
+        "states": {
+          "hover": "oklch(0.39 0.02 240)",
+          "focus": "oklch(0.38 0.02 240)",
+          "active": "oklch(0.36 0.02 240)",
+          "disabled": "oklch(0.5 0.01 240)"
+        }
       },
       "category": "color",
       "namespace": "color",
       "semanticMeaning": "Default border color for components",
-      "scalePosition": 28,
+      "scalePosition": 14,
       "trustLevel": "low",
       "cognitiveLoad": 1,
       "generateUtilityClass": true,
       "applicableComponents": [
-        "input",
-        "card",
-        "button",
-        "separator"
+        "all"
       ],
       "accessibilityLevel": "AAA",
       "consequence": "reversible",
       "usageContext": [
-        "component-borders",
-        "dividers"
-      ]
-    },
-    {
-      "name": "border-dark",
-      "value": {
-        "name": "border-dark",
-        "scale": [],
-        "token": "border-dark",
-        "value": "500",
-        "use": "Dark mode variant of border"
-      },
-      "category": "color",
-      "namespace": "color",
-      "semanticMeaning": "Dark mode: Default border color for components",
-      "scalePosition": 29,
-      "trustLevel": "low",
-      "cognitiveLoad": 1,
-      "generateUtilityClass": false,
-      "applicableComponents": [
-        "input",
-        "card",
-        "button",
-        "separator"
-      ],
-      "accessibilityLevel": "AAA",
-      "consequence": "reversible",
-      "usageContext": [
-        "dark-component-borders",
-        "dark-dividers"
+        "border"
       ]
     }
   ]

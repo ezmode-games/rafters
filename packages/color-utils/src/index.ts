@@ -10,8 +10,6 @@ export * from './analysis.js';
 export * from './conversion.js';
 export * from './harmony.js';
 export * from './manipulation.js';
-export * from './naming.js';
-export * from './palette.js';
 export * from './studio.js';
-// Export implemented utilities
-export * from './validation.js';
+// Unified color object generator - DRY for API, Studio, and tokens
+export * from './generator.js';

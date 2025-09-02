@@ -12,6 +12,7 @@ vi.mock('../../../lib/ai/claude/client', () => ({
   getClaudeClient: vi.fn(() => ({
     generateText: vi.fn().mockResolvedValue(
       JSON.stringify({
+        suggestedName: 'Test Color',
         reasoning: 'Test reasoning',
         emotionalImpact: 'Test emotional impact',
         culturalContext: 'Test cultural context',
@@ -99,6 +100,7 @@ describe('generateColorIntelligence', () => {
     const intelligence = await generateColorIntelligence(color, context, 'test-key');
 
     expect(intelligence).toEqual({
+      suggestedName: 'Test Color',
       reasoning: 'Test reasoning',
       emotionalImpact: 'Test emotional impact',
       culturalContext: 'Test cultural context',

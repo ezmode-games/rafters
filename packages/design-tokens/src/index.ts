@@ -22,6 +22,15 @@ import { z } from 'zod';
 export { type TokenDependency, TokenDependencyGraph } from './dependencies.js';
 // Export core TokenRegistry class
 export { TokenRegistry } from './registry.js';
+// Export new clean export system
+export {
+  exportTokensFromRegistry,
+  exportToTailwindCSS,
+  exportToCSSVariables,
+  exportColorScales,
+} from './export.js';
+// Export complete tailwind v4 exporter
+export { exportToTailwindV4Complete } from './exporters/tailwind-v4.js';
 
 // Import for internal use
 import { TokenRegistry } from './registry.js';
@@ -45,12 +54,12 @@ export { Token, TokenSchema } from '@rafters/shared';
  * Convert a token value (string or ColorValue object) to a CSS string
  * For ColorValue objects, extracts the appropriate CSS value from scale
  */
-function tokenValueToCss(value: string | ColorValue): string {
+export function tokenValueToCss(value: string | ColorValue): string {
   if (typeof value === 'string') {
     return value;
   }
 
-  // Handle ColorValue object - extract from scale using value position
+  // Handle ColorValue object - extract from scale using value position or use direct value
   if (value.scale && value.scale.length > 0) {
     let targetIndex = 5; // Default to 500 position (index 5)
 
@@ -66,6 +75,11 @@ function tokenValueToCss(value: string | ColorValue): string {
     if (targetOklch) {
       return `oklch(${targetOklch.l} ${targetOklch.c} ${targetOklch.h}${targetOklch.alpha !== undefined && targetOklch.alpha !== 1 ? ` / ${targetOklch.alpha}` : ''})`;
     }
+  }
+
+  // Handle ColorValue with empty scale - use direct OKLCH value
+  if (value.value && typeof value.value === 'string' && value.value.includes('oklch(')) {
+    return value.value;
   }
 
   // Final fallback
@@ -578,7 +592,12 @@ export const checkTailwindVersion = async (cwd: string): Promise<string> => {
 
     if (deps.tailwindcss) {
       const version = deps.tailwindcss;
-      if (version.includes('4') || version.includes('next') || version.includes('beta')) {
+      if (
+        version.includes('4') ||
+        version.includes('next') ||
+        version.includes('beta') ||
+        version.includes('catalog:')
+      ) {
         return 'v4';
       }
       return 'v3';
@@ -903,6 +922,46 @@ export const writeTokenFiles = async (
     categoryCount: Object.keys(tokensByCategory).length,
   };
   writeFileSync(registryFile, JSON.stringify(registryData, null, 2));
+
+  // Enrich color tokens with AI intelligence using TokenRegistry (skip in test mode)
+  const isTestMode =
+    process.env.NODE_ENV === 'test' || process.env.CI === 'true' || process.env.VITEST === 'true';
+
+  if (!isTestMode) {
+    const { TokenRegistry } = await import('./registry.js');
+    const registry = new TokenRegistry(allTokens);
+
+    // Process color tokens with AI intelligence
+    const colorTokens = allTokens.filter((token: Token) => token.category === 'color');
+
+    for (const token of colorTokens) {
+      try {
+        await registry.enrichColorToken(token.name);
+      } catch (error) {
+        console.log(
+          `    ⚠ Skipped ${token.name}: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
+      }
+    }
+
+    // Re-write the color tokens with intelligence
+    const processedColorTokens = registry
+      .list()
+      .filter((token: Token) => token.category === 'color');
+    if (processedColorTokens.length > 0) {
+      const colorFile = join(tokensDir, 'color.json');
+      const colorData = {
+        category: 'color',
+        generatedAt: new Date().toISOString(),
+        tokens: processedColorTokens.map((token: Token) => ({
+          ...token,
+          // Clean up undefined values for JSON
+          ...Object.fromEntries(Object.entries(token).filter(([_, v]) => v !== undefined)),
+        })),
+      };
+      writeFileSync(colorFile, JSON.stringify(colorData, null, 2));
+    }
+  }
 
   // Generate CSS file for the requested format
   if (format === 'tailwind' || format === 'css') {

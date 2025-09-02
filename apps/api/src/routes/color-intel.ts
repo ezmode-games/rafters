@@ -6,6 +6,8 @@ import { calculateColorData, generateColorIntelligence } from '../lib/color-inte
 interface CloudflareBindings {
   RAFTERS_INTEL: KVNamespace;
   CLAUDE_API_KEY: string;
+  CLAUDE_GATEWAY_URL?: string; // Optional CF Gateway URL
+  CF_TOKEN?: string; // CF AI Gateway authentication token
 }
 
 interface ColorIntelRequest {
@@ -65,8 +67,16 @@ colorIntel.post('/', async (c) => {
       return c.json({ error: 'Missing API key', message: 'CLAUDE_API_KEY not set' }, 500);
     }
 
+    const gatewayUrl = c.env.CLAUDE_GATEWAY_URL;
+    const cfToken = c.env.CF_TOKEN;
     const [intelligence, { harmonies, accessibility, analysis }] = await Promise.all([
-      generateColorIntelligence(oklch, { token: body.token, name: body.name }, apiKey),
+      generateColorIntelligence(
+        oklch,
+        { token: body.token, name: body.name },
+        apiKey,
+        gatewayUrl,
+        cfToken
+      ),
       Promise.resolve(calculateColorData(oklch)),
     ]);
 

@@ -5,8 +5,6 @@
 import type { OKLCH } from '@rafters/shared';
 import Color from 'colorjs.io';
 import { oklchToCSS, oklchToHex } from './conversion.js';
-import { parseColorToOKLCH } from './validation.js';
-
 /**
  * Generate CSS custom properties from color palette
  */
@@ -62,5 +60,16 @@ export function parseColorString(colorString: string): OKLCH {
     throw new Error(`Invalid color string: ${colorString}`);
   }
 
-  return parseColorToOKLCH(colorString);
+  try {
+    const color = new Color(colorString);
+    const oklch = color.to('oklch');
+
+    return {
+      l: oklch.l,
+      c: oklch.c,
+      h: oklch.h || 0, // Handle undefined hue for achromatic colors
+    };
+  } catch (_error) {
+    throw new Error(`Invalid color string: ${colorString}`);
+  }
 }

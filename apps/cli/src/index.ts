@@ -8,7 +8,6 @@ import { addCommand } from './commands/add.js';
 import { cleanCommand } from './commands/clean.js';
 import { initCommand } from './commands/init.js';
 import { listCommand } from './commands/list.js';
-import { tokensCommand } from './commands/tokens.js';
 import { startMCPServer } from './mcp/index.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -18,7 +17,7 @@ const program = new Command();
 
 program
   .name('rafters')
-  .description('CLI for installing Rafters design system components with embedded intelligence')
+  .description('AI-first CLI for Rafters design system components with embedded intelligence')
   .version(packageJson.version);
 
 program
@@ -45,27 +44,6 @@ program
   .description('Remove all Rafters configuration and files')
   .option('-f, --force', 'Skip confirmation prompt')
   .action(cleanCommand);
-
-program
-  .command('tokens <action> [args...]')
-  .description('Access design token intelligence')
-  .option('-j, --json', 'Output as JSON')
-  .action(tokensCommand)
-  .addHelpText(
-    'after',
-    `
-Available actions:
-  get <name>          Get a specific token
-  list [category]     List all tokens or by category
-  color <name>        Get color intelligence with scale and states
-  validate <colors>   Validate color combination cognitive load
-  
-Examples:
-  rafters tokens get primary
-  rafters tokens list color
-  rafters tokens color primary --json
-  rafters tokens validate primary warning destructive`
-  );
 
 program
   .command('mcp')

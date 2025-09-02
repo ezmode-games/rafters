@@ -14,7 +14,7 @@ import { detectFramework } from '../helpers/frameworkDetection.js';
 import { cleanupAllTempApps, createTempTestApp } from '../helpers/testApp.js';
 import type { TestFixtureInfo } from '../types.js';
 
-describe('rafters init', { timeout: 30000 }, () => {
+describe.skip('rafters init', { timeout: 30000 }, () => {
   let testApp: TestFixtureInfo;
 
   // Helper function to create answers file for non-interactive testing

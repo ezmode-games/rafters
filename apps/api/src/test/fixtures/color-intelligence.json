@@ -1,0 +1,131 @@
+{
+  "oklch(0.5, 0.1, 240)": {
+    "intelligence": {
+      "suggestedName": "ocean-depths",
+      "reasoning": "This medium-lightness blue with moderate chroma creates a balanced, professional appearance. The OKLCH values provide consistent perception across different displays while maintaining sufficient color richness for digital interfaces.",
+      "emotionalImpact": "Evokes trust, stability, and calm focus - ideal for professional applications. The moderate saturation prevents overwhelming users while maintaining visual interest and brand personality.",
+      "culturalContext": "Blue universally represents trust and reliability across cultures. In Western contexts, associated with corporate professionalism; in Eastern cultures, often linked to tranquility and wisdom. Generally positive across all demographics.",
+      "accessibilityNotes": "Provides 3.1:1 contrast against white (passes AA for large text). For normal text, pair with white or very light backgrounds. In dark mode, this shade works well as an accent against dark backgrounds with 4.2:1 contrast.",
+      "usageGuidance": "Excellent for primary buttons, links, and brand elements where trust-building is essential. Avoid using as the only way to convey critical information due to color vision considerations. Perfect for navigation elements and call-to-action buttons in professional interfaces."
+    },
+    "harmonies": {
+      "complementary": { "l": 0.5, "c": 0.1, "h": 60 },
+      "triadic": [{ "l": 0.5, "c": 0.1, "h": 0 }, { "l": 0.5, "c": 0.1, "h": 120 }],
+      "analogous": [{ "l": 0.5, "c": 0.1, "h": 210 }, { "l": 0.5, "c": 0.1, "h": 270 }],
+      "tetradic": [
+        { "l": 0.5, "c": 0.1, "h": 60 },
+        { "l": 0.5, "c": 0.1, "h": 120 },
+        { "l": 0.5, "c": 0.1, "h": 300 }
+      ],
+      "monochromatic": [
+        { "l": 0.3, "c": 0.1, "h": 240 },
+        { "l": 0.4, "c": 0.1, "h": 240 },
+        { "l": 0.6, "c": 0.1, "h": 240 },
+        { "l": 0.7, "c": 0.1, "h": 240 }
+      ]
+    },
+    "accessibility": {
+      "onWhite": {
+        "wcagAA": false,
+        "wcagAAA": false,
+        "contrastRatio": 3.1
+      },
+      "onBlack": {
+        "wcagAA": true,
+        "wcagAAA": false,
+        "contrastRatio": 4.2
+      }
+    },
+    "analysis": {
+      "temperature": "cool",
+      "isLight": false,
+      "name": "Medium Blue"
+    }
+  },
+  "oklch(0.8, 0.05, 30)": {
+    "intelligence": {
+      "suggestedName": "warm-cream",
+      "reasoning": "High lightness with low chroma creates a subtle, warm neutral that works as both background and accent. The warm hue angle provides gentle warmth without overpowering other elements.",
+      "emotionalImpact": "Conveys comfort, approachability, and gentle warmth. Creates a welcoming atmosphere without being attention-demanding, supporting user focus on content rather than interface elements.",
+      "culturalContext": "Warm neutrals are universally associated with comfort and naturalness. In design systems, often used for backgrounds and subtle accents. Culturally neutral with positive associations across demographics.",
+      "accessibilityNotes": "Excellent contrast against dark text (11.2:1 ratio, exceeds AAA). Can be used as background color with dark text. In dark mode implementations, use sparingly as accent only.",
+      "usageGuidance": "Perfect for page backgrounds, card surfaces, and subtle highlighting. Excellent for reducing harsh white backgrounds while maintaining readability. Avoid using for important actionable elements as it may appear inactive."
+    },
+    "harmonies": {
+      "complementary": { "l": 0.8, "c": 0.05, "h": 210 },
+      "triadic": [{ "l": 0.8, "c": 0.05, "h": 150 }, { "l": 0.8, "c": 0.05, "h": 270 }],
+      "analogous": [{ "l": 0.8, "c": 0.05, "h": 0 }, { "l": 0.8, "c": 0.05, "h": 60 }],
+      "tetradic": [
+        { "l": 0.8, "c": 0.05, "h": 120 },
+        { "l": 0.8, "c": 0.05, "h": 210 },
+        { "l": 0.8, "c": 0.05, "h": 300 }
+      ],
+      "monochromatic": [
+        { "l": 0.6, "c": 0.05, "h": 30 },
+        { "l": 0.7, "c": 0.05, "h": 30 },
+        { "l": 0.9, "c": 0.05, "h": 30 },
+        { "l": 0.95, "c": 0.05, "h": 30 }
+      ]
+    },
+    "accessibility": {
+      "onWhite": {
+        "wcagAA": false,
+        "wcagAAA": false,
+        "contrastRatio": 1.4
+      },
+      "onBlack": {
+        "wcagAA": true,
+        "wcagAAA": true,
+        "contrastRatio": 11.2
+      }
+    },
+    "analysis": {
+      "temperature": "warm",
+      "isLight": true,
+      "name": "Light Warm Gray"
+    }
+  },
+  "oklch(0.6, 0.2, 15)": {
+    "intelligence": {
+      "suggestedName": "sunset-coral",
+      "reasoning": "Balanced lightness with high chroma creates vibrant yet usable red-orange. The specific hue angle provides warmth and energy while remaining professional enough for interface elements.",
+      "emotionalImpact": "Energetic and attention-grabbing without being aggressive. Evokes creativity, enthusiasm, and warmth. Can increase user engagement and create positive emotional associations with interactive elements.",
+      "culturalContext": "Warm reds and oranges are associated with energy and positivity across most cultures. In Western contexts, often used for calls-to-action; in Eastern cultures, associated with good fortune and celebration.",
+      "accessibilityNotes": "Provides 4.8:1 contrast on white backgrounds (passes AA for normal text). Ensure sufficient contrast when used for text elements. Works well as accent color but verify readability in context.",
+      "usageGuidance": "Excellent for call-to-action buttons, notifications, and highlighting important elements. Use sparingly to maintain impact - too much can overwhelm users. Avoid for large text areas or primary backgrounds."
+    },
+    "harmonies": {
+      "complementary": { "l": 0.6, "c": 0.2, "h": 195 },
+      "triadic": [{ "l": 0.6, "c": 0.2, "h": 135 }, { "l": 0.6, "c": 0.2, "h": 255 }],
+      "analogous": [{ "l": 0.6, "c": 0.2, "h": 345 }, { "l": 0.6, "c": 0.2, "h": 45 }],
+      "tetradic": [
+        { "l": 0.6, "c": 0.2, "h": 105 },
+        { "l": 0.6, "c": 0.2, "h": 195 },
+        { "l": 0.6, "c": 0.2, "h": 285 }
+      ],
+      "monochromatic": [
+        { "l": 0.4, "c": 0.2, "h": 15 },
+        { "l": 0.5, "c": 0.2, "h": 15 },
+        { "l": 0.7, "c": 0.2, "h": 15 },
+        { "l": 0.8, "c": 0.2, "h": 15 }
+      ]
+    },
+    "accessibility": {
+      "onWhite": {
+        "wcagAA": true,
+        "wcagAAA": false,
+        "contrastRatio": 4.8
+      },
+      "onBlack": {
+        "wcagAA": true,
+        "wcagAAA": false,
+        "contrastRatio": 3.2
+      }
+    },
+    "analysis": {
+      "temperature": "warm",
+      "isLight": false,
+      "name": "Medium Red-Orange"
+    }
+  }
+}

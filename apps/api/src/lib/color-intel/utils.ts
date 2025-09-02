@@ -28,9 +28,11 @@ export function generateCacheKey(oklch: OKLCH): string {
 export async function generateColorIntelligence(
   oklch: OKLCH,
   context: ColorContext,
-  apiKey: string
+  apiKey: string,
+  gatewayUrl?: string,
+  cfToken?: string
 ) {
-  const client = getClaudeClient(apiKey);
+  const client = getClaudeClient(apiKey, gatewayUrl, cfToken);
 
   // Round color values for consistency
   const roundedColor = roundOKLCH(oklch);
@@ -47,6 +49,7 @@ Color: OKLCH(${roundedColor.l}, ${roundedColor.c}, ${roundedColor.h})${contextIn
 Provide exhaustive analysis in this exact JSON structure:
 
 {
+  "suggestedName": "A beautiful, descriptive color name that captures this color's character and personality. Examples: 'ocean-depths', 'autumn-ember', 'forest-whisper'. Be creative and evocative.",
   "reasoning": "Detailed explanation of why this specific OKLCH combination works psychologically and visually. Include lightness perception, chroma intensity effects, and hue associations. 2-3 sentences.",
   "emotionalImpact": "Complete psychological response this color evokes in users. Cover emotional associations, cognitive effects, and behavioral influences. Include cultural universals and variations. 2-3 sentences.", 
   "culturalContext": "Cross-cultural color associations and meanings. Address Western, Eastern, and global contexts. Mention any cultural sensitivities or positive associations. 2-3 sentences.",
@@ -81,6 +84,7 @@ Return only valid JSON, no additional text.`;
 
     // Validate the structure
     if (
+      !intelligence.suggestedName ||
       !intelligence.reasoning ||
       !intelligence.emotionalImpact ||
       !intelligence.culturalContext ||

@@ -5,6 +5,7 @@
 import type { OKLCH } from '@rafters/shared';
 import { APCAcontrast, sRGBtoY } from 'apca-w3';
 import Color from 'colorjs.io';
+import { roundOKLCH } from './conversion.js';
 
 /**
  * Convert OKLCH to relative luminance for WCAG calculations
@@ -138,7 +139,7 @@ export function findAccessibleColor(
     }
 
     if (meetsStandard) {
-      return testColor;
+      return roundOKLCH(testColor);
     }
 
     // Adjust lightness based on which direction provides better contrast
@@ -158,5 +159,5 @@ export function findAccessibleColor(
     iterations++;
   }
 
-  return result;
+  return roundOKLCH(result);
 }
