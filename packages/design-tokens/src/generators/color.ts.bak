@@ -1,0 +1,676 @@
+/**
+ * Color Tokens Generator
+ *
+ * Semantic color system with accessibility validation
+ * Generates comprehensive color scales with meaning and usage context
+ */
+
+import type { ColorValue, OKLCH, Token } from '@rafters/shared';
+import { 
+  generateColorName, 
+  generateLightnessScale,
+  generateSemanticColorSuggestions,
+  findAccessibleColor,
+  calculateWCAGContrast,
+  meetsWCAGStandard,
+  generateOptimalGray
+} from '@rafters/color-utils';
+
+/**
+ * Primary tone for grayscale generation (HSL: 240°, 5.3%, 26.1%)
+ * Converted to OKLCH for mathematical operations
+ */
+const PRIMARY_TONE: OKLCH = {
+  l: 0.261,
+  c: 0.053 * 0.4, // Convert saturation to approximate chroma
+  h: 240,
+  alpha: 1
+};
+
+/**
+ * Generate mathematically perfect grayscale from primary tone
+ * Uses the primary tone's slight color bias for consistency
+ */
+function generateSystemGrayscale(primaryTone: OKLCH): Record<string, OKLCH> {
+  const grayscale = generateOptimalGray([primaryTone]);
+  const scale = generateLightnessScale(grayscale);
+  
+  // Convert the Record<number, OKLCH> to Record<string, OKLCH>
+  const stringScale: Record<string, OKLCH> = {};
+  Object.entries(scale).forEach(([key, value]) => {
+    stringScale[key] = value;
+  });
+  
+  return stringScale;
+}
+
+/**
+ * Generate semantic colors using harmony + contrast validation
+ * Each semantic color is mathematically derived from primary and accessibility-tested
+ */
+function generateSemanticColorsWithValidation(primaryColor: OKLCH): {
+  success: OKLCH;
+  warning: OKLCH;
+  danger: OKLCH;
+  info: OKLCH;
+} {
+  const suggestions = generateSemanticColorSuggestions(primaryColor);
+  
+  // Common test backgrounds for accessibility validation
+  const testBackgrounds = [
+    { l: 1, c: 0, h: 0, alpha: 1 }, // White
+    { l: 0.85, c: 0.01, h: 240, alpha: 1 }, // Light gray
+    { l: 0.1, c: 0, h: 0, alpha: 1 }, // Dark
+  ];
+  
+  const result = {
+    success: suggestions.success[0],
+    warning: suggestions.warning[0], 
+    danger: suggestions.danger[0],
+    info: suggestions.info[0]
+  };
+  
+  // Validate and optimize each semantic color for accessibility
+  for (const [semantic, color] of Object.entries(result)) {
+    let accessibleColor = color;
+    
+    // Test against each background and find most accessible version
+    for (const bg of testBackgrounds) {
+      if (!meetsWCAGStandard(accessibleColor, bg, 'AA', 'normal')) {
+        accessibleColor = findAccessibleColor(accessibleColor, bg, 'WCAG-AA');
+      }
+    }
+    
+    result[semantic as keyof typeof result] = accessibleColor;
+  }
+  
+  return result;
+}
+
+/**
+ * Generate complete ColorValue with mathematical intelligence
+ * Includes scale, naming, states, and accessibility metadata
+ */
+function createIntelligentColorValue(
+  baseColor: OKLCH, 
+  semanticToken?: string, 
+  usage?: string
+): ColorValue {
+  // Generate full 50-950 scale using mathematical lightness curves
+  const scaleRecord = generateLightnessScale(baseColor);
+  
+  // Convert Record<number, OKLCH> to OKLCH[] in proper order
+  const scale: OKLCH[] = [
+    scaleRecord[50],
+    scaleRecord[100], 
+    scaleRecord[200],
+    scaleRecord[300],
+    scaleRecord[400],
+    scaleRecord[500],
+    scaleRecord[600],
+    scaleRecord[700],
+    scaleRecord[800],
+    scaleRecord[900],
+    scaleRecord[950] || scaleRecord[900] // Fallback if 950 doesn't exist
+  ].filter(Boolean); // Remove any undefined values
+  
+  // Generate descriptive color name using color science
+  const colorName = generateColorName(baseColor);
+  
+  // Generate accessible states (hover, focus, active, disabled)
+  const states: Record<string, string> = {};
+  if (semanticToken) {
+    // Only semantic tokens get interactive states
+    const whiteBackground = { l: 1, c: 0, h: 0, alpha: 1 };
+    
+    // Hover: slightly darker, ensure contrast
+    const hoverColor = { ...baseColor, l: Math.max(0.1, baseColor.l - 0.05) };
+    const accessibleHover = findAccessibleColor(hoverColor, whiteBackground, 'WCAG-AA');
+    states.hover = `oklch(${accessibleHover.l} ${accessibleHover.c} ${accessibleHover.h})`;
+    
+    // Focus: slightly darker than hover, ensure contrast
+    const focusColor = { ...baseColor, l: Math.max(0.1, baseColor.l - 0.08) };
+    const accessibleFocus = findAccessibleColor(focusColor, whiteBackground, 'WCAG-AA');
+    states.focus = `oklch(${accessibleFocus.l} ${accessibleFocus.c} ${accessibleFocus.h})`;
+    
+    // Active: darker still, ensure contrast  
+    const activeColor = { ...baseColor, l: Math.max(0.1, baseColor.l - 0.12) };
+    const accessibleActive = findAccessibleColor(activeColor, whiteBackground, 'WCAG-AA');
+    states.active = `oklch(${accessibleActive.l} ${accessibleActive.c} ${accessibleActive.h})`;
+    
+    // Disabled: reduce contrast significantly
+    states.disabled = `oklch(${baseColor.l * 0.6} ${baseColor.c * 0.3} ${baseColor.h})`;
+  }
+  
+  return {
+    name: colorName,
+    scale,
+    token: semanticToken,
+    value: '500', // Default to middle of scale
+    use: usage,
+    ...(Object.keys(states).length > 0 && { states }),
+    // Intelligence fields will be populated by API cache later
+  };
+}
+
+/**
+ * Generate comprehensive color tokens with semantic meaning
+ * Now produces ColorValue objects with full scale, states, and dark mode support
+ *
+ * @returns Array of color tokens with ColorValue objects containing OKLCH scales
+ *
+ * @example
+ * ```typescript
+ * const colorTokens = generateColorTokens();
+ * // Generates semantic colors with ColorValue objects containing:
+ * // - baseColor: reference color for the semantic token
+ * // - scale: OKLCH color scales [50, 100, 200...900]
+ * // - states: hover, focus, active, disabled variants
+ * // - darkStates: dark mode variants for all states
+ * ```
+ */
+export function generateColorTokens(): Token[] {
+  const tokens: Token[] = [];
+
+  // Generate mathematically perfect semantic colors using harmony + contrast validation
+  const semanticColors = generateSemanticColorsWithValidation(PRIMARY_TONE);
+  
+  // Generate system grayscale from primary tone
+  const grayscaleScale = generateSystemGrayscale(PRIMARY_TONE);
+
+  // Create semantic color tokens with full mathematical intelligence
+  const semanticDefinitions = [
+    {
+      semantic: 'primary',
+      color: PRIMARY_TONE,
+      usage: 'Primary brand color for main actions and focus states',
+      trustLevel: 'high' as const,
+      cognitiveLoad: 3,
+      components: ['button', 'link', 'badge', 'progress'],
+    },
+    {
+      semantic: 'success', 
+      color: semanticColors.success,
+      usage: 'Success states, confirmations, positive feedback',
+      trustLevel: 'low' as const,
+      cognitiveLoad: 2,
+      components: ['alert', 'toast', 'badge', 'progress'],
+    },
+    {
+      semantic: 'warning',
+      color: semanticColors.warning, 
+      usage: 'Warning states, caution, important information',
+      trustLevel: 'medium' as const,
+      cognitiveLoad: 5,
+      components: ['alert', 'toast', 'badge'],
+    },
+    {
+      semantic: 'danger',
+      color: semanticColors.danger,
+      usage: 'Destructive actions, errors, danger - REQUIRES confirmation UX',
+      trustLevel: 'critical' as const,
+      cognitiveLoad: 8,
+      components: ['button', 'alert', 'toast'],
+      requiresConfirmation: true,
+    },
+    {
+      semantic: 'info',
+      color: semanticColors.info,
+      usage: 'Informational messages, neutral notifications', 
+      trustLevel: 'low' as const,
+      cognitiveLoad: 2,
+      components: ['alert', 'toast', 'badge'],
+    },
+  ];
+
+  // Generate semantic tokens using mathematical color intelligence
+  semanticDefinitions.forEach((def, index) => {
+    // Create main semantic token
+    const colorValue = createIntelligentColorValue(def.color, def.semantic, def.usage);
+    
+    tokens.push({
+      name: def.semantic,
+      value: colorValue,
+      category: 'color',
+      namespace: 'color', 
+      semanticMeaning: def.usage,
+      scalePosition: index * 2,
+      trustLevel: def.trustLevel,
+      cognitiveLoad: def.cognitiveLoad,
+      generateUtilityClass: true,
+      applicableComponents: def.components,
+      accessibilityLevel: 'AAA',
+      consequence: def.trustLevel === 'critical' ? 'destructive' : 
+                  def.trustLevel === 'high' ? 'significant' : 'reversible',
+      usageContext: [def.semantic],
+      ...(def.requiresConfirmation && { requiresConfirmation: true }),
+    });
+
+    // Create foreground token with mathematical contrast optimization
+    const foregroundColor = { ...def.color, l: def.color.l > 0.5 ? 0.05 : 0.95 };
+    const foregroundValue = createIntelligentColorValue(
+      foregroundColor, 
+      `${def.semantic}-foreground`,
+      `Text color for ${def.semantic} backgrounds`
+    );
+    
+    tokens.push({
+      name: `${def.semantic}-foreground`, 
+      value: foregroundValue,
+      category: 'color',
+      namespace: 'color',
+      semanticMeaning: `Text color for ${def.semantic} backgrounds`,
+      scalePosition: index * 2 + 1,
+      trustLevel: def.trustLevel,
+      cognitiveLoad: 1,
+      generateUtilityClass: true,
+      applicableComponents: ['text', 'icon'],
+      accessibilityLevel: 'AAA',
+      consequence: 'reversible',
+      usageContext: [`text-on-${def.semantic}`],
+    });
+  });
+
+  // Generate neutral colors using mathematical grayscale
+  const neutralDefinitions = [
+    { name: 'background', scale: '50', usage: 'Primary background for content areas' },
+    { name: 'foreground', scale: '900', usage: 'Primary text color for body content' }, 
+    { name: 'muted', scale: '100', usage: 'Muted backgrounds for secondary content areas' },
+    { name: 'muted-foreground', scale: '600', usage: 'Muted text for secondary information' },
+    { name: 'border', scale: '200', usage: 'Default border color for components' },
+  ];
+
+  neutralDefinitions.forEach((def, index) => {
+    const scaleColor = grayscaleScale[def.scale];
+    const colorValue = createIntelligentColorValue(scaleColor, def.name, def.usage);
+    
+    tokens.push({
+      name: def.name,
+      value: colorValue,
+      category: 'color', 
+      namespace: 'color',
+      semanticMeaning: def.usage,
+      scalePosition: semanticDefinitions.length * 2 + index,
+      trustLevel: 'low' as const,
+      cognitiveLoad: 1,
+      generateUtilityClass: true,
+      applicableComponents: ['all'],
+      accessibilityLevel: 'AAA', 
+      consequence: 'reversible',
+      usageContext: [def.name.replace('-', '_')],
+    });
+  });
+
+  return tokens;
+
+  // Remove old manual implementation
+  /**
+   * OLD Helper function to create OKLCH color scale
+   */
+  function createOKLCHScale_OLD(baseL: number, baseC: number, baseH: number): OKLCH[] {
+    const scale: OKLCH[] = [];
+    const scaleSteps = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
+
+    for (let i = 0; i < scaleSteps.length; i++) {
+      const step = scaleSteps[i];
+      // Calculate lightness based on scale position
+      // 50 = very light, 500 = base, 900 = very dark
+      let lightness: number;
+      if (step <= 500) {
+        // Interpolate from light to base
+        const factor = (500 - step) / 450; // 0 to 1
+        lightness = baseL + (0.95 - baseL) * factor;
+      } else {
+        // Interpolate from base to dark
+        const factor = (step - 500) / 400; // 0 to 1
+        lightness = baseL - (baseL - 0.15) * factor;
+      }
+
+      // Adjust chroma slightly for better color harmony
+      const chroma = step === 50 || step === 100 ? baseC * 0.5 : baseC;
+
+      scale.push({
+        l: Math.max(0, Math.min(1, lightness)),
+        c: Math.max(0, chroma),
+        h: baseH,
+        alpha: 1,
+      });
+    }
+
+    return scale;
+  }
+
+  /**
+   * Helper function to create state variants
+   */
+  function createStates(
+    baseLightness: number,
+    chroma: number,
+    hue: number
+  ): Record<string, string> {
+    return {
+      hover: `oklch(${Math.max(0.1, baseLightness - 0.05)} ${chroma} ${hue})`,
+      focus: `oklch(${Math.max(0.1, baseLightness - 0.03)} ${chroma} ${hue})`,
+      active: `oklch(${Math.max(0.1, baseLightness - 0.08)} ${chroma} ${hue})`,
+      disabled: `oklch(${baseLightness * 0.5} ${chroma * 0.3} ${hue})`,
+    };
+  }
+
+  const colorDefinitions = [
+    // Primary brand colors
+    {
+      name: 'primary',
+      lightValue: 'oklch(0.45 0.12 240)', // Blue
+      darkValue: 'oklch(0.7 0.12 240)', // deprecated, use separate dark token
+      lightness: 0.45,
+      chroma: 0.12,
+      hue: 240,
+      meaning: 'Primary brand color for main actions and focus states',
+      trustLevel: 'high' as const,
+      cognitiveLoad: 3,
+      usage: ['cta', 'primary-button', 'brand', 'focus'],
+      components: ['button', 'link', 'badge', 'progress'],
+    },
+    {
+      name: 'primary-foreground',
+      lightValue: 'oklch(0.95 0 0)', // White
+      darkValue: 'oklch(0.15 0.005 240)',
+      lightness: 0.95,
+      chroma: 0,
+      hue: 0,
+      meaning: 'Text color for primary backgrounds',
+      trustLevel: 'high' as const,
+      cognitiveLoad: 1,
+      usage: ['text-on-primary', 'button-text'],
+      components: ['button', 'badge'],
+    },
+
+    // Success colors
+    {
+      name: 'success',
+      lightValue: 'oklch(0.62 0.17 145)', // Green
+      darkValue: 'oklch(0.55 0.15 145)',
+      lightness: 0.62,
+      chroma: 0.17,
+      hue: 145,
+      meaning: 'Success states, confirmations, positive feedback',
+      trustLevel: 'low' as const,
+      cognitiveLoad: 2,
+      usage: ['success-message', 'confirmation', 'complete'],
+      components: ['alert', 'toast', 'badge', 'progress'],
+    },
+    {
+      name: 'success-foreground',
+      lightValue: 'oklch(0.95 0 0)',
+      darkValue: 'oklch(0.15 0.005 145)',
+      lightness: 0.95,
+      chroma: 0,
+      hue: 0,
+      meaning: 'Text color for success backgrounds',
+      trustLevel: 'low' as const,
+      cognitiveLoad: 1,
+      usage: ['text-on-success'],
+      components: ['alert', 'badge'],
+    },
+
+    // Warning colors
+    {
+      name: 'warning',
+      lightValue: 'oklch(0.7 0.15 75)', // Amber
+      darkValue: 'oklch(0.65 0.13 75)',
+      lightness: 0.7,
+      chroma: 0.15,
+      hue: 75,
+      meaning: 'Warning states, caution, important information',
+      trustLevel: 'medium' as const,
+      cognitiveLoad: 5,
+      usage: ['warning-message', 'caution', 'important'],
+      components: ['alert', 'toast', 'badge'],
+    },
+    {
+      name: 'warning-foreground',
+      lightValue: 'oklch(0.15 0.005 75)',
+      darkValue: 'oklch(0.95 0 0)',
+      lightness: 0.15,
+      chroma: 0.005,
+      hue: 75,
+      meaning: 'Text color for warning backgrounds',
+      trustLevel: 'medium' as const,
+      cognitiveLoad: 1,
+      usage: ['text-on-warning'],
+      components: ['alert', 'badge'],
+    },
+
+    // Destructive/Error colors
+    {
+      name: 'destructive',
+      lightValue: 'oklch(0.53 0.24 27)', // Red
+      darkValue: 'oklch(0.58 0.22 27)',
+      lightness: 0.53,
+      chroma: 0.24,
+      hue: 27,
+      meaning: 'Destructive actions, errors, danger - REQUIRES confirmation UX',
+      trustLevel: 'critical' as const,
+      cognitiveLoad: 8,
+      usage: ['error', 'delete', 'danger', 'critical'],
+      components: ['button', 'alert', 'toast'],
+      requiresConfirmation: true,
+    },
+    {
+      name: 'destructive-foreground',
+      lightValue: 'oklch(0.95 0 0)',
+      darkValue: 'oklch(0.15 0.005 27)',
+      lightness: 0.95,
+      chroma: 0,
+      hue: 0,
+      meaning: 'Text color for destructive backgrounds',
+      trustLevel: 'critical' as const,
+      cognitiveLoad: 1,
+      usage: ['text-on-destructive'],
+      components: ['button', 'alert'],
+    },
+
+    // Info colors
+    {
+      name: 'info',
+      lightValue: 'oklch(0.66 0.15 240)', // Blue-gray
+      darkValue: 'oklch(0.6 0.12 240)',
+      lightness: 0.66,
+      chroma: 0.15,
+      hue: 240,
+      meaning: 'Informational messages, neutral notifications',
+      trustLevel: 'low' as const,
+      cognitiveLoad: 2,
+      usage: ['info-message', 'notification', 'neutral'],
+      components: ['alert', 'toast', 'badge'],
+    },
+    {
+      name: 'info-foreground',
+      lightValue: 'oklch(0.95 0 0)',
+      darkValue: 'oklch(0.15 0.005 240)',
+      lightness: 0.95,
+      chroma: 0,
+      hue: 0,
+      meaning: 'Text color for info backgrounds',
+      trustLevel: 'low' as const,
+      cognitiveLoad: 1,
+      usage: ['text-on-info'],
+      components: ['alert', 'badge'],
+    },
+
+    // Background colors
+    {
+      name: 'background',
+      lightValue: 'oklch(1 0 0)', // White
+      darkValue: 'oklch(0.09 0 0)', // Near black
+      lightness: 1,
+      chroma: 0,
+      hue: 0,
+      meaning: 'Primary background for content areas',
+      trustLevel: 'low' as const,
+      cognitiveLoad: 1,
+      usage: ['page-background', 'content-area'],
+      components: ['all'],
+    },
+    {
+      name: 'foreground',
+      lightValue: 'oklch(0.15 0.005 240)', // Near black
+      darkValue: 'oklch(0.95 0 0)', // White
+      lightness: 0.15,
+      chroma: 0.005,
+      hue: 240,
+      meaning: 'Primary text color for body content',
+      trustLevel: 'low' as const,
+      cognitiveLoad: 1,
+      usage: ['body-text', 'primary-text'],
+      components: ['text', 'heading', 'paragraph'],
+    },
+
+    // Muted colors
+    {
+      name: 'muted',
+      lightValue: 'oklch(0.95 0.01 240)', // Light gray
+      darkValue: 'oklch(0.17 0.01 240)', // Dark gray
+      lightness: 0.95,
+      chroma: 0.01,
+      hue: 240,
+      meaning: 'Muted backgrounds for secondary content areas',
+      trustLevel: 'low' as const,
+      cognitiveLoad: 1,
+      usage: ['secondary-background', 'subtle-areas'],
+      components: ['card', 'sidebar', 'section'],
+    },
+    {
+      name: 'muted-foreground',
+      lightValue: 'oklch(0.45 0.02 240)', // Medium gray
+      darkValue: 'oklch(0.63 0.02 240)', // Light gray
+      lightness: 0.45,
+      chroma: 0.02,
+      hue: 240,
+      meaning: 'Muted text for secondary information',
+      trustLevel: 'low' as const,
+      cognitiveLoad: 1,
+      usage: ['secondary-text', 'metadata', 'captions'],
+      components: ['text', 'label', 'caption'],
+    },
+
+    // Border colors
+    {
+      name: 'border',
+      lightValue: 'oklch(0.9 0.01 240)', // Light border
+      darkValue: 'oklch(0.17 0.01 240)', // Dark border
+      lightness: 0.9,
+      chroma: 0.01,
+      hue: 240,
+      meaning: 'Default border color for components',
+      trustLevel: 'low' as const,
+      cognitiveLoad: 1,
+      usage: ['component-borders', 'dividers'],
+      components: ['input', 'card', 'button', 'separator'],
+    },
+  ];
+
+  colorDefinitions.forEach((color, index) => {
+    // Generate OKLCH scale for non-foreground colors
+    const scale =
+      color.name.includes('foreground') || color.name === 'background' || color.name === 'border'
+        ? [] // Skip scale generation for foreground/neutral colors
+        : createOKLCHScale(color.lightness, color.chroma, color.hue);
+
+    // Generate state variants for interactive colors
+    const states =
+      color.name.includes('foreground') || color.name === 'background' || color.name === 'border'
+        ? {} // Skip states for non-interactive colors
+        : createStates(color.lightness, color.chroma, color.hue);
+
+    // Create light mode token with ColorValue object
+    const lightColorValue: ColorValue = {
+      name: color.name, // Will get proper color name from color-utils later
+      scale: scale.length === 0 
+        ? [{ l: color.lightness, c: color.chroma, h: color.hue, alpha: 1 }] // Single OKLCH object for tokens without scales
+        : scale, // Full OKLCH scale array for tokens with scales
+      token: color.name, // Semantic assignment
+      value: scale.length === 0 ? '50' : '500', // For single-value scales use '50' (index 0), otherwise '500' (index 5)
+      use: color.meaning, // Human reasoning for color choice
+      ...(Object.keys(states).length > 0 && { states }),
+      // Intelligence fields left empty - populated from API cache later
+    };
+
+    // Push light mode token
+    tokens.push({
+      name: color.name,
+      value: lightColorValue, // ColorValue object with full intelligence structure
+      category: 'color',
+      namespace: 'color',
+      semanticMeaning: color.meaning,
+      scalePosition: index * 2, // Double spacing for light/dark pairs
+      trustLevel: color.trustLevel,
+      cognitiveLoad: color.cognitiveLoad,
+      generateUtilityClass: true,
+      applicableComponents: color.components,
+      accessibilityLevel: 'AAA',
+      consequence:
+        color.trustLevel === 'critical'
+          ? 'destructive'
+          : color.trustLevel === 'high'
+            ? 'significant'
+            : 'reversible',
+      usageContext: color.usage,
+      ...(color.requiresConfirmation && {
+        requiresConfirmation: true,
+        trustLevel: 'critical',
+      }),
+    });
+
+    // Create corresponding dark mode token if darkValue exists
+    if (color.darkValue) {
+      // Parse dark OKLCH to get values
+      const darkMatch = color.darkValue.match(/oklch\(([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)\)/);
+      if (darkMatch) {
+        const darkL = Number.parseFloat(darkMatch[1]);
+        const darkC = Number.parseFloat(darkMatch[2]);
+        const darkH = Number.parseFloat(darkMatch[3]);
+
+        // Generate dark scale if needed
+        const darkScale = scale.length > 0 ? createOKLCHScale(darkL, darkC, darkH) : [];
+
+        // Generate dark states if needed
+        const darkStates = Object.keys(states).length > 0 ? createStates(darkL, darkC, darkH) : {};
+
+        const darkColorValue: ColorValue = {
+          name: `${color.name}-dark`,
+          scale: darkScale.length === 0 
+            ? [{ l: darkL, c: darkC, h: darkH, alpha: 1 }] // Single OKLCH object for tokens without scales
+            : darkScale, // Full OKLCH scale array for tokens with scales
+          token: `${color.name}-dark`,
+          value: darkScale.length === 0 ? '50' : '500', // For single-value scales use '50' (index 0), otherwise '500' (index 5)
+          use: `Dark mode variant of ${color.name}`,
+          ...(Object.keys(darkStates).length > 0 && { states: darkStates }),
+        };
+
+        tokens.push({
+          name: `${color.name}-dark`,
+          value: darkColorValue,
+          category: 'color',
+          namespace: 'color',
+          semanticMeaning: `Dark mode: ${color.meaning}`,
+          scalePosition: index * 2 + 1, // Interleave with light tokens
+          trustLevel: color.trustLevel,
+          cognitiveLoad: color.cognitiveLoad,
+          generateUtilityClass: false, // Dark variants use CSS vars, not utility classes
+          applicableComponents: color.components,
+          accessibilityLevel: 'AAA',
+          consequence:
+            color.trustLevel === 'critical'
+              ? 'destructive'
+              : color.trustLevel === 'high'
+                ? 'significant'
+                : 'reversible',
+          usageContext: color.usage.map((u) => `dark-${u}`),
+        });
+      }
+    }
+  });
+
+  return tokens;
+}

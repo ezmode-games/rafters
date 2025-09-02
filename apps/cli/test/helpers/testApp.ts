@@ -58,23 +58,9 @@ export async function createTempTestApp(
 }
 
 /**
- * Ensure test fixtures exist, create them if missing
+ * Ensure test fixtures exist
  */
 async function ensureFixturesExist(): Promise<void> {
-  if (!existsSync(FIXTURES_DIR)) {
-    console.log('Creating test fixtures (this may take a few minutes)...');
-    try {
-      execSync('node scripts/create-test-fixtures.js', {
-        cwd: CLI_ROOT,
-        stdio: 'inherit',
-      });
-    } catch (error) {
-      throw new Error(
-        `Failed to create test fixtures: ${error instanceof Error ? error.message : error}`
-      );
-    }
-  }
-
   // Verify all expected fixtures exist
   const expectedFixtures: TestAppOptions['type'][] = [
     'nextjs-app',
@@ -90,7 +76,7 @@ async function ensureFixturesExist(): Promise<void> {
 
   if (missingFixtures.length > 0) {
     throw new Error(
-      `Missing test fixtures: ${missingFixtures.join(', ')}. Run 'node scripts/create-test-fixtures.js' to regenerate.`
+      `Missing test fixtures: ${missingFixtures.join(', ')}. Fixtures should be static directories in test/fixtures/`
     );
   }
 }

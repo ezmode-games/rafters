@@ -28,7 +28,6 @@
     "test:coverage": "vitest run --coverage",
     "test:integration": "vitest run test/integration --reporter=verbose",
     "test:integration:watch": "vitest test/integration",
-    "test:fixtures": "node scripts/create-test-fixtures.js",
     "test:all": "pnpm test && pnpm test:integration",
     "test:preflight": "vitest run",
     "lint": "biome check .",

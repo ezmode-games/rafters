@@ -1,55 +1,41 @@
 import {
+  type ColorContext,
   calculateWCAGContrast,
+  generateColorCacheKey,
   generateColorName,
+  generateColorValue,
   generateHarmoniousPalette,
   getColorTemperature,
   isLightColor,
   meetsWCAGStandard,
+  roundOKLCH,
+  validateOKLCH,
 } from '@rafters/color-utils';
 import type { OKLCH } from '@rafters/shared';
 import { getClaudeClient } from '../ai/claude/client';
 
-interface ColorContext {
-  token?: string;
-  name?: string;
-}
+// Remove duplicate interface - using ColorContext from color-utils
 
-// Validate OKLCH input values
-export function validateOKLCH(oklch: unknown): oklch is OKLCH {
-  if (!oklch || typeof oklch !== 'object') {
-    return false;
-  }
+// Using validateOKLCH from @rafters/color-utils to avoid duplication
 
-  const candidate = oklch as Record<string, unknown>;
-  const { l, c, h } = candidate;
-
-  if (typeof l !== 'number' || l < 0 || l > 1) {
-    return false;
-  }
-
-  if (typeof c !== 'number' || c < 0) {
-    return false;
-  }
-
-  if (typeof h !== 'number' || h < 0 || h > 360) {
-    return false;
-  }
-
-  return true;
-}
-
-// Generate consistent cache key
+// Generate consistent cache key using unified rounding
 export function generateCacheKey(oklch: OKLCH): string {
-  return `color-intel:${oklch.l.toFixed(3)}-${oklch.c.toFixed(3)}-${oklch.h.toFixed(1)}`;
+  const rounded = roundOKLCH(oklch);
+  return `color-intel:${rounded.l}-${rounded.c}-${rounded.h}`;
 }
 
 // Generate color intelligence using Claude 3.5 Haiku
 export async function generateColorIntelligence(
   oklch: OKLCH,
   context: ColorContext,
-  apiKey: string
+  apiKey: string,
+  gatewayUrl?: string,
+  cfToken?: string
 ) {
-  const client = getClaudeClient(apiKey);
+  const client = getClaudeClient(apiKey, gatewayUrl, cfToken);
+
+  // Round color values for consistency
+  const roundedColor = roundOKLCH(oklch);
 
   const contextInfo = [
     context.token ? `\nSemantic Role: ${context.token}` : '',
@@ -58,11 +44,12 @@ export async function generateColorIntelligence(
 
   const prompt = `You are a color theory expert and design system consultant. Analyze the provided OKLCH color and generate comprehensive design intelligence for AI agents and human designers.
 
-Color: OKLCH(${oklch.l}, ${oklch.c}, ${oklch.h})${contextInfo}
+Color: OKLCH(${roundedColor.l}, ${roundedColor.c}, ${roundedColor.h})${contextInfo}
 
 Provide exhaustive analysis in this exact JSON structure:
 
 {
+  "suggestedName": "A beautiful, descriptive color name that captures this color's character and personality. Examples: 'ocean-depths', 'autumn-ember', 'forest-whisper'. Be creative and evocative.",
   "reasoning": "Detailed explanation of why this specific OKLCH combination works psychologically and visually. Include lightness perception, chroma intensity effects, and hue associations. 2-3 sentences.",
   "emotionalImpact": "Complete psychological response this color evokes in users. Cover emotional associations, cognitive effects, and behavioral influences. Include cultural universals and variations. 2-3 sentences.", 
   "culturalContext": "Cross-cultural color associations and meanings. Address Western, Eastern, and global contexts. Mention any cultural sensitivities or positive associations. 2-3 sentences.",
@@ -97,6 +84,7 @@ Return only valid JSON, no additional text.`;
 
     // Validate the structure
     if (
+      !intelligence.suggestedName ||
       !intelligence.reasoning ||
       !intelligence.emotionalImpact ||
       !intelligence.culturalContext ||
@@ -116,37 +104,39 @@ Return only valid JSON, no additional text.`;
 
 // Calculate mathematical color data using color-utils
 export function calculateColorData(oklch: OKLCH) {
+  // Round input color for consistency
+  const roundedColor = roundOKLCH(oklch);
   const white: OKLCH = { l: 1, c: 0, h: 0 };
   const black: OKLCH = { l: 0, c: 0, h: 0 };
 
-  // Generate harmonies
+  // Generate harmonies using rounded color
   const harmonies = {
-    complementary: generateHarmoniousPalette(oklch, 'complementary', 1)[0],
-    triadic: generateHarmoniousPalette(oklch, 'triadic', 2),
-    analogous: generateHarmoniousPalette(oklch, 'analogous', 2),
-    tetradic: generateHarmoniousPalette(oklch, 'tetradic', 3),
-    monochromatic: generateHarmoniousPalette(oklch, 'monochromatic', 4),
+    complementary: generateHarmoniousPalette(roundedColor, 'complementary', 1)[0],
+    triadic: generateHarmoniousPalette(roundedColor, 'triadic', 2),
+    analogous: generateHarmoniousPalette(roundedColor, 'analogous', 2),
+    tetradic: generateHarmoniousPalette(roundedColor, 'tetradic', 3),
+    monochromatic: generateHarmoniousPalette(roundedColor, 'monochromatic', 4),
   };
 
-  // Calculate accessibility
+  // Calculate accessibility using rounded color
   const accessibility = {
     onWhite: {
-      wcagAA: meetsWCAGStandard(oklch, white, 'AA', 'normal'),
-      wcagAAA: meetsWCAGStandard(oklch, white, 'AAA', 'normal'),
-      contrastRatio: calculateWCAGContrast(oklch, white),
+      wcagAA: meetsWCAGStandard(roundedColor, white, 'AA', 'normal'),
+      wcagAAA: meetsWCAGStandard(roundedColor, white, 'AAA', 'normal'),
+      contrastRatio: calculateWCAGContrast(roundedColor, white),
     },
     onBlack: {
-      wcagAA: meetsWCAGStandard(oklch, black, 'AA', 'normal'),
-      wcagAAA: meetsWCAGStandard(oklch, black, 'AAA', 'normal'),
-      contrastRatio: calculateWCAGContrast(oklch, black),
+      wcagAA: meetsWCAGStandard(roundedColor, black, 'AA', 'normal'),
+      wcagAAA: meetsWCAGStandard(roundedColor, black, 'AAA', 'normal'),
+      contrastRatio: calculateWCAGContrast(roundedColor, black),
     },
   };
 
-  // Color analysis
+  // Color analysis using rounded color
   const analysis = {
-    temperature: getColorTemperature(oklch),
-    isLight: isLightColor(oklch),
-    name: generateColorName(oklch),
+    temperature: getColorTemperature(roundedColor),
+    isLight: isLightColor(roundedColor),
+    name: generateColorName(roundedColor),
   };
 
   return { harmonies, accessibility, analysis };

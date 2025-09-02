@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { z } from 'zod';
 import { loadConfig } from '../utils/config.js';
 import { getRaftersTitle } from '../utils/logo.js';
-import { fetchComponentRegistry } from '../utils/registry.js';
+import { type ComponentManifest, fetchComponentRegistry } from '../utils/registry.js';
 
 const ConfigSchema = z
   .object({
@@ -17,7 +17,6 @@ interface ListOptions {
 }
 
 interface InstalledComponent {
-  name: string;
   path: string;
   installed: string;
   version: string;
@@ -28,6 +27,7 @@ interface InstalledComponent {
     trustBuilding: string;
     semanticMeaning: string;
   };
+  dependencies: string[];
 }
 
 function loadInstalledComponents(cwd = process.cwd()): Record<string, InstalledComponent> {
@@ -40,6 +40,20 @@ function loadInstalledComponents(cwd = process.cwd()): Record<string, InstalledC
   } catch {
     return {};
   }
+}
+
+function compareVersions(installed: string, registry: string): 'up-to-date' | 'outdated' | 'newer' {
+  const parseVersion = (v: string) => v.split('.').map(Number);
+  const [iMajor = 0, iMinor = 0, iPatch = 0] = parseVersion(installed);
+  const [rMajor = 0, rMinor = 0, rPatch = 0] = parseVersion(registry);
+
+  if (iMajor > rMajor) return 'newer';
+  if (iMajor < rMajor) return 'outdated';
+  if (iMinor > rMinor) return 'newer';
+  if (iMinor < rMinor) return 'outdated';
+  if (iPatch > rPatch) return 'newer';
+  if (iPatch < rPatch) return 'outdated';
+  return 'up-to-date';
 }
 
 export async function listCommand(options: ListOptions = {}): Promise<void> {
@@ -59,19 +73,49 @@ export async function listCommand(options: ListOptions = {}): Promise<void> {
     console.log();
 
     if (options.details) {
-      // Show detailed view
-      const installedComponents = Object.values(installed);
+      // Show detailed view with update information
+      const installedNames = Object.keys(installed);
+      const updatesAvailable: string[] = [];
 
-      if (installedComponents.length > 0) {
+      if (installedNames.length > 0) {
         console.log('Installed Components:');
         console.log();
 
-        for (const component of installedComponents) {
-          console.log(`${component.name} (v${component.version})`);
+        for (const name of installedNames) {
+          const component = installed[name];
+          const registryComponent = (registry.components || []).find((c) => c.name === name);
+
+          console.log(`${name} (v${component.version})`);
           console.log(`  Path: ${component.path}`);
+          console.log(`  Installed: ${new Date(component.installed).toLocaleDateString()}`);
           console.log(
-            `  Intelligence: Cognitive load=${component.intelligence.cognitiveLoad}, ${component.intelligence.attentionEconomics.split(':')[0]}`
+            `  Intelligence: Cognitive load=${component.intelligence.cognitiveLoad}/10, ${component.intelligence.attentionEconomics.split(':')[0]}`
           );
+
+          if (registryComponent) {
+            const registryComponentWithVersion = registryComponent as ComponentManifest & {
+              version?: string;
+            };
+            const registryVersion =
+              registryComponentWithVersion.version ||
+              registryComponent.meta?.rafters?.version ||
+              '0.0.0';
+            const versionStatus = compareVersions(component.version, registryVersion);
+            if (versionStatus === 'outdated') {
+              console.log(`  \u2191 Update available: v${registryVersion}`);
+              updatesAvailable.push(name);
+            } else if (versionStatus === 'newer') {
+              console.log('  \u2197 Development version (newer than registry)');
+            } else {
+              console.log('  \u2713 Up to date');
+            }
+          } else {
+            console.log('  ? Component not found in registry');
+          }
+
+          if (component.dependencies.length > 0) {
+            console.log(`  Dependencies: ${component.dependencies.join(', ')}`);
+          }
           console.log();
         }
       }
@@ -79,36 +123,120 @@ export async function listCommand(options: ListOptions = {}): Promise<void> {
       const availableComponents = (registry.components || []).filter((c) => !installed[c.name]);
 
       if (availableComponents.length > 0) {
-        console.log(`Available Components: ${availableComponents.length} remaining`);
+        console.log(`Available Components (${availableComponents.length} remaining):`);
         console.log();
 
-        for (const component of availableComponents.slice(0, 5)) {
-          console.log(`  ${component.name} - ${component.description}`);
+        for (const component of availableComponents.slice(0, 8)) {
+          const componentWithIntelligence = component as ComponentManifest & {
+            intelligence?: { cognitiveLoad: number };
+            version?: string;
+          };
+          const cognitiveLoad =
+            componentWithIntelligence.intelligence?.cognitiveLoad ||
+            component.meta?.rafters?.intelligence?.cognitiveLoad ||
+            0;
+          const version =
+            componentWithIntelligence.version || component.meta?.rafters?.version || '0.0.0';
+          const description = component.description || 'No description available';
+          console.log(`  ${component.name} (v${version})`);
+          console.log(`    ${description}`);
+          console.log(`    Intelligence: Cognitive load=${cognitiveLoad}/10`);
+          console.log();
         }
 
-        if (availableComponents.length > 5) {
-          console.log(`  ... and ${availableComponents.length - 5} more`);
+        if (availableComponents.length > 8) {
+          console.log(
+            `  ... and ${availableComponents.length - 8} more (use 'rafters list' for compact view)`
+          );
+          console.log();
         }
+      }
+
+      if (updatesAvailable.length > 0) {
+        console.log(
+          `\u2191 ${updatesAvailable.length} update(s) available: ${updatesAvailable.join(', ')}`
+        );
+        console.log(`Run 'rafters add ${updatesAvailable.join(' ')}' to update`);
       }
     } else {
-      // Show compact view
-      console.log('Available Components:');
-      console.log();
+      // Show enhanced compact view with update status
+      const installedNames = Object.keys(installed);
+      const updatesAvailable: string[] = [];
 
-      for (const component of registry.components || []) {
-        const isInstalled = installed[component.name];
-        const icon = isInstalled ? '[x]' : '[ ]';
-        const name = component.name;
-        const description = `- ${component.description}`;
+      // Check for installed components and updates
+      if (installedNames.length > 0) {
+        console.log('Installed Components:');
+        console.log();
 
-        console.log(`${icon} ${name.padEnd(12)} ${description}`);
+        for (const name of installedNames) {
+          const installedComponent = installed[name];
+          const registryComponent = (registry.components || []).find((c) => c.name === name);
+
+          if (registryComponent) {
+            const registryComponentWithVersion = registryComponent as ComponentManifest & {
+              version?: string;
+            };
+            const registryVersion =
+              registryComponentWithVersion.version ||
+              registryComponent.meta?.rafters?.version ||
+              '0.0.0';
+            const versionStatus = compareVersions(installedComponent.version, registryVersion);
+            let statusIcon = '✓';
+            let statusText = '';
+
+            if (versionStatus === 'outdated') {
+              statusIcon = '↑';
+              statusText = ` (update available: v${registryVersion})`;
+              updatesAvailable.push(name);
+            } else if (versionStatus === 'newer') {
+              statusIcon = '↗';
+              statusText = ' (dev version)';
+            }
+
+            console.log(
+              `${statusIcon} ${name.padEnd(12)} v${installedComponent.version}${statusText}`
+            );
+          } else {
+            console.log(`? ${name.padEnd(12)} v${installedComponent.version} (not in registry)`);
+          }
+        }
+        console.log();
       }
 
-      const installedCount = Object.keys(installed).length;
-      const totalCount = registry.components?.length || 0;
+      // Show available components not yet installed
+      const availableComponents = (registry.components || []).filter((c) => !installed[c.name]);
 
-      console.log();
-      console.log(`Installed: ${installedCount}/${totalCount} components`);
+      if (availableComponents.length > 0) {
+        console.log('Available Components:');
+        console.log();
+
+        for (const component of availableComponents) {
+          const componentWithIntelligence = component as ComponentManifest & {
+            intelligence?: { cognitiveLoad: number };
+          };
+          const cognitiveLoad =
+            componentWithIntelligence.intelligence?.cognitiveLoad ||
+            component.meta?.rafters?.intelligence?.cognitiveLoad ||
+            0;
+          const description = component.description || 'No description available';
+          console.log(
+            `  ${component.name.padEnd(12)} - ${description} (load: ${cognitiveLoad}/10)`
+          );
+        }
+        console.log();
+      }
+
+      // Summary
+      const installedCount = installedNames.length;
+      const totalCount = registry.components?.length || 0;
+      const availableCount = totalCount - installedCount;
+
+      console.log(`Summary: ${installedCount} installed, ${availableCount} available`);
+
+      if (updatesAvailable.length > 0) {
+        console.log(`Updates: ${updatesAvailable.length} component(s) have updates available`);
+        console.log(`Run 'rafters add ${updatesAvailable.join(' ')}' to update`);
+      }
     }
   } catch (error) {
     console.error('Error listing components:', error);

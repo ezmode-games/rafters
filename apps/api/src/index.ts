@@ -5,6 +5,8 @@ import { colorIntel } from './routes/color-intel';
 interface CloudflareBindings {
   RAFTERS_INTEL: KVNamespace;
   CLAUDE_API_KEY: string;
+  CF_TOKEN: string;
+  CLAUDE_GATEWAY_URL: string;
 }
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();

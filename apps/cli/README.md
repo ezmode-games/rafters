@@ -4,9 +4,9 @@
 
 # Rafters CLI
 
-> Command-line tool for initializing design token systems and managing components with embedded AI intelligence
+> AI-first command-line tool for managing design system components with embedded intelligence
 
-Rafters CLI helps you initialize a complete design system foundation and add React components with built-in AI agent design intelligence patterns including cognitive load optimization, attention economics, accessibility features, and trust-building patterns.
+Lean CLI focused on project setup and component management. AI agents access design intelligence through the integrated MCP server, not CLI commands.
 
 ## ⚠️ CRITICAL: How Rafters Works ⚠️
 
@@ -124,7 +124,6 @@ Install components with embedded AI intelligence patterns.
 3. **Installs dependencies** (Radix UI, etc.)
 4. **Updates local registry** in `.rafters/registry/components.json`
 5. **Adds to project** at `src/components/ui/`
-6. **Adds Storybook story** (if configured)
 
 **Usage:**
 ```bash
@@ -148,21 +147,69 @@ npx rafters add button input select
 ✓ All components installed with design intelligence
 ```
 
-### `list` - Show Available Components
+### `list` - Component Status Overview
 
-Lists all components available in the Rafters registry.
+Shows installed components, available updates, and registry components with intelligence metadata.
 
+**What it shows:**
+1. **Installed components** - Local components with version and update status
+2. **Available updates** - Components with newer versions in registry
+3. **Available components** - Registry components not yet installed
+4. **Intelligence metadata** - Cognitive load and trust levels for each component
+
+**Usage:**
 ```bash
+# Compact view with update indicators
 npx rafters list
 
-Available components:
-  - button - Interactive button with trust patterns
-  - input - Form input with validation states
-  - select - Dropdown with accessibility
-  - dialog - Modal with cognitive load management
-  - card - Container component with cognitive load optimization
-  - label - Form labels with semantic relationships
+Installed Components:
+✓ button           v0.1.0
+↑ input            v0.1.0 (update available: v0.1.2)
+✓ card             v0.2.0
+
+Available Components:
+  select         - Dropdown with accessibility (load: 5/10, trust: high)
+  dialog         - Modal with cognitive load management (load: 7/10, trust: critical)
+  label          - Form labels with semantic relationships (load: 1/10, trust: low)
+
+Summary: 3 installed, 3 available
+Updates: 1 component(s) have updates available
+Run 'rafters add input' to update
+
+# Detailed view with full metadata
+npx rafters list --details
+
+Installed Components:
+
+button (v0.1.0)
+  Path: src/components/ui/button.tsx
+  Installed: 1/27/2025
+  Intelligence: Cognitive load=3/10, Size hierarchy
+  ✓ Up to date
+  Dependencies: @radix-ui/react-slot
+
+input (v0.1.0)
+  Path: src/components/ui/input.tsx
+  Installed: 1/27/2025
+  Intelligence: Cognitive load=4/10, Validation states
+  ↑ Update available: v0.1.2
+  Dependencies: class-variance-authority
+
+Available Components (3 remaining):
+  select (v0.1.0)
+    Dropdown with accessibility and choice anxiety reduction
+    Intelligence: Cognitive load=5/10, Trust level=high
+    
+  dialog (v0.1.1)
+    Modal with cognitive load management and focus patterns
+    Intelligence: Cognitive load=7/10, Trust level=critical
 ```
+
+**Status Indicators:**
+- `✓` - Component up to date
+- `↑` - Update available
+- `↗` - Development version (newer than registry)
+- `?` - Component not found in registry
 
 ### `clean` - Remove Rafters Installation
 
@@ -179,27 +226,34 @@ Completely removes Rafters from your project, including all generated files and 
 # Remove everything (interactive confirmation)
 npx rafters clean
 
-# Remove only configuration (keep components)
-npx rafters clean --config-only
-
 # Force removal without confirmation
 npx rafters clean --force
 ```
 
-**Options:**
-- `--config-only` - Only remove `.rafters/` directory, keep installed components
-- `--force` - Skip confirmation prompts
-- `--dry-run` - Show what would be removed without actually removing
+### `mcp` - Start MCP Server
 
-**Interactive cleanup:**
+Starts the Model Context Protocol server for AI agent integration.
+
+**What it does:**
+1. **Loads design tokens** - Reads `.rafters/tokens/*.json` files
+2. **Provides component intelligence** - Exposes cognitive load, trust patterns
+3. **Validates color combinations** - Checks accessibility and cognitive load
+4. **Calculates design metrics** - Helps AI agents make informed UX decisions
+
+**Usage:**
 ```bash
-? Remove .rafters/ directory? (Y/n)
-? Remove CSS token imports? (Y/n) 
-? Remove installed components from src/components/ui/? (Y/n)
-? Remove utils.ts file? (y/N)
+# Start MCP server (runs until stopped)
+npx rafters mcp
 ```
 
-## Available Components
+**MCP Tools Available to AI Agents:**
+- `get_color_intelligence` - Complete color analysis and semantic meaning
+- `get_component_intelligence` - Component cognitive load and usage patterns
+- `validate_color_combination` - Multi-color accessibility validation
+- `get_accessible_colors` - WCAG compliant color recommendations
+- `calculate_cognitive_load` - Interface complexity assessment
+
+## Components with Design Intelligence
 
 | Component | Cognitive Load | Intelligence Features |
 |-----------|----------------|----------------------|
@@ -209,7 +263,6 @@ npx rafters clean --force
 | **Select** | 5/10 | Choice anxiety reduction, interaction patterns |
 | **Dialog** | 7/10 | Modal timing, focus management, trust building |
 | **Label** | 1/10 | Information hierarchy, semantic relationships |
-| **Tabs** | 4/10 | Content organization, navigation patterns |
 
 ## Design Intelligence Features
 
@@ -245,8 +298,7 @@ your-project/
 │   └── agent-instructions.md   # AI usage patterns and guidelines
 ├── src/
 │   ├── components/ui/          # Installed components go here
-│   ├── lib/utils.ts            # Utility functions (clsx + tailwind-merge)
-│   └── stories/                # Intelligence stories (if Storybook)
+│   └── lib/utils.ts            # Utility functions (clsx + tailwind-merge)
 └── app.css or globals.css      # CSS with injected design tokens
 ```
 
@@ -273,16 +325,16 @@ npx rafters init --config ./scripts/rafters-production.json
 
 ## Token System
 
-### Stock Tokens (Grayscale Foundation)
+### Generated Design Tokens
 
-Initial tokens are mathematically perfect grayscale:
+Rafters creates mathematically perfect design tokens with embedded intelligence:
 ```json
 {
   "generator": "color",
   "tokens": [
     {
       "name": "primary",
-      "value": "oklch(0.45 0 0)",  // Grayscale default
+      "value": "oklch(0.45 0 0)",
       "semanticMeaning": "Primary actions and brand color",
       "cognitiveLoad": 3,
       "trustLevel": "high",
@@ -292,31 +344,16 @@ Initial tokens are mathematically perfect grayscale:
 }
 ```
 
-### Studio Modifications
+### CSS Output
 
-After Studio customization, tokens include overrides:
-```json
-{
-  "name": "primary",
-  "value": "oklch(0.45 0 0)",           // Stock grayscale
-  "modifiedValue": "oklch(0.45 0.15 260)", // Designer's brand blue
-  "designerReasoning": "Brand blue from company logo",
-  // AI metadata preserved...
-}
-```
-
-### CSS Generation
-
-Reads `.rafters/tokens/*.json` and generates:
+Generates Tailwind v4 compatible CSS:
 ```css
 @theme {
-  /* Uses modifiedValue if exists, else value */
   --color-primary: oklch(0.45 0.15 260);
   --color-primary-foreground: oklch(0.98 0 0);
   --spacing-sm: 0.5rem;
   --spacing-md: 1rem;
   --spacing-lg: 1.618rem;
-  /* ... all tokens */
 }
 ```
 
@@ -366,15 +403,20 @@ Reads `.rafters/tokens/*.json` and generates:
 - `tokenFormat` - Format for design tokens (tailwind/css/react-native)
 - `packageManager` - Detected package manager (npm/yarn/pnpm)
 
-## AI Agent Integration
+## MCP Server for AI Agents
 
-Rafters creates `.rafters/agent-instructions.md` with guidance for AI coding assistants:
+The CLI includes an MCP (Model Context Protocol) server for AI agent integration:
 
-- How to use component intelligence patterns
-- Cognitive load optimization guidelines  
-- Accessibility-first development approach
-- Trust-building interaction patterns
-- Quick reference to component manifest
+```bash
+npx rafters mcp
+```
+
+Provides AI agents with:
+- Design token intelligence and semantic meaning
+- Component metadata and usage patterns  
+- Cognitive load calculations and trust building guidance
+- Color intelligence and accessibility validation
+- Systematic design reasoning for better UX decisions
 
 ## Debugging Guide
 

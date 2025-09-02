@@ -38,6 +38,7 @@ describe('ColorValueSchema', () => {
           disabled: 'ocean-blue-400',
         },
         intelligence: {
+          suggestedName: 'Ocean Blue',
           reasoning: 'Ocean blue conveys professional trust without appearing cold',
           emotionalImpact: 'Calming yet authoritative, builds user confidence',
           culturalContext: 'Universally positive in business contexts',

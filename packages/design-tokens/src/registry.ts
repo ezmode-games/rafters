@@ -3,9 +3,10 @@
  *
  * Provides O(1) get/set operations with intelligent metadata preservation
  * Built for AI-first design token system with comprehensive intelligence metadata
+ * Automatically enriches color tokens with intelligence from Color Intelligence API
  */
 
-import type { ColorValue, Token } from '@rafters/shared';
+import type { ColorValue, OKLCH, Token } from '@rafters/shared';
 import { TokenDependencyGraph } from './dependencies.js';
 
 // Helper function to convert token values to CSS (simple inline implementation)
@@ -17,14 +18,231 @@ function tokenValueToCss(value: string | ColorValue): string {
   return value.value || 'inherit';
 }
 
+// Generate a unique token ID for colors based on OKLCH values
+function generateColorTokenId(oklch: OKLCH): string {
+  // Round to 2 decimal places for L and C, whole degrees for H
+  // This gives us ~1.4M possible colors while maintaining perceptual uniqueness
+  const l = (Math.round(oklch.l * 100) / 100).toFixed(2);
+  const c = (Math.round(oklch.c * 100) / 100).toFixed(2);
+  const h = Math.round(oklch.h).toString();
+  return `color-${l}-${c}-${h}`;
+}
+
+// Extract OKLCH from ColorValue or Token
+function extractOKLCH(value: string | ColorValue): OKLCH | null {
+  if (typeof value === 'string') {
+    // Parse OKLCH string like "oklch(0.5 0.1 240)"
+    const match = value.match(/oklch\(([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)(?:\s*\/\s*([0-9.]+))?\)/);
+    if (match) {
+      return {
+        l: Number.parseFloat(match[1]),
+        c: Number.parseFloat(match[2]),
+        h: Number.parseFloat(match[3]),
+        alpha: match[4] ? Number.parseFloat(match[4]) : 1,
+      };
+    }
+    return null;
+  }
+
+  // For ColorValue, use the specified value or middle of scale
+  if (typeof value === 'object' && value.scale) {
+    // Calculate index from value: "500" -> 500/100 = 5 -> index 5, default to 5 (500 position)
+    const targetIndex = value.value ? Math.floor(Number.parseInt(value.value) / 100) : 5;
+    return value.scale[Math.min(targetIndex, value.scale.length - 1)] || value.scale[0];
+  }
+
+  return null;
+}
+
+// Color Intelligence API response type
+interface ColorIntelligence {
+  intelligence: {
+    reasoning: string;
+    emotionalImpact: string;
+    culturalContext: string;
+    accessibilityNotes: string;
+    usageGuidance: string;
+    suggestedName?: string; // New field for AI-generated name
+  };
+  harmonies: {
+    complementary: OKLCH;
+    triadic: OKLCH[];
+    analogous: OKLCH[];
+    tetradic: OKLCH[];
+    monochromatic: OKLCH[];
+  };
+  accessibility: {
+    onWhite: {
+      wcagAA: boolean;
+      wcagAAA: boolean;
+      contrastRatio: number;
+    };
+    onBlack: {
+      wcagAA: boolean;
+      wcagAAA: boolean;
+      contrastRatio: number;
+    };
+  };
+  analysis: {
+    temperature: 'warm' | 'cool' | 'neutral';
+    isLight: boolean;
+    name: string;
+  };
+}
+
+// Fetch color intelligence from the API
+async function fetchColorIntelligence(
+  oklch: OKLCH,
+  context?: { token?: string; name?: string }
+): Promise<ColorIntelligence | null> {
+  try {
+    const apiUrl =
+      process.env.COLOR_INTEL_API_URL || 'https://rafters.realhandy.tech/api/color-intel';
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        oklch: {
+          l: oklch.l,
+          c: oklch.c,
+          h: oklch.h,
+        },
+        token: context?.token,
+        name: context?.name,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error(`Color Intelligence API error: ${response.status} ${response.statusText}`);
+      return null;
+    }
+
+    const fullResponse = await response.json();
+
+    // Transform API response to match our ColorIntelligence interface
+    return {
+      intelligence: fullResponse.intelligence,
+      harmonies: fullResponse.harmonies,
+      accessibility: fullResponse.accessibility,
+      analysis: fullResponse.analysis,
+    };
+  } catch (error) {
+    console.error('Failed to fetch color intelligence:', error);
+    return null;
+  }
+}
+
 export class TokenRegistry {
   private tokens: Map<string, Token> = new Map();
   public dependencyGraph: TokenDependencyGraph = new TokenDependencyGraph();
 
   constructor(initialTokens?: Token[]) {
     if (initialTokens) {
+      // Process tokens synchronously; async enrichment is available via enrichColorToken and should be called after registry creation if needed
       for (const token of initialTokens) {
-        this.tokens.set(token.name, token);
+        this.addToken(token);
+      }
+    }
+  }
+
+  /**
+   * Add a token to the registry, enriching color tokens with intelligence if needed
+   */
+  private addToken(token: Token): void {
+    // For now, store as-is. Async enrichment will be added via enrichColorToken method
+    this.tokens.set(token.name, token);
+  }
+
+  /**
+   * Enrich a color token with intelligence from the API
+   * This is async and should be called after initial registry creation
+   */
+  async enrichColorToken(tokenName: string): Promise<void> {
+    const token = this.tokens.get(tokenName);
+    if (!token || token.category !== 'color') {
+      return;
+    }
+
+    const colorValue = token.value;
+    if (typeof colorValue === 'string') {
+      // Simple string value, no enrichment needed for references
+      return;
+    }
+
+    // Check if already has intelligence
+    if (colorValue.intelligence) {
+      return;
+    }
+
+    // Extract OKLCH for API call
+    const oklch = extractOKLCH(colorValue);
+    if (!oklch) {
+      console.warn(`Could not extract OKLCH from token ${tokenName}`);
+      return;
+    }
+
+    // Fetch from API (CF Gateway handles caching)
+    const intelligence = await fetchColorIntelligence(oklch, {
+      token: tokenName,
+      name: colorValue.name,
+    });
+
+    if (intelligence) {
+      // Use AI-generated name with fallbacks
+      const aiGeneratedName =
+        intelligence.intelligence.suggestedName ||
+        intelligence.analysis.name ||
+        colorValue.name ||
+        `color-${oklch.l.toFixed(2)}-${oklch.c.toFixed(2)}-${oklch.h.toFixed(0)}`;
+
+      // Ensure intelligence has required suggestedName
+      const enrichedIntelligence = {
+        ...intelligence.intelligence,
+        suggestedName: intelligence.intelligence.suggestedName || aiGeneratedName,
+      };
+
+      // Enrich the ColorValue
+      const enrichedValue: ColorValue = {
+        ...colorValue,
+        name: aiGeneratedName,
+        intelligence: enrichedIntelligence,
+        harmonies: intelligence.harmonies,
+        accessibility: intelligence.accessibility,
+        analysis: intelligence.analysis,
+        token: generateColorTokenId(oklch), // Add the token ID for quick lookups
+      };
+
+      // Update the token with enriched value
+      const enrichedToken: Token = {
+        ...token,
+        value: enrichedValue,
+      };
+
+      this.tokens.set(tokenName, enrichedToken);
+    }
+  }
+
+  /**
+   * Enrich all color tokens in the registry
+   * Should be called after initial loading to ensure all colors have intelligence
+   */
+  async enrichAllColorTokens(): Promise<void> {
+    const colorTokens = Array.from(this.tokens.entries()).filter(
+      ([_, token]) => token.category === 'color'
+    );
+
+    // Process in batches to avoid overwhelming the API
+    const batchSize = 5;
+    for (let i = 0; i < colorTokens.length; i += batchSize) {
+      const batch = colorTokens.slice(i, i + batchSize);
+      await Promise.all(batch.map(([name]) => this.enrichColorToken(name)));
+
+      // Small delay between batches
+      if (i + batchSize < colorTokens.length) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
     }
   }

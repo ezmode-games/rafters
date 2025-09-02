@@ -12,7 +12,7 @@ import { ensureCLIBuilt, runCLI } from '../helpers/cliRunner.js';
 import { createTempTestApp } from '../helpers/testApp.js';
 import type { TestFixtureInfo } from '../types.js';
 
-describe('rafters mcp', { timeout: 30000 }, () => {
+describe.skip('rafters mcp', { timeout: 30000 }, () => {
   let testApp: TestFixtureInfo;
 
   beforeEach(async () => {

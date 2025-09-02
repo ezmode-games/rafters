@@ -26,10 +26,6 @@ function getRegistryBaseUrl(): string {
     );
     return process.env.RAFTERS_REGISTRY_API_URL;
   }
-  // Warn if using new default
-  console.warn(
-    '[rafters-cli] Default registry URL changed to /registry. If you experience issues, set RAFTERS_REGISTRY_URL to the previous /api/registry endpoint.'
-  );
   return 'https://rafters.realhandy.tech/registry';
 }
 const REGISTRY_TIMEOUT = 10000; // 10 seconds

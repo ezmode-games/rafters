@@ -5,7 +5,6 @@ import {
   calculateColorData,
   generateCacheKey,
   generateColorIntelligence,
-  validateOKLCH,
 } from '../../../lib/color-intel/utils';
 
 // Mock dependencies
@@ -13,6 +12,7 @@ vi.mock('../../../lib/ai/claude/client', () => ({
   getClaudeClient: vi.fn(() => ({
     generateText: vi.fn().mockResolvedValue(
       JSON.stringify({
+        suggestedName: 'Test Color',
         reasoning: 'Test reasoning',
         emotionalImpact: 'Test emotional impact',
         culturalContext: 'Test cultural context',
@@ -23,20 +23,29 @@ vi.mock('../../../lib/ai/claude/client', () => ({
   })),
 }));
 
-vi.mock('@rafters/color-utils', () => ({
-  calculateWCAGContrast: vi.fn(() => 4.5),
-  generateColorName: vi.fn(() => 'Sky Blue'),
-  generateHarmoniousPalette: vi.fn((color: OKLCH, _type: string, count?: number) => {
-    const colors = [];
-    for (let i = 0; i < (count || 1); i++) {
-      colors.push({ ...color, h: (color.h + 180) % 360 });
-    }
-    return colors;
-  }),
-  getColorTemperature: vi.fn(() => 'cool'),
-  isLightColor: vi.fn((color: OKLCH) => color.l > 0.5),
-  meetsWCAGStandard: vi.fn(() => true),
-}));
+vi.mock('@rafters/color-utils', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    calculateWCAGContrast: vi.fn(() => 4.5),
+    generateColorName: vi.fn(() => 'Sky Blue'),
+    generateHarmoniousPalette: vi.fn((color: OKLCH, _type: string, count?: number) => {
+      const colors = [];
+      for (let i = 0; i < (count || 1); i++) {
+        colors.push({ ...color, h: (color.h + 180) % 360 });
+      }
+      return colors;
+    }),
+    getColorTemperature: vi.fn(() => 'cool'),
+    isLightColor: vi.fn((color: OKLCH) => color.l > 0.5),
+    meetsWCAGStandard: vi.fn(() => true),
+  };
+});
+
+// Import validateOKLCH after mocks are set up
+const { validateOKLCH } = await vi.importActual<{
+  validateOKLCH: (oklch: unknown) => oklch is OKLCH;
+}>('@rafters/color-utils');
 
 describe('validateOKLCH', () => {
   it('should validate valid OKLCH color', () => {
@@ -73,7 +82,7 @@ describe('generateCacheKey', () => {
   it('should generate consistent cache key', () => {
     const color: OKLCH = { l: 0.5, c: 0.2, h: 180 };
     const key = generateCacheKey(color);
-    expect(key).toBe('color-intel:0.500-0.200-180.0');
+    expect(key).toBe('color-intel:0.5-0.2-180');
   });
 
   it('should round values consistently', () => {
@@ -91,6 +100,7 @@ describe('generateColorIntelligence', () => {
     const intelligence = await generateColorIntelligence(color, context, 'test-key');
 
     expect(intelligence).toEqual({
+      suggestedName: 'Test Color',
       reasoning: 'Test reasoning',
       emotionalImpact: 'Test emotional impact',
       culturalContext: 'Test cultural context',
