@@ -139,7 +139,7 @@ export class TokenRegistry {
 
   constructor(initialTokens?: Token[]) {
     if (initialTokens) {
-      // Process tokens synchronously for now, async enrichment can be added later
+      // Process tokens synchronously; async enrichment is available via enrichColorToken and should be called after registry creation if needed
       for (const token of initialTokens) {
         this.addToken(token);
       }
