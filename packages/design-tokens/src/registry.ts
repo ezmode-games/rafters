@@ -44,8 +44,10 @@ function extractOKLCH(value: string | ColorValue): OKLCH | null {
     return null;
   }
 
-  // For ColorValue, use the middle of the scale (500 position) or value field
-    const targetIndex = value.value ? Math.floor(Number.parseInt(value.value) / 100) : 5; // Default to 500
+  // For ColorValue, use the specified value or middle of scale
+  if (typeof value === 'object' && value.scale) {
+    // Calculate index from value: "500" -> 500/100 = 5 -> index 5, default to 5 (500 position)
+    const targetIndex = value.value ? Math.floor(Number.parseInt(value.value) / 100) : 5;
     return value.scale[Math.min(targetIndex, value.scale.length - 1)] || value.scale[0];
   }
 
