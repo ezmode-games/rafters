@@ -48,12 +48,10 @@ function generateThemeBlock(registry: TokenRegistry): string[] {
   // Get all tokens in dependency order
   const sortedTokenNames = registry.dependencyGraph.topologicalSort();
   const allTokens = registry.list();
-  const tokenMap = new Map<string, Token>();
-
-  for (const token of allTokens) {
-    tokenMap.set(token.name, token);
-  }
-
+  const tokenMap = Array.from(allTokens).reduce(
+    (map, token) => map.set(token.name, token),
+    new Map<string, Token>()
+  );
   // Group tokens by category for organized output
   const tokensByCategory = new Map<string, Token[]>();
 
