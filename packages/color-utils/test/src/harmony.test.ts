@@ -142,10 +142,22 @@ describe('Pure OKLCH Harmony Functions', () => {
   });
 
   describe('generateOKLCHScale', () => {
-    it('should generate 50-900 scale in OKLCH format', () => {
+    it('should generate 50-950 scale in OKLCH format with 600 base', () => {
       const scale = generateOKLCHScale(testColor);
 
-      const expectedSteps = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900'];
+      const expectedSteps = [
+        '50',
+        '100',
+        '200',
+        '300',
+        '400',
+        '500',
+        '600',
+        '700',
+        '800',
+        '900',
+        '950',
+      ];
       for (const step of expectedSteps) {
         expect(scale).toHaveProperty(step);
 
@@ -160,13 +172,14 @@ describe('Pure OKLCH Harmony Functions', () => {
         expect(color.alpha).toBe(testColor.alpha);
       }
 
-      // 500 should match the base color lightness
-      expect(scale['500'].l).toBe(testColor.l);
+      // 600 should match the base color lightness (new architecture)
+      expect(scale['600'].l).toBe(testColor.l);
 
       // Lightness should progress logically
       expect(scale['50'].l).toBeGreaterThan(scale['100'].l);
       expect(scale['100'].l).toBeGreaterThan(scale['200'].l);
       expect(scale['800'].l).toBeGreaterThan(scale['900'].l);
+      expect(scale['900'].l).toBeGreaterThan(scale['950'].l);
     });
   });
 });

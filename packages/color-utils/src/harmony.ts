@@ -6,6 +6,7 @@
 import type { OKLCH } from '@rafters/shared';
 import { calculateWCAGContrast } from './accessibility.js';
 import { roundOKLCH } from './conversion.js';
+import { generateSurfaceColor } from './manipulation.js';
 
 /**
  * Generate optimal gray color for a given palette
@@ -191,11 +192,7 @@ export function generateRaftersHarmony(baseColor: OKLCH): {
   const highlight = harmony.analogous1;
 
   // Surface = desaturated version of base for backgrounds
-  const surface: OKLCH = {
-    ...harmony.base,
-    l: 0.85, // Light enough for content
-    c: Math.max(0.02, harmony.base.c * 0.15), // Very low chroma
-  };
+  const surface = generateSurfaceColor(harmony.base);
 
   // Neutral = calculated optimal gray
   const neutral = harmony.neutral!; // We know it exists from generateHarmony
@@ -215,7 +212,7 @@ export function generateRaftersHarmony(baseColor: OKLCH): {
  * Generate semantic color suggestions based on color theory and conventional expectations
  * Each semantic color gets multiple suggestions for user choice
  */
-function generateSemanticColorSuggestions(baseColor: OKLCH): {
+export function generateSemanticColorSuggestions(baseColor: OKLCH): {
   danger: OKLCH[];
   success: OKLCH[];
   warning: OKLCH[];
@@ -374,23 +371,103 @@ function generateColorCombinations(colorScale: Record<string, OKLCH>) {
 }
 
 /**
+ * Validate if a color is suitable for scale generation
+ * Too light or too dark colors don't generate useful scales
+ */
+function validateScaleGeneration(baseColor: OKLCH): {
+  isValid: boolean;
+  reason?: string;
+  suggestedLightness?: number;
+} {
+  const l = baseColor.l;
+
+  // Too light - won't generate useful darker shades
+  if (l > 0.85) {
+    return {
+      isValid: false,
+      reason: 'Color too light for scale generation',
+      suggestedLightness: 0.7,
+    };
+  }
+
+  // Too dark - won't generate useful lighter tints
+  if (l < 0.15) {
+    return {
+      isValid: false,
+      reason: 'Color too dark for scale generation',
+      suggestedLightness: 0.4,
+    };
+  }
+
+  return { isValid: true };
+}
+
+/**
+ * Generate lightness progression using mathematical functions
+ * Base color positioned at 600, with 5 lighter + 4 darker + 950
+ */
+function generateLightnessProgression(baseLightness: number): Record<string, number> {
+  // Mathematical constants for natural progression
+  const MAX_LIGHT = 0.95; // Lightest usable tint
+  const MIN_DARK = 0.05; // Darkest usable shade
+
+  // Base at 600 allows balanced progression
+  const positions = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
+  const baseIndex = 6; // 600 position
+
+  const lightness: Record<string, number> = {};
+
+  // Generate lighter colors (50-500) using power curve for natural progression
+  for (let i = 0; i < baseIndex; i++) {
+    const stepsFromBase = baseIndex - i;
+    const totalLighterSteps = baseIndex;
+
+    // Power curve creates more natural spacing (more tints near white)
+    const t = (stepsFromBase / totalLighterSteps) ** 0.8;
+    const calculatedL = baseLightness + (MAX_LIGHT - baseLightness) * t;
+
+    lightness[positions[i]] = Math.min(MAX_LIGHT, calculatedL);
+  }
+
+  // Base color at 600
+  lightness['600'] = baseLightness;
+
+  // Generate darker colors (700-950) with progressive darkening
+  for (let i = baseIndex + 1; i < positions.length; i++) {
+    const stepsFromBase = i - baseIndex;
+    const totalDarkerSteps = positions.length - 1 - baseIndex;
+
+    // Linear progression for shades (more predictable)
+    const t = stepsFromBase / totalDarkerSteps;
+    const darkenAmount = (baseLightness - MIN_DARK) * t;
+    const calculatedL = Math.max(MIN_DARK, baseLightness - darkenAmount);
+
+    lightness[positions[i]] = calculatedL;
+  }
+
+  return lightness;
+}
+
+/**
  * Generate OKLCH color scale from base color with perceptual uniformity
- * Creates 50-900 scale with proper lightness distribution
+ * Creates 50-950 scale with mathematical lightness progression
+ * Base color positioned at 600 for balanced tint/shade distribution
  */
 export function generateOKLCHScale(baseColor: OKLCH): Record<string, OKLCH> {
-  // Define lightness values for each scale step (perceptually uniform)
-  const lightnessSteps = {
-    50: 0.96,
-    100: 0.92,
-    200: 0.84,
-    300: 0.76,
-    400: 0.64,
-    500: baseColor.l, // Use the actual base color lightness
-    600: Math.max(0.1, baseColor.l - 0.15),
-    700: Math.max(0.08, baseColor.l - 0.25),
-    800: Math.max(0.06, baseColor.l - 0.35),
-    900: Math.max(0.04, baseColor.l - 0.45),
-  };
+  // Validate input color for scale generation
+  const validation = validateScaleGeneration(baseColor);
+
+  if (!validation.isValid) {
+    // console.warn(`Scale generation warning: ${validation.reason}`);
+    // Continue with suggested lightness or original
+    const adjustedColor = validation.suggestedLightness
+      ? { ...baseColor, l: validation.suggestedLightness }
+      : baseColor;
+    return generateOKLCHScale(adjustedColor);
+  }
+
+  // Generate mathematical lightness progression
+  const lightnessSteps = generateLightnessProgression(baseColor.l);
 
   const scale: Record<string, OKLCH> = {};
 
@@ -398,7 +475,7 @@ export function generateOKLCHScale(baseColor: OKLCH): Record<string, OKLCH> {
     // Adjust chroma based on lightness to maintain perceptual uniformity
     let adjustedChroma = baseColor.c;
 
-    // Reduce chroma at very light and very dark ends
+    // Preserve existing chroma adjustment logic (refined)
     if (lightness > 0.9) {
       adjustedChroma *= 0.3; // Very light colors need less chroma
     } else if (lightness < 0.15) {
@@ -457,7 +534,7 @@ function generateSemanticColorSystem(baseColor: OKLCH) {
  * Colors get cooler and lighter with distance
  * Applied to UI: background colors should be cooler/lighter, foreground warmer/darker
  */
-function calculateAtmosphericWeight(color: OKLCH): {
+export function calculateAtmosphericWeight(color: OKLCH): {
   distanceWeight: number; // 0 = background, 1 = foreground
   temperature: 'warm' | 'neutral' | 'cool';
   atmosphericRole: 'background' | 'midground' | 'foreground';
@@ -589,7 +666,7 @@ function calculateSimultaneousContrast(
  * some colors feel "heavier" than others
  * Used for visual balance in UI layouts
  */
-function calculatePerceptualWeight(color: OKLCH): {
+export function calculatePerceptualWeight(color: OKLCH): {
   weight: number; // 0-1, higher = more visual weight
   density: 'light' | 'medium' | 'heavy';
   balancingRecommendation: string;

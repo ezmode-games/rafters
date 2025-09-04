@@ -1,16 +1,4 @@
-import {
-  type ColorContext,
-  calculateWCAGContrast,
-  generateColorCacheKey,
-  generateColorName,
-  generateColorValue,
-  generateHarmoniousPalette,
-  getColorTemperature,
-  isLightColor,
-  meetsWCAGStandard,
-  roundOKLCH,
-  validateOKLCH,
-} from '@rafters/color-utils';
+import { type ColorContext, roundOKLCH } from '@rafters/color-utils';
 import type { OKLCH } from '@rafters/shared';
 import { getClaudeClient } from '../ai/claude/client';
 
@@ -82,6 +70,11 @@ Return only valid JSON, no additional text.`;
     // Parse the JSON response
     const intelligence = JSON.parse(responseText);
 
+    // Use supplied name if provided, otherwise use AI-generated name
+    if (context.name) {
+      intelligence.suggestedName = context.name;
+    }
+
     // Validate the structure
     if (
       !intelligence.suggestedName ||
@@ -100,44 +93,4 @@ Return only valid JSON, no additional text.`;
       `Intelligence generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
   }
-}
-
-// Calculate mathematical color data using color-utils
-export function calculateColorData(oklch: OKLCH) {
-  // Round input color for consistency
-  const roundedColor = roundOKLCH(oklch);
-  const white: OKLCH = { l: 1, c: 0, h: 0 };
-  const black: OKLCH = { l: 0, c: 0, h: 0 };
-
-  // Generate harmonies using rounded color
-  const harmonies = {
-    complementary: generateHarmoniousPalette(roundedColor, 'complementary', 1)[0],
-    triadic: generateHarmoniousPalette(roundedColor, 'triadic', 2),
-    analogous: generateHarmoniousPalette(roundedColor, 'analogous', 2),
-    tetradic: generateHarmoniousPalette(roundedColor, 'tetradic', 3),
-    monochromatic: generateHarmoniousPalette(roundedColor, 'monochromatic', 4),
-  };
-
-  // Calculate accessibility using rounded color
-  const accessibility = {
-    onWhite: {
-      wcagAA: meetsWCAGStandard(roundedColor, white, 'AA', 'normal'),
-      wcagAAA: meetsWCAGStandard(roundedColor, white, 'AAA', 'normal'),
-      contrastRatio: calculateWCAGContrast(roundedColor, white),
-    },
-    onBlack: {
-      wcagAA: meetsWCAGStandard(roundedColor, black, 'AA', 'normal'),
-      wcagAAA: meetsWCAGStandard(roundedColor, black, 'AAA', 'normal'),
-      contrastRatio: calculateWCAGContrast(roundedColor, black),
-    },
-  };
-
-  // Color analysis using rounded color
-  const analysis = {
-    temperature: getColorTemperature(roundedColor),
-    isLight: isLightColor(roundedColor),
-    name: generateColorName(roundedColor),
-  };
-
-  return { harmonies, accessibility, analysis };
 }

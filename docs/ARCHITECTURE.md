@@ -1,82 +1,118 @@
 # Rafters Architecture
-## Shadcn-Style Component Distribution with Design Intelligence
+## Mathematical Design Intelligence System
 
-*Components as source code with embedded design reasoning*
+*Components and tokens with embedded mathematical design reasoning*
 
 ---
 
 ## Core Approach
 
-Rafters follows the shadcn model but adds design intelligence patterns:
-- **Install components as source code** (not npm dependencies)
-- **Embed design reasoning** in comments, manifest, and stories
-- **Web configurator** generates design tokens
-- **CLI tool** handles component installation
+Rafters provides mathematical design intelligence across all systems:
+- **Install components as source code** with embedded design reasoning (shadcn-compatible)
+- **Mathematical token generation** for colors, spacing, typography, and motion
+- **JSDoc intelligence comments** provide design reasoning for AI agents
+- **Cross-system intelligence** understanding relationships between colors, layout, accessibility
 
 ---
 
-## Three-Layer Intelligence System
+## Dual Registry Architecture
 
-### 1. Component Comments (Essential Patterns)
+### 1. Component Registry (WHAT & WHY)
+Components carry embedded design reasoning through JSDoc intelligence comments:
+
 ```tsx
 /**
- * Button Intelligence: cognitiveLoad=3, size=attention hierarchy
- * Destructive variant REQUIRES confirmation UX patterns  
- * Full patterns: .rafters/agent-instructions.md
+ * Button Intelligence: cognitiveLoad=3, trustLevel=medium
+ * 
+ * Mathematical Intelligence:
+ * - Size hierarchy follows golden ratio attention economics
+ * - Spacing uses systematic progression (8px base, 1.618 ratio)
+ * - Color accessibility calculated with perceptual weight analysis
+ * 
+ * Usage Intelligence:
+ * - Destructive variant REQUIRES confirmation UX patterns
+ * - Primary buttons limited to 1 per view (attention economics)
+ * - Touch targets: 44px minimum (WCAG AAA compliance)
+ * 
+ * Cross-System Relationships:
+ * - Works with motion accessibility tokens for reduced-motion users
+ * - Integrates with typography scale for consistent text sizing
  */
 export const Button = ...
 ```
 
-### 2. Component Manifest (Machine-Readable Fallback)
-```json
+### 2. Token Registry (HOW)
+Mathematical intelligence for systematic token generation:
+
+```typescript
+// Mathematical spacing intelligence
 {
-  "components": {
-    "Button": {
-      "path": "components/ui/button.tsx",
-      "story": "stories/button-intelligence.stories.tsx", 
-      "intelligence": {
-        "cognitiveLoad": 3,
-        "attentionEconomics": "Size hierarchy: sm=tertiary, md=secondary, lg=primary",
-        "accessibility": "44px touch targets, WCAG AAA contrast",
-        "trustBuilding": "Destructive variant needs confirmation patterns",
-        "semanticMeaning": "Primary=main action, Secondary=optional, Destructive=careful consideration"
-      }
-    }
+  name: "golden-3",
+  value: "1.618rem", 
+  intelligence: {
+    mathRelationship: "4px * 1.618^3 / 16",
+    scalePosition: 3,
+    attentionLevel: "high",
+    cognitiveLoad: 1,
+    accessibilityLevel: "AAA"
+  }
+}
+
+// Color theory intelligence
+{
+  name: "Ocean Depths",
+  intelligence: {
+    atmosphericWeight: { role: "foreground", temperature: "cool" },
+    perceptualWeight: { density: "heavy", balancingRecommendation: "Use sparingly" },
+    accessibilityMatrix: { AA: ["light"], AAA: ["white", "gray-50"] }
+  }
+}
+
+// Musical typography intelligence  
+{
+  name: "text-xl",
+  intelligence: {
+    mathRelationship: "1 * 1.618^1",
+    musicalRatio: "golden",
+    cognitiveLoad: 3,
+    usageContext: ["headings", "section-titles"]
   }
 }
 ```
-
-### 3. Intelligence Stories (Complete Education)
-Full Storybook stories demonstrating design reasoning, accessibility patterns, and cognitive load optimization.
 
 ---
 
 ## System Components
 
-### Web Configurator
-- **Input**: Grayscale foundation components
-- **Configuration**: Colors, spacing, typography, borders
-- **Output**: Tailwind v4+ CSS custom properties
-- **Features**: Real-time preview, export CSS
+### Mathematical Token Generators
+- **Colors**: Color theory atmospheric perspective and perceptual weight analysis
+- **Spacing**: Golden ratio, linear, and exponential mathematical progressions
+- **Typography**: Musical harmony ratios (golden, major-third, perfect-fifth) with readability optimization
+- **Motion**: Physics-based easing with cognitive load awareness
+- **Output**: Design tokens with embedded mathematical intelligence
 
-### CLI Tool
+### CLI Tool (Shadcn-Compatible)
 ```bash
-npx rafters init     # Setup project with token system
-npx rafters add <component>  # Install component + intelligence
+npx rafters init     # Setup project with mathematical token system
+npx rafters add <component>  # Install component with JSDoc intelligence
+npx rafters tokens <color>   # Generate color intelligence for design tokens
 ```
 
 ### Project Structure After Init
 ```
 project/
 ├── .rafters/
-│   ├── agent-instructions.md    # AI usage patterns
-│   ├── config.json             # CLI configuration  
-│   └── component-manifest.json # Intelligence fallback
+│   ├── config.json                    # CLI configuration  
+│   └── intelligence-manifest.json     # Component & token intelligence registry
 ├── src/
-│   ├── components/ui/          # Installed components
-│   ├── stories/               # Intelligence stories (if Storybook)
-│   └── tokens.css             # Design system tokens
-└── tailwind.css               # Includes tokens
+│   ├── components/ui/                 # Components with JSDoc intelligence
+│   ├── lib/design-tokens/             # Mathematical token generators
+│   │   ├── colors.ts                  # Color theory intelligence
+│   │   ├── spacing.ts                 # Golden ratio spacing
+│   │   ├── typography.ts              # Musical harmony typography  
+│   │   └── motion.ts                  # Physics-based motion
+│   └── styles/tokens.css              # Generated design tokens
+└── tailwind.config.ts                 # Includes mathematical token system
 ```
 
 ---
@@ -84,102 +120,139 @@ project/
 ## CLI Commands
 
 ### `npx rafters init`
-**Purpose**: Initialize Rafters in project
+**Purpose**: Initialize Rafters mathematical design intelligence system
 
 **Flow**:
 1. Detect package manager (pnpm/npm/yarn)
 2. Check for existing Tailwind CSS installation
-3. Ask: "Do you use Storybook? (y/N)"
-4. If yes: "Stories path? (./src/stories)"
+3. Ask: "Generate mathematical token system? (Y/n)"
+4. If yes: "Token systems: colors, spacing, typography, motion? (all)"
 5. Create `.rafters/` directory structure
-6. Install required dependencies (Radix primitives, clsx, tailwind-merge)
-7. Generate initial config and agent instructions
+6. Install required dependencies (Radix primitives, clsx, tailwind-merge, design-tokens)
+7. Generate mathematical token generators and JSDoc intelligence templates
 
 **Creates**:
-- `.rafters/config.json`
-- `.rafters/agent-instructions.md`
-- `.rafters/component-manifest.json`
-- `src/components/ui/` directory
+- `.rafters/config.json` - CLI configuration
+- `.rafters/intelligence-manifest.json` - Component and token intelligence registry
+- `src/lib/design-tokens/` - Mathematical token generators
+- `src/components/ui/` - Component directory with JSDoc intelligence templates
+- `src/styles/tokens.css` - Generated design tokens
 
 ### `npx rafters add <component>`
-**Purpose**: Install component with intelligence patterns
+**Purpose**: Install component with embedded JSDoc design intelligence
 
 **Flow**:
 1. Read `.rafters/config.json`
 2. Download component source from registry
-3. Write to `src/components/ui/<component>.tsx`
-4. Add intelligence comment header
-5. Update `.rafters/component-manifest.json`
-6. If Storybook configured: add intelligence story
-7. Install any missing Radix dependencies
+3. Write to `src/components/ui/<component>.tsx` with JSDoc intelligence
+4. Update `.rafters/intelligence-manifest.json`
+5. Install any missing Radix dependencies
+6. Generate related mathematical tokens if needed
 
 **Example**:
 ```bash
 npx rafters add button
 ✓ Installing Button component...
-✓ Adding intelligence patterns...
-✓ Updating component manifest...
-✓ Adding Button story...
-✓ Button installed with design intelligence
+✓ Adding JSDoc intelligence patterns...
+✓ Updating intelligence manifest...
+✓ Installing Radix dependencies...
+✓ Button installed with mathematical design intelligence
 ```
+
+### `npx rafters tokens <color>` *(Future)*
+**Purpose**: Generate mathematical color intelligence
+
+**Flow**:
+1. Analyze color using color theory mathematical functions
+2. Calculate atmospheric weight and perceptual weight
+3. Generate accessibility matrix for WCAG compliance
+4. Output token with embedded intelligence metadata
+5. Update design token registry with mathematical relationships
 
 ---
 
-## Token System
+## Mathematical Token System
 
-### Web Configurator Output
+### Generated Mathematical Tokens
 ```css
-/* Generated from web configurator */
+/* Generated from mathematical design intelligence */
 @import "tailwindcss";
 
 @theme {
-  /* Brand Colors (from configurator) */
-  --color-primary: #your-brand-color;
-  --color-primary-foreground: auto; /* calculated for accessibility */
+  /* Color Theory Intelligence */
+  --color-primary: oklch(0.7 0.15 220); /* Cool atmospheric foreground */
+  --color-primary-foreground: oklch(0.95 0.02 220); /* Calculated for AAA contrast */
   
-  /* Spacing Scale (φ-based) */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.618rem;
+  /* Golden Ratio Spacing System */
+  --spacing-0: 0rem;          /* 0px - mathematical zero */
+  --spacing-1: 0.25rem;       /* 4px - base unit */
+  --spacing-2: 0.405rem;      /* 4px * 1.618^1 / 16 */
+  --spacing-3: 0.655rem;      /* 4px * 1.618^2 / 16 */
+  --spacing-4: 1.059rem;      /* 4px * 1.618^3 / 16 */
   
-  /* Typography Scale */
-  --font-family-primary: "Your Font";
-  --font-size-base: 1rem;
-  --font-size-lg: 1.25rem;
+  /* Musical Typography Scale (Golden Ratio) */
+  --font-size-xs: 0.618rem;   /* Base * φ^-2 - Small text */
+  --font-size-sm: 0.764rem;   /* Base * φ^-1 - Small paragraphs */
+  --font-size-base: 1rem;     /* Base - Body text (16px) */
+  --font-size-lg: 1.618rem;   /* Base * φ^1 - Large text */
+  --font-size-xl: 2.618rem;   /* Base * φ^2 - Headings */
   
-  /* Border Radius */
-  --radius-base: 8px;
-  --radius-lg: 12px;
+  /* Motion Physics with Cognitive Load */
+  --motion-duration-instant: 0ms;      /* Cognitive load >= 8 */
+  --motion-duration-fast: 150ms;       /* Low cognitive load */
+  --motion-duration-normal: 300ms;     /* Standard interactions */
+  --motion-duration-slow: 500ms;       /* High attention required */
   
-  /* Component-Specific Tokens */
-  --button-padding-sm: var(--spacing-xs) var(--spacing-sm);
-  --button-padding-md: var(--spacing-sm) var(--spacing-md);
-  --button-padding-lg: var(--spacing-md) var(--spacing-lg);
+  /* Accessibility-First Border Radius */
+  --radius-sm: 4px;    /* Touch-friendly minimum */
+  --radius-md: 8px;    /* Standard UI elements */
+  --radius-lg: 12px;   /* Card-level containers */
 }
 ```
 
-### Component Usage
+### Component Usage with JSDoc Intelligence
 ```tsx
+/**
+ * Button Intelligence: cognitiveLoad=3, trustLevel=medium
+ * 
+ * Mathematical Intelligence:
+ * - Size hierarchy follows golden ratio attention economics (sm=tertiary, lg=primary)
+ * - Spacing uses systematic progression (--spacing-2, --spacing-3, --spacing-4)
+ * - Color accessibility calculated with perceptual weight analysis
+ * - Motion respects cognitive load (reduced for high-load interactions)
+ * 
+ * Usage Intelligence:
+ * - Destructive variant REQUIRES confirmation UX patterns
+ * - Primary buttons limited to 1 per view (attention economics)
+ * - Touch targets: 44px minimum (WCAG AAA compliance)
+ * 
+ * Cross-System Relationships:
+ * - Integrates with motion tokens for reduced-motion accessibility
+ * - Typography scale maintains consistent text hierarchy
+ * - Color theory ensures proper atmospheric weight distribution
+ */
 export const Button = ({ size = 'md', variant = 'primary', ...props }) => {
   return (
     <button
       className={cn(
-        // Base styles using semantic tokens
-        'inline-flex items-center justify-center rounded-[var(--radius-base)]',
-        'font-medium transition-colors focus-visible:outline-none',
+        // Base styles using mathematical tokens
+        'inline-flex items-center justify-center rounded-[var(--radius-md)]',
+        'font-medium focus-visible:outline-none',
+        'transition-colors duration-[var(--motion-duration-fast)]',
         
-        // Size variants using token system
+        // Golden ratio size hierarchy
         {
-          'h-8 px-[var(--spacing-xs)] text-sm': size === 'sm',
-          'h-10 px-[var(--spacing-md)]': size === 'md',
-          'h-12 px-[var(--spacing-lg)] text-lg': size === 'lg',
+          'h-8 px-[var(--spacing-2)] text-[var(--font-size-sm)]': size === 'sm',  // Tertiary
+          'h-10 px-[var(--spacing-3)] text-[var(--font-size-base)]': size === 'md', // Secondary  
+          'h-12 px-[var(--spacing-4)] text-[var(--font-size-lg)]': size === 'lg',  // Primary
         },
         
-        // Color variants using semantic tokens
+        // Color theory variants with accessibility intelligence
         {
           'bg-[var(--color-primary)] text-[var(--color-primary-foreground)]': variant === 'primary',
           'bg-[var(--color-secondary)] text-[var(--color-secondary-foreground)]': variant === 'secondary',
+          // Destructive requires confirmation patterns (see JSDoc intelligence)
+          'bg-[var(--color-destructive)] text-[var(--color-destructive-foreground)]': variant === 'destructive',
         }
       )}
       {...props}
@@ -190,87 +263,98 @@ export const Button = ({ size = 'md', variant = 'primary', ...props }) => {
 
 ---
 
-## Intelligence Distribution
+## Mathematical Intelligence Distribution
 
-### Why This Approach Works for AI
+### Why This Approach Works for AI Agents
 
-**1. Source Code Ownership**
-- AIs can read and understand complete implementation
-- No black box dependencies to reverse-engineer
-- Intelligence patterns embedded in readable code
+**1. Mathematical Foundation**
+- Color theory calculations provide consistent, predictable intelligence
+- Golden ratio spacing ensures systematic proportional relationships
+- Musical typography ratios create naturally harmonious text scales
+- All intelligence derived from mathematical principles, not arbitrary decisions
 
-**2. Layered Intelligence Access**
-- **Comments**: Immediate essential patterns
-- **Manifest**: Machine-readable intelligence data
-- **Stories**: Complete design education
+**2. Cross-System Intelligence**
+- **JSDoc Comments**: Mathematical relationships and usage intelligence embedded in code
+- **Token Registry**: Complete mathematical derivation and accessibility calculations
+- **Component Registry**: Design reasoning with cross-system relationships
 
-**3. Local MCP Integration**
-- Components become part of local codebase context
-- MCP server can analyze specific implementations
-- Intelligence patterns inform local AI decisions
+**3. MCP Integration for AI Agents**
+- Components and tokens become part of local AI agent context
+- Mathematical intelligence enables principled design decisions
+- Cross-system relationships prevent design inconsistencies
+- AI agents understand WHY decisions were made, not just WHAT they are
 
-**4. Educational Value**
-- Teams learn design intelligence by reading code
-- Intelligence patterns transfer to new components
-- Design reasoning becomes part of team knowledge
+**4. Systematic Design Education**
+- Teams learn mathematical design principles through embedded intelligence
+- Design reasoning transfers across all components and tokens
+- Mathematical foundations enable consistent decision-making
+- Intelligence accumulates and compounds across the design system
 
-### Benefits Over Traditional Libraries
+### Benefits Over Traditional Design Libraries
 
 **Traditional Approach**:
 ```tsx
 import { Button } from 'some-library'
-// AI knows: "it's a button component"
+// AI knows: "it's a button component with these props"
 ```
 
-**Rafters Approach**:
+**Rafters Mathematical Intelligence Approach**:
 ```tsx
 /**
- * Button Intelligence: cognitiveLoad=3, size=attention hierarchy
- * Destructive variant REQUIRES confirmation UX patterns
+ * Button Intelligence: cognitiveLoad=3, trustLevel=medium
+ * Mathematical Intelligence: Golden ratio hierarchy, color theory accessibility
+ * Cross-System Relationships: Motion, typography, spacing integration
+ * Usage Patterns: Destructive requires confirmation, primary limited per view
  */
 export const Button = ({ variant, size, ...props }) => {
-  // Full implementation with design reasoning
+  // Implementation using mathematical token system
 }
-// AI knows: implementation + design intelligence + usage patterns
+// AI knows: Mathematical relationships + design reasoning + cross-system intelligence + accessibility compliance
 ```
 
 ---
 
 ## Future Enhancements
 
-### Version 1.0
-- Web configurator for token generation
-- CLI for component installation
-- Core component library with intelligence patterns
+### Version 1.0 (Current)
+- Mathematical token generation system (colors, spacing, typography, motion)
+- CLI for component installation with JSDoc intelligence
+- Core component library with embedded design reasoning
+- MCP integration for AI agent access
 
 ### Version 2.0
-- Component registry with community contributions
-- Advanced intelligence patterns (animations, micro-interactions)
-- MCP server integration for local AI assistance
+- Rafters Studio for design intent capture and mathematical intelligence generation
+- Advanced mathematical functions for layout proportions and negative space
+- Community component registry with intelligence validation
+- Cross-system intelligence optimization and conflict detection
 
 ### Version 3.0
-- Design intelligence validation tools
-- Automated accessibility testing
-- Intelligence pattern evolution tracking
+- Complete design intelligence preservation platform
+- AI agent training on mathematical design principles
+- Automated accessibility compliance validation across all systems
+- Design reasoning evolution and pattern learning
 
 ---
 
 ## Technical Constraints
 
 ### Requirements
-- **Tailwind CSS v4+** (CSS-first configuration)
-- **React 18+** 
-- **Radix UI primitives** (accessibility foundation)
+- **Tailwind CSS v4+** (CSS-first configuration with mathematical tokens)
+- **React 18+** (React 19 patterns preferred for purity requirements)
+- **Radix UI primitives** (accessibility foundation for WCAG AAA compliance)
+- **Mathematical token generators** (golden ratio, musical harmony, color theory)
 
 ### Non-Requirements
-- No config file syncing (CSS custom properties only)
-- No version management (source code ownership)
-- No customization preservation (manual maintenance)
+- No AI inference costs (mathematical intelligence is pre-calculated)
+- No config file syncing (mathematical tokens via CSS custom properties)
+- No version management (source code ownership with intelligence preservation)
+- No runtime dependencies (mathematical calculations happen at design time)
 
 ### Philosophy
-- **Simple overwrites** - delete and rewrite, no merging
-- **Source code ownership** - your code, your responsibility
-- **Intelligence preservation** - design reasoning travels with code
-- **Non-invasive** - doesn't modify existing project files
+- **Mathematical foundations** - intelligence derived from design theory, not arbitrary decisions
+- **Source code ownership** - your code with embedded mathematical intelligence
+- **Cross-system intelligence** - colors, spacing, typography, motion work together systematically
+- **Accessibility-first** - WCAG AAA compliance mathematically built into all systems
+- **AI-agent friendly** - JSDoc intelligence enables principled AI decision-making
 
-This architecture provides the intelligent foundation (like rafters) while respecting that each project needs to own and evolve their components according to their specific needs.
+This architecture provides mathematical design intelligence (like structural rafters) that enables both human designers and AI agents to make principled, systematic design decisions based on centuries of design theory rather than guesswork.

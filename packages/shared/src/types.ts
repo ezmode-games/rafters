@@ -118,6 +118,34 @@ export const ColorAnalysisSchema = z.object({
 
 export type ColorAnalysis = z.infer<typeof ColorAnalysisSchema>;
 
+// Atmospheric Weight Schema (atmospheric perspective color theory)
+export const AtmosphericWeightSchema = z.object({
+  distanceWeight: z.number().min(0).max(1), // 0 = background, 1 = foreground
+  temperature: z.enum(['warm', 'neutral', 'cool']),
+  atmosphericRole: z.enum(['background', 'midground', 'foreground']),
+});
+
+export type AtmosphericWeight = z.infer<typeof AtmosphericWeightSchema>;
+
+// Perceptual Weight Schema (visual balance in UI layouts)
+export const PerceptualWeightSchema = z.object({
+  weight: z.number().min(0).max(1), // 0-1, higher = more visual weight
+  density: z.enum(['light', 'medium', 'heavy']),
+  balancingRecommendation: z.string(),
+});
+
+export type PerceptualWeight = z.infer<typeof PerceptualWeightSchema>;
+
+// Semantic Color Suggestions Schema
+export const SemanticColorSuggestionsSchema = z.object({
+  danger: z.array(OKLCHSchema),
+  success: z.array(OKLCHSchema),
+  warning: z.array(OKLCHSchema),
+  info: z.array(OKLCHSchema),
+});
+
+export type SemanticColorSuggestions = z.infer<typeof SemanticColorSuggestionsSchema>;
+
 // Complete API Response Schema
 export const ColorIntelligenceResponseSchema = z.object({
   intelligence: ColorIntelligenceSchema,
@@ -142,6 +170,11 @@ export const ColorValueSchema = z.object({
   harmonies: ColorHarmoniesSchema.optional(),
   accessibility: ColorAccessibilitySchema.optional(),
   analysis: ColorAnalysisSchema.optional(),
+
+  // Advanced color theory intelligence (calculated by color-utils)
+  atmosphericWeight: AtmosphericWeightSchema.optional(),
+  perceptualWeight: PerceptualWeightSchema.optional(),
+  semanticSuggestions: SemanticColorSuggestionsSchema.optional(),
 
   // Unique token ID for quick color lookups (e.g., "color-0.500-0.120-240.0")
   tokenId: z.string().optional(),

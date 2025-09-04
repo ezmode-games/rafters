@@ -8,10 +8,18 @@
 
 import type { ColorValue, OKLCH } from '@rafters/shared';
 import { ColorValueSchema, OKLCHSchema } from '@rafters/shared';
-import { findAccessibleColor } from './accessibility.js';
+import { calculateWCAGContrast, findAccessibleColor, meetsWCAGStandard } from './accessibility.js';
+import { getColorTemperature, isLightColor } from './analysis.js';
 import { roundOKLCH } from './conversion.js';
-// Removed atmospheric/perceptual weight imports - using harmony functions directly
-import { generateOKLCHScale as generateLightnessScale } from './harmony.js';
+import {
+  calculateAtmosphericWeight,
+  calculatePerceptualWeight,
+  generateHarmony,
+  generateOKLCHScale as generateLightnessScale,
+  generateRaftersHarmony,
+  generateSemanticColorSuggestions,
+  generateSemanticColors,
+} from './harmony.js';
 
 /**
  * Color context validation using shared schemas
@@ -34,10 +42,11 @@ export function generateColorValue(baseColor: OKLCH, context: ColorContext = {})
   const validatedColor = OKLCHSchema.parse(baseColor);
   // Round for consistency and cache optimization
   const roundedColor = roundOKLCH(validatedColor);
-  // Generate mathematical lightness scale (50-950) using rounded color
+  // Generate mathematical lightness scale (50-950) with base at 600 using rounded color
   const scaleRecord = generateLightnessScale(roundedColor);
 
   // Convert Record<number, OKLCH> to ordered OKLCH array (already rounded from harmony)
+  // Base color now positioned at 600 for balanced tint/shade distribution
   const scale: OKLCH[] = [
     scaleRecord[50],
     scaleRecord[100],
@@ -45,11 +54,11 @@ export function generateColorValue(baseColor: OKLCH, context: ColorContext = {})
     scaleRecord[300],
     scaleRecord[400],
     scaleRecord[500],
-    scaleRecord[600],
+    scaleRecord[600], // Base color position
     scaleRecord[700],
     scaleRecord[800],
     scaleRecord[900],
-    scaleRecord[950] || scaleRecord[900],
+    scaleRecord[950], // Now always generated mathematically
   ].filter(Boolean);
 
   // Generate descriptive color name (or use provided name) using validated color
@@ -98,15 +107,69 @@ export function generateColorValue(baseColor: OKLCH, context: ColorContext = {})
     states.disabled = `oklch(${disabledColor.l} ${disabledColor.c} ${disabledColor.h})`;
   }
 
+  // Generate harmonies using existing harmony functions
+  const harmonyData = generateHarmony(roundedColor);
+  const harmonies = {
+    complementary: harmonyData.complementary,
+    triadic: [harmonyData.triadic1, harmonyData.triadic2],
+    analogous: [harmonyData.analogous1, harmonyData.analogous2],
+    tetradic: [harmonyData.tetradic1, harmonyData.tetradic2, harmonyData.tetradic3],
+    monochromatic: [
+      harmonyData.analogous1,
+      harmonyData.analogous2,
+      harmonyData.triadic1,
+      harmonyData.triadic2,
+    ].slice(0, 4),
+  };
+
+  // Calculate accessibility using existing accessibility functions
+  const white = roundOKLCH({ l: 1, c: 0, h: 0 });
+  const black = roundOKLCH({ l: 0, c: 0, h: 0 });
+  const accessibility = {
+    onWhite: {
+      wcagAA: meetsWCAGStandard(roundedColor, white, 'AA', 'normal'),
+      wcagAAA: meetsWCAGStandard(roundedColor, white, 'AAA', 'normal'),
+      contrastRatio: Math.round(calculateWCAGContrast(roundedColor, white) * 100) / 100,
+    },
+    onBlack: {
+      wcagAA: meetsWCAGStandard(roundedColor, black, 'AA', 'normal'),
+      wcagAAA: meetsWCAGStandard(roundedColor, black, 'AAA', 'normal'),
+      contrastRatio: Math.round(calculateWCAGContrast(roundedColor, black) * 100) / 100,
+    },
+  };
+
+  // Color analysis with core properties
+  const analysis = {
+    temperature: getColorTemperature(roundedColor),
+    isLight: isLightColor(roundedColor),
+    name: `color-${Math.round(roundedColor.h)}-${Math.round(roundedColor.l * 100)}-${Math.round(roundedColor.c * 100)}`,
+  };
+
+  // Calculate color theory intelligence
+  const atmosphericWeight = calculateAtmosphericWeight(roundedColor);
+  const perceptualWeight = calculatePerceptualWeight(roundedColor);
+
+  // Generate semantic color suggestions based on color theory
+  const semanticSuggestions = generateSemanticColorSuggestions(roundedColor);
+
   const colorValue = {
     name: colorName,
     scale,
     token: context.token,
-    value: '500', // Default scale position
+    value: '600', // Default scale position (updated to match new base)
     use: context.usage,
     ...(Object.keys(states).length > 0 && { states }),
-    // Intelligence fields left for API to populate:
-    // intelligence, harmonies, accessibility, analysis
+    // Mathematical data from color-utils
+    harmonies,
+    accessibility,
+    analysis,
+    // Advanced color theory intelligence
+    atmosphericWeight,
+    perceptualWeight,
+    semanticSuggestions,
+    // All mathematical intelligence included in analysis field
+    // Intelligence field left for API to populate with AI data:
+    // intelligence
   };
 
   // Validate output with Zod
