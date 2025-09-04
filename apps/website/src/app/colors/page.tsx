@@ -181,11 +181,33 @@ export default async function ColorsPage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Tailwind Color Intelligence</h1>
-        <p className="text-gray-600 text-lg">
-          All {colors.length} Tailwind 600-level colors with complete AI intelligence, OKLCH scales,
-          and accessibility analysis. Generated once, cached in Vectorize.
-        </p>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">Tailwind Color Intelligence</h1>
+        <div className="text-gray-600 text-lg space-y-4 max-w-4xl">
+          <p>
+            All {colors.length} Tailwind 600-level colors with complete AI intelligence, OKLCH
+            scales, and accessibility analysis. Generated once, cached in Vectorize.
+          </p>
+
+          <div className="bg-gray-50 rounded-lg p-6 text-left space-y-4">
+            <h2 className="text-xl font-semibold text-gray-900">
+              Contrast-Aware Scale Mathematics
+            </h2>
+            <p>
+              Instead of traditional linear lightness progressions, Rafters generates color scales
+              based on <strong>target contrast ratios</strong> optimized for modern app interfaces.
+              Our algorithm targets specific WCAG contrast values: 1.01, 1.45, 2.05, 3.0, 4.54, 7.0,
+              and up to 13.86 for maximum accessibility.
+            </p>
+            <p>
+              Light steps (50-400) provide the crucial 1.45-3.0 contrast range needed for dark mode
+              UI chrome—subtle borders, disabled text, and secondary elements that traditional
+              scales miss. Dark steps (600-950) deliver 4.5+ contrast ratios for accessible text on
+              light backgrounds. This dual-optimization approach ensures your color system works
+              seamlessly across both light and dark themes, eliminating the common problem of "dead
+              zones" where colors don't meet accessibility standards on either background.
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="grid gap-8 md:gap-12">

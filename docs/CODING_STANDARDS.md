@@ -20,7 +20,6 @@ See [Section 13: Mandatory Preflight Checks](#13-mandatory-preflight-checks-befo
 
 ---
 
-
 ## NEVER USE NPM NPX ##
 This is a pnpm workspace monorepo. using these tools can create a mess of the managed builds.
 NPX will run anything you suggest. It is a massive security risk to my computer.
