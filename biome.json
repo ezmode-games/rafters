@@ -5,6 +5,7 @@
       "**/node_modules",
       "**/dist",
       "**/build",
+      "**/.next",
       "**/.open-next",
       "**/.wrangler",
       "**/worker-configuration.d.ts",

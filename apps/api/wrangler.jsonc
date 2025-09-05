@@ -16,5 +16,10 @@
       "zone_id": "bad23610704adb1dc65b05bc22d6fb6f"
     }
   ],
-  "vars": {}
+  "vectorize": [
+    {
+      "binding": "VECTORIZE",
+      "index_name": "rafters-color-intel"
+    }
+  ]
 }

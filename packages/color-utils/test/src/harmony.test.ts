@@ -142,10 +142,22 @@ describe('Pure OKLCH Harmony Functions', () => {
   });
 
   describe('generateOKLCHScale', () => {
-    it('should generate 50-900 scale in OKLCH format', () => {
+    it('should generate contrast-aware 50-950 scale optimized for light and dark modes', () => {
       const scale = generateOKLCHScale(testColor);
 
-      const expectedSteps = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900'];
+      const expectedSteps = [
+        '50',
+        '100',
+        '200',
+        '300',
+        '400',
+        '500',
+        '600',
+        '700',
+        '800',
+        '900',
+        '950',
+      ];
       for (const step of expectedSteps) {
         expect(scale).toHaveProperty(step);
 
@@ -158,15 +170,62 @@ describe('Pure OKLCH Harmony Functions', () => {
         // Hue should remain consistent
         expect(color.h).toBe(testColor.h);
         expect(color.alpha).toBe(testColor.alpha);
+
+        // All values should be properly rounded
+        expect(color.l).toEqual(Math.round(color.l * 100) / 100);
+        expect(color.c).toEqual(Math.round(color.c * 100) / 100);
+        expect(color.h).toEqual(Math.round(color.h));
       }
 
-      // 500 should match the base color lightness
-      expect(scale['500'].l).toBe(testColor.l);
+      // Contrast-aware lightness distribution
+      // Light steps (50-400) should be light for dark mode usage
+      expect(scale['50'].l).toBeGreaterThan(0.9);
+      expect(scale['100'].l).toBeGreaterThan(0.8);
+      expect(scale['200'].l).toBeGreaterThan(0.7);
+      expect(scale['300'].l).toBeGreaterThan(0.6);
+      expect(scale['400'].l).toBeGreaterThan(0.5);
 
-      // Lightness should progress logically
+      // Dark steps (600-950) should be dark for light mode usage
+      expect(scale['600'].l).toBeLessThan(0.5);
+      expect(scale['700'].l).toBeLessThan(0.4);
+      expect(scale['800'].l).toBeLessThan(0.3);
+      expect(scale['900'].l).toBeLessThan(0.2);
+      expect(scale['950'].l).toBeLessThan(0.1);
+
+      // Lightness should progress logically within each range
       expect(scale['50'].l).toBeGreaterThan(scale['100'].l);
       expect(scale['100'].l).toBeGreaterThan(scale['200'].l);
+      expect(scale['200'].l).toBeGreaterThan(scale['300'].l);
+      expect(scale['300'].l).toBeGreaterThan(scale['400'].l);
+
+      expect(scale['600'].l).toBeGreaterThan(scale['700'].l);
+      expect(scale['700'].l).toBeGreaterThan(scale['800'].l);
       expect(scale['800'].l).toBeGreaterThan(scale['900'].l);
+      expect(scale['900'].l).toBeGreaterThan(scale['950'].l);
+
+      // Chroma should be adjusted based on lightness for perceptual uniformity
+      expect(scale['50'].c).toBeLessThan(testColor.c); // Very light = less chroma
+      expect(scale['950'].c).toBeLessThan(testColor.c); // Very dark = less chroma
+    });
+
+    it('should create scales suitable for dark mode UI chrome (low contrast ratios)', () => {
+      const scale = generateOKLCHScale(testColor);
+
+      // Steps 50-300 should provide the 1.45-3.0 contrast range needed for dark mode
+      expect(scale['50'].l).toBeGreaterThan(0.95); // Nearly white for subtle elements
+      expect(scale['100'].l).toBeGreaterThan(0.9); // Light for disabled text
+      expect(scale['200'].l).toBeGreaterThan(0.8); // Medium-light for secondary UI
+      expect(scale['300'].l).toBeGreaterThan(0.7); // Large text AA minimum
+    });
+
+    it('should create scales suitable for light mode text (high contrast ratios)', () => {
+      const scale = generateOKLCHScale(testColor);
+
+      // Steps 600-950 should provide 4.5+ contrast for accessible text on light backgrounds
+      expect(scale['600'].l).toBeLessThan(0.5); // Dark enough for AAA text
+      expect(scale['700'].l).toBeLessThan(0.3); // Very dark for high contrast
+      expect(scale['800'].l).toBeLessThan(0.2); // Nearly black
+      expect(scale['950'].l).toBeLessThan(0.1); // Almost black
     });
   });
 });

@@ -3,7 +3,7 @@ import { cors } from 'hono/cors';
 import { colorIntel } from './routes/color-intel';
 
 interface CloudflareBindings {
-  RAFTERS_INTEL: KVNamespace;
+  VECTORIZE: VectorizeIndex;
   CLAUDE_API_KEY: string;
   CF_TOKEN: string;
   CLAUDE_GATEWAY_URL: string;

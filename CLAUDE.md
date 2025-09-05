@@ -135,22 +135,22 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
 <Button className="bg-blue-500 text-white">
 ```
 
-### 3. FOLLOW 7-File Story Architecture for New Components
-**MANDATORY files for every component:**
-1. `ComponentName.mdx` - Overview Documentation
-2. `ComponentName.stories.tsx` - Primary Story (with `onClick: fn()`)
-3. `ComponentNameIntelligence.stories.tsx` - Design Intelligence
-4. `ComponentNameVariants.stories.tsx` - Visual Variants
-5. `ComponentNameProperties.stories.tsx` - Interactive Properties  
-6. `ComponentNameSemantic.stories.tsx` - Semantic Usage
-7. `ComponentNameAccessibility.stories.tsx` - Accessibility Compliance
+### 3. FOLLOW JSDoc Intelligence Standards for New Components
+**MANDATORY intelligence for every component:**
+1. `@cognitive-load` - Mental effort rating (1-10 scale)
+2. `@attention-economics` - Visual hierarchy and usage rules
+3. `@trust-building` - Confidence patterns for different consequence levels
+4. `@accessibility` - WCAG compliance and screen reader support
+5. `@semantic-meaning` - Contextual usage and variant purposes
+6. `@usage-patterns` - Clear DO/NEVER guidelines
+7. `@design-guides` - Links to design reasoning documentation
 
 ### 4. RUN Tests Before Committing
 ```bash
 pnpm test
 ```
 
-** Broken stories = Corrupted AI training data**
+** Broken components = Failed intelligence access for AI agents**
 
 ## CRITICAL DEVELOPMENT STANDARDS
 
@@ -164,7 +164,7 @@ pnpm test
 
 ### Lefthook Pre-commit Will BLOCK Commits Unless:
 - `pnpm biome check` passes
-- `pnpm vitest run` passes (includes story tests)
+- `pnpm vitest run` passes 
 - All TypeScript compiles without errors
 - No linting violations
 
@@ -172,12 +172,12 @@ pnpm test
 
 **BEFORE implementing any interface, apply this framework:**
 
-1. **Attention**: What deserves user focus? → [Attention Economics](./packages/ui/src/stories/AttentionEconomics.mdx)
-2. **Cognition**: How much mental effort? → [Cognitive Load](./packages/ui/src/stories/CognitiveLoad.mdx)  
-3. **Space**: How does whitespace create hierarchy? → [Negative Space](./packages/ui/src/stories/NegativeSpace.mdx)
-4. **Typography**: How does text support information flow? → [Typography Intelligence](./packages/ui/src/stories/TypographyIntelligence.mdx)
-5. **Enhancement**: What's core vs. enhanced? → [Progressive Enhancement](./packages/ui/src/stories/ProgressiveEnhancement.mdx)
-6. **Trust**: What's the consequence level? → [Trust Building](./packages/ui/src/stories/TrustBuilding.mdx)
+1. **Attention**: What deserves user focus? → Component `@attention-economics` annotations
+2. **Cognition**: How much mental effort? → Component `@cognitive-load` ratings
+3. **Space**: How does whitespace create hierarchy? → Token spacing relationships
+4. **Typography**: How does text support information flow? → Typography token intelligence
+5. **Enhancement**: What's core vs. enhanced? → Component accessibility patterns
+6. **Trust**: What's the consequence level? → Component `@trust-building` patterns
 
 ---
 
@@ -213,16 +213,15 @@ Every component includes design reasoning you can access:
  */
 ```
 
-### **Design Intelligence Quick Reference**
-Use these comprehensive guides to understand design reasoning patterns:
+### **Access Design Intelligence Through Components**
+Read embedded intelligence from component JSDoc annotations:
 
-- **[Trust Building](./packages/ui/src/stories/TrustBuilding.mdx)** - Reduce user anxiety, build confidence through appropriate friction
-- **[Attention Economics](./packages/ui/src/stories/AttentionEconomics.mdx)** - Manage finite cognitive resources, create clear visual hierarchy
-- **[Cognitive Load](./packages/ui/src/stories/CognitiveLoad.mdx)** - Apply Miller's Law, prevent user overwhelm with progressive disclosure
-- **[Negative Space](./packages/ui/src/stories/NegativeSpace.mdx)** - Master whitespace as powerful design element for hierarchy
-- **[Typography Intelligence](./packages/ui/src/stories/TypographyIntelligence.mdx)** - Create information architecture through systematic text hierarchy
-- **[Progressive Enhancement](./packages/ui/src/stories/ProgressiveEnhancement.mdx)** - Build from core experience outward, ensure universal access
-- **[Component Intelligence Synthesis](./packages/ui/src/stories/ComponentPatterns.mdx)** - Integrate all patterns for optimal interface composition
+- **Trust Building** - Read component `@trust-building` annotations for user confidence patterns
+- **Attention Economics** - Read component `@attention-economics` for visual hierarchy guidance  
+- **Cognitive Load** - Read component `@cognitive-load` ratings for mental complexity management
+- **Accessibility** - Read component `@accessibility` annotations for WCAG compliance patterns
+- **Usage Patterns** - Read component `@usage-patterns` for DO/NEVER guidelines
+- **Semantic Meaning** - Read component `@semantic-meaning` for contextual usage rules
 
 ### **Make Informed UX Decisions**
 Instead of guessing, read the embedded guidance:
@@ -258,16 +257,16 @@ Apply the embedded design knowledge to:
 
 ## Testing Requirements with Vitest
 
-**All Storybook stories are tested with Vitest** through `@storybook/addon-vitest`. Stories are AI training data that must function correctly:
+**Component intelligence must function correctly for AI agent access:**
 
-- **Stories are AI training scenarios** - not just documentation but behavior examples
-- **Every story becomes a test case** - ensuring AI guidance actually works
-- **Stories must render without errors** - broken training data corrupts AI learning
-- **Interactive stories must work** - AI needs real behavior patterns to learn from
+- **Components are AI guidance sources** - JSDoc intelligence must be accurate
+- **Every component becomes a design resource** - ensuring embedded reasoning is accessible
+- **Components must render without errors** - broken components prevent AI intelligence access
+- **Intelligence annotations must be complete** - AI agents need comprehensive guidance
 
 **Test commands:**
 ```bash
-pnpm test              # Run all tests including stories
+pnpm test              # Run all tests
 pnpm vitest run        # CI test runner
 ```
 
@@ -368,7 +367,7 @@ const UserForm = createFormFromSchema(UserSchema, async (data) => {
 - [ ] **Deterministic Functions**: Ensure same inputs always produce same outputs
 - [ ] **forwardRef Removal**: Convert to direct `ref` prop pattern
 - [ ] **Hook Updates**: Replace manual patterns with React 19 hooks where applicable
-- [ ] **Story Updates**: Ensure all 7 story files use React 19 patterns
+- [ ] **Intelligence Updates**: Ensure all JSDoc annotations include React 19 patterns
 - [ ] **Test Verification**: Confirm component works with concurrent rendering
 
 ### **Priority Migration List (15 Components)**:
@@ -379,79 +378,39 @@ const UserForm = createFormFromSchema(UserSchema, async (data) => {
 
 ### **Post-Migration Requirements:**
 - All components MUST pass `pnpm preflight`
-- All stories MUST render without errors
-- All components MUST work with `useTransition` and `useOptimistic`
+- All components MUST render without errors
+- All components MUST work with `useTransition` and `useOptimistic`  
 - TypeScript interfaces MUST include proper `ref` prop types
 
-**Story Testing Integration:**
-```typescript
-// Stories automatically become tests via Vitest addon
-export const Primary: Story = {
-  args: {
-    variant: 'primary',
-    children: 'Primary Button',
-    onClick: fn(), // REQUIRED for interactive components
-  },
-}
-// This story runs as a test in browser environment
+## Component Intelligence Standards
+
+### JSDoc Intelligence Requirements (MANDATORY)
+
+**Every component MUST include comprehensive JSDoc intelligence:**
+
+```jsx
+/**
+ * Interactive button component for user actions
+ *
+ * @registry-name button
+ * @registry-version 0.1.0
+ * @registry-status published
+ *
+ * @cognitive-load 3/10 - Simple action trigger with clear visual hierarchy
+ * @attention-economics Primary variant commands highest attention - use sparingly
+ * @trust-building Destructive actions require confirmation patterns
+ * @accessibility WCAG AAA compliant with 44px minimum touch targets
+ * @semantic-meaning primary=main actions, destructive=irreversible actions
+ *
+ * @usage-patterns
+ * DO: Primary buttons for main user goals, maximum 1 per section
+ * NEVER: Multiple primary buttons competing for attention
+ *
+ * @design-guides
+ * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
+ * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
+ */
 ```
-
-## AI Training Standards (Storybook)
-
-See [docs/STORYBOOK_STANDARDS.md](./docs/STORYBOOK_STANDARDS.md) for complete standards.
-
-### 7-File Story Architecture (MANDATORY)
-
-**Every component MUST implement exactly 7 story files** for comprehensive AI training:
-
-#### 1. **Overview Documentation** (`ComponentName.mdx`)
-- Component purpose and basic usage
-- Simple usage guidelines with DOs/DONTs  
-- Import from main `.stories.tsx` file only
-- Single Canvas example showing common usage
-
-#### 2. **Primary Story** (`ComponentName.stories.tsx`)
-- **Status comment REQUIRED** at top of file:
-  ```typescript
-  // @componentStatus published | draft | depreciated
-  // @version 0.1.0
-  ```
-- Single "Common" story showcasing all major variants
-- Complete argTypes for all component props
-- Interactive controls for rapid prototyping
-- Must include `onClick: fn()` for interactive components
-
-#### 3. **Design Intelligence** (`ComponentNameIntelligence.stories.tsx`)
-- Trust-building patterns and progressive confirmation
-- Attention hierarchy demonstrations
-- Cognitive load optimization examples
-- Context-aware adaptations
-- Loading states and feedback patterns
-
-#### 4. **Visual Variants** (`ComponentNameVariants.stories.tsx`)
-- All visual styling variants (primary, secondary, etc.)
-- Visual hierarchy demonstrations
-- Semantic color token usage exclusively
-- Style-focused examples with semantic meaning
-
-#### 5. **Interactive Properties** (`ComponentNameProperties.stories.tsx`)
-- Size variations and scaling relationships
-- State demonstrations (disabled, loading, error)
-- Interactive feedback patterns
-- Property combinations and behaviors
-
-#### 6. **Semantic Usage** (`ComponentNameSemantic.stories.tsx`)
-- Contextual usage examples in real scenarios
-- Semantic variants (success, warning, error, info)
-- Trust level implementations
-- Consequence-appropriate styling
-
-#### 7. **Accessibility Compliance** (`ComponentNameAccessibility.stories.tsx`)
-- WCAG AAA compliance demonstrations
-- Keyboard navigation patterns
-- Screen reader compatibility
-- Focus management and ARIA properties
-- Color contrast demonstrations
 
 ### Trust-Building Intelligence Framework
 
@@ -461,158 +420,6 @@ Components implement **4 trust levels** that match user psychology:
 - **Medium Trust** - Moderate consequences, balanced caution  
 - **High Trust** - Significant impact, deliberate friction
 - **Critical Trust** - Permanent consequences, maximum friction
-
-### AI Training Requirements
-
-**Every training scenario (story) MUST:**
-- Use `.tsx` extension for JSX parsing by AI agents
-- Import `fn()` for interactive behavior training: `import { fn } from 'storybook/test'`
-- Include comprehensive JSDoc for AI context understanding
-- Use semantic design tokens exclusively (teaches proper token usage to AI)
-- Pass accessibility checks (ensures AI learns accessible patterns)
-- Function as executable tests (validates AI training data quality)
-- Follow title hierarchy: `03 Components/Category/ComponentName/StoryType`
-
-**Example AI training scenario:**
-```typescript
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { fn } from 'storybook/test'
-import { Button } from '../components/ui/button'
-
-/**
- * AI Training: Button Intelligence
- * cognitiveLoad=3, size=attention hierarchy
- * Destructive variant REQUIRES confirmation UX patterns
- * This trains AI agents on button hierarchy and safety patterns
- */
-const meta = {
-  title: '03 Components/Action/Button',
-  component: Button,
-  parameters: {
-    layout: 'centered',
-    docs: {
-      description: {
-        component: 'AI Training: Foundational interactive element with embedded design reasoning for systematic decision-making.',
-      },
-    },
-  },
-  argTypes: {
-    variant: {
-      control: 'select',
-      options: ['primary', 'secondary', 'destructive', 'outline', 'ghost'],
-      description: 'Visual variant with semantic meaning',
-    },
-    onClick: {
-      description: 'Click handler - required for interactive testing',
-    },
-  },
-  args: { onClick: fn() }, // CRITICAL for story testing
-} satisfies Meta<typeof Button>
-
-export default meta
-type Story = StoryObj<typeof meta>
-
-/**
- * Primary action button for main user interactions.
- * Uses semantic primary tokens for highest attention hierarchy.
- */
-export const Primary: Story = {
-  args: {
-    variant: 'primary',
-    children: 'Primary Action',
-  },
-}
-```
-
-### **Complete Story File Example Structure**
-Based on the Button component implementation:
-
-**1. Button.mdx** - Design Philosophy Overview
-```markdown
-import { Meta, Canvas } from '@storybook/addon-docs/blocks';
-import * as Stories from './Button.stories.tsx';
-
-<Meta title="03 Components/Action/Button" of={Stories} name="Overview" />
-
-# Button Component
-
-Every interaction begins with intent. The button is where user intention meets interface response.
-Our button system is built on the principle that clarity of purpose should be immediately apparent.
-
-## Design Intelligence
-- Cognitive Load: 3/10 (simple action triggers)
-- Trust Building: Consistent visual hierarchy builds user confidence  
-- Attention Economics: Primary buttons command highest attention, use sparingly
-```
-
-**2. Button.stories.tsx** - Main Component Story
-```typescript
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { fn } from 'storybook/test'
-import { Button } from '../components/ui/button'
-
-const meta = {
-  title: '03 Components/Action/Button',
-  component: Button,
-  parameters: {
-    layout: 'centered',
-    docs: {
-      description: {
-        component: 'AI Training: Foundational interactive element with embedded design reasoning.',
-      },
-    },
-  },
-  argTypes: {
-    variant: {
-      control: 'select',
-      options: ['primary', 'secondary', 'destructive', 'outline', 'ghost'],
-      description: 'Visual variant with semantic meaning',
-    },
-    onClick: {
-      description: 'Click handler - required for interactive testing',
-    },
-  },
-  args: { onClick: fn() }, // CRITICAL for story testing
-} satisfies Meta<typeof Button>
-
-export default meta
-type Story = StoryObj<typeof meta>
-
-export const Primary: Story = {
-  args: {
-    variant: 'primary',
-    children: 'Primary Action',
-  },
-}
-```
-
-**Additional Story Files**: Follow same pattern for Intelligence, Variants, Properties, Semantic, and Accessibility stories.
-
-### Component Intelligence Comments
-**MANDATORY** in every component:
-```jsx
-/**
- * AI Intelligence: Component knowledge embedded for systematic decision-making
- * Trust Level: {level} - {explanation}
- * Cognitive Load: {1-10} - {complexity reasoning}
- * Safety Constraints: {required patterns}
- * Usage Context: {when/where to use}
- */
-```
-
-### Story Testing Integration (UI Package ONLY)
-**IMPORTANT: The UI package uses stories AS tests - NOT separate unit tests like other packages.**
-
-**All stories are automatically tested** via `@storybook/addon-vitest`:
-- Stories function as AI training scenarios AND test cases simultaneously
-- **No additional `.test.ts` files needed** - stories provide complete test coverage
-- Broken stories corrupt AI learning - they MUST render without errors
-- Interactive stories require `onClick: fn()` for proper test execution
-- Use `pnpm test` to verify story integrity
-
-**This is DIFFERENT from other monorepo packages** which use traditional unit testing.
-
-**Complete 7-File Architecture**: See [docs/STORYBOOK_STANDARDS.md](./docs/STORYBOOK_STANDARDS.md) for detailed implementation guides and examples for all 7 file types.
 
 ## Design Intelligence Integration
 

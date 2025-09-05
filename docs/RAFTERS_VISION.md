@@ -20,15 +20,15 @@
 - **Technical implementation** (CSS generation, component logic, accessibility compliance)
 - **Design reasoning documentation** for future reference and team communication
 
-### The Bridge: Rafters Studio
-**Studio handles complex mathematical relationships gracefully** so designers can focus on creative decisions:
+### The Bridge: Rafters System
+**Rafters handles complex mathematical relationships systematically** so designers can focus on creative decisions:
 
-- Designer chooses a color → Studio calculates perceptually uniform scales
-- Designer selects harmony direction → Studio generates mathematically precise palettes
-- Designer defines hierarchy intent → Studio creates consistent typographic systems
-- Designer makes aesthetic choices → Studio ensures accessibility across all color vision types
+- Designer chooses a color → TokenRegistry calculates perceptually uniform scales and relationships
+- Designer selects semantic meaning → ComponentRegistry provides usage patterns and design intelligence  
+- Designer defines hierarchy intent → System creates consistent typographic and spacing systems
+- Designer makes aesthetic choices → System ensures accessibility and systematic consistency
 
-**The motion and interaction design reduces cognitive load** by making complex relationships feel intuitive and natural.
+**The embedded intelligence reduces cognitive load** by providing systematic guidance for both humans and AI agents.
 
 ---
 
@@ -38,47 +38,40 @@
 Designers make hundreds of micro-decisions based on intuition, experience, and aesthetic judgment. AI agents need systematic rules to make consistent decisions that honor the designer's intent.
 
 ### The Rafters Solution
-**Convert human design intuition into machine-readable intelligence:**
+**Convert human design intuition into machine-readable intelligence through two registry systems:**
 
-#### 1. Decision Documentation
-Every design choice is captured with reasoning:
-```typescript
-// Human chose this color for trust and professionalism
-// Studio calculated the accessible variants
-const primary = {
-  intent: "trust-building, professional authority",
-  oklch: "oklch(0.6 0.15 250)", // Designer's choice
-  accessibility: {
-    aaLarge: ["oklch(0.3 0.12 250)"], // Studio calculated
-    aaNormal: ["oklch(0.25 0.1 250)"], // Studio calculated
-    aaa: ["oklch(0.2 0.08 250)"] // Studio calculated
-  }
-}
-```
-
-#### 2. Systematic Relationships
-Studio calculates how decisions connect:
-```typescript
-// Designer picked blue → Studio generated semantic system
-const semanticPalette = {
-  primary: designerChoice, // Trust, authority
-  success: harmonyCalculated, // Based on designer's blue
-  warning: accessibilityOptimized, // Maintains contrast ratios
-  danger: culturallyAppropriate // Red that works with designer's blue
-}
-```
-
-#### 3. AI Usage Patterns
-Components include embedded intelligence:
+#### 1. Component Registry (WHAT & WHY)
+Every component includes embedded design reasoning:
 ```jsx
 /**
- * Human Intent: Primary actions should command attention without overwhelming
- * Mathematical Reality: 4.5:1 contrast minimum, 44px touch targets
- * AI Guidance: Use for max 1-2 actions per interface
+ * @cognitive-load 3/10 - Simple action trigger with clear visual hierarchy
+ * @attention-economics Primary variant commands highest attention - use sparingly
+ * @trust-building Destructive actions require confirmation patterns
+ * @accessibility WCAG AAA compliant with 44px minimum touch targets
+ * @semantic-meaning primary=main actions, destructive=irreversible actions
  */
-<Button variant="primary" cognitiveLoad={3}>
-  Complete Order
-</Button>
+<Button variant="primary">Complete Order</Button>
+```
+
+#### 2. Token Registry (HOW)
+Mathematical relationships and implementation details:
+```typescript
+// Designer intent: Trust-building professional blue
+// TokenRegistry provides mathematical implementation
+const primary = {
+  50: "oklch(0.95 0.02 250)",   // Calculated scale
+  500: "oklch(0.6 0.15 250)",  // Designer's choice  
+  900: "oklch(0.2 0.08 250)",  // Accessible variants
+  // Dependency relationships managed automatically
+}
+```
+
+#### 3. MCP Integration
+AI agents access intelligence through multiple pathways:
+```typescript
+// MCP queries component registry for design reasoning
+// MCP queries token registry for implementation values  
+// AI makes informed decisions based on embedded intelligence
 ```
 
 ---
@@ -98,58 +91,65 @@ Components include embedded intelligence:
 8. Ensure systematic consistency
 
 **Rafters Process** (Minimal Cognitive Load):
-1. Choose color you love
-2. Studio handles all mathematical complexity gracefully
-3. Make aesthetic refinements through intuitive interface
-4. Export complete system with embedded AI intelligence
+1. Choose design intent (color, spacing, typography)
+2. TokenRegistry handles mathematical complexity automatically
+3. ComponentRegistry provides usage patterns and design reasoning
+4. AI agents access embedded intelligence through MCP
+5. System ensures consistency and accessibility by default
 
-### Graceful Mathematical Infrastructure
+### Registry-Based Intelligence Infrastructure
 
-**Motion Design Principles:**
-- **Floating elements** → Meditative state, reduces decision paralysis
-- **Smooth transitions** → Complex relationships feel natural
-- **Progressive emergence** → Overwhelming choices become manageable steps  
-- **Visual feedback** → Mathematical constraints feel intuitive
+**Component Registry Intelligence:**
+- **Design reasoning** embedded in JSDoc annotations  
+- **Usage patterns** with clear DO/NEVER guidelines
+- **Cognitive load** ratings for systematic decision-making
+- **Trust-building** patterns for user confidence
 
-**The designer experiences flow state** while Studio handles OKLCH math, accessibility calculations, and systematic relationships invisibly.
+**Token Registry Mathematics:**
+- **OKLCH color space** for perceptual uniformity
+- **Dependency graphs** for systematic relationships  
+- **Accessibility calculations** built into every token
+- **Mathematical precision** while preserving design intent
+
+**The system handles complex relationships systematically** while preserving human design reasoning for AI consumption.
 
 ---
 
 ## AI Agent Intelligence Integration
 
-### Embedded Design Reasoning
-Every component includes three layers of intelligence for AI consumption:
+### Dual Registry Architecture for AI Intelligence
+AI agents access design intelligence through two complementary systems:
 
-#### 1. Component Comments (Human Reasoning)
+#### 1. Component Registry Access (Design Reasoning)
 ```jsx
 /**
- * Designer Intent: Destructive actions need careful consideration
- * Cognitive Load: 7/10 - requires confirmation patterns
- * Usage Context: Account deletion, data loss, irreversible actions
+ * @cognitive-load 7/10 - Destructive actions require careful consideration  
+ * @attention-economics High-priority, requires confirmation patterns
+ * @trust-building Permanent consequences demand progressive confirmation
+ * @accessibility 44px touch targets, high contrast, screen reader optimized
+ * @usage-patterns NEVER: Multiple destructive actions without confirmation
  */
 ```
 
-#### 2. Component Manifest (Mathematical Relationships)
-```json
-{
-  "intelligence": {
-    "contrastRatio": 4.8,
-    "colorHarmony": "complementary",
-    "accessibilityZone": "AAA",
-    "attentionEconomy": "high-priority"
-  }
+#### 2. Token Registry Access (Implementation Values)
+```typescript
+// AI queries TokenRegistry for mathematical implementation
+const destructiveToken = {
+  value: "oklch(0.6 0.2 15)",      // Base color
+  foreground: "oklch(0.98 0.01 15)", // Accessible text
+  hover: "oklch(0.55 0.2 15)",     // Interaction state
+  dependencies: ["destructive-foreground", "ring"] // Required tokens
 }
 ```
 
-#### 3. Systematic Constraints (Behavioral Rules)
+#### 3. MCP Integration Points
 ```typescript
-// AI agents can read these constraints
-const buttonIntelligence = {
-  maxPerInterface: 2, // Attention economy
-  requiresConfirmation: variant === 'destructive',
-  contrastMinimum: 4.5,
-  touchTarget: 44 // Accessibility requirement
-}
+// AI agent workflow:
+// 1. Query ComponentRegistry: "What variant for account deletion?"
+// 2. Response: "destructive variant, requires confirmation patterns"  
+// 3. Query TokenRegistry: "Implementation for destructive?"
+// 4. Response: Complete color values and dependency relationships
+// 5. AI implements with embedded intelligence
 ```
 
 ---
@@ -163,10 +163,10 @@ const buttonIntelligence = {
 - **Beautiful results** that honor aesthetic intent
 
 ### for AI Agents  
-- **Systematic consistency** across all design applications
-- **Clear usage patterns** for every component
-- **Embedded reasoning** for context-appropriate decisions
-- **Mathematical precision** in color, spacing, and typography
+- **Component intelligence** through structured JSDoc annotations
+- **Token precision** through mathematical relationships and dependency graphs
+- **MCP integration** for seamless intelligence access
+- **Systematic decision-making** based on embedded design reasoning
 
 ### For Teams
 - **Transferable design intelligence** that survives designer transitions
@@ -176,4 +176,4 @@ const buttonIntelligence = {
 
 ---
 
-**Rafters bridges human creativity and AI precision through graceful mathematical infrastructure, enabling designers to focus on what they do best while giving AI agents the systematic language to honor human design intent.**
+**Rafters bridges human creativity and AI precision through dual registry architecture, enabling designers to embed their reasoning into systematic intelligence that AI agents can access and honor through MCP integration.**
