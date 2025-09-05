@@ -16,6 +16,9 @@
       "zone_id": "bad23610704adb1dc65b05bc22d6fb6f"
     }
   ],
+  "triggers": {
+    "crons": ["* * * * *"]
+  },
   "vectorize": [
     {
       "binding": "VECTORIZE",
