@@ -2,15 +2,7 @@ import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import * as z from 'zod';
 
-import {
-  calculateWCAGContrast,
-  generateColorValue,
-  generateHarmony,
-  getColorTemperature,
-  isLightColor,
-  meetsWCAGStandard,
-  validateOKLCH,
-} from '@rafters/color-utils';
+import { generateColorValue, validateOKLCH } from '@rafters/color-utils';
 import { ColorValueSchema, OKLCHSchema } from '@rafters/shared';
 import { generateColorIntelligence } from '../lib/color-intel/utils';
 
@@ -19,6 +11,40 @@ import { generateColorIntelligence } from '../lib/color-intel/utils';
 // The 375 additional dimensions provide deterministic mathematical encoding
 // of color relationships using trigonometric functions of OKLCH components
 const VECTORIZE_ADDITIONAL_DIMENSIONS = 375;
+
+/**
+ * Generate deterministic vector dimensions efficiently using mathematical functions
+ * Avoids expensive Array.from iteration by computing values directly
+ */
+function generateVectorDimensions(oklch: { l: number; c: number; h: number }): number[] {
+  const dimensions: number[] = [];
+
+  // Base factor for mathematical functions
+  const hueRad = (oklch.h * Math.PI) / 180;
+  const chromaScale = oklch.c * 10; // Scale chroma for better distribution
+  const lightnessScale = oklch.l * 2; // Scale lightness for better distribution
+
+  // Generate dimensions using efficient mathematical relationships
+  for (let i = 0; i < VECTORIZE_ADDITIONAL_DIMENSIONS; i++) {
+    const factor = (i + 1) / VECTORIZE_ADDITIONAL_DIMENSIONS;
+
+    // Use different mathematical functions based on index ranges for better distribution
+    if (i < 125) {
+      // Trigonometric functions with hue variations
+      dimensions.push(Math.sin(hueRad * factor) * chromaScale * lightnessScale);
+    } else if (i < 250) {
+      // Cosine functions with chroma variations
+      dimensions.push(Math.cos(hueRad * factor) * oklch.l * oklch.c);
+    } else {
+      // Combined functions for complex relationships
+      dimensions.push(
+        Math.sin(factor * Math.PI) * Math.cos(oklch.h * factor * 0.01) * oklch.l * oklch.c
+      );
+    }
+  }
+
+  return dimensions;
+}
 
 interface CloudflareBindings {
   VECTORIZE: VectorizeIndex;
@@ -131,11 +157,8 @@ colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
               oklch.c > 0.15 ? 1 : 0, // High chroma/saturation
               Math.sin((oklch.h * Math.PI) / 180), // Hue as sine
               Math.cos((oklch.h * Math.PI) / 180), // Hue as cosine
-              // Fill remaining dimensions with deterministic mathematical functions of OKLCH
-              ...Array.from({ length: VECTORIZE_ADDITIONAL_DIMENSIONS }, (_, i) => {
-                const factor = (i + 1) / VECTORIZE_ADDITIONAL_DIMENSIONS;
-                return Math.sin(oklch.h * factor) * oklch.c * oklch.l;
-              }),
+              // Fill remaining dimensions with efficient deterministic mathematical functions
+              ...generateVectorDimensions(oklch),
             ],
             metadata: {
               complete_color_value: JSON.stringify(validatedColorValue),
@@ -155,9 +178,7 @@ colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
       return c.json(
         {
           error: 'Validation failed',
-          message: error.issues
-            .map((e: z.ZodIssue) => `${e.path.join('.')}: ${e.message}`)
-            .join(', '),
+          message: error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', '),
         },
         400
       );
