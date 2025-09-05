@@ -193,10 +193,9 @@ function AccessibilityMatrix({ colorValue }: { colorValue: ColorValue }) {
             WCAG AA Normal Text (4.5:1) • {pairs.length} pairs
           </h5>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-            {limitedPairs.map(([i, j]) => {
-              // Safety check for valid indices
-              if (!colorValue.scale[i] || !colorValue.scale[j]) return null;
-              return (
+            {limitedPairs
+              .filter(([i, j]) => colorValue.scale[i] && colorValue.scale[j])
+              .map(([i, j]) => (
                 <AccessibilityPair
                   key={`aa-${i}-${j}`}
                   color1={colorValue.scale[i]}
@@ -205,8 +204,7 @@ function AccessibilityMatrix({ colorValue }: { colorValue: ColorValue }) {
                   scale1Index={i}
                   scale2Index={j}
                 />
-              );
-            })}
+              ))}
           </div>
           {pairs.length > maxPairs && (
             <p className="text-xs text-gray-500 mt-2">
@@ -223,10 +221,9 @@ function AccessibilityMatrix({ colorValue }: { colorValue: ColorValue }) {
             WCAG AAA Normal Text (7:1) • {aaaPairs.length} pairs
           </h5>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-            {limitedAAAPairs.map(([i, j]) => {
-              // Safety check for valid indices
-              if (!colorValue.scale[i] || !colorValue.scale[j]) return null;
-              return (
+            {limitedAAAPairs
+              .filter(([i, j]) => colorValue.scale[i] && colorValue.scale[j])
+              .map(([i, j]) => (
                 <AccessibilityPair
                   key={`aaa-${i}-${j}`}
                   color1={colorValue.scale[i]}
@@ -235,8 +232,7 @@ function AccessibilityMatrix({ colorValue }: { colorValue: ColorValue }) {
                   scale1Index={i}
                   scale2Index={j}
                 />
-              );
-            })}
+              ))}
           </div>
           {aaaPairs.length > maxPairs && (
             <p className="text-xs text-gray-500 mt-2">
