@@ -28,25 +28,10 @@ app.use(
 app.route('/api/color-intel', colorIntel);
 app.route('/api/color-queue', colorQueueProgress);
 
-// Scheduled function for cron triggers
-export const scheduled: ExportedHandlerScheduledHandler<CloudflareBindings> = async (
-  event,
-  env,
-  _ctx
-) => {
-  console.log('🎨 Color queue cron triggered at:', new Date(event.scheduledTime).toISOString());
+export default {
+  fetch: app.fetch,
 
-  const startTime = Date.now();
-  const result = await processColorQueue({ RAFTERS_INTEL: env.RAFTERS_INTEL });
-  const duration = Date.now() - startTime;
-
-  if (result.processed) {
-    console.log(`✅ Color processed successfully in ${duration}ms`);
-  } else if (result.error) {
-    console.log(`⚠️  Processing failed: ${result.error} (${duration}ms)`);
-  } else {
-    console.log(`ℹ️  No colors available for processing (${duration}ms)`);
-  }
+  async scheduled(event: ScheduledEvent, env: CloudflareBindings, ctx: ExecutionContext) {
+    await processColorQueue({ RAFTERS_INTEL: env.RAFTERS_INTEL });
+  },
 };
-
-export default app;
