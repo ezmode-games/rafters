@@ -157,7 +157,7 @@ function generateQueueItemKey(oklch: OKLCH, index: number): string {
  * Create progress tracking entry
  */
 function createProgressEntry(totalColors: number): QueueProgress {
-  const estimatedSeconds = totalColors * 10; // 10 seconds per color
+  const estimatedSeconds = totalColors * 60; // 60 seconds per color (1 minute)
   const estimatedCompletion = new Date(Date.now() + estimatedSeconds * 1000).toISOString();
 
   return {
@@ -230,7 +230,7 @@ export async function seedColorQueue(config: BootstrapSeederConfig, kv: KVStore)
   console.log('🎉 Color queue seeding complete!');
   console.log(`📈 Seeded ${allColors.length} colors for distributed processing`);
   console.log(`⏱️  Estimated completion time: ${progress.estimatedCompletion}`);
-  console.log('🔄 Cron processor will handle 1 color every 10 seconds');
+  console.log('🔄 Cron processor will handle 1 color every minute');
 }
 
 /**
@@ -275,6 +275,7 @@ export async function runSeeder() {
 }
 
 // Run if called directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+import { fileURLToPath } from 'node:url';
+if (fileURLToPath(import.meta.url) === process.argv[1]) {
   runSeeder();
 }

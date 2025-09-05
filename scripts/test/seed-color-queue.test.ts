@@ -43,6 +43,15 @@ import {
   seedColorQueue,
 } from '../seed-color-queue.js';
 
+// Mock loadStandardColors for testing
+vi.mock('../seed-color-queue.js', async () => {
+  const actual = await vi.importActual('../seed-color-queue.js');
+  return {
+    ...actual,
+    loadStandardColors: vi.fn(),
+  };
+});
+
 describe('Color Queue Seeder', () => {
   let mockKV: MockKV;
 
