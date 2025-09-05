@@ -21,5 +21,11 @@
       "binding": "VECTORIZE",
       "index_name": "rafters-color-intel"
     }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "RAFTERS_INTEL",
+      "id": "6b15dbdd8a304ec1a374aa8e913f4123"
+    }
   ]
 }
