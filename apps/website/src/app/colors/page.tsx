@@ -108,6 +108,180 @@ function ColorScale({
   );
 }
 
+function getScalePositionLabel(index: number): string {
+  const positions = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
+  return positions[index] || `${index}`;
+}
+
+function AccessibilityPair({
+  color1,
+  color2,
+  level,
+  scale1Index,
+  scale2Index,
+}: {
+  color1: { l: number; c: number; h: number };
+  color2: { l: number; c: number; h: number };
+  level: 'AA' | 'AAA';
+  scale1Index: number;
+  scale2Index: number;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      {/* Connected swatches */}
+      <div className="flex items-center">
+        <div
+          className="w-6 h-6 rounded-l-md border border-gray-300"
+          style={{ backgroundColor: oklchToCSS(color1) }}
+        />
+        <div
+          className="w-6 h-6 rounded-r-md border border-gray-300"
+          style={{ backgroundColor: oklchToCSS(color2) }}
+        />
+      </div>
+
+      {/* Connection indicator */}
+      <div className="w-3 h-0.5 bg-gray-400" />
+
+      {/* Compliance badge */}
+      <span
+        className={`px-1.5 py-0.5 rounded text-xs font-medium ${
+          level === 'AAA' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+        }`}
+      >
+        {level}
+      </span>
+
+      {/* Scale positions */}
+      <span className="text-xs text-gray-500 font-mono">
+        {getScalePositionLabel(scale1Index)} + {getScalePositionLabel(scale2Index)}
+      </span>
+    </div>
+  );
+}
+
+function AccessibilityMatrix({ colorValue }: { colorValue: ColorValue }) {
+  // Access pre-computed matrices from updated ColorValue (gracefully handle missing data)
+  const pairs = colorValue.accessibility?.wcagAA?.normal || [];
+  const aaaPairs = colorValue.accessibility?.wcagAAA?.normal || [];
+
+  // Ensure we have valid scale data before proceeding
+  if (!colorValue.scale || colorValue.scale.length === 0) {
+    return (
+      <div className="space-y-4">
+        <h4 className="text-sm font-medium text-gray-700">Accessibility Pairs</h4>
+        <p className="text-xs text-gray-500 italic">
+          Accessibility data not available for this color.
+        </p>
+      </div>
+    );
+  }
+
+  // Limit displayed pairs to avoid overwhelming UI
+  const maxPairs = 8;
+  const limitedPairs = pairs.slice(0, maxPairs);
+  const limitedAAAPairs = aaaPairs.slice(0, maxPairs);
+
+  return (
+    <div className="space-y-4">
+      <h4 className="text-sm font-medium text-gray-700">Accessibility Pairs</h4>
+
+      {/* AA Pairs */}
+      {limitedPairs.length > 0 && (
+        <div>
+          <h5 className="text-xs font-medium text-blue-700 mb-2">
+            WCAG AA Normal Text (4.5:1) • {pairs.length} pairs
+          </h5>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+            {limitedPairs.map(([i, j]) => {
+              // Safety check for valid indices
+              if (!colorValue.scale[i] || !colorValue.scale[j]) return null;
+              return (
+                <AccessibilityPair
+                  key={`aa-${i}-${j}`}
+                  color1={colorValue.scale[i]}
+                  color2={colorValue.scale[j]}
+                  level="AA"
+                  scale1Index={i}
+                  scale2Index={j}
+                />
+              );
+            })}
+          </div>
+          {pairs.length > maxPairs && (
+            <p className="text-xs text-gray-500 mt-2">
+              Showing {maxPairs} of {pairs.length} AA-compliant pairs
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* AAA Pairs */}
+      {limitedAAAPairs.length > 0 && (
+        <div>
+          <h5 className="text-xs font-medium text-green-700 mb-2">
+            WCAG AAA Normal Text (7:1) • {aaaPairs.length} pairs
+          </h5>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+            {limitedAAAPairs.map(([i, j]) => {
+              // Safety check for valid indices
+              if (!colorValue.scale[i] || !colorValue.scale[j]) return null;
+              return (
+                <AccessibilityPair
+                  key={`aaa-${i}-${j}`}
+                  color1={colorValue.scale[i]}
+                  color2={colorValue.scale[j]}
+                  level="AAA"
+                  scale1Index={i}
+                  scale2Index={j}
+                />
+              );
+            })}
+          </div>
+          {aaaPairs.length > maxPairs && (
+            <p className="text-xs text-gray-500 mt-2">
+              Showing {maxPairs} of {aaaPairs.length} AAA-compliant pairs
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Background compatibility summary */}
+      {(colorValue.accessibility?.onWhite?.aa?.length ||
+        colorValue.accessibility?.onBlack?.aa?.length) && (
+        <div className="pt-3 border-t border-gray-200">
+          <h5 className="text-xs font-medium text-gray-700 mb-2">Background Compatibility</h5>
+          <div className="flex gap-4 text-xs">
+            {colorValue.accessibility?.onWhite?.aa?.length && (
+              <div>
+                <span className="text-gray-600">White background:</span>
+                <span className="ml-1 font-mono text-gray-900">
+                  {colorValue.accessibility.onWhite.aa.length} AA shades
+                </span>
+              </div>
+            )}
+            {colorValue.accessibility?.onBlack?.aa?.length && (
+              <div>
+                <span className="text-gray-600">Black background:</span>
+                <span className="ml-1 font-mono text-gray-900">
+                  {colorValue.accessibility.onBlack.aa.length} AA shades
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {limitedPairs.length === 0 && limitedAAAPairs.length === 0 && (
+        <p className="text-xs text-gray-500 italic">
+          No accessible pairs found in this color scale. Consider using colors with greater
+          lightness variation.
+        </p>
+      )}
+    </div>
+  );
+}
+
 export const metadata: Metadata = {
   title: 'Rafters Color Intelligence | All Tailwind Colors',
   description:
@@ -269,60 +443,13 @@ export default async function ColorsPage() {
               )}
             </div>
 
-            {/* WCAG Accessibility Matrix - Temporarily disabled due to data structure mismatch */}
-            {colorData.accessibility && false && (
+            {/* WCAG Accessibility Matrix with Visual Pairs */}
+            {colorData.accessibility && (
               <div className="mb-6 p-4 bg-green-50 rounded-lg">
                 <h4 className="text-sm font-medium text-gray-700 mb-3">
                   WCAG Accessibility Matrix
                 </h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h5 className="text-xs font-medium text-green-700 mb-2">AA Compliance</h5>
-                    <div className="space-y-1 text-xs">
-                      <div>
-                        <span className="text-gray-600">Normal text pairs:</span>
-                        <span className="ml-2 font-mono">
-                          {colorData.accessibility?.onWhite?.wcagAA ? '1' : '0'}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600">Large text pairs:</span>
-                        <span className="ml-2 font-mono">
-                          {colorData.accessibility?.onWhite?.wcagAA ? '1' : '0'}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600">On white shades:</span>
-                        <span className="ml-2 font-mono">
-                          {colorData.accessibility?.onWhite?.contrastRatio?.toFixed(2) ?? 'N/A'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <h5 className="text-xs font-medium text-green-800 mb-2">AAA Compliance</h5>
-                    <div className="space-y-1 text-xs">
-                      <div>
-                        <span className="text-gray-600">Normal text pairs:</span>
-                        <span className="ml-2 font-mono">
-                          {colorData.accessibility?.onWhite?.wcagAAA ? '1' : '0'}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600">Large text pairs:</span>
-                        <span className="ml-2 font-mono">
-                          {colorData.accessibility?.onWhite?.wcagAAA ? '1' : '0'}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600">On white shades:</span>
-                        <span className="ml-2 font-mono">
-                          {colorData.accessibility?.onWhite?.contrastRatio?.toFixed(2) ?? 'N/A'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <AccessibilityMatrix colorValue={colorData} />
               </div>
             )}
 

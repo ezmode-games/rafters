@@ -15,6 +15,9 @@
 - Validates component intelligence before implementation
 - Acts as forcing function to apply embedded design reasoning
 
+## Read the docs!
+all apps and packages have their own readme, the docs/ folder has many important and require docs.
+
 ## BEFORE ANY CODE - RUN THIS COMMAND:
 ```bash
 pnpm preflight

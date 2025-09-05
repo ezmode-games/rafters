@@ -95,15 +95,36 @@ export type ColorHarmonies = z.infer<typeof ColorHarmoniesSchema>;
 
 // Color Accessibility Schema (calculated by color-utils)
 export const ColorAccessibilitySchema = z.object({
+  // Pre-computed contrast matrices (indices into scale array)
+  wcagAA: z
+    .object({
+      normal: z.array(z.array(z.number())), // [[0, 5], [0, 6], ...] - pairs that meet AA
+      large: z.array(z.array(z.number())), // [[0, 4], [0, 5], ...] - more pairs for large text
+    })
+    .optional(),
+  wcagAAA: z
+    .object({
+      normal: z.array(z.array(z.number())), // [[0, 7], [0, 8], ...] - fewer pairs meet AAA
+      large: z.array(z.array(z.number())), // [[0, 6], [0, 7], ...]
+    })
+    .optional(),
+
+  // Basic compatibility data for the base color
   onWhite: z.object({
     wcagAA: z.boolean(),
     wcagAAA: z.boolean(),
     contrastRatio: z.number(),
+    // Pre-computed indices for scale lookups
+    aa: z.array(z.number()).optional(), // [5, 6, 7, 8, 9] - shades that pass AA on white
+    aaa: z.array(z.number()).optional(), // [7, 8, 9] - shades that pass AAA on white
   }),
   onBlack: z.object({
     wcagAA: z.boolean(),
     wcagAAA: z.boolean(),
     contrastRatio: z.number(),
+    // Pre-computed indices for scale lookups
+    aa: z.array(z.number()).optional(), // [0, 1, 2, 3, 4] - shades that pass AA on black
+    aaa: z.array(z.number()).optional(), // [0, 1, 2] - shades that pass AAA on black
   }),
 });
 

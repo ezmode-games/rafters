@@ -102,6 +102,114 @@ export function meetsAPCAStandard(foreground: OKLCH, background: OKLCH, textSize
 }
 
 /**
+ * Pre-computed accessibility contrast matrix interface
+ * Stores WCAG AA/AAA compliance pairs as indices into color scales
+ */
+export interface AccessibilityMetadata {
+  // Pre-computed contrast matrices (indices into scale array)
+  wcagAA: {
+    normal: number[][]; // [[0, 5], [0, 6], [1, 7], ...] - pairs that meet AA
+    large: number[][]; // [[0, 4], [0, 5], [1, 5], ...] - more pairs for large text
+  };
+  wcagAAA: {
+    normal: number[][]; // [[0, 7], [0, 8], [0, 9], ...] - fewer pairs meet AAA
+    large: number[][]; // [[0, 6], [0, 7], [1, 7], ...]
+  };
+
+  // Pre-calculated for common backgrounds
+  onWhite: {
+    aa: number[]; // [5, 6, 7, 8, 9] - shades that pass AA on white
+    aaa: number[]; // [7, 8, 9] - shades that pass AAA on white
+  };
+  onBlack: {
+    aa: number[]; // [0, 1, 2, 3, 4] - shades that pass AA on black
+    aaa: number[]; // [0, 1, 2] - shades that pass AAA on black
+  };
+}
+
+/**
+ * Generate pre-computed accessibility metadata for a color scale
+ * Eliminates expensive on-demand contrast calculations by storing all valid pairs as indices
+ */
+export function generateAccessibilityMetadata(scale: OKLCH[]): AccessibilityMetadata {
+  if (!scale || scale.length === 0) {
+    // Return empty metadata for invalid scales
+    return {
+      wcagAA: { normal: [], large: [] },
+      wcagAAA: { normal: [], large: [] },
+      onWhite: { aa: [], aaa: [] },
+      onBlack: { aa: [], aaa: [] },
+    };
+  }
+
+  const metadata: AccessibilityMetadata = {
+    wcagAA: { normal: [], large: [] },
+    wcagAAA: { normal: [], large: [] },
+    onWhite: { aa: [], aaa: [] },
+    onBlack: { aa: [], aaa: [] },
+  };
+
+  // White and black reference colors
+  const white: OKLCH = { l: 1, c: 0, h: 0 };
+  const black: OKLCH = { l: 0, c: 0, h: 0 };
+
+  // Check all pairs within the scale
+  for (let i = 0; i < scale.length; i++) {
+    for (let j = 0; j < scale.length; j++) {
+      if (i === j) continue; // Skip same color pairs
+
+      const color1 = scale[i];
+      const color2 = scale[j];
+
+      // Skip invalid OKLCH values
+      if (!color1 || !color2 || typeof color1.l !== 'number' || typeof color2.l !== 'number') {
+        continue;
+      }
+
+      // Check WCAG AA compliance
+      if (meetsWCAGStandard(color1, color2, 'AA', 'normal')) {
+        metadata.wcagAA.normal.push([i, j]);
+      }
+      if (meetsWCAGStandard(color1, color2, 'AA', 'large')) {
+        metadata.wcagAA.large.push([i, j]);
+      }
+
+      // Check WCAG AAA compliance
+      if (meetsWCAGStandard(color1, color2, 'AAA', 'normal')) {
+        metadata.wcagAAA.normal.push([i, j]);
+      }
+      if (meetsWCAGStandard(color1, color2, 'AAA', 'large')) {
+        metadata.wcagAAA.large.push([i, j]);
+      }
+    }
+
+    // Check against white background
+    const colorForWhite = scale[i];
+    if (colorForWhite && typeof colorForWhite.l === 'number') {
+      if (meetsWCAGStandard(colorForWhite, white, 'AA', 'normal')) {
+        metadata.onWhite.aa.push(i);
+      }
+      if (meetsWCAGStandard(colorForWhite, white, 'AAA', 'normal')) {
+        metadata.onWhite.aaa.push(i);
+      }
+    }
+
+    // Check against black background
+    const colorForBlack = scale[i];
+    if (colorForBlack && typeof colorForBlack.l === 'number') {
+      if (meetsWCAGStandard(colorForBlack, black, 'AA', 'normal')) {
+        metadata.onBlack.aa.push(i);
+      }
+      if (meetsWCAGStandard(colorForBlack, black, 'AAA', 'normal')) {
+        metadata.onBlack.aaa.push(i);
+      }
+    }
+  }
+
+  return metadata;
+}
+
+/**
  * Find the closest accessible color to target color
  */
 export function findAccessibleColor(
