@@ -126,4 +126,4 @@ app.get('/status', async (c) => {
   }
 });
 
-export default app;
+export { app as colorQueueProgress };
