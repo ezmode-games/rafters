@@ -1,5 +1,4 @@
-import { calculateWCAGContrast } from './packages/color-utils/dist/accessibility.js';
-import { generateOKLCHScale } from './packages/color-utils/dist/harmony.js';
+import { generateOKLCHScale } from './packages/color-utils/src/harmony.js';
 
 // Test the new contrast-based scale generation
 const testColor = { l: 0.6, c: 0.2, h: 220, alpha: 1 }; // Blue color
