@@ -8,7 +8,12 @@
 
 import type { ColorValue, OKLCH } from '@rafters/shared';
 import { ColorValueSchema, OKLCHSchema } from '@rafters/shared';
-import { calculateWCAGContrast, findAccessibleColor, meetsWCAGStandard } from './accessibility.js';
+import {
+  calculateWCAGContrast,
+  findAccessibleColor,
+  generateAccessibilityMetadata,
+  meetsWCAGStandard,
+} from './accessibility.js';
 import { getColorTemperature, isLightColor } from './analysis.js';
 import { roundOKLCH } from './conversion.js';
 import {
@@ -122,19 +127,32 @@ export function generateColorValue(baseColor: OKLCH, context: ColorContext = {})
     ].slice(0, 4),
   };
 
-  // Calculate accessibility using existing accessibility functions
+  // Generate pre-computed accessibility metadata for instant contrast lookups
+  const accessibilityMetadata = generateAccessibilityMetadata(scale);
+
+  // Calculate basic accessibility for backwards compatibility
   const white = roundOKLCH({ l: 1, c: 0, h: 0 });
   const black = roundOKLCH({ l: 0, c: 0, h: 0 });
   const accessibility = {
+    // Pre-computed contrast matrices - the key innovation
+    ...accessibilityMetadata,
+
+    // Basic compatibility data for the base color
     onWhite: {
       wcagAA: meetsWCAGStandard(roundedColor, white, 'AA', 'normal'),
       wcagAAA: meetsWCAGStandard(roundedColor, white, 'AAA', 'normal'),
       contrastRatio: Math.round(calculateWCAGContrast(roundedColor, white) * 100) / 100,
+      // Pre-computed indices override for scale lookups
+      aa: accessibilityMetadata.onWhite.aa,
+      aaa: accessibilityMetadata.onWhite.aaa,
     },
     onBlack: {
       wcagAA: meetsWCAGStandard(roundedColor, black, 'AA', 'normal'),
       wcagAAA: meetsWCAGStandard(roundedColor, black, 'AAA', 'normal'),
       contrastRatio: Math.round(calculateWCAGContrast(roundedColor, black) * 100) / 100,
+      // Pre-computed indices for scale lookups
+      aa: accessibilityMetadata.onBlack.aa,
+      aaa: accessibilityMetadata.onBlack.aaa,
     },
   };
 
