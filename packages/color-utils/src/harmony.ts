@@ -505,7 +505,8 @@ export function generateOKLCHScale(baseColor: OKLCH): Record<string, OKLCH> {
   const validation = validateScaleGeneration(baseColor);
 
   if (!validation.isValid) {
-    // console.warn(`Scale generation warning: ${validation.reason}`);
+    // Scale generation warning: validation.reason
+    // Note: Logging removed to keep utility library environment-agnostic
     // Continue with suggested lightness or original
     const adjustedColor = validation.suggestedLightness
       ? { ...baseColor, l: validation.suggestedLightness }

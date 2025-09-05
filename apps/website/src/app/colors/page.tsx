@@ -1,66 +1,5 @@
+import type { ColorValue } from '@rafters/shared';
 import type { Metadata } from 'next';
-
-interface ColorData {
-  name: string;
-  scale: Array<{ l: number; c: number; h: number }>;
-  value?: string;
-  analysis?: {
-    temperature: 'warm' | 'cool' | 'neutral';
-    isLight: boolean;
-    name: string;
-  };
-  harmonies?: {
-    complementary: { l: number; c: number; h: number };
-    triadic: Array<{ l: number; c: number; h: number }>;
-    analogous: Array<{ l: number; c: number; h: number }>;
-  };
-  accessibility?: {
-    wcagAA: {
-      normal: Array<[number, number]>;
-      large: Array<[number, number]>;
-    };
-    wcagAAA: {
-      normal: Array<[number, number]>;
-      large: Array<[number, number]>;
-    };
-    onWhite: {
-      aa: number[];
-      aaa: number[];
-    };
-    onBlack: {
-      aa: number[];
-      aaa: number[];
-    };
-  };
-  semanticIntelligence?: {
-    atmosphericWeight: {
-      distanceWeight: number;
-      temperature: 'warm' | 'neutral' | 'cool';
-      atmosphericRole: 'background' | 'midground' | 'foreground';
-    };
-    perceptualWeight: {
-      weight: number;
-      density: 'light' | 'medium' | 'heavy';
-      balancingRecommendation: string;
-    };
-    contextualRecommendations: string[];
-    harmonicTension?: number;
-  };
-  semanticSuggestions?: {
-    danger: Array<{ l: number; c: number; h: number; alpha: number }>;
-    success: Array<{ l: number; c: number; h: number; alpha: number }>;
-    warning: Array<{ l: number; c: number; h: number; alpha: number }>;
-    info: Array<{ l: number; c: number; h: number; alpha: number }>;
-  };
-  intelligence: {
-    suggestedName: string;
-    reasoning: string;
-    emotionalImpact: string;
-    culturalContext: string;
-    accessibilityNotes: string;
-    usageGuidance: string;
-  };
-}
 
 // All Tailwind 600-level colors that we stored
 const tailwindColors = [
@@ -88,8 +27,8 @@ const tailwindColors = [
   { name: 'Tailwind Rose', oklch: { l: 0.586, c: 0.253, h: 17.585 } },
 ];
 
-async function getColorData(): Promise<ColorData[]> {
-  const colors: ColorData[] = [];
+async function getColorData(): Promise<ColorValue[]> {
+  const colors: ColorValue[] = [];
 
   for (const color of tailwindColors) {
     try {
@@ -103,7 +42,7 @@ async function getColorData(): Promise<ColorData[]> {
       });
 
       if (response.ok) {
-        const data = (await response.json()) as ColorData;
+        const data = (await response.json()) as ColorValue;
         colors.push(data);
       }
     } catch (error) {
@@ -222,7 +161,7 @@ export default async function ColorsPage() {
                 <ColorSwatch color={colorData.scale[5]} />
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">
-                    {colorData.intelligence.suggestedName}
+                    {colorData.intelligence?.suggestedName ?? colorData.name}
                   </h2>
                   <p className="text-gray-600">{oklchToCSS(colorData.scale[5])}</p>
                 </div>
@@ -343,19 +282,19 @@ export default async function ColorsPage() {
                       <div>
                         <span className="text-gray-600">Normal text pairs:</span>
                         <span className="ml-2 font-mono">
-                          {colorData.accessibility?.wcagAA?.normal?.length || 0}
+                          {colorData.accessibility?.onWhite?.wcagAA ? '1' : '0'}
                         </span>
                       </div>
                       <div>
                         <span className="text-gray-600">Large text pairs:</span>
                         <span className="ml-2 font-mono">
-                          {colorData.accessibility?.wcagAA?.large?.length || 0}
+                          {colorData.accessibility?.onWhite?.wcagAA ? '1' : '0'}
                         </span>
                       </div>
                       <div>
                         <span className="text-gray-600">On white shades:</span>
                         <span className="ml-2 font-mono">
-                          [{colorData.accessibility?.onWhite?.aa?.join?.(', ') || ''}]
+                          {colorData.accessibility?.onWhite?.contrastRatio?.toFixed(2) ?? 'N/A'}
                         </span>
                       </div>
                     </div>
@@ -366,19 +305,19 @@ export default async function ColorsPage() {
                       <div>
                         <span className="text-gray-600">Normal text pairs:</span>
                         <span className="ml-2 font-mono">
-                          {colorData.accessibility?.wcagAAA?.normal?.length || 0}
+                          {colorData.accessibility?.onWhite?.wcagAAA ? '1' : '0'}
                         </span>
                       </div>
                       <div>
                         <span className="text-gray-600">Large text pairs:</span>
                         <span className="ml-2 font-mono">
-                          {colorData.accessibility?.wcagAAA?.large?.length || 0}
+                          {colorData.accessibility?.onWhite?.wcagAAA ? '1' : '0'}
                         </span>
                       </div>
                       <div>
                         <span className="text-gray-600">On white shades:</span>
                         <span className="ml-2 font-mono">
-                          [{colorData.accessibility?.onWhite?.aaa?.join?.(', ') || ''}]
+                          {colorData.accessibility?.onWhite?.contrastRatio?.toFixed(2) ?? 'N/A'}
                         </span>
                       </div>
                     </div>
@@ -388,7 +327,7 @@ export default async function ColorsPage() {
             )}
 
             {/* Semantic Intelligence */}
-            {colorData.semanticIntelligence && (
+            {(colorData.atmosphericWeight || colorData.perceptualWeight) && (
               <div className="mb-6 p-4 bg-purple-50 rounded-lg">
                 <h4 className="text-sm font-medium text-gray-700 mb-3">
                   Leonardo-Inspired Semantic Intelligence
@@ -400,21 +339,19 @@ export default async function ColorsPage() {
                       <div>
                         <span className="text-gray-600">Distance weight:</span>
                         <span className="ml-2 font-mono">
-                          {colorData.semanticIntelligence.atmosphericWeight.distanceWeight.toFixed(
-                            2
-                          )}
+                          {colorData.atmosphericWeight?.distanceWeight?.toFixed(2)}
                         </span>
                       </div>
                       <div>
                         <span className="text-gray-600">Role:</span>
                         <span className="ml-2 capitalize">
-                          {colorData.semanticIntelligence.atmosphericWeight.atmosphericRole}
+                          {colorData.atmosphericWeight?.atmosphericRole ?? 'N/A'}
                         </span>
                       </div>
                       <div>
                         <span className="text-gray-600">Temperature:</span>
                         <span className="ml-2 capitalize">
-                          {colorData.semanticIntelligence.atmosphericWeight.temperature}
+                          {colorData.atmosphericWeight?.temperature ?? 'N/A'}
                         </span>
                       </div>
                     </div>
@@ -425,45 +362,43 @@ export default async function ColorsPage() {
                       <div>
                         <span className="text-gray-600">Visual weight:</span>
                         <span className="ml-2 font-mono">
-                          {colorData.semanticIntelligence.perceptualWeight.weight.toFixed(2)}
+                          {colorData.perceptualWeight?.weight?.toFixed(2) ?? 'N/A'}
                         </span>
                       </div>
                       <div>
                         <span className="text-gray-600">Density:</span>
                         <span className="ml-2 capitalize">
-                          {colorData.semanticIntelligence.perceptualWeight.density}
+                          {colorData.perceptualWeight?.density ?? 'N/A'}
                         </span>
                       </div>
-                      {colorData.semanticIntelligence.harmonicTension && (
+                      {false && ( // harmonicTension not available in new schema
                         <div>
                           <span className="text-gray-600">Harmonic tension:</span>
-                          <span className="ml-2 font-mono">
-                            {colorData.semanticIntelligence.harmonicTension.toFixed(2)}
-                          </span>
+                          <span className="ml-2 font-mono">{'N/A'}</span>
                         </div>
                       )}
                     </div>
                   </div>
                 </div>
-                {colorData.semanticIntelligence.contextualRecommendations.length > 0 && (
+                {false && ( // contextualRecommendations not available in new schema
                   <div className="mt-3">
                     <h6 className="text-xs font-medium text-purple-700 mb-1">
                       Contextual Recommendations
                     </h6>
                     <ul className="text-xs text-gray-600 space-y-1">
-                      {colorData.semanticIntelligence.contextualRecommendations.map((rec) => (
+                      {[].map((rec: string) => (
                         <li key={rec}>• {rec}</li>
                       ))}
                     </ul>
                   </div>
                 )}
-                {colorData.semanticIntelligence.perceptualWeight.balancingRecommendation && (
+                {colorData.perceptualWeight?.balancingRecommendation && (
                   <div className="mt-3">
                     <h6 className="text-xs font-medium text-purple-700 mb-1">
                       Balancing Recommendation
                     </h6>
                     <p className="text-xs text-gray-600">
-                      {colorData.semanticIntelligence.perceptualWeight.balancingRecommendation}
+                      {colorData.perceptualWeight?.balancingRecommendation}
                     </p>
                   </div>
                 )}
@@ -531,21 +466,21 @@ export default async function ColorsPage() {
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">Color Reasoning</h3>
                   <p className="text-gray-700 text-sm leading-relaxed">
-                    {colorData.intelligence.reasoning}
+                    {colorData.intelligence?.reasoning ?? 'No reasoning available'}
                   </p>
                 </div>
 
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">Emotional Impact</h3>
                   <p className="text-gray-700 text-sm leading-relaxed">
-                    {colorData.intelligence.emotionalImpact}
+                    {colorData.intelligence?.emotionalImpact ?? 'No emotional impact available'}
                   </p>
                 </div>
 
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">Cultural Context</h3>
                   <p className="text-gray-700 text-sm leading-relaxed">
-                    {colorData.intelligence.culturalContext}
+                    {colorData.intelligence?.culturalContext ?? 'No cultural context available'}
                   </p>
                 </div>
               </div>
@@ -554,14 +489,15 @@ export default async function ColorsPage() {
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">Accessibility Notes</h3>
                   <p className="text-gray-700 text-sm leading-relaxed">
-                    {colorData.intelligence.accessibilityNotes}
+                    {colorData.intelligence?.accessibilityNotes ??
+                      'No accessibility notes available'}
                   </p>
                 </div>
 
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">Usage Guidance</h3>
                   <p className="text-gray-700 text-sm leading-relaxed">
-                    {colorData.intelligence.usageGuidance}
+                    {colorData.intelligence?.usageGuidance ?? 'No usage guidance available'}
                   </p>
                 </div>
               </div>

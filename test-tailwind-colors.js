@@ -1,9 +1,9 @@
-#!/usr/bin/env node
-
 /**
  * Test all 500 Tailwind colors with the color intelligence API
  * This validates scale accuracy and intelligence generation for the complete Tailwind palette
  * Using official Tailwind OKLCH values from their package
+ *
+ * Run with: pnpm node test-tailwind-colors.js
  */
 
 // Official Tailwind v4 color palette in OKLCH format (from tailwindcss package)

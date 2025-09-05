@@ -1,4 +1,7 @@
 import { zValidator } from '@hono/zod-validator';
+import { Hono } from 'hono';
+import * as z from 'zod';
+
 import {
   calculateWCAGContrast,
   generateColorValue,
@@ -9,9 +12,13 @@ import {
   validateOKLCH,
 } from '@rafters/color-utils';
 import { ColorValueSchema, OKLCHSchema } from '@rafters/shared';
-import { Hono } from 'hono';
-import * as z from 'zod';
 import { generateColorIntelligence } from '../lib/color-intel/utils';
+
+// Vectorize requires exactly 384 dimensions for color intelligence vectors
+// Structure: 4 OKLCH values + 5 semantic dimensions + 375 mathematical functions
+// The 375 additional dimensions provide deterministic mathematical encoding
+// of color relationships using trigonometric functions of OKLCH components
+const VECTORIZE_ADDITIONAL_DIMENSIONS = 375;
 
 interface CloudflareBindings {
   VECTORIZE: VectorizeIndex;
@@ -104,8 +111,8 @@ colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
       intelligence, // AI intelligence from Claude API
     };
 
-    // TODO: Fix schema validation - temporarily skip to see raw data
-    const validatedColorValue = completeColorValue;
+    // Validate completeColorValue against ColorValueSchema
+    const validatedColorValue = ColorValueSchema.parse(completeColorValue);
 
     // Store in Vectorize for future semantic search
     if (vectorize) {
@@ -125,8 +132,8 @@ colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
               Math.sin((oklch.h * Math.PI) / 180), // Hue as sine
               Math.cos((oklch.h * Math.PI) / 180), // Hue as cosine
               // Fill remaining dimensions with deterministic mathematical functions of OKLCH
-              ...Array.from({ length: 375 }, (_, i) => {
-                const factor = (i + 1) / 375;
+              ...Array.from({ length: VECTORIZE_ADDITIONAL_DIMENSIONS }, (_, i) => {
+                const factor = (i + 1) / VECTORIZE_ADDITIONAL_DIMENSIONS;
                 return Math.sin(oklch.h * factor) * oklch.c * oklch.l;
               }),
             ],
