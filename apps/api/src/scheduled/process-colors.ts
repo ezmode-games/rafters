@@ -2,7 +2,7 @@
  * Color Queue Processor - Scheduled Worker
  *
  * Processes color queue items from KV store using atomic state management.
- * Runs as cron job every 10 seconds to generate ColorValue objects with full intelligence.
+ * Runs as cron job every minute to generate ColorValue objects with full intelligence.
  */
 
 import { generateColorCacheKey, generateColorValue } from '@rafters/color-utils';
@@ -85,8 +85,10 @@ export async function claimNextPendingColor(kv: KVStore): Promise<string | null>
           processingStarted: now,
         };
 
-        // Use conditional PUT to ensure atomicity
-        // In a real implementation, this would use KV's compare-and-swap semantics
+        // LIMITATION: This implementation lacks true atomicity for claiming items
+        // Multiple workers could potentially claim the same item simultaneously
+        // In production, this could be improved with KV metadata for compare-and-swap
+        // or by using queue item keys with timestamps for pseudo-atomicity
         await kv.put(key.name, JSON.stringify(claimedItem));
 
         // Return the claimed key
@@ -198,8 +200,8 @@ async function updateProgress(kv: KVStore): Promise<void> {
       processing,
       completed,
       failed,
-      // Recalculate estimated completion based on remaining work
-      estimatedCompletion: new Date(Date.now() + pending * 10 * 1000).toISOString(),
+      // Recalculate estimated completion based on remaining work (1 minute per color)
+      estimatedCompletion: new Date(Date.now() + pending * 60 * 1000).toISOString(),
     };
 
     await kv.put('color-queue:progress', JSON.stringify(updatedProgress));
