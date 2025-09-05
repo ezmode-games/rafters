@@ -73,10 +73,15 @@ describe('generateAccessibilityMetadata', () => {
   });
 
   it('should skip invalid OKLCH values in scale', () => {
-    const scaleWithInvalid: OKLCH[] = [
+    type InvalidOKLCH = {
+      l: number;
+      c: number;
+      h: number;
+    };
+
+    const scaleWithInvalid: (OKLCH | InvalidOKLCH)[] = [
       { l: 0.95, c: 0.02, h: 240 }, // Valid
-      // @ts-expect-error - testing invalid data handling
-      { l: Number.NaN, c: 0.05, h: 240 }, // Invalid
+      { l: Number.NaN, c: 0.05, h: 240 }, // Invalid - properly typed
       { l: 0.2, c: 0.15, h: 240 }, // Valid
     ];
 
