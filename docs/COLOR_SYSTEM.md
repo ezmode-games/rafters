@@ -144,32 +144,25 @@ Final consumer-facing variables:
 --color-secondary: var(--rafters-color-secondary);
 ```
 
-## Three-Tier Architecture
+## Two-Tier Architecture
 
-### Tier 1: Vectorize Database (Comprehensive Intelligence)
-**Cloudflare Vectorize index** with semantic search capabilities:
+### Bootstrap Process (Data Generation)
+**Distributed KV color queue** generates the data used by the two-tier system:
 
-- **540+ strategic colors** pre-computed with complete intelligence
-- **Strategic matrix**: 9L × 5C × 12H OKLCH grid + popular system colors  
-- **Vector embeddings** of intelligence text for AI agent semantic search
-- **Grows over time** as new colors are requested and cached
-- **Sub-100ms semantic queries** ("trustworthy blues", "warm accent colors")
+- **846+ strategic colors** processing via distributed queue system
+- **Strategic matrix**: 9L × 5C × 12H OKLCH grid (540 colors) + design system standards (306 colors)
+- **14-hour bootstrap process** generating complete ColorValue objects with AI intelligence
+- **Output**: Comprehensive color intelligence cache for the two-tier system
 
-**Vector Schema**:
-```typescript
-interface ColorVector {
-  id: string,              // "oklch-0.50-0.15-240" 
-  values: number[],        // Embedding of intelligence text
-  metadata: {
-    oklch: OKLCH,
-    colorValue: ColorValue, // Complete object with all intelligence
-    semanticTags: string[]  // ["trustworthy", "primary", "cool"]
-  }
-}
-```
+**Future Matrix Expansions** (potential monthly growth):
+- **Higher chroma precision**: 5C → 8C for more saturated design systems
+- **Finer lightness steps**: 9L → 15L for better tonal relationships
+- **Extended hue coverage**: 12H → 24H for nuanced color harmony
+- **Specialized matrices**: Dark mode optimized, accessibility-focused, brand-specific
+- **Queue system enables** distributed processing of expanded matrices over time
 
-### Tier 2: Local JSON Cache (Project-Optimized)
-**Single compressed file** shipped with Rafters for instant access:
+### Tier 1: Static Color Cache (Comprehensive Intelligence)
+**Pre-computed JSON file** shipped with Rafters for instant access:
 
 **Location**: `packages/design-tokens/static-color-cache.json`
 
@@ -177,9 +170,10 @@ interface ColorVector {
 ```json
 {
   "oklch-60-12-240": {
-    "name": "ocean-blue",
+    "name": "midnight-horizon",
     "scale": [...],
     "intelligence": {
+      "suggestedName": "midnight-horizon",
       "reasoning": "Ocean blue at moderate lightness conveys professional trust...",
       "emotionalImpact": "Calming yet authoritative, builds user confidence...",
       "culturalContext": "Universally positive in business contexts...",
@@ -189,35 +183,36 @@ interface ColorVector {
     "accessibility": {
       "wcagAA": { "normal": [[0, 5], [0, 6], [1, 7]] },
       "onWhite": { "aa": [5, 6, 7, 8, 9] }
-    }
+    },
+    "harmonies": {...},
+    "analysis": {...}
   }
 }
 ```
 
-### Tier 3: Project Token Files (User Customization)
+### Tier 2: Project Token Files (User Customization)
 **Version-controlled project settings** in `.rafters/tokens/`:
 
 - **TokenRegistry manages** all read/write operations
-- **Human-editable** through UI that saves to JSON files
-- **Dependency graph system** for color relationships
-- **No enrichment** - colors arrive fully-formed with intelligence
+- **Human-editable** through UI that saves to JSON files  
+- **Dependency graph system** for semantic token relationships
+- **No enrichment** - colors arrive fully-formed with intelligence from Tier 1 cache
 
 ### Performance Flow
 ```
-Request → Local Cache Hit → Response (instant)
-Request → Local Cache Miss → Vectorize Hit → Response (<100ms)  
-Request → Vectorize Miss → API → Generate → Store in Vector → Response (10s, one-time)
+Request → Static Cache Hit → Response (instant)
+Request → Static Cache Miss → API Fallback → Generate & Cache → Response (~10s, one-time)
 ```
 
 **Performance Targets**:
-- **95%+ cache hit rate** for design system colors
-- **Sub-100ms** for vectorize semantic search
+- **95%+ cache hit rate** for strategic color matrix  
 - **Zero runtime costs** for cached colors
+- **Instant offline access** to comprehensive color intelligence
 
 ## Color Intelligence System
 
 ### Mathematical Intelligence Generation (Primary)
-**Powered by color-utils Leonardo-inspired functions**:
+**Powered by color-utils color theory functions**:
 
 ```typescript
 // Step 1: Generate base ColorValue with mathematical intelligence
@@ -226,7 +221,7 @@ const colorValue = generateColorValue(baseColor, {
   generateStates: true 
 });
 
-// Step 2: Apply Leonardo-inspired semantic intelligence
+// Step 2: Apply color theory semantic intelligence
 const semanticSuggestions = generateSemanticColorSuggestions(baseColor);
 const semanticIntelligence = generateSemanticColors(baseColor, semanticSuggestions);
 
@@ -251,9 +246,9 @@ const enhancedColorValue = {
 **Advanced Leonardo-Inspired Intelligence** (Currently Underutilized):
 - **`generateSemanticColors()`** - **THE BIG ONE** - Combines atmospheric perspective, simultaneous contrast, and perceptual weight
 - **`calculateAtmosphericWeight()`** - Warm colors advance, cool colors recede (perfect for UI depth hierarchy)
-- **`calculatePerceptualWeight()`** - Visual weight: Red > Orange > Yellow > Green > Blue > Purple (Leonardo's observations)
+- **`calculatePerceptualWeight()`** - Visual weight: Red > Orange > Yellow > Green > Blue > Purple
 - **`calculateSimultaneousContrast()`** - Colors optimized for their visual context
-- **`generateRaftersHarmony()`** - Maps traditional color theory to UI semantic roles using Leonardo principles
+- **`generateRaftersHarmony()`** - Maps traditional color theory to UI semantic roles using color theory
 - **`generateOptimalGray()`** - Perceptually-weighted gray generation from palette colors
 
 **Studio-Specific Functions**:
@@ -422,13 +417,6 @@ return {
   // AI only adds 3 fields when absolutely necessary
 };
 ```
-
-**Cost Comparison**:
-- **Old approach**: 20,000 tokens per color = $0.005 per request
-- **New approach**: 200 tokens per color = $0.00005 per request  
-- **Savings**: 99% cost reduction
-- **Most requests**: $0 (mathematical only, no AI needed)
-
 ## MCP Integration (AI Agent Access)
 
 ### Current MCP Status

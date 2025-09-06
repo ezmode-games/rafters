@@ -1,36 +1,65 @@
 # Rafters Architecture
-## Mathematical Design Intelligence System
+## TokenRegistry-Based Design Intelligence System
 
-*Components and tokens with embedded mathematical design reasoning*
+*Components and tokens with embedded mathematical design reasoning powered by centralized registry*
 
 ---
 
 ## Core Approach
 
-Rafters provides mathematical design intelligence across all systems:
+Rafters provides mathematical design intelligence through centralized token management:
+- **TokenRegistry class** as single source of truth for all design tokens
 - **Install components as source code** with embedded design reasoning (shadcn-compatible)
-- **Mathematical token generation** for colors, spacing, typography, and motion
-- **JSDoc intelligence comments** provide design reasoning for AI agents
+- **Automatic AI enrichment** for colors via Color Intelligence API
+- **Mathematical dependency tracking** with topological sorting and cycle detection
+- **MCP server integration** providing 7 design intelligence tools for AI agents
 - **Cross-system intelligence** understanding relationships between colors, layout, accessibility
 
 ---
 
-## Dual Registry Architecture
+## TokenRegistry Architecture
 
-### 1. Component Registry (WHAT & WHY)
+### 1. TokenRegistry (Single Source of Truth)
+The TokenRegistry class manages all tokens with embedded intelligence and dependency tracking:
+
+```typescript
+// TokenRegistry with O(1) operations and dependency management
+const registry = new TokenRegistry();
+
+// Set tokens with automatic metadata handling
+registry.set('destructive', 'oklch(0.4 0.15 20)', {
+  category: 'color',
+  trustLevel: 'critical',
+  cognitiveLoad: 7,
+  usageContext: ['delete', 'permanent-action']
+});
+
+// Automatic AI enrichment via Color Intelligence API
+await registry.enrichColorToken('destructive');
+// Adds: colorIntelligence, accessibility data, psychological analysis
+
+// Mathematical dependency tracking
+registry.addDependency('destructive-hover', ['destructive'], 'state:hover');
+registry.addDependency('spacing-lg', ['spacing-base'], 'calc({spacing-base} * 2)');
+
+// Dependency validation with cycle detection
+registry.wouldCreateCircularDependency('primary', ['primary-hover']); // false
+```
+
+### 2. Component Intelligence (JSDoc Metadata)
 Components carry embedded design reasoning through JSDoc intelligence comments:
 
 ```tsx
 /**
  * Button Intelligence: cognitiveLoad=3, trustLevel=medium
  * 
- * Mathematical Intelligence:
- * - Size hierarchy follows golden ratio attention economics
- * - Spacing uses systematic progression (8px base, 1.618 ratio)
+ * TokenRegistry Integration:
+ * - Uses semantic tokens from registry: 'primary', 'destructive', 'secondary'
+ * - Automatic dependency resolution for hover/focus states
  * - Color accessibility calculated with perceptual weight analysis
  * 
  * Usage Intelligence:
- * - Destructive variant REQUIRES confirmation UX patterns
+ * - Destructive variant REQUIRES confirmation UX patterns (trustLevel=critical)
  * - Primary buttons limited to 1 per view (attention economics)
  * - Touch targets: 44px minimum (WCAG AAA compliance)
  * 
@@ -41,61 +70,75 @@ Components carry embedded design reasoning through JSDoc intelligence comments:
 export const Button = ...
 ```
 
-### 2. Token Registry (HOW)
-Mathematical intelligence for systematic token generation:
+### 3. TokenDependencyGraph (Mathematical Relationships)
+Dependency tracking with topological sorting prevents circular references:
 
 ```typescript
-// Mathematical spacing intelligence
-{
-  name: "golden-3",
-  value: "1.618rem", 
-  intelligence: {
-    mathRelationship: "4px * 1.618^3 / 16",
-    scalePosition: 3,
-    attentionLevel: "high",
-    cognitiveLoad: 1,
-    accessibilityLevel: "AAA"
-  }
-}
+// Automatic dependency management with cycle detection
+const graph = new TokenDependencyGraph();
 
-// Color theory intelligence
-{
-  name: "Ocean Depths",
-  intelligence: {
-    atmosphericWeight: { role: "foreground", temperature: "cool" },
-    perceptualWeight: { density: "heavy", balancingRecommendation: "Use sparingly" },
-    accessibilityMatrix: { AA: ["light"], AAA: ["white", "gray-50"] }
-  }
-}
+// Add dependencies with generation rules
+graph.addDependency('primary-hover', ['primary'], 'state:hover');
+graph.addDependency('spacing-lg', ['spacing-base'], 'calc({spacing-base} * 2)');
 
-// Musical typography intelligence  
-{
-  name: "text-xl",
-  intelligence: {
-    mathRelationship: "1 * 1.618^1",
-    musicalRatio: "golden",
-    cognitiveLoad: 3,
-    usageContext: ["headings", "section-titles"]
-  }
-}
+// Topological sorting for update order (Kahn's algorithm)
+const updateOrder = graph.topologicalSort();
+// Returns: ['spacing-base', 'primary', 'spacing-lg', 'primary-hover']
+
+// Circular dependency prevention
+graph.wouldCreateCircularDependency('primary', ['primary-hover']); // false
+graph.wouldCreateCircularDependency('primary-hover', ['primary']); // true
+```
+
+### 4. MCP Server (AI Agent Integration)
+Model Context Protocol server provides 7 design intelligence tools:
+
+```typescript
+// MCP Server running on port 3001
+const mcpServer = {
+  tools: [
+    'get_color_intelligence',      // Complete color analysis with AI metadata
+    'get_token_dependencies',      // Dependency resolution and generation rules  
+    'calculate_cognitive_load',    // 15-point cognitive load budget system
+    'validate_color_combination',  // Accessibility and readability analysis
+    'get_colors_by_trust_level',  // Trust-based color classification
+    'get_component_metadata',      // Component intelligence and usage patterns
+    'recommend_design_improvements' // AI-powered design optimization
+  ]
+};
 ```
 
 ---
 
 ## System Components
 
-### Mathematical Token Generators
-- **Colors**: Color theory atmospheric perspective and perceptual weight analysis
-- **Spacing**: Golden ratio, linear, and exponential mathematical progressions
-- **Typography**: Musical harmony ratios (golden, major-third, perfect-fifth) with readability optimization
-- **Motion**: Physics-based easing with cognitive load awareness
-- **Output**: Design tokens with embedded mathematical intelligence
+### TokenRegistry Class
+- **Centralized token management**: Single source of truth for all design tokens
+- **O(1) operations**: Efficient get/set operations with Map-based storage
+- **AI enrichment**: Automatic color intelligence via https://rafters.realhandy.tech/api/color-intel
+- **Dependency tracking**: Integration with TokenDependencyGraph for relationship management
+- **JSON persistence**: Tokens stored in files but accessed only through registry
+- **Output**: Enriched tokens with embedded mathematical intelligence
+
+### TokenDependencyGraph Class  
+- **Topological sorting**: Kahn's algorithm for dependency order resolution
+- **Cycle detection**: Prevents circular dependencies in token relationships
+- **Generation rules**: Support for calc(), state:hover, scale:500 patterns
+- **Performance**: O(V + E) complexity for dependency operations
+- **Output**: Sorted dependency lists and circular dependency validation
+
+### Color Intelligence API
+- **AI-powered analysis**: Psychological impact, semantic meaning, trust levels
+- **OKLCH color space**: Perceptually uniform color calculations
+- **Accessibility mathematics**: WCAG AA/AAA compliance with contrast ratios
+- **Temperature analysis**: Warm/cool/neutral classification
+- **Output**: Complete color intelligence metadata
 
 ### CLI Tool (Shadcn-Compatible)
 ```bash
-npx rafters init     # Setup project with mathematical token system
+npx rafters init        # Setup project with TokenRegistry system
+npx rafters mcp         # Start MCP server with design intelligence tools
 npx rafters add <component>  # Install component with JSDoc intelligence
-npx rafters tokens <color>   # Generate color intelligence for design tokens
 ```
 
 ### Project Structure After Init
@@ -103,16 +146,19 @@ npx rafters tokens <color>   # Generate color intelligence for design tokens
 project/
 ├── .rafters/
 │   ├── config.json                    # CLI configuration  
+│   ├── tokens/                        # JSON token storage (managed by TokenRegistry)
+│   │   ├── colors.json                # Color tokens with AI intelligence
+│   │   ├── spacing.json               # Spacing tokens with mathematical ratios
+│   │   └── typography.json            # Typography tokens with musical harmony
 │   └── intelligence-manifest.json     # Component & token intelligence registry
 ├── src/
 │   ├── components/ui/                 # Components with JSDoc intelligence
-│   ├── lib/design-tokens/             # Mathematical token generators
-│   │   ├── colors.ts                  # Color theory intelligence
-│   │   ├── spacing.ts                 # Golden ratio spacing
-│   │   ├── typography.ts              # Musical harmony typography  
-│   │   └── motion.ts                  # Physics-based motion
+│   ├── lib/design-tokens/             # TokenRegistry and dependency management
+│   │   ├── registry.ts                # TokenRegistry class implementation
+│   │   ├── dependencies.ts            # TokenDependencyGraph class
+│   │   └── export.ts                  # CSS/Tailwind export functionality
 │   └── styles/tokens.css              # Generated design tokens
-└── tailwind.config.ts                 # Includes mathematical token system
+└── tailwind.config.ts                 # Includes TokenRegistry-based token system
 ```
 
 ---
@@ -120,34 +166,51 @@ project/
 ## CLI Commands
 
 ### `npx rafters init`
-**Purpose**: Initialize Rafters mathematical design intelligence system
+**Purpose**: Initialize Rafters TokenRegistry-based design intelligence system
 
 **Flow**:
 1. Detect package manager (pnpm/npm/yarn)
 2. Check for existing Tailwind CSS installation
-3. Ask: "Generate mathematical token system? (Y/n)"
-4. If yes: "Token systems: colors, spacing, typography, motion? (all)"
-5. Create `.rafters/` directory structure
+3. Ask: "Generate TokenRegistry system? (Y/n)"
+4. If yes: "Token categories: colors, spacing, typography, motion? (all)"
+5. Create `.rafters/` directory structure with token storage
 6. Install required dependencies (Radix primitives, clsx, tailwind-merge, design-tokens)
-7. Generate mathematical token generators and JSDoc intelligence templates
+7. Generate TokenRegistry configuration and JSDoc intelligence templates
 
 **Creates**:
 - `.rafters/config.json` - CLI configuration
+- `.rafters/tokens/` - JSON token storage managed by TokenRegistry
 - `.rafters/intelligence-manifest.json` - Component and token intelligence registry
-- `src/lib/design-tokens/` - Mathematical token generators
+- `src/lib/design-tokens/` - TokenRegistry and dependency management classes
 - `src/components/ui/` - Component directory with JSDoc intelligence templates
 - `src/styles/tokens.css` - Generated design tokens
+
+### `npx rafters mcp`
+**Purpose**: Start Model Context Protocol server for AI agent integration
+
+**Flow**:
+1. Initialize TokenRegistry from stored tokens
+2. Load dependency graph and generation rules
+3. Start MCP server on port 3001
+4. Register 7 design intelligence tools
+5. Enable AI agent access to token intelligence
+
+**Provides**:
+- Real-time token intelligence queries
+- Cognitive load calculations with 15-point budget
+- Color accessibility validation
+- Design optimization recommendations
 
 ### `npx rafters add <component>`
 **Purpose**: Install component with embedded JSDoc design intelligence
 
 **Flow**:
-1. Read `.rafters/config.json`
+1. Read `.rafters/config.json` and TokenRegistry configuration
 2. Download component source from registry
 3. Write to `src/components/ui/<component>.tsx` with JSDoc intelligence
 4. Update `.rafters/intelligence-manifest.json`
 5. Install any missing Radix dependencies
-6. Generate related mathematical tokens if needed
+6. Generate related tokens via TokenRegistry if needed
 
 **Example**:
 ```bash

@@ -1,15 +1,23 @@
+import type { OKLCH } from '@rafters/shared';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import queueHandler from './queue/process-colors-queue';
 import { colorIntel } from './routes/color-intel';
-import { colorQueueProgress } from './routes/color-queue-progress';
-import { processColorQueue } from './scheduled/process-colors';
+import { seedQueue } from './routes/seed-queue';
+
+// Message format for queue
+interface ColorMessage {
+  oklch: OKLCH;
+  index: number;
+  timestamp: string;
+}
 
 interface CloudflareBindings {
   VECTORIZE: VectorizeIndex;
   CLAUDE_API_KEY: string;
   CF_TOKEN: string;
   CLAUDE_GATEWAY_URL: string;
-  RAFTERS_INTEL: KVNamespace;
+  COLOR_QUEUE: Queue;
 }
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
@@ -26,19 +34,17 @@ app.use(
 
 // Mount routes
 app.route('/api/color-intel', colorIntel);
-app.route('/api/color-queue', colorQueueProgress);
+app.route('/api/seed-queue', seedQueue);
 
-// Export the scheduled function as a named export
-export async function scheduled(
-  event: ScheduledEvent,
-  env: CloudflareBindings,
-  ctx: ExecutionContext
-) {
-  await processColorQueue({ RAFTERS_INTEL: env.RAFTERS_INTEL });
+// Scheduled function is no longer needed - queue system handles processing automatically
+
+// Export the queue handler as a named export
+export async function queue(batch: MessageBatch<ColorMessage>, env: CloudflareBindings) {
+  await queueHandler.queue(batch, env);
 }
 
 // Default export for the Worker
 export default {
   fetch: app.fetch,
-  scheduled,
+  queue,
 };

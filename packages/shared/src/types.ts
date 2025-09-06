@@ -177,6 +177,44 @@ export const ColorIntelligenceResponseSchema = z.object({
 
 export type ColorIntelligenceResponse = z.infer<typeof ColorIntelligenceResponseSchema>;
 
+// Seed Queue API Response Schemas
+export const SeedQueueStatsSchema = z.object({
+  strategicColors: z.number(),
+  standardColors: z.number(),
+  totalColors: z.number(),
+  totalSent: z.number(),
+});
+
+export const SeedQueueSuccessResponseSchema = z.object({
+  success: z.literal(true),
+  message: z.string(),
+  stats: SeedQueueStatsSchema,
+  timestamp: z.string(),
+});
+
+export const SeedQueueErrorResponseSchema = z.object({
+  success: z.literal(false),
+  error: z.string(),
+  timestamp: z.string(),
+});
+
+export const SeedQueueInfoResponseSchema = z.object({
+  endpoint: z.string(),
+  method: z.string(),
+  description: z.string(),
+  expectedColors: z.object({
+    strategic: z.string(),
+    standard: z.string(),
+    total: z.number(),
+  }),
+});
+
+export type SeedQueueStats = z.infer<typeof SeedQueueStatsSchema>;
+export type SeedQueueSuccessResponse = z.infer<typeof SeedQueueSuccessResponseSchema>;
+export type SeedQueueErrorResponse = z.infer<typeof SeedQueueErrorResponseSchema>;
+export type SeedQueueInfoResponse = z.infer<typeof SeedQueueInfoResponseSchema>;
+export type SeedQueueResponse = SeedQueueSuccessResponse | SeedQueueErrorResponse;
+
 // Color Value Schema for complex color structures
 export const ColorValueSchema = z.object({
   name: z.string(), // the fancy name from color-utils, IE ocean-blue

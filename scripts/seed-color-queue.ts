@@ -81,60 +81,57 @@ export function generateStrategicMatrix(config: BootstrapSeederConfig['strategic
 /**
  * Load standard colors from design systems
  * Includes Tailwind, Material Design, brand colors, and accessibility colors
+ * Loads all 306 colors from the comprehensive colors-data.json file
  */
 export async function loadStandardColors(): Promise<OKLCH[]> {
-  // Standard design system colors converted to OKLCH
-  const standardColors: OKLCH[] = [
-    // Tailwind CSS primary colors (converted to OKLCH)
-    { l: 0.87, c: 0.06, h: 142 }, // green-100
-    { l: 0.7, c: 0.15, h: 142 }, // green-500
-    { l: 0.45, c: 0.15, h: 142 }, // green-800
+  try {
+    // Only try to load from filesystem in Node.js environment
+    if (typeof process === 'undefined') {
+      throw new Error('Filesystem not available in Worker environment');
+    }
 
-    { l: 0.88, c: 0.05, h: 240 }, // blue-100
-    { l: 0.65, c: 0.2, h: 240 }, // blue-500
-    { l: 0.4, c: 0.2, h: 240 }, // blue-800
+    // Import colors-data.json from the proper location
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
 
-    { l: 0.88, c: 0.08, h: 15 }, // red-100
-    { l: 0.65, c: 0.25, h: 15 }, // red-500
-    { l: 0.4, c: 0.2, h: 15 }, // red-800
+    const colorsDataPath = join(process.cwd(), 'apps/website/scripts/colors-data.json');
+    const colorsData = JSON.parse(readFileSync(colorsDataPath, 'utf8'));
 
-    { l: 0.9, c: 0.06, h: 45 }, // yellow-100
-    { l: 0.8, c: 0.18, h: 45 }, // yellow-500
-    { l: 0.55, c: 0.15, h: 45 }, // yellow-800
+    const allColors: OKLCH[] = [];
 
-    // Material Design primary colors
-    { l: 0.66, c: 0.24, h: 269 }, // Purple 500
-    { l: 0.7, c: 0.22, h: 300 }, // Pink 500
-    { l: 0.75, c: 0.25, h: 330 }, // Rose 500
-    { l: 0.68, c: 0.18, h: 25 }, // Orange 500
-    { l: 0.72, c: 0.2, h: 180 }, // Cyan 500
-    { l: 0.68, c: 0.22, h: 200 }, // Light blue 500
+    // Extract OKLCH values from all categories
+    for (const category of Object.values(colorsData)) {
+      if (Array.isArray(category)) {
+        for (const colorEntry of category) {
+          if (colorEntry.oklch && typeof colorEntry.oklch === 'object') {
+            allColors.push({
+              l: colorEntry.oklch.l,
+              c: colorEntry.oklch.c,
+              h: colorEntry.oklch.h,
+              alpha: colorEntry.oklch.alpha || 1,
+            });
+          }
+        }
+      }
+    }
 
-    // Brand colors (approximate OKLCH conversions)
-    { l: 0.35, c: 0.18, h: 220 }, // Facebook blue
-    { l: 0.85, c: 0.05, h: 0 }, // Apple light
-    { l: 0.15, c: 0.02, h: 0 }, // Apple dark
-    { l: 0.5, c: 0.25, h: 15 }, // YouTube red
-    { l: 0.45, c: 0.2, h: 120 }, // Spotify green
-    { l: 0.65, c: 0.22, h: 200 }, // Twitter blue
+    console.log(`✓ Loaded ${allColors.length} standard design system colors`);
+    return allColors;
+  } catch (error) {
+    console.warn('Failed to load colors-data.json, falling back to minimal set:', error);
 
-    // High contrast accessibility colors
-    { l: 0.98, c: 0.01, h: 0 }, // Near white
-    { l: 0.95, c: 0.02, h: 240 }, // Light gray
-    { l: 0.85, c: 0.03, h: 240 }, // Medium light gray
-    { l: 0.5, c: 0.05, h: 240 }, // Medium gray
-    { l: 0.25, c: 0.03, h: 240 }, // Dark gray
-    { l: 0.1, c: 0.02, h: 240 }, // Very dark gray
-    { l: 0.05, c: 0.01, h: 0 }, // Near black
+    // Fallback to minimal colors if file loading fails
+    const fallbackColors: OKLCH[] = [
+      // Just the essential colors as fallback
+      { l: 0.98, c: 0.01, h: 0 }, // Near white
+      { l: 0.05, c: 0.01, h: 0 }, // Near black
+      { l: 0.45, c: 0.15, h: 240 }, // Primary blue
+      { l: 0.55, c: 0.25, h: 15 }, // Error red
+      { l: 0.75, c: 0.2, h: 135 }, // Success green
+    ];
 
-    // Semantic accessibility colors
-    { l: 0.75, c: 0.2, h: 135 }, // Success green (high contrast)
-    { l: 0.55, c: 0.25, h: 15 }, // Error red (high contrast)
-    { l: 0.7, c: 0.22, h: 45 }, // Warning yellow (high contrast)
-    { l: 0.6, c: 0.25, h: 220 }, // Info blue (high contrast)
-  ];
-
-  return standardColors;
+    return fallbackColors;
+  }
 }
 
 /**
@@ -237,14 +234,17 @@ export async function seedColorQueue(config: BootstrapSeederConfig, kv: KVStore)
  * CLI runner function
  */
 export async function runSeeder() {
-  // Default configuration for production
+  // Default configuration for production: 846+ strategic colors
+  // Strategic matrix: 9L × 5C × 12H = 540 colors
+  // Standard colors: 306 design system colors from colors-data.json
+  // Total: 846+ colors for comprehensive intelligence coverage
   const defaultConfig: BootstrapSeederConfig = {
     strategicMatrix: {
-      lightnessSteps: 9,
-      chromaSteps: 5,
-      hueSteps: 12,
+      lightnessSteps: 9, // 9 lightness steps (0.1 to 0.9)
+      chromaSteps: 5, // 5 chroma steps (0.05 to 0.25)
+      hueSteps: 12, // 12 hue steps (30° intervals)
     },
-    includeStandardColors: true,
+    includeStandardColors: true, // 306 colors from all design systems
     kvNamespace: 'RAFTERS_INTEL',
   };
 
@@ -274,8 +274,16 @@ export async function runSeeder() {
   }
 }
 
-// Run if called directly
-import { fileURLToPath } from 'node:url';
-if (fileURLToPath(import.meta.url) === process.argv[1]) {
-  runSeeder();
+// Run if called directly (Node.js only)
+if (typeof process !== 'undefined' && process.argv) {
+  // Dynamic import to avoid issues in Worker environment
+  import('node:url')
+    .then(({ fileURLToPath }) => {
+      if (fileURLToPath(import.meta.url) === process.argv[1]) {
+        runSeeder();
+      }
+    })
+    .catch(() => {
+      // Ignore import errors in Worker environment
+    });
 }

@@ -16,19 +16,27 @@
       "zone_id": "bad23610704adb1dc65b05bc22d6fb6f"
     }
   ],
-  "triggers": {
-    "crons": ["* * * * *"]
+  "queues": {
+    "producers": [
+      {
+        "queue": "color-processing-queue",
+        "binding": "COLOR_QUEUE"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "color-processing-queue",
+        "max_batch_size": 10,
+        "max_batch_timeout": 5,
+        "max_retries": 3,
+        "dead_letter_queue": "color-processing-dlq"
+      }
+    ]
   },
   "vectorize": [
     {
       "binding": "VECTORIZE",
       "index_name": "rafters-color-intel"
-    }
-  ],
-  "kv_namespaces": [
-    {
-      "binding": "RAFTERS_INTEL",
-      "id": "6b15dbdd8a304ec1a374aa8e913f4123"
     }
   ]
 }
