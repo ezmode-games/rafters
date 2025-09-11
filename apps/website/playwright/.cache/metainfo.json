@@ -11,16 +11,16 @@
   ],
   "sources": {
     "/Users/seansilvius/projects/claude/real-handy/rafters/apps/website/playwright/index.html": {
-      "timestamp": 1757558213673.027
+      "timestamp": 1757632869059.0684
     },
     "/Users/seansilvius/projects/claude/real-handy/rafters/apps/website/playwright/index.ts": {
-      "timestamp": 1757575752813.5974
-    },
-    "/Users/seansilvius/projects/claude/real-handy/rafters/node_modules/.pnpm/react@19.1.1/node_modules/react/index.js": {
-      "timestamp": 1751077066689.1616
+      "timestamp": 1757632967156.0854
     },
     "/Users/seansilvius/projects/claude/real-handy/rafters/node_modules/.pnpm/react-dom@19.1.1_react@19.1.1/node_modules/react-dom/client.js": {
       "timestamp": 1751077068004.1191
+    },
+    "/Users/seansilvius/projects/claude/real-handy/rafters/node_modules/.pnpm/react@19.1.1/node_modules/react/index.js": {
+      "timestamp": 1751077066689.1616
     },
     "/Users/seansilvius/projects/claude/real-handy/rafters/apps/website/src/components/ComponentPreview.tsx": {
       "timestamp": 1757578712486.149
@@ -31,23 +31,23 @@
     "/Users/seansilvius/projects/claude/real-handy/rafters/node_modules/.pnpm/react-dom@19.1.1_react@19.1.1/node_modules/react-dom/cjs/react-dom-client.production.js": {
       "timestamp": 1753818821413.6816
     },
+    "/Users/seansilvius/projects/claude/real-handy/rafters/node_modules/.pnpm/react@19.1.1/node_modules/react/jsx-runtime.js": {
+      "timestamp": 1751077066689.733
+    },
     "/Users/seansilvius/projects/claude/real-handy/rafters/node_modules/.pnpm/scheduler@0.26.0/node_modules/scheduler/index.js": {
       "timestamp": 1751077068709.7168
     },
     "/Users/seansilvius/projects/claude/real-handy/rafters/node_modules/.pnpm/react-dom@19.1.1_react@19.1.1/node_modules/react-dom/index.js": {
       "timestamp": 1751077068004.3772
     },
-    "/Users/seansilvius/projects/claude/real-handy/rafters/node_modules/.pnpm/react@19.1.1/node_modules/react/jsx-runtime.js": {
-      "timestamp": 1751077066689.733
+    "/Users/seansilvius/projects/claude/real-handy/rafters/node_modules/.pnpm/react@19.1.1/node_modules/react/cjs/react-jsx-runtime.production.js": {
+      "timestamp": 1751077066691.7188
     },
     "/Users/seansilvius/projects/claude/real-handy/rafters/node_modules/.pnpm/scheduler@0.26.0/node_modules/scheduler/cjs/scheduler.production.js": {
       "timestamp": 1751077068710.8618
     },
     "/Users/seansilvius/projects/claude/real-handy/rafters/node_modules/.pnpm/react-dom@19.1.1_react@19.1.1/node_modules/react-dom/cjs/react-dom.production.js": {
       "timestamp": 1753818821438.295
-    },
-    "/Users/seansilvius/projects/claude/real-handy/rafters/node_modules/.pnpm/react@19.1.1/node_modules/react/cjs/react-jsx-runtime.production.js": {
-      "timestamp": 1751077066691.7188
     }
   },
   "deps": {
