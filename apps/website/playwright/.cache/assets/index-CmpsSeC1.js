@@ -16982,8 +16982,8 @@ window.playwrightUpdate = async (rootElement, component) => {
   entry.setRenderer(() => __pwRender(component));
 };
 
-const _Users_seansilvius_projects_claude_real_handy_rafters_apps_website_src_components_ComponentPreview = () => __vitePreload(() => import('./ComponentPreview-BkDdvqvN.js'),true              ?[]:void 0).then((mod) => mod.default);
+const _Users_seansilvius_projects_claude_real_handy_rafters_apps_website_src_components_ComponentPreview = () => __vitePreload(() => import('./ComponentPreview-egz1NAR5.js'),true              ?[]:void 0).then((mod) => mod.default);
 __pwRegistry.initialize({ _Users_seansilvius_projects_claude_real_handy_rafters_apps_website_src_components_ComponentPreview });
 
 export { React as R, getDefaultExportFromCjs as g, reactExports as r };
-//# sourceMappingURL=index-BIk96LZD.js.map
+//# sourceMappingURL=index-CmpsSeC1.js.map

@@ -5,10 +5,10 @@
  * for making informed UX decisions using Rafters components.
  */
 
-import { getComponentRegistry } from '../lib/registry/componentService';
+import { getRegistryMetadata } from '../lib/registry/componentService';
 
 export async function GET() {
-  const registry = await getComponentRegistry();
+  const registry = getRegistryMetadata();
 
   // Sort components by cognitive load for logical presentation
   const sortedComponents = registry.components.sort((a, b) => {

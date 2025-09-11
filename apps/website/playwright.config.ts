@@ -9,7 +9,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:4321',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:4321',
     trace: 'on-first-retry',
   },
 
@@ -32,5 +32,8 @@ export default defineConfig({
     command: 'pnpm dev',
     url: 'http://localhost:4321',
     reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000,
+    stderr: 'pipe',
+    stdout: 'pipe',
   },
 });

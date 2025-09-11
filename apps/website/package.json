@@ -16,7 +16,7 @@
     "test:spec": "vitest run --config vitest.config.ts --grep spec",
     "test:component": "playwright test --config=playwright-ct.config.ts",
     "test:e2e": "playwright test",
-    "test:preflight": "vitest run && playwright test --config=playwright-ct.config.ts --reporter=json && playwright test --reporter=json"
+    "test:preflight": "vitest run && playwright test --config=playwright-ct.config.ts --timeout=30000 && playwright test --timeout=30000"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
@@ -24,6 +24,7 @@
     "@astrojs/mdx": "^4.3.2",
     "@astrojs/react": "^4.3.1",
     "@rafters/design-tokens": "workspace:*",
+    "@rafters/shared": "workspace:*",
     "astro": "^5.13.7",
     "typescript": "catalog:"
   },

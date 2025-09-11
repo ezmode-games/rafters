@@ -1,4 +1,4 @@
-import { g as getDefaultExportFromCjs, r as reactExports, R as React } from './index-BIk96LZD.js';
+import { g as getDefaultExportFromCjs, r as reactExports, R as React } from './index-CmpsSeC1.js';
 
 var jsxRuntime$2 = {exports: {}};
 
@@ -213,12 +213,12 @@ function ComponentPreview({
       const html = generateComponentHTML(componentData, variant, parsedProps);
       mountPoint.innerHTML = html;
       const buttons = mountPoint.querySelectorAll(".rafters-button");
-      buttons.forEach((button) => {
+      for (const button of buttons) {
         button.addEventListener("click", () => {
           button.setAttribute("data-clicked", "true");
           console.log(`${component} clicked with variant: ${variant}`);
         });
-      });
+      }
     }
   }, [componentData, loading, component, variant, parsedProps]);
   const generateComponentHTML = (data, variantName, componentProps) => {
@@ -352,6 +352,7 @@ function ComponentPreview({
               /* @__PURE__ */ jsxRuntimeExports.jsx(
                 "button",
                 {
+                  type: "button",
                   className: "reload-btn px-2 py-1 bg-blue-100 hover:bg-blue-200 rounded",
                   onClick: handleReload,
                   children: "Reload"
@@ -360,6 +361,7 @@ function ComponentPreview({
               /* @__PURE__ */ jsxRuntimeExports.jsx(
                 "button",
                 {
+                  type: "button",
                   className: "view-code-btn px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded",
                   onClick: () => console.log("View code for:", component),
                   children: "View Code"
@@ -374,4 +376,4 @@ function ComponentPreview({
 }
 
 export { ComponentPreview as default };
-//# sourceMappingURL=ComponentPreview-BkDdvqvN.js.map
+//# sourceMappingURL=ComponentPreview-egz1NAR5.js.map

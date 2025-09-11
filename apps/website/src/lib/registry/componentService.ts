@@ -2,152 +2,263 @@
  * Component Service - Astro Edition
  *
  * Manages loading and processing of components for the registry API.
- * Uses generated registry manifest with embedded JSDoc intelligence.
+ * Uses shared Zod schemas for type safety and validation.
  */
 
-// Import the generated manifest from TypeScript file
-import { registryManifest } from './registryData';
+import { readFileSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
+import {
+  type ComponentManifest,
+  ComponentManifestSchema,
+  type DesignGuide,
+  DesignGuideSchema,
+  type Example,
+  ExampleSchema,
+  type Intelligence,
+  IntelligenceSchema,
+  type RegistryResponse,
+  RegistryResponseSchema,
+  type UsagePatterns,
+  UsagePatternsSchema,
+} from '@rafters/shared';
 
-// Type definitions for our generated registry manifest
-interface RaftersIntelligence {
-  cognitiveLoad: number;
-  attentionEconomics: string;
-  accessibility: string;
-  trustBuilding: string;
-  semanticMeaning: string;
-}
+// Cache for components to avoid re-parsing
+let componentsCache: ComponentManifest[] | null = null;
 
-interface UsagePatterns {
-  dos: string[];
-  nevers: string[];
-}
+/**
+ * Parse JSDoc comments from component source code
+ */
+function parseJSDocFromSource(content: string, filename: string): ComponentManifest | null {
+  // Extract JSDoc comment block
+  const jsdocMatch = content.match(/\/\*\*\s*\n([\s\S]*?)\*\//);
+  if (!jsdocMatch) {
+    return null;
+  }
 
-interface DesignGuide {
-  name: string;
-  url: string;
-}
+  const jsdocContent = jsdocMatch[1];
 
-interface Example {
-  title?: string;
-  code: string;
-  description?: string;
-}
+  // Extract registry metadata
+  const registryName = extractJSDocTag(jsdocContent, 'registry-name');
+  const registryVersion = extractJSDocTag(jsdocContent, 'registry-version') || '0.1.0';
+  const registryPath = extractJSDocTag(jsdocContent, 'registry-path');
+  const registryType = extractJSDocTag(jsdocContent, 'registry-type') || 'registry:component';
 
-interface GeneratedComponent {
-  name: string;
-  path: string;
-  type: string;
-  description?: string;
-  content: string;
-  dependencies: string[];
-  docs?: string;
-  meta?: {
-    rafters: {
-      version: string;
-      intelligence: RaftersIntelligence;
-      usagePatterns: UsagePatterns;
-      designGuides: DesignGuide[];
-      examples: Example[];
-    };
-  };
-}
+  if (!registryName) {
+    return null;
+  }
 
-interface GeneratedManifest {
-  components: GeneratedComponent[];
-  total: number;
-  lastUpdated: string;
-}
+  // Extract intelligence metadata using Zod schema
+  const intelligence: Intelligence = IntelligenceSchema.parse({
+    cognitiveLoad: Number.parseFloat(
+      extractJSDocTag(jsdocContent, 'cognitive-load')?.split('/')[0] || '0'
+    ),
+    attentionEconomics: extractJSDocTag(jsdocContent, 'attention-economics') || '',
+    accessibility: extractJSDocTag(jsdocContent, 'accessibility') || '',
+    trustBuilding: extractJSDocTag(jsdocContent, 'trust-building') || '',
+    semanticMeaning: extractJSDocTag(jsdocContent, 'semantic-meaning') || '',
+  });
 
-// Shadcn-compatible ComponentManifest type
-export interface ComponentManifest {
-  $schema?: string;
-  name: string;
-  type:
-    | 'registry:component'
-    | 'registry:lib'
-    | 'registry:style'
-    | 'registry:block'
-    | 'registry:page'
-    | 'registry:hook';
-  description?: string;
-  dependencies?: string[];
-  files?: Array<{
-    path: string;
-    type: string;
-    content: string;
-  }>;
-  docs?: string;
-  meta?: {
-    rafters?: {
-      version: string;
-      intelligence: RaftersIntelligence;
-      usagePatterns: UsagePatterns;
-      designGuides: DesignGuide[];
-      examples: Example[];
-    };
-  };
-}
+  // Extract usage patterns using Zod schema - handle multiline content
+  const dos: string[] = [];
+  const nevers: string[] = [];
 
-// Load the generated registry manifest
-function loadGeneratedManifest(): GeneratedManifest {
-  return JSON.parse(JSON.stringify(registryManifest)) as GeneratedManifest;
-}
+  // Find the full usage-patterns block (multiline)
+  const usagePatternsMatch = jsdocContent.match(
+    /@usage-patterns\s*\n([\s\S]*?)(?=@[a-z-]+|\*\/|$)/
+  );
+  if (usagePatternsMatch) {
+    const usagePatternsRaw = usagePatternsMatch[1];
+    const lines = usagePatternsRaw.split('\n');
+    for (const line of lines) {
+      const trimmed = line.trim().replace(/^\*\s*/, ''); // Remove leading asterisk and spaces
+      if (trimmed.startsWith('DO:')) {
+        dos.push(trimmed.substring(3).trim());
+      } else if (trimmed.startsWith('NEVER:')) {
+        nevers.push(trimmed.substring(6).trim());
+      }
+    }
+  }
 
-// Convert generated component to shadcn-compatible format
-function convertToComponentManifest(component: GeneratedComponent): ComponentManifest {
-  return {
+  const usagePatterns: UsagePatterns = UsagePatternsSchema.parse({
+    dos,
+    nevers,
+  });
+
+  // Extract design guides using Zod schema
+  const designGuidesRaw = extractJSDocTag(jsdocContent, 'design-guides') || '';
+  const designGuides: DesignGuide[] = [];
+
+  if (designGuidesRaw) {
+    const lines = designGuidesRaw.split('\n');
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('-')) {
+        const match = trimmed.match(/-\s*(.+?):\s*(.+)/);
+        if (match) {
+          designGuides.push(
+            DesignGuideSchema.parse({
+              name: match[1].trim(),
+              url: match[2].trim(),
+            })
+          );
+        }
+      }
+    }
+  }
+
+  // Extract dependencies (filter out invalid ones)
+  const dependenciesRaw = extractJSDocTag(jsdocContent, 'dependencies') || '';
+  const dependencies = dependenciesRaw
+    .split(',')
+    .map((dep) => dep.trim())
+    .filter((dep) => dep.length > 0 && dep !== '@rafters/design-tokens/motion'); // Filter out invalid dependencies
+
+  // Extract examples using Zod schema
+  const exampleMatch = jsdocContent.match(/@example\s*\n\s*```tsx?\s*\n([\s\S]*?)```/);
+  const examples: Example[] = [];
+  if (exampleMatch) {
+    examples.push(
+      ExampleSchema.parse({
+        code: exampleMatch[1].trim(),
+      })
+    );
+  }
+
+  // Generate docs URL
+  const docs = `https://rafters.realhandy.tech/docs/components/${registryName}`;
+
+  // Build component manifest using Zod schema
+  const componentManifest: ComponentManifest = ComponentManifestSchema.parse({
     $schema: 'https://ui.shadcn.com/schema/registry-item.json',
-    name: component.name,
-    type: component.type as ComponentManifest['type'],
-    description: component.description,
-    dependencies: component.dependencies,
-    docs: component.docs,
+    name: registryName,
+    type: registryType as 'registry:component',
+    description: '',
+    dependencies,
     files: [
       {
-        path: component.path,
-        type: component.type,
-        content: component.content,
+        path: registryPath || `components/ui/${filename}`,
+        content,
+        type: 'registry:component',
       },
     ],
-    meta: component.meta,
-  };
+    docs,
+    meta: {
+      rafters: {
+        version: registryVersion,
+        intelligence,
+        usagePatterns,
+        designGuides,
+        examples,
+      },
+    },
+  });
+
+  return componentManifest;
 }
 
-export async function getComponentRegistry(): Promise<{
-  components: ComponentManifest[];
-}> {
-  const manifest = loadGeneratedManifest();
-
-  const components = manifest.components.map(convertToComponentManifest);
-
-  return { components };
+/**
+ * Extract a specific JSDoc tag value
+ */
+function extractJSDocTag(jsdocContent: string, tagName: string): string | null {
+  const regex = new RegExp(`@${tagName}\\s+(.+)`, 'i');
+  const match = jsdocContent.match(regex);
+  return match ? match[1].trim() : null;
 }
 
-export async function getComponentByName(name: string): Promise<ComponentManifest | null> {
-  const registry = await getComponentRegistry();
-  return registry.components.find((c) => c.name.toLowerCase() === name.toLowerCase()) || null;
+/**
+ * Load and parse all components from the UI package
+ */
+function loadComponents(): ComponentManifest[] {
+  if (componentsCache) {
+    return componentsCache;
+  }
+
+  const componentsDir = join(process.cwd(), '../../packages/ui/src/components');
+  const components: ComponentManifest[] = [];
+
+  try {
+    const files = readdirSync(componentsDir);
+
+    for (const file of files) {
+      if (file.endsWith('.tsx')) {
+        const filePath = join(componentsDir, file);
+        const content = readFileSync(filePath, 'utf-8');
+
+        const componentData = parseJSDocFromSource(content, file);
+        if (componentData) {
+          components.push(componentData);
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error loading components:', error);
+  }
+
+  componentsCache = components;
+  return components;
 }
 
-// Registry metadata for AI consumption
-export async function getRegistryMetadata() {
-  const manifest = loadGeneratedManifest();
+/**
+ * Get all components for the registry
+ */
+export function getAllComponents(): ComponentManifest[] {
+  return loadComponents();
+}
 
-  return {
+/**
+ * Get a specific component by name
+ */
+export function getComponent(name: string): ComponentManifest | null {
+  const components = loadComponents();
+  return components.find((comp) => comp.name.toLowerCase() === name.toLowerCase()) || null;
+}
+
+/**
+ * Get the registry manifest (components list endpoint)
+ */
+export function getRegistryManifest(): RegistryResponse {
+  const components = loadComponents();
+
+  return RegistryResponseSchema.parse({
     $schema: 'https://rafters.dev/schemas/registry.json',
     name: 'Rafters AI Design Intelligence Registry',
-    version: '1.0.0',
-    description: 'Components with embedded design reasoning for AI agents',
-    baseUrl: 'https://rafters.realhandy.tech/registry',
-    components: manifest.components.map((component) => ({
-      name: component.name,
-      description: component.description || '',
-      version: component.meta?.rafters?.version || '0.1.0',
-      type: component.type,
-      cognitiveLoad: component.meta?.rafters?.intelligence?.cognitiveLoad || 0,
-      dependencies: component.dependencies,
-      files: [component.path],
-    })),
-    totalComponents: manifest.total,
-    lastUpdated: manifest.lastUpdated,
-  };
+    homepage: 'https://rafters.realhandy.tech',
+    components,
+  });
 }
+
+/**
+ * Get registry metadata for the root registry endpoint
+ */
+export function getRegistryMetadata(): RegistryResponse {
+  const components = loadComponents();
+
+  // Calculate intelligence averages
+  const totalCognitiveLoad = components.reduce((sum, comp) => {
+    return sum + (comp.meta?.rafters?.intelligence?.cognitiveLoad || 0);
+  }, 0);
+  const avgCognitiveLoad = components.length > 0 ? totalCognitiveLoad / components.length : 0;
+
+  return RegistryResponseSchema.parse({
+    $schema: 'https://rafters.dev/schemas/registry.json',
+    name: 'Rafters AI Design Intelligence Registry',
+    homepage: 'https://rafters.realhandy.tech',
+    components: components.map((comp) => ({
+      ...comp,
+      // Add computed metadata for the registry root
+      description: comp.description || `${comp.name} component with embedded design intelligence`,
+    })),
+    // Note: Adding intelligence stats here, but they're not in the Zod schema
+    // We may need to extend the schema in shared if we want this data validated
+  });
+}
+
+// Re-export types from shared for convenience
+export type {
+  ComponentManifest,
+  Intelligence,
+  UsagePatterns,
+  DesignGuide,
+  Example,
+  RegistryResponse,
+};

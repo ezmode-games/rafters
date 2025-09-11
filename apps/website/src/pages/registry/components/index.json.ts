@@ -6,12 +6,12 @@
 
 import {
   type ComponentManifest,
-  getComponentRegistry,
+  getRegistryMetadata,
 } from '../../../lib/registry/componentService';
 
 export async function GET() {
   try {
-    const registryData = await getComponentRegistry();
+    const registryData = getRegistryMetadata();
 
     // Transform to simpler format for listing (shadcn-compatible)
     const componentsData = {
