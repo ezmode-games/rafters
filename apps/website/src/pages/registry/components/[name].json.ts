@@ -5,19 +5,21 @@
  */
 
 import type { GetStaticPaths } from 'astro';
-import { getComponentByName, getComponentRegistry } from '../../../lib/registry/componentService';
+import { getComponent, getRegistryMetadata } from '../../../lib/registry/componentService';
 
 export async function getStaticPaths() {
-  const registry = await getComponentRegistry();
+  const registry = getRegistryMetadata();
 
-  return registry.components.map((component) => ({
-    params: { name: component.name },
-  }));
+  return (
+    registry.components?.map((component) => ({
+      params: { name: component.name },
+    })) || []
+  );
 }
 
 export async function GET({ params }: { params: { name: string } }) {
   try {
-    const componentData = await getComponentByName(params.name);
+    const componentData = getComponent(params.name);
 
     if (!componentData) {
       return new Response(JSON.stringify({ error: `Component '${params.name}' not found` }), {
