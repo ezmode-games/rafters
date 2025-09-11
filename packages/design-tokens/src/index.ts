@@ -860,7 +860,7 @@ export const writeTokenFiles = async (
 
   // Import all generators and create complete token set
   const { generateAllTokens } = await import('./generators/index.js');
-  const allTokens = generateAllTokens();
+  const allTokens = await generateAllTokens();
 
   // Convert to DesignSystem format
   const designSystem: DesignSystem = {

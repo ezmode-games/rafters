@@ -1,0 +1,34 @@
+---
+import tokenCache from '../../../data/token-cache.json';
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+
+// Use cached color tokens (generated at build time when package version changes)
+const { colorTokens, stats, generatedAt, version } = tokenCache;
+const { semantic: semanticColors, families: familyGroups } = colorTokens;
+
+// Utility function to convert OKLCH object to CSS string
+function oklchToCss(oklch: unknown): string {
+  if (typeof oklch === 'string') return oklch;
+  if (oklch && typeof oklch === 'object' && oklch.l !== undefined) {
+    return `oklch(${oklch.l} ${oklch.c} ${oklch.h})`;
+  }
+  return 'transparent';
+}
+
+// Get the primary color value from a ColorValue object
+function getColorValue(colorValue: unknown, index = 5): string {
+  if (typeof colorValue === 'string') return colorValue;
+  if (colorValue?.scale && Array.isArray(colorValue.scale)) {
+    const targetIndex = Math.min(index, colorValue.scale.length - 1);
+    return oklchToCss(colorValue.scale[targetIndex]);
+  }
+  return 'transparent';
+}
+---
+
+<DocsLayout title="Live Color Tokens" description="Live color tokens with OKLCH values and AI intelligence">
+  <div class="prose prose-lg max-w-none">
+    <h1>Simple Test</h1>
+    <p>Testing if basic structure works</p>
+  </div>
+</DocsLayout>

@@ -1,0 +1,203 @@
+---
+import tokenCache from '../../../data/token-cache.json';
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+
+// Use cached tokens (generated at build time when package version changes)
+const { allTokens, tokensByCategory, stats, generatedAt, version } = tokenCache;
+
+// Sort categories for consistent display
+const categories = Object.keys(tokensByCategory).sort();
+
+// Utility function to convert OKLCH object to CSS string
+function oklchToCss(oklch: unknown): string {
+  if (typeof oklch === 'string') return oklch;
+  if (oklch && typeof oklch === 'object' && oklch.l !== undefined) {
+    return `oklch(${oklch.l} ${oklch.c} ${oklch.h})`;
+  }
+  return 'transparent';
+}
+
+// Get the display value for any token value
+function getDisplayValue(tokenValue: unknown): string {
+  if (typeof tokenValue === 'string') return tokenValue;
+
+  // Handle ColorValue objects with OKLCH scales
+  if (tokenValue?.scale && Array.isArray(tokenValue.scale)) {
+    const midIndex = Math.floor(tokenValue.scale.length / 2);
+    return oklchToCss(tokenValue.scale[midIndex]);
+  }
+
+  // Handle direct OKLCH objects
+  if (tokenValue && typeof tokenValue === 'object' && tokenValue.l !== undefined) {
+    return oklchToCss(tokenValue);
+  }
+
+  // Handle other objects
+  if (typeof tokenValue === 'object' && tokenValue !== null) {
+    return JSON.stringify(tokenValue, null, 2);
+  }
+
+  return String(tokenValue);
+}
+
+// Check if a token is a color token
+function isColorToken(token: { value?: unknown }): boolean {
+  if (typeof token.value === 'string') return false;
+  if (token.value?.scale && Array.isArray(token.value.scale)) return true;
+  if (token.value && typeof token.value === 'object' && token.value.l !== undefined) return true;
+  return false;
+}
+---
+
+<DocsLayout title="Live Design Tokens" description="Live tokens generated from @rafters/design-tokens generators">
+  <div class="prose prose-lg max-w-none">
+    <h1>Live Design Tokens</h1>
+    <p class="lead">
+      <strong>{stats.totalTokens} design tokens</strong> including <strong>{stats.colorTokens} API-enhanced color tokens</strong> 
+      generated using mathematical relationships and AI intelligence metadata.
+    </p>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+      <h2 class="text-lg font-semibold text-blue-900 mb-2">System Statistics</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+        <div>
+          <div class="font-medium text-blue-800">Total Tokens</div>
+          <div class="text-2xl font-bold text-blue-900">{stats.totalTokens}</div>
+        </div>
+        <div>
+          <div class="font-medium text-blue-800">Categories</div>
+          <div class="text-2xl font-bold text-blue-900">{stats.categories}</div>
+        </div>
+        <div>
+          <div class="font-medium text-blue-800">Generators</div>
+          <div class="text-2xl font-bold text-blue-900">18</div>
+        </div>
+        <div>
+          <div class="font-medium text-blue-800">Color Families</div>
+          <div class="text-2xl font-bold text-blue-900">
+            {stats.colorFamilies}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {categories.map(category => {
+      const tokens = tokensByCategory[category];
+      return (
+        <section class="mb-12">
+          <h2 class="text-2xl font-bold mb-4 capitalize">{category} Tokens</h2>
+          <p class="text-gray-600 mb-6">
+            {tokens.length} tokens generated with mathematical relationships and embedded intelligence
+          </p>
+          
+          <div class="overflow-x-auto">
+            <table class="min-w-full border border-gray-200 rounded-lg">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-2 text-left font-medium text-gray-900">Name</th>
+                  <th class="px-4 py-2 text-left font-medium text-gray-900">Value</th>
+                  <th class="px-4 py-2 text-left font-medium text-gray-900">Cognitive Load</th>
+                  <th class="px-4 py-2 text-left font-medium text-gray-900">Trust Level</th>
+                  <th class="px-4 py-2 text-left font-medium text-gray-900">Usage Context</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tokens.map((token, index) => (
+                  <tr class={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td class="px-4 py-2 font-mono text-sm">{token.name}</td>
+                    <td class="px-4 py-2 font-mono text-sm">
+                      {isColorToken(token) ? (
+                        <div class="flex items-center gap-2">
+                          <div 
+                            class="w-6 h-6 rounded border border-gray-300 flex-shrink-0"
+                            style={`background-color: ${getDisplayValue(token.value)}`}
+                            title={getDisplayValue(token.value)}
+                          ></div>
+                          <span>{getDisplayValue(token.value)}</span>
+                        </div>
+                      ) : (
+                        getDisplayValue(token.value)
+                      )}
+                    </td>
+                    <td class="px-4 py-2 text-sm">
+                      {token.cognitiveLoad ? (
+                        <span class={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                          token.cognitiveLoad <= 3 ? 'bg-green-100 text-green-800' :
+                          token.cognitiveLoad <= 6 ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {token.cognitiveLoad}/10
+                        </span>
+                      ) : (
+                        <span class="text-gray-400">—</span>
+                      )}
+                    </td>
+                    <td class="px-4 py-2 text-sm">
+                      {token.trustLevel ? (
+                        <span class={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                          token.trustLevel === 'low' ? 'bg-blue-100 text-blue-800' :
+                          token.trustLevel === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                          token.trustLevel === 'high' ? 'bg-orange-100 text-orange-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {token.trustLevel}
+                        </span>
+                      ) : (
+                        <span class="text-gray-400">—</span>
+                      )}
+                    </td>
+                    <td class="px-4 py-2 text-sm">
+                      {token.usageContext ? (
+                        <div class="flex flex-wrap gap-1">
+                          {token.usageContext.slice(0, 3).map(context => (
+                            <span class="inline-block px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
+                              {context}
+                            </span>
+                          ))}
+                          {token.usageContext.length > 3 && (
+                            <span class="text-gray-400 text-xs">+{token.usageContext.length - 3} more</span>
+                          )}
+                        </div>
+                      ) : (
+                        <span class="text-gray-400">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      );
+    })}
+
+    <section class="mt-12 p-6 bg-gray-50 rounded-lg">
+      <h2 class="text-xl font-bold mb-4">About Live Tokens</h2>
+      <div class="grid md:grid-cols-2 gap-6 text-sm">
+        <div>
+          <h3 class="font-semibold mb-2">Generation Process</h3>
+          <ul class="space-y-1 text-gray-600">
+            <li>• Tokens generated at build time when package version changes</li>
+            <li>• Mathematical relationships maintained</li>
+            <li>• AI intelligence metadata included</li>
+            <li>• Dependency graphs respected</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-2">Token Categories</h3>
+          <ul class="space-y-1 text-gray-600">
+            <li>• <strong>Color:</strong> {stats.colorTokens} API-enhanced tokens across {stats.colorFamilies} families</li>
+            <li>• <strong>Spacing:</strong> Mathematical scales with golden ratio</li>
+            <li>• <strong>Typography:</strong> Modular scales with harmony</li>
+            <li>• <strong>Motion:</strong> Timing with personality</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="mt-4 pt-4 border-t border-gray-200 flex justify-between text-xs text-gray-500">
+        <div>Generated from @rafters/design-tokens v{version}</div>
+        <div>Last updated: {new Date(generatedAt).toLocaleString()}</div>
+      </div>
+    </section>
+  </div>
+</DocsLayout>

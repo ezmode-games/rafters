@@ -1,0 +1,115 @@
+---
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Import the registry data
+import { getRegistryMetadata } from '../lib/registry/componentService';
+
+const registryData = await getRegistryMetadata();
+const components = registryData.components;
+---
+
+<BaseLayout title="Component Registry – Rafters" description="Browse and explore Rafters design system components with embedded intelligence">
+	<main class="mx-auto max-w-6xl flex min-h-screen flex-col items-center justify-center gap-8 p-4">
+		<Header title="Component Registry" titleClasses="text-4xl leading-3 tracking-wide" />
+		
+		<section class="max-w-5xl w-full font-sans text-lg leading-relaxed">
+			<p class="mb-8 text-base opacity-80 text-center">
+				Explore the complete catalog of Rafters components with embedded design intelligence.
+				Each component includes cognitive load ratings, trust patterns, and usage guidelines for AI agents.
+			</p>
+
+			<div class="grid md:grid-cols-2 gap-6 mb-16">
+				{components.map((component) => (
+					<div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
+						<div class="flex justify-between items-start mb-4">
+							<div>
+								<h3 class="text-xl font-semibold mb-2">{component.name}</h3>
+								<p class="text-sm text-gray-600 mb-3">{component.description}</p>
+							</div>
+							{component.cognitiveLoad && (
+								<div class="text-xs bg-blue-100 px-2 py-1 rounded">
+									Load: {component.cognitiveLoad}/10
+								</div>
+							)}
+						</div>
+
+						<div class="mb-3">
+							<span class="text-xs font-medium text-gray-700">Type: </span>
+							<span class="text-xs text-gray-600">{component.type}</span>
+						</div>
+
+						{component.dependencies?.length > 0 && (
+							<div class="mb-4">
+								<span class="text-xs font-medium text-gray-700">Dependencies: </span>
+								<span class="text-xs text-gray-600">{component.dependencies.join(', ')}</span>
+							</div>
+						)}
+
+						<div class="flex gap-3 text-sm">
+							<a 
+								href={`/docs/components/${component.name}`} 
+								class="underline hover:no-underline text-blue-600"
+							>
+								Documentation
+							</a>
+							<a 
+								href={`/registry/components/${component.name}.json`}
+								class="underline hover:no-underline text-gray-600"
+							>
+								Registry Data
+							</a>
+						</div>
+					</div>
+				))}
+			</div>
+
+			<div class="bg-gray-50 border border-gray-200 rounded-lg p-8 mb-8">
+				<h2 class="text-2xl font-semibold mb-6">Registry APIs</h2>
+				<div class="space-y-4">
+					<div>
+						<p class="text-sm text-gray-600 mb-2">Complete registry index:</p>
+						<code class="block bg-gray-900 text-gray-100 p-3 rounded font-mono text-sm">
+							GET /registry/index.json
+						</code>
+					</div>
+					<div>
+						<p class="text-sm text-gray-600 mb-2">Component list:</p>
+						<code class="block bg-gray-900 text-gray-100 p-3 rounded font-mono text-sm">
+							GET /registry/components/index.json
+						</code>
+					</div>
+					<div>
+						<p class="text-sm text-gray-600 mb-2">Individual component:</p>
+						<code class="block bg-gray-900 text-gray-100 p-3 rounded font-mono text-sm">
+							GET /registry/components/&#123;name&#125;.json
+						</code>
+					</div>
+					<div>
+						<p class="text-sm text-gray-600 mb-2">AI-focused documentation:</p>
+						<code class="block bg-gray-900 text-gray-100 p-3 rounded font-mono text-sm">
+							GET /llms.txt
+						</code>
+					</div>
+				</div>
+			</div>
+
+			<div class="text-center">
+				<p class="text-base text-gray-600 mb-4">
+					Ready to build with embedded design intelligence?
+				</p>
+				<div class="flex gap-4 justify-center">
+					<a href="/docs/components" class="underline hover:no-underline text-lg">
+						Browse Documentation
+					</a>
+					<a href="/llms.txt" class="underline hover:no-underline text-lg">
+						AI Documentation
+					</a>
+				</div>
+			</div>
+		</section>
+
+		<Footer />
+	</main>
+</BaseLayout>

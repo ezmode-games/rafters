@@ -1,5 +1,5 @@
 /**
- * Component Service
+ * Component Service - Astro Edition
  *
  * Manages loading and processing of components for the registry API.
  * Uses generated registry manifest with embedded JSDoc intelligence.
@@ -123,7 +123,7 @@ export async function getComponentRegistry(): Promise<{
   return { components };
 }
 
-export async function getComponent(name: string): Promise<ComponentManifest | null> {
+export async function getComponentByName(name: string): Promise<ComponentManifest | null> {
   const registry = await getComponentRegistry();
   return registry.components.find((c) => c.name.toLowerCase() === name.toLowerCase()) || null;
 }
@@ -137,7 +137,7 @@ export async function getRegistryMetadata() {
     name: 'Rafters AI Design Intelligence Registry',
     version: '1.0.0',
     description: 'Components with embedded design reasoning for AI agents',
-    baseUrl: 'https://rafters.realhandy.tech/api/registry',
+    baseUrl: 'https://rafters.realhandy.tech/registry',
     components: manifest.components.map((component) => ({
       name: component.name,
       description: component.description || '',

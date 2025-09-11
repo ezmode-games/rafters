@@ -1,0 +1,91 @@
+---
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Huh? – Rafters" description="Frequently asked questions about Rafters design system">
+	<main class="mx-auto max-w-4xl flex min-h-screen flex-col items-center justify-center gap-8 p-4">
+		<Header title="Huh?" titleClasses="text-4xl leading-3 tracking-wide" />
+		
+		<article class="max-w-3xl font-sans text-lg leading-relaxed">
+			<section class="mb-12">
+				<h2 class="text-2xl font-semibold mb-6">Wait, what's Rafters again?</h2>
+				<p class="mb-6">
+					It's a design system built for AI agents. Instead of just giving you components, 
+					we capture the design reasoning behind every decision and make it machine-readable.
+				</p>
+				<p class="mb-6">
+					When AI builds interfaces using Rafters, it doesn't guess - it reads the embedded 
+					intelligence about cognitive load, attention economics, and trust patterns.
+				</p>
+			</section>
+
+			<section class="mb-12">
+				<h2 class="text-2xl font-semibold mb-6">How is this different from shadcn/ui?</h2>
+				<p class="mb-6">
+					shadcn/ui gives you beautiful components. Rafters gives you beautiful components 
+					<em>plus</em> the intelligence about when and why to use them.
+				</p>
+				<p class="mb-6">
+					Every Rafters component includes metadata like cognitive load ratings, attention 
+					economics patterns, and trust-building requirements. AI agents can read this data 
+					and make informed UX decisions.
+				</p>
+			</section>
+
+			<section class="mb-12">
+				<h2 class="text-2xl font-semibold mb-6">Why IBM Plex fonts?</h2>
+				<p class="mb-6">
+					IBM Plex was designed for technical interfaces. The mono variant gives headings 
+					a distinctive technical aesthetic that signals "this is for builders," while the 
+					sans variant provides excellent readability for body text.
+				</p>
+				<p class="mb-6">
+					Plus, it's free, well-made, and has excellent support for code and data display.
+				</p>
+			</section>
+
+			<section class="mb-12">
+				<h2 class="text-2xl font-semibold mb-6">What's with the cognitive load ratings?</h2>
+				<p class="mb-6">
+					Every component gets a rating from 0-10 based on how much mental effort it requires. 
+					A Container is 0/10 (invisible structure), a Button is 3/10 (simple action), 
+					a Dialog is 6/10 (interrupts flow).
+				</p>
+				<p class="mb-6">
+					AI agents can use these ratings to build interfaces that respect users' cognitive 
+					capacity and avoid overwhelming them.
+				</p>
+			</section>
+
+			<section class="mb-12">
+				<h2 class="text-2xl font-semibold mb-6">Can I use this without AI?</h2>
+				<p class="mb-6">
+					Absolutely! The components work perfectly for human developers too. The embedded 
+					intelligence just makes the design decisions more explicit and systematic.
+				</p>
+				<p class="mb-6">
+					Think of it as documentation that never gets out of sync because it's built into 
+					the components themselves.
+				</p>
+			</section>
+
+			<section class="mb-12">
+				<h2 class="text-2xl font-semibold mb-6">What's in the registry?</h2>
+				<p class="mb-6">
+					Component code, design intelligence metadata, usage patterns, accessibility 
+					requirements, and examples. Everything an AI agent needs to understand how 
+					to use components appropriately.
+				</p>
+				<p class="mb-6">
+					Check out <a href="/llms.txt" class="underline">llms.txt</a> for the AI-focused 
+					documentation, or browse the <a href="/docs/components" class="underline">component docs</a> 
+					for human-readable explanations.
+				</p>
+			</section>
+		</article>
+
+		<Footer />
+	</main>
+</BaseLayout>

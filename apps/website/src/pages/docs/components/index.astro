@@ -1,0 +1,142 @@
+---
+import { getCollection } from 'astro:content';
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+
+// Get all component docs
+const componentDocs = await getCollection('components', ({ data }) => !data.draft);
+componentDocs.sort((a, b) => (a.data.order || 999) - (b.data.order || 999));
+
+// Get the main component overview from the index.mdx content
+const overviewDoc = componentDocs.find((doc) => doc.slug === 'index');
+const otherComponents = componentDocs.filter((doc) => doc.slug !== 'index');
+---
+
+<DocsLayout title="Components" description="Rafters component library with embedded design intelligence">
+  <div class="space-y-12">
+    <!-- Header -->
+    <div>
+      <h1 class="text-4xl font-mono font-semibold mb-8">Components</h1>
+      <p class="text-xl text-gray-600 mb-8">
+        AI-driven component library with embedded design intelligence for systematic UX decisions.
+      </p>
+    </div>
+
+    <!-- Overview Link -->
+    {overviewDoc && (
+      <div class="bg-primary-50 border border-primary-200 rounded-lg p-6 mb-8">
+        <h2 class="text-xl font-semibold mb-3">
+          <a href={`/docs/components/${overviewDoc.slug}`} class="hover:text-primary-700">
+            📚 {overviewDoc.data.title}
+          </a>
+        </h2>
+        <p class="text-gray-600 mb-4">{overviewDoc.data.description}</p>
+        <a 
+          href={`/docs/components/${overviewDoc.slug}`}
+          class="text-primary-600 hover:text-primary-700 font-medium"
+        >
+          Read complete overview →
+        </a>
+      </div>
+    )}
+
+    <!-- Component Grid -->
+    <section>
+      <h2 class="text-2xl font-semibold mb-6">Available Components</h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        {otherComponents.map((doc) => (
+          <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h3 class="text-lg font-semibold mb-2">
+                  <a href={`/docs/components/${doc.slug}`} class="hover:text-primary-700">
+                    {doc.data.title}
+                  </a>
+                </h3>
+                <p class="text-sm text-gray-600">{doc.data.description}</p>
+              </div>
+              {doc.data.cognitiveLoad !== undefined && (
+                <div class="text-center">
+                  <div class="text-xs bg-blue-100 px-2 py-1 rounded mb-1">
+                    Load: {doc.data.cognitiveLoad}/10
+                  </div>
+                  {doc.data.trustLevel && (
+                    <div class="text-xs bg-gray-100 px-2 py-1 rounded">
+                      {doc.data.trustLevel}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {doc.data.attentionEconomics && (
+              <div class="mb-4">
+                <span class="text-xs font-medium text-gray-700">Attention: </span>
+                <span class="text-xs text-gray-600 italic">{doc.data.attentionEconomics}</span>
+              </div>
+            )}
+
+            <a 
+              href={`/docs/components/${doc.slug}`}
+              class="inline-flex items-center text-sm text-primary-600 hover:text-primary-700 font-medium"
+            >
+              View documentation →
+            </a>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Design Intelligence Summary -->
+    <section class="bg-gray-50 border border-gray-200 rounded-lg p-8">
+      <h2 class="text-2xl font-semibold mb-6">Design Intelligence Framework</h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div>
+          <h3 class="text-lg font-semibold mb-3">Cognitive Load</h3>
+          <p class="text-sm text-gray-600 mb-3">
+            Every component rated 0-10 for mental effort required. Helps AI agents respect user cognitive capacity.
+          </p>
+          <div class="text-xs text-gray-500">
+            0-2: Invisible • 3-5: Moderate • 6-8: Significant • 9-10: Maximum
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-3">Trust Building</h3>
+          <p class="text-sm text-gray-600 mb-3">
+            Components adapt behavior based on consequence levels and user confidence requirements.
+          </p>
+          <div class="text-xs text-gray-500">
+            Low: Minimal friction • Medium: Balanced caution • High: Enhanced weight • Critical: Progressive confirmation
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-semibold mb-3">Attention Economics</h3>
+          <p class="text-sm text-gray-600 mb-3">
+            Mathematical visual hierarchy patterns that guide user focus systematically.
+          </p>
+          <div class="text-xs text-gray-500">
+            Democratic: Equal weight • Hierarchical: Clear primary/secondary • Focused: Single attention point
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Getting Started -->
+    <section>
+      <h2 class="text-2xl font-semibold mb-6">Getting Started</h2>
+      <div class="bg-gray-900 text-gray-100 rounded-lg p-6">
+        <div class="space-y-4">
+          <div>
+            <p class="text-sm text-gray-300 mb-2">Initialize Rafters:</p>
+            <code class="block text-sm">npx rafters init</code>
+          </div>
+          <div>
+            <p class="text-sm text-gray-300 mb-2">Add a component:</p>
+            <code class="block text-sm">npx rafters add button</code>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</DocsLayout>

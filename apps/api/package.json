@@ -15,7 +15,7 @@
     "@hono/zod-validator": "^0.7.2",
     "@rafters/color-utils": "workspace:^",
     "@rafters/shared": "workspace:^",
-    "hono": "^4.9.5",
+    "hono": "^4.9.6",
     "zod": "catalog:"
   },
   "devDependencies": {

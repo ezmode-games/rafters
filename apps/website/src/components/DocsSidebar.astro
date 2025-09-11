@@ -1,0 +1,176 @@
+---
+import { getCollection } from 'astro:content';
+
+// Get all foundation, component, and token docs
+const foundationDocs = await getCollection('foundation', ({ data }) => {
+  return !data.draft;
+});
+
+const componentDocs = await getCollection('components', ({ data }) => {
+  return !data.draft;
+});
+
+const tokenDocs = await getCollection('tokens', ({ data }) => {
+  return !data.draft;
+});
+
+// Sort by order
+foundationDocs.sort((a, b) => (a.data.order || 999) - (b.data.order || 999));
+componentDocs.sort((a, b) => (a.data.order || 999) - (b.data.order || 999));
+tokenDocs.sort((a, b) => (a.data.order || 999) - (b.data.order || 999));
+
+// Get current path for active state
+const currentPath = Astro.url.pathname;
+---
+
+<aside class="w-64 bg-gray-50 border-r border-gray-200 min-h-screen p-6">
+  <nav class="space-y-8">
+    <!-- Foundation Section -->
+    <div>
+      <h3 class="text-sm font-semibold text-gray-900 mb-3">Foundation</h3>
+      <ul class="space-y-1">
+        {foundationDocs.map((doc) => {
+          const href = `/docs/foundation/${doc.slug}`;
+          const isActive = currentPath === href;
+          return (
+            <li>
+              <a 
+                href={href}
+                class={`block px-3 py-2 rounded text-sm transition-colors ${
+                  isActive 
+                    ? 'bg-primary-100 text-primary-700 font-medium' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                {doc.data.title}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+
+    <!-- Components Section -->
+    <div>
+      <h3 class="text-sm font-semibold text-gray-900 mb-3">Components</h3>
+      <ul class="space-y-1">
+        {componentDocs.map((doc) => {
+          const href = `/docs/components/${doc.slug}`;
+          const isActive = currentPath === href;
+          return (
+            <li>
+              <a 
+                href={href}
+                class={`flex items-center justify-between px-3 py-2 rounded text-sm transition-colors ${
+                  isActive 
+                    ? 'bg-primary-100 text-primary-700 font-medium' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                <span>{doc.data.title}</span>
+                {doc.data.cognitiveLoad !== undefined && (
+                  <span class="text-xs bg-gray-200 px-1.5 py-0.5 rounded">
+                    {doc.data.cognitiveLoad}/10
+                  </span>
+                )}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+
+    <!-- Design Tokens Section -->
+    <div>
+      <h3 class="text-sm font-semibold text-gray-900 mb-3">Design Tokens</h3>
+      <ul class="space-y-1">
+        <li>
+          <a 
+            href="/docs/tokens/live"
+            class={`flex items-center justify-between px-3 py-2 rounded text-sm transition-colors ${
+              currentPath === '/docs/tokens/live'
+                ? 'bg-primary-100 text-primary-700 font-medium' 
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            }`}
+          >
+            <span>Design Tokens</span>
+            <span class="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
+              LIVE
+            </span>
+          </a>
+        </li>
+        <li>
+          <a 
+            href="/docs/tokens/color-live"
+            class={`flex items-center justify-between px-3 py-2 rounded text-sm transition-colors ${
+              currentPath === '/docs/tokens/color-live'
+                ? 'bg-primary-100 text-primary-700 font-medium' 
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            }`}
+          >
+            <span>Color System</span>
+            <span class="text-xs bg-green-100 text-green-800 px-1.5 py-0.5 rounded">
+              API
+            </span>
+          </a>
+        </li>
+        {tokenDocs.map((doc) => {
+          const href = `/docs/tokens/${doc.slug}`;
+          const isActive = currentPath === href;
+          return (
+            <li>
+              <a 
+                href={href}
+                class={`flex items-center justify-between px-3 py-2 rounded text-sm transition-colors ${
+                  isActive 
+                    ? 'bg-primary-100 text-primary-700 font-medium' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                <span>{doc.data.title}</span>
+                {doc.data.category && (
+                  <span class="text-xs bg-green-100 px-1.5 py-0.5 rounded">
+                    {doc.data.category}
+                  </span>
+                )}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+
+    <!-- Quick Links -->
+    <div>
+      <h3 class="text-sm font-semibold text-gray-900 mb-3">Quick Links</h3>
+      <ul class="space-y-1">
+        <li>
+          <a 
+            href="/registry"
+            class="block px-3 py-2 rounded text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+          >
+            Component Registry
+          </a>
+        </li>
+        <li>
+          <a 
+            href="/llms.txt"
+            class="block px-3 py-2 rounded text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+          >
+            AI Documentation
+          </a>
+        </li>
+        <li>
+          <a 
+            href="https://github.com/real-handy/rafters"
+            class="block px-3 py-2 rounded text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+            target="_blank"
+            rel="noopener"
+          >
+            GitHub Repository
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</aside>
