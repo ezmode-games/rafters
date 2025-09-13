@@ -42,6 +42,9 @@ export class JSDocIntelligenceParser {
   }
 
   private parseIntelligenceFromComment(jsDocComment: string): ComponentIntelligence | null {
+    // Parse with Doctrine first
+    const parsed = doctrine.parse(jsDocComment, { unwrap: true });
+
     const intelligence: Partial<ComponentIntelligence> = {
       cognitiveLoad: 0,
       attentionEconomics: '',
@@ -55,64 +58,71 @@ export class JSDocIntelligenceParser {
 
     let hasIntelligence = false;
 
-    // Parse @cognitive-load
-    const cognitiveLoadMatch = jsDocComment.match(/@cognitive-load\s+(\d+)(?:\/\d+)?\s*-?\s*(.*)/);
-    if (cognitiveLoadMatch) {
-      intelligence.cognitiveLoad = Number.parseInt(cognitiveLoadMatch[1], 10);
-      hasIntelligence = true;
-    }
-
-    // Parse @attention-economics
-    const attentionMatch = jsDocComment.match(
-      /@attention-economics\s+([\s\S]*?)(?=\n\s*\*\s*@|\*\/|$)/
-    );
-    if (attentionMatch) {
-      intelligence.attentionEconomics = attentionMatch[1].replace(/\n\s*\*/g, ' ').trim();
-      hasIntelligence = true;
-    }
-
-    // Parse @trust-building
-    const trustMatch = jsDocComment.match(/@trust-building\s+([\s\S]*?)(?=\n\s*\*\s*@|\*\/|$)/);
-    if (trustMatch) {
-      intelligence.trustBuilding = trustMatch[1].replace(/\n\s*\*/g, ' ').trim();
-      hasIntelligence = true;
-    }
-
-    // Parse @accessibility
-    const accessibilityMatch = jsDocComment.match(
-      /@accessibility\s+([\s\S]*?)(?=\n\s*\*\s*@|\*\/|$)/
-    );
-    if (accessibilityMatch) {
-      intelligence.accessibility = accessibilityMatch[1].replace(/\n\s*\*/g, ' ').trim();
-      hasIntelligence = true;
-    }
-
-    // Parse @semantic-meaning
-    const semanticMatch = jsDocComment.match(
-      /@semantic-meaning\s+([\s\S]*?)(?=\n\s*\*\s*@|\*\/|$)/
-    );
-    if (semanticMatch) {
-      intelligence.semanticMeaning = semanticMatch[1].replace(/\n\s*\*/g, ' ').trim();
-      hasIntelligence = true;
-    }
-
-    // Parse multiline sections
-    const patterns = this.parseUsagePatterns(jsDocComment);
-    if (patterns.dos.length > 0 || patterns.nevers.length > 0) {
-      intelligence.usagePatterns = patterns;
-      hasIntelligence = true;
-    }
-
-    const guides = this.parseDesignGuides(jsDocComment);
-    if (guides.length > 0) {
-      intelligence.designGuides = guides;
-      hasIntelligence = true;
-    }
-
-    const examples = this.parseExamples(jsDocComment);
-    if (examples.length > 0) {
-      intelligence.examples = examples;
-      hasIntelligence = true;
+    // Extract intelligence from Doctrine's parsed tags
+    // Note: Doctrine treats @cognitive-load as @cognitive with description "-load ..."
+    for (const tag of parsed.tags) {
+      if (tag.title === 'cognitive' && tag.description?.startsWith('-load')) {
+        // Handle @cognitive-load
+        const cognitiveLoadMatch = tag.description.match(/-load\s+(\d+)(?:\/\d+)?\s*-?\s*(.*)/);
+        if (cognitiveLoadMatch) {
+          intelligence.cognitiveLoad = Number.parseInt(cognitiveLoadMatch[1], 10);
+          hasIntelligence = true;
+        }
+      } else if (tag.title === 'attention' && tag.description?.startsWith('-economics')) {
+        // Handle @attention-economics
+        const match = tag.description.match(/-economics\s+(.*)/);
+        if (match) {
+          intelligence.attentionEconomics = match[1].trim();
+          hasIntelligence = true;
+        }
+      } else if (tag.title === 'trust' && tag.description?.startsWith('-building')) {
+        // Handle @trust-building
+        const match = tag.description.match(/-building\s+(.*)/);
+        if (match) {
+          intelligence.trustBuilding = match[1].trim();
+          hasIntelligence = true;
+        }
+      } else if (tag.title === 'semantic' && tag.description?.startsWith('-meaning')) {
+        // Handle @semantic-meaning
+        const match = tag.description.match(/-meaning\s+(.*)/);
+        if (match) {
+          intelligence.semanticMeaning = match[1].trim();
+          hasIntelligence = true;
+        }
+      } else if (tag.title === 'usage' && tag.description?.startsWith('-patterns')) {
+        // Handle @usage-patterns
+        const match = tag.description.match(/-patterns\s+([\s\S]*)/);
+        if (match) {
+          const patterns = this.parseUsagePatternsFromDescription(match[1]);
+          if (patterns.dos.length > 0 || patterns.nevers.length > 0) {
+            intelligence.usagePatterns = patterns;
+            hasIntelligence = true;
+          }
+        }
+      } else if (tag.title === 'design' && tag.description?.startsWith('-guides')) {
+        // Handle @design-guides
+        const match = tag.description.match(/-guides\s+([\s\S]*)/);
+        if (match) {
+          const guides = this.parseDesignGuidesFromDescription(match[1]);
+          if (guides.length > 0) {
+            intelligence.designGuides = guides;
+            hasIntelligence = true;
+          }
+        }
+      } else if (tag.title === 'accessibility') {
+        // Handle @accessibility (no hyphen)
+        if (tag.description) {
+          intelligence.accessibility = tag.description.trim();
+          hasIntelligence = true;
+        }
+      } else if (tag.title === 'example') {
+        // Handle @example (no hyphen)
+        const examples = this.parseExampleFromDescription(tag.description || '');
+        if (examples.length > 0) {
+          intelligence.examples.push(...examples);
+          hasIntelligence = true;
+        }
+      }
     }
 
     // Return null if no valid JSDoc intelligence found
@@ -123,24 +133,18 @@ export class JSDocIntelligenceParser {
     return intelligence as ComponentIntelligence;
   }
 
-  private parseUsagePatterns(content: string): { dos: string[]; nevers: string[] } {
-    // Parse multiline @usage-patterns section
+  private parseUsagePatternsFromDescription(description: string): {
+    dos: string[];
+    nevers: string[];
+  } {
+    // Parse multiline usage patterns from Doctrine tag description
     const patterns = { dos: [] as string[], nevers: [] as string[] };
 
-    // Find the @usage-patterns section
-    const usagePatternsMatch = content.match(/@usage-patterns\s*([\s\S]*?)(?=@\w+|$|\*\/)/);
-    if (!usagePatternsMatch) {
-      return patterns;
-    }
-
-    const usagePatternsContent = usagePatternsMatch[1];
-
     // Split by lines and process each line
-    const lines = usagePatternsContent.split('\n');
+    const lines = description.split('\n');
 
     for (const line of lines) {
-      // Remove leading * and whitespace from JSDoc lines
-      const cleanLine = line.replace(/^\s*\*?\s*/, '').trim();
+      const cleanLine = line.trim();
 
       if (cleanLine.startsWith('DO:')) {
         const doPattern = cleanLine.substring(3).trim();
@@ -158,24 +162,17 @@ export class JSDocIntelligenceParser {
     return patterns;
   }
 
-  private parseDesignGuides(content: string): Array<{ name: string; url: string }> {
-    // Parse @design-guides with name:url format
+  private parseDesignGuidesFromDescription(
+    description: string
+  ): Array<{ name: string; url: string }> {
+    // Parse design guides from Doctrine tag description
     const guides: Array<{ name: string; url: string }> = [];
 
-    // Find the @design-guides section
-    const designGuidesMatch = content.match(/@design-guides\s*([\s\S]*?)(?=@\w+|$|\*\/)/);
-    if (!designGuidesMatch) {
-      return guides;
-    }
-
-    const designGuidesContent = designGuidesMatch[1];
-
     // Split by lines and process each line
-    const lines = designGuidesContent.split('\n');
+    const lines = description.split('\n');
 
     for (const line of lines) {
-      // Remove leading * and whitespace from JSDoc lines
-      const cleanLine = line.replace(/^\s*\*?\s*/, '').trim();
+      const cleanLine = line.trim();
 
       // Match pattern: - Name: URL
       const guideMatch = cleanLine.match(/^-\s*(.+?):\s*(https?:\/\/.+)$/);
@@ -190,31 +187,25 @@ export class JSDocIntelligenceParser {
     return guides;
   }
 
-  private parseExamples(content: string): Array<{ code: string }> {
-    // Extract @example code blocks
+  private parseExampleFromDescription(description: string): Array<{ code: string }> {
+    // Extract code blocks from Doctrine tag description
     const examples: Array<{ code: string }> = [];
 
-    // Find all @example sections using exec to avoid iterator issues
-    const exampleRegex = /@example\s*([\s\S]*?)(?=@\w+|$|\*\/)/g;
-    let match: RegExpExecArray | null;
-    
-    while ((match = exampleRegex.exec(content)) !== null) {
-      const exampleContent = match[1];
-      
-      // Look for code blocks with ```tsx or ``` 
-      const codeBlockRegex = /```(?:tsx|ts|javascript|js)?\s*([\s\S]*?)```/g;
-      let codeMatch: RegExpExecArray | null;
-      
-      while ((codeMatch = codeBlockRegex.exec(exampleContent)) !== null) {
-        let code = codeMatch[1];
-        
-        // Clean up JSDoc formatting - remove leading * and whitespace
-        code = code.replace(/^\s*\*\s?/gm, '').trim();
-        
-        if (code) {
-          examples.push({ code });
-        }
+    // Look for code blocks with ```tsx or ```
+    const codeBlockRegex = /```(?:tsx|ts|javascript|js)?\s*([\s\S]*?)```/g;
+    let codeMatch = codeBlockRegex.exec(description);
+
+    while (codeMatch !== null) {
+      let code = codeMatch[1];
+
+      // Clean up any remaining formatting
+      code = code.trim();
+
+      if (code) {
+        examples.push({ code });
       }
+
+      codeMatch = codeBlockRegex.exec(description);
     }
 
     return examples;
