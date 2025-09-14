@@ -50,7 +50,7 @@ jobs:
         if: steps.check.outputs.skip-tests == 'false'
         uses: biomejs/setup-biome@v2
         with:
-          version: 1.9.4
+          version: 2.2.2
 
       - name: Biome Quick Check
         if: steps.check.outputs.skip-tests == 'false'
