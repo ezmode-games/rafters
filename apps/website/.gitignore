@@ -29,3 +29,4 @@ pnpm-debug.log*
 !.dev.vars.example
 .env*
 !.env.example
+test-results/
