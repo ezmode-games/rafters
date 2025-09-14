@@ -5,7 +5,7 @@
  * caching, error handling, and validation.
  */
 
-import { beforeEach, describe, expect, it, vi, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { RegistryComponentFetcher } from '../../../src/lib/swc/RegistryFetcher';
 import type { RegistryComponent, RegistryError } from '../../../src/lib/swc/types';
 
@@ -92,10 +92,10 @@ describe('RegistryComponentFetcher', () => {
 
       // First fetch
       await fetcher.fetchComponent('button');
-      
+
       // Second fetch should use cache
       const cachedResult = await fetcher.fetchComponent('button');
-      
+
       expect(cachedResult.fromCache).toBe(true);
       expect(cachedResult.component.name).toBe('button');
       expect(mockFetch).toHaveBeenCalledTimes(1); // Only called once
@@ -117,7 +117,7 @@ describe('RegistryComponentFetcher', () => {
         status: 404,
         statusText: 'Not Found',
       });
-      
+
       try {
         await fetcher.fetchComponent('missing');
       } catch (error) {
@@ -136,8 +136,10 @@ describe('RegistryComponentFetcher', () => {
         return Promise.reject(abortError);
       });
 
-      await expect(fetcher.fetchComponent('button')).rejects.toThrow('Registry request timeout after 10000ms');
-      
+      await expect(fetcher.fetchComponent('button')).rejects.toThrow(
+        'Registry request timeout after 10000ms'
+      );
+
       try {
         await fetcher.fetchComponent('button');
       } catch (error) {
@@ -150,8 +152,10 @@ describe('RegistryComponentFetcher', () => {
     it('should handle general network errors', async () => {
       mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
-      await expect(fetcher.fetchComponent('button')).rejects.toThrow('Failed to fetch from registry');
-      
+      await expect(fetcher.fetchComponent('button')).rejects.toThrow(
+        'Failed to fetch from registry'
+      );
+
       try {
         await fetcher.fetchComponent('button');
       } catch (error) {
@@ -172,7 +176,9 @@ describe('RegistryComponentFetcher', () => {
         json: () => Promise.resolve(invalidResponse),
       });
 
-      await expect(fetcher.fetchComponent('button')).rejects.toThrow('Registry response validation failed');
+      await expect(fetcher.fetchComponent('button')).rejects.toThrow(
+        'Registry response validation failed'
+      );
     });
 
     it('should require at least one file with content', async () => {
@@ -203,14 +209,16 @@ describe('RegistryComponentFetcher', () => {
         json: () => Promise.reject(new Error('Invalid JSON')),
       });
 
-      await expect(fetcher.fetchComponent('button')).rejects.toThrow('Failed to fetch from registry');
+      await expect(fetcher.fetchComponent('button')).rejects.toThrow(
+        'Failed to fetch from registry'
+      );
     });
   });
 
   describe('fetchMultipleComponents', () => {
     it('should fetch multiple components in parallel', async () => {
       const cardComponent = { ...mockComponent, name: 'card' };
-      
+
       mockFetch
         .mockResolvedValueOnce({
           ok: true,
@@ -379,7 +387,9 @@ describe('RegistryComponentFetcher', () => {
 
       expect(result.component.meta?.rafters?.version).toBe('2.0.0');
       expect(result.component.meta?.rafters?.intelligence?.cognitiveLoad).toBe(5);
-      expect(result.component.meta?.rafters?.usagePatterns?.dos).toEqual(['Use for critical actions']);
+      expect(result.component.meta?.rafters?.usagePatterns?.dos).toEqual([
+        'Use for critical actions',
+      ]);
       expect(result.component.meta?.rafters?.designGuides?.[0].name).toBe('Component Guide');
       expect(result.component.meta?.rafters?.examples?.[0].code).toBe('<Button>Example</Button>');
     });

@@ -6,11 +6,7 @@
  */
 
 import { z } from 'zod';
-import type {
-  FetchResult,
-  RegistryComponent,
-  RegistryError,
-} from './types';
+import type { FetchResult, RegistryComponent, RegistryError } from './types';
 
 // Inline schemas to avoid dependency issues with @rafters/shared
 const ComponentFileSchema = z.object({
@@ -26,17 +22,27 @@ const ComponentIntelligenceSchema = z.object({
   accessibility: z.string(),
   trustBuilding: z.string(),
   semanticMeaning: z.string(),
-  usagePatterns: z.object({
-    dos: z.array(z.string()),
-    nevers: z.array(z.string()),
-  }).optional(),
-  designGuides: z.array(z.object({
-    name: z.string(),
-    url: z.string(),
-  })).optional(),
-  examples: z.array(z.object({
-    code: z.string(),
-  })).optional(),
+  usagePatterns: z
+    .object({
+      dos: z.array(z.string()),
+      nevers: z.array(z.string()),
+    })
+    .optional(),
+  designGuides: z
+    .array(
+      z.object({
+        name: z.string(),
+        url: z.string(),
+      })
+    )
+    .optional(),
+  examples: z
+    .array(
+      z.object({
+        code: z.string(),
+      })
+    )
+    .optional(),
 });
 
 const ComponentManifestSchema = z.object({
@@ -86,17 +92,9 @@ const ComponentManifestSchema = z.object({
 });
 
 // Required fields validation
-const REQUIRED_FIELDS = [
-  'name',
-  'type',
-  'files',
-] as const;
+const REQUIRED_FIELDS = ['name', 'type', 'files'] as const;
 
-const REQUIRED_FILE_FIELDS = [
-  'path',
-  'content',
-  'type',
-] as const;
+const REQUIRED_FILE_FIELDS = ['path', 'content', 'type'] as const;
 
 /**
  * Registry Component Fetcher with caching and error handling
@@ -114,7 +112,7 @@ export class RegistryComponentFetcher {
    */
   async fetchComponent(componentName: string): Promise<FetchResult> {
     const startTime = Date.now();
-    
+
     // 1. Check cache first
     if (this.cache.has(componentName)) {
       const component = this.cache.get(componentName)!;
@@ -128,13 +126,13 @@ export class RegistryComponentFetcher {
 
     // 2. Fetch from registry API if not cached
     const component = await this.fetchFromRegistry(componentName);
-    
+
     // 3. Validate response structure
     const validatedComponent = this.validateRegistryResponse(component, componentName);
-    
+
     // 4. Store in cache
     this.cache.set(componentName, validatedComponent);
-    
+
     // 5. Return component data with metadata
     return {
       component: validatedComponent,
@@ -149,7 +147,7 @@ export class RegistryComponentFetcher {
    */
   async fetchMultipleComponents(componentNames: string[]): Promise<Map<string, FetchResult>> {
     const results = new Map<string, FetchResult>();
-    
+
     // Use Promise.allSettled to handle individual failures gracefully
     const promises = componentNames.map(async (name) => {
       try {
@@ -161,14 +159,17 @@ export class RegistryComponentFetcher {
     });
 
     const settled = await Promise.allSettled(promises);
-    
+
     for (const outcome of settled) {
       if (outcome.status === 'fulfilled' && outcome.value.result) {
         results.set(outcome.value.name, outcome.value.result);
       }
       // Log errors but don't throw - allow partial success
       if (outcome.status === 'fulfilled' && outcome.value.error) {
-        console.warn(`Failed to fetch component '${outcome.value.name}':`, outcome.value.error.message);
+        console.warn(
+          `Failed to fetch component '${outcome.value.name}':`,
+          outcome.value.error.message
+        );
       }
       if (outcome.status === 'rejected') {
         console.warn('Unexpected error in fetchMultipleComponents:', outcome.reason);
@@ -183,7 +184,7 @@ export class RegistryComponentFetcher {
    */
   private async fetchFromRegistry(componentName: string): Promise<any> {
     const url = `${this.baseUrl}/registry/components/${encodeURIComponent(componentName)}`;
-    
+
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
@@ -221,7 +222,9 @@ export class RegistryComponentFetcher {
         if (error.name === 'RegistryError') {
           throw error; // Already properly formatted
         }
-        const networkError = new Error(`Failed to fetch from registry: ${error.message}`) as RegistryError;
+        const networkError = new Error(
+          `Failed to fetch from registry: ${error.message}`
+        ) as RegistryError;
         networkError.name = 'RegistryError';
         networkError.componentName = componentName;
         networkError.registryUrl = url;
@@ -238,7 +241,7 @@ export class RegistryComponentFetcher {
     try {
       // First try to parse with inline schema for validation
       const parsed = ComponentManifestSchema.parse(data);
-      
+
       // Additional validation for required fields
       for (const field of REQUIRED_FIELDS) {
         if (!(field in parsed) || parsed[field as keyof typeof parsed] === undefined) {
@@ -260,7 +263,9 @@ export class RegistryComponentFetcher {
       }
 
       // Ensure at least one file with content
-      const hasContent = parsed.files.some(file => file.content && file.content.trim().length > 0);
+      const hasContent = parsed.files.some(
+        (file) => file.content && file.content.trim().length > 0
+      );
       if (!hasContent) {
         throw new Error('Component must have at least one file with non-empty content');
       }
@@ -271,20 +276,22 @@ export class RegistryComponentFetcher {
         type: parsed.type,
         description: parsed.description || '',
         dependencies: parsed.dependencies || [],
-        files: parsed.files.map(file => ({
+        files: parsed.files.map((file) => ({
           path: file.path,
           content: file.content,
           type: file.type,
         })),
-        meta: parsed.meta?.rafters ? {
-          rafters: {
-            version: parsed.meta.rafters.version,
-            intelligence: parsed.meta.rafters.intelligence,
-            usagePatterns: parsed.meta.rafters.usagePatterns,
-            designGuides: parsed.meta.rafters.designGuides,
-            examples: parsed.meta.rafters.examples,
-          },
-        } : undefined,
+        meta: parsed.meta?.rafters
+          ? {
+              rafters: {
+                version: parsed.meta.rafters.version,
+                intelligence: parsed.meta.rafters.intelligence,
+                usagePatterns: parsed.meta.rafters.usagePatterns,
+                designGuides: parsed.meta.rafters.designGuides,
+                examples: parsed.meta.rafters.examples,
+              },
+            }
+          : undefined,
       };
 
       return registryComponent;
