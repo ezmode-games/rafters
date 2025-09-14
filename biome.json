@@ -16,6 +16,7 @@
       "!**/.wrangler/**/*",
       "!**/.astro/**/*",
       "!**/test-results/**/*",
+      "!**/.turbo/**/*",
       "!**/.vscode/**/*",
       "!**/playwright/.cache/**/*"
     ],
