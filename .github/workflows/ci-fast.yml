@@ -103,16 +103,16 @@ jobs:
         id: affected
         run: |
           echo "Affected packages:"
-          npx turbo run build --filter='...[origin/main]' --dry-run=json | jq -r '.tasks[].package' | sort -u
+          npx turbo run build --filter='...[main]' --dry-run=json | jq -r '.tasks[].package' | sort -u
 
       - name: Build affected packages
-        run: npx turbo build --filter='...[origin/main]' --cache-dir=.turbo
+        run: npx turbo build --filter='...[main]' --cache-dir=.turbo
 
       - name: TypeCheck affected packages
-        run: npx turbo typecheck type-check --filter='...[origin/main]' --cache-dir=.turbo
+        run: npx turbo typecheck type-check --filter='...[main]' --cache-dir=.turbo
 
       - name: Test affected packages
-        run: npx turbo test:run --filter='...[origin/main]' --cache-dir=.turbo
+        run: npx turbo test:run --filter='...[main]' --cache-dir=.turbo
 
       - name: Upload Turbo cache
         if: always()

@@ -336,7 +336,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Install minimal dependencies
-        run: pnpm install --frozen-lockfile --filter changesets-cli
+        run: pnpm install --frozen-lockfile
 
       - name: Check for changesets
         run: |
