@@ -4,6 +4,8 @@
  * Exports for JSDoc Intelligence parsing and TypeScript/JSX compilation
  */
 
+// React SSR Executor
+export { ReactSSRExecutor } from './ReactSSRExecutor';
 // SWC Compiler
 export { SWCCompiler } from './SWCCompiler';
 
@@ -13,6 +15,8 @@ export type {
   CompilationOptions,
   CompilationResult,
   ComponentIntelligence,
+  ExecutionError,
+  ExecutionResult,
   SWCConfig,
 } from './types';
 

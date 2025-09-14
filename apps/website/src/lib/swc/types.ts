@@ -71,3 +71,18 @@ export interface CompilationOptions {
   filename?: string;
   cacheKey?: string;
 }
+
+// React SSR Execution Types (Issue #129)
+export interface ExecutionResult {
+  html: string;
+  renderTime: number;
+  componentName: string;
+  props: Record<string, unknown>;
+}
+
+export interface ExecutionError extends Error {
+  name: 'ExecutionError';
+  componentName?: string;
+  phase: 'creation' | 'rendering' | 'props';
+  originalError: unknown;
+}
