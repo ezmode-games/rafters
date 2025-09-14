@@ -11,15 +11,15 @@ export interface ComponentIntelligence {
   trustBuilding: string;
   accessibility: string;
   semanticMeaning: string;
-  usagePatterns: {
+  usagePatterns?: {
     dos: string[];
     nevers: string[];
   };
-  designGuides: Array<{
+  designGuides?: Array<{
     name: string;
     url: string;
   }>;
-  examples: Array<{
+  examples?: Array<{
     code: string;
   }>;
 }
@@ -85,4 +85,48 @@ export interface ExecutionError extends Error {
   componentName?: string;
   phase: 'creation' | 'rendering' | 'props';
   originalError: unknown;
+}
+
+// Registry Component Fetcher Types (Issue #130)
+export interface RegistryComponent {
+  name: string;
+  type: string;
+  description: string;
+  dependencies: string[];
+  files: Array<{
+    path: string;
+    content: string;
+    type: string;
+  }>;
+  meta?: {
+    rafters?: {
+      version: string;
+      intelligence?: ComponentIntelligence;
+      usagePatterns?: {
+        dos: string[];
+        nevers: string[];
+      };
+      designGuides?: Array<{
+        name: string;
+        url: string;
+      }>;
+      examples?: Array<{
+        code: string;
+      }>;
+    };
+  };
+}
+
+export interface FetchResult {
+  component: RegistryComponent;
+  fromCache: boolean;
+  fetchTime: number;
+  registryUrl: string;
+}
+
+export interface RegistryError extends Error {
+  name: 'RegistryError';
+  componentName: string;
+  statusCode?: number;
+  registryUrl: string;
 }

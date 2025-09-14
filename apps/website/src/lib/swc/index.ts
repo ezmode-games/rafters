@@ -8,6 +8,8 @@
 export { ReactSSRExecutor } from './ReactSSRExecutor';
 // SWC Compiler
 export { SWCCompiler } from './SWCCompiler';
+// Registry Component Fetcher
+export { RegistryComponentFetcher } from './RegistryFetcher';
 
 // Types
 export type {
@@ -17,6 +19,9 @@ export type {
   ComponentIntelligence,
   ExecutionError,
   ExecutionResult,
+  FetchResult,
+  RegistryComponent,
+  RegistryError,
   SWCConfig,
 } from './types';
 
