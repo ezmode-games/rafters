@@ -21,148 +21,201 @@ import {
   type UsagePatterns,
   UsagePatternsSchema,
 } from '@rafters/shared';
+import { type Spec, parse } from 'comment-parser';
 
 // Cache for components to avoid re-parsing
 let componentsCache: ComponentManifest[] | null = null;
 
 /**
- * Parse JSDoc comments from component source code
+ * Parse JSDoc comments from component source code using comment-parser
  */
 function parseJSDocFromSource(content: string, filename: string): ComponentManifest | null {
-  // Extract JSDoc comment block
-  const jsdocMatch = content.match(/\/\*\*\s*\n([\s\S]*?)\*\//);
-  if (!jsdocMatch) {
+  try {
+    // Parse JSDoc comment using comment-parser
+    const parsed = parse(content);
+    if (!parsed || parsed.length === 0) {
+      return null;
+    }
+
+    const comment = parsed[0];
+
+    // Extract registry metadata (kebab-case tags)
+    const registryName = findTagValue(comment.tags, 'registry-name');
+    const registryVersion = findTagValue(comment.tags, 'registry-version') || '0.1.0';
+    const registryPath = findTagValue(comment.tags, 'registry-path');
+    const registryType = findTagValue(comment.tags, 'registry-type') || 'registry:component';
+
+    if (!registryName) {
+      return null;
+    }
+
+    // Extract intelligence metadata using camelCase tags
+    const cognitiveLoadRaw =
+      findTagValue(comment.tags, 'cognitiveLoad') || findTagValue(comment.tags, 'cognitive-load');
+    const cognitiveLoad = parseCognitiveLoad(cognitiveLoadRaw);
+
+    const attentionEconomics =
+      findTagValue(comment.tags, 'attentionEconomics') ||
+      findTagValue(comment.tags, 'attention-economics') ||
+      '';
+    const accessibility = findTagValue(comment.tags, 'accessibility') || '';
+    const trustBuilding =
+      findTagValue(comment.tags, 'trustBuilding') ||
+      findTagValue(comment.tags, 'trust-building') ||
+      '';
+    const semanticMeaning =
+      findTagValue(comment.tags, 'semanticMeaning') ||
+      findTagValue(comment.tags, 'semantic-meaning') ||
+      '';
+
+    const intelligence: Intelligence = IntelligenceSchema.parse({
+      cognitiveLoad,
+      attentionEconomics,
+      accessibility,
+      trustBuilding,
+      semanticMeaning,
+    });
+
+    // Extract usage patterns (camelCase or kebab-case)
+    const usagePatternsTag = comment.tags.find(
+      (tag) => tag.tag === 'usagePatterns' || tag.tag === 'usage-patterns'
+    );
+    const usagePatterns: UsagePatterns = parseUsagePatterns(usagePatternsTag?.description || '');
+
+    // Extract design guides (camelCase or kebab-case)
+    const designGuidesTag = comment.tags.find(
+      (tag) => tag.tag === 'designGuides' || tag.tag === 'design-guides'
+    );
+    const designGuides: DesignGuide[] = parseDesignGuides(designGuidesTag?.description || '');
+
+    // Extract dependencies
+    const dependenciesRaw = findTagValue(comment.tags, 'dependencies') || '';
+    const dependencies = dependenciesRaw
+      .split(',')
+      .map((dep) => dep.trim())
+      .filter((dep) => dep.length > 0 && dep !== '@rafters/design-tokens/motion');
+
+    // Extract examples
+    const exampleTags = comment.tags.filter((tag) => tag.tag === 'example');
+    const examples: Example[] = [];
+    for (const tag of exampleTags) {
+      const codeMatch = tag.description.match(
+        /```(?:tsx?|typescript|javascript)?\s*\n([\s\S]*?)```/
+      );
+      const code = codeMatch ? codeMatch[1].trim() : tag.description.trim();
+      if (code) {
+        examples.push(ExampleSchema.parse({ code }));
+      }
+    }
+
+    // Generate docs URL
+    const docs = `https://rafters.realhandy.tech/docs/components/${registryName}`;
+
+    // Build component manifest using Zod schema
+    const componentManifest: ComponentManifest = ComponentManifestSchema.parse({
+      $schema: 'https://ui.shadcn.com/schema/registry-item.json',
+      name: registryName,
+      type: registryType as 'registry:component',
+      description: '',
+      dependencies,
+      files: [
+        {
+          path: registryPath || `components/ui/${filename}`,
+          content,
+          type: 'registry:component',
+        },
+      ],
+      docs,
+      meta: {
+        rafters: {
+          version: registryVersion,
+          intelligence,
+          usagePatterns,
+          designGuides,
+          examples,
+        },
+      },
+    });
+
+    return componentManifest;
+  } catch (error) {
+    console.error('Error parsing component:', filename, error);
     return null;
   }
+}
 
-  const jsdocContent = jsdocMatch[1];
+/**
+ * Find a tag value from comment-parser tags
+ */
+function findTagValue(tags: Spec[], tagName: string): string | null {
+  const tag = tags.find((t) => t.tag === tagName);
+  if (!tag) return null;
 
-  // Extract registry metadata
-  const registryName = extractJSDocTag(jsdocContent, 'registry-name');
-  const registryVersion = extractJSDocTag(jsdocContent, 'registry-version') || '0.1.0';
-  const registryPath = extractJSDocTag(jsdocContent, 'registry-path');
-  const registryType = extractJSDocTag(jsdocContent, 'registry-type') || 'registry:component';
+  // For simple tags like @registry-name container, the value is in 'name' field
+  // For complex tags with descriptions, the value is in 'description' field
+  const value = tag.name?.trim() || tag.description?.trim() || '';
+  return value || null;
+}
 
-  if (!registryName) {
-    return null;
-  }
+/**
+ * Parse cognitive load from various formats
+ */
+function parseCognitiveLoad(value: string | null): number {
+  if (!value) return 0;
+  const match = value.match(/^(\d+)(?:\/\d+)?/);
+  return match ? Number.parseInt(match[1], 10) : 0;
+}
 
-  // Extract intelligence metadata using Zod schema
-  const intelligence: Intelligence = IntelligenceSchema.parse({
-    cognitiveLoad: Number.parseFloat(
-      extractJSDocTag(jsdocContent, 'cognitive-load')?.split('/')[0] || '0'
-    ),
-    attentionEconomics: extractJSDocTag(jsdocContent, 'attention-economics') || '',
-    accessibility: extractJSDocTag(jsdocContent, 'accessibility') || '',
-    trustBuilding: extractJSDocTag(jsdocContent, 'trust-building') || '',
-    semanticMeaning: extractJSDocTag(jsdocContent, 'semantic-meaning') || '',
-  });
-
-  // Extract usage patterns using Zod schema - handle multiline content
+/**
+ * Parse usage patterns from multiline content
+ * Handles content flattened by comment-parser (without newlines)
+ */
+function parseUsagePatterns(content: string): UsagePatterns {
   const dos: string[] = [];
   const nevers: string[] = [];
 
-  // Find the full usage-patterns block (multiline)
-  const usagePatternsMatch = jsdocContent.match(
-    /@usage-patterns\s*\n([\s\S]*?)(?=@[a-z-]+|\*\/|$)/
-  );
-  if (usagePatternsMatch) {
-    const usagePatternsRaw = usagePatternsMatch[1];
-    const lines = usagePatternsRaw.split('\n');
-    for (const line of lines) {
-      const trimmed = line.trim().replace(/^\*\s*/, ''); // Remove leading asterisk and spaces
-      if (trimmed.startsWith('DO:')) {
-        dos.push(trimmed.substring(3).trim());
-      } else if (trimmed.startsWith('NEVER:')) {
-        nevers.push(trimmed.substring(6).trim());
-      }
+  // Split by 'DO:' and 'NEVER:' patterns since comment-parser flattens multiline content
+  const parts = content.split(/\s+(?=(?:DO:|NEVER:))/);
+
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (trimmed.startsWith('DO:')) {
+      dos.push(trimmed.substring(3).trim());
+    } else if (trimmed.startsWith('NEVER:')) {
+      nevers.push(trimmed.substring(6).trim());
     }
   }
 
-  const usagePatterns: UsagePatterns = UsagePatternsSchema.parse({
-    dos,
-    nevers,
-  });
+  return UsagePatternsSchema.parse({ dos, nevers });
+}
 
-  // Extract design guides using Zod schema
-  const designGuidesRaw = extractJSDocTag(jsdocContent, 'design-guides') || '';
-  const designGuides: DesignGuide[] = [];
+/**
+ * Parse design guides from multiline content
+ */
+function parseDesignGuides(content: string): DesignGuide[] {
+  const guides: DesignGuide[] = [];
 
-  if (designGuidesRaw) {
-    const lines = designGuidesRaw.split('\n');
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (trimmed.startsWith('-')) {
-        const match = trimmed.match(/-\s*(.+?):\s*(.+)/);
-        if (match) {
-          designGuides.push(
+  const lines = content.split('\n');
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('-')) {
+      const match = trimmed.match(/-\s*(.+?):\s*(.+)/);
+      if (match) {
+        try {
+          guides.push(
             DesignGuideSchema.parse({
               name: match[1].trim(),
               url: match[2].trim(),
             })
           );
+        } catch (error) {
+          console.warn('Failed to parse design guide:', trimmed);
         }
       }
     }
   }
 
-  // Extract dependencies (filter out invalid ones)
-  const dependenciesRaw = extractJSDocTag(jsdocContent, 'dependencies') || '';
-  const dependencies = dependenciesRaw
-    .split(',')
-    .map((dep) => dep.trim())
-    .filter((dep) => dep.length > 0 && dep !== '@rafters/design-tokens/motion'); // Filter out invalid dependencies
-
-  // Extract examples using Zod schema
-  const exampleMatch = jsdocContent.match(/@example\s*\n\s*```tsx?\s*\n([\s\S]*?)```/);
-  const examples: Example[] = [];
-  if (exampleMatch) {
-    examples.push(
-      ExampleSchema.parse({
-        code: exampleMatch[1].trim(),
-      })
-    );
-  }
-
-  // Generate docs URL
-  const docs = `https://rafters.realhandy.tech/docs/components/${registryName}`;
-
-  // Build component manifest using Zod schema
-  const componentManifest: ComponentManifest = ComponentManifestSchema.parse({
-    $schema: 'https://ui.shadcn.com/schema/registry-item.json',
-    name: registryName,
-    type: registryType as 'registry:component',
-    description: '',
-    dependencies,
-    files: [
-      {
-        path: registryPath || `components/ui/${filename}`,
-        content,
-        type: 'registry:component',
-      },
-    ],
-    docs,
-    meta: {
-      rafters: {
-        version: registryVersion,
-        intelligence,
-        usagePatterns,
-        designGuides,
-        examples,
-      },
-    },
-  });
-
-  return componentManifest;
-}
-
-/**
- * Extract a specific JSDoc tag value
- */
-function extractJSDocTag(jsdocContent: string, tagName: string): string | null {
-  const regex = new RegExp(`@${tagName}\\s+(.+)`, 'i');
-  const match = jsdocContent.match(regex);
-  return match ? match[1].trim() : null;
+  return guides;
 }
 
 /**

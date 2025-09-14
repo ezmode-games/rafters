@@ -27,6 +27,7 @@
     "@rafters/shared": "workspace:*",
     "@swc/core": "^1.10.5",
     "astro": "^5.13.7",
+    "comment-parser": "^1.4.1",
     "typescript": "catalog:"
   },
   "devDependencies": {
