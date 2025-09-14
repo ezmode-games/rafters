@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "echo 'Cloudflare Workers app - no build step required' && mkdir -p dist && echo 'workers-ready' > dist/.ready",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings",
@@ -22,5 +23,10 @@
     "@cloudflare/vitest-pool-workers": "^0.8.68",
     "vitest": "catalog:",
     "wrangler": "^4.34.0"
+  },
+  "turbo": {
+    "build": {
+      "outputs": ["dist/**"]
+    }
   }
 }

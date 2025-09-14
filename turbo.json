@@ -1,0 +1,67 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "remoteCache": {
+    "signature": true
+  },
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", ".astro/**", "build/**"],
+      "cache": true,
+      "env": ["NODE_ENV", "PUBLIC_*", "VITE_*", "ASTRO_*"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"],
+      "cache": true,
+      "env": ["NODE_ENV", "CI"]
+    },
+    "test:run": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"],
+      "cache": true,
+      "env": ["NODE_ENV", "CI"]
+    },
+    "test:preflight": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "cache": true
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "outputs": ["playwright-report/**"],
+      "cache": false,
+      "env": ["CI", "PLAYWRIGHT_*"]
+    },
+    "test:component": {
+      "dependsOn": ["build"],
+      "outputs": ["playwright-report/**"],
+      "cache": false
+    },
+    "type-check": {
+      "dependsOn": ["^build"],
+      "outputs": ["tsconfig.tsbuildinfo", ".tsbuildinfo"],
+      "cache": true
+    },
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "outputs": ["tsconfig.tsbuildinfo", ".tsbuildinfo"],
+      "cache": true
+    },
+    "lint": {
+      "outputs": [],
+      "cache": true
+    },
+    "format": {
+      "outputs": [],
+      "cache": false
+    },
+    "clean": {
+      "cache": false
+    }
+  }
+}

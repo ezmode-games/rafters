@@ -45,4 +45,5 @@ yarn-error.log*
 **/.env*
 
 # TypeScript
-*.tsbuildinfo
+*.tsbuildinfo.turbo/
+apps/website/playwright/.cache/

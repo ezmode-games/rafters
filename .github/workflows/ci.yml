@@ -4,10 +4,24 @@ on:
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.changeset/**.md'
+      - 'LICENSE'
   # Temporarily disabled push trigger to test release workflow
   # push:
   #   branches:
   #     - main
+
+# Cancel in-progress runs for the same PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
 jobs:
   test:
@@ -28,13 +42,49 @@ jobs:
           node-version: 20
           cache: 'pnpm'
 
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Restore pnpm store cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pnpm-store
+            node_modules/.cache
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
 
-      - name: Install Playwright Browsers
-        run: pnpm --filter website exec playwright install --with-deps
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Restore Turbo cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .turbo
+            **/.turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright Browsers if needed
+        run: |
+          if [ ! -d ~/.cache/ms-playwright ]; then
+            pnpm --filter website exec playwright install --with-deps
+          fi
+
+      - name: Run Preflight Check (Affected Only)
+        if: github.event_name == 'pull_request'
+        run: pnpm preflight:affected
 
       - name: Run Full Preflight Check
+        if: github.event_name != 'pull_request'
         run: pnpm preflight
 
   changeset-check:
