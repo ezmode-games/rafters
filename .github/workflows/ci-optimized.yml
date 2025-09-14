@@ -72,7 +72,7 @@ jobs:
       - name: Setup Biome
         uses: biomejs/setup-biome@v2
         with:
-          version: 2.2.2
+          version: 1.9.4
 
       - name: Run Biome check
         run: biome check --diagnostic-level=error --no-errors-on-unmatched
