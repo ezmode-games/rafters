@@ -50,7 +50,7 @@ export const useSidebarNavigation = (options: UseSidebarNavigationOptions = {}) 
   const collapsible = useSidebarStore((state) => state.collapsible);
 
   // Sidebar actions
-  const { navigate, toggleCollapsed, setCurrentPath, setActiveItem } = useSidebarActions();
+  const { navigate, toggleCollapsed, setActiveItem } = useSidebarActions();
 
   // Menu coordination
   const menu = useMenu(menuId, 'sidebar', cognitiveLoad);

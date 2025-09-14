@@ -11,7 +11,7 @@ export async function GET() {
   const registry = getRegistryMetadata();
 
   // Sort components by cognitive load for logical presentation
-  const sortedComponents = registry.components.sort((a, b) => {
+  const _sortedComponents = registry.components.sort((a, b) => {
     const aLoad = a.meta?.rafters?.intelligence?.cognitiveLoad || 0;
     const bLoad = b.meta?.rafters?.intelligence?.cognitiveLoad || 0;
     return aLoad - bLoad;

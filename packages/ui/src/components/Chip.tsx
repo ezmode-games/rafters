@@ -51,7 +51,7 @@ export type ChipVariant = 'urgent' | 'new' | 'live' | 'beta' | 'premium' | 'coun
 export type ChipPosition = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
 export type ChipSize = 'sm' | 'md' | 'lg';
 
-export interface ChipProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface ChipProps extends React.HTMLAttributes<HTMLOutputElement> {
   // Core variant for semantic meaning
   variant: ChipVariant;
 
@@ -120,7 +120,7 @@ const CHIP_INTELLIGENCE = {
   },
 } as const;
 
-export const Chip = forwardRef<HTMLSpanElement, ChipProps>(
+export const Chip = forwardRef<HTMLOutputElement, ChipProps>(
   (
     {
       variant,
@@ -137,7 +137,7 @@ export const Chip = forwardRef<HTMLSpanElement, ChipProps>(
     const displayValue = value || (variant === 'count' ? '1' : '');
 
     return (
-      <span
+      <output
         ref={ref}
         className={cn(
           // High visibility positioning that breaks parent boundaries
@@ -169,7 +169,7 @@ export const Chip = forwardRef<HTMLSpanElement, ChipProps>(
         {...props}
       >
         {displayValue}
-      </span>
+      </output>
     );
   }
 );

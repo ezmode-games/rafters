@@ -11,7 +11,11 @@
     "directory": "dist",
     "format": "esm"
   },
-  "files": ["dist", "tokens", "README.md"],
+  "files": [
+    "dist",
+    "tokens",
+    "README.md"
+  ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.js",
   "scripts": {

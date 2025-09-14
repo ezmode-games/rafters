@@ -83,11 +83,12 @@ describe('addCommand', () => {
     vi.mocked(ora).mockReturnValue(mockSpinner as ReturnType<typeof ora>);
 
     // Mock file operations
-    const { fileExists, writeFile, createComponentPath } = await import('../../src/utils/files.js');
+    const { fileExists, createComponentPath, writeFile } = await import('../../src/utils/files.js');
     const { installDependencies } = await import('../../src/utils/dependencies.js');
 
     vi.mocked(fileExists).mockReturnValue(false);
     vi.mocked(createComponentPath).mockReturnValue('./src/components/ui/button.tsx');
+    vi.mocked(writeFile).mockReturnValue(undefined);
     vi.mocked(installDependencies).mockResolvedValue();
 
     // Mock manifest operations
@@ -105,7 +106,7 @@ describe('addCommand', () => {
     const { loadConfig, transformImports } = await import('../../src/utils/config.js');
     const { fetchComponent } = await import('../../src/utils/registry.js');
     const { getRaftersTitle } = await import('../../src/utils/logo.js');
-    const { fileExists, writeFile, createComponentPath } = await import('../../src/utils/files.js');
+    const { fileExists, createComponentPath, writeFile } = await import('../../src/utils/files.js');
     const { installDependencies } = await import('../../src/utils/dependencies.js');
     const { default: ora } = await import('ora');
 
@@ -181,7 +182,7 @@ describe('addCommand', () => {
     const { loadConfig, transformImports } = await import('../../src/utils/config.js');
     const { fetchComponent } = await import('../../src/utils/registry.js');
     const { getRaftersTitle } = await import('../../src/utils/logo.js');
-    const { fileExists, writeFile, createComponentPath } = await import('../../src/utils/files.js');
+    const { fileExists, createComponentPath, writeFile } = await import('../../src/utils/files.js');
     const { installDependencies } = await import('../../src/utils/dependencies.js');
     const { default: ora } = await import('ora');
 
@@ -191,6 +192,7 @@ describe('addCommand', () => {
     vi.mocked(ora).mockReturnValue(mockSpinner as ReturnType<typeof ora>);
     vi.mocked(fileExists).mockReturnValue(true); // Component exists
     vi.mocked(createComponentPath).mockReturnValue('./src/components/ui/button.tsx');
+    vi.mocked(writeFile).mockReturnValue(undefined);
     vi.mocked(installDependencies).mockResolvedValue();
     vi.mocked(transformImports).mockReturnValue(
       'export default function Button() { return <button>Click me</button>; }'
@@ -231,7 +233,7 @@ describe('addCommand', () => {
     const { loadConfig } = await import('../../src/utils/config.js');
     const { fetchComponent } = await import('../../src/utils/registry.js');
     const { getRaftersTitle } = await import('../../src/utils/logo.js');
-    const { fileExists, writeFile, createComponentPath } = await import('../../src/utils/files.js');
+    const { fileExists, createComponentPath, writeFile } = await import('../../src/utils/files.js');
     const { installDependencies } = await import('../../src/utils/dependencies.js');
     const { default: ora } = await import('ora');
 
@@ -241,6 +243,7 @@ describe('addCommand', () => {
     vi.mocked(ora).mockReturnValue(mockSpinner as ReturnType<typeof ora>);
     vi.mocked(fileExists).mockReturnValue(false);
     vi.mocked(createComponentPath).mockReturnValue('./src/components/ui/button.tsx');
+    vi.mocked(writeFile).mockReturnValue(undefined);
     vi.mocked(installDependencies).mockRejectedValue(new Error('Install failed'));
 
     mockReadFileSync.mockImplementation(() =>
@@ -264,7 +267,7 @@ describe('addCommand', () => {
     const { loadConfig, transformImports } = await import('../../src/utils/config.js');
     const { fetchComponent } = await import('../../src/utils/registry.js');
     const { getRaftersTitle } = await import('../../src/utils/logo.js');
-    const { fileExists, writeFile, createComponentPath } = await import('../../src/utils/files.js');
+    const { fileExists, createComponentPath, writeFile } = await import('../../src/utils/files.js');
     const { installDependencies } = await import('../../src/utils/dependencies.js');
     const { default: ora } = await import('ora');
 
@@ -279,6 +282,7 @@ describe('addCommand', () => {
     vi.mocked(ora).mockReturnValue(mockSpinner as ReturnType<typeof ora>);
     vi.mocked(fileExists).mockReturnValue(false);
     vi.mocked(createComponentPath).mockReturnValue('./src/components/ui/button.tsx');
+    vi.mocked(writeFile).mockReturnValue(undefined);
     vi.mocked(installDependencies).mockResolvedValue();
     vi.mocked(transformImports).mockReturnValue(
       'export default function Button() { return <button>Click me</button>; }'

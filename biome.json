@@ -2,22 +2,29 @@
   "$schema": "https://biomejs.dev/schemas/2.2.2/schema.json",
   "files": {
     "ignoreUnknown": false,
-    "ignore": [
-      "**/*.css",
-      "**/*.d.ts",
-      "apps/cli/test/fixtures/**/*",
-      "**/worker-configuration.d.ts",
-      "**/token-cache.json",
-      "**/.wrangler/**/*",
-      "**/.astro/**/*",
-      "**/test-results/**/*"
+    "includes": [
+      "**",
+      "!**/*.css",
+      "!**/*.d.ts",
+      "!**/*.astro",
+      "!**/dist/**/*",
+      "!**/build/**/*",
+      "!**/.next/**/*",
+      "!apps/cli/test/fixtures/**/*",
+      "!**/worker-configuration.d.ts",
+      "!**/token-cache.json",
+      "!**/.wrangler/**/*",
+      "!**/.astro/**/*",
+      "!**/test-results/**/*",
+      "!**/.vscode/**/*",
+      "!**/playwright/.cache/**/*"
     ],
     "maxSize": 10485760
   },
   "vcs": {
     "enabled": true,
     "clientKind": "git",
-    "useIgnoreFile": true
+    "useIgnoreFile": false
   },
   "linter": {
     "enabled": true,
@@ -25,6 +32,9 @@
       "recommended": true,
       "style": {
         "noNonNullAssertion": "off"
+      },
+      "correctness": {
+        "noUnusedVariables": "warn"
       }
     }
   },

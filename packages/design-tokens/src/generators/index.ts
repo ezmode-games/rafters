@@ -46,7 +46,6 @@ import { generateDepthScale } from './depth.js';
 import { generateFontFamilyTokens } from './font-family.js';
 import { generateFontWeightTokens } from './font-weight.js';
 import { generateGridTokens } from './grid.js';
-import { generateHeightScale } from './height.js';
 import { generateLetterSpacingTokens } from './letter-spacing.js';
 import { generateMotionTokens } from './motion.js';
 import { generateOpacityTokens } from './opacity.js';

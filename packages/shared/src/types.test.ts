@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ColorValueSchema, OKLCHSchema } from './types';
+import { ColorValueSchema } from './types';
 
 describe('ColorValueSchema', () => {
   describe('basic structure', () => {
@@ -163,7 +163,7 @@ describe('ColorValueSchema', () => {
       // This means: [[{l,c,h}], [{l,c,h}]]
       // Why the extra nesting?
 
-      const scale = [
+      const _scale = [
         [{ l: 0.95, c: 0.05, h: 240 }], // Why array wrapping single OKLCH?
         [{ l: 0.9, c: 0.1, h: 240 }],
       ];

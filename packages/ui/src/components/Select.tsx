@@ -96,12 +96,7 @@ export function SelectTrigger({
       <div className="flex items-center justify-between w-full">
         {children}
         {showCount && itemCount && (
-          <span
-            className="text-xs text-muted-foreground ml-2"
-            aria-label={`${itemCount} options available`}
-          >
-            ({itemCount})
-          </span>
+          <span className="text-xs text-muted-foreground ml-2">({itemCount})</span>
         )}
       </div>
       <SelectPrimitive.Icon asChild>
@@ -266,24 +261,10 @@ export function SelectItem({
 
       <div className="flex-1 flex flex-col">
         <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
-        {description && (
-          <span
-            className="text-xs text-muted-foreground mt-0.5"
-            aria-label={`Description: ${description}`}
-          >
-            {description}
-          </span>
-        )}
+        {description && <span className="text-xs text-muted-foreground mt-0.5">{description}</span>}
       </div>
 
-      {shortcut && (
-        <span
-          className="text-xs text-muted-foreground ml-2 font-mono"
-          aria-label={`Keyboard shortcut: ${shortcut}`}
-        >
-          {shortcut}
-        </span>
-      )}
+      {shortcut && <span className="text-xs text-muted-foreground ml-2 font-mono">{shortcut}</span>}
     </SelectPrimitive.Item>
   );
 }

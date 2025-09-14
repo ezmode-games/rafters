@@ -6,20 +6,7 @@
  * Integrates with registry to pull component code and intelligence
  */
 
-interface Props {
-  /** Component name from registry */
-  component: string;
-  /** Component variant/props as JSON string */
-  variant?: string;
-  /** Custom props to pass to component */
-  props?: string;
-  /** Show component intelligence metadata */
-  showIntelligence?: boolean;
-  /** Preview container height */
-  height?: string;
-  /** Custom CSS classes for preview container */
-  class?: string;
-}
+// Props defined inline for better type inference with Astro
 
 const {
   component,

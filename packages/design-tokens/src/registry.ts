@@ -47,7 +47,7 @@ function extractOKLCH(value: string | ColorValue): OKLCH | null {
   // For ColorValue, use the specified value or middle of scale
   if (typeof value === 'object' && value.scale) {
     // Calculate index from value: "500" -> 500/100 = 5 -> index 5, default to 5 (500 position)
-    const targetIndex = value.value ? Math.floor(Number.parseInt(value.value) / 100) : 5;
+    const targetIndex = value.value ? Math.floor(Number.parseInt(value.value, 10) / 100) : 5;
     return value.scale[Math.min(targetIndex, value.scale.length - 1)] || value.scale[0];
   }
 
@@ -414,7 +414,7 @@ export class TokenRegistry {
               : tokenValueToCss(darkStateToken.value);
         }
       } else if (rule.startsWith('scale:')) {
-        const scaleNumber = Number.parseInt(rule.replace('scale:', ''));
+        const scaleNumber = Number.parseInt(rule.replace('scale:', ''), 10);
         const scaleIndex = standardScale.indexOf(scaleNumber);
         if (scaleIndex !== -1) {
           // Ensure arrays are long enough
@@ -467,7 +467,7 @@ export class TokenRegistry {
         }
       }
 
-      const colorValue: ColorValue = {
+      const _colorValue: ColorValue = {
         name: baseToken.name,
         scale: scale,
         value: baseToken.name, // The semantic token name

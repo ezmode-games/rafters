@@ -1,9 +1,8 @@
 import { zValidator } from '@hono/zod-validator';
-import { Hono } from 'hono';
-import * as z from 'zod';
-
 import { generateColorValue, validateOKLCH } from '@rafters/color-utils';
 import { ColorValueSchema, OKLCHSchema } from '@rafters/shared';
+import { Hono } from 'hono';
+import * as z from 'zod';
 import { generateColorIntelligence } from '../lib/color-intel/utils';
 
 // Vectorize requires exactly 384 dimensions for color intelligence vectors

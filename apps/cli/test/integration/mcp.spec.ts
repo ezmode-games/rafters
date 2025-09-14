@@ -8,7 +8,7 @@ import { spawn } from 'node:child_process';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { ensureCLIBuilt, runCLI } from '../helpers/cliRunner.js';
+import { ensureCLIBuilt } from '../helpers/cliRunner.js';
 import { createTempTestApp } from '../helpers/testApp.js';
 import type { TestFixtureInfo } from '../types.js';
 
@@ -80,7 +80,7 @@ describe.skip('rafters mcp', { timeout: 30000 }, () => {
                   }
                   return;
                 }
-              } catch (e) {
+              } catch (_e) {
                 // Not a complete JSON yet, continue
               }
             }

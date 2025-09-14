@@ -45,16 +45,6 @@ import { cn } from '../lib/utils';
 import './article-prose.css';
 
 /**
- * Type map for polymorphic elements
- */
-type ElementTypeMap = {
-  div: HTMLDivElement;
-  main: HTMLElement;
-  section: HTMLElement;
-  article: HTMLElement;
-};
-
-/**
  * Container component props with layout intelligence
  */
 export interface ContainerProps extends React.HTMLAttributes<HTMLElement> {

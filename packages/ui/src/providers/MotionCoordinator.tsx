@@ -16,9 +16,9 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import { z } from 'zod';
 import {
   type AccessibleMotionConfig,
+  globalMenuCoordinator,
   type MenuMotionCoordinator,
   type MotionLevel,
-  globalMenuCoordinator,
   menuMotionConfigs,
   useAccessibleMotion,
   usePerformanceAwareMotion,
@@ -53,7 +53,6 @@ const MotionBudgetSchema = z.object({
   respectReducedMotion: z.boolean().default(true),
 });
 
-type MotionPriority = z.infer<typeof MotionPrioritySchema>;
 type MotionType = z.infer<typeof MotionTypeSchema>;
 type MotionDuration = z.infer<typeof MotionDurationSchema>;
 type AnimationRequest = z.infer<typeof AnimationRequestSchema>;
@@ -508,20 +507,22 @@ export const MotionCoordinator: React.FC<MotionCoordinatorProps> = ({
     [state.budget.enableGpuAcceleration, getPerformanceMotionClass]
   );
 
+  // Create accessibility motion config at component level
+  const accessibilityMotionConfig: AccessibleMotionConfig = {
+    cognitiveLoad: state.currentLoad,
+    trustLevel: 'medium',
+    interactionType: 'navigation',
+    respectsReducedMotion: state.budget.respectReducedMotion,
+  };
+
+  const { getMotionClass: getAccessibleMotionClass } =
+    useAccessibleMotion(accessibilityMotionConfig);
+
   const getReducedMotionClass = useCallback(
     (baseClass: string, _menuId: string): string => {
-      // Use existing motion accessibility utilities
-      const config: AccessibleMotionConfig = {
-        cognitiveLoad: state.currentLoad,
-        trustLevel: 'medium',
-        interactionType: 'navigation',
-        respectsReducedMotion: state.budget.respectReducedMotion,
-      };
-
-      const { getMotionClass } = useAccessibleMotion(config);
-      return getMotionClass(baseClass);
+      return getAccessibleMotionClass(baseClass);
     },
-    [state.currentLoad, state.budget.respectReducedMotion]
+    [getAccessibleMotionClass]
   );
 
   const shouldAnimate = useCallback(
@@ -617,7 +618,7 @@ export const useMenuMotion = (menuId: string, menuType: keyof typeof menuMotionC
   const coordinator = useMotionCoordinator();
   const coordination = useMenuCoordination();
   const config = menuMotionConfigs[menuType];
-  const { getMotionClass, shouldAnimate } = useAccessibleMotion(config);
+  const { shouldAnimate } = useAccessibleMotion(config);
 
   // Auto-request motion priority for high-priority menus
   const { isMenuActive } = coordination;

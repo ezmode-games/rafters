@@ -4,7 +4,6 @@
  * Returns specific component data with full design intelligence
  */
 
-import type { GetStaticPaths } from 'astro';
 import { getComponent, getRegistryMetadata } from '../../../lib/registry/componentService';
 
 export async function getStaticPaths() {

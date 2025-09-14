@@ -6,7 +6,7 @@
  */
 
 import { execSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, rmSync } from 'node:fs';
+import { cpSync, existsSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { TestAppOptions, TestFixtureInfo } from '../types.js';

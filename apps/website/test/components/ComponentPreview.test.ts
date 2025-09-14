@@ -3,7 +3,6 @@ import {
   ComponentPreviewFixture,
   mockComponentData,
   mockFetchResponses,
-  mockProps,
   setupMocks,
 } from '../fixtures/componentPreview.fixture';
 
@@ -158,8 +157,8 @@ describe('ComponentPreview', () => {
     it('should generate container HTML with intelligence', () => {
       const generateComponentHTML = (
         componentData: Record<string, unknown>,
-        variant: string,
-        props: Record<string, unknown>
+        _variant: string,
+        _props: Record<string, unknown>
       ) => {
         const { name } = componentData;
         const cognitive = componentData.meta?.rafters?.intelligence?.cognitiveLoad || 0;
@@ -197,7 +196,7 @@ describe('ComponentPreview', () => {
       const generateComponentHTML = (
         componentData: Record<string, unknown>,
         variant: string,
-        props: Record<string, unknown>
+        _props: Record<string, unknown>
       ) => {
         const { name } = componentData;
         const cognitive = componentData.meta?.rafters?.intelligence?.cognitiveLoad || 0;

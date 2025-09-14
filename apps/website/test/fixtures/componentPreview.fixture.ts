@@ -160,8 +160,6 @@ export const mockFetchResponses = {
 
 export class ComponentPreviewFixture {
   private componentName: string;
-  private variant: string;
-  private props: Record<string, unknown>;
   private mockContainer: HTMLElement & { attachShadow: ReturnType<typeof vi.fn> };
   private mockShadowRoot: ShadowRoot & {
     innerHTML: string;

@@ -23,19 +23,7 @@ const componentCollection = defineCollection({
   }),
 });
 
-const tokensCollection = defineCollection({
-  type: 'content',
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    category: z.enum(['color', 'spacing', 'typography', 'elevation', 'motion', 'breakpoints']),
-    order: z.number().optional(),
-    draft: z.boolean().optional(),
-  }),
-});
-
 export const collections = {
   foundation: foundationCollection,
   components: componentCollection,
-  tokens: tokensCollection,
 };

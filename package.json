@@ -5,7 +5,10 @@
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.12.4",
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
@@ -53,7 +56,7 @@
     "url": "https://github.com/real-handy/rafters"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
+    "@biomejs/biome": "catalog:",
     "@changesets/changelog-github": "^0.5.1",
     "@changesets/cli": "^2.29.6",
     "lefthook": "^1.12.3",

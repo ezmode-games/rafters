@@ -7,7 +7,7 @@
 
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { ensureCLIBuilt, runCLI, runCLIExpectingFailure } from '../helpers/cliRunner.js';
 import { detectFramework } from '../helpers/frameworkDetection.js';

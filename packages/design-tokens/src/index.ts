@@ -7,30 +7,24 @@
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import {
-  type ColorValue,
-  type Token,
-  TokenSchema,
-  type TokenSet,
-  TokenSetSchema,
-} from '@rafters/shared';
+import { type ColorValue, type Token, TokenSchema, type TokenSet } from '@rafters/shared';
 import { ensureDirSync } from 'fs-extra';
 import sqids from 'sqids';
 import { z } from 'zod';
 
 // Export dependency tracking system
 export { type TokenDependency, TokenDependencyGraph } from './dependencies.js';
-// Export core TokenRegistry class
-export { TokenRegistry } from './registry.js';
 // Export new clean export system
 export {
+  exportColorScales,
+  exportToCSSVariables,
   exportTokensFromRegistry,
   exportToTailwindCSS,
-  exportToCSSVariables,
-  exportColorScales,
 } from './export.js';
 // Export complete tailwind v4 exporter
 export { exportToTailwindV4Complete } from './exporters/tailwind-v4.js';
+// Export core TokenRegistry class
+export { TokenRegistry } from './registry.js';
 
 // Import for internal use
 import { TokenRegistry } from './registry.js';
@@ -43,7 +37,7 @@ export const generateShortCode = () => {
 /**
  * Type guard to check if a value is a ColorValue object
  */
-function isColorValue(value: unknown): value is ColorValue {
+function _isColorValue(value: unknown): value is ColorValue {
   return typeof value === 'object' && value !== null && 'name' in value && 'scale' in value;
 }
 
@@ -64,8 +58,8 @@ export function tokenValueToCss(value: string | ColorValue): string {
     let targetIndex = 5; // Default to 500 position (index 5)
 
     // If value field specifies a scale position, use that
-    if (value.value && !Number.isNaN(Number.parseInt(value.value))) {
-      const scalePosition = Number.parseInt(value.value);
+    if (value.value && !Number.isNaN(Number.parseInt(value.value, 10))) {
+      const scalePosition = Number.parseInt(value.value, 10);
       const scalePositions = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
       targetIndex = scalePositions.indexOf(scalePosition);
       if (targetIndex === -1) targetIndex = 5; // Fallback to 500
@@ -91,7 +85,7 @@ export function tokenValueToCss(value: string | ColorValue): string {
  * Convert a token value to CSS string for dark mode
  * For ColorValue objects, uses states when available, otherwise falls back to light value
  */
-function tokenValueToCssDark(value: string | ColorValue, stateName = 'default'): string {
+function _tokenValueToCssDark(value: string | ColorValue, stateName = 'default'): string {
   if (typeof value === 'string') {
     return value;
   }
@@ -144,26 +138,26 @@ export type DesignSystem = z.infer<typeof DesignSystemSchema>;
 
 // Import and re-export all generators from generators folder
 export {
-  generateSpacingScale,
-  generateDepthScale,
-  generateHeightScale,
-  generateTypographyScale,
-  generateColorTokens,
+  generateAllTokens,
+  generateAspectRatioTokens,
+  generateBackdropTokens,
   generateBorderRadiusTokens,
-  generateMotionTokens,
-  generateOpacityTokens,
+  generateBorderWidthTokens,
+  generateBreakpointTokens,
+  generateColorTokens,
+  generateDepthScale,
   generateFontFamilyTokens,
   generateFontWeightTokens,
-  generateLetterSpacingTokens,
-  generateBreakpointTokens,
-  generateAspectRatioTokens,
   generateGridTokens,
-  generateTransformTokens,
-  generateWidthTokens,
-  generateBackdropTokens,
-  generateBorderWidthTokens,
+  generateHeightScale,
+  generateLetterSpacingTokens,
+  generateMotionTokens,
+  generateOpacityTokens,
+  generateSpacingScale,
   generateTouchTargetTokens,
-  generateAllTokens,
+  generateTransformTokens,
+  generateTypographyScale,
+  generateWidthTokens,
 } from './generators/index.js';
 
 /**

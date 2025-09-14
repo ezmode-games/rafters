@@ -5,7 +5,7 @@
  * with proper isolation and error handling.
  */
 
-import { execSync, spawn } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { join } from 'node:path';
 import type { CLIRunOptions, CLIRunResult } from '../types.js';
 

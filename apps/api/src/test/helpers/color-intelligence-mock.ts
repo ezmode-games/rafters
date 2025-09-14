@@ -1,6 +1,5 @@
 import { roundOKLCH } from '@rafters/color-utils';
-import type { ColorIntelligenceResponse } from '@rafters/shared';
-import type { OKLCH } from '@rafters/shared';
+import type { ColorIntelligenceResponse, OKLCH } from '@rafters/shared';
 import fixtures from '../fixtures/color-intelligence.json';
 
 /**

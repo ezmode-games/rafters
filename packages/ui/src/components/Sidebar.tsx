@@ -150,7 +150,7 @@ export interface SidebarGroupContentProps extends React.HTMLAttributes<HTMLDivEl
 }
 
 // Individual sidebar navigation item
-export interface SidebarItemProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onClick'> {
+export interface SidebarItemProps extends Omit<React.HTMLAttributes<HTMLButtonElement>, 'onClick'> {
   onClick?: (event: React.MouseEvent<HTMLElement>) => void;
   // Navigation behavior
   href?: string;
@@ -312,7 +312,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
       role={landmark ? 'navigation' : undefined}
       aria-label={ariaLabel}
-      aria-expanded={collapsible ? !isCollapsed : undefined}
       {...props}
     >
       {/* Skip link for accessibility */}
@@ -564,7 +563,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
 
   // Simplified click handler
   const handleClick = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
+    (event: React.MouseEvent<HTMLButtonElement>) => {
       if (disabled || loading) {
         event.preventDefault();
         return;
@@ -709,12 +708,15 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
   }
 
   return (
-    <div
+    <button
+      type="button"
       className={cn(
         // Base item styles with motor accessibility
         'flex items-center gap-3 px-2 py-2 rounded-md text-sm font-medium',
         'transition-all cursor-pointer select-none',
         'duration-200',
+        // Reset button styles
+        'bg-transparent border-none text-left w-full',
 
         // Navigation hierarchy with proper indentation
         level > 0 && `ml-${Math.min(level * 4, 12)}`,
@@ -750,9 +752,9 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
 
         className
       )}
+      disabled={disabled}
       onClick={handleClick}
       aria-current={isActive ? 'page' : undefined}
-      aria-disabled={disabled}
       aria-busy={loading}
       title={collapsed && showTooltip ? String(children) : undefined}
       {...props}
@@ -793,7 +795,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
 
       {/* Badge with attention hierarchy */}
       {badge && !collapsed && <div className="ml-auto flex-shrink-0">{badge}</div>}
-    </div>
+    </button>
   );
 };
 

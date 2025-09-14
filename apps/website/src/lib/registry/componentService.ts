@@ -5,7 +5,7 @@
  * Uses shared Zod schemas for type safety and validation.
  */
 
-import { readFileSync, readdirSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   type ComponentManifest,
@@ -21,7 +21,7 @@ import {
   type UsagePatterns,
   UsagePatternsSchema,
 } from '@rafters/shared';
-import { type Spec, parse } from 'comment-parser';
+import { parse, type Spec } from 'comment-parser';
 
 // Cache for components to avoid re-parsing
 let componentsCache: ComponentManifest[] | null = null;
@@ -208,7 +208,7 @@ function parseDesignGuides(content: string): DesignGuide[] {
               url: match[2].trim(),
             })
           );
-        } catch (error) {
+        } catch (_error) {
           console.warn('Failed to parse design guide:', trimmed);
         }
       }
@@ -290,7 +290,7 @@ export function getRegistryMetadata(): RegistryResponse {
   const totalCognitiveLoad = components.reduce((sum, comp) => {
     return sum + (comp.meta?.rafters?.intelligence?.cognitiveLoad || 0);
   }, 0);
-  const avgCognitiveLoad = components.length > 0 ? totalCognitiveLoad / components.length : 0;
+  const _avgCognitiveLoad = components.length > 0 ? totalCognitiveLoad / components.length : 0;
 
   return RegistryResponseSchema.parse({
     $schema: 'https://rafters.dev/schemas/registry.json',

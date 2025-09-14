@@ -14,7 +14,7 @@ describe('generateShortCode', () => {
   });
 
   it('should generate different codes on subsequent calls', () => {
-    const code1 = generateShortCode();
+    const _code1 = generateShortCode();
     // Small delay to ensure different timestamp
     const code2 = generateShortCode();
     // Allow for potential timestamp collision but verify it's at least a valid string

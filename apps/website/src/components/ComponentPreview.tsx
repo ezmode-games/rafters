@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useId } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 
 /**
  * ComponentPreview - Shadow DOM isolated component rendering for MDX
@@ -48,7 +48,7 @@ export default function ComponentPreview({
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const shadowRootRef = useRef<ShadowRoot | null>(null);
-  const previewId = useId();
+  const _previewId = useId();
 
   // Parse props string into object
   const parsedProps = React.useMemo(() => {

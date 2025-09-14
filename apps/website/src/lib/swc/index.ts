@@ -9,10 +9,10 @@ export { SWCCompiler } from './SWCCompiler';
 
 // Types
 export type {
-  ComponentIntelligence,
-  CompilationResult,
   CompilationError,
   CompilationOptions,
+  CompilationResult,
+  ComponentIntelligence,
   SWCConfig,
 } from './types';
 
