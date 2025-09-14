@@ -7,7 +7,7 @@
 // React SSR Executor
 export { ReactSSRExecutor } from './ReactSSRExecutor';
 // Registry Component Fetcher
-export { RegistryComponentFetcher } from './RegistryFetcher';
+export { RegistryComponentFetcher, validateComponentName } from './RegistryFetcher';
 // SWC Compiler
 export { SWCCompiler } from './SWCCompiler';
 

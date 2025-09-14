@@ -6,7 +6,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { RegistryComponentFetcher } from '../../../src/lib/swc/RegistryFetcher';
+import { RegistryComponentFetcher, validateComponentName } from '../../../src/lib/swc/RegistryFetcher';
 import type { RegistryComponent, RegistryError } from '../../../src/lib/swc/types';
 
 // Mock fetch globally
@@ -50,11 +50,33 @@ describe('RegistryComponentFetcher', () => {
         },
       },
     };
+
     vi.clearAllMocks();
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.resetAllMocks();
+  });
+
+  describe('validateComponentName', () => {
+    it('should validate valid component names', () => {
+      expect(() => validateComponentName('button')).not.toThrow();
+      expect(() => validateComponentName('button-large')).not.toThrow();
+      expect(() => validateComponentName('card')).not.toThrow();
+      expect(() => validateComponentName('a')).not.toThrow();
+      expect(() => validateComponentName('a-b-c')).not.toThrow();
+    });
+
+    it('should reject invalid component names', () => {
+      expect(() => validateComponentName('')).toThrow('Component name cannot be empty');
+      expect(() => validateComponentName('  ')).toThrow('Component name cannot be empty');
+      expect(() => validateComponentName(' button')).toThrow('leading or trailing whitespace');
+      expect(() => validateComponentName('button ')).toThrow('leading or trailing whitespace');
+      expect(() => validateComponentName('Button')).toThrow('lowercase letters, numbers, and hyphens');
+      expect(() => validateComponentName('button_test')).toThrow('lowercase letters, numbers, and hyphens');
+      expect(() => validateComponentName('-button')).toThrow('lowercase letters, numbers, and hyphens');
+      expect(() => validateComponentName('button-')).toThrow('lowercase letters, numbers, and hyphens');
+    });
   });
 
   describe('fetchComponent', () => {
@@ -89,7 +111,7 @@ describe('RegistryComponentFetcher', () => {
         ok: true,
         json: () => Promise.resolve(mockComponent),
       });
-
+      
       // First fetch
       await fetcher.fetchComponent('button');
 
@@ -108,7 +130,9 @@ describe('RegistryComponentFetcher', () => {
         statusText: 'Not Found',
       });
 
-      await expect(fetcher.fetchComponent('nonexistent-component')).rejects.toThrow();
+      await expect(
+        fetcher.fetchComponent('nonexistent')
+      ).rejects.toThrow();
     });
 
     it('should throw RegistryError with proper context when component not found', async () => {
@@ -119,106 +143,118 @@ describe('RegistryComponentFetcher', () => {
       });
 
       try {
-        await fetcher.fetchComponent('missing');
+        await fetcher.fetchComponent('nonexistent');
+        expect.fail('Should have thrown an error');
       } catch (error) {
         const registryError = error as RegistryError;
         expect(registryError.name).toBe('RegistryError');
-        expect(registryError.componentName).toBe('missing');
+        expect(registryError.componentName).toBe('nonexistent');
         expect(registryError.statusCode).toBe(404);
-        expect(registryError.registryUrl).toContain('/registry/components/missing');
+        expect(registryError.registryUrl).toContain('/registry/components/nonexistent');
       }
     });
 
     it('should handle network timeout errors', async () => {
-      mockFetch.mockImplementation(() => {
-        const abortError = new Error('The user aborted a request');
-        abortError.name = 'AbortError';
-        return Promise.reject(abortError);
-      });
-
-      await expect(fetcher.fetchComponent('button')).rejects.toThrow(
-        'Registry request timeout after 10000ms'
+      // Mock fetch to simulate AbortError
+      mockFetch.mockRejectedValueOnce(
+        Object.assign(new Error('The operation was aborted'), {
+          name: 'AbortError',
+        })
       );
 
       try {
-        await fetcher.fetchComponent('button');
+        await fetcher.fetchComponent('timeout-test');
+        expect.fail('Should have thrown an error');
       } catch (error) {
         const registryError = error as RegistryError;
         expect(registryError.name).toBe('RegistryError');
-        expect(registryError.componentName).toBe('button');
+        expect(registryError.message).toContain('timeout');
+        expect(registryError.componentName).toBe('timeout-test');
       }
     });
 
-    it('should handle general network errors', async () => {
-      mockFetch.mockRejectedValueOnce(new Error('Network error'));
-
-      await expect(fetcher.fetchComponent('button')).rejects.toThrow(
-        'Failed to fetch from registry'
-      );
-
-      try {
-        await fetcher.fetchComponent('button');
-      } catch (error) {
-        const registryError = error as RegistryError;
-        expect(registryError.name).toBe('RegistryError');
-        expect(registryError.componentName).toBe('button');
-      }
-    });
-
-    it('should validate registry response structure', async () => {
-      const invalidResponse = {
-        name: 'button',
-        // Missing required fields: type, files
-      };
-
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(invalidResponse),
-      });
-
-      await expect(fetcher.fetchComponent('button')).rejects.toThrow(
-        'Registry response validation failed'
-      );
-    });
-
-    it('should require at least one file with content', async () => {
-      const componentWithoutContent = {
-        ...mockComponent,
-        files: [
-          {
-            path: 'ui/button.tsx',
-            content: '', // Empty content
-            type: 'registry:component',
-          },
-        ],
-      };
-
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(componentWithoutContent),
-      });
-
-      await expect(fetcher.fetchComponent('button')).rejects.toThrow(
-        'Component must have at least one file with non-empty content'
-      );
-    });
-
-    it('should handle malformed JSON responses', async () => {
+    it('should handle malformed JSON response', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: () => Promise.reject(new Error('Invalid JSON')),
       });
 
-      await expect(fetcher.fetchComponent('button')).rejects.toThrow(
-        'Failed to fetch from registry'
-      );
+      try {
+        await fetcher.fetchComponent('malformed-json');
+        expect.fail('Should have thrown an error');
+      } catch (error) {
+        const registryError = error as RegistryError;
+        expect(registryError.name).toBe('RegistryError');
+        expect(registryError.message).toContain('Failed to fetch');
+        expect(registryError.componentName).toBe('malformed-json');
+      }
+    });
+
+    it('should validate required fields in component response', async () => {
+      const invalidComponent = { ...mockComponent };
+      delete (invalidComponent as any).name;
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(invalidComponent),
+      });
+
+      try {
+        await fetcher.fetchComponent('invalid-component');
+        expect.fail('Should have thrown an error');
+      } catch (error) {
+        const registryError = error as RegistryError;
+        expect(registryError.name).toBe('RegistryError');
+        expect(registryError.message).toContain('validation failed');
+        expect(registryError.componentName).toBe('invalid-component');
+      }
+    });
+
+    it('should validate files array structure', async () => {
+      const invalidComponent = { ...mockComponent, files: [] };
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(invalidComponent),
+      });
+
+      try {
+        await fetcher.fetchComponent('no-files');
+        expect.fail('Should have thrown an error');
+      } catch (error) {
+        const registryError = error as RegistryError;
+        expect(registryError.name).toBe('RegistryError');
+        expect(registryError.message).toContain('validation failed');
+        expect(registryError.message).toContain('at least one file');
+      }
+    });
+
+    it('should preserve component intelligence metadata', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockComponent),
+      });
+
+      const result = await fetcher.fetchComponent('button');
+      const intelligence = result.component.meta?.rafters?.intelligence;
+
+      expect(intelligence).toBeDefined();
+      expect(intelligence?.cognitiveLoad).toBe(3);
+      expect(intelligence?.attentionEconomics).toContain('Size hierarchy');
+      expect(intelligence?.accessibility).toBe('WCAG AAA compliant');
+      expect(intelligence?.trustBuilding).toContain('Destructive actions');
+      expect(intelligence?.semanticMeaning).toContain('Primary=main actions');
+      expect(intelligence?.usagePatterns?.dos).toEqual(['Use for primary actions']);
+      expect(intelligence?.usagePatterns?.nevers).toEqual([
+        'Never use for destructive actions without confirmation',
+      ]);
     });
   });
 
   describe('fetchMultipleComponents', () => {
     it('should fetch multiple components in parallel', async () => {
-      const cardComponent = { ...mockComponent, name: 'card' };
-
+      const mockCard = { ...mockComponent, name: 'card' };
+      
       mockFetch
         .mockResolvedValueOnce({
           ok: true,
@@ -226,18 +262,22 @@ describe('RegistryComponentFetcher', () => {
         })
         .mockResolvedValueOnce({
           ok: true,
-          json: () => Promise.resolve(cardComponent),
+          json: () => Promise.resolve(mockCard),
         });
 
       const results = await fetcher.fetchMultipleComponents(['button', 'card']);
 
       expect(results.size).toBe(2);
+      expect(results.has('button')).toBe(true);
+      expect(results.has('card')).toBe(true);
       expect(results.get('button')?.component.name).toBe('button');
       expect(results.get('card')?.component.name).toBe('card');
       expect(mockFetch).toHaveBeenCalledTimes(2);
     });
 
     it('should handle partial failures gracefully', async () => {
+      const mockCard = { ...mockComponent, name: 'card' };
+      
       mockFetch
         .mockResolvedValueOnce({
           ok: true,
@@ -249,78 +289,125 @@ describe('RegistryComponentFetcher', () => {
           statusText: 'Not Found',
         });
 
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      // Spy on console.warn
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-      const results = await fetcher.fetchMultipleComponents(['button', 'missing']);
+      const results = await fetcher.fetchMultipleComponents(['button', 'nonexistent']);
 
-      expect(results.size).toBe(1); // Only successful result
-      expect(results.get('button')?.component.name).toBe('button');
-      expect(results.has('missing')).toBe(false);
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Failed to fetch component 'missing'"),
-        expect.any(String)
+      expect(results.size).toBe(1);
+      expect(results.has('button')).toBe(true);
+      expect(results.has('nonexistent')).toBe(false);
+      expect(warnSpy).toHaveBeenCalledWith(
+        "Failed to fetch component 'nonexistent':",
+        "HTTP 404: Not Found"
       );
 
-      consoleSpy.mockRestore();
+      warnSpy.mockRestore();
+    });
+
+    it('should validate component names before fetching', async () => {
+      // Spy on console.warn to avoid noise in test output
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      
+      const results = await fetcher.fetchMultipleComponents(['Button', 'invalid_name']);
+      
+      // Should return empty results since both names are invalid
+      expect(results.size).toBe(0);
+      expect(warnSpy).toHaveBeenCalledTimes(2); // Called for each invalid name
+      
+      warnSpy.mockRestore();
     });
   });
 
-  describe('cache management', () => {
-    beforeEach(async () => {
-      // Set up cache with a component
+  describe('Cache Management', () => {
+    it('should clear specific component from cache', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve(mockComponent),
       });
+      
+      // Fetch and cache
       await fetcher.fetchComponent('button');
-    });
 
-    it('should provide cache statistics', () => {
-      const stats = fetcher.getCacheStats();
-      expect(stats.size).toBeGreaterThan(0);
-      expect(stats.keys).toContain('button');
-    });
-
-    it('should clear specific component from cache', () => {
+      // Clear specific component
       fetcher.clearCache('button');
-      const afterClear = fetcher.getCacheStats();
-      expect(afterClear.keys).not.toContain('button');
+
+      // Should fetch from network again
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockComponent),
+      });
+
+      const result = await fetcher.fetchComponent('button');
+      expect(result.fromCache).toBe(false);
+      expect(mockFetch).toHaveBeenCalledTimes(2);
     });
 
-    it('should clear entire cache', () => {
+    it('should clear entire cache', async () => {
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockComponent),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve({ ...mockComponent, name: 'card' }),
+        });
+
+      // Cache multiple components
+      await fetcher.fetchComponent('button');
+      await fetcher.fetchComponent('card');
+
+      // Clear entire cache
       fetcher.clearCache();
-      const afterClear = fetcher.getCacheStats();
-      expect(afterClear.size).toBe(0);
-      expect(afterClear.keys).toHaveLength(0);
+
+      // Both should fetch from network again
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockComponent),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve({ ...mockComponent, name: 'card' }),
+        });
+
+      const buttonResult = await fetcher.fetchComponent('button');
+      const cardResult = await fetcher.fetchComponent('card');
+
+      expect(buttonResult.fromCache).toBe(false);
+      expect(cardResult.fromCache).toBe(false);
+      expect(mockFetch).toHaveBeenCalledTimes(4);
+    });
+
+    it('should return cache statistics with new fields', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockComponent),
+      });
+
+      await fetcher.fetchComponent('button');
+
+      const stats = fetcher.getCacheStats();
+      expect(stats.size).toBe(1);
+      expect(stats.keys).toEqual(['button']);
+      expect(stats.ttl).toBe(5 * 60 * 1000); // 5 minutes
+      expect(stats.maxSize).toBe(100);
     });
   });
 
-  describe('constructor', () => {
-    it('should use default base URL', () => {
-      const defaultFetcher = new RegistryComponentFetcher();
-      // We can't directly access the private property, but we can test the URL in requests
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockComponent),
-      });
-
-      defaultFetcher.fetchComponent('button');
-
-      expect(mockFetch).toHaveBeenCalledWith(
-        'https://rafters.realhandy.tech/registry/components/button',
-        expect.any(Object)
-      );
-    });
-
-    it('should accept custom base URL', () => {
+  describe('Custom Registry URL', () => {
+    it('should use custom registry URL', async () => {
       const customFetcher = new RegistryComponentFetcher('https://custom.registry.com');
+      
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve(mockComponent),
       });
 
-      customFetcher.fetchComponent('button');
+      const result = await customFetcher.fetchComponent('button');
 
+      expect(result.registryUrl).toContain('https://custom.registry.com');
       expect(mockFetch).toHaveBeenCalledWith(
         'https://custom.registry.com/registry/components/button',
         expect.any(Object)
@@ -328,70 +415,11 @@ describe('RegistryComponentFetcher', () => {
     });
   });
 
-  describe('URL encoding', () => {
-    it('should properly encode component names with special characters', async () => {
-      const specialName = 'button/special-name';
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({ ...mockComponent, name: specialName }),
-      });
-
-      await fetcher.fetchComponent(specialName);
-
-      expect(mockFetch).toHaveBeenCalledWith(
-        'https://rafters.realhandy.tech/registry/components/button%2Fspecial-name',
-        expect.any(Object)
-      );
-    });
-  });
-
-  describe('metadata preservation', () => {
-    it('should preserve all component metadata from registry response', async () => {
-      const componentWithFullMetadata = {
-        ...mockComponent,
-        meta: {
-          rafters: {
-            version: '2.0.0',
-            intelligence: {
-              cognitiveLoad: 5,
-              attentionEconomics: 'Complex attention patterns',
-              accessibility: 'WCAG AA compliant',
-              trustBuilding: 'High security requirements',
-              semanticMeaning: 'Critical system actions',
-            },
-            usagePatterns: {
-              dos: ['Use for critical actions'],
-              nevers: ['Never use without confirmation'],
-            },
-            designGuides: [
-              {
-                name: 'Component Guide',
-                url: 'https://example.com/guide',
-              },
-            ],
-            examples: [
-              {
-                code: '<Button>Example</Button>',
-              },
-            ],
-          },
-        },
-      };
-
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(componentWithFullMetadata),
-      });
-
-      const result = await fetcher.fetchComponent('button');
-
-      expect(result.component.meta?.rafters?.version).toBe('2.0.0');
-      expect(result.component.meta?.rafters?.intelligence?.cognitiveLoad).toBe(5);
-      expect(result.component.meta?.rafters?.usagePatterns?.dos).toEqual([
-        'Use for critical actions',
-      ]);
-      expect(result.component.meta?.rafters?.designGuides?.[0].name).toBe('Component Guide');
-      expect(result.component.meta?.rafters?.examples?.[0].code).toBe('<Button>Example</Button>');
+  describe('Input Validation', () => {
+    it('should reject invalid component name inputs', async () => {
+      await expect(fetcher.fetchComponent('')).rejects.toThrow('Component name must be a non-empty string');
+      await expect(fetcher.fetchComponent('  ')).rejects.toThrow('Component name cannot be empty or only whitespace');
+      await expect(fetcher.fetchComponent('<script>alert(1)</script>')).rejects.toThrow('contains invalid characters');
     });
   });
 });

@@ -8,7 +8,7 @@
 import { z } from 'zod';
 import type { FetchResult, RegistryComponent, RegistryError } from './types';
 
-// Inline schemas to avoid dependency issues with @rafters/shared
+// Using inline schemas for now - shared package has build issues
 const ComponentFileSchema = z.object({
   path: z.string(),
   content: z.string(),
@@ -91,17 +91,43 @@ const ComponentManifestSchema = z.object({
     .optional(),
 });
 
+type ComponentManifest = z.infer<typeof ComponentManifestSchema>;
+
+// Branded type for component names to prevent type errors
+type ComponentName = string & { readonly __brand: unique symbol };
+
+export function validateComponentName(name: string): ComponentName {
+  if (!name || typeof name !== 'string' || name.trim() === '') {
+    throw new Error('Component name cannot be empty or null');
+  }
+  if (name.trim() !== name) {
+    throw new Error('Component name cannot have leading or trailing whitespace');
+  }
+  if (!/^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/.test(name)) {
+    throw new Error('Component name must contain only lowercase letters, numbers, and hyphens');
+  }
+  return name as ComponentName;
+}
+
 // Required fields validation
 const REQUIRED_FIELDS = ['name', 'type', 'files'] as const;
 
 const REQUIRED_FILE_FIELDS = ['path', 'content', 'type'] as const;
 
+// Cache entry interface with timestamp for TTL
+interface CacheEntry {
+  component: RegistryComponent;
+  timestamp: number;
+}
+
 /**
  * Registry Component Fetcher with caching and error handling
  */
 export class RegistryComponentFetcher {
-  private cache: Map<string, RegistryComponent> = new Map();
+  private cache: Map<string, CacheEntry> = new Map();
   private baseUrl: string;
+  private readonly MAX_CACHE_SIZE = 100;
+  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
   constructor(baseUrl = 'https://rafters.realhandy.tech') {
     this.baseUrl = baseUrl;
@@ -111,34 +137,41 @@ export class RegistryComponentFetcher {
    * Fetch a single component from the registry with caching
    */
   async fetchComponent(componentName: string): Promise<FetchResult> {
+    // Validate input first
+    this.validateComponentNameInput(componentName);
+    const validatedName = validateComponentName(componentName);
+
     const startTime = Date.now();
 
-    // 1. Check cache first
-    if (this.cache.has(componentName)) {
-      const component = this.cache.get(componentName)!;
+    // 1. Check cache first and evict expired entries
+    this.evictExpiredEntries();
+
+    if (this.cache.has(validatedName)) {
+      const cacheEntry = this.cache.get(validatedName)!;
       return {
-        component,
+        component: cacheEntry.component,
         fromCache: true,
         fetchTime: Date.now() - startTime,
-        registryUrl: `${this.baseUrl}/registry/components/${componentName}`,
+        registryUrl: `${this.baseUrl}/registry/components/${validatedName}`,
       };
     }
 
     // 2. Fetch from registry API if not cached
-    const component = await this.fetchFromRegistry(componentName);
+    const componentData = await this.fetchFromRegistry(validatedName);
 
     // 3. Validate response structure
-    const validatedComponent = this.validateRegistryResponse(component, componentName);
+    const validatedComponent = this.validateRegistryResponse(componentData, validatedName);
 
-    // 4. Store in cache
-    this.cache.set(componentName, validatedComponent);
+    // 4. Store in cache with size management
+    this.addToCache(validatedName, validatedComponent);
 
     // 5. Return component data with metadata
+    const fetchTime = Date.now() - startTime;
     return {
       component: validatedComponent,
       fromCache: false,
-      fetchTime: Date.now() - startTime,
-      registryUrl: `${this.baseUrl}/registry/components/${componentName}`,
+      fetchTime,
+      registryUrl: `${this.baseUrl}/registry/components/${validatedName}`,
     };
   }
 
@@ -182,7 +215,7 @@ export class RegistryComponentFetcher {
   /**
    * HTTP fetch with proper error handling
    */
-  private async fetchFromRegistry(componentName: string): Promise<any> {
+  private async fetchFromRegistry(componentName: ComponentName): Promise<ComponentManifest> {
     const url = `${this.baseUrl}/registry/components/${encodeURIComponent(componentName)}`;
 
     try {
@@ -200,12 +233,12 @@ export class RegistryComponentFetcher {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        const error = new Error(`HTTP ${response.status}: ${response.statusText}`) as RegistryError;
-        error.name = 'RegistryError';
-        error.componentName = componentName;
-        error.statusCode = response.status;
-        error.registryUrl = url;
-        throw error;
+        throw this.createRegistryError(
+          `HTTP ${response.status}: ${response.statusText}`,
+          componentName,
+          url,
+          response.status
+        );
       }
 
       const data = await response.json();
@@ -213,22 +246,20 @@ export class RegistryComponentFetcher {
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
-          const timeoutError = new Error(`Registry request timeout after 10000ms`) as RegistryError;
-          timeoutError.name = 'RegistryError';
-          timeoutError.componentName = componentName;
-          timeoutError.registryUrl = url;
-          throw timeoutError;
+          throw this.createRegistryError(
+            'Registry request timeout after 10000ms',
+            componentName,
+            url
+          );
         }
         if (error.name === 'RegistryError') {
           throw error; // Already properly formatted
         }
-        const networkError = new Error(
-          `Failed to fetch from registry: ${error.message}`
-        ) as RegistryError;
-        networkError.name = 'RegistryError';
-        networkError.componentName = componentName;
-        networkError.registryUrl = url;
-        throw networkError;
+        throw this.createRegistryError(
+          `Failed to fetch from registry: ${error.message}`,
+          componentName,
+          url
+        );
       }
       throw error;
     }
@@ -237,9 +268,9 @@ export class RegistryComponentFetcher {
   /**
    * Validate response structure and required fields
    */
-  private validateRegistryResponse(data: unknown, componentName: string): RegistryComponent {
+  private validateRegistryResponse(data: unknown, componentName: ComponentName): RegistryComponent {
     try {
-      // First try to parse with inline schema for validation
+      // First try to parse with shared schema for validation
       const parsed = ComponentManifestSchema.parse(data);
 
       // Additional validation for required fields
@@ -296,15 +327,84 @@ export class RegistryComponentFetcher {
 
       return registryComponent;
     } catch (error) {
-      const validationError = new Error(
+      throw this.createRegistryError(
         `Registry response validation failed for component '${componentName}': ${
           error instanceof Error ? error.message : 'Unknown validation error'
-        }`
-      ) as RegistryError;
-      validationError.name = 'RegistryError';
-      validationError.componentName = componentName;
-      validationError.registryUrl = `${this.baseUrl}/registry/components/${componentName}`;
-      throw validationError;
+        }`,
+        componentName,
+        `${this.baseUrl}/registry/components/${componentName}`
+      );
+    }
+  }
+
+  /**
+   * Validate component name input for security and format
+   */
+  private validateComponentNameInput(name: string): void {
+    if (!name || typeof name !== 'string') {
+      throw new Error('Component name must be a non-empty string');
+    }
+
+    if (name.trim() === '') {
+      throw new Error('Component name cannot be empty or only whitespace');
+    }
+
+    if (name.length > 100) {
+      throw new Error('Component name cannot exceed 100 characters');
+    }
+
+    // Prevent potential XSS or injection attacks
+    if (/<|>|&|"|'|`/.test(name)) {
+      throw new Error('Component name contains invalid characters');
+    }
+  }
+
+  /**
+   * Create a properly formatted RegistryError
+   */
+  private createRegistryError(
+    message: string,
+    componentName: ComponentName,
+    url: string,
+    statusCode?: number
+  ): RegistryError {
+    const error = new Error(message) as RegistryError;
+    error.name = 'RegistryError';
+    error.componentName = componentName;
+    error.registryUrl = url;
+    if (statusCode) {
+      error.statusCode = statusCode;
+    }
+    return error;
+  }
+
+  /**
+   * Add component to cache with size management
+   */
+  private addToCache(componentName: ComponentName, component: RegistryComponent): void {
+    // If cache is at max size, remove oldest entry
+    if (this.cache.size >= this.MAX_CACHE_SIZE) {
+      const firstKey = this.cache.keys().next().value;
+      if (firstKey) {
+        this.cache.delete(firstKey);
+      }
+    }
+
+    this.cache.set(componentName, {
+      component,
+      timestamp: Date.now(),
+    });
+  }
+
+  /**
+   * Remove expired entries from cache
+   */
+  private evictExpiredEntries(): void {
+    const now = Date.now();
+    for (const [key, value] of this.cache) {
+      if (now - value.timestamp > this.CACHE_TTL) {
+        this.cache.delete(key);
+      }
     }
   }
 
@@ -322,10 +422,12 @@ export class RegistryComponentFetcher {
   /**
    * Return cache statistics
    */
-  getCacheStats(): { size: number; keys: string[] } {
+  getCacheStats(): { size: number; keys: string[]; ttl: number; maxSize: number } {
     return {
       size: this.cache.size,
       keys: Array.from(this.cache.keys()),
+      ttl: this.CACHE_TTL,
+      maxSize: this.MAX_CACHE_SIZE,
     };
   }
 }
