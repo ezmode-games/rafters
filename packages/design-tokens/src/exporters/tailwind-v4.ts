@@ -18,7 +18,7 @@ import type { TokenRegistry } from '../registry.js';
 /**
  * Convert token value to CSS, handling ColorValue objects and references
  */
-function tokenValueToCss(value: string | ColorValue, tokenName?: string): string {
+function tokenValueToCss(value: string | ColorValue, _tokenName?: string): string {
   if (typeof value === 'string') {
     return value;
   }
@@ -200,7 +200,7 @@ function generateThemeBlock(registry: TokenRegistry): string[] {
                 lines.push(`  --rafters-${token.name}: var(--color-${colorValue.value});`);
               } else if (colorValue.value.match(/^\d+$/)) {
                 // Scale position like "500" - need to resolve to OKLCH from the scale
-                const scalePosition = Number.parseInt(colorValue.value);
+                const scalePosition = Number.parseInt(colorValue.value, 10);
                 const standardScale = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
                 const scaleIndex = standardScale.indexOf(scalePosition);
 

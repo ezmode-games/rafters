@@ -1,1 +1,3 @@
-export default function Root() { return <div>Test</div>; }
+export default function Root() {
+  return <div>Test</div>;
+}

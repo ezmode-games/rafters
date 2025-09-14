@@ -46,7 +46,6 @@ import { generateDepthScale } from './depth.js';
 import { generateFontFamilyTokens } from './font-family.js';
 import { generateFontWeightTokens } from './font-weight.js';
 import { generateGridTokens } from './grid.js';
-import { generateHeightScale } from './height.js';
 import { generateLetterSpacingTokens } from './letter-spacing.js';
 import { generateMotionTokens } from './motion.js';
 import { generateOpacityTokens } from './opacity.js';
@@ -62,13 +61,15 @@ import { generateWidthTokens } from './width.js';
  *
  * @returns Complete set of design tokens for a design system
  */
-export function generateAllTokens(): Token[] {
+export async function generateAllTokens(): Promise<Token[]> {
+  const colorTokens = await generateColorTokens(); // Async color generation with API calls
+
   return [
     ...generateSpacingScale('linear', 4, 1.25, 12),
     ...generateDepthScale('exponential', 10),
     // Height tokens removed - spacing scale generates h-* utilities automatically
     ...generateTypographyScale('golden', 1),
-    ...generateColorTokens(), // Mathematical color tokens, AI enhancement happens later
+    ...colorTokens, // AI-enhanced color tokens from API
     ...generateMotionTokens(),
     ...generateBorderRadiusTokens(),
     ...generateTouchTargetTokens(),

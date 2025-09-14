@@ -177,7 +177,7 @@ export function exportToTailwindCSS(registry: TokenRegistry): string {
             registry.dependencyGraph.getGenerationRule(a.name)?.replace('scale:', '') || '0';
           const bScale =
             registry.dependencyGraph.getGenerationRule(b.name)?.replace('scale:', '') || '0';
-          return Number.parseInt(aScale) - Number.parseInt(bScale);
+          return Number.parseInt(aScale, 10) - Number.parseInt(bScale, 10);
         });
 
         for (const scaleToken of scaleTokenArray) {

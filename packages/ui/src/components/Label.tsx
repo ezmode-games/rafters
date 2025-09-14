@@ -107,7 +107,7 @@ export function Label({
               'ml-1',
               validationState === 'error' ? 'text-destructive' : 'text-destructive'
             )}
-            aria-label="required field"
+            aria-hidden="true"
           >
             *
           </span>

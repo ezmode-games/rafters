@@ -1,0 +1,251 @@
+---
+title: "Dialog Component"
+description: "Modal dialog with focus management and trust-building escape patterns"
+cognitiveLoad: 6
+trustLevel: "high"
+attentionEconomics: "Modal patterns with progressive trust levels and escape hatches"
+order: 4
+---
+
+import ComponentPreview from '../../components/ComponentPreview.tsx'
+
+# Dialog Component
+
+The Dialog component provides modal interactions with embedded trust-building patterns and cognitive load management. It interrupts user flow deliberately, requiring careful consideration of when and how to use it.
+
+## Design Intelligence
+
+<ComponentPreview 
+  component="dialog" 
+  showIntelligence={true}
+  height="200px"
+  client:load
+/>
+
+**Cognitive Load: 6/10** - Interrupts user flow and requires decision making, demanding significant mental context switching.
+
+**Trust Building:** Clear close mechanisms, confirmation patterns for destructive actions, and progressive disclosure based on consequence levels.
+
+**Attention Economics:** Modal patterns capture attention completely:
+- **Modal** → Full attention capture (blocking workflow)
+- **Drawer** → Partial attention (supplementary content)
+- **Popover** → Contextual attention (in-context help)
+
+## Trust Levels
+
+Dialog behavior adapts based on the trust level required for the action:
+
+### Low Trust - Quick Actions
+<ComponentPreview 
+  component="dialog" 
+  variant="low-trust"
+  props='{"trustLevel": "low", "size": "sm"}'
+  height="140px"
+  client:load
+/>
+
+**Use Cases:** Save draft, quick confirmations, minimal friction actions
+
+```tsx
+<Dialog>
+  <DialogTrigger>Save Draft</DialogTrigger>
+  <DialogContent trustLevel="low" size="sm">
+    <DialogTitle>Save Draft</DialogTitle>
+    <DialogDescription>Save your progress?</DialogDescription>
+  </DialogContent>
+</Dialog>
+```
+
+### Medium Trust - Moderate Consequences
+<ComponentPreview 
+  component="dialog" 
+  variant="medium-trust"
+  props='{"trustLevel": "medium", "size": "md"}'
+  height="160px"
+  client:load
+/>
+
+**Use Cases:** Publish content, moderate impact actions with clear context
+
+```tsx
+<Dialog>
+  <DialogTrigger>Publish Article</DialogTrigger>
+  <DialogContent trustLevel="medium">
+    <DialogTitle>Publish Article</DialogTitle>
+    <DialogDescription>
+      This will make your article publicly visible.
+    </DialogDescription>
+  </DialogContent>
+</Dialog>
+```
+
+### High Trust - Significant Impact
+<ComponentPreview 
+  component="dialog" 
+  variant="high-trust"
+  props='{"trustLevel": "high", "size": "lg"}'
+  height="180px"
+  client:load
+/>
+
+**Use Cases:** Payments, account changes, significant consequences requiring detailed explanation
+
+```tsx
+<Dialog>
+  <DialogTrigger>Process Payment</DialogTrigger>
+  <DialogContent trustLevel="high" size="lg">
+    <DialogTitle>Confirm Payment</DialogTitle>
+    <DialogDescription>
+      You will be charged $99.99 for the annual subscription.
+      This will auto-renew unless cancelled.
+    </DialogDescription>
+  </DialogContent>
+</Dialog>
+```
+
+### Critical Trust - Permanent Actions
+<ComponentPreview 
+  component="dialog" 
+  variant="critical-trust"
+  props='{"trustLevel": "critical", "destructive": true}'
+  height="200px"
+  client:load
+/>
+
+**Use Cases:** Account deletion, permanent data loss, irreversible actions
+
+```tsx
+<Dialog>
+  <DialogTrigger variant="destructive">Delete Account</DialogTrigger>
+  <DialogContent trustLevel="critical" destructive>
+    <DialogTitle>Delete Account</DialogTitle>
+    <DialogDescription>
+      This action cannot be undone. All your data will be permanently deleted.
+    </DialogDescription>
+  </DialogContent>
+</Dialog>
+```
+
+## Usage Patterns
+
+### ✅ DO
+- **Low trust:** Quick confirmations, save draft (size=sm, minimal friction)
+- **Medium trust:** Publish content, moderate consequences (clear context)
+- **High trust:** Payments, significant impact (detailed explanation)
+- **Critical trust:** Account deletion, permanent loss (progressive confirmation)
+
+### ❌ NEVER
+- Routine actions that don't need interruption
+- Non-essential interruptions that break user flow
+- Overuse of modal patterns for simple tasks
+
+## Size Variants
+
+Dialog size should match cognitive complexity:
+
+| Size | Width | Use Case | Cognitive Load |
+|------|-------|----------|----------------|
+| `sm` | max-w-sm | Quick confirmations, simple actions | Low |
+| `md` | max-w-md | Standard dialogs, moderate content | Medium |
+| `lg` | max-w-lg | Complex forms, detailed explanations | High |
+| `xl` | max-w-2xl | Rich content, multiple steps | Very High |
+| `full` | 95vw × 95vh | Immersive experiences, full-screen | Maximum |
+
+## Component Structure
+
+```tsx
+<Dialog>
+  <DialogTrigger asChild>
+    <Button>Open Dialog</Button>
+  </DialogTrigger>
+  
+  <DialogContent trustLevel="medium">
+    <DialogHeader>
+      <DialogTitle>Dialog Title</DialogTitle>
+      <DialogDescription>
+        Clear explanation of what this dialog does.
+      </DialogDescription>
+    </DialogHeader>
+    
+    {/* Dialog content */}
+    
+    <DialogFooter>
+      <DialogClose asChild>
+        <Button variant="outline">Cancel</Button>
+      </DialogClose>
+      <Button>Confirm</Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+```
+
+## Accessibility Features
+
+- **Focus Trapping:** Focus stays within dialog until dismissed
+- **Escape Key:** Always available escape hatch
+- **Backdrop Dismissal:** Click outside to close (non-destructive actions)
+- **Screen Reader Support:** Proper ARIA attributes and announcements
+- **Keyboard Navigation:** Tab order and focus management
+
+## Trust-Building Visual Patterns
+
+The Dialog component includes visual cues that build user confidence:
+
+| Trust Level | Visual Indicators |
+|-------------|------------------|
+| **Low** | Standard borders, minimal visual weight |
+| **Medium** | Subtle primary border hints |
+| **High** | Enhanced borders, increased shadow |
+| **Critical** | Strong border emphasis, enhanced shadows |
+| **Destructive** | Warning-colored borders and shadows |
+
+## Cognitive Complexity Management
+
+Dialog spacing and layout adapt to content complexity:
+
+| Complexity | Padding | Gap | Use Case |
+|------------|---------|-----|----------|
+| **Simple** | 16px | 12px | Yes/No confirmations |
+| **Moderate** | 24px | 16px | Forms with explanation |
+| **Complex** | 32px | 24px | Multi-step processes |
+
+## Animation and Motion
+
+Dialogs use trust-building animation patterns:
+- **Smooth entrance:** Reduces cognitive jarring with fade-in and gentle zoom
+- **Backdrop blur:** Creates focus without harsh visual breaks
+- **Consistent timing:** Predictable animation duration builds confidence
+
+## Error Handling
+
+For critical dialogs, implement progressive confirmation:
+
+```tsx
+<DialogContent trustLevel="critical" destructive>
+  <DialogTitle>Delete Account</DialogTitle>
+  <DialogDescription>
+    Type "DELETE" to confirm account deletion.
+  </DialogDescription>
+  <Input 
+    placeholder="Type DELETE to confirm"
+    onChange={(e) => setConfirmation(e.target.value)}
+  />
+  <DialogFooter>
+    <Button 
+      variant="destructive" 
+      disabled={confirmation !== "DELETE"}
+    >
+      Delete Account
+    </Button>
+  </DialogFooter>
+</DialogContent>
+```
+
+## Design System Integration
+
+- **Motion Tokens:** Uses design system motion tokens for consistent animations
+- **Trust Patterns:** Visual hierarchy based on consequence levels
+- **Focus Management:** Radix UI primitives ensure accessibility
+- **Escape Hatches:** Multiple ways to dismiss (ESC, backdrop, close button)
+
+The Dialog component balances user agency with necessary interruption, providing clear escape hatches while ensuring important decisions receive appropriate attention and consideration.

@@ -230,8 +230,8 @@ export function transformImports(
     // If componentsDir is not the standard "./src/components/ui", adjust the relative path
     if (componentsDir !== './src/components/ui') {
       // Calculate the relative path from componentsDir to src/lib/utils
-      const srcLibPath = join(cwd, 'src/lib');
-      const componentsDirPath = join(cwd, componentsDir);
+      const _srcLibPath = join(cwd, 'src/lib');
+      const _componentsDirPath = join(cwd, componentsDir);
 
       // Simple heuristic: if componentsDir is deeper, add more "../"
       const relativeDepth = componentsDir.split('/').length - 2; // -2 for "./" and "src"

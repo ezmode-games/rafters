@@ -1,4 +1,3 @@
-import type { Mock } from 'vitest';
 import { describe, expect, it, vi } from 'vitest';
 import { ClaudeClient } from '../../../../lib/ai/claude/client';
 

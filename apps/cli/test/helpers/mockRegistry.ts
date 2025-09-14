@@ -5,8 +5,8 @@
  * the add command without relying on the live registry endpoints.
  */
 
-import { type Server, createServer } from 'node:http';
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import { createServer, type Server } from 'node:http';
 import type { ComponentManifest } from '@rafters/shared';
 
 // Mock button component for testing

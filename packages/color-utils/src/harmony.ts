@@ -455,13 +455,13 @@ function generateContrastBasedLightness(baseLightness: number): Record<string, n
 
     let calculatedL: number;
 
-    if (Number.parseInt(step) <= 400) {
+    if (Number.parseInt(step, 10) <= 400) {
       // Light scale (50-400): These should be light colors for use on dark backgrounds
       // High step numbers = higher contrast = lighter colors
       calculatedL = lightnessForContrast(targetRatio, BLACK_L, true);
 
       // Light steps should progress from very light (50) to medium-light (400)
-      const stepNum = Number.parseInt(step);
+      const stepNum = Number.parseInt(step, 10);
       if (stepNum === 50)
         calculatedL = 0.98; // Nearly white
       else if (stepNum === 100)
@@ -477,7 +477,7 @@ function generateContrastBasedLightness(baseLightness: number): Record<string, n
       calculatedL = lightnessForContrast(targetRatio, WHITE_L, false);
 
       // Dark steps should progress from medium-dark (600) to very dark (950)
-      const stepNum = Number.parseInt(step);
+      const stepNum = Number.parseInt(step, 10);
       if (stepNum === 600)
         calculatedL = 0.4; // Medium-dark
       else if (stepNum === 700)
@@ -556,7 +556,7 @@ export function generateOKLCHScale(baseColor: OKLCH): Record<string, OKLCH> {
 /**
  * Generate semantic color system with intelligent background/foreground suggestions - Pure OKLCH
  */
-function generateSemanticColorSystem(baseColor: OKLCH) {
+function _generateSemanticColorSystem(baseColor: OKLCH) {
   const suggestions = generateSemanticColorSuggestions(baseColor);
   const semanticSystem: {
     [K in keyof typeof suggestions]: {

@@ -4,11 +4,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import {
-  type AccessibilityAlert,
-  type SemanticMapping,
-  validateSemanticMappings,
-} from '../src/validation-alerts.js';
+import { type SemanticMapping, validateSemanticMappings } from '../src/validation-alerts.js';
 
 describe('Semantic Mapping Validation System', () => {
   // Test data representing user's right-click semantic assignments

@@ -285,7 +285,7 @@ Return JSON only:
 ```
 
 **What We DON'T Need from AI**:
-- ❌ Color theory (we have Leonardo math)
+- ❌ Color theory (we have Color Theroymath)
 - ❌ Harmonies (we have `generateHarmony()`)
 - ❌ Accessibility (we have WCAG/APCA functions)
 - ❌ Perceptual analysis (we have atmospheric/perceptual weight)
@@ -333,6 +333,12 @@ const semanticColors = generateSemanticColors(userColor, generateSemanticColorSu
 - **Highlight**: Analogous (subtle emphasis and cohesion)
 - **Surface**: Desaturated base (backgrounds)
 - **Neutral**: Optimal gray calculated from all harmonies
+- **Success**: semantic suggestion 1, success
+- **Info**: semantic suggestion 2, info
+- **Alert**: semantic suggestion 3, alert
+- **destructive**: semantic suggestion 1, destructive
+
+each family shall also have as noted above, complete tier 2 sematic state tokens based on the wcag contrast pairs. 
 
 ### Bootstrap Process (Populate Cache & Vector)
 **One-time generation of strategic color matrix**:

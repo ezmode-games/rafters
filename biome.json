@@ -1,29 +1,30 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.3/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.2.2/schema.json",
   "files": {
-    "ignore": [
-      "**/node_modules",
-      "**/dist",
-      "**/build",
-      "**/.next",
-      "**/.open-next",
-      "**/.wrangler",
-      "**/worker-configuration.d.ts",
-      "**/.react-router",
-      "**/*.css",
-      "**/*.d.ts",
-      "apps/cli/test/fixtures/**/*",
-      "apps/cli/test/fixtures/**/*.json",
-      "apps/cli/test/fixtures/**/*.ts",
-      "apps/cli/test/fixtures/**/*.tsx",
-      "apps/cli/test/fixtures/**/*.js",
-      "apps/cli/test/fixtures/**/*.jsx"
-    ]
+    "ignoreUnknown": false,
+    "includes": [
+      "**",
+      "!**/*.css",
+      "!**/*.d.ts",
+      "!**/*.astro",
+      "!**/dist/**/*",
+      "!**/build/**/*",
+      "!**/.next/**/*",
+      "!apps/cli/test/fixtures/**/*",
+      "!**/worker-configuration.d.ts",
+      "!**/token-cache.json",
+      "!**/.wrangler/**/*",
+      "!**/.astro/**/*",
+      "!**/test-results/**/*",
+      "!**/.vscode/**/*",
+      "!**/playwright/.cache/**/*"
+    ],
+    "maxSize": 10485760
   },
   "vcs": {
     "enabled": true,
     "clientKind": "git",
-    "useIgnoreFile": true
+    "useIgnoreFile": false
   },
   "linter": {
     "enabled": true,
@@ -31,6 +32,9 @@
       "recommended": true,
       "style": {
         "noNonNullAssertion": "off"
+      },
+      "correctness": {
+        "noUnusedVariables": "warn"
       }
     }
   },

@@ -1,5 +1,4 @@
 import type { OKLCH } from '@rafters/shared';
-import type { Mock } from 'vitest';
 import { describe, expect, it, vi } from 'vitest';
 import { generateCacheKey, generateColorIntelligence } from '../../../lib/color-intel/utils';
 

@@ -21,9 +21,7 @@ import {
   calculatePerceptualWeight,
   generateHarmony,
   generateOKLCHScale as generateLightnessScale,
-  generateRaftersHarmony,
   generateSemanticColorSuggestions,
-  generateSemanticColors,
 } from './harmony.js';
 
 /**

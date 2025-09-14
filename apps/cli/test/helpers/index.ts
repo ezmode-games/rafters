@@ -5,38 +5,37 @@
  * with real filesystem operations and actual project fixtures.
  */
 
-// Test app fixture management
-export {
-  createTempTestApp,
-  cleanupAllTempApps,
-  getAvailableFixtures,
-  validateTestAppStructure,
-} from './testApp.js';
+// Re-export types for convenience
+export type {
+  CLIRunOptions,
+  CLIRunResult,
+  FrameworkDetectionResult,
+  TestAppOptions,
+  TestFixtureInfo,
+} from '../types.js';
 
 // CLI command execution
 export {
-  runCLI,
-  runCLISuccessfully,
-  runCLIExpectingFailure,
   ensureCLIBuilt,
   getCLIVersion,
+  runCLI,
+  runCLIExpectingFailure,
+  runCLISuccessfully,
 } from './cliRunner.js';
 
 // Framework detection and validation
 export {
   detectFramework,
-  validateFrameworkDetection,
   getFrameworkPaths,
+  validateFrameworkDetection,
 } from './frameworkDetection.js';
 
 // Mock registry for testing
 export { MockRegistryServer } from './mockRegistry.js';
-
-// Re-export types for convenience
-export type {
-  TestAppOptions,
-  TestFixtureInfo,
-  CLIRunResult,
-  CLIRunOptions,
-  FrameworkDetectionResult,
-} from '../types.js';
+// Test app fixture management
+export {
+  cleanupAllTempApps,
+  createTempTestApp,
+  getAvailableFixtures,
+  validateTestAppStructure,
+} from './testApp.js';

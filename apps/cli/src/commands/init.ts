@@ -203,7 +203,7 @@ export async function initCommand(options: { yes?: boolean; config?: string } = 
         `Failed to fetch Studio tokens: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
       // Generate default tokens using generators
-      const tokens = generateAllTokens();
+      const tokens = await generateAllTokens();
       tokenSet = {
         id: 'default',
         name: 'Generated Design System',
@@ -212,7 +212,7 @@ export async function initCommand(options: { yes?: boolean; config?: string } = 
     }
   } else {
     // Generate default tokens using generators
-    const tokens = generateAllTokens();
+    const tokens = await generateAllTokens();
     tokenSet = {
       id: 'default',
       name: 'Generated Design System',

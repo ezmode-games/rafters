@@ -7,14 +7,12 @@
  */
 
 import {
-  calculateWCAGContrast,
   findAccessibleColor,
+  generateColorValue,
   generateOKLCHScale,
   meetsWCAGStandard,
 } from '@rafters/color-utils';
-import { generateColorValue } from '@rafters/color-utils';
 import type { ColorValue, OKLCH, Token } from '@rafters/shared';
-import { TokenRegistry } from '../registry.js';
 
 /**
  * Primary tone for grayscale generation (HSL: 240°, 5.3%, 26.1%)
@@ -49,7 +47,7 @@ function generateSystemGrayscale(primaryTone: OKLCH): Record<string, OKLCH> {
  * Generate semantic colors using harmony + contrast validation
  * Each semantic color is mathematically derived from primary and accessibility-tested
  */
-function generateSemanticColorsWithValidation(primaryColor: OKLCH): {
+function generateSemanticColorsWithValidation(_primaryColor: OKLCH): {
   success: OKLCH;
   warning: OKLCH;
   danger: OKLCH;

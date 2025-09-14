@@ -11,10 +11,8 @@
  * - No manual state management required
  */
 
-import { generateColorCacheKey, generateColorValue } from '@rafters/color-utils';
-import type { ColorValue, OKLCH } from '@rafters/shared';
-import { ColorValueSchema } from '../lib/color-intel/schema.js';
-import { generateColorIntelligence } from '../lib/color-intel/utils.js';
+import { generateColorCacheKey } from '@rafters/color-utils';
+import type { OKLCH } from '@rafters/shared';
 
 // Message structure from queue producer
 interface ColorMessage {
@@ -46,7 +44,7 @@ interface ProcessingStats {
  */
 async function processColorMessage(
   message: ColorMessage,
-  env: Env,
+  _env: Env,
   messageId: string
 ): Promise<{ success: boolean; error?: string; cacheKey?: string }> {
   try {
@@ -65,7 +63,7 @@ async function processColorMessage(
       throw new Error(`Color intel API failed: ${response.status}`);
     }
 
-    const colorData = await response.json();
+    const _colorData = await response.json();
     const cacheKey = generateColorCacheKey(message.oklch);
 
     console.log(`✅ Generated full intelligence: ${cacheKey}`);

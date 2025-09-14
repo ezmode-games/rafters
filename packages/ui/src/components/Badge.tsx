@@ -191,10 +191,8 @@ export function Badge({
   if (isInteractive && removable && onRemove) {
     // Single button solution with separated interaction zones (Sally's recommendation)
     return (
-      <div
-        ref={ref as React.ForwardedRef<HTMLDivElement>}
-        // biome-ignore lint/a11y/useSemanticElements: div with role="group" is more appropriate than fieldset for badge interaction grouping
-        role="group"
+      <fieldset
+        ref={ref as React.ForwardedRef<HTMLFieldSetElement>}
         aria-label={`${statusInfo.ariaLabel}${children ? `: ${children}` : ''} - clickable badge with remove option`}
         className={cn(
           'relative inline-flex items-center rounded-md text-xs font-medium select-none',
@@ -352,7 +350,7 @@ export function Badge({
           </span>
         </button>
         {renderChip()}
-      </div>
+      </fieldset>
     );
   }
 

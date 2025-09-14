@@ -1,0 +1,342 @@
+---
+/**
+ * ComponentPreview - Shadow DOM isolated component rendering for MDX
+ *
+ * Renders Rafters UI components in isolated Shadow DOM with proper styling
+ * Integrates with registry to pull component code and intelligence
+ */
+
+// Props defined inline for better type inference with Astro
+
+const {
+  component,
+  variant = 'default',
+  props = '{}',
+  showIntelligence = false,
+  height = '200px',
+  class: className = '',
+} = Astro.props;
+
+// Generate unique ID for this preview
+const previewId = `preview-${component}-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<div 
+  class={`component-preview-wrapper border rounded-lg p-4 ${className}`}
+  data-component={component}
+  data-variant={variant}
+>
+  {showIntelligence && (
+    <div class="preview-intelligence mb-3 text-sm text-gray-600">
+      <div class="intelligence-loading">Loading component intelligence...</div>
+    </div>
+  )}
+  
+  <div 
+    id={previewId}
+    class="preview-container bg-white border rounded"
+    style={`height: ${height}; position: relative;`}
+    data-props={props}
+  >
+    <div class="loading-state flex items-center justify-center h-full text-gray-500">
+      <div class="animate-spin w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+      <span class="ml-2">Loading {component} component...</span>
+    </div>
+  </div>
+  
+  <div class="preview-controls mt-2 flex gap-2 text-xs">
+    <button 
+      class="reload-btn px-2 py-1 bg-blue-100 hover:bg-blue-200 rounded"
+      data-preview-id={previewId}
+    >
+      Reload
+    </button>
+    <button 
+      class="view-code-btn px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded"
+      data-component={component}
+    >
+      View Code
+    </button>
+  </div>
+  
+  <!-- Error state (hidden by default) -->
+  <div class="error-state hidden mt-2 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+    <strong>Component Error:</strong>
+    <div class="error-message"></div>
+  </div>
+</div>
+
+<script define:vars={{ previewId, component, variant, props, showIntelligence }}>
+  /**
+   * Shadow DOM Component Preview System
+   * 
+   * Creates isolated rendering environment for Rafters components
+   * with proper style encapsulation and registry integration
+   */
+  
+  class ComponentPreview {
+    constructor(containerId, componentName, variantName, componentProps, showIntel) {
+      this.containerId = containerId;
+      this.componentName = componentName;
+      this.variant = variantName;
+      this.props = this.parseProps(componentProps);
+      this.showIntelligence = showIntel;
+      this.container = null;
+      this.shadowRoot = null;
+      this.componentData = null;
+      
+      this.init();
+    }
+    
+    parseProps(propsString) {
+      try {
+        return JSON.parse(propsString || '{}');
+      } catch (e) {
+        console.warn(`Failed to parse props for ${this.componentName}:`, e);
+        return {};
+      }
+    }
+    
+    async init() {
+      this.container = document.getElementById(this.containerId);
+      if (!this.container) {
+        console.error(`Preview container ${this.containerId} not found`);
+        return;
+      }
+      
+      try {
+        // Load component data from registry
+        await this.loadComponentData();
+        
+        // Create shadow DOM
+        this.createShadowDOM();
+        
+        // Load component intelligence if requested
+        if (this.showIntelligence) {
+          this.displayIntelligence();
+        }
+        
+        // Render component preview
+        this.renderComponent();
+        
+      } catch (error) {
+        this.showError(error);
+      }
+    }
+    
+    async loadComponentData() {
+      try {
+        const response = await fetch(`/registry/components/${this.componentName}.json`);
+        if (!response.ok) {
+          throw new Error(`Component ${this.componentName} not found in registry`);
+        }
+        this.componentData = await response.json();
+      } catch (error) {
+        throw new Error(`Failed to load component data: ${error.message}`);
+      }
+    }
+    
+    createShadowDOM() {
+      // Clear loading state
+      this.container.innerHTML = '';
+      
+      // Create shadow root
+      this.shadowRoot = this.container.attachShadow({ mode: 'open' });
+      
+      // Create isolated container
+      this.shadowRoot.innerHTML = `
+        <style>
+          /* Reset styles for isolation */
+          :host {
+            display: block;
+            width: 100%;
+            height: 100%;
+          }
+          
+          /* Basic component styling - would load from Rafters CSS */
+          .component-root {
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            font-family: system-ui, sans-serif;
+          }
+          
+          /* Minimal component styles for demo */
+          .rafters-button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            border: 1px solid transparent;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+          }
+          
+          .rafters-button.primary {
+            background-color: #3b82f6;
+            color: white;
+          }
+          
+          .rafters-button.primary:hover {
+            background-color: #2563eb;
+          }
+          
+          .rafters-button.secondary {
+            background-color: #f3f4f6;
+            color: #374151;
+            border-color: #d1d5db;
+          }
+          
+          .rafters-button.destructive {
+            background-color: #ef4444;
+            color: white;
+          }
+          
+          .rafters-container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 1rem;
+          }
+          
+          .rafters-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+          }
+          
+          .rafters-grid-item {
+            padding: 1rem;
+            background-color: #f9fafb;
+            border-radius: 0.375rem;
+            border: 1px solid #e5e7eb;
+          }
+        </style>
+        
+        <div class="component-root">
+          <div id="component-mount"></div>
+        </div>
+      `;
+    }
+    
+    renderComponent() {
+      const mountPoint = this.shadowRoot.getElementById('component-mount');
+      
+      // Simple component rendering based on registry data
+      const html = this.generateComponentHTML();
+      mountPoint.innerHTML = html;
+      
+      // Add event handlers if needed
+      this.attachEventHandlers(mountPoint);
+    }
+    
+    generateComponentHTML() {
+      const { name } = this.componentData;
+      const cognitive = this.componentData.meta?.rafters?.intelligence?.cognitiveLoad || 0;
+      
+      switch (name) {
+        case 'button':
+          return `
+            <button class="rafters-button ${this.variant}" data-cognitive-load="${cognitive}">
+              ${this.props.children || `${this.variant} Button`}
+            </button>
+          `;
+          
+        case 'container':
+          return `
+            <div class="rafters-container" data-cognitive-load="${cognitive}">
+              <p>Container component (Cognitive Load: ${cognitive}/10)</p>
+              <p>Invisible structure that reduces visual complexity</p>
+            </div>
+          `;
+          
+        case 'grid':
+          return `
+            <div class="rafters-grid" data-cognitive-load="${cognitive}">
+              <div class="rafters-grid-item">Grid Item 1</div>
+              <div class="rafters-grid-item">Grid Item 2</div>
+              <div class="rafters-grid-item">Grid Item 3</div>
+            </div>
+          `;
+          
+        default:
+          return `
+            <div class="component-placeholder" data-cognitive-load="${cognitive}">
+              <h3>${name} Component</h3>
+              <p>Cognitive Load: ${cognitive}/10</p>
+              <p>Variant: ${this.variant}</p>
+            </div>
+          `;
+      }
+    }
+    
+    attachEventHandlers(mountPoint) {
+      // Add basic interaction for buttons
+      const buttons = mountPoint.querySelectorAll('.rafters-button');
+      buttons.forEach(button => {
+        button.addEventListener('click', () => {
+          console.log(`${this.componentName} clicked with variant: ${this.variant}`);
+        });
+      });
+    }
+    
+    displayIntelligence() {
+      const intelligenceEl = this.container.closest('.component-preview-wrapper')
+        ?.querySelector('.preview-intelligence .intelligence-loading');
+      
+      if (intelligenceEl && this.componentData?.meta?.rafters?.intelligence) {
+        const intel = this.componentData.meta.rafters.intelligence;
+        intelligenceEl.innerHTML = `
+          <div class="space-y-1">
+            <div><strong>Cognitive Load:</strong> ${intel.cognitiveLoad}/10</div>
+            <div><strong>Attention:</strong> ${intel.attentionEconomics}</div>
+            <div><strong>Trust:</strong> ${intel.trustBuilding}</div>
+          </div>
+        `;
+      }
+    }
+    
+    showError(error) {
+      console.error('ComponentPreview error:', error);
+      
+      const wrapper = this.container.closest('.component-preview-wrapper');
+      const errorEl = wrapper?.querySelector('.error-state');
+      const messageEl = wrapper?.querySelector('.error-message');
+      
+      if (errorEl && messageEl) {
+        messageEl.textContent = error.message;
+        errorEl.classList.remove('hidden');
+      }
+      
+      // Fallback: show error in container
+      this.container.innerHTML = `
+        <div class="error-fallback flex items-center justify-center h-full text-red-600">
+          <div class="text-center">
+            <div class="font-semibold">Component Error</div>
+            <div class="text-sm">${error.message}</div>
+          </div>
+        </div>
+      `;
+    }
+  }
+  
+  // Initialize component preview when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      new ComponentPreview(previewId, component, variant, props, showIntelligence);
+    });
+  } else {
+    new ComponentPreview(previewId, component, variant, props, showIntelligence);
+  }
+  
+  // Add reload functionality
+  document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('reload-btn')) {
+      const targetPreviewId = e.target.dataset.previewId;
+      if (targetPreviewId === previewId) {
+        new ComponentPreview(previewId, component, variant, props, showIntelligence);
+      }
+    }
+  });
+</script>

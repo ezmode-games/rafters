@@ -4,12 +4,7 @@
 
 import type { OKLCH } from '@rafters/shared';
 import { describe, expect, it } from 'vitest';
-import {
-  calculateWCAGContrast,
-  generateAccessibilityMetadata,
-  meetsWCAGStandard,
-} from '../src/accessibility.js';
-import type { AccessibilityMetadata } from '../src/accessibility.js';
+import { generateAccessibilityMetadata, meetsWCAGStandard } from '../src/accessibility.js';
 
 describe('generateAccessibilityMetadata', () => {
   it('should generate contrast matrices for color scale', () => {

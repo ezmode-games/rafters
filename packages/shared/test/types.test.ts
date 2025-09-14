@@ -3,7 +3,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { type ColorValue, ColorValueSchema, type Token, TokenSchema } from '../src/types.js';
+import { ColorValueSchema, type Token, TokenSchema } from '../src/types.js';
 
 describe('ColorValueSchema', () => {
   it('should validate a valid color value structure', () => {
