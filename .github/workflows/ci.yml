@@ -90,19 +90,15 @@ jobs:
       - name: Run Full Preflight Check
         run: pnpm preflight
 
-  changeset-check:
-    name: Changeset Check
+  # Trigger release workflow after successful CI on main branch
+  trigger-release:
+    name: Trigger Release
+    needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-        with:
-          # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
-          fetch-depth: 0
-
-      - name: Fetch main branch
-        run: git fetch origin main:main
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -117,10 +113,22 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Check for changesets
+        id: changesets
         run: |
-          if [ -z "$(ls -A .changeset/ 2>/dev/null | grep -v README.md | grep -v config.json)" ]; then
-            echo "::warning::No changeset found. If this PR includes changes that should trigger a release, please add a changeset by running 'pnpm changeset' and committing the result."
+          if [ -n "$(ls -A .changeset/ 2>/dev/null | grep -v README.md | grep -v config.json)" ]; then
+            echo "has-changesets=true" >> $GITHUB_OUTPUT
+            echo "Changesets found - release workflow will handle publishing"
           else
-            echo "Changeset found ✅"
-            pnpm changeset:check
+            echo "has-changesets=false" >> $GITHUB_OUTPUT
+            echo "No changesets found - no release needed"
+          fi
+
+      - name: Summary
+        run: |
+          echo "## CI Complete" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Tests passed" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.changesets.outputs.has-changesets }}" = "true" ]; then
+            echo "- 📦 Changesets detected - release workflow will run" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ⏭️ No changesets - no release needed" >> $GITHUB_STEP_SUMMARY
           fi
