@@ -1,7 +1,8 @@
-name: CI
+name: CI Full
 
 on:
-  pull_request:
+  # Run comprehensive testing on main branch pushes
+  push:
     branches:
       - main
     paths-ignore:
@@ -9,14 +10,18 @@ on:
       - 'docs/**'
       - '.changeset/**.md'
       - 'LICENSE'
-  # Temporarily disabled push trigger to test release workflow
-  # push:
-  #   branches:
-  #     - main
+  # Manual trigger for comprehensive testing
+  workflow_dispatch:
+    inputs:
+      run_e2e:
+        description: 'Run E2E tests'
+        required: false
+        default: true
+        type: boolean
 
-# Cancel in-progress runs for the same PR
+# Cancel in-progress runs for the same workflow
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -82,18 +87,13 @@ jobs:
             pnpm --filter website exec playwright install --with-deps
           fi
 
-      - name: Run Preflight Check (Affected Only)
-        if: github.event_name == 'pull_request'
-        run: pnpm preflight:affected
-
       - name: Run Full Preflight Check
-        if: github.event_name != 'pull_request'
         run: pnpm preflight
 
   changeset-check:
     name: Changeset Check
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'push'
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4

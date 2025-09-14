@@ -1,6 +1,6 @@
-name: CI Fast
+name: CI
 
-# This workflow provides rapid feedback on PRs by only testing changed code
+# Fast feedback on PRs using Turbo's intelligent change detection
 on:
   pull_request:
     types: [opened, synchronize]
@@ -12,7 +12,7 @@ on:
       - '.gitignore'
 
 concurrency:
-  group: ci-fast-${{ github.event.pull_request.number }}
+  group: ci-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 env:
@@ -122,8 +122,8 @@ jobs:
           key: turbo-${{ runner.os }}-${{ github.sha }}
 
   # Status check that other workflows can depend on
-  ci-fast-status:
-    name: Fast CI Complete
+  ci-status:
+    name: CI Complete
     runs-on: ubuntu-latest
     needs: [quick-checks, test-affected]
     if: always()
@@ -131,10 +131,10 @@ jobs:
       - name: Report status
         run: |
           if [ "${{ needs.quick-checks.outputs.skip-tests }}" = "true" ]; then
-            echo "✅ CI Fast: Skipped (only docs/config changes)"
+            echo "CI: Skipped (only docs/config changes)"
           elif [ "${{ contains(needs.*.result, 'failure') }}" = "true" ]; then
-            echo "❌ CI Fast: Failed"
+            echo "CI: Failed"
             exit 1
           else
-            echo "✅ CI Fast: Passed"
+            echo "CI: Passed"
           fi
