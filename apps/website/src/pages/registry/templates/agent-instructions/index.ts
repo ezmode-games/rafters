@@ -44,7 +44,7 @@ Every component includes design reasoning:
 \`\`\`
 
 ## Resources
-- Component Registry: https://rafters.realhandy.tech/api/registry/components
+- Component Registry: https://rafters.realhandy.tech/registry/components
 - Design Intelligence: https://rafters.realhandy.tech
 - Documentation: https://rafters.realhandy.tech/docs
 
