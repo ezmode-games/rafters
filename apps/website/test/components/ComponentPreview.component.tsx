@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/experimental-ct-react';
 import React from 'react';
-import ComponentPreview from '../../src/components/ComponentPreview';
+import ComponentPreview from '../../src/components/ComponentPreview.tsx';
 
 /**
  * Playwright Component Tests for ComponentPreview
