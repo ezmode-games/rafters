@@ -1,0 +1,31 @@
+---
+export interface FAQItem {
+  question: string;
+  answer: string[];
+}
+
+export interface Props {
+  items: FAQItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<section class="faq">
+  {items.map((item: FAQItem) => (
+    <div class="faq-item mb-12">
+      <h2 class="text-2xl font-semibold mb-6">{item.question}</h2>
+      <div class="faq-answer">
+        {item.answer.map((paragraph: string) => (
+          <p class="mb-6" set:html={paragraph} />
+        ))}
+      </div>
+    </div>
+  ))}
+</section>
+
+<style>
+  .faq-answer a {
+    @apply underline;
+  }
+</style>

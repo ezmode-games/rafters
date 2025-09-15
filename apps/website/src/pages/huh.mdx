@@ -1,0 +1,104 @@
+---
+layout: '../layouts/BaseLayout.astro'
+title: 'Huh? – Rafters'
+description: 'Why another design system exists and how Rafters solves AI interface problems'
+---
+
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import FAQ from '../components/FAQ.astro';
+
+export const faqItems = [
+  {
+    question: "Wait, what's Rafters again?",
+    answer: [
+      "It's a design system built for AI agents. Instead of just giving you components, we capture the design reasoning behind every decision and make it machine-readable.",
+      "When AI builds interfaces using Rafters, it doesn't guess - it reads the embedded intelligence about cognitive load, attention economics, and trust patterns."
+    ]
+  },
+  {
+    question: "How is this different from shadcn/ui?",
+    answer: [
+      "shadcn/ui is a collection of copy-paste components. Rafters is a design system—a comprehensive set of standards, components, patterns, and guidelines that work together as a cohesive system.",
+      "Design systems provide the \"why\" behind design decisions, not just the \"what.\" Rafters takes this further by encoding design reasoning into machine-readable metadata that AI agents can understand and apply systematically.",
+      "Every component includes cognitive load ratings, attention economics patterns, and trust-building requirements. This embedded intelligence helps maintain design consistency and user experience quality at scale."
+    ]
+  },
+  {
+    question: "What's with the cognitive load ratings?",
+    answer: [
+      "Every component gets a rating from 0-10 based on how much mental effort it requires. A Container is 0/10 (invisible structure), a Button is 3/10 (simple action), a Dialog is 6/10 (interrupts flow).",
+      "AI agents can use these ratings to build interfaces that respect users' cognitive capacity and avoid overwhelming them."
+    ]
+  },
+  {
+    question: "Can I use this without AI?",
+    answer: [
+      "Absolutely! The components work perfectly for human developers too. The embedded intelligence just makes the design decisions more explicit and systematic.",
+      "Think of it as documentation that never gets out of sync because it's built into the components themselves."
+    ]
+  },
+  {
+    question: "What's in the registry?",
+    answer: [
+      "Component code, design intelligence metadata, usage patterns, accessibility requirements, and examples. Everything an AI agent needs to understand how to use components appropriately.",
+      "Check out <a href=\"/llms.txt\">llms.txt</a> for the AI-focused documentation, or browse the <a href=\"/docs/components\">component docs</a> for human-readable explanations."
+    ]
+  }
+];
+
+<main class="mx-auto max-w-4xl flex min-h-screen flex-col items-center justify-center gap-8 p-4">
+  <Header title="Huh?" titleClasses="text-4xl leading-3 tracking-wide" />
+
+  <article class="max-w-3xl font-sans text-lg leading-relaxed">
+
+    # Huh?
+
+    You're probably wondering why another design system exists. Here's the real story.
+
+    ## The Problem: AI Has No Taste
+
+    We tried everything. Built scrapers that collected the top 15,000 websites and their CSS. Fed massive vector databases full of design examples to AI models. Documented every design principle we could think of.
+
+    The AI didn't care. It would rush in, pattern match on surface-level similarities, and generate interfaces that looked technically correct but felt completely wrong. Bad spacing. Poor hierarchy. Accessibility violations. No sense of rhythm or proportion.
+
+    By the time anyone realized the AI had made a mess, it was too late. The damage was done.
+
+    ## The Insight: Stop Teaching Taste, Embed It
+
+    We realized we were solving the wrong problem. Instead of trying to teach AI aesthetic judgment (which may never work), we decided to embed human design intelligence directly into the system itself.
+
+    Every component carries embedded reasoning: cognitive load ratings, trust levels, accessibility guidance, usage context. Every token has mathematical relationships and semantic meaning. Every interaction pattern includes the human thinking behind it.
+
+    ## How It Works
+
+    **By default, it mostly works.** The mathematical spacing, semantic colors, and proper accessibility ratings mean even lazy implementations won't be disasters.
+
+    **Container and grid do the heavy lifting.** Good layout systems handle most visual structure automatically, so you can't mess up the fundamentals.
+
+    **Rich metadata when you need to think.** When someone says "this feels wrong" or "this is confusing," all the design intelligence is right there. Instead of guessing, you can look up the cognitive load, trust requirements, and usage patterns.
+
+    ## The Result
+
+    A design system that works even when you don't fully understand design. AI agents can build decent interfaces by default, then access human design intelligence when they need to make deeper decisions.
+
+    It's not about teaching machines taste. It's about making it impossible for them to exercise bad taste in the first place.
+
+    ## Why "Rafters"?
+
+    Rafters hold up buildings. They're structural, essential, mostly invisible - but everything depends on them being solid. Good design systems are the same way. They should work quietly in the background, supporting everything you build on top.
+
+    Plus, if you've ever tried to build something without proper structural support, you know how quickly it all falls apart. Same with interfaces built without design intelligence.
+
+    ## Still confused?
+
+    That's fair. We're trying to solve a problem most people don't even know exists yet. AI-generated interfaces are about to flood the world, and most of them are going to be terrible.
+
+    Rafters is our attempt to fix that before it becomes everyone's problem.
+
+    <FAQ items={faqItems} />
+
+  </article>
+
+  <Footer />
+</main>
