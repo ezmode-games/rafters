@@ -1,0 +1,123 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+/**
+ * Modal dialog component with focus management and escape patterns
+ *
+ * @registry-name dialog
+ * @registry-version 0.1.0
+ * @registry-status published
+ * @registry-path components/ui/Dialog.tsx
+ * @registry-type registry:component
+ *
+ * @cognitive-load 6/10 - Interrupts user flow, requires decision making
+ * @attention-economics Attention capture: modal=full attention, drawer=partial attention, popover=contextual attention
+ * @trust-building Clear close mechanisms, confirmation for destructive actions, non-blocking for informational content
+ * @accessibility Focus trapping, escape key handling, backdrop dismissal, screen reader announcements
+ * @semantic-meaning Usage patterns: modal=blocking workflow, drawer=supplementary, alert=urgent information
+ *
+ * @usage-patterns
+ * DO: Low trust - Quick confirmations, save draft (size=sm, minimal friction)
+ * DO: Medium trust - Publish content, moderate consequences (clear context)
+ * DO: High trust - Payments, significant impact (detailed explanation)
+ * DO: Critical trust - Account deletion, permanent loss (progressive confirmation)
+ * NEVER: Routine actions, non-essential interruptions
+ *
+ * @design-guides
+ * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
+ * - Cognitive Load: https://rafters.realhandy.tech/docs/llm/cognitive-load
+ * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
+ *
+ * @dependencies @radix-ui/react-dialog
+ *
+ * @example
+ * ```tsx
+ * // Critical trust dialog with confirmation
+ * <Dialog>
+ *   <DialogTrigger asChild>
+ *     <Button variant="destructive">Delete Account</Button>
+ *   </DialogTrigger>
+ *   <DialogContent trustLevel="critical" destructive>
+ *     <DialogTitle>Delete Account</DialogTitle>
+ *     <DialogDescription>This action cannot be undone.</DialogDescription>
+ *   </DialogContent>
+ * </Dialog>
+ * ```
+ */
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { cn } from '../lib/utils';
+// Root Dialog component
+export const Dialog = DialogPrimitive.Root;
+// Trigger component
+export const DialogTrigger = DialogPrimitive.Trigger;
+// Portal component for z-index management
+export const DialogPortal = DialogPrimitive.Portal;
+// Overlay with trust-building visual hierarchy
+export function DialogOverlay({ className, ref, ...props }) {
+    return (_jsx(DialogPrimitive.Overlay, { ref: ref, className: cn(
+        // Base overlay with trust-building opacity
+        'fixed inset-0 z-50 bg-background/80 backdrop-blur-sm', 
+        // Trust pattern: Smooth entrance reduces cognitive jarring
+        'data-[state=open]:animate-in data-[state=closed]:animate-out', 'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0', className), ...props }));
+}
+// Main Content component with intelligence patterns
+export function DialogContent({ className, children, trustLevel = 'medium', destructive = false, size = 'md', cognitiveComplexity = 'moderate', ref, ...props }) {
+    return (_jsxs(DialogPortal, { children: [_jsx(DialogOverlay, {}), _jsx(DialogPrimitive.Content, { ref: ref, className: cn(
+                // Base styles with trust-building visual hierarchy
+                'fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%]', 'bg-background border border-border rounded-lg shadow-lg', 'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring', 
+                // Trust-building: Enhanced borders for high-trust operations
+                trustLevel === 'critical' && 'border-2 border-primary/20 shadow-xl', trustLevel === 'high' && 'border-primary/10 shadow-lg', 
+                // Destructive actions get visual warning indicators
+                destructive && 'border-destructive/20 shadow-destructive/10', 
+                // Size variants for cognitive load management
+                {
+                    'w-full max-w-sm': size === 'sm',
+                    'w-full max-w-md': size === 'md',
+                    'w-full max-w-lg': size === 'lg',
+                    'w-full max-w-2xl': size === 'xl',
+                    'w-[95vw] max-w-none h-[95vh]': size === 'full',
+                }, 
+                // Cognitive complexity affects spacing
+                {
+                    'p-4 gap-3': cognitiveComplexity === 'simple',
+                    'p-6 gap-4': cognitiveComplexity === 'moderate',
+                    'p-8 gap-6': cognitiveComplexity === 'complex',
+                }, 
+                // Trust pattern: Smooth animations reduce cognitive jarring
+                'transition-all', 'motion-modal', 'data-[state=open]:animate-in data-[state=closed]:animate-out', 'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0', 'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95', 'data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]', 'data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]', className), ...props, children: children })] }));
+}
+// Header with trust-building hierarchy
+export function DialogHeader({ className, ref, ...props }) {
+    return (_jsx("div", { ref: ref, className: cn(
+        // Cognitive load optimization: Clear visual hierarchy
+        'flex flex-col space-y-2 text-center sm:text-left', 
+        // Trust pattern: Adequate spacing prevents rushed decisions
+        'mb-4', className), ...props }));
+}
+// Footer with action hierarchy and trust patterns
+export function DialogFooter({ className, ref, ...props }) {
+    return (_jsx("div", { ref: ref, className: cn(
+        // Trust pattern: Actions flow from low to high commitment (left to right)
+        'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', 
+        // Motor accessibility: Enhanced spacing for touch targets
+        'space-y-2 sm:space-y-0 pt-4', 
+        // Cognitive load: Clear separation from content
+        'border-t border-border/50 mt-6', className), ...props }));
+}
+// Title with semantic hierarchy
+export function DialogTitle({ className, ref, ...props }) {
+    return (_jsx(DialogPrimitive.Title, { ref: ref, className: cn(
+        // Cognitive load: Clear title hierarchy
+        'text-lg font-semibold leading-none tracking-tight', 
+        // Trust pattern: Titles establish context and confidence
+        'text-foreground', className), ...props }));
+}
+// Description with trust-building clarity
+export function DialogDescription({ className, ref, ...props }) {
+    return (_jsx(DialogPrimitive.Description, { ref: ref, className: cn(
+        // Trust pattern: Clear explanation reduces uncertainty
+        'text-sm text-muted-foreground leading-relaxed', 
+        // Cognitive load: Comfortable reading line height
+        'max-w-none', className), ...props }));
+}
+// Close button with escape hatch accessibility
+export const DialogClose = DialogPrimitive.Close;
+//# sourceMappingURL=Dialog.js.map

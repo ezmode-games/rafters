@@ -1,0 +1,57 @@
+{
+  "name": "@rafters/monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Rafters - Design intelligence system for AI agents",
+  "type": "module",
+  "packageManager": "pnpm@9.15.2",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "test": "turbo test",
+    "test:integration": "turbo test:integration",
+    "test:e2e": "turbo test:e2e",
+    "typecheck": "turbo typecheck",
+    "lint": "turbo lint",
+    "format": "turbo format",
+    "check": "turbo check",
+    "clean": "turbo clean && rm -rf node_modules",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "pnpm build && changeset publish",
+    "preflight": "turbo preflight",
+    "prepare": "lefthook install"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.4",
+    "@changesets/cli": "^2.27.10",
+    "@cloudflare/vitest-pool-workers": "^0.8.68",
+    "@cloudflare/workers-types": "^4.20250102.0",
+    "@types/node": "^20.19.1",
+    "lefthook": "^1.9.6",
+    "turbo": "^2.3.4",
+    "typescript": "^5.9.2",
+    "vite": "^7.0.6",
+    "vitest": "^3.2.4",
+    "wrangler": "^4.34.0"
+  },
+  "pnpm": {
+    "updateConfig": {
+      "ignoreDependencies": []
+    },
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "react": "19.x",
+        "react-dom": "19.x"
+      }
+    },
+    "overrides": {
+      "react": "^19.1.1",
+      "react-dom": "^19.1.1"
+    }
+  }
+}

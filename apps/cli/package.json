@@ -1,0 +1,73 @@
+{
+  "name": "@rafters/cli",
+  "version": "0.1.1",
+  "description": "AI-first design intelligence CLI for generating semantic design tokens and components",
+  "type": "module",
+  "private": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "rafters": "./dist/bin.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc --build",
+    "dev": "tsc --build --watch",
+    "test": "vitest run",
+    "test:preflight": "vitest run",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "pnpm build"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "catalog:",
+    "@types/fs-extra": "catalog:",
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "dependencies": {
+    "@rafters/shared": "workspace:*",
+    "@rafters/design-tokens": "workspace:*",
+    "@modelcontextprotocol/sdk": "^0.5.0",
+    "chalk": "^5.3.0",
+    "clsx": "catalog:",
+    "commander": "^12.1.0",
+    "execa": "^9.5.1",
+    "fs-extra": "catalog:",
+    "inquirer": "^12.1.0",
+    "ora": "^8.1.0",
+    "tailwind-merge": "catalog:",
+    "zod": "catalog:"
+  },
+  "keywords": [
+    "design-system",
+    "design-tokens",
+    "ai",
+    "cli",
+    "semantic-tokens",
+    "accessibility",
+    "design-intelligence"
+  ],
+  "author": "Sean Silvius",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/real-handy/rafters",
+    "directory": "apps/cli"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
