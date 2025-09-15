@@ -1,0 +1,44 @@
+{
+  "name": "@rafters/website",
+  "version": "1.0.0",
+  "description": "Rafters design system website deployed on Cloudflare Pages",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "vitest run",
+    "test:integration": "vitest run --config vitest.config.cloudflare.ts",
+    "test:e2e": "playwright test",
+    "test:preflight": "vitest run && vitest run --config vitest.config.cloudflare.ts && playwright test",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@rafters/ui": "workspace:*",
+    "@rafters/design-tokens": "workspace:*",
+    "@rafters/shared": "workspace:*",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.6.9",
+    "@playwright/test": "^1.50.1",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "wrangler": "catalog:"
+  },
+  "author": "Sean Silvius",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/real-handy/rafters",
+    "directory": "apps/website"
+  }
+}

@@ -5,8 +5,8 @@
  * proper AI agent consumption and accessibility compliance.
  */
 
-import { readFile, readdir, stat } from 'node:fs/promises';
-import { join, extname } from 'node:path';
+import { readdir, readFile, stat } from 'node:fs/promises';
+import { extname, join } from 'node:path';
 import { z } from 'zod';
 import type { ValidateOptions, ValidationResult } from '../types';
 
@@ -15,16 +15,20 @@ const TokenSchema = z.object({
   value: z.unknown(),
   category: z.string(),
   type: z.string(),
-  intelligence: z.object({
-    cognitiveLoad: z.number().min(1).max(10).optional(),
-    trustLevel: z.enum(['low', 'medium', 'high', 'critical']).optional(),
-    accessibility: z.object({
-      wcagLevel: z.enum(['A', 'AA', 'AAA']).optional(),
-      contrastRatio: z.number().optional(),
-      screenReader: z.boolean().optional(),
-    }).optional(),
-    semanticMeaning: z.string().optional(),
-  }).optional(),
+  intelligence: z
+    .object({
+      cognitiveLoad: z.number().min(1).max(10).optional(),
+      trustLevel: z.enum(['low', 'medium', 'high', 'critical']).optional(),
+      accessibility: z
+        .object({
+          wcagLevel: z.enum(['A', 'AA', 'AAA']).optional(),
+          contrastRatio: z.number().optional(),
+          screenReader: z.boolean().optional(),
+        })
+        .optional(),
+      semanticMeaning: z.string().optional(),
+    })
+    .optional(),
 });
 
 const TokenFileSchema = z.object({
@@ -54,7 +58,7 @@ export async function validateTokens(options: ValidateOptions): Promise<Validati
 
     // Read all token files
     const files = await readdir(path);
-    const tokenFiles = files.filter(file => extname(file) === '.json');
+    const tokenFiles = files.filter((file) => extname(file) === '.json');
 
     if (tokenFiles.length === 0) {
       errors.push('No token files found in directory');
@@ -86,7 +90,6 @@ export async function validateTokens(options: ValidateOptions): Promise<Validati
 
     // Validate intelligence coverage
     await validateIntelligenceCoverage(path, tokenFiles, warnings);
-
   } catch (error) {
     errors.push(`Validation error: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
@@ -147,11 +150,14 @@ async function validateTokenFile(
 
     // Validate metadata consistency
     if (tokenFile.metadata.count !== tokenFile.tokens.length) {
-      errors.push(`Token count mismatch in ${filePath}: metadata says ${tokenFile.metadata.count}, actual ${tokenFile.tokens.length}`);
+      errors.push(
+        `Token count mismatch in ${filePath}: metadata says ${tokenFile.metadata.count}, actual ${tokenFile.tokens.length}`
+      );
     }
-
   } catch (error) {
-    errors.push(`Failed to read/parse token file: ${filePath} - ${error instanceof Error ? error.message : 'Unknown error'}`);
+    errors.push(
+      `Failed to read/parse token file: ${filePath} - ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }
 
@@ -179,8 +185,12 @@ async function validateIntelligenceCoverage(
   const coverage = (tokensWithIntelligence / totalTokens) * 100;
 
   if (coverage < 50) {
-    warnings.push(`Low AI intelligence coverage: ${coverage.toFixed(1)}% (${tokensWithIntelligence}/${totalTokens})`);
+    warnings.push(
+      `Low AI intelligence coverage: ${coverage.toFixed(1)}% (${tokensWithIntelligence}/${totalTokens})`
+    );
   } else if (coverage < 80) {
-    warnings.push(`Moderate AI intelligence coverage: ${coverage.toFixed(1)}% - consider adding more intelligence metadata`);
+    warnings.push(
+      `Moderate AI intelligence coverage: ${coverage.toFixed(1)}% - consider adding more intelligence metadata`
+    );
   }
 }

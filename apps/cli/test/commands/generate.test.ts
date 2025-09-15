@@ -1,21 +1,28 @@
 /**
  * Tests for generate command
+ * Uses vi.mock() for external dependencies (file system, external packages)
+ * This is appropriate for command-level testing where we want to avoid side effects
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { promises as fs } from 'node:fs';
-import { generateTokens } from '../../src/commands/generate';
+import { mkdir, writeFile } from 'node:fs/promises';
 import * as designTokens from '@rafters/design-tokens';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { generateTokens } from '../../src/commands/generate';
 
-vi.mock('node:fs', () => ({
-  promises: {
-    writeFile: vi.fn(),
-    mkdir: vi.fn(),
-  },
+// Mock the specific fs functions used in the command
+// Using vi.mock() here is appropriate because:
+// 1. We're testing command-level functionality
+// 2. We want to prevent actual file system operations
+// 3. The command depends heavily on these external operations
+vi.mock('node:fs/promises', () => ({
+  writeFile: vi.fn().mockResolvedValue(undefined),
+  mkdir: vi.fn().mockResolvedValue(undefined),
 }));
 
+// Mock external package to avoid complex token generation in tests
+// This ensures tests focus on the command logic, not token generation details
 vi.mock('@rafters/design-tokens', () => ({
-  generateAllTokens: vi.fn(),
+  generateAllTokens: vi.fn().mockResolvedValue([]),
 }));
 
 describe('generateTokens', () => {
@@ -56,27 +63,27 @@ describe('generateTokens', () => {
     });
 
     // Should create output directory
-    expect(fs.mkdir).toHaveBeenCalledWith('./test-tokens', { recursive: true });
+    expect(mkdir).toHaveBeenCalledWith('./test-tokens', { recursive: true });
 
     // Should write category files
-    expect(fs.writeFile).toHaveBeenCalledWith(
+    expect(writeFile).toHaveBeenCalledWith(
       expect.stringContaining('color.json'),
       expect.stringContaining('"primary"')
     );
 
-    expect(fs.writeFile).toHaveBeenCalledWith(
+    expect(writeFile).toHaveBeenCalledWith(
       expect.stringContaining('spacing.json'),
       expect.stringContaining('"space-md"')
     );
 
     // Should write combined tokens file
-    expect(fs.writeFile).toHaveBeenCalledWith(
+    expect(writeFile).toHaveBeenCalledWith(
       expect.stringContaining('tokens.json'),
       expect.stringContaining('"totalTokens": 2')
     );
 
     // Should write TypeScript definitions
-    expect(fs.writeFile).toHaveBeenCalledWith(
+    expect(writeFile).toHaveBeenCalledWith(
       expect.stringContaining('tokens.d.ts'),
       expect.stringContaining('export type TokenCategory')
     );
@@ -90,8 +97,8 @@ describe('generateTokens', () => {
       config: './test-config.js',
     });
 
-    expect(fs.mkdir).toHaveBeenCalledWith('./empty-tokens', { recursive: true });
-    expect(fs.writeFile).toHaveBeenCalledWith(
+    expect(mkdir).toHaveBeenCalledWith('./empty-tokens', { recursive: true });
+    expect(writeFile).toHaveBeenCalledWith(
       expect.stringContaining('tokens.json'),
       expect.stringContaining('"totalTokens": 0')
     );
@@ -112,12 +119,12 @@ describe('generateTokens', () => {
     });
 
     // Should write separate files for each category
-    expect(fs.writeFile).toHaveBeenCalledWith(
+    expect(writeFile).toHaveBeenCalledWith(
       expect.stringContaining('color.json'),
       expect.stringMatching(/"tokens":\s*\[\s*{[^}]*"name":\s*"red"/)
     );
 
-    expect(fs.writeFile).toHaveBeenCalledWith(
+    expect(writeFile).toHaveBeenCalledWith(
       expect.stringContaining('spacing.json'),
       expect.stringMatching(/"tokens":\s*\[\s*{[^}]*"name":\s*"sm"/)
     );

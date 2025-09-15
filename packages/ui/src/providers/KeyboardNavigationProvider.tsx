@@ -503,7 +503,9 @@ export const KeyboardNavigationProvider: React.FC<KeyboardNavigationProviderProp
 
       try {
         handler.onAction?.(action, event);
-        onGlobalKeyAction?.(action, menuId, event!);
+        if (event) {
+          onGlobalKeyAction?.(action, menuId, event);
+        }
         return true;
       } catch (error) {
         console.warn('Keyboard action failed:', error);

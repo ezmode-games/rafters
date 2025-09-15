@@ -70,4 +70,4 @@ export const ASCII_LOGO = `
 `;
 
 // Export React components from separate file
-export * from './components.js';
+export * from './components.tsx';

@@ -6,7 +6,7 @@ packages:
 catalog:
   # Core TypeScript toolchain
   typescript: 5.9.2
-  '@types/node': 20.19.1
+  '@types/node': 24.4.0
 
   # Build tools optimized for Workers
   vite: ^7.0.6
@@ -22,7 +22,7 @@ catalog:
   '@testing-library/user-event': ^14.6.1
   '@playwright/test': ^1.55.0
   '@playwright/experimental-ct-react': ^1.55.0
-  '@cloudflare/vitest-pool-workers': ^0.8.68
+  '@cloudflare/vitest-pool-workers': ^0.9.1
   jsdom: ^26.1.0
 
   # React 19 ecosystem
@@ -53,6 +53,18 @@ catalog:
 
   # Anthropic SDK for AI features
   '@anthropic-ai/sdk': ^0.60.0
+
+  # Next.js for websites
+  next: ^15.2.6
+  '@next/mdx': ^15.2.6
+  '@mdx-js/react': ^3.2.0
+  '@mdx-js/loader': ^3.2.0
+
+  # Color utilities
+  colorjs.io: ^0.5.2
+  apca-w3: ^0.1.9
+  chroma-js: ^2.6.0
+  '@types/chroma-js': ^2.4.4
 
 # Native dependencies that must be built
 onlyBuiltDependencies:

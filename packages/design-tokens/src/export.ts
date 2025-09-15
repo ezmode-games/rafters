@@ -125,7 +125,7 @@ export function exportToTailwindCSS(registry: TokenRegistry): string {
     if (!tokensByCategory.has(category)) {
       tokensByCategory.set(category, []);
     }
-    tokensByCategory.get(category)!.push(token);
+    tokensByCategory.get(category)?.push(token);
   }
 
   // Process each category with proper Tailwind v4 naming
@@ -149,7 +149,7 @@ export function exportToTailwindCSS(registry: TokenRegistry): string {
             scaleTokens.set(baseTokenName, []);
           }
           if (baseTokenName) {
-            scaleTokens.get(baseTokenName)!.push(token);
+            scaleTokens.get(baseTokenName)?.push(token);
           }
         } else if (!rule || !rule.startsWith('state:')) {
           // This is a base token or standalone token
@@ -318,7 +318,7 @@ export function exportToCSSVariables(registry: TokenRegistry): string {
     if (!tokensByCategory.has(token.category)) {
       tokensByCategory.set(token.category, []);
     }
-    tokensByCategory.get(token.category)!.push(token);
+    tokensByCategory.get(token.category)?.push(token);
   }
 
   for (const [category, categoryTokens] of tokensByCategory.entries()) {

@@ -350,7 +350,7 @@ export function cn(...inputs: ClassValue[]) {
 
     // Install complete design system CSS
     if (answers.tokenFormat === 'css' || answers.tokenFormat === 'tailwind') {
-      const cssResult = await injectCSSImport(config.cssFile!, cwd);
+      const cssResult = await injectCSSImport(config.cssFile ?? '', cwd);
 
       if (cssResult.action === 'replaced' && cssResult.backupPath) {
         console.log(`Backed up existing ${config.cssFile} to ${cssResult.backupPath}`);

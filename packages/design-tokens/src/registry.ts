@@ -157,6 +157,27 @@ export class TokenRegistry {
   }
 
   /**
+   * Public method to add a token to the registry
+   */
+  add(token: Token): void {
+    this.addToken(token);
+  }
+
+  /**
+   * Remove a token from the registry
+   */
+  remove(tokenName: string): boolean {
+    return this.tokens.delete(tokenName);
+  }
+
+  /**
+   * Clear all tokens from the registry
+   */
+  clear(): void {
+    this.tokens.clear();
+  }
+
+  /**
    * Enrich a color token with intelligence from the API
    * This is async and should be called after initial registry creation
    */
@@ -270,8 +291,22 @@ export class TokenRegistry {
     return this.tokens.has(tokenName);
   }
 
-  list(): Token[] {
-    return Array.from(this.tokens.values());
+  list(filter?: { category?: string; namespace?: string }): Token[] {
+    const allTokens = Array.from(this.tokens.values());
+
+    if (!filter) {
+      return allTokens;
+    }
+
+    return allTokens.filter((token) => {
+      if (filter.category && token.category !== filter.category) {
+        return false;
+      }
+      if (filter.namespace && token.namespace !== filter.namespace) {
+        return false;
+      }
+      return true;
+    });
   }
 
   size(): number {

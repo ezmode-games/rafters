@@ -1,11 +1,24 @@
 /**
  * Tests for validate command
+ * Uses vi.mock() for file system operations to prevent actual file access
+ * This is appropriate for command-level testing where we control the file system state
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { promises as fs } from 'node:fs';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { validateTokens } from '../../src/commands/validate';
 
+// Mock fs.Stats for testing
+interface MockStats {
+  isDirectory: () => boolean;
+  isFile: () => boolean;
+}
+
+// Mock file system operations to control test environment
+// Using vi.mock() here is appropriate because:
+// 1. We're testing command-level file validation functionality
+// 2. We need to simulate different file system states
+// 3. We want to prevent actual file system access during tests
 vi.mock('node:fs', () => ({
   promises: {
     readFile: vi.fn(),
@@ -20,7 +33,10 @@ describe('validateTokens', () => {
   });
 
   it('should validate valid token files successfully', async () => {
-    vi.mocked(fs.stat).mockResolvedValue({ isDirectory: () => true } as any);
+    vi.mocked(fs.stat).mockResolvedValue({
+      isDirectory: () => true,
+      isFile: () => false,
+    } as MockStats);
     vi.mocked(fs.readdir).mockResolvedValue(['color.json', 'spacing.json']);
 
     const validTokenFile = {
@@ -61,7 +77,10 @@ describe('validateTokens', () => {
   });
 
   it('should detect invalid token file structure', async () => {
-    vi.mocked(fs.stat).mockResolvedValue({ isDirectory: () => true } as any);
+    vi.mocked(fs.stat).mockResolvedValue({
+      isDirectory: () => true,
+      isFile: () => false,
+    } as MockStats);
     vi.mocked(fs.readdir).mockResolvedValue(['invalid.json']);
 
     const invalidTokenFile = {
@@ -79,7 +98,10 @@ describe('validateTokens', () => {
   });
 
   it('should warn about missing AI intelligence metadata', async () => {
-    vi.mocked(fs.stat).mockResolvedValue({ isDirectory: () => true } as any);
+    vi.mocked(fs.stat).mockResolvedValue({
+      isDirectory: () => true,
+      isFile: () => false,
+    } as MockStats);
     vi.mocked(fs.readdir).mockResolvedValue(['color.json']);
 
     const tokenFileWithoutIntelligence = {
@@ -111,7 +133,10 @@ describe('validateTokens', () => {
   });
 
   it('should warn about low contrast ratios', async () => {
-    vi.mocked(fs.stat).mockResolvedValue({ isDirectory: () => true } as any);
+    vi.mocked(fs.stat).mockResolvedValue({
+      isDirectory: () => true,
+      isFile: () => false,
+    } as MockStats);
     vi.mocked(fs.readdir).mockResolvedValue(['color.json']);
 
     const tokenFileWithLowContrast = {
@@ -143,7 +168,7 @@ describe('validateTokens', () => {
     const result = await validateTokens({ path: './tokens' });
 
     expect(result.valid).toBe(true);
-    expect(result.warnings.some(w => w.includes('low contrast ratio'))).toBe(true);
+    expect(result.warnings.some((w) => w.includes('low contrast ratio'))).toBe(true);
   });
 
   it('should handle directory not found', async () => {
@@ -156,7 +181,10 @@ describe('validateTokens', () => {
   });
 
   it('should handle empty token directory', async () => {
-    vi.mocked(fs.stat).mockResolvedValue({ isDirectory: () => true } as any);
+    vi.mocked(fs.stat).mockResolvedValue({
+      isDirectory: () => true,
+      isFile: () => false,
+    } as MockStats);
     vi.mocked(fs.readdir).mockResolvedValue([]);
 
     const result = await validateTokens({ path: './empty' });

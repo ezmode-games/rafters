@@ -5,7 +5,7 @@
  * using the design-tokens package generators.
  */
 
-import { writeFile, mkdir } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { generateAllTokens } from '@rafters/design-tokens';
 import type { Token } from '@rafters/shared';
@@ -34,8 +34,8 @@ export async function generateTokens(options: GenerateOptions): Promise<void> {
       metadata: {
         count: categoryTokens.length,
         aiIntelligence: true,
-        semanticTokens: true
-      }
+        semanticTokens: true,
+      },
     };
 
     await writeFile(filePath, JSON.stringify(fileContent, null, 2));
@@ -51,8 +51,8 @@ export async function generateTokens(options: GenerateOptions): Promise<void> {
       totalTokens: tokens.length,
       categories: Object.keys(tokensByCategory),
       aiIntelligence: true,
-      semanticTokens: true
-    }
+      semanticTokens: true,
+    },
   };
 
   await writeFile(combinedPath, JSON.stringify(combinedContent, null, 2));
@@ -111,7 +111,7 @@ export interface CombinedTokens {
   };
 }
 
-export type TokenCategory = ${categories.map(cat => `'${cat}'`).join(' | ')};
+export type TokenCategory = ${categories.map((cat) => `'${cat}'`).join(' | ')};
 
 declare const tokens: CombinedTokens;
 export default tokens;

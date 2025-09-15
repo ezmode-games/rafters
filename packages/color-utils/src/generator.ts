@@ -50,9 +50,21 @@ export function generateColorValue(baseColor: OKLCH, context: ColorContext = {})
 
   // Convert Record<number, OKLCH> to ordered OKLCH array (already rounded from harmony)
   // Base color now positioned at 600 for balanced tint/shade distribution
-  const scaleKeys = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'] as const;
+  const scaleKeys = [
+    '50',
+    '100',
+    '200',
+    '300',
+    '400',
+    '500',
+    '600',
+    '700',
+    '800',
+    '900',
+    '950',
+  ] as const;
   const scale: OKLCH[] = scaleKeys
-    .map(key => scaleRecord[key])
+    .map((key) => scaleRecord[key])
     .filter((color): color is OKLCH => color !== undefined);
 
   // Generate descriptive color name (or use provided name) using validated color

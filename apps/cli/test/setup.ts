@@ -2,7 +2,7 @@
  * Test setup for CLI package
  */
 
-import { beforeEach } from 'vitest';
+import { beforeEach, vi } from 'vitest';
 
 beforeEach(() => {
   // Reset any global state between tests

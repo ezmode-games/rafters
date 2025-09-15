@@ -4,13 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [
-        "dist/**",
-        ".next/**",
-        "!.next/cache/**",
-        "build/**",
-        "out/**"
-      ],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "build/**", "out/**"],
       "env": ["NODE_ENV", "NEXT_PUBLIC_*", "VITE_*", "PUBLIC_*"]
     },
     "dev": {
@@ -20,16 +14,28 @@
     },
     "test": {
       "dependsOn": ["^build"],
-      "outputs": ["coverage/**"],
+      "outputs": ["coverage/**", "test-results/**"],
       "cache": false,
       "interactive": true,
+      "env": ["NODE_ENV", "CI"],
+      "persistent": false
+    },
+    "test:unit": {
+      "dependsOn": ["^typecheck"],
+      "outputs": ["coverage/unit/**", "test-results/**"],
+      "cache": true,
       "env": ["NODE_ENV", "CI"]
     },
     "test:integration": {
       "dependsOn": ["^build"],
-      "outputs": ["coverage/**"],
+      "outputs": ["coverage/integration/**", "test-results/**"],
       "cache": false,
-      "interactive": true,
+      "env": ["NODE_ENV", "CI", "RAFTERS_INTEL"]
+    },
+    "test:component": {
+      "dependsOn": ["^build"],
+      "outputs": ["playwright-report-components/**", "test-results/**", "coverage/component/**"],
+      "cache": false,
       "env": ["NODE_ENV", "CI"]
     },
     "test:e2e": {
@@ -38,6 +44,23 @@
       "cache": false,
       "interactive": true,
       "env": ["NODE_ENV", "CI", "BASE_URL"]
+    },
+    "test:watch": {
+      "cache": false,
+      "persistent": true,
+      "interactive": true
+    },
+    "test:coverage": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"],
+      "cache": true,
+      "env": ["NODE_ENV", "CI"]
+    },
+    "test:benchmark": {
+      "dependsOn": ["^build"],
+      "outputs": ["benchmark-results/**"],
+      "cache": true,
+      "env": ["NODE_ENV"]
     },
     "typecheck": {
       "dependsOn": ["^typecheck"],
@@ -61,9 +84,10 @@
       "cache": false
     },
     "preflight": {
-      "dependsOn": ["typecheck", "lint", "test", "test:integration"],
-      "outputs": [],
-      "cache": false
+      "dependsOn": ["typecheck", "lint", "test:unit", "test:integration", "test:component"],
+      "outputs": ["test-results/**", "coverage/**"],
+      "cache": false,
+      "env": ["NODE_ENV", "CI"]
     }
   }
 }

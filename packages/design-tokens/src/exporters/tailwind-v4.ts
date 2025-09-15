@@ -63,7 +63,7 @@ function generateThemeBlock(registry: TokenRegistry): string[] {
     if (!tokensByCategory.has(category)) {
       tokensByCategory.set(category, []);
     }
-    tokensByCategory.get(category)!.push(token);
+    tokensByCategory.get(category)?.push(token);
   }
 
   // Add remaining tokens not in dependency graph
@@ -72,7 +72,11 @@ function generateThemeBlock(registry: TokenRegistry): string[] {
     if (!tokensByCategory.has(category)) {
       tokensByCategory.set(category, []);
     }
-    const categoryTokens = tokensByCategory.get(category)!;
+    const categoryTokens = tokensByCategory.get(category);
+    if (!categoryTokens) {
+      tokensByCategory.set(category, []);
+      continue;
+    }
     if (!categoryTokens.some((t) => t.name === token.name)) {
       categoryTokens.push(token);
     }

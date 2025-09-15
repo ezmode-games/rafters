@@ -2,7 +2,6 @@
  * CLI type definitions
  */
 
-
 export interface CLIConfig {
   output: string;
   colorApiUrl?: string;

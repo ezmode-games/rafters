@@ -21,20 +21,23 @@
     "test:preflight": "vitest run",
     "lint": "biome check .",
     "format": "biome format --write .",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "validate-standards": "tsx scripts/validate-standards.ts"
   },
   "devDependencies": {
-    "@types/fs-extra": "catalog:",
-    "@types/node": "catalog:",
-    "typescript": "catalog:",
-    "vitest": "catalog:"
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.19.1",
+    "glob": "^11.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "@rafters/color-utils": "workspace:*",
     "@rafters/shared": "workspace:*",
-    "fs-extra": "catalog:",
-    "sqids": "catalog:",
-    "zod": "catalog:"
+    "fs-extra": "^11.2.0",
+    "sqids": "^0.3.0",
+    "zod": "^3.24.1"
   },
   "author": "Sean Silvius",
   "license": "MIT",

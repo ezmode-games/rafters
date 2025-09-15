@@ -4,17 +4,47 @@
   "private": true,
   "description": "Rafters - Design intelligence system for AI agents",
   "type": "module",
-  "packageManager": "pnpm@9.15.2",
+  "packageManager": "pnpm@10.16.1",
   "engines": {
-    "node": ">=20.0.0",
-    "pnpm": ">=9.0.0"
+    "node": ">=22.0.0",
+    "pnpm": ">=10.0.0"
   },
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "test": "turbo test",
-    "test:integration": "turbo test:integration",
+
+    "// ===== MONOREPO TESTING ORCHESTRATION =====": "",
+    "test": "node scripts/test-orchestrator.mjs all",
+    "test:affected": "node scripts/test-orchestrator.mjs affected",
+    "test:unit": "vitest run --workspace",
+    "test:integration": "vitest run --workspace --config vitest.workspace.ts --project integration",
+    "test:component": "vitest run --workspace --config vitest.workspace.ts --project component",
     "test:e2e": "turbo test:e2e",
+    "test:progressive": "node scripts/test-orchestrator.mjs progressive",
+
+    "// Advanced Testing Commands": "",
+    "test:watch": "vitest --workspace --config vitest.workspace.ts",
+    "test:coverage": "vitest run --workspace --coverage",
+    "test:coverage:unit": "vitest run --workspace --coverage --project unit",
+    "test:coverage:integration": "vitest run --workspace --coverage --project integration",
+    "test:ui": "vitest --workspace --ui",
+    "test:reporter": "vitest run --workspace --reporter=verbose --reporter=json --outputFile=test-results/results.json",
+
+    "// Performance Testing": "",
+    "test:performance": "vitest run --workspace --config vitest.workspace.ts --reporter=json | node scripts/performance-analyzer.mjs",
+    "test:memory": "node --expose-gc scripts/memory-test-runner.mjs",
+    "test:benchmark": "vitest bench --workspace",
+
+    "// CI/CD Testing Commands": "",
+    "test:ci": "vitest run --workspace --coverage --reporter=junit --reporter=github-actions",
+    "test:ci:sharded": "vitest run --workspace --shard=${SHARD_INDEX:-1}/${SHARD_COUNT:-1}",
+    "test:ci:parallel": "vitest run --workspace --pool=threads --poolOptions.threads.maxThreads=${MAX_THREADS:-4}",
+
+    "// Future-Ready Commands": "",
+    "test:ai-insights": "node scripts/ai-test-analyzer.mjs",
+    "test:distributed": "node scripts/distributed-test-coordinator.mjs",
+    "test:smart": "node scripts/smart-test-selector.mjs",
+
     "typecheck": "turbo typecheck",
     "lint": "turbo lint",
     "format": "turbo format",
