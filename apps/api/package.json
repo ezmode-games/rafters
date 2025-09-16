@@ -23,7 +23,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.6.9",
+    "@cloudflare/vitest-pool-workers": "^0.9.1",
     "typescript": "catalog:",
     "vitest": "catalog:",
     "wrangler": "catalog:"
