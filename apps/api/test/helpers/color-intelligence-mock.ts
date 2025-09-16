@@ -10,7 +10,7 @@ export function mockColorIntelligence(oklch: OKLCH): ColorIntelligenceResponse |
   const rounded = roundOKLCH(oklch);
   const key = `oklch(${rounded.l}, ${rounded.c}, ${rounded.h})`;
 
-  return fixtures[key as keyof typeof fixtures] || null;
+  return (fixtures[key as keyof typeof fixtures] as ColorIntelligenceResponse) || null;
 }
 
 /**

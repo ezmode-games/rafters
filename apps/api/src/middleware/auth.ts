@@ -76,7 +76,7 @@ export function requireApiKey() {
     }
 
     // Valid API key, proceed to next middleware/handler
-    await next();
+    return await next();
   };
 }
 

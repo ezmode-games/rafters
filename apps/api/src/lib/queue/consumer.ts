@@ -5,6 +5,7 @@
  * Uses internal HTTP requests through the main Hono app.
  */
 
+import type { ColorValue } from '@rafters/shared';
 import type { Hono } from 'hono';
 import type { ColorSeedMessage } from './publisher';
 
@@ -16,6 +17,95 @@ interface CloudflareBindings {
   CLAUDE_GATEWAY_URL: string;
   COLOR_SEED_QUEUE: Queue;
   SEED_QUEUE_API_KEY: string;
+}
+
+/**
+ * Create request for color-intel API
+ */
+export function createColorIntelRequest(message: ColorSeedMessage): Request {
+  const { oklch, token, name } = message;
+  const requestBody = JSON.stringify({ oklch, token, name });
+  return new Request('http://internal/api/color-intel', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: requestBody,
+  });
+}
+
+/**
+ * Determine if response is successful
+ */
+export function isSuccessResponse(status: number): boolean {
+  return status === 200;
+}
+
+/**
+ * Handle successful response
+ */
+export function handleSuccessResponse(
+  message: Message<ColorSeedMessage>,
+  colorData: ColorValue
+): void {
+  console.log(
+    `Processed color seed: ${colorData.name || 'processed'} - ${colorData.intelligence?.suggestedName || 'unnamed'}`
+  );
+  message.ack();
+}
+
+/**
+ * Handle error response
+ */
+export function handleErrorResponse(
+  message: Message<ColorSeedMessage>,
+  error: Error | unknown
+): void {
+  console.error('Failed to process color seed message:', error);
+  message.retry();
+}
+
+/**
+ * Create error for failed API response
+ */
+export function createApiError(status: number, errorText: string): Error {
+  return new Error(`Color-intel API returned ${status}: ${errorText}`);
+}
+
+/**
+ * Process single message
+ */
+export async function processSingleMessage(
+  message: Message<ColorSeedMessage>,
+  app: Hono<{ Bindings: CloudflareBindings }>,
+  env: CloudflareBindings
+): Promise<{ success: boolean; message: Message<ColorSeedMessage>; error?: unknown }> {
+  try {
+    const request = createColorIntelRequest(message.body);
+    const result = await app.fetch(request, env);
+
+    if (isSuccessResponse(result.status)) {
+      const colorData = (await result.json()) as ColorValue;
+      handleSuccessResponse(message, colorData);
+      return { success: true, message };
+    } else {
+      const errorText = await result.text();
+      throw createApiError(result.status, errorText);
+    }
+  } catch (error) {
+    handleErrorResponse(message, error);
+    return { success: false, message, error };
+  }
+}
+
+/**
+ * Utility: Split array into chunks for controlled concurrency
+ * Optimized for Workers memory constraints
+ */
+export function chunkArray<T>(array: T[], chunkSize: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    chunks.push(array.slice(i, i + chunkSize));
+  }
+  return chunks;
 }
 
 /**
@@ -64,38 +154,9 @@ export async function processColorSeedBatch(
   const CONCURRENCY_LIMIT = 10;
 
   // Process messages in concurrent chunks
-  const processingPromises = batch.messages.map(async (message) => {
-    try {
-      const { oklch, token, name } = message.body;
-
-      // Reuse request configuration for memory efficiency
-      const requestBody = JSON.stringify({ oklch, token, name });
-      const request = new Request('http://internal/api/color-intel', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: requestBody,
-      });
-
-      // Call the internal API via the main Hono app
-      const result = await app.fetch(request, env);
-
-      if (result.status === 200) {
-        const colorData = await result.json();
-        console.log(
-          `Processed color seed: ${colorData.name || 'processed'} - ${colorData.intelligence?.suggestedName || 'unnamed'}`
-        );
-        message.ack();
-        return { success: true, message };
-      } else {
-        const errorText = await result.text();
-        throw new Error(`Color-intel API returned ${result.status}: ${errorText}`);
-      }
-    } catch (error) {
-      console.error('Failed to process color seed message:', error);
-      message.retry();
-      return { success: false, message, error };
-    }
-  });
+  const processingPromises = batch.messages.map((message) =>
+    processSingleMessage(message, app, env)
+  );
 
   // Execute with controlled concurrency to prevent Workers memory limits
   const chunks = chunkArray(processingPromises, CONCURRENCY_LIMIT);
@@ -104,16 +165,4 @@ export async function processColorSeedBatch(
     // Process each chunk concurrently, wait for all to complete
     await Promise.allSettled(chunk);
   }
-}
-
-/**
- * Utility: Split array into chunks for controlled concurrency
- * Optimized for Workers memory constraints
- */
-function chunkArray<T>(array: T[], chunkSize: number): T[][] {
-  const chunks: T[][] = [];
-  for (let i = 0; i < array.length; i += chunkSize) {
-    chunks.push(array.slice(i, i + chunkSize));
-  }
-  return chunks;
 }

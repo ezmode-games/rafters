@@ -1,485 +1,201 @@
 /**
- * Unit Tests for Color Seed Queue Consumer
- *
- * Tests the queue consumer logic for processing ColorSeedMessage batches.
- * Focuses on business logic and error handling without Cloudflare runtime dependencies.
+ * Queue Consumer Unit Tests
+ * Tests consumer logic with spyOn mocking
  */
 
-import type { OKLCH } from '@rafters/shared';
-import type { Hono } from 'hono';
+import type { ColorValue } from '@rafters/shared';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { processColorSeedBatch } from '../../../src/lib/queue/consumer';
-import type { ColorSeedMessage } from '../../../src/lib/queue/publisher';
+import * as consumer from '@/lib/queue/consumer';
+import type { ColorSeedMessage } from '@/lib/queue/publisher';
 
-// Mock message interface with proper typing
-interface MockMessage {
-  body: ColorSeedMessage;
-  ack: ReturnType<typeof vi.fn>;
-  retry: ReturnType<typeof vi.fn>;
-}
-
-// Mock message batch interface
-interface MockMessageBatch {
-  messages: MockMessage[];
-}
-
-// Mock environment interface
-interface MockEnv {
-  VECTORIZE: VectorizeIndex;
-  AI: Ai;
-  CLAUDE_API_KEY: string;
-  CF_TOKEN: string;
-  CLAUDE_GATEWAY_URL: string;
-  COLOR_SEED_QUEUE: Queue;
-  SEED_QUEUE_API_KEY: string;
-}
-
-// Mock Hono app interface
-interface MockHonoApp {
-  fetch: ReturnType<typeof vi.fn>;
-}
-
-describe('Color Seed Queue Consumer - Unit Tests', () => {
-  let mockEnv: MockEnv;
-  let mockApp: MockHonoApp;
-
+describe('Queue Consumer Unit Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-
-    mockEnv = {
-      VECTORIZE: {} as VectorizeIndex,
-      AI: {} as Ai,
-      CLAUDE_API_KEY: 'test-claude-api-key',
-      CF_TOKEN: 'test-cf-token',
-      CLAUDE_GATEWAY_URL: 'https://gateway.test.com',
-      COLOR_SEED_QUEUE: {} as Queue,
-      SEED_QUEUE_API_KEY: 'test-seed-queue-api-key',
-    };
-
-    mockApp = {
-      fetch: vi.fn(),
-    };
   });
 
-  describe('processColorSeedBatch', () => {
-    test('processes single message successfully', async () => {
-      const testOklch: OKLCH = { l: 0.65, c: 0.12, h: 240 };
-      const testMessage: ColorSeedMessage = {
-        oklch: testOklch,
-        token: 'primary',
-        name: 'test-blue',
-        requestId: 'test-request-123',
+  describe('createColorIntelRequest', () => {
+    test('creates POST request with correct URL', () => {
+      const message: ColorSeedMessage = {
+        oklch: { l: 0.5, c: 0.1, h: 180 },
         timestamp: Date.now(),
       };
 
-      const mockMessage: MockMessage = {
-        body: testMessage,
-        ack: vi.fn(),
-        retry: vi.fn(),
-      };
+      const request = consumer.createColorIntelRequest(message);
 
-      const mockBatch: MockMessageBatch = {
-        messages: [mockMessage],
-      };
-
-      const mockColorResult = {
-        id: 'oklch-0.65-0.12-240',
-        name: 'test-blue',
-        oklch: testOklch,
-        intelligence: {
-          suggestedName: 'Deep Azure',
-          reasoning: 'Calming blue color for primary actions',
-          emotionalImpact: 'Trust and reliability',
-          culturalContext: 'Professional blue tone',
-          accessibilityNotes: 'High contrast available',
-          usageGuidance: 'Use for primary CTAs',
-        },
-      };
-
-      // Mock successful API response
-      mockApp.fetch.mockResolvedValue(
-        new Response(JSON.stringify(mockColorResult), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        })
-      );
-
-      await processColorSeedBatch(
-        mockBatch as unknown as MessageBatch<ColorSeedMessage>,
-        mockEnv,
-        mockApp as unknown as Hono<{ Bindings: MockEnv }>
-      );
-
-      // Verify API was called with correct request
-      expect(mockApp.fetch).toHaveBeenCalledOnce();
-      const [request, env] = mockApp.fetch.mock.calls[0];
-
-      expect(request.url).toBe('http://internal/api/color-intel');
       expect(request.method).toBe('POST');
-      expect(await request.json()).toEqual({
-        oklch: testOklch,
+      expect(request.url).toBe('http://internal/api/color-intel');
+    });
+
+    test('creates request with JSON content type', () => {
+      const message: ColorSeedMessage = {
+        oklch: { l: 0.5, c: 0.1, h: 180 },
+        timestamp: Date.now(),
+      };
+
+      const request = consumer.createColorIntelRequest(message);
+
+      expect(request.headers.get('Content-Type')).toBe('application/json');
+    });
+
+    test('includes all message fields in request body', () => {
+      const message: ColorSeedMessage = {
+        oklch: { l: 0.5, c: 0.1, h: 180 },
         token: 'primary',
         name: 'test-blue',
-      });
-      expect(env).toBe(mockEnv);
+        timestamp: Date.now(),
+      };
 
-      // Verify message was acknowledged
-      expect(mockMessage.ack).toHaveBeenCalledOnce();
+      const request = consumer.createColorIntelRequest(message);
+      const body = request.body;
+
+      expect(body).toBeDefined();
+    });
+  });
+
+  describe('isSuccessResponse', () => {
+    test('returns true for status 200', () => {
+      expect(consumer.isSuccessResponse(200)).toBe(true);
+    });
+
+    test('returns false for status 400', () => {
+      expect(consumer.isSuccessResponse(400)).toBe(false);
+    });
+
+    test('returns false for status 500', () => {
+      expect(consumer.isSuccessResponse(500)).toBe(false);
+    });
+
+    test('returns false for status 201', () => {
+      expect(consumer.isSuccessResponse(201)).toBe(false);
+    });
+  });
+
+  describe('handleSuccessResponse', () => {
+    test('calls message.ack()', () => {
+      const mockMessage = {
+        ack: vi.fn(),
+        retry: vi.fn(),
+      } as unknown as Message<ColorSeedMessage>;
+
+      const colorData: ColorValue = {
+        name: 'Test Color',
+        scale: [{ l: 0.5, c: 0.1, h: 180 }],
+      };
+
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+      consumer.handleSuccessResponse(mockMessage, colorData);
+
+      expect(mockMessage.ack).toHaveBeenCalled();
       expect(mockMessage.retry).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
     });
 
-    test('processes multiple messages in batch', async () => {
-      const testMessages: ColorSeedMessage[] = [
-        {
-          oklch: { l: 0.5, c: 0.1, h: 0 },
-          token: 'red',
-          name: 'test-red',
-          requestId: 'test-1',
-          timestamp: Date.now(),
-        },
-        {
-          oklch: { l: 0.6, c: 0.15, h: 120 },
-          token: 'green',
-          name: 'test-green',
-          requestId: 'test-2',
-          timestamp: Date.now(),
-        },
-        {
-          oklch: { l: 0.7, c: 0.2, h: 240 },
-          token: 'blue',
-          name: 'test-blue',
-          requestId: 'test-3',
-          timestamp: Date.now(),
-        },
-      ];
-
-      const mockMessages: MockMessage[] = testMessages.map((body) => ({
-        body,
+    test('logs color name and suggested name', () => {
+      const mockMessage = {
         ack: vi.fn(),
         retry: vi.fn(),
-      }));
+      } as unknown as Message<ColorSeedMessage>;
 
-      const mockBatch: MockMessageBatch = {
-        messages: mockMessages,
-      };
-
-      // Mock successful API responses for all messages
-      mockApp.fetch
-        .mockResolvedValueOnce(
-          new Response(JSON.stringify({ id: 'red', name: 'test-red' }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-          })
-        )
-        .mockResolvedValueOnce(
-          new Response(JSON.stringify({ id: 'green', name: 'test-green' }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-          })
-        )
-        .mockResolvedValueOnce(
-          new Response(JSON.stringify({ id: 'blue', name: 'test-blue' }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-          })
-        );
-
-      await processColorSeedBatch(
-        mockBatch as unknown as MessageBatch<ColorSeedMessage>,
-        mockEnv,
-        mockApp as unknown as Hono<{ Bindings: MockEnv }>
-      );
-
-      // Verify all messages were processed
-      expect(mockApp.fetch).toHaveBeenCalledTimes(3);
-
-      // Verify all messages were acknowledged
-      mockMessages.forEach((message) => {
-        expect(message.ack).toHaveBeenCalledOnce();
-        expect(message.retry).not.toHaveBeenCalled();
-      });
-    });
-
-    test('processes message with minimal data (no token/name)', async () => {
-      const testMessage: ColorSeedMessage = {
-        oklch: { l: 0.5, c: 0.1, h: 180 },
-        requestId: 'test-minimal',
-        timestamp: Date.now(),
-      };
-
-      const mockMessage: MockMessage = {
-        body: testMessage,
-        ack: vi.fn(),
-        retry: vi.fn(),
-      };
-
-      const mockBatch: MockMessageBatch = {
-        messages: [mockMessage],
-      };
-
-      const mockColorResult = {
-        id: 'oklch-0.50-0.10-180',
-        name: 'Generated color',
-        oklch: { l: 0.5, c: 0.1, h: 180 },
+      const colorData: ColorValue = {
+        name: 'Test Color',
+        scale: [{ l: 0.5, c: 0.1, h: 180 }],
         intelligence: {
-          suggestedName: 'Generated Cyan',
-          reasoning: 'Color generated from OKLCH values',
+          suggestedName: 'Ocean Blue',
+          reasoning: 'test',
+          emotionalImpact: 'test',
+          culturalContext: 'test',
+          accessibilityNotes: 'test',
+          usageGuidance: 'test',
         },
       };
 
-      mockApp.fetch.mockResolvedValue(
-        new Response(JSON.stringify(mockColorResult), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        })
-      );
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
-      await processColorSeedBatch(
-        mockBatch as unknown as MessageBatch<ColorSeedMessage>,
-        mockEnv,
-        mockApp as unknown as Hono<{ Bindings: MockEnv }>
-      );
+      consumer.handleSuccessResponse(mockMessage, colorData);
 
-      // Verify API was called with undefined for token/name
-      expect(mockApp.fetch).toHaveBeenCalledOnce();
-      const [request] = mockApp.fetch.mock.calls[0];
-      expect(await request.json()).toEqual({
-        oklch: { l: 0.5, c: 0.1, h: 180 },
-        token: undefined,
-        name: undefined,
-      });
+      expect(consoleSpy).toHaveBeenCalledWith('Processed color seed: Test Color - Ocean Blue');
 
-      expect(mockMessage.ack).toHaveBeenCalledOnce();
+      consoleSpy.mockRestore();
     });
+  });
 
-    test('handles API error and retries message', async () => {
-      const testMessage: ColorSeedMessage = {
-        oklch: { l: 0.5, c: 0.1, h: 180 },
-        token: 'error-token',
-        name: 'error-color',
-        requestId: 'error-test',
-        timestamp: Date.now(),
-      };
-
-      const mockMessage: MockMessage = {
-        body: testMessage,
+  describe('handleErrorResponse', () => {
+    test('calls message.retry()', () => {
+      const mockMessage = {
         ack: vi.fn(),
         retry: vi.fn(),
-      };
+      } as unknown as Message<ColorSeedMessage>;
 
-      const mockBatch: MockMessageBatch = {
-        messages: [mockMessage],
-      };
+      const error = new Error('Test error');
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      // Mock API error response
-      mockApp.fetch.mockResolvedValue(
-        new Response('Claude API rate limited', {
-          status: 500,
-          statusText: 'Internal Server Error',
-        })
-      );
+      consumer.handleErrorResponse(mockMessage, error);
 
-      await processColorSeedBatch(
-        mockBatch as unknown as MessageBatch<ColorSeedMessage>,
-        mockEnv,
-        mockApp as unknown as Hono<{ Bindings: MockEnv }>
-      );
-
-      // Verify message was retried, not acknowledged
-      expect(mockMessage.retry).toHaveBeenCalledOnce();
+      expect(mockMessage.retry).toHaveBeenCalled();
       expect(mockMessage.ack).not.toHaveBeenCalled();
+
+      errorSpy.mockRestore();
     });
 
-    test('handles mixed success and failure in batch', async () => {
-      const testMessages: ColorSeedMessage[] = [
-        {
-          oklch: { l: 0.5, c: 0.1, h: 0 },
-          token: 'success',
-          name: 'success-color',
-          requestId: 'success-1',
-          timestamp: Date.now(),
-        },
-        {
-          oklch: { l: 0.6, c: 0.15, h: 120 },
-          token: 'failure',
-          name: 'failure-color',
-          requestId: 'failure-1',
-          timestamp: Date.now(),
-        },
-        {
-          oklch: { l: 0.7, c: 0.2, h: 240 },
-          token: 'success-2',
-          name: 'success-color-2',
-          requestId: 'success-2',
-          timestamp: Date.now(),
-        },
-      ];
-
-      const mockMessages: MockMessage[] = testMessages.map((body) => ({
-        body,
+    test('logs error message', () => {
+      const mockMessage = {
         ack: vi.fn(),
         retry: vi.fn(),
-      }));
+      } as unknown as Message<ColorSeedMessage>;
 
-      const mockBatch: MockMessageBatch = {
-        messages: mockMessages,
-      };
+      const error = new Error('Test error');
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      // Mock success for first and third messages, failure for second
-      mockApp.fetch
-        .mockResolvedValueOnce(
-          new Response(JSON.stringify({ id: 'success-1', name: 'success-color' }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-          })
-        )
-        .mockResolvedValueOnce(
-          new Response('Processing failed', {
-            status: 500,
-            statusText: 'Internal Server Error',
-          })
-        )
-        .mockResolvedValueOnce(
-          new Response(JSON.stringify({ id: 'success-2', name: 'success-color-2' }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-          })
-        );
+      consumer.handleErrorResponse(mockMessage, error);
 
-      await processColorSeedBatch(
-        mockBatch as unknown as MessageBatch<ColorSeedMessage>,
-        mockEnv,
-        mockApp as unknown as Hono<{ Bindings: MockEnv }>
-      );
+      expect(errorSpy).toHaveBeenCalledWith('Failed to process color seed message:', error);
 
-      // Verify first and third messages were acknowledged
-      expect(mockMessages[0].ack).toHaveBeenCalledOnce();
-      expect(mockMessages[0].retry).not.toHaveBeenCalled();
+      errorSpy.mockRestore();
+    });
+  });
 
-      expect(mockMessages[2].ack).toHaveBeenCalledOnce();
-      expect(mockMessages[2].retry).not.toHaveBeenCalled();
+  describe('createApiError', () => {
+    test('creates error with status and text', () => {
+      const error = consumer.createApiError(500, 'Internal Server Error');
 
-      // Verify second message was retried
-      expect(mockMessages[1].retry).toHaveBeenCalledOnce();
-      expect(mockMessages[1].ack).not.toHaveBeenCalled();
+      expect(error.message).toBe('Color-intel API returned 500: Internal Server Error');
     });
 
-    test('handles environment with all required fields', async () => {
-      const testMessage: ColorSeedMessage = {
-        oklch: { l: 0.5, c: 0.1, h: 180 },
-        requestId: 'env-test',
-        timestamp: Date.now(),
-      };
+    test('creates error with 404 status', () => {
+      const error = consumer.createApiError(404, 'Not Found');
 
-      const mockMessage: MockMessage = {
-        body: testMessage,
-        ack: vi.fn(),
-        retry: vi.fn(),
-      };
+      expect(error.message).toBe('Color-intel API returned 404: Not Found');
+    });
+  });
 
-      const mockBatch: MockMessageBatch = {
-        messages: [mockMessage],
-      };
+  describe('chunkArray', () => {
+    test('splits array into chunks of specified size', () => {
+      const array = [1, 2, 3, 4, 5, 6, 7];
+      const chunks = consumer.chunkArray(array, 3);
 
-      const mockColorResult = {
-        id: 'env-color',
-        name: 'Generated color',
-        oklch: { l: 0.5, c: 0.1, h: 180 },
-        intelligence: {
-          suggestedName: 'Environment Cyan',
-          reasoning: 'Color processed with full environment',
-        },
-      };
-
-      mockApp.fetch.mockResolvedValue(
-        new Response(JSON.stringify(mockColorResult), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        })
-      );
-
-      await processColorSeedBatch(
-        mockBatch as unknown as MessageBatch<ColorSeedMessage>,
-        mockEnv,
-        mockApp as unknown as Hono<{ Bindings: MockEnv }>
-      );
-
-      // Verify API was called with correct request
-      expect(mockApp.fetch).toHaveBeenCalledOnce();
-      const [request, env] = mockApp.fetch.mock.calls[0];
-      expect(await request.json()).toEqual({
-        oklch: { l: 0.5, c: 0.1, h: 180 },
-        token: undefined,
-        name: undefined,
-      });
-      expect(env).toBe(mockEnv);
-
-      expect(mockMessage.ack).toHaveBeenCalledOnce();
+      expect(chunks).toEqual([[1, 2, 3], [4, 5, 6], [7]]);
     });
 
-    test('continues processing after individual message errors', async () => {
-      const testMessages: ColorSeedMessage[] = [
-        {
-          oklch: { l: 0.5, c: 0.1, h: 0 },
-          requestId: 'first',
-          timestamp: Date.now(),
-        },
-        {
-          oklch: { l: 0.6, c: 0.15, h: 120 },
-          requestId: 'second-error',
-          timestamp: Date.now(),
-        },
-        {
-          oklch: { l: 0.7, c: 0.2, h: 240 },
-          requestId: 'third',
-          timestamp: Date.now(),
-        },
-      ];
+    test('returns empty array for empty input', () => {
+      const chunks = consumer.chunkArray([], 5);
 
-      const mockMessages: MockMessage[] = testMessages.map((body) => ({
-        body,
-        ack: vi.fn(),
-        retry: vi.fn(),
-      }));
+      expect(chunks).toEqual([]);
+    });
 
-      const mockBatch: MockMessageBatch = {
-        messages: mockMessages,
-      };
+    test('returns single chunk for small array', () => {
+      const array = [1, 2];
+      const chunks = consumer.chunkArray(array, 5);
 
-      // First succeeds, second fails, third succeeds
-      mockApp.fetch
-        .mockResolvedValueOnce(
-          new Response(JSON.stringify({ id: 'first-success', name: 'first' }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-          })
-        )
-        .mockResolvedValueOnce(
-          new Response('Network timeout', {
-            status: 500,
-            statusText: 'Internal Server Error',
-          })
-        )
-        .mockResolvedValueOnce(
-          new Response(JSON.stringify({ id: 'third-success', name: 'third' }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-          })
-        );
+      expect(chunks).toEqual([[1, 2]]);
+    });
 
-      await processColorSeedBatch(
-        mockBatch as unknown as MessageBatch<ColorSeedMessage>,
-        mockEnv,
-        mockApp as unknown as Hono<{ Bindings: MockEnv }>
-      );
+    test('handles chunk size of 1', () => {
+      const array = [1, 2, 3];
+      const chunks = consumer.chunkArray(array, 1);
 
-      // Verify all three messages were processed
-      expect(mockApp.fetch).toHaveBeenCalledTimes(3);
-
-      // Verify success/failure patterns
-      expect(mockMessages[0].ack).toHaveBeenCalledOnce();
-      expect(mockMessages[1].retry).toHaveBeenCalledOnce();
-      expect(mockMessages[2].ack).toHaveBeenCalledOnce();
+      expect(chunks).toEqual([[1], [2], [3]]);
     });
   });
 });

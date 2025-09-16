@@ -55,15 +55,15 @@ export function calculateAPCAContrast(foreground: OKLCH, background: OKLCH): num
   const bgRgb = backgroundColorObj.to('srgb');
 
   // Convert to 0-255 RGB values for apca-w3
-  const fgR = fgRgb.r * 255;
-  const fgG = fgRgb.g * 255;
-  const fgB = fgRgb.b * 255;
-  const bgR = bgRgb.r * 255;
-  const bgG = bgRgb.g * 255;
-  const bgB = bgRgb.b * 255;
+  const fgR = Number(fgRgb.r) * 255;
+  const fgG = Number(fgRgb.g) * 255;
+  const fgB = Number(fgRgb.b) * 255;
+  const bgR = Number(bgRgb.r) * 255;
+  const bgG = Number(bgRgb.g) * 255;
+  const bgB = Number(bgRgb.b) * 255;
 
   // Use official APCA calculation
-  return APCAcontrast(sRGBtoY([fgR, fgG, fgB]), sRGBtoY([bgR, bgG, bgB]));
+  return Number(APCAcontrast(Number(sRGBtoY([fgR, fgG, fgB])), Number(sRGBtoY([bgR, bgG, bgB]))));
 }
 
 /**

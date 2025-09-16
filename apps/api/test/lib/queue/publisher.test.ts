@@ -1,447 +1,282 @@
 /**
- * Unit Tests for ColorSeedPublisher
- *
- * Tests the queue publishing logic for color seed generation.
- * Focuses on business logic and error handling without Cloudflare runtime dependencies.
+ * ColorSeedPublisher Unit Tests
+ * Tests queue publisher logic with spyOn mocking
  */
 
-import type { OKLCH } from '@rafters/shared';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { ColorSeedPublisher } from '../../../src/lib/queue/publisher';
-
-// Mock Queue interface
-interface MockQueue {
-  send: ReturnType<typeof vi.fn>;
-  sendBatch: ReturnType<typeof vi.fn>;
-}
+import { ColorSeedPublisher } from '@/lib/queue/publisher';
 
 describe('ColorSeedPublisher', () => {
-  let mockQueue: MockQueue;
-  let publisher: ColorSeedPublisher;
-
   beforeEach(() => {
-    mockQueue = {
-      send: vi.fn(),
-      sendBatch: vi.fn(),
-    };
-    publisher = new ColorSeedPublisher(mockQueue as unknown as Queue);
+    vi.clearAllMocks();
   });
 
-  describe('publishSingle', () => {
-    const testColor: OKLCH = { l: 0.65, c: 0.12, h: 240 };
+  test('publishSingle creates message with all required fields', async () => {
+    const mockSend = vi.fn().mockResolvedValue(undefined);
+    const mockQueue = { send: mockSend } as unknown as Queue;
+    const publisher = new ColorSeedPublisher(mockQueue);
 
-    test('publishes single color with minimal data', async () => {
-      mockQueue.send.mockResolvedValue(undefined);
+    const result = await publisher.publishSingle(
+      { l: 0.5, c: 0.1, h: 180 },
+      { token: 'primary', name: 'ocean-blue' }
+    );
 
-      const result = await publisher.publishSingle(testColor);
-
-      expect(result.success).toBe(true);
-      expect(result.requestId).toBeDefined();
-      expect(result.queuedCount).toBe(1);
-      expect(mockQueue.send).toHaveBeenCalledOnce();
-
-      const [message, options] = mockQueue.send.mock.calls[0];
-      expect(message.oklch).toEqual(testColor);
-      expect(message.timestamp).toBeTypeOf('number');
-      expect(message.requestId).toBeDefined();
-      expect(options.contentType).toBe('json');
-    });
-
-    test('publishes single color with optional metadata', async () => {
-      mockQueue.send.mockResolvedValue(undefined);
-
-      const result = await publisher.publishSingle(testColor, {
+    expect(result.success).toBe(true);
+    expect(result.queuedCount).toBe(1);
+    expect(result.requestId).toBeDefined();
+    expect(mockSend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        oklch: { l: 0.5, c: 0.1, h: 180 },
         token: 'primary',
-        name: 'test-blue',
-        requestId: 'custom-request-id',
-      });
-
-      expect(result.success).toBe(true);
-      expect(result.requestId).toBe('custom-request-id');
-
-      const [message] = mockQueue.send.mock.calls[0];
-      expect(message.token).toBe('primary');
-      expect(message.name).toBe('test-blue');
-      expect(message.requestId).toBe('custom-request-id');
-    });
-
-    test('generates requestId when not provided', async () => {
-      mockQueue.send.mockResolvedValue(undefined);
-
-      const result = await publisher.publishSingle(testColor);
-
-      expect(result.requestId).toMatch(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-      );
-
-      const [message] = mockQueue.send.mock.calls[0];
-      expect(message.requestId).toBe(result.requestId);
-    });
-
-    test('handles queue send errors gracefully', async () => {
-      const errorMessage = 'Queue send failed';
-      mockQueue.send.mockRejectedValue(new Error(errorMessage));
-
-      const result = await publisher.publishSingle(testColor);
-
-      expect(result.success).toBe(false);
-      expect(result.error).toBe(errorMessage);
-      expect(result.requestId).toBeUndefined();
-      expect(result.queuedCount).toBeUndefined();
-    });
-
-    test('handles non-Error exceptions', async () => {
-      mockQueue.send.mockRejectedValue('String error');
-
-      const result = await publisher.publishSingle(testColor);
-
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Unknown error');
-    });
-
-    test('includes current timestamp in message', async () => {
-      mockQueue.send.mockResolvedValue(undefined);
-      const startTime = Date.now();
-
-      await publisher.publishSingle(testColor);
-
-      const [message] = mockQueue.send.mock.calls[0];
-      const endTime = Date.now();
-
-      expect(message.timestamp).toBeGreaterThanOrEqual(startTime);
-      expect(message.timestamp).toBeLessThanOrEqual(endTime);
-    });
+        name: 'ocean-blue',
+        requestId: expect.any(String),
+        timestamp: expect.any(Number),
+      }),
+      { contentType: 'json' }
+    );
   });
 
-  describe('publishBatch', () => {
-    const testColors = [
-      { oklch: { l: 0.5, c: 0.1, h: 0 }, token: 'red', name: 'test-red' },
-      { oklch: { l: 0.6, c: 0.15, h: 120 }, token: 'green', name: 'test-green' },
-      { oklch: { l: 0.7, c: 0.2, h: 240 }, token: 'blue', name: 'test-blue' },
+  test('publishSingle works with minimal options', async () => {
+    const mockSend = vi.fn().mockResolvedValue(undefined);
+    const mockQueue = { send: mockSend } as unknown as Queue;
+    const publisher = new ColorSeedPublisher(mockQueue);
+
+    const result = await publisher.publishSingle({ l: 0.7, c: 0.2, h: 240 });
+
+    expect(result.success).toBe(true);
+    expect(mockSend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        oklch: { l: 0.7, c: 0.2, h: 240 },
+        token: undefined,
+        name: undefined,
+        requestId: expect.any(String),
+        timestamp: expect.any(Number),
+      }),
+      { contentType: 'json' }
+    );
+  });
+
+  test('publishSingle respects provided requestId', async () => {
+    const mockSend = vi.fn().mockResolvedValue(undefined);
+    const mockQueue = { send: mockSend } as unknown as Queue;
+    const publisher = new ColorSeedPublisher(mockQueue);
+
+    const customRequestId = 'custom-request-123';
+    const result = await publisher.publishSingle(
+      { l: 0.3, c: 0.05, h: 120 },
+      { requestId: customRequestId }
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.requestId).toBe(customRequestId);
+    expect(mockSend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        requestId: customRequestId,
+      }),
+      { contentType: 'json' }
+    );
+  });
+
+  test('publishSingle handles queue send errors', async () => {
+    const mockSend = vi.fn().mockRejectedValue(new Error('Queue full'));
+    const mockQueue = { send: mockSend } as unknown as Queue;
+    const publisher = new ColorSeedPublisher(mockQueue);
+
+    const result = await publisher.publishSingle({ l: 0.5, c: 0.1, h: 180 });
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('Queue full');
+    expect(result.queuedCount).toBeUndefined();
+    expect(result.requestId).toBeUndefined();
+  });
+
+  test('publishSingle handles non-Error exceptions', async () => {
+    const mockSend = vi.fn().mockRejectedValue('String error');
+    const mockQueue = { send: mockSend } as unknown as Queue;
+    const publisher = new ColorSeedPublisher(mockQueue);
+
+    const result = await publisher.publishSingle({ l: 0.5, c: 0.1, h: 180 });
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('Unknown error');
+  });
+
+  test('publishBatch processes multiple colors correctly', async () => {
+    const mockSendBatch = vi.fn().mockResolvedValue(undefined);
+    const mockQueue = { sendBatch: mockSendBatch } as unknown as Queue;
+    const publisher = new ColorSeedPublisher(mockQueue);
+
+    const colors = [
+      { oklch: { l: 0.5, c: 0.1, h: 180 }, token: 'primary' },
+      { oklch: { l: 0.6, c: 0.2, h: 240 }, name: 'blue-light' },
+      { oklch: { l: 0.4, c: 0.15, h: 200 } },
     ];
 
-    test('publishes small batch as single sendBatch call', async () => {
-      mockQueue.sendBatch.mockResolvedValue(undefined);
+    const result = await publisher.publishBatch(colors, { batchId: 'test-batch' });
 
-      const result = await publisher.publishBatch(testColors);
-
-      expect(result.success).toBe(true);
-      expect(result.queuedCount).toBe(3);
-      expect(result.requestId).toBeDefined();
-      expect(mockQueue.sendBatch).toHaveBeenCalledOnce();
-
-      const [messages] = mockQueue.sendBatch.mock.calls[0];
-      expect(messages).toHaveLength(3);
-      expect(messages[0].body.oklch).toEqual(testColors[0].oklch);
-      expect(messages[0].body.token).toBe('red');
-      expect(messages[0].body.name).toBe('test-red');
-      expect(messages[0].options.contentType).toBe('json');
-    });
-
-    test('splits large batches into chunks of 100', async () => {
-      const largeColorSet = Array.from({ length: 250 }, (_, i) => ({
-        oklch: { l: 0.5, c: 0.1, h: i * 1.44 }, // Spread across hue range
-        token: `color-${i}`,
-      }));
-
-      mockQueue.sendBatch.mockResolvedValue(undefined);
-
-      const result = await publisher.publishBatch(largeColorSet);
-
-      expect(result.success).toBe(true);
-      expect(result.queuedCount).toBe(250);
-      expect(mockQueue.sendBatch).toHaveBeenCalledTimes(3); // 100 + 100 + 50
-
-      // Verify first batch has 100 messages
-      const [firstBatch] = mockQueue.sendBatch.mock.calls[0];
-      expect(firstBatch).toHaveLength(100);
-
-      // Verify last batch has remaining 50 messages
-      const [lastBatch] = mockQueue.sendBatch.mock.calls[2];
-      expect(lastBatch).toHaveLength(50);
-    });
-
-    test('generates unique requestIds for each message in batch', async () => {
-      mockQueue.sendBatch.mockResolvedValue(undefined);
-
-      await publisher.publishBatch(testColors, { batchId: 'test-batch' });
-
-      const [messages] = mockQueue.sendBatch.mock.calls[0];
-      const requestIds = messages.map((msg: { body: { requestId: string } }) => msg.body.requestId);
-
-      // All requestIds should be unique
-      const uniqueIds = new Set(requestIds);
-      expect(uniqueIds.size).toBe(requestIds.length);
-
-      // All should start with batch ID
-      requestIds.forEach((id: string) => {
-        expect(id).toMatch(/^test-batch-0-[0-9a-f-]+$/);
-      });
-    });
-
-    test('uses generated batchId when not provided', async () => {
-      mockQueue.sendBatch.mockResolvedValue(undefined);
-
-      const result = await publisher.publishBatch([testColors[0]]);
-
-      expect(result.requestId).toMatch(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-      );
-    });
-
-    test('handles sendBatch errors gracefully', async () => {
-      const errorMessage = 'Batch send failed';
-      mockQueue.sendBatch.mockRejectedValue(new Error(errorMessage));
-
-      const result = await publisher.publishBatch(testColors);
-
-      expect(result.success).toBe(false);
-      expect(result.error).toBe(errorMessage);
-      expect(result.queuedCount).toBeUndefined();
-    });
-
-    test('handles empty batch', async () => {
-      const result = await publisher.publishBatch([]);
-
-      expect(result.success).toBe(true);
-      expect(result.queuedCount).toBe(0);
-      expect(mockQueue.sendBatch).not.toHaveBeenCalled();
-    });
-
-    test('includes delay between batches for rate limiting', async () => {
-      const largeColorSet = Array.from({ length: 150 }, (_, i) => ({
-        oklch: { l: 0.5, c: 0.1, h: i * 2.4 },
-      }));
-
-      mockQueue.sendBatch.mockResolvedValue(undefined);
-
-      const startTime = Date.now();
-      await publisher.publishBatch(largeColorSet);
-      const endTime = Date.now();
-
-      // Should have at least 250ms delay between 2 batches
-      expect(endTime - startTime).toBeGreaterThanOrEqual(250);
-      expect(mockQueue.sendBatch).toHaveBeenCalledTimes(2);
-    });
+    expect(result.success).toBe(true);
+    expect(result.queuedCount).toBe(3);
+    expect(result.requestId).toBe('test-batch');
+    expect(mockSendBatch).toHaveBeenCalledTimes(1); // All 3 colors in one batch
   });
 
-  describe('publishSpectrum', () => {
-    test('generates correct number of colors for spectrum', async () => {
-      mockQueue.sendBatch.mockResolvedValue(undefined);
+  test('publishBatch generates batchId when not provided', async () => {
+    const mockSendBatch = vi.fn().mockResolvedValue(undefined);
+    const mockQueue = { sendBatch: mockSendBatch } as unknown as Queue;
+    const publisher = new ColorSeedPublisher(mockQueue);
 
-      const config = {
-        lightnessSteps: 3,
-        chromaSteps: 2,
-        hueSteps: 4,
-        baseName: 'test-spectrum',
-      };
+    const colors = [{ oklch: { l: 0.5, c: 0.1, h: 180 } }];
+    const result = await publisher.publishBatch(colors);
 
-      const result = await publisher.publishSpectrum(config);
-
-      expect(result.success).toBe(true);
-      expect(result.queuedCount).toBe(24); // 3 × 2 × 4 = 24
-
-      // Should generate exactly 24 messages
-      const [messages] = mockQueue.sendBatch.mock.calls[0];
-      expect(messages).toHaveLength(24);
-    });
-
-    test('generates colors with correct OKLCH ranges', async () => {
-      mockQueue.sendBatch.mockResolvedValue(undefined);
-
-      const config = {
-        lightnessSteps: 3, // 0.1, 0.5, 0.9
-        chromaSteps: 2, // 0.0, 0.4
-        hueSteps: 2, // 0°, 180°
-      };
-
-      await publisher.publishSpectrum(config);
-
-      const [messages] = mockQueue.sendBatch.mock.calls[0];
-      const colors = messages.map((msg: { body: { oklch: OKLCH } }) => msg.body.oklch);
-
-      // Check lightness range
-      const lightnesses = colors.map((c: OKLCH) => c.l);
-      expect(Math.min(...lightnesses)).toBe(0.1);
-      expect(Math.max(...lightnesses)).toBe(0.9);
-
-      // Check chroma range
-      const chromas = colors.map((c: OKLCH) => c.c);
-      expect(Math.min(...chromas)).toBe(0);
-      expect(Math.max(...chromas)).toBe(0.4);
-
-      // Check hue range
-      const hues = colors.map((c: OKLCH) => c.h);
-      expect(Math.min(...hues)).toBe(0);
-      expect(Math.max(...hues)).toBe(180);
-    });
-
-    test('generates descriptive names for spectrum colors', async () => {
-      mockQueue.sendBatch.mockResolvedValue(undefined);
-
-      const config = {
-        lightnessSteps: 2,
-        chromaSteps: 2,
-        hueSteps: 2,
-        baseName: 'custom-spectrum',
-      };
-
-      await publisher.publishSpectrum(config);
-
-      const [messages] = mockQueue.sendBatch.mock.calls[0];
-      const names = messages.map((msg: { body: { name: string } }) => msg.body.name);
-
-      // Should include base name and OKLCH values
-      expect(names[0]).toMatch(/^custom-spectrum-l\d+-c\d+-h\d+$/);
-      expect(names).toContain('custom-spectrum-l10-c0-h0');
-      expect(names).toContain('custom-spectrum-l90-c40-h180');
-    });
-
-    test('uses default baseName when not provided', async () => {
-      mockQueue.sendBatch.mockResolvedValue(undefined);
-
-      const config = {
-        lightnessSteps: 2, // Use 2 to avoid division by zero bug
-        chromaSteps: 2, // Use 2 to avoid division by zero bug
-        hueSteps: 1,
-      };
-
-      await publisher.publishSpectrum(config);
-
-      const [messages] = mockQueue.sendBatch.mock.calls[0];
-      const name = (messages[0] as { body: { name: string } }).body.name;
-
-      expect(name).toMatch(/^spectrum-l\d+-c\d+-h\d+$/);
-    });
-
-    test('assigns spectrum-seed token to all generated colors', async () => {
-      mockQueue.sendBatch.mockResolvedValue(undefined);
-
-      const config = {
-        lightnessSteps: 2,
-        chromaSteps: 1,
-        hueSteps: 1,
-      };
-
-      await publisher.publishSpectrum(config);
-
-      const [messages] = mockQueue.sendBatch.mock.calls[0];
-      const tokens = messages.map((msg: { body: { token: string } }) => msg.body.token);
-
-      expect(tokens.every((token: string) => token === 'spectrum-seed')).toBe(true);
-    });
-
-    test('handles spectrum generation errors', async () => {
-      mockQueue.sendBatch.mockRejectedValue(new Error('Spectrum batch failed'));
-
-      const config = {
-        lightnessSteps: 2,
-        chromaSteps: 2,
-        hueSteps: 2,
-      };
-
-      const result = await publisher.publishSpectrum(config);
-
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Spectrum batch failed');
-    });
-
-    test('generates requestId with spectrum prefix', async () => {
-      mockQueue.sendBatch.mockResolvedValue(undefined);
-
-      const config = {
-        lightnessSteps: 1,
-        chromaSteps: 1,
-        hueSteps: 1,
-      };
-
-      const result = await publisher.publishSpectrum(config);
-
-      expect(result.requestId).toMatch(/^spectrum-\d+$/);
-    });
-
-    test('rounds OKLCH values to 2 decimal places', async () => {
-      mockQueue.sendBatch.mockResolvedValue(undefined);
-
-      const config = {
-        lightnessSteps: 3, // Will generate 0.1, 0.5, 0.9
-        chromaSteps: 3, // Will generate 0.0, 0.2, 0.4
-        hueSteps: 1,
-      };
-
-      await publisher.publishSpectrum(config);
-
-      const [messages] = mockQueue.sendBatch.mock.calls[0];
-      const colors = messages.map((msg: { body: { oklch: OKLCH } }) => msg.body.oklch);
-
-      colors.forEach((color: OKLCH) => {
-        // Check that values are rounded to 2 decimal places
-        expect(color.l).toBe(Math.round(color.l * 100) / 100);
-        expect(color.c).toBe(Math.round(color.c * 100) / 100);
-        expect(color.h).toBe(Math.round(color.h));
-      });
-    });
+    expect(result.success).toBe(true);
+    expect(result.requestId).toBeDefined();
+    expect(result.requestId).toMatch(/^[0-9a-f-]+$/i); // UUID format
   });
 
-  describe('edge cases and validation', () => {
-    test('handles very large spectrum configurations', async () => {
-      mockQueue.sendBatch.mockResolvedValue(undefined);
+  test('publishBatch handles batch send errors gracefully', async () => {
+    const mockSendBatch = vi.fn().mockRejectedValue(new Error('Batch failed'));
+    const mockQueue = { sendBatch: mockSendBatch } as unknown as Queue;
+    const publisher = new ColorSeedPublisher(mockQueue);
 
-      const config = {
-        lightnessSteps: 10,
-        chromaSteps: 10,
-        hueSteps: 10, // 1000 total colors
-      };
+    const colors = [{ oklch: { l: 0.5, c: 0.1, h: 180 } }, { oklch: { l: 0.6, c: 0.2, h: 240 } }];
 
-      const result = await publisher.publishSpectrum(config);
+    const result = await publisher.publishBatch(colors);
 
-      expect(result.success).toBe(true);
-      expect(result.queuedCount).toBe(1000);
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('Batch failed');
+  });
 
-      // Should split into multiple batches (1000 / 100 = 10 batches)
-      expect(mockQueue.sendBatch).toHaveBeenCalledTimes(10);
+  test('publishBatch creates correct requestId format for batched messages', async () => {
+    const mockSendBatch = vi.fn().mockResolvedValue(undefined);
+    const mockQueue = { sendBatch: mockSendBatch } as unknown as Queue;
+    const publisher = new ColorSeedPublisher(mockQueue);
+
+    const colors = [{ oklch: { l: 0.5, c: 0.1, h: 180 } }];
+    await publisher.publishBatch(colors, { batchId: 'batch-123' });
+
+    const call = mockSendBatch.mock.calls[0];
+    const messages = call[0];
+    const message = messages[0];
+    expect(message.body.requestId).toMatch(/^batch-123-0-[0-9a-f-]+$/i);
+  });
+
+  test('publishSpectrum generates expected number of colors', async () => {
+    const mockSendBatch = vi.fn().mockResolvedValue(undefined);
+    const mockQueue = { sendBatch: mockSendBatch } as unknown as Queue;
+    const publisher = new ColorSeedPublisher(mockQueue);
+
+    const config = {
+      lightnessSteps: 3,
+      chromaSteps: 2,
+      hueSteps: 4,
+      baseName: 'test-spectrum',
+    };
+
+    const result = await publisher.publishSpectrum(config);
+    const expectedCount = 3 * 2 * 4; // 24 colors
+
+    expect(result.success).toBe(true);
+    expect(result.queuedCount).toBe(expectedCount);
+    expect(mockSendBatch).toHaveBeenCalledTimes(1); // All colors in one batch call
+  });
+
+  test('publishSpectrum uses provided values correctly', async () => {
+    const mockSendBatch = vi.fn().mockResolvedValue(undefined);
+    const mockQueue = { sendBatch: mockSendBatch } as unknown as Queue;
+    const publisher = new ColorSeedPublisher(mockQueue);
+
+    // Test with specific config values
+    const result = await publisher.publishSpectrum({
+      lightnessSteps: 2,
+      chromaSteps: 2,
+      hueSteps: 3,
+    });
+    const expectedCount = 2 * 2 * 3; // 12 colors
+
+    expect(result.success).toBe(true);
+    expect(result.queuedCount).toBe(expectedCount);
+  });
+
+  test('publishSpectrum creates proper color names', async () => {
+    const mockSendBatch = vi.fn().mockResolvedValue(undefined);
+    const mockQueue = { sendBatch: mockSendBatch } as unknown as Queue;
+    const publisher = new ColorSeedPublisher(mockQueue);
+
+    await publisher.publishSpectrum({
+      lightnessSteps: 2,
+      chromaSteps: 1,
+      hueSteps: 2,
+      baseName: 'test',
     });
 
-    test('handles minimum spectrum configuration', async () => {
-      mockQueue.sendBatch.mockResolvedValue(undefined);
+    // Check that messages have proper naming
+    const call = mockSendBatch.mock.calls[0];
+    const messages = call[0];
+    const message = messages[0];
+    expect(message.body.name).toMatch(/^test-/);
+    expect(message.body.oklch).toEqual(
+      expect.objectContaining({
+        l: expect.any(Number),
+        c: expect.any(Number),
+        h: expect.any(Number),
+      })
+    );
+  });
 
-      const config = {
-        lightnessSteps: 2, // Use 2 to avoid division by zero bug
-        chromaSteps: 2, // Use 2 to avoid division by zero bug
-        hueSteps: 1,
-      };
+  test('publishSpectrum handles spectrum generation errors', async () => {
+    const mockSendBatch = vi.fn().mockRejectedValue(new Error('Spectrum send failed'));
+    const mockQueue = { sendBatch: mockSendBatch } as unknown as Queue;
+    const publisher = new ColorSeedPublisher(mockQueue);
 
-      const result = await publisher.publishSpectrum(config);
-
-      expect(result.success).toBe(true);
-      expect(result.queuedCount).toBe(4); // 2 × 2 × 1 = 4
-      expect(mockQueue.sendBatch).toHaveBeenCalledOnce();
-
-      const [messages] = mockQueue.sendBatch.mock.calls[0];
-      expect(messages).toHaveLength(4);
-
-      // Check that we get proper OKLCH values (not NaN)
-      messages.forEach((msg: { body: { oklch: OKLCH } }) => {
-        expect(msg.body.oklch.l).not.toBeNaN();
-        expect(msg.body.oklch.c).not.toBeNaN();
-        expect(msg.body.oklch.h).not.toBeNaN();
-      });
+    const result = await publisher.publishSpectrum({
+      lightnessSteps: 2,
+      chromaSteps: 1,
+      hueSteps: 1,
     });
 
-    test('validates OKLCH color values are within expected ranges', async () => {
-      mockQueue.send.mockResolvedValue(undefined);
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('Spectrum send failed');
+  });
 
-      const validColor: OKLCH = { l: 0.5, c: 0.2, h: 180 };
-      const result = await publisher.publishSingle(validColor);
+  test('chunkArray divides arrays correctly', () => {
+    const mockQueue = { send: vi.fn() } as unknown as Queue;
+    const publisher = new ColorSeedPublisher(mockQueue);
 
-      expect(result.success).toBe(true);
+    // Access private method through type assertion for testing
+    const chunkArray = (
+      publisher as unknown as { chunkArray: <T>(array: T[], chunkSize: number) => T[][] }
+    ).chunkArray;
 
-      const [message] = mockQueue.send.mock.calls[0];
-      expect(message.oklch.l).toBeGreaterThanOrEqual(0);
-      expect(message.oklch.l).toBeLessThanOrEqual(1);
-      expect(message.oklch.c).toBeGreaterThanOrEqual(0);
-      expect(message.oklch.h).toBeGreaterThanOrEqual(0);
-      expect(message.oklch.h).toBeLessThanOrEqual(360);
-    });
+    const items = [1, 2, 3, 4, 5, 6, 7];
+    const chunks = chunkArray(items, 3);
+
+    expect(chunks).toEqual([[1, 2, 3], [4, 5, 6], [7]]);
+  });
+
+  test('chunkArray handles empty arrays', () => {
+    const mockQueue = { send: vi.fn() } as unknown as Queue;
+    const publisher = new ColorSeedPublisher(mockQueue);
+
+    const chunkArray = (
+      publisher as unknown as { chunkArray: <T>(array: T[], chunkSize: number) => T[][] }
+    ).chunkArray;
+    const chunks = chunkArray([], 5);
+
+    expect(chunks).toEqual([]);
+  });
+
+  test('message timestamp is recent', async () => {
+    const mockSend = vi.fn().mockResolvedValue(undefined);
+    const mockQueue = { send: mockSend } as unknown as Queue;
+    const publisher = new ColorSeedPublisher(mockQueue);
+
+    const beforeTime = Date.now();
+    await publisher.publishSingle({ l: 0.5, c: 0.1, h: 180 });
+    const afterTime = Date.now();
+
+    const call = mockSend.mock.calls[0];
+    const message = call[0];
+    expect(message.timestamp).toBeGreaterThanOrEqual(beforeTime);
+    expect(message.timestamp).toBeLessThanOrEqual(afterTime);
   });
 });

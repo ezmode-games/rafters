@@ -23,8 +23,11 @@ app.use(
   cors({
     origin: (origin) => {
       // Allow localhost for development and realhandy.tech domains for production
-      if (!origin) return true; // Same-origin requests
-      return origin.includes('localhost') || origin.endsWith('.realhandy.tech');
+      if (!origin) return '*'; // Same-origin requests
+      if (origin.includes('localhost') || origin.endsWith('.realhandy.tech')) {
+        return origin;
+      }
+      throw new Error('CORS policy violation');
     },
     allowMethods: ['GET', 'POST', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'X-API-Key'],

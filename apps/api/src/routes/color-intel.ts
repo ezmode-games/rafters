@@ -31,7 +31,6 @@ function generateVectorDimensions(oklch: { l: number; c: number; h: number }): n
   // Pre-compute expensive operations once
   const hueRad = (oklch.h * Math.PI) / 180;
   const hueCos = Math.cos(hueRad);
-  const _hueSin = Math.sin(hueRad);
   const chromaScale = oklch.c * 10; // Scale chroma for better distribution
   const lightnessScale = oklch.l * 2; // Scale lightness for better distribution
   const chromaLightness = oklch.c * oklch.l;
@@ -67,6 +66,7 @@ interface CloudflareBindings {
   CLAUDE_API_KEY: string;
   CF_TOKEN: string;
   CLAUDE_GATEWAY_URL: string;
+  AI: Ai;
 }
 
 const ColorIntelRequest = z.object({
