@@ -23,6 +23,11 @@ const AnnouncementContext = createContext<AnnouncementContextValue | null>(null)
 export interface AnnouncementProviderProps {
   children: React.ReactNode;
   debounceDelay?: number;
+  onAnnouncement?: (announcement: {
+    menuId?: string;
+    type: string;
+    priority: 'polite' | 'assertive';
+  }) => void;
 }
 
 /**
@@ -56,3 +61,14 @@ export function useAnnouncements() {
   }
   return context;
 }
+
+// Stub exports for MenuCoordinationSystem compatibility
+export const MENU_MESSAGES = {
+  OPENED: 'Menu opened',
+  CLOSED: 'Menu closed',
+  ITEM_SELECTED: 'Item selected',
+  ITEM_FOCUSED: 'Item focused',
+} as const;
+
+// Alias for backwards compatibility
+export const useMenuAnnouncements = useAnnouncements;

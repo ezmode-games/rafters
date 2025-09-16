@@ -43,7 +43,7 @@
  * ```
  */
 import { ChevronRight, Home, MoreHorizontal } from 'lucide-react';
-import { createContext, useCallback, useContext, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { cn } from '../lib/utils';
 
 export type BreadcrumbSeparator =
@@ -107,6 +107,8 @@ export interface BreadcrumbPageProps extends React.HTMLAttributes<HTMLSpanElemen
 }
 
 // Separator intelligence with cognitive load ratings
+// Note: Separator intelligence for AI reference - not used in runtime
+/*
 const _SEPARATOR_INTELLIGENCE = {
   'chevron-right': {
     cognitiveLoad: 2,
@@ -145,6 +147,7 @@ const _SEPARATOR_INTELLIGENCE = {
     accessibility: 'excellent',
   },
 } as const;
+*/
 
 // Safe character separators with Unicode support
 const SAFE_SEPARATORS = {
@@ -183,6 +186,8 @@ export function Breadcrumb({
 }: BreadcrumbProps) {
   const [_expanded, _setExpanded] = useState(false);
 
+  // Separator rendering function - reserved for future intelligence integration
+  /*
   const _renderSeparator = useCallback(() => {
     if (typeof separator === 'string') {
       const separatorMap = {
@@ -217,6 +222,7 @@ export function Breadcrumb({
       />
     );
   }, [separator, separatorProps]);
+  */
 
   return (
     <BreadcrumbContext.Provider value={{ separator, separatorProps }}>

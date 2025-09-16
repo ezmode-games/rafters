@@ -1,0 +1,98 @@
+---
+/**
+ * Documentation card component with embedded design intelligence
+ *
+ * @cognitive-load 2/10 - Simple card layout with clear hierarchy
+ * @attention-economics Use sparingly - cards create visual noise if overused
+ * @trust-building Low trust - informational content, reversible navigation
+ * @accessibility WCAG AAA compliant with proper focus indicators
+ * @semantic-meaning Surface backgrounds create gentle content separation
+ *
+ * @usage-patterns
+ * DO: Group related documentation topics, maintain consistent spacing
+ * NEVER: Use primary colors for backgrounds - reserved for actions
+ */
+
+export interface Props {
+  title: string;
+  description: string;
+  href: string;
+  trustLevel?: 'low' | 'medium' | 'high' | 'critical';
+  cognitiveLoad?: number;
+  attentionNote?: string;
+  variant?: 'foundation' | 'component' | 'link' | 'info';
+}
+
+const {
+  title,
+  description,
+  href,
+  trustLevel = 'low',
+  cognitiveLoad,
+  attentionNote,
+  variant = 'foundation',
+} = Astro.props;
+
+// Apply semantic color tokens based on variant and trust level
+const getCardClasses = (variant: string, trustLevel: string) => {
+  const baseClasses = 'border rounded-lg p-6 transition-colors hover:shadow-sm';
+
+  switch (variant) {
+    case 'foundation':
+      return `${baseClasses} bg-background border-border hover:bg-muted/50`;
+    case 'component':
+      return `${baseClasses} bg-muted/30 border-border hover:bg-muted/60`;
+    case 'info':
+      return `${baseClasses} bg-info/10 border-info/20 hover:bg-info/20`;
+    default:
+      return `${baseClasses} bg-background border-border hover:bg-muted/40`;
+  }
+};
+---
+
+<div class={getCardClasses(variant, trustLevel)}>
+  <div class="flex justify-between items-start mb-3">
+    <h3 class="text-lg font-semibold text-foreground">
+      <a 
+        href={href}
+        class="hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 rounded-sm"
+        aria-describedby={cognitiveLoad ? `${title.replace(/\s/g, '-')}-cognitive-load` : undefined}
+      >
+        {title}
+      </a>
+    </h3>
+    {cognitiveLoad !== undefined && (
+      <span 
+        id={`${title.replace(/\s/g, '-')}-cognitive-load`}
+        class="text-xs bg-info/10 text-info-foreground px-2 py-1 rounded border border-info/20"
+        title={`Cognitive load: ${cognitiveLoad}/10 - ${cognitiveLoad <= 3 ? 'Low mental effort' : cognitiveLoad <= 6 ? 'Moderate complexity' : 'High complexity'}`}
+      >
+        {cognitiveLoad}/10
+      </span>
+    )}
+  </div>
+  
+  <p class="text-sm text-muted-foreground mb-4 leading-relaxed">
+    {description}
+  </p>
+  
+  {attentionNote && (
+    <p class="text-xs text-muted-foreground/80 mb-4 italic border-l-2 border-muted pl-3">
+      {attentionNote}
+    </p>
+  )}
+  
+  <a 
+    href={href}
+    class="inline-flex items-center text-sm text-primary hover:text-primary/80 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-1 rounded-sm"
+    aria-label={`Read more about ${title}`}
+  >
+    <span class="mr-2">
+      {variant === 'component' ? 'View component' : 
+       variant === 'foundation' ? 'Read more' : 
+       variant === 'link' ? 'View' : 
+       'Learn more'}
+    </span>
+    <span aria-hidden="true">→</span>
+  </a>
+</div>

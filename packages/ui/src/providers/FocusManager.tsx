@@ -18,6 +18,9 @@ interface FocusManagerContextValue {
   unregisterFocusElement: (menuId: string) => void;
   createFocusTrap: (boundary: HTMLElement, menuId: string) => void;
   releaseFocusTrap: (menuId: string) => void;
+  // Additional methods expected by KeyboardNavigationProvider
+  announceFocusChange: (message: string, priority?: 'polite' | 'assertive') => void;
+  getFocusedMenuId: () => string | null;
 }
 
 const FocusManagerContext = createContext<FocusManagerContextValue | null>(null);
@@ -49,11 +52,22 @@ export function FocusManager({ children }: FocusManagerProps) {
     // No-op
   }
 
+  function announceFocusChange(_message: string, _priority?: 'polite' | 'assertive') {
+    // No-op stub - TODO: Implement screen reader announcements
+  }
+
+  function getFocusedMenuId(): string | null {
+    // No-op stub - TODO: Track focused menu
+    return null;
+  }
+
   const value: FocusManagerContextValue = {
     registerFocusElement,
     unregisterFocusElement,
     createFocusTrap,
     releaseFocusTrap,
+    announceFocusChange,
+    getFocusedMenuId,
   };
 
   return <FocusManagerContext.Provider value={value}>{children}</FocusManagerContext.Provider>;

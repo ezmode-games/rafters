@@ -16,6 +16,8 @@ test-results
 **/test-results
 playwright-report
 **/playwright-report
+playwright-report-components
+**/playwright-report-components
 playwright/.cache
 
 # Production

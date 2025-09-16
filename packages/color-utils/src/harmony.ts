@@ -769,18 +769,18 @@ export function calculatePerceptualWeight(color: OKLCH): {
   const weight = lightnessWeight * 0.4 + chromaWeight * 0.35 + hueWeight * 0.25;
 
   let density: 'light' | 'medium' | 'heavy';
-  let balancingRecommendation: string;
 
   if (weight < 0.3) {
     density = 'light';
-    balancingRecommendation = 'Can be used in larger areas, needs darker accents for balance';
   } else if (weight < 0.7) {
     density = 'medium';
-    balancingRecommendation = 'Good for medium-sized UI elements, balanced weight';
   } else {
     density = 'heavy';
-    balancingRecommendation = 'Use sparingly, best for small accents or important CTAs';
   }
+
+  // Mark for AI to generate contextual balancing recommendations
+  // AI will have access to the weight value and density to generate intelligent guidance
+  const balancingRecommendation = '<AI_GENERATE>';
 
   return {
     weight,

@@ -14,14 +14,14 @@ export default defineWorkersConfig({
     poolOptions: {
       workers: {
         wrangler: { configPath: './wrangler.jsonc' },
+        // Test bindings for Cloudflare services - overrides for testing
         bindings: {
-          // Test bindings for Cloudflare services
           RAFTERS_INTEL: { type: 'kv' },
+          DESIGN_TOKENS: { type: 'kv' },
+          COMPONENT_REGISTRY: { type: 'kv' },
           RAFTERS_CACHE: { type: 'kv' },
-        },
-        miniflare: {
-          // Additional Miniflare configuration
-          kvNamespaces: ['RAFTERS_INTEL', 'RAFTERS_CACHE'],
+          CLAUDE_API_KEY: 'test-api-key',
+          ENVIRONMENT: 'test',
         },
       },
     },

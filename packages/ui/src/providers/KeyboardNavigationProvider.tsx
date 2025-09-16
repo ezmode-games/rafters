@@ -48,7 +48,7 @@ const KeyConfigSchema = z.object({
       alt: z.boolean().default(false),
       meta: z.boolean().default(false),
     })
-    .default({}),
+    .default({ ctrl: false, shift: false, alt: false, meta: false }),
   action: KeyboardActionSchema,
   preventDefault: z.boolean().default(true),
   stopPropagation: z.boolean().default(true),
@@ -406,12 +406,12 @@ const getNavigableElements = (container: HTMLElement): HTMLElement[] => {
 const matchesKeyConfig = (event: KeyboardEvent, config: KeyConfig): boolean => {
   if (event.key !== config.key) return false;
 
-  const modifiers = config.modifiers || {};
+  const modifiers = config.modifiers || { ctrl: false, shift: false, alt: false, meta: false };
   return (
-    event.ctrlKey === (modifiers.ctrl || false) &&
-    event.shiftKey === (modifiers.shift || false) &&
-    event.altKey === (modifiers.alt || false) &&
-    event.metaKey === (modifiers.meta || false)
+    event.ctrlKey === (modifiers.ctrl ?? false) &&
+    event.shiftKey === (modifiers.shift ?? false) &&
+    event.altKey === (modifiers.alt ?? false) &&
+    event.metaKey === (modifiers.meta ?? false)
   );
 };
 
@@ -432,7 +432,7 @@ export const KeyboardNavigationProvider: React.FC<KeyboardNavigationProviderProp
   typeAheadDelay = 1000,
   onGlobalKeyAction,
 }) => {
-  const _coordination = useMenuCoordination();
+  useMenuCoordination(); // Required for context access
   const focusManager = useFocusManager();
 
   const [state, setState] = useState<KeyboardNavigationState>({
@@ -443,7 +443,7 @@ export const KeyboardNavigationProvider: React.FC<KeyboardNavigationProviderProp
     lastKeyTime: 0,
   });
 
-  const searchTimeoutRef = useRef<NodeJS.Timeout>();
+  const searchTimeoutRef = useRef<number>(0);
 
   // Register keyboard handler for a menu
   const registerKeyboardHandler = useCallback((handler: KeyboardHandler) => {
@@ -557,7 +557,7 @@ export const KeyboardNavigationProvider: React.FC<KeyboardNavigationProviderProp
 
       searchTimeoutRef.current = setTimeout(() => {
         disableSearchMode();
-      }, typeAheadDelay);
+      }, typeAheadDelay) as unknown as number;
     },
     [typeAheadDelay, disableSearchMode]
   );
@@ -774,7 +774,10 @@ export const useMenuKeyboard = (
         menuId,
         menuType,
         priority: menuType === 'context' ? 1 : menuType === 'navigation' ? 2 : 5,
-        keyConfigs: keyConfigs.map((config) => ({ modifiers: {}, ...config })),
+        keyConfigs: keyConfigs.map((config) => ({
+          modifiers: { ctrl: false, shift: false, alt: false, meta: false },
+          ...config,
+        })),
         onAction,
         enabled: true,
       });
@@ -783,6 +786,7 @@ export const useMenuKeyboard = (
         unregisterKeyboardHandler(menuId);
       };
     }
+    return () => {}; // No-op cleanup for inactive menus
   }, [
     menuId,
     menuType,

@@ -1,0 +1,223 @@
+import { zValidator } from '@hono/zod-validator';
+import { generateColorValue, validateOKLCH } from '@rafters/color-utils';
+import { ColorValueSchema } from '@rafters/shared';
+import { Hono } from 'hono';
+import * as z from 'zod';
+import { generateColorIntelligence } from '../lib/color-intel/utils';
+
+// Local OKLCH schema to avoid import issues
+const OKLCHSchema = z.object({
+  l: z.number().min(0).max(1),
+  c: z.number().min(0),
+  h: z.number().min(0).max(360),
+  alpha: z.number().min(0).max(1).optional(),
+});
+
+// Vectorize requires exactly 384 dimensions for color intelligence vectors
+// Structure: 4 OKLCH values + 5 semantic dimensions + 375 mathematical functions
+// The 375 additional dimensions provide deterministic mathematical encoding
+// of color relationships using trigonometric functions of OKLCH components
+const VECTORIZE_ADDITIONAL_DIMENSIONS = 375;
+
+/**
+ * Generate deterministic vector dimensions efficiently using mathematical functions
+ * Avoids expensive Array.from iteration by computing values directly
+ */
+function generateVectorDimensions(oklch: { l: number; c: number; h: number }): number[] {
+  const dimensions: number[] = [];
+
+  // Base factor for mathematical functions
+  const hueRad = (oklch.h * Math.PI) / 180;
+  const chromaScale = oklch.c * 10; // Scale chroma for better distribution
+  const lightnessScale = oklch.l * 2; // Scale lightness for better distribution
+
+  // Generate dimensions using efficient mathematical relationships
+  for (let i = 0; i < VECTORIZE_ADDITIONAL_DIMENSIONS; i++) {
+    const factor = (i + 1) / VECTORIZE_ADDITIONAL_DIMENSIONS;
+
+    // Use different mathematical functions based on index ranges for better distribution
+    if (i < 125) {
+      // Trigonometric functions with hue variations
+      dimensions.push(Math.sin(hueRad * factor) * chromaScale * lightnessScale);
+    } else if (i < 250) {
+      // Cosine functions with chroma variations
+      dimensions.push(Math.cos(hueRad * factor) * oklch.l * oklch.c);
+    } else {
+      // Combined functions for complex relationships
+      dimensions.push(
+        Math.sin(factor * Math.PI) * Math.cos(oklch.h * factor * 0.01) * oklch.l * oklch.c
+      );
+    }
+  }
+
+  return dimensions;
+}
+
+interface CloudflareBindings {
+  VECTORIZE: VectorizeIndex;
+  CLAUDE_API_KEY: string;
+  CF_TOKEN: string;
+  CLAUDE_GATEWAY_URL: string;
+}
+
+const ColorIntelRequest = z.object({
+  oklch: OKLCHSchema,
+  token: z.string().optional(),
+  name: z.string().optional(),
+  expire: z.boolean().optional(), // Force cache invalidation, skip AI generation
+});
+
+const colorIntel = new Hono<{ Bindings: CloudflareBindings }>();
+
+colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
+  try {
+    const data = c.req.valid('json');
+
+    // Validate OKLCH input
+    if (!validateOKLCH(data.oklch)) {
+      return c.json(
+        {
+          error: 'Invalid OKLCH values',
+          message: 'OKLCH must have l (0-1), c (0+), h (0-360)',
+        },
+        400
+      );
+    }
+
+    const oklch = data.oklch;
+    const colorId = `oklch-${oklch.l.toFixed(2)}-${oklch.c.toFixed(2)}-${oklch.h.toFixed(0)}`;
+    const vectorize = c.env.VECTORIZE;
+
+    // Check for existing cached data
+    let existingIntelligence = null;
+    if (vectorize) {
+      try {
+        const existing = await vectorize.getByIds([colorId]);
+        if (existing.length > 0 && existing[0]?.metadata?.complete_color_value) {
+          const cachedColorValue = JSON.parse(existing[0].metadata.complete_color_value as string);
+
+          // If expire flag is not set, return cached data
+          if (!data.expire) {
+            return c.json(cachedColorValue);
+          }
+
+          // If expire flag is set, save existing AI intelligence for reuse
+          existingIntelligence = cachedColorValue.intelligence;
+        }
+      } catch (vectorError) {
+        console.warn('Vectorize read failed:', vectorError);
+      }
+    }
+
+    // Generate AI intelligence and mathematical data
+    const apiKey = c.env.CLAUDE_API_KEY;
+    if (!apiKey) {
+      return c.json({ error: 'Missing API key', message: 'CLAUDE_API_KEY not set' }, 500);
+    }
+
+    const gatewayUrl = c.env.CLAUDE_GATEWAY_URL;
+    const cfToken = c.env.CF_TOKEN;
+    const context = { token: data.token, name: data.name };
+
+    // Generate fresh mathematical data, reuse existing AI intelligence if available
+    const colorValue = generateColorValue(oklch, context);
+
+    let intelligence: {
+      suggestedName: string;
+      reasoning: string;
+      emotionalImpact: string;
+      culturalContext: string;
+      accessibilityNotes: string;
+      usageGuidance: string;
+      balancingGuidance?: string; // New field for perceptual weight recommendations
+    };
+    if (existingIntelligence) {
+      // Reuse existing AI intelligence when expire flag is set
+      intelligence = existingIntelligence;
+    } else {
+      // Generate new AI intelligence only if none exists
+      // Pass the perceptual weight data to AI for contextual recommendations
+      const perceptualWeight = colorValue.perceptualWeight;
+      intelligence = await generateColorIntelligence(
+        oklch,
+        context,
+        apiKey,
+        gatewayUrl,
+        cfToken,
+        perceptualWeight,
+        c.env.AI
+      );
+    }
+
+    // Replace any <AI_GENERATE> tokens with AI-generated content
+    const processedColorValue = { ...colorValue };
+    if (processedColorValue.perceptualWeight?.balancingRecommendation === '<AI_GENERATE>') {
+      processedColorValue.perceptualWeight.balancingRecommendation =
+        intelligence.balancingGuidance ||
+        `Weight: ${processedColorValue.perceptualWeight.weight.toFixed(2)} - ${processedColorValue.perceptualWeight.density} visual density`;
+    }
+
+    // Use mathematical color intelligence from generateColorValue
+    const completeColorValue = {
+      ...processedColorValue,
+      intelligence, // AI intelligence from Claude API
+    };
+
+    // Validate completeColorValue against ColorValueSchema
+    const validatedColorValue = ColorValueSchema.parse(completeColorValue);
+
+    // Store in Vectorize for future semantic search
+    if (vectorize) {
+      try {
+        await vectorize.upsert([
+          {
+            id: colorId,
+            values: [
+              oklch.l,
+              oklch.c,
+              oklch.h,
+              oklch.alpha || 1,
+              // Deterministic semantic dimensions based on OKLCH only
+              oklch.h < 60 || oklch.h > 300 ? 1 : 0, // Warm hues (red-yellow range)
+              oklch.l > 0.65 ? 1 : 0, // Light colors
+              oklch.c > 0.15 ? 1 : 0, // High chroma/saturation
+              Math.sin((oklch.h * Math.PI) / 180), // Hue as sine
+              Math.cos((oklch.h * Math.PI) / 180), // Hue as cosine
+              // Fill remaining dimensions with efficient deterministic mathematical functions
+              ...generateVectorDimensions(oklch),
+            ],
+            metadata: {
+              complete_color_value: JSON.stringify(validatedColorValue),
+            },
+          },
+        ]);
+      } catch (vectorError) {
+        console.warn('Vectorize write failed:', vectorError);
+      }
+    }
+
+    return c.json(validatedColorValue);
+  } catch (error) {
+    console.error('Color intelligence API error:', error);
+
+    if (error instanceof z.ZodError) {
+      return c.json(
+        {
+          error: 'Validation failed',
+          message: error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', '),
+        },
+        400
+      );
+    }
+
+    return c.json(
+      {
+        error: 'Internal server error',
+        message: 'An unexpected error occurred',
+      },
+      500
+    );
+  }
+});
+
+export { colorIntel };

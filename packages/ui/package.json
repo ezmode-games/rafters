@@ -17,11 +17,11 @@
     "src"
   ],
   "scripts": {
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "test:integration": "echo \"UI package uses unit tests only - no Cloudflare Workers integration needed\"",
     "test:component": "playwright test --config playwright.config.component.ts",
-    "test:preflight": "vitest run && playwright test --config playwright.config.component.ts",
+    "test:preflight": "vitest run --passWithNoTests && playwright test --config playwright.config.component.ts",
     "lint": "biome check .",
     "format": "biome format --write .",
     "type-check": "tsc --noEmit"

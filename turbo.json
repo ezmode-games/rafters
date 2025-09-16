@@ -88,6 +88,24 @@
       "outputs": ["test-results/**", "coverage/**"],
       "cache": false,
       "env": ["NODE_ENV", "CI"]
+    },
+    "deploy": {
+      "dependsOn": ["build", "preflight"],
+      "outputs": [],
+      "cache": false,
+      "env": ["NODE_ENV", "CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID"]
+    },
+    "deploy:preview": {
+      "dependsOn": ["build"],
+      "outputs": [],
+      "cache": false,
+      "env": ["NODE_ENV", "CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID"]
+    },
+    "publish": {
+      "dependsOn": ["build", "preflight"],
+      "outputs": [],
+      "cache": false,
+      "env": ["NODE_ENV", "NPM_TOKEN"]
     }
   }
 }

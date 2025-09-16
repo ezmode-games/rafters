@@ -12,7 +12,6 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-
     "// ===== MONOREPO TESTING ORCHESTRATION =====": "",
     "test": "node scripts/test-orchestrator.mjs all",
     "test:affected": "node scripts/test-orchestrator.mjs affected",
@@ -21,7 +20,6 @@
     "test:component": "vitest run --workspace --config vitest.workspace.ts --project component",
     "test:e2e": "turbo test:e2e",
     "test:progressive": "node scripts/test-orchestrator.mjs progressive",
-
     "// Advanced Testing Commands": "",
     "test:watch": "vitest --workspace --config vitest.workspace.ts",
     "test:coverage": "vitest run --workspace --coverage",
@@ -29,22 +27,15 @@
     "test:coverage:integration": "vitest run --workspace --coverage --project integration",
     "test:ui": "vitest --workspace --ui",
     "test:reporter": "vitest run --workspace --reporter=verbose --reporter=json --outputFile=test-results/results.json",
-
     "// Performance Testing": "",
-    "test:performance": "vitest run --workspace --config vitest.workspace.ts --reporter=json | node scripts/performance-analyzer.mjs",
-    "test:memory": "node --expose-gc scripts/memory-test-runner.mjs",
     "test:benchmark": "vitest bench --workspace",
-
     "// CI/CD Testing Commands": "",
     "test:ci": "vitest run --workspace --coverage --reporter=junit --reporter=github-actions",
     "test:ci:sharded": "vitest run --workspace --shard=${SHARD_INDEX:-1}/${SHARD_COUNT:-1}",
     "test:ci:parallel": "vitest run --workspace --pool=threads --poolOptions.threads.maxThreads=${MAX_THREADS:-4}",
-
     "// Future-Ready Commands": "",
     "test:ai-insights": "node scripts/ai-test-analyzer.mjs",
     "test:distributed": "node scripts/distributed-test-coordinator.mjs",
-    "test:smart": "node scripts/smart-test-selector.mjs",
-
     "typecheck": "turbo typecheck",
     "lint": "turbo lint",
     "format": "turbo format",
@@ -60,8 +51,7 @@
     "@biomejs/biome": "^2.2.4",
     "@changesets/cli": "^2.27.10",
     "@cloudflare/vitest-pool-workers": "^0.8.68",
-    "@cloudflare/workers-types": "^4.20250102.0",
-    "@types/node": "^20.19.1",
+    "@types/node": "^22.0.0",
     "lefthook": "^1.9.6",
     "turbo": "^2.3.4",
     "typescript": "^5.9.2",
@@ -75,13 +65,23 @@
     },
     "peerDependencyRules": {
       "allowedVersions": {
-        "react": "19.x",
-        "react-dom": "19.x"
+        "react": ">=19.0.0",
+        "react-dom": ">=19.0.0"
       }
     },
     "overrides": {
-      "react": "^19.1.1",
-      "react-dom": "^19.1.1"
-    }
+      "react": "^19.0.0",
+      "react-dom": "^19.0.0"
+    },
+    "onlyBuiltDependencies": [
+      "@cloudflare/workerd-darwin-64",
+      "@cloudflare/workerd-linux-64",
+      "@swc/core",
+      "@tailwindcss/oxide",
+      "esbuild",
+      "lefthook",
+      "sharp",
+      "workerd"
+    ]
   }
 }

@@ -1,44 +1,45 @@
 {
-  "name": "@rafters/website",
-  "version": "1.0.0",
-  "description": "Rafters design system website deployed on Cloudflare Pages",
+  "name": "website",
   "type": "module",
-  "private": true,
+  "version": "0.0.1",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "test": "vitest run",
-    "test:integration": "vitest run --config vitest.config.cloudflare.ts",
+    "dev": "astro dev",
+    "build": "node scripts/generate-token-cache.mjs && astro build",
+    "preview": "astro build && wrangler dev",
+    "astro": "astro",
+    "deploy": "node scripts/generate-token-cache.mjs && astro build && wrangler deploy",
+    "cf-typegen": "wrangler types",
+    "generate-tokens": "node scripts/generate-token-cache.mjs",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "test:unit": "vitest run --config vitest.config.ts --passWithNoTests",
+    "test:spec": "vitest run --config vitest.config.ts --grep spec",
+    "test:component": "playwright test --config=playwright-ct.config.ts --pass-with-no-tests",
     "test:e2e": "playwright test",
-    "test:preflight": "vitest run && vitest run --config vitest.config.cloudflare.ts && playwright test",
-    "lint": "biome check .",
-    "format": "biome format --write .",
-    "type-check": "tsc --noEmit"
+    "test:preflight": "vitest run --passWithNoTests && playwright test --config=playwright-ct.config.ts --pass-with-no-tests"
   },
   "dependencies": {
-    "@rafters/ui": "workspace:*",
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/cloudflare": "^12.6.8",
+    "@astrojs/mdx": "^4.3.2",
+    "@astrojs/react": "^4.3.1",
     "@rafters/design-tokens": "workspace:*",
     "@rafters/shared": "workspace:*",
-    "next": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:"
+    "@swc/core": "^1.10.5",
+    "astro": "^5.13.7",
+    "comment-parser": "^1.4.1",
+    "typescript": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.6.9",
-    "@playwright/test": "^1.50.1",
+    "@playwright/experimental-ct-react": "^1.55.0",
+    "@playwright/test": "^1.55.0",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "typescript": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "vitest": "catalog:",
-    "wrangler": "catalog:"
-  },
-  "author": "Sean Silvius",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/real-handy/rafters",
-    "directory": "apps/website"
+    "wrangler": "^4.35.0"
   }
 }

@@ -1,0 +1,251 @@
+---
+title: "Typography System"
+description: "Hierarchical text patterns with IBM Plex fonts and systematic scaling relationships"
+order: 4
+---
+
+# Typography System
+
+Rafters uses IBM Plex Sans and IBM Plex Mono to create a distinctive technical aesthetic that signals "this is for builders" while maintaining excellent readability for all content types.
+
+## Font Selection Strategy
+
+### IBM Plex Sans - Body Text
+**Purpose**: Optimized for extended reading and UI text
+- **Weight Range**: 100-700 (Light to Bold)
+- **Default Weight**: 300 (Light) for reduced visual weight
+- **Line Height**: 1.6-1.7 for comfortable reading
+- **Use Cases**: Paragraphs, descriptions, labels, form inputs
+
+### IBM Plex Mono - Headings & Code
+**Purpose**: Technical identity and code display
+- **Weight Range**: 100-700 (Light to Bold) 
+- **Default Weight**: 400 (Regular) for proper mono spacing
+- **Line Height**: 1.2 for tight heading hierarchy
+- **Use Cases**: Headings, code blocks, technical labels
+
+## Hierarchical Scale
+
+### Heading Hierarchy
+```css
+/* H1 - Page Titles */
+h1 { 
+  font-family: var(--font-mono);
+  font-size: 2.25rem;      /* 36px */
+  line-height: 1.2;
+  font-weight: 400;
+  margin-top: 0;
+}
+
+/* H2 - Major Sections */
+h2 { 
+  font-family: var(--font-mono);
+  font-size: 1.875rem;     /* 30px */
+  line-height: 1.2;
+  font-weight: 400;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+/* H3 - Sub-sections */
+h3 { 
+  font-family: var(--font-mono);
+  font-size: 1.5rem;       /* 24px */
+  line-height: 1.2;
+  font-weight: 400;
+}
+
+/* H4-H6 - Minor headings */
+h4, h5, h6 { 
+  font-family: var(--font-mono);
+  font-size: 1.25rem;      /* 20px */
+  line-height: 1.2;
+  font-weight: 400;
+}
+```
+
+### Body Text Scale
+```css
+/* Large Text - Introductions */
+.text-xl {
+  font-family: var(--font-sans);
+  font-size: 1.25rem;      /* 20px */
+  line-height: 1.75;
+  font-weight: 300;
+}
+
+/* Standard Text - Default body */
+.text-lg {
+  font-family: var(--font-sans);
+  font-size: 1.125rem;     /* 18px */
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+/* Base Text - UI elements */
+.text-base {
+  font-family: var(--font-sans);
+  font-size: 1rem;         /* 16px */
+  line-height: 1.5;
+  font-weight: 300;
+}
+
+/* Small Text - Secondary info */
+.text-sm {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;     /* 14px */
+  line-height: 1.25;
+  font-weight: 300;
+}
+
+/* Tiny Text - Captions, labels */
+.text-xs {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;      /* 12px */
+  line-height: 1;
+  font-weight: 300;
+}
+```
+
+## Mathematical Relationships
+
+### Modular Scale
+Typography follows a **1.2 ratio (Minor Third)** for harmonious proportional relationships:
+
+- **12px** (0.75rem) - Captions
+- **14px** (0.875rem) - Secondary text  
+- **16px** (1rem) - Base size
+- **18px** (1.125rem) - Body text
+- **20px** (1.25rem) - Large body
+- **24px** (1.5rem) - H3
+- **30px** (1.875rem) - H2
+- **36px** (2.25rem) - H1
+
+### Line Height Strategy
+- **Headings**: 1.2 (tight for visual hierarchy)
+- **Body Text**: 1.6-1.7 (comfortable reading)
+- **UI Elements**: 1.25-1.5 (compact interfaces)
+- **Code**: 1.4 (readable but compact)
+
+## Semantic Typography Classes
+
+### Content-Aware Typography
+```css
+/* Article Typography - Automatic styling */
+article h1, article h2, article h3 {
+  font-family: var(--font-mono);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+article p {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+
+article ul, article ol {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+article blockquote {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-style: italic;
+  border-left: 4px solid #e5e7eb;
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  color: #6b7280;
+}
+```
+
+### Code Typography
+```css
+/* Inline Code */
+article code {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.875rem;
+  background-color: #f3f4f6;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+/* Code Blocks */
+article pre {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  background-color: #1f2937;
+  color: #f9fafb;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+}
+
+article pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+}
+```
+
+## Accessibility & Performance
+
+### WCAG Compliance
+- **Minimum font sizes**: 16px base (never below 14px)
+- **Contrast ratios**: Minimum 4.5:1 (AA), target 7:1 (AAA)
+- **Line length**: 45-75 characters for optimal reading
+- **Line height**: Minimum 1.5 for body text
+
+### Font Loading Strategy
+```html
+<!-- Preconnect for performance -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<!-- Load with display=swap for FOUT prevention -->
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+```
+
+### Fallback Stack
+```css
+:root {
+  --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', 'Courier New', monospace;
+}
+```
+
+## Design Intelligence Integration
+
+### Cognitive Load Through Typography
+**Low Cognitive Load** (0-2/10):
+- Light font weights (300)
+- Generous line spacing (1.6-1.7)
+- Comfortable font sizes (16px+)
+- High contrast ratios
+
+**Medium Cognitive Load** (3-5/10):
+- Regular font weights (400-500)
+- Standard line spacing (1.4-1.6)
+- Smaller font sizes (14-16px)
+- Clear hierarchy
+
+**High Cognitive Load** (6+/10):
+- Bold font weights (600-700)
+- Tight line spacing (1.2-1.4)
+- Dense information display
+- Multiple font sizes in proximity
+
+### Trust Building Through Typography
+- **Professional**: IBM Plex Mono for headings signals technical expertise
+- **Readable**: IBM Plex Sans ensures accessibility and comfort
+- **Systematic**: Mathematical scale demonstrates design precision
+- **Consistent**: Same fonts across all brand touchpoints
+
+This typography system supports both human readers and AI agents by providing clear semantic meaning, systematic relationships, and embedded reasoning about cognitive load and trust building.

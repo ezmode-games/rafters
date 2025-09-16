@@ -172,7 +172,12 @@ const estimateAnimationDuration = (request: AnimationRequest): number => {
   if (request.duration === 'custom' && request.customDuration) {
     return request.customDuration;
   }
-  return MOTION_DURATIONS[request.duration] || MOTION_DURATIONS.standard;
+
+  // Handle only valid duration keys, exclude 'custom'
+  const validDuration = request.duration === 'custom' ? 'standard' : request.duration;
+  return (
+    MOTION_DURATIONS[validDuration as keyof typeof MOTION_DURATIONS] || MOTION_DURATIONS.standard
+  );
 };
 
 const calculateCognitiveLoad = (type: MotionType, duration: number, priority: number): number => {
@@ -491,7 +496,17 @@ export const MotionCoordinator: React.FC<MotionCoordinatorProps> = ({
   // Motion utilities
   const getMotionClass = useCallback(
     (menuId: string, type: MotionType, duration: MotionDuration): string => {
-      let baseClass = MOTION_CLASSES[type]?.[duration] || MOTION_CLASSES[type]?.standard || '';
+      // Handle custom duration by falling back to standard
+      const validDuration = duration === 'custom' ? 'standard' : duration;
+      const typeMotions = MOTION_CLASSES[type as keyof typeof MOTION_CLASSES];
+      let baseClass = '';
+
+      if (typeMotions && typeof typeMotions === 'object') {
+        baseClass =
+          (typeMotions as Record<string, string>)[validDuration] ||
+          (typeMotions as Record<string, string>).standard ||
+          '';
+      }
 
       // Apply performance considerations
       baseClass = getPerformanceMotionClass(baseClass);
@@ -643,6 +658,7 @@ export const useMenuMotion = (menuId: string, menuType: keyof typeof menuMotionC
         releaseMotionPriority(menuId);
       };
     }
+    return () => {}; // No-op cleanup for inactive menus
   }, [menuId, menuType, isMenuActive, setMotionPriority, releaseMotionPriority]);
 
   // Cancel animations when menu unmounts
@@ -671,6 +687,7 @@ export const useMenuMotion = (menuId: string, menuType: keyof typeof menuMotionC
         priority: config.trustLevel === 'critical' ? 1 : config.trustLevel === 'high' ? 2 : 5,
         cognitiveLoad: config.cognitiveLoad,
         trustLevel: config.trustLevel,
+        canBeReduced: true,
         ...options,
       });
     },
