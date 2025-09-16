@@ -37,7 +37,7 @@
     "@rafters/shared": "workspace:*",
     "fs-extra": "^11.2.0",
     "sqids": "^0.3.0",
-    "zod": "^3.24.1"
+    "zod": "catalog:"
   },
   "author": "Sean Silvius",
   "license": "MIT",

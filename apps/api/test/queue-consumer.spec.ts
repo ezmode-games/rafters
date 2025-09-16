@@ -273,7 +273,7 @@ describe('Queue Consumer - Integration Tests', () => {
         const [request, env] = call;
         expect(request.url).toBe('http://internal/api/color-intel');
         expect(request.method).toBe('POST');
-        expect(env).toBe(testEnv);
+        expect(env).toBe(testEnv as unknown as MockCloudflareBindings);
       });
     });
 
@@ -470,7 +470,7 @@ describe('Queue Consumer - Integration Tests', () => {
       const [request, env] = mockApp.fetch.mock.calls[0];
       expect(request.url).toBe('http://internal/api/color-intel');
       expect(request.method).toBe('POST');
-      expect(env).toBe(minimalEnv);
+      expect(env).toBe(minimalEnv as unknown as MockCloudflareBindings);
 
       expect(mockMessage.ack).toHaveBeenCalledOnce();
     });
@@ -601,7 +601,7 @@ describe('Queue Consumer - Integration Tests', () => {
       const [request, env] = mockApp.fetch.mock.calls[0];
       expect(request.url).toBe('http://internal/api/color-intel');
       expect(request.method).toBe('POST');
-      expect(env).toBe(testEnv); // Environment includes VECTORIZE binding
+      expect(env).toBe(testEnv as unknown as MockCloudflareBindings); // Environment includes VECTORIZE binding
 
       expect(mockMessage.ack).toHaveBeenCalledOnce();
     });

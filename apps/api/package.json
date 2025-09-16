@@ -20,7 +20,7 @@
     "@rafters/color-utils": "workspace:*",
     "@rafters/shared": "workspace:*",
     "hono": "^4.6.14",
-    "zod": "^3.24.1"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.9.1",
