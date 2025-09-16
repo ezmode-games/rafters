@@ -470,19 +470,30 @@ class TestExecutor {
 
   displayTestOutput(output) {
     const lines = output.split('\n');
-    let relevantLines = [];
+    const relevantLines = [];
     let inErrorSection = false;
 
     for (const line of lines) {
       // Look for error indicators
-      if (line.includes('FAIL') || line.includes('ERROR') || line.includes('✗') ||
-          line.includes('×') || line.includes('AssertionError') || line.includes('Test failed') ||
-          line.includes('Command failed') || line.includes('exited (1)')) {
+      if (
+        line.includes('FAIL') ||
+        line.includes('ERROR') ||
+        line.includes('✗') ||
+        line.includes('×') ||
+        line.includes('AssertionError') ||
+        line.includes('Test failed') ||
+        line.includes('Command failed') ||
+        line.includes('exited (1)')
+      ) {
         inErrorSection = true;
         relevantLines.push(line);
       } else if (inErrorSection) {
         // Continue capturing lines in error context
-        if (line.trim() === '' && relevantLines.length > 0 && !relevantLines[relevantLines.length - 1].trim()) {
+        if (
+          line.trim() === '' &&
+          relevantLines.length > 0 &&
+          !relevantLines[relevantLines.length - 1].trim()
+        ) {
           // Skip multiple empty lines
           continue;
         }
@@ -494,8 +505,12 @@ class TestExecutor {
         }
       }
       // Also capture standalone error lines
-      else if (line.includes('Error:') || line.includes('Failed:') ||
-               line.includes('command finished with error') || line.includes('ELIFECYCLE')) {
+      else if (
+        line.includes('Error:') ||
+        line.includes('Failed:') ||
+        line.includes('command finished with error') ||
+        line.includes('ELIFECYCLE')
+      ) {
         relevantLines.push(line);
       }
     }
@@ -591,13 +606,24 @@ async function main() {
             const lines = pkgResult.output.split('\n');
             let inFailureSection = false;
             for (const line of lines) {
-              if (line.includes('FAIL') || line.includes('✗') || line.includes('×') || line.includes('Error:') || line.includes('AssertionError')) {
+              if (
+                line.includes('FAIL') ||
+                line.includes('✗') ||
+                line.includes('×') ||
+                line.includes('Error:') ||
+                line.includes('AssertionError')
+              ) {
                 inFailureSection = true;
               }
               if (inFailureSection && (line.trim() === '' || line.includes('Tests'))) {
                 inFailureSection = false;
               }
-              if (inFailureSection || line.includes('FAIL') || line.includes('✗') || line.includes('×')) {
+              if (
+                inFailureSection ||
+                line.includes('FAIL') ||
+                line.includes('✗') ||
+                line.includes('×')
+              ) {
                 console.log(`     ${line}`);
               }
             }
