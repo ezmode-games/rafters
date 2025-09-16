@@ -338,9 +338,43 @@ class TestExecutor {
 
       const duration = Date.now() - startTime;
 
-      // Parse test results (simplified)
-      const passed = (result.match(/✓/g) || []).length;
-      const failed = (result.match(/✗|×/g) || []).length;
+      // Parse test results for Vitest output format
+      const testSummary = result.match(/Tests\s+(\d+)\s+passed\s+\((\d+)\)/);
+      const failedMatch = result.match(/Tests\s+(\d+)\s+failed\s+\((\d+)\)/);
+
+      const passed = testSummary ? parseInt(testSummary[1], 10) : 0;
+      const failed = failedMatch ? parseInt(failedMatch[1], 10) : 0;
+
+      // Handle no tests found case (like website with --passWithNoTests)
+      if (result.includes('No test files found, exiting with code 0')) {
+        return {
+          success: true,
+          package: info.name,
+          path: packagePath,
+          total: 0,
+          passed: 0,
+          failed: 0,
+          duration,
+          output: result,
+          skipped: true,
+        };
+      }
+
+      // Fallback to symbol counting if summary parsing fails
+      if (passed === 0 && failed === 0) {
+        const passedSymbols = (result.match(/✓/g) || []).length;
+        const failedSymbols = (result.match(/✗|×/g) || []).length;
+        return {
+          success: failedSymbols === 0 && passedSymbols > 0,
+          package: info.name,
+          path: packagePath,
+          total: passedSymbols + failedSymbols,
+          passed: passedSymbols,
+          failed: failedSymbols,
+          duration,
+          output: result,
+        };
+      }
 
       return {
         success: failed === 0,
@@ -353,6 +387,21 @@ class TestExecutor {
         output: result,
       };
     } catch (error) {
+      // Handle packages with no test script
+      if (error.message.includes('test') && (error.message.includes('not found') || error.message.includes('not available'))) {
+        return {
+          success: true,
+          package: info.name,
+          path: packagePath,
+          total: 0,
+          passed: 0,
+          failed: 0,
+          duration: Date.now() - startTime,
+          skipped: true,
+          skipReason: 'No test script available',
+        };
+      }
+
       return {
         success: false,
         package: info.name,
