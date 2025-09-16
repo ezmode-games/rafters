@@ -118,7 +118,7 @@ export function tokenValueToCssDark(value: string | ColorValue, stateName = 'def
 export const DesignSystemSchema = z.object({
   id: z.string(),
   name: z.string(),
-  tokens: z.array(TokenSchema),
+  tokens: z.array(TokenSchema as z.ZodTypeAny),
 
   // Accessibility and compliance settings
   accessibilityTarget: z.enum(['AA', 'AAA']).default('AA'),

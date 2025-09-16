@@ -63,7 +63,7 @@ export function calculateAPCAContrast(foreground: OKLCH, background: OKLCH): num
   const bgB = bgRgb.b * 255;
 
   // Use official APCA calculation
-  return APCAcontrast(sRGBtoY(fgR, fgG, fgB), sRGBtoY(bgR, bgG, bgB));
+  return APCAcontrast(sRGBtoY([fgR, fgG, fgB]), sRGBtoY([bgR, bgG, bgB]));
 }
 
 /**
