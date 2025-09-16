@@ -159,7 +159,11 @@ describe('Color Intelligence Utils - Unit Tests', () => {
           temperature: 0.7,
         }),
         expect.objectContaining({
-          gateway: { id: 'colors' },
+          gateway: {
+            id: 'colors',
+            cacheTtl: 3600,
+            collectLogs: false,
+          },
         })
       );
     });

@@ -57,6 +57,9 @@ Be specific about OKLCH values and their perceptual effects. Focus on unique, no
     {
       gateway: {
         id: 'colors',
+        // Enable caching and skip_cache for better performance
+        cacheTtl: 3600, // Cache AI responses for 1 hour
+        collectLogs: false, // Disable logging for better performance
       },
     }
   );

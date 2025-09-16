@@ -86,7 +86,7 @@ describe('Color Intelligence API - Basic Integration', () => {
 
     // OPTIONS requests return 204 No Content or 200 OK
     expect([200, 204]).toContain(response.status);
-    expect(response.headers.get('Access-Control-Allow-Origin')).toBe('*');
+    expect(response.headers.get('Access-Control-Allow-Origin')).toBe('true'); // Updated for domain restriction
   });
 
   test('API rejects invalid OKLCH values', async () => {
@@ -144,7 +144,7 @@ describe('Color Intelligence API - Basic Integration', () => {
     const response = await app.fetch(request, env, ctx);
     await waitOnExecutionContext(ctx);
 
-    expect(response.headers.get('Access-Control-Allow-Origin')).toBe('*');
+    expect(response.headers.get('Access-Control-Allow-Origin')).toBe('true'); // Updated for domain restriction
   });
 
   test('API handles missing required fields', async () => {

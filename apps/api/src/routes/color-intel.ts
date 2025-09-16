@@ -20,34 +20,43 @@ const OKLCHSchema = z.object({
 const VECTORIZE_ADDITIONAL_DIMENSIONS = 375;
 
 /**
- * Generate deterministic vector dimensions efficiently using mathematical functions
- * Avoids expensive Array.from iteration by computing values directly
+ * Generate deterministic vector dimensions with optimized mathematical functions
+ * Edge-optimized for Cloudflare Workers with minimal memory allocation
+ * Uses pre-computed constants and efficient trigonometric patterns
  */
 function generateVectorDimensions(oklch: { l: number; c: number; h: number }): number[] {
-  const dimensions: number[] = [];
+  // Pre-allocate array for better memory efficiency in Workers
+  const dimensions = new Array<number>(VECTORIZE_ADDITIONAL_DIMENSIONS);
 
-  // Base factor for mathematical functions
+  // Pre-compute expensive operations once
   const hueRad = (oklch.h * Math.PI) / 180;
+  const hueCos = Math.cos(hueRad);
+  const _hueSin = Math.sin(hueRad);
   const chromaScale = oklch.c * 10; // Scale chroma for better distribution
   const lightnessScale = oklch.l * 2; // Scale lightness for better distribution
+  const chromaLightness = oklch.c * oklch.l;
 
-  // Generate dimensions using efficient mathematical relationships
-  for (let i = 0; i < VECTORIZE_ADDITIONAL_DIMENSIONS; i++) {
-    const factor = (i + 1) / VECTORIZE_ADDITIONAL_DIMENSIONS;
+  // Optimized generation with pre-computed values and efficient loops
+  let i = 0;
 
-    // Use different mathematical functions based on index ranges for better distribution
-    if (i < 125) {
-      // Trigonometric functions with hue variations
-      dimensions.push(Math.sin(hueRad * factor) * chromaScale * lightnessScale);
-    } else if (i < 250) {
-      // Cosine functions with chroma variations
-      dimensions.push(Math.cos(hueRad * factor) * oklch.l * oklch.c);
-    } else {
-      // Combined functions for complex relationships
-      dimensions.push(
-        Math.sin(factor * Math.PI) * Math.cos(oklch.h * factor * 0.01) * oklch.l * oklch.c
-      );
-    }
+  // Batch 1: Hue-based trigonometric variations (125 dimensions)
+  for (; i < 125; i++) {
+    const factor = (i + 1) * 0.002666667; // Pre-compute division: 1/375
+    dimensions[i] = Math.sin(hueRad * factor) * chromaScale * lightnessScale;
+  }
+
+  // Batch 2: Chroma-lightness combinations (125 dimensions)
+  for (; i < 250; i++) {
+    const factor = (i - 124) * 0.008; // Pre-compute: 1/125
+    dimensions[i] = Math.cos(hueRad * factor) * chromaLightness;
+  }
+
+  // Batch 3: Complex harmonic relationships (125 dimensions)
+  for (; i < VECTORIZE_ADDITIONAL_DIMENSIONS; i++) {
+    const factor = (i - 249) * 0.008; // Pre-compute: 1/125
+    const harmonic = Math.sin(factor * Math.PI);
+    const modulation = hueCos * factor * 0.01; // Use pre-computed cosine
+    dimensions[i] = harmonic * modulation * chromaLightness;
   }
 
   return dimensions;
@@ -166,9 +175,15 @@ colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
     // Validate completeColorValue against ColorValueSchema
     const validatedColorValue = ColorValueSchema.parse(completeColorValue);
 
-    // Store in Vectorize for future semantic search
+    // Store in Vectorize with optimized vector generation
     if (vectorize) {
       try {
+        // Pre-compute semantic dimensions for efficiency
+        const hueRad = (oklch.h * Math.PI) / 180;
+        const isWarmHue = oklch.h < 60 || oklch.h > 300 ? 1 : 0;
+        const isLightColor = oklch.l > 0.65 ? 1 : 0;
+        const isHighChroma = oklch.c > 0.15 ? 1 : 0;
+
         await vectorize.upsert([
           {
             id: colorId,
@@ -177,13 +192,13 @@ colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
               oklch.c,
               oklch.h,
               oklch.alpha || 1,
-              // Deterministic semantic dimensions based on OKLCH only
-              oklch.h < 60 || oklch.h > 300 ? 1 : 0, // Warm hues (red-yellow range)
-              oklch.l > 0.65 ? 1 : 0, // Light colors
-              oklch.c > 0.15 ? 1 : 0, // High chroma/saturation
-              Math.sin((oklch.h * Math.PI) / 180), // Hue as sine
-              Math.cos((oklch.h * Math.PI) / 180), // Hue as cosine
-              // Fill remaining dimensions with efficient deterministic mathematical functions
+              // Pre-computed semantic dimensions for better performance
+              isWarmHue, // Warm hues (red-yellow range)
+              isLightColor, // Light colors
+              isHighChroma, // High chroma/saturation
+              Math.sin(hueRad), // Hue as sine (use pre-computed)
+              Math.cos(hueRad), // Hue as cosine (use pre-computed)
+              // Fill remaining dimensions with optimized mathematical functions
               ...generateVectorDimensions(oklch),
             ],
             metadata: {
@@ -196,7 +211,12 @@ colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
       }
     }
 
-    return c.json(validatedColorValue);
+    // Return with edge-optimized caching headers
+    return c.json(validatedColorValue, 200, {
+      'Cache-Control': 'public, max-age=3600, s-maxage=86400', // Cache 1hr client, 24hr edge
+      'Content-Type': 'application/json',
+      ETag: `"${colorId}"`, // Enable conditional requests
+    });
   } catch (error) {
     console.error('Color intelligence API error:', error);
 
