@@ -213,17 +213,32 @@ class TestExecutor {
 
   async runUnit() {
     console.log('🧪 Running unit tests across monorepo...');
-    return this.executeTestType('unit');
+    const result = await this.executeTestType('unit');
+    if (!result.success && result.output) {
+      console.log('\n🔍 Unit Test Failure Details:');
+      this.displayTestOutput(result.output);
+    }
+    return result;
   }
 
   async runIntegration() {
     console.log('🔗 Running integration tests across monorepo...');
-    return this.executeTestType('integration');
+    const result = await this.executeTestType('integration');
+    if (!result.success && result.output) {
+      console.log('\n🔍 Integration Test Failure Details:');
+      this.displayTestOutput(result.output);
+    }
+    return result;
   }
 
   async runE2E() {
     console.log('🌐 Running E2E tests across monorepo...');
-    return this.executeTestType('e2e');
+    const result = await this.executeTestType('e2e');
+    if (!result.success && result.output) {
+      console.log('\n🔍 E2E Test Failure Details:');
+      this.displayTestOutput(result.output);
+    }
+    return result;
   }
 
   async runProgressive() {
@@ -311,9 +326,24 @@ class TestExecutor {
 
       console.log(`Running: ${command}`);
 
+      let output = '';
+      let errorOutput = '';
+
       const child = spawn('pnpm', ['run', `test:${type}`, workspaceFlag].filter(Boolean), {
-        stdio: 'inherit',
+        stdio: ['inherit', 'pipe', 'pipe'],
         cwd: ROOT_DIR,
+      });
+
+      child.stdout.on('data', (data) => {
+        const chunk = data.toString();
+        process.stdout.write(chunk); // Still show output in real-time
+        output += chunk;
+      });
+
+      child.stderr.on('data', (data) => {
+        const chunk = data.toString();
+        process.stderr.write(chunk); // Still show errors in real-time
+        errorOutput += chunk;
       });
 
       child.on('close', (code) => {
@@ -321,6 +351,7 @@ class TestExecutor {
           success: code === 0,
           type,
           exitCode: code,
+          output: output + errorOutput,
         });
       });
     });
@@ -388,7 +419,10 @@ class TestExecutor {
       };
     } catch (error) {
       // Handle packages with no test script
-      if (error.message.includes('test') && (error.message.includes('not found') || error.message.includes('not available'))) {
+      if (
+        error.message.includes('test') &&
+        (error.message.includes('not found') || error.message.includes('not available'))
+      ) {
         return {
           success: true,
           package: info.name,
@@ -431,6 +465,47 @@ class TestExecutor {
     } catch {
       // Fallback to all files if git fails
       return [];
+    }
+  }
+
+  displayTestOutput(output) {
+    const lines = output.split('\n');
+    let relevantLines = [];
+    let inErrorSection = false;
+
+    for (const line of lines) {
+      // Look for error indicators
+      if (line.includes('FAIL') || line.includes('ERROR') || line.includes('✗') ||
+          line.includes('×') || line.includes('AssertionError') || line.includes('Test failed') ||
+          line.includes('Command failed') || line.includes('exited (1)')) {
+        inErrorSection = true;
+        relevantLines.push(line);
+      } else if (inErrorSection) {
+        // Continue capturing lines in error context
+        if (line.trim() === '' && relevantLines.length > 0 && !relevantLines[relevantLines.length - 1].trim()) {
+          // Skip multiple empty lines
+          continue;
+        }
+        relevantLines.push(line);
+
+        // Stop error section on certain markers
+        if (line.includes('Tasks:') || line.includes('Time:') || line.match(/^\s*✅/)) {
+          break;
+        }
+      }
+      // Also capture standalone error lines
+      else if (line.includes('Error:') || line.includes('Failed:') ||
+               line.includes('command finished with error') || line.includes('ELIFECYCLE')) {
+        relevantLines.push(line);
+      }
+    }
+
+    if (relevantLines.length > 0) {
+      for (const line of relevantLines) {
+        console.log(`   ${line}`);
+      }
+    } else {
+      console.log('   (No specific error details captured)');
     }
   }
 
@@ -497,6 +572,45 @@ async function main() {
     process.exit(0);
   } else {
     console.log('\n❌ Some tests failed!');
+
+    // Display detailed failure information
+    if (result.packages) {
+      console.log('\n🔍 Failure Details:');
+      for (const [pkg, pkgResult] of Object.entries(result.packages)) {
+        if (!pkgResult.success && !pkgResult.skipped) {
+          console.log(`\n📦 Package: ${pkgResult.package || pkg}`);
+          console.log(`   Path: ${pkgResult.path || pkg}`);
+
+          if (pkgResult.error) {
+            console.log(`   Error: ${pkgResult.error}`);
+          }
+
+          if (pkgResult.output && pkgResult.output.includes('FAIL')) {
+            console.log(`   Output:`);
+            // Extract and display relevant failure lines
+            const lines = pkgResult.output.split('\n');
+            let inFailureSection = false;
+            for (const line of lines) {
+              if (line.includes('FAIL') || line.includes('✗') || line.includes('×') || line.includes('Error:') || line.includes('AssertionError')) {
+                inFailureSection = true;
+              }
+              if (inFailureSection && (line.trim() === '' || line.includes('Tests'))) {
+                inFailureSection = false;
+              }
+              if (inFailureSection || line.includes('FAIL') || line.includes('✗') || line.includes('×')) {
+                console.log(`     ${line}`);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Show summary if available
+    if (result.summary) {
+      console.log(`\n📊 Summary: ${result.summary.failed}/${result.summary.total} tests failed`);
+    }
+
     process.exit(1);
   }
 }
