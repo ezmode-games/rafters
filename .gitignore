@@ -28,10 +28,9 @@ build
 out
 **/out
 
-# Next.js
-.next
-**/.next
-.next-env.d.ts
+# astro
+.astro
+**/.astro
 
 # Turbo
 .turbo
