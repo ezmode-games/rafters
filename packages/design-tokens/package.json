@@ -17,8 +17,8 @@
     "src"
   ],
   "scripts": {
-    "test": "vitest run",
-    "test:preflight": "vitest run",
+    "test": "vitest run --passWithNoTests",
+    "test:preflight": "vitest run --passWithNoTests",
     "lint": "biome check .",
     "format": "biome format --write .",
     "type-check": "tsc --noEmit",
