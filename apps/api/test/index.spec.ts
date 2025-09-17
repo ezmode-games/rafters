@@ -60,8 +60,6 @@ describe('Main App', () => {
         },
         body: JSON.stringify({
           oklch: { l: 0.5, c: 0.1, h: 180 },
-          token: 'test-token',
-          name: 'test-color',
         }),
       }),
       env

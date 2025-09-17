@@ -1,6 +1,6 @@
 import { zValidator } from '@hono/zod-validator';
 import { generateColorValue, validateOKLCH } from '@rafters/color-utils';
-import { ColorValueSchema } from '@rafters/shared';
+import { type ColorIntelligence, ColorValueSchema } from '@rafters/shared';
 import { Hono } from 'hono';
 import * as z from 'zod';
 import { generateColorIntelligence } from '../lib/color-intel/utils';
@@ -63,7 +63,6 @@ function generateVectorDimensions(oklch: { l: number; c: number; h: number }): n
 
 interface CloudflareBindings {
   VECTORIZE: VectorizeIndex;
-  CLAUDE_API_KEY: string;
   CF_TOKEN: string;
   CLAUDE_GATEWAY_URL: string;
   AI: Ai;
@@ -71,8 +70,6 @@ interface CloudflareBindings {
 
 const ColorIntelRequest = z.object({
   oklch: OKLCHSchema,
-  token: z.string().optional(),
-  name: z.string().optional(),
   expire: z.boolean().optional(), // Force cache invalidation, skip AI generation
 });
 
@@ -118,58 +115,22 @@ colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
       }
     }
 
-    // Generate AI intelligence and mathematical data
-    const apiKey = c.env.CLAUDE_API_KEY;
-    if (!apiKey) {
-      return c.json({ error: 'Missing API key', message: 'CLAUDE_API_KEY not set' }, 500);
-    }
+    // Generate fresh mathematical data without context
+    const colorValue = generateColorValue(oklch);
 
-    const gatewayUrl = c.env.CLAUDE_GATEWAY_URL;
-    const cfToken = c.env.CF_TOKEN;
-    const context = { token: data.token, name: data.name };
-
-    // Generate fresh mathematical data, reuse existing AI intelligence if available
-    const colorValue = generateColorValue(oklch, context);
-
-    let intelligence: {
-      suggestedName: string;
-      reasoning: string;
-      emotionalImpact: string;
-      culturalContext: string;
-      accessibilityNotes: string;
-      usageGuidance: string;
-      balancingGuidance?: string; // New field for perceptual weight recommendations
-    };
+    let intelligence: ColorIntelligence;
     if (existingIntelligence) {
       // Reuse existing AI intelligence when expire flag is set
       intelligence = existingIntelligence;
     } else {
-      // Generate new AI intelligence only if none exists
-      // Pass the perceptual weight data to AI for contextual recommendations
-      const perceptualWeight = colorValue.perceptualWeight;
-      intelligence = await generateColorIntelligence(
-        oklch,
-        context,
-        apiKey,
-        gatewayUrl,
-        cfToken,
-        perceptualWeight,
-        c.env.AI
-      );
-    }
-
-    // Replace any <AI_GENERATE> tokens with AI-generated content
-    const processedColorValue = { ...colorValue };
-    if (processedColorValue.perceptualWeight?.balancingRecommendation === '<AI_GENERATE>') {
-      processedColorValue.perceptualWeight.balancingRecommendation =
-        intelligence.balancingGuidance ||
-        `Weight: ${processedColorValue.perceptualWeight.weight.toFixed(2)} - ${processedColorValue.perceptualWeight.density} visual density`;
+      // Generate new pure AI intelligence
+      intelligence = await generateColorIntelligence(oklch, c.env.AI);
     }
 
     // Use mathematical color intelligence from generateColorValue
     const completeColorValue = {
-      ...processedColorValue,
-      intelligence, // AI intelligence from Claude API
+      ...colorValue,
+      intelligence, // Pure AI intelligence
     };
 
     // Validate completeColorValue against ColorValueSchema

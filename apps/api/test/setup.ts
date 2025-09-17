@@ -37,6 +37,4 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-console.log('🧪 API Integration Test Environment Initialized');
-console.log('☁️ Cloudflare Workers runtime ready');
-console.log('🤖 Claude API mocked for testing');
+// Quiet setup - no console output in tests

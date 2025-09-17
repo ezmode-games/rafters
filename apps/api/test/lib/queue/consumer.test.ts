@@ -37,7 +37,7 @@ describe('Queue Consumer Unit Tests', () => {
       expect(request.headers.get('Content-Type')).toBe('application/json');
     });
 
-    test('includes all message fields in request body', () => {
+    test('includes only OKLCH in request body', () => {
       const message: ColorSeedMessage = {
         oklch: { l: 0.5, c: 0.1, h: 180 },
         token: 'primary',
