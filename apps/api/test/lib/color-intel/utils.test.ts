@@ -50,10 +50,7 @@ describe('Color Intelligence Utils', () => {
     } as unknown as Ai;
 
     await expect(
-      colorIntelUtils.generateColorIntelligence(
-        { l: 0.5, c: 0.1, h: 240 },
-        mockAi
-      )
+      colorIntelUtils.generateColorIntelligence({ l: 0.5, c: 0.1, h: 240 }, mockAi)
     ).rejects.toThrow('AI binding failed');
   });
 
@@ -65,10 +62,7 @@ describe('Color Intelligence Utils', () => {
     } as unknown as Ai;
 
     await expect(
-      colorIntelUtils.generateColorIntelligence(
-        { l: 0.8, c: 0.05, h: 60 },
-        mockAi
-      )
+      colorIntelUtils.generateColorIntelligence({ l: 0.8, c: 0.05, h: 60 }, mockAi)
     ).rejects.toThrow('Invalid AI response format');
   });
 });

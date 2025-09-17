@@ -89,9 +89,6 @@ export function generateCacheKey(oklch: OKLCH): string {
   return `color-intel:${rounded.l}-${rounded.c}-${rounded.h}`;
 }
 
-export async function generateColorIntelligence(
-  oklch: OKLCH,
-  aiBinding: Ai
-) {
+export async function generateColorIntelligence(oklch: OKLCH, aiBinding: Ai) {
   return generateWithWorkersAI(oklch, {}, undefined, aiBinding);
 }

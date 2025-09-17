@@ -55,15 +55,11 @@ describe('Color Intel Route Logic', () => {
       .spyOn(colorIntelUtils, 'generateColorIntelligence')
       .mockResolvedValue(mockIntelligence);
 
-    const result = await colorIntelUtils.generateColorIntelligence(
-      { l: 0.5, c: 0.1, h: 240 },
-      { run: vi.fn() } as unknown as Ai
-    );
+    const result = await colorIntelUtils.generateColorIntelligence({ l: 0.5, c: 0.1, h: 240 }, {
+      run: vi.fn(),
+    } as unknown as Ai);
 
-    expect(generateIntelSpy).toHaveBeenCalledWith(
-      { l: 0.5, c: 0.1, h: 240 },
-      expect.any(Object)
-    );
+    expect(generateIntelSpy).toHaveBeenCalledWith({ l: 0.5, c: 0.1, h: 240 }, expect.any(Object));
 
     expect(result).toEqual(mockIntelligence);
 
