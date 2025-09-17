@@ -61,22 +61,12 @@ function generateVectorDimensions(oklch: { l: number; c: number; h: number }): n
   return dimensions;
 }
 
-interface CloudflareBindings {
-  VECTORIZE: VectorizeIndex;
-  CLAUDE_API_KEY: string;
-  CF_TOKEN: string;
-  CLAUDE_GATEWAY_URL: string;
-  AI: Ai;
-}
-
 const ColorIntelRequest = z.object({
   oklch: OKLCHSchema,
-  token: z.string().optional(),
-  name: z.string().optional(),
   expire: z.boolean().optional(), // Force cache invalidation, skip AI generation
 });
 
-const colorIntel = new Hono<{ Bindings: CloudflareBindings }>();
+const colorIntel = new Hono<{ Bindings: Env }>();
 
 colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
   try {
@@ -118,18 +108,8 @@ colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
       }
     }
 
-    // Generate AI intelligence and mathematical data
-    const apiKey = c.env.CLAUDE_API_KEY;
-    if (!apiKey) {
-      return c.json({ error: 'Missing API key', message: 'CLAUDE_API_KEY not set' }, 500);
-    }
-
-    const gatewayUrl = c.env.CLAUDE_GATEWAY_URL;
-    const cfToken = c.env.CF_TOKEN;
-    const context = { token: data.token, name: data.name };
-
     // Generate fresh mathematical data, reuse existing AI intelligence if available
-    const colorValue = generateColorValue(oklch, context);
+    const colorValue = generateColorValue(oklch);
 
     let intelligence: {
       suggestedName: string;
@@ -144,18 +124,8 @@ colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
       // Reuse existing AI intelligence when expire flag is set
       intelligence = existingIntelligence;
     } else {
-      // Generate new AI intelligence only if none exists
-      // Pass the perceptual weight data to AI for contextual recommendations
-      const perceptualWeight = colorValue.perceptualWeight;
-      intelligence = await generateColorIntelligence(
-        oklch,
-        context,
-        apiKey,
-        gatewayUrl,
-        cfToken,
-        perceptualWeight,
-        c.env.AI
-      );
+      // Generate new AI intelligence using Workers AI
+      intelligence = await generateColorIntelligence(oklch, c.env.AI);
     }
 
     // Replace any <AI_GENERATE> tokens with AI-generated content

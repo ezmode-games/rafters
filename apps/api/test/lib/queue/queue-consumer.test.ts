@@ -9,16 +9,6 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { processColorSeedBatch, processSingleMessage } from '@/lib/queue/consumer';
 import type { ColorSeedMessage } from '@/lib/queue/publisher';
 
-interface CloudflareBindings {
-  VECTORIZE: VectorizeIndex;
-  AI: Ai;
-  CLAUDE_API_KEY: string;
-  CF_TOKEN: string;
-  CLAUDE_GATEWAY_URL: string;
-  COLOR_SEED_QUEUE: Queue;
-  SEED_QUEUE_API_KEY: string;
-}
-
 describe('Queue Consumer Specification', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -61,9 +51,9 @@ describe('Queue Consumer Specification', () => {
           status: 200,
           json: vi.fn().mockResolvedValue(mockColorData),
         }),
-      } as unknown as Hono<{ Bindings: CloudflareBindings }>;
+      } as unknown as Hono<{ Bindings: Env }>;
 
-      const mockEnv = {} as CloudflareBindings;
+      const mockEnv = {} as Env;
 
       const result = await processSingleMessage(mockMessage, mockApp, mockEnv);
 
@@ -95,9 +85,9 @@ describe('Queue Consumer Specification', () => {
           status: 500,
           text: vi.fn().mockResolvedValue('Internal Server Error'),
         }),
-      } as unknown as Hono<{ Bindings: CloudflareBindings }>;
+      } as unknown as Hono<{ Bindings: Env }>;
 
-      const mockEnv = {} as CloudflareBindings;
+      const mockEnv = {} as Env;
 
       const result = await processSingleMessage(mockMessage, mockApp, mockEnv);
 
@@ -119,9 +109,9 @@ describe('Queue Consumer Specification', () => {
 
       const mockApp = {
         fetch: vi.fn().mockRejectedValue(new Error('Network timeout')),
-      } as unknown as Hono<{ Bindings: CloudflareBindings }>;
+      } as unknown as Hono<{ Bindings: Env }>;
 
-      const mockEnv = {} as CloudflareBindings;
+      const mockEnv = {} as Env;
 
       const result = await processSingleMessage(mockMessage, mockApp, mockEnv);
 
@@ -158,9 +148,9 @@ describe('Queue Consumer Specification', () => {
           status: 200,
           json: vi.fn().mockResolvedValue({ name: 'Test' }),
         }),
-      } as unknown as Hono<{ Bindings: CloudflareBindings }>;
+      } as unknown as Hono<{ Bindings: Env }>;
 
-      const mockEnv = {} as CloudflareBindings;
+      const mockEnv = {} as Env;
 
       await processColorSeedBatch(mockBatch, mockEnv, mockApp);
 
@@ -207,9 +197,9 @@ describe('Queue Consumer Specification', () => {
           status: 200,
           json: vi.fn().mockResolvedValue({ name: 'Test' }),
         }),
-      } as unknown as Hono<{ Bindings: CloudflareBindings }>;
+      } as unknown as Hono<{ Bindings: Env }>;
 
-      const mockEnv = {} as CloudflareBindings;
+      const mockEnv = {} as Env;
 
       await processColorSeedBatch(mockBatch, mockEnv, mockApp);
 
@@ -262,9 +252,9 @@ describe('Queue Consumer Specification', () => {
             status: 500,
             text: vi.fn().mockResolvedValue('Error'),
           }),
-      } as unknown as Hono<{ Bindings: CloudflareBindings }>;
+      } as unknown as Hono<{ Bindings: Env }>;
 
-      const mockEnv = {} as CloudflareBindings;
+      const mockEnv = {} as Env;
 
       await processColorSeedBatch(mockBatch, mockEnv, mockApp);
 
@@ -300,9 +290,9 @@ describe('Queue Consumer Specification', () => {
           status: 200,
           json: vi.fn().mockResolvedValue({ name: 'Test' }),
         }),
-      } as unknown as Hono<{ Bindings: CloudflareBindings }>;
+      } as unknown as Hono<{ Bindings: Env }>;
 
-      const mockEnv = {} as CloudflareBindings;
+      const mockEnv = {} as Env;
 
       await processColorSeedBatch(mockBatch, mockEnv, mockApp);
 
@@ -348,9 +338,9 @@ describe('Queue Consumer Specification', () => {
 
       const mockApp = {
         fetch: vi.fn().mockRejectedValue(new Error('Service unavailable')),
-      } as unknown as Hono<{ Bindings: CloudflareBindings }>;
+      } as unknown as Hono<{ Bindings: Env }>;
 
-      const mockEnv = {} as CloudflareBindings;
+      const mockEnv = {} as Env;
 
       await processColorSeedBatch(mockBatch, mockEnv, mockApp);
 
@@ -370,9 +360,9 @@ describe('Queue Consumer Specification', () => {
 
       const mockApp = {
         fetch: vi.fn(),
-      } as unknown as Hono<{ Bindings: CloudflareBindings }>;
+      } as unknown as Hono<{ Bindings: Env }>;
 
-      const mockEnv = {} as CloudflareBindings;
+      const mockEnv = {} as Env;
 
       await processColorSeedBatch(mockBatch, mockEnv, mockApp);
 
