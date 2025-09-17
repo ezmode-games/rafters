@@ -16,9 +16,7 @@
       "dependsOn": ["^build"],
       "outputs": ["coverage/**", "test-results/**"],
       "cache": false,
-      "interactive": true,
-      "env": ["NODE_ENV", "CI"],
-      "persistent": false
+      "env": ["NODE_ENV", "CI"]
     },
     "test:unit": {
       "dependsOn": ["^typecheck"],
