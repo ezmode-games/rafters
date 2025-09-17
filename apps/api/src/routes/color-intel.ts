@@ -125,15 +125,7 @@ colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
       intelligence = existingIntelligence;
     } else {
       // Generate new AI intelligence using Workers AI
-      intelligence = await generateColorIntelligence(
-        oklch,
-        {}, // Empty context for pure function approach
-        '', // Deprecated API key
-        undefined, // Deprecated gateway URL
-        undefined, // Deprecated CF token
-        undefined, // No perceptual weight
-        c.env.AI
-      );
+      intelligence = await generateColorIntelligence(oklch, c.env.AI);
     }
 
     // Replace any <AI_GENERATE> tokens with AI-generated content

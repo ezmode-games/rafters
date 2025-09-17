@@ -91,16 +91,7 @@ export function generateCacheKey(oklch: OKLCH): string {
 
 export async function generateColorIntelligence(
   oklch: OKLCH,
-  context: ColorContext,
-  _apiKey: string,
-  _gatewayUrl?: string,
-  _cfToken?: string,
-  perceptualWeight?: { weight: number; density: 'light' | 'medium' | 'heavy' },
-  aiBinding?: Ai
+  aiBinding: Ai
 ) {
-  if (!aiBinding) {
-    throw new Error('AI binding required for color intelligence generation');
-  }
-
-  return generateWithWorkersAI(oklch, context, perceptualWeight, aiBinding);
+  return generateWithWorkersAI(oklch, {}, undefined, aiBinding);
 }

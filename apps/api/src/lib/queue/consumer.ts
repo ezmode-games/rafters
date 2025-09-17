@@ -13,8 +13,8 @@ import type { ColorSeedMessage } from './publisher';
  * Create request for color-intel API
  */
 export function createColorIntelRequest(message: ColorSeedMessage): Request {
-  const { oklch, token, name } = message;
-  const requestBody = JSON.stringify({ oklch, token, name });
+  const { oklch } = message;
+  const requestBody = JSON.stringify({ oklch });
   return new Request('http://internal/api/color-intel', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

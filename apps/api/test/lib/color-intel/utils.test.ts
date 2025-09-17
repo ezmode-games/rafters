@@ -27,11 +27,6 @@ describe('Color Intelligence Utils', () => {
 
     const result = await colorIntelUtils.generateColorIntelligence(
       { l: 0.5, c: 0.1, h: 240 },
-      { token: 'primary' },
-      'test-api-key',
-      'https://gateway.example.com',
-      'cf-token',
-      { weight: 0.6, density: 'medium' },
       mockAi
     );
 
@@ -57,11 +52,6 @@ describe('Color Intelligence Utils', () => {
     await expect(
       colorIntelUtils.generateColorIntelligence(
         { l: 0.5, c: 0.1, h: 240 },
-        { token: 'primary' },
-        'test-api-key',
-        'https://gateway.example.com',
-        'cf-token',
-        { weight: 0.6, density: 'medium' },
         mockAi
       )
     ).rejects.toThrow('AI binding failed');
@@ -77,11 +67,6 @@ describe('Color Intelligence Utils', () => {
     await expect(
       colorIntelUtils.generateColorIntelligence(
         { l: 0.8, c: 0.05, h: 60 },
-        {},
-        'test-api-key',
-        'https://gateway.example.com',
-        'cf-token',
-        { weight: 0.3, density: 'light' },
         mockAi
       )
     ).rejects.toThrow('Invalid AI response format');

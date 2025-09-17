@@ -57,21 +57,11 @@ describe('Color Intel Route Logic', () => {
 
     const result = await colorIntelUtils.generateColorIntelligence(
       { l: 0.5, c: 0.1, h: 240 },
-      { token: 'primary' },
-      'api-key',
-      'gateway-url',
-      'cf-token',
-      mockColorValue.perceptualWeight,
       { run: vi.fn() } as unknown as Ai
     );
 
     expect(generateIntelSpy).toHaveBeenCalledWith(
       { l: 0.5, c: 0.1, h: 240 },
-      { token: 'primary' },
-      'api-key',
-      'gateway-url',
-      'cf-token',
-      mockColorValue.perceptualWeight,
       expect.any(Object)
     );
 
