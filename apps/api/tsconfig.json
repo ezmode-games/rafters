@@ -6,10 +6,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "types": [
-      "@cloudflare/vitest-pool-workers",
-      "vitest/globals"
-    ],
+    "types": ["@cloudflare/vitest-pool-workers", "vitest/globals"],
     "module": "ES2022",
     "target": "ES2022",
     "lib": ["ES2022"],
