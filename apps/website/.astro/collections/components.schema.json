@@ -1,0 +1,49 @@
+{
+  "$ref": "#/definitions/components",
+  "definitions": {
+    "components": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "cognitiveLoad": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "trustLevel": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+        "attentionEconomics": {
+          "type": "string"
+        },
+        "order": {
+          "type": "number"
+        },
+        "draft": {
+          "type": "boolean"
+        },
+        "$schema": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "description",
+        "cognitiveLoad"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

@@ -137,7 +137,9 @@ export const DesignSystemSchema = z.object({
   spacingBaseUnit: z.number().min(2).max(32).default(4), // Base unit in px
 });
 
-export type DesignSystem = z.infer<typeof DesignSystemSchema>;
+export type DesignSystem = z.infer<typeof DesignSystemSchema> & {
+  tokens: Token[];
+};
 
 // Import and re-export all generators from generators folder
 export {
@@ -170,7 +172,7 @@ function generateCssCustomProperties(designSystem: DesignSystem): string {
   const lightTokens: string[] = [];
   const darkTokens: string[] = [];
 
-  for (const token of designSystem.tokens) {
+  for (const token of designSystem.tokens as Token[]) {
     // Use tokenValueToCss to handle both string and ColorValue tokens
     const tokenValue = tokenValueToCss(token.value);
 
@@ -205,7 +207,7 @@ function generateCssCustomProperties(designSystem: DesignSystem): string {
 function generateTailwindStylesheet(designSystem: DesignSystem): string {
   // Group tokens by category for organized generation
   const tokensByCategory: Record<string, Token[]> = {};
-  for (const token of designSystem.tokens) {
+  for (const token of designSystem.tokens as Token[]) {
     if (!tokensByCategory[token.category]) {
       tokensByCategory[token.category] = [];
     }
@@ -1154,7 +1156,7 @@ ${tokensContent}
 export const exportTokens = (designSystem: DesignSystem, format: 'tw' | 'css' | 'json'): string => {
   // Validate tokens before export
   try {
-    for (const token of designSystem.tokens) {
+    for (const token of designSystem.tokens as Token[]) {
       TokenSchema.parse(token);
     }
   } catch (error) {

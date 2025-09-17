@@ -37,7 +37,9 @@ The API implements cutting-edge color science:
 
 ## API Endpoints
 
-### POST `/api/color-intel`
+### Color Intelligence API
+
+#### POST `/api/color-intel`
 
 Generate comprehensive color intelligence for any OKLCH color.
 
@@ -473,5 +475,203 @@ The API serves as the foundation for AI-powered design systems where:
 - **Millions of Colors**: As users explore brand colors, experimental palettes, and unique combinations
 - **Collective Intelligence**: Each generated color adds to the growing knowledge base
 - **No Limits**: The system can handle ANY color in the OKLCH space with complete mathematical analysis
+
+### Queue System API
+
+The queue system enables asynchronous processing of large color datasets without blocking HTTP requests. All queue endpoints require authentication.
+
+#### Authentication
+
+All queue endpoints require the `X-API-Key` header:
+
+```bash
+export SEED_QUEUE_API_KEY="your-secure-api-key"
+curl -H "X-API-Key: $SEED_QUEUE_API_KEY" \
+     -H "Content-Type: application/json" \
+     https://rafters.realhandy.tech/api/seed-queue/status
+```
+
+#### POST `/api/seed-queue/single`
+
+Queue a single color for asynchronous processing.
+
+**Request Body:**
+```json
+{
+  "oklch": {
+    "l": 0.65,
+    "c": 0.12,
+    "h": 240,
+    "alpha": 1.0
+  },
+  "token": "primary",
+  "name": "ocean-blue"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Color queued for processing",
+  "requestId": "uuid-v4-string",
+  "queuedCount": 1
+}
+```
+
+#### POST `/api/seed-queue/batch`
+
+Queue multiple colors for batch processing (max 1000 colors per request).
+
+**Request Body:**
+```json
+{
+  "colors": [
+    {
+      "oklch": {"l": 0.5, "c": 0.1, "h": 0},
+      "token": "danger",
+      "name": "red-500"
+    },
+    {
+      "oklch": {"l": 0.6, "c": 0.15, "h": 120},
+      "token": "success"
+    }
+  ],
+  "batchId": "custom-batch-id"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "10 colors queued for processing",
+  "batchId": "custom-batch-id",
+  "queuedCount": 10
+}
+```
+
+#### POST `/api/seed-queue/spectrum`
+
+Generate and queue a systematic spectrum of colors for comprehensive color space exploration.
+
+**Request Body:**
+```json
+{
+  "lightnessSteps": 9,
+  "chromaSteps": 5,
+  "hueSteps": 12,
+  "baseName": "design-system"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Spectrum of 540 colors queued for processing",
+  "spectrumId": "spectrum-1704123456789",
+  "config": {
+    "lightnessSteps": 9,
+    "chromaSteps": 5,
+    "hueSteps": 12,
+    "totalColors": 540
+  },
+  "estimatedProcessingTime": "2 seconds"
+}
+```
+
+**Generated Color Matrix:**
+- **Lightness**: 9 steps from 0.1 to 0.9
+- **Chroma**: 5 steps from 0.0 to 0.4
+- **Hue**: 12 steps (30° intervals)
+- **Total**: L × C × H = 540 colors
+
+#### GET `/api/seed-queue/status`
+
+Get queue system status and configuration information.
+
+**Response:**
+```json
+{
+  "status": "operational",
+  "publisher": "color-seed-queue",
+  "security": {
+    "authentication": "API key required",
+    "header": "X-API-Key"
+  },
+  "limits": {
+    "maxBatchSize": 100,
+    "maxRequestSize": 1000,
+    "rateLimit": "400 messages/second",
+    "maxMessageSize": "128 KB"
+  },
+  "endpoints": {
+    "single": "POST /single - Queue single color",
+    "batch": "POST /batch - Queue multiple colors",
+    "spectrum": "POST /spectrum - Generate color spectrum",
+    "status": "GET /status - This endpoint"
+  }
+}
+```
+
+### Queue Processing Flow
+
+1. **Publishing**: Colors are batched and sent to Cloudflare Queue
+2. **Consumer Processing**: Queue consumer processes each message asynchronously
+3. **Vector Storage**: Processed colors generate 384-dimensional vectors
+4. **Similarity Search**: Vectors become immediately searchable
+
+**Monitor Processing:**
+```bash
+# Check processing status
+curl -H "X-API-Key: $API_KEY" \
+     https://rafters.realhandy.tech/api/seed-queue/status
+
+# View generated vectors
+pnpm wrangler vectorize list-vectors rafters-color-intel --limit 10
+```
+
+## Error Handling
+
+### Queue Authentication Errors
+
+**Missing API Key (401):**
+```json
+{
+  "error": "Authentication required",
+  "message": "Missing X-API-Key header",
+  "code": "MISSING_API_KEY"
+}
+```
+
+**Invalid API Key (403):**
+```json
+{
+  "error": "Invalid API key",
+  "message": "The provided API key is not valid",
+  "code": "INVALID_API_KEY"
+}
+```
+
+### Validation Errors
+
+**Invalid Color Values (400):**
+```json
+{
+  "error": "Validation failed",
+  "message": "Invalid OKLCH values",
+  "details": "Lightness must be between 0 and 1"
+}
+```
+
+**Batch Size Limit (400):**
+```json
+{
+  "error": "Validation failed",
+  "message": "Too many colors in batch",
+  "details": "Maximum 1000 colors per request"
+}
+```
 
 This is not just a color API - it's an infinitely scalable color intelligence platform that grows with every use, building the most comprehensive color knowledge base ever created.

@@ -16,9 +16,7 @@
       "dependsOn": ["^build"],
       "outputs": ["coverage/**", "test-results/**"],
       "cache": false,
-      "interactive": true,
-      "env": ["NODE_ENV", "CI"],
-      "persistent": false
+      "env": ["NODE_ENV", "CI"]
     },
     "test:unit": {
       "dependsOn": ["^typecheck"],
@@ -84,7 +82,14 @@
       "cache": false
     },
     "preflight": {
-      "dependsOn": ["typecheck", "lint", "test:unit", "test:integration", "test:component"],
+      "dependsOn": [
+        "build",
+        "typecheck",
+        "lint",
+        "test:unit",
+        "test:integration",
+        "test:component"
+      ],
       "outputs": ["test-results/**", "coverage/**"],
       "cache": false,
       "env": ["NODE_ENV", "CI"]

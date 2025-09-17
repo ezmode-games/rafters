@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "types": ["@cloudflare/vitest-pool-workers", "vitest/globals"],
+    "module": "ES2022",
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true
+  },
+  "include": ["src/**/*", "test/**/*", "worker-configuration.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}

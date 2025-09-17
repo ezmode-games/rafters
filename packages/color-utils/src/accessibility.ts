@@ -55,15 +55,20 @@ export function calculateAPCAContrast(foreground: OKLCH, background: OKLCH): num
   const bgRgb = backgroundColorObj.to('srgb');
 
   // Convert to 0-255 RGB values for apca-w3
-  const fgR = fgRgb.r * 255;
-  const fgG = fgRgb.g * 255;
-  const fgB = fgRgb.b * 255;
-  const bgR = bgRgb.r * 255;
-  const bgG = bgRgb.g * 255;
-  const bgB = bgRgb.b * 255;
+  const fgR = Math.max(0, Math.min(255, (fgRgb.r || 0) * 255));
+  const fgG = Math.max(0, Math.min(255, (fgRgb.g || 0) * 255));
+  const fgB = Math.max(0, Math.min(255, (fgRgb.b || 0) * 255));
+  const bgR = Math.max(0, Math.min(255, (bgRgb.r || 0) * 255));
+  const bgG = Math.max(0, Math.min(255, (bgRgb.g || 0) * 255));
+  const bgB = Math.max(0, Math.min(255, (bgRgb.b || 0) * 255));
+
+  // Calculate luminance values
+  const fgY = sRGBtoY([fgR, fgG, fgB]);
+  const bgY = sRGBtoY([bgR, bgG, bgB]);
 
   // Use official APCA calculation
-  return APCAcontrast(sRGBtoY(fgR, fgG, fgB), sRGBtoY(bgR, bgG, bgB));
+  const result = APCAcontrast(fgY, bgY);
+  return typeof result === 'number' ? result : 0;
 }
 
 /**
