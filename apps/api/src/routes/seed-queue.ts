@@ -37,13 +37,7 @@ const SpectrumConfigSchema = z.object({
   baseName: z.string().optional().default('spectrum-seed'),
 });
 
-// Interface for Cloudflare bindings
-interface CloudflareBindings {
-  COLOR_SEED_QUEUE: Queue;
-  SEED_QUEUE_API_KEY: string;
-}
-
-const app = new Hono<{ Bindings: CloudflareBindings }>();
+const app = new Hono<{ Bindings: Env }>();
 
 // Apply API key authentication to ALL queue endpoints
 app.use('*', requireApiKey());

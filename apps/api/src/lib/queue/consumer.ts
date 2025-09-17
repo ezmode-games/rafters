@@ -9,16 +9,6 @@ import type { ColorValue } from '@rafters/shared';
 import type { Hono } from 'hono';
 import type { ColorSeedMessage } from './publisher';
 
-interface CloudflareBindings {
-  VECTORIZE: VectorizeIndex;
-  AI: Ai;
-  CLAUDE_API_KEY: string;
-  CF_TOKEN: string;
-  CLAUDE_GATEWAY_URL: string;
-  COLOR_SEED_QUEUE: Queue;
-  SEED_QUEUE_API_KEY: string;
-}
-
 /**
  * Create request for color-intel API
  */
@@ -75,8 +65,8 @@ export function createApiError(status: number, errorText: string): Error {
  */
 export async function processSingleMessage(
   message: Message<ColorSeedMessage>,
-  app: Hono<{ Bindings: CloudflareBindings }>,
-  env: CloudflareBindings
+  app: Hono<{ Bindings: Env }>,
+  env: Env
 ): Promise<{ success: boolean; message: Message<ColorSeedMessage>; error?: unknown }> {
   try {
     const request = createColorIntelRequest(message.body);
@@ -147,8 +137,8 @@ export function chunkArray<T>(array: T[], chunkSize: number): T[][] {
  */
 export async function processColorSeedBatch(
   batch: MessageBatch<ColorSeedMessage>,
-  env: CloudflareBindings,
-  app: Hono<{ Bindings: CloudflareBindings }>
+  env: Env,
+  app: Hono<{ Bindings: Env }>
 ): Promise<void> {
   // Workers optimized concurrency limit (prevents memory exhaustion)
   const CONCURRENCY_LIMIT = 10;

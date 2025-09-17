@@ -14,9 +14,6 @@ import { seedQueue } from './routes/seed-queue';
 
 interface CloudflareBindings {
   VECTORIZE: VectorizeIndex;
-  CLAUDE_API_KEY: string;
-  CF_TOKEN: string;
-  CLAUDE_GATEWAY_URL: string;
   AI: Ai;
   COLOR_SEED_QUEUE: Queue;
   SEED_QUEUE_API_KEY: string;
