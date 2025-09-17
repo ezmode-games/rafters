@@ -52,8 +52,6 @@ Generate comprehensive color intelligence for any OKLCH color.
     "h": 240.0,
     "alpha": 1.0
   },
-  "token": "primary",
-  "name": "ocean-blue",
   "expire": false
 }
 ```
@@ -64,9 +62,7 @@ Generate comprehensive color intelligence for any OKLCH color.
   - `c`: Chroma (0+)
   - `h`: Hue (0-360)
   - `alpha`: Alpha (0-1, optional)
-- `token` (optional): Semantic role (primary, success, warning, danger, etc.)
-- `name` (optional): Override suggested color name
-- `expire` (optional): Force regeneration while preserving AI intelligence
+- `expire` (optional): Force cache invalidation while preserving AI intelligence
 
 #### Response Schema
 ```json
@@ -78,7 +74,6 @@ Generate comprehensive color intelligence for any OKLCH color.
     ...
     {"l": 0.15, "c": 0.08, "h": 240, "alpha": 1}
   ],
-  "token": "primary",
   "value": "600",
   "intelligence": {
     "suggestedName": "ocean-depths",
@@ -285,18 +280,7 @@ curl -X POST https://rafters.realhandy.tech/api/color-intel \
   }'
 ```
 
-### Semantic Color Assignment
-```bash
-curl -X POST https://rafters.realhandy.tech/api/color-intel \
-  -H "Content-Type: application/json" \
-  -d '{
-    "oklch": {"l": 0.55, "c": 0.15, "h": 355},
-    "token": "danger",
-    "name": "critical-red"
-  }'
-```
-
-### Vector Update (Preserve AI Intelligence)
+### Force Cache Invalidation (Preserve AI Intelligence)
 ```bash
 curl -X POST https://rafters.realhandy.tech/api/color-intel \
   -H "Content-Type: application/json" \
@@ -478,7 +462,7 @@ The API serves as the foundation for AI-powered design systems where:
 
 ### Queue System API
 
-The queue system enables asynchronous processing of large color datasets without blocking HTTP requests. All queue endpoints require authentication.
+The queue system enables asynchronous processing of large OKLCH color datasets without blocking HTTP requests. While queue endpoints may accept `token` and `name` fields for backward compatibility, the actual processing has been simplified to use pure OKLCH values only. The queue consumer extracts only the `oklch` field from each message and generates comprehensive color intelligence based purely on these mathematical values. All queue endpoints require authentication.
 
 #### Authentication
 
@@ -493,7 +477,7 @@ curl -H "X-API-Key: $SEED_QUEUE_API_KEY" \
 
 #### POST `/api/seed-queue/single`
 
-Queue a single color for asynchronous processing.
+Queue a single OKLCH color for asynchronous processing.
 
 **Request Body:**
 ```json
@@ -503,11 +487,11 @@ Queue a single color for asynchronous processing.
     "c": 0.12,
     "h": 240,
     "alpha": 1.0
-  },
-  "token": "primary",
-  "name": "ocean-blue"
+  }
 }
 ```
+
+**Note**: Queue endpoints may accept optional `token` and `name` fields for backward compatibility, but the queue consumer processes only the `oklch` field to generate pure OKLCH-based color intelligence.
 
 **Response:**
 ```json
@@ -521,33 +505,32 @@ Queue a single color for asynchronous processing.
 
 #### POST `/api/seed-queue/batch`
 
-Queue multiple colors for batch processing (max 1000 colors per request).
+Queue multiple OKLCH colors for batch processing (max 1000 colors per request).
 
 **Request Body:**
 ```json
 {
   "colors": [
     {
-      "oklch": {"l": 0.5, "c": 0.1, "h": 0},
-      "token": "danger",
-      "name": "red-500"
+      "oklch": {"l": 0.5, "c": 0.1, "h": 0}
     },
     {
-      "oklch": {"l": 0.6, "c": 0.15, "h": 120},
-      "token": "success"
+      "oklch": {"l": 0.6, "c": 0.15, "h": 120}
     }
   ],
   "batchId": "custom-batch-id"
 }
 ```
 
+**Note**: Each color object in the array may include optional `token` and `name` fields for backward compatibility, but only the `oklch` values are processed by the queue consumer.
+
 **Response:**
 ```json
 {
   "success": true,
-  "message": "10 colors queued for processing",
+  "message": "2 colors queued for processing",
   "batchId": "custom-batch-id",
-  "queuedCount": 10
+  "queuedCount": 2
 }
 ```
 
@@ -617,10 +600,11 @@ Get queue system status and configuration information.
 
 ### Queue Processing Flow
 
-1. **Publishing**: Colors are batched and sent to Cloudflare Queue
-2. **Consumer Processing**: Queue consumer processes each message asynchronously
-3. **Vector Storage**: Processed colors generate 384-dimensional vectors
-4. **Similarity Search**: Vectors become immediately searchable
+1. **Publishing**: OKLCH colors are batched and sent to Cloudflare Queue
+2. **Consumer Processing**: Queue consumer extracts only the `oklch` field from each message and processes it asynchronously
+3. **Pure OKLCH Analysis**: Color intelligence generation is based entirely on mathematical OKLCH properties using Workers AI
+4. **Vector Storage**: Processed colors generate 384-dimensional vectors based purely on OKLCH values
+5. **Similarity Search**: Vectors become immediately searchable for semantic color discovery
 
 **Monitor Processing:**
 ```bash
