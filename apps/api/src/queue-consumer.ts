@@ -12,15 +12,8 @@ import type { ColorSeedMessage } from './lib/queue/publisher';
 import { colorIntel } from './routes/color-intel';
 import { seedQueue } from './routes/seed-queue';
 
-interface CloudflareBindings {
-  VECTORIZE: VectorizeIndex;
-  AI: Ai;
-  COLOR_SEED_QUEUE: Queue;
-  SEED_QUEUE_API_KEY: string;
-}
-
 // Create the same app structure as index.ts for internal API calls
-const app = new Hono<{ Bindings: CloudflareBindings }>();
+const app = new Hono<{ Bindings: Env }>();
 
 app.use(
   '*',
@@ -35,7 +28,7 @@ app.route('/api/color-intel', colorIntel);
 app.route('/api/seed-queue', seedQueue);
 
 export default {
-  async queue(batch: MessageBatch<ColorSeedMessage>, env: CloudflareBindings): Promise<void> {
+  async queue(batch: MessageBatch<ColorSeedMessage>, env: Env): Promise<void> {
     await processColorSeedBatch(batch, env, app);
   },
 };
