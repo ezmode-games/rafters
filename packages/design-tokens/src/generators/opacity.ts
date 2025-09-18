@@ -1,7 +1,8 @@
 /**
- * Opacity Generator
+ * Opacity Generator - Rafters-Enhanced Tokens
  *
- * Semantic opacity system for states and overlays
+ * Semantic opacity system with behavioral intelligence
+ * Provides meaningful transparency (opacity-disabled vs opacity-50) for UI states
  */
 
 import type { Token } from '../index';

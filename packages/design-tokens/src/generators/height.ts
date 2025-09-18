@@ -1,8 +1,8 @@
 /**
- * Height Scale Generator
+ * Height Generator - Tailwind-Native Tokens (Semantic)
  *
- * Component height system with responsive variants and accessibility validation
- * Ensures proper touch targets and usability across devices
+ * Semantic height system that powers Tailwind utilities: h-screen, h-full, etc.
+ * Provides contextual sizing beyond the mathematical spacing scale
  */
 
 import type { Token } from '../index';

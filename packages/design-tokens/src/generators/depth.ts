@@ -1,7 +1,8 @@
 /**
- * Depth Scale Generator (Shadows and Z-Index)
+ * Depth Scale Generator - Mixed Token Types
  *
- * Generates semantic shadow and z-index tokens for visual hierarchy and layering
+ * Shadows: Tailwind-Native tokens that enhance shadow-* utilities
+ * Z-Index: Rafters-Enhanced tokens with semantic layering intelligence (z-modal vs z-[1000])
  */
 
 import type { Token } from '../index';
@@ -12,13 +13,13 @@ import type { Token } from '../index';
  * @param _system - Mathematical progression (currently exponential only)
  * @param _baseMultiplier - Base multiplier for exponential progression
  *
- * @returns Array of depth tokens (shadows and z-index) with AI intelligence metadata
+ * @returns Array of depth tokens with semantic intelligence
  *
  * @example
  * ```typescript
  * const depthTokens = generateDepthScale('exponential', 10);
- * // Generates: shadow tokens (none, sm, base, md, lg, xl, 2xl)
- * // and z-index tokens (base, sticky, dropdown, modal, popover, notification, tooltip)
+ * // Shadow tokens: --shadow-sm, --shadow-lg (enhance Tailwind)
+ * // Z-index tokens: --z-modal, --z-dropdown (semantic layering)
  * ```
  */
 export function generateDepthScale(

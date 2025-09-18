@@ -1,7 +1,8 @@
 /**
- * Backdrop Generator
+ * Backdrop Generator - Tailwind-Native Tokens
  *
- * Backdrop filter system for overlays and modals
+ * Backdrop filter system that powers Tailwind utilities: backdrop-blur-*
+ * Provides mathematical blur values for overlays and modals
  */
 
 import type { Token } from '../index';

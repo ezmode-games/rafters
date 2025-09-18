@@ -1,7 +1,8 @@
 /**
- * Font Family Generator
+ * Font Family Generator - Rafters-Enhanced Tokens
  *
- * Semantic font stack system with fallbacks
+ * Semantic font stacks with personality intelligence
+ * Provides meaningful typography (font-readable vs font-sans) with usage context
  */
 
 import type { Token } from '../index';

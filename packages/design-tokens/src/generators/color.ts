@@ -123,6 +123,7 @@ export function generateColorTokens(): Token[] {
   const grayscaleScale = generateSystemGrayscale(PRIMARY_TONE);
 
   // Create semantic color tokens with full mathematical intelligence
+  // 100% shadcn/ui compatible semantic tokens
   const semanticDefinitions = [
     {
       semantic: 'primary',
@@ -131,6 +132,22 @@ export function generateColorTokens(): Token[] {
       trustLevel: 'high' as const,
       cognitiveLoad: 3,
       components: ['button', 'link', 'badge', 'progress'],
+    },
+    {
+      semantic: 'secondary',
+      color: { l: 0.92, c: 0.01, h: 240, alpha: 1 }, // Light neutral
+      usage: 'Secondary actions, subtle backgrounds',
+      trustLevel: 'low' as const,
+      cognitiveLoad: 2,
+      components: ['button', 'card', 'badge'],
+    },
+    {
+      semantic: 'accent',
+      color: { l: 0.45, c: 0.12, h: 280, alpha: 1 }, // Purple accent
+      usage: 'Accent color for highlights and emphasis',
+      trustLevel: 'medium' as const,
+      cognitiveLoad: 4,
+      components: ['badge', 'highlight', 'focus-ring'],
     },
     {
       semantic: 'success',

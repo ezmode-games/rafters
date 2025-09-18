@@ -1,7 +1,8 @@
 /**
- * Width Generator
+ * Width Generator - Tailwind-Native Tokens (Semantic)
  *
- * Width token system for component sizing
+ * Semantic width system that powers Tailwind utilities: w-full, w-screen, etc.
+ * Provides contextual sizing beyond the mathematical spacing scale
  */
 
 import type { Token } from '../index';

@@ -1,7 +1,8 @@
 /**
- * Breakpoint Generator
+ * Breakpoint Generator - Tailwind-Native Tokens
  *
- * Responsive breakpoint and container system
+ * Responsive breakpoint system that powers Tailwind utilities: responsive variants
+ * Provides container sizes and screen breakpoints for responsive design
  */
 
 import type { Token } from '../index';

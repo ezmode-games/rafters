@@ -1,7 +1,8 @@
 /**
- * Border Radius Generator
+ * Border Radius Generator - Tailwind-Native Tokens
  *
- * Rounded corner system with semantic naming
+ * Mathematical radius system that powers Tailwind utilities: rounded-*
+ * Provides semantic corner rounding from sharp (technical) to full (pills)
  */
 
 import type { Token } from '../index';

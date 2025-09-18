@@ -1,7 +1,8 @@
 /**
- * Aspect Ratio Generator
+ * Aspect Ratio Generator - Tailwind-Native Tokens
  *
- * Proportional aspect ratio system for media and layout
+ * Mathematical aspect ratio system that powers Tailwind utilities: aspect-*
+ * Provides proportional ratios including golden ratio and common media formats
  */
 
 import type { Token } from '../index';

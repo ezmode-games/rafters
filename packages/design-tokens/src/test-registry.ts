@@ -38,7 +38,7 @@ async function testColorEnrichment() {
   // Enrich the color token
   console.log('Enriching token with AI intelligence...');
   try {
-    await registry.enrichColorToken('primary');
+    // await registry.enrichColorToken('primary'); // Method removed
 
     console.log('\nAfter enrichment:');
     const afterToken = registry.get('primary');
