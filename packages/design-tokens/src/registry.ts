@@ -8,6 +8,7 @@
 
 import type { Token } from '@rafters/shared';
 import { TokenDependencyGraph } from './dependencies';
+import { GenerationRuleExecutor, GenerationRuleParser } from './generation-rules';
 
 // Helper function to convert token values to CSS (simple inline implementation)
 
@@ -20,6 +21,8 @@ import { TokenDependencyGraph } from './dependencies';
 export class TokenRegistry {
   private tokens: Map<string, Token> = new Map();
   public dependencyGraph: TokenDependencyGraph = new TokenDependencyGraph();
+  private ruleParser = new GenerationRuleParser();
+  private ruleExecutor = new GenerationRuleExecutor(this);
 
   constructor(initialTokens?: Token[]) {
     if (initialTokens) {
@@ -63,7 +66,7 @@ export class TokenRegistry {
     return this.tokens.get(tokenName);
   }
 
-  set(tokenName: string, value: string): void {
+  async set(tokenName: string, value: string): Promise<void> {
     const existingToken = this.tokens.get(tokenName);
     if (!existingToken) {
       throw new Error(`Token "${tokenName}" does not exist. Cannot update non-existent token.`);
@@ -76,6 +79,9 @@ export class TokenRegistry {
     };
 
     this.tokens.set(tokenName, updatedToken);
+
+    // Regenerate all dependent tokens
+    await this.regenerateDependents(tokenName);
   }
 
   has(tokenName: string): boolean {
@@ -122,6 +128,85 @@ export class TokenRegistry {
    * Add dependency relationship with generation rule
    */
   addDependency(tokenName: string, dependsOn: string[], rule: string): void {
+    // Validate all tokens exist
+    if (!this.tokens.has(tokenName)) {
+      throw new Error(`Token ${tokenName} does not exist`);
+    }
+
+    for (const dep of dependsOn) {
+      if (!this.tokens.has(dep)) {
+        throw new Error(`Dependency token ${dep} does not exist`);
+      }
+    }
+
     this.dependencyGraph.addDependency(tokenName, dependsOn, rule);
+  }
+
+  /**
+   * Get dependency information including generation rule
+   */
+  getDependencyInfo(tokenName: string): { dependsOn: string[]; rule?: string } | null {
+    const dependsOn = this.getDependencies(tokenName);
+    const rule = this.dependencyGraph.getGenerationRule(tokenName);
+
+    if (dependsOn.length === 0 && !rule) {
+      return null;
+    }
+
+    return { dependsOn, rule };
+  }
+
+  /**
+   * Regenerate all dependent tokens when a dependency changes
+   */
+  private async regenerateDependents(changedTokenName: string): Promise<void> {
+    // Get all tokens that depend on the changed token
+    const dependents = this.dependencyGraph.getDependents(changedTokenName);
+
+    if (dependents.length === 0) {
+      return; // No dependents to update
+    }
+
+    // Sort in topological order to handle cascading dependencies
+    const sortedDependents = this.dependencyGraph.topologicalSort();
+
+    // Filter to only the dependents we need to update
+    const dependentsToUpdate = sortedDependents.filter((tokenName) =>
+      dependents.includes(tokenName)
+    );
+
+    for (const dependentName of dependentsToUpdate) {
+      try {
+        await this.regenerateToken(dependentName);
+      } catch (error) {
+        console.warn(`Failed to regenerate token ${dependentName}:`, error);
+        // Continue with other tokens even if one fails
+      }
+    }
+  }
+
+  /**
+   * Regenerate a single token using its generation rule
+   */
+  private async regenerateToken(tokenName: string): Promise<void> {
+    // Get the generation rule for this token
+    const rule = this.dependencyGraph.getGenerationRule(tokenName);
+    if (!rule) {
+      return; // No rule to execute
+    }
+
+    try {
+      // Parse and execute the rule
+      const parsedRule = this.ruleParser.parse(rule);
+      const newValue = this.ruleExecutor.execute(parsedRule, tokenName);
+
+      // Update token value (but don't trigger cascading - we're already in cascade)
+      const existingToken = this.tokens.get(tokenName);
+      if (existingToken) {
+        this.tokens.set(tokenName, { ...existingToken, value: newValue });
+      }
+    } catch (error) {
+      throw new Error(`Failed to regenerate token ${tokenName}: ${error}`);
+    }
   }
 }
