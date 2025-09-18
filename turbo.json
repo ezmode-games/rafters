@@ -13,7 +13,7 @@
       "interactive": true
     },
     "test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^typecheck"],
       "outputs": ["coverage/**", "test-results/**"],
       "cache": false,
       "env": ["NODE_ENV", "CI"]
@@ -25,13 +25,13 @@
       "env": ["NODE_ENV", "CI"]
     },
     "test:integration": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^typecheck"],
       "outputs": ["coverage/integration/**", "test-results/**"],
       "cache": false,
       "env": ["NODE_ENV", "CI", "RAFTERS_INTEL"]
     },
     "test:component": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^typecheck"],
       "outputs": ["playwright-report-components/**", "test-results/**", "coverage/component/**"],
       "cache": false,
       "env": ["NODE_ENV", "CI"]
@@ -49,13 +49,13 @@
       "interactive": true
     },
     "test:coverage": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^typecheck"],
       "outputs": ["coverage/**"],
       "cache": true,
       "env": ["NODE_ENV", "CI"]
     },
     "test:benchmark": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^typecheck"],
       "outputs": ["benchmark-results/**"],
       "cache": true,
       "env": ["NODE_ENV"]
