@@ -1,13 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.base.json",
   "files": [],
   "compilerOptions": {},
-  "references": [
-    { "path": "./packages/shared" },
-    { "path": "./packages/ui" },
-    { "path": "./packages/design-tokens" },
-    { "path": "./packages/color-utils" },
-    { "path": "./apps/api" },
-    { "path": "./apps/cli" }
-  ]
+  "references": [{ "path": "./apps/api" }, { "path": "./apps/cli" }]
 }

@@ -12,15 +12,21 @@
  * Uses TokenRegistry as single source of truth for ALL tokens
  */
 
-import type { ColorValue, Token } from '@rafters/shared';
+import type { ColorReference, ColorValue, Token } from '@rafters/shared';
 import type { TokenRegistry } from '../registry';
 
 /**
  * Convert token value to CSS, handling ColorValue objects and references
  */
-function tokenValueToCss(value: string | ColorValue, _tokenName?: string): string {
+function tokenValueToCss(value: string | ColorValue | ColorReference, _tokenName?: string): string {
   if (typeof value === 'string') {
     return value;
+  }
+
+  // Handle ColorReference object - convert to CSS variable reference
+  if (typeof value === 'object' && 'family' in value && 'position' in value) {
+    const colorRef = value as ColorReference;
+    return `var(--color-${colorRef.family}-${colorRef.position})`;
   }
 
   // Handle ColorValue object - use the value or default to oklch from scale

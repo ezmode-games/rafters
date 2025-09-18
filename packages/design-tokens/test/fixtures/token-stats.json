@@ -1,0 +1,75 @@
+{
+  "total": 64,
+  "scaleTokens": 0,
+  "semanticTokens": 0,
+  "stateTokens": 26,
+  "themeTokens": 0,
+  "darkTokens": 0,
+  "lightTokens": 64,
+  "families": [],
+  "tokensByNamespace": {
+    "color": 9,
+    "theme": 0
+  },
+  "exampleTokens": {
+    "scale": [],
+    "semantic": [],
+    "state": [
+      {
+        "name": "primary-hover",
+        "value": {
+          "family": "primary",
+          "position": "700"
+        },
+        "category": "color",
+        "namespace": "rafters",
+        "semanticMeaning": "Primary hover state",
+        "cognitiveLoad": 3,
+        "trustLevel": "high",
+        "accessibilityLevel": "AA",
+        "generateUtilityClass": true,
+        "interactionType": "hover",
+        "applicableComponents": ["button", "link", "nav", "cta"],
+        "generatedFrom": "primary",
+        "mathRelationship": "hover state progression from 600"
+      },
+      {
+        "name": "primary-active",
+        "value": {
+          "family": "primary",
+          "position": "800"
+        },
+        "category": "color",
+        "namespace": "rafters",
+        "semanticMeaning": "Primary active state",
+        "cognitiveLoad": 3,
+        "trustLevel": "high",
+        "accessibilityLevel": "AA",
+        "generateUtilityClass": true,
+        "interactionType": "active",
+        "applicableComponents": ["button", "link", "nav", "cta"],
+        "generatedFrom": "primary",
+        "mathRelationship": "active state progression from 600"
+      },
+      {
+        "name": "primary-disabled",
+        "value": {
+          "family": "primary",
+          "position": "400"
+        },
+        "category": "color",
+        "namespace": "rafters",
+        "semanticMeaning": "Primary disabled state",
+        "cognitiveLoad": 3,
+        "trustLevel": "high",
+        "accessibilityLevel": "AA",
+        "generateUtilityClass": true,
+        "interactionType": "disabled",
+        "applicableComponents": ["button", "link", "nav", "cta"],
+        "generatedFrom": "primary",
+        "mathRelationship": "disabled state progression from 600"
+      }
+    ],
+    "theme": []
+  }
+}

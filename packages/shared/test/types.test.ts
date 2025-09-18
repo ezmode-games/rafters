@@ -6,6 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   ColorIntelligenceSchema,
+  ColorReferenceSchema,
   ColorValueSchema,
   ComponentIntelligenceSchema,
   ComponentManifestSchema,
@@ -149,6 +150,52 @@ describe('ColorValueSchema', () => {
   });
 });
 
+describe('ColorReferenceSchema', () => {
+  it('should validate color reference with family and position', () => {
+    const validReference = {
+      family: 'ocean-blue',
+      position: '600',
+    };
+
+    const result = ColorReferenceSchema.safeParse(validReference);
+    expect(result.success).toBe(true);
+  });
+
+  it('should validate various scale positions', () => {
+    const positions = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
+
+    positions.forEach((position) => {
+      const reference = {
+        family: 'test-family',
+        position,
+      };
+
+      const result = ColorReferenceSchema.safeParse(reference);
+      expect(result.success).toBe(true);
+    });
+  });
+
+  it('should require both family and position', () => {
+    const missingPosition = {
+      family: 'ocean-blue',
+      // Missing position
+    };
+
+    const result = ColorReferenceSchema.safeParse(missingPosition);
+    expect(result.success).toBe(false);
+  });
+
+  it('should require valid string values', () => {
+    const invalidTypes = {
+      family: 123, // Should be string
+      position: true, // Should be string
+    };
+
+    const result = ColorReferenceSchema.safeParse(invalidTypes);
+    expect(result.success).toBe(false);
+  });
+});
+
 describe('TokenSchema', () => {
   const basicToken = {
     name: 'primary-500',
@@ -172,6 +219,22 @@ describe('TokenSchema', () => {
     };
 
     const result = TokenSchema.safeParse(colorToken);
+    expect(result.success).toBe(true);
+  });
+
+  it('should validate token with ColorReference', () => {
+    const colorReferenceToken = {
+      ...basicToken,
+      value: {
+        family: 'ocean-blue',
+        position: '600',
+      },
+      category: 'color',
+      namespace: 'rafters',
+      semanticMeaning: 'Primary brand color for main actions',
+    };
+
+    const result = TokenSchema.safeParse(colorReferenceToken);
     expect(result.success).toBe(true);
   });
 

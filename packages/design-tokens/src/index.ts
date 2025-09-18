@@ -6,7 +6,13 @@
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { type ColorValue, type Token, TokenSchema, type TokenSet } from '@rafters/shared';
+import {
+  type ColorReference,
+  type ColorValue,
+  type Token,
+  TokenSchema,
+  type TokenSet,
+} from '@rafters/shared';
 import { ensureDirSync } from 'fs-extra';
 import sqids from 'sqids';
 import { z } from 'zod';
@@ -50,9 +56,15 @@ export { TokenSchema } from '@rafters/shared';
  * Convert a token value (string or ColorValue object) to a CSS string
  * For ColorValue objects, extracts the appropriate CSS value from scale
  */
-export function tokenValueToCss(value: string | ColorValue): string {
+export function tokenValueToCss(value: string | ColorValue | ColorReference): string {
   if (typeof value === 'string') {
     return value;
+  }
+
+  // Handle ColorReference object - convert to CSS variable reference
+  if (typeof value === 'object' && 'family' in value && 'position' in value) {
+    const colorRef = value as ColorReference;
+    return `var(--color-${colorRef.family}-${colorRef.position})`;
   }
 
   // Handle ColorValue object - extract from scale using value position or use direct value
@@ -87,9 +99,18 @@ export function tokenValueToCss(value: string | ColorValue): string {
  * Convert a token value to CSS string for dark mode
  * For ColorValue objects, uses states when available, otherwise falls back to light value
  */
-export function tokenValueToCssDark(value: string | ColorValue, stateName = 'default'): string {
+export function tokenValueToCssDark(
+  value: string | ColorValue | ColorReference,
+  stateName = 'default'
+): string {
   if (typeof value === 'string') {
     return value;
+  }
+
+  // Handle ColorReference object - convert to CSS variable reference
+  if (typeof value === 'object' && 'family' in value && 'position' in value) {
+    const colorRef = value as ColorReference;
+    return `var(--color-${colorRef.family}-${colorRef.position})`;
   }
 
   // Handle ColorValue object for dark mode

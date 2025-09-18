@@ -5,13 +5,15 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
-    "moduleResolution": "bundler" // Modern resolution for better import handling
+    "moduleResolution": "bundler", // Modern resolution for better import handling
+    "baseUrl": "../../",
+    "paths": {
+      "@rafters/shared/*": ["packages/shared/src/*"],
+      "@rafters/api/*": ["apps/api/src/*"],
+      "@rafters/website/*": ["apps/website/src/*"],
+      "@rafters/cli/*": ["apps/cli/src/*"]
+    }
   },
   "include": ["src/**/*"],
-  "exclude": ["dist", "node_modules", "**/*.test.ts", "**/*.spec.ts"],
-  "references": [
-    { "path": "../../packages/shared" },
-    { "path": "../../packages/design-tokens" },
-    { "path": "../../packages/color-utils" }
-  ]
+  "exclude": ["dist", "node_modules", "**/*.test.ts", "**/*.spec.ts"]
 }

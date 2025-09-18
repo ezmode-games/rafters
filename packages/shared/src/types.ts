@@ -240,11 +240,19 @@ export const ColorValueSchema = z.object({
 
 export type ColorValue = z.infer<typeof ColorValueSchema>;
 
+// Color Reference Schema for semantic tokens that reference color families
+export const ColorReferenceSchema = z.object({
+  family: z.string(), // "flipped-out-gray", "ocean-blue", etc.
+  position: z.string(), // "50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "950"
+});
+
+export type ColorReference = z.infer<typeof ColorReferenceSchema>;
+
 // Comprehensive Design Token Schema - Single Source of Truth
 export const TokenSchema = z.object({
   // Core token data
   name: z.string(),
-  value: z.union([z.string(), ColorValueSchema]), // String for most tokens, ColorValue for colors
+  value: z.union([z.string(), ColorValueSchema, ColorReferenceSchema]), // String, ColorValue for families, or ColorReference for semantic
   category: z.string(),
   namespace: z.string(),
 
