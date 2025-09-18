@@ -1,7 +1,10 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "../../tsconfig.source.json",
-  "compilerOptions": {},
+  "compilerOptions": {
+    "incremental": false,
+    "tsBuildInfoFile": null
+  },
   "include": ["src/**/*", "test/fixtures/generators/color.test.ts"],
   "exclude": ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"]
 }
