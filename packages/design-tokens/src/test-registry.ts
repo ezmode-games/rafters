@@ -1,4 +1,4 @@
-import type { Token } from '@rafters/shared';
+import type { ColorValue, Token } from '@rafters/shared';
 import { TokenRegistry } from './registry';
 
 // Simple test script to verify color intelligence integration
@@ -28,11 +28,12 @@ async function testColorEnrichment() {
 
   console.log('Before enrichment:');
   const beforeToken = registry.get('primary');
-  if (beforeToken && typeof beforeToken.value === 'object') {
-    console.log(`- Name: ${beforeToken.value.name}`);
-    console.log(`- Has intelligence: ${!!beforeToken.value.intelligence}`);
-    console.log(`- Has harmonies: ${!!beforeToken.value.harmonies}`);
-    console.log(`- Has accessibility: ${!!beforeToken.value.accessibility}\n`);
+  if (beforeToken && typeof beforeToken.value === 'object' && 'name' in beforeToken.value) {
+    const colorValue = beforeToken.value as ColorValue;
+    console.log(`- Name: ${colorValue.name}`);
+    console.log(`- Has intelligence: ${!!colorValue.intelligence}`);
+    console.log(`- Has harmonies: ${!!colorValue.harmonies}`);
+    console.log(`- Has accessibility: ${!!colorValue.accessibility}\n`);
   }
 
   // Enrich the color token
@@ -42,23 +43,24 @@ async function testColorEnrichment() {
 
     console.log('\nAfter enrichment:');
     const afterToken = registry.get('primary');
-    if (afterToken && typeof afterToken.value === 'object') {
-      console.log(`- Name: ${afterToken.value.name}`);
-      console.log(`- Has intelligence: ${!!afterToken.value.intelligence}`);
-      console.log(`- Has harmonies: ${!!afterToken.value.harmonies}`);
-      console.log(`- Has accessibility: ${!!afterToken.value.accessibility}`);
-      console.log(`- Token ID: ${afterToken.value.token}`);
+    if (afterToken && typeof afterToken.value === 'object' && 'name' in afterToken.value) {
+      const colorValue = afterToken.value as ColorValue;
+      console.log(`- Name: ${colorValue.name}`);
+      console.log(`- Has intelligence: ${!!colorValue.intelligence}`);
+      console.log(`- Has harmonies: ${!!colorValue.harmonies}`);
+      console.log(`- Has accessibility: ${!!colorValue.accessibility}`);
+      console.log(`- Token ID: ${colorValue.token}`);
 
-      if (afterToken.value.intelligence) {
+      if (colorValue.intelligence) {
         console.log('\nAI Intelligence:');
-        console.log(`- Reasoning: ${afterToken.value.intelligence.reasoning.substring(0, 100)}...`);
-        console.log(`- Usage: ${afterToken.value.intelligence.usageGuidance.substring(0, 100)}...`);
+        console.log(`- Reasoning: ${colorValue.intelligence.reasoning.substring(0, 100)}...`);
+        console.log(`- Usage: ${colorValue.intelligence.usageGuidance.substring(0, 100)}...`);
       }
 
-      if (afterToken.value.analysis) {
+      if (colorValue.analysis) {
         console.log('\nColor Analysis:');
-        console.log(`- Temperature: ${afterToken.value.analysis.temperature}`);
-        console.log(`- Is Light: ${afterToken.value.analysis.isLight}`);
+        console.log(`- Temperature: ${colorValue.analysis.temperature}`);
+        console.log(`- Is Light: ${colorValue.analysis.isLight}`);
       }
     }
   } catch (error) {

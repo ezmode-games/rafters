@@ -10,7 +10,7 @@
  * - React Native style objects (future)
  */
 
-import type { ColorValue, Token } from '@rafters/shared';
+import type { ColorReference, ColorValue, Token } from '@rafters/shared';
 import type { TokenRegistry } from './registry';
 
 /**
@@ -32,7 +32,7 @@ function isTokenReference(value: string): boolean {
  * Preserves CSS variable references for dependent tokens
  */
 function tokenValueToCss(
-  value: string | ColorValue,
+  value: string | ColorValue | ColorReference,
   tokenName?: string,
   registry?: TokenRegistry
 ): string {
@@ -56,6 +56,12 @@ function tokenValueToCss(
     }
 
     return value;
+  }
+
+  // Handle ColorReference object - convert to CSS variable reference
+  if (typeof value === 'object' && 'family' in value && 'position' in value) {
+    const colorRef = value as ColorReference;
+    return `var(--color-${colorRef.family}-${colorRef.position})`;
   }
 
   // Handle ColorValue object - extract the appropriate CSS value

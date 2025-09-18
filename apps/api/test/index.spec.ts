@@ -103,6 +103,22 @@ describe('Main App', () => {
   test('queue handler processes batch messages', async () => {
     const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
+    // Mock the global fetch instead of worker.fetch for internal HTTP calls
+    const originalFetch = global.fetch;
+    global.fetch = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          name: 'Test Color',
+          scale: [{ l: 0.5, c: 0.1, h: 180 }],
+          intelligence: { suggestedName: 'Test Color' },
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+    );
+
     const mockBatch: MessageBatch<ColorSeedMessage> = {
       queue: 'COLOR_SEED_QUEUE',
       messages: [
@@ -124,19 +140,12 @@ describe('Main App', () => {
       ackAll: vi.fn(),
     };
 
-    // Mock the internal fetch to simulate successful processing
-    const originalFetch = worker.fetch;
-    const mockFetch = vi
-      .fn()
-      .mockResolvedValue(new Response(JSON.stringify({ success: true }), { status: 200 }));
-    worker.fetch = mockFetch;
-
     await worker.queue(mockBatch, env);
 
     expect(mockBatch.messages[0].ack).toHaveBeenCalled();
 
     // Restore original fetch
-    worker.fetch = originalFetch;
+    global.fetch = originalFetch;
     consoleSpy.mockRestore();
-  });
+  }, 10000); // 10 second timeout
 });

@@ -66,14 +66,19 @@ import { generateWidthTokens } from './width';
  * @returns Complete set of design tokens for a design system
  */
 export async function generateAllTokens(): Promise<Token[]> {
-  const colorTokens = await generateColorTokens(); // Async color generation with API calls
+  // Use default primary color for token generation
+  const colorResult = await generateColorTokens({
+    baseColor: { l: 0.44, c: 0.01, h: 286 }, // Official grayscale primary
+    apiUrl: 'https://rafters.realhandy.tech/api/color-intel',
+    generateDarkMode: true,
+  });
 
   return [
     ...generateSpacingScale('linear', 4, 1.25, 12),
     ...generateDepthScale('exponential', 10),
     // Height tokens removed - spacing scale generates h-* utilities automatically
     ...generateTypographyScale('golden', 1),
-    ...colorTokens, // AI-enhanced color tokens from API
+    ...colorResult.tokens, // AI-enhanced color tokens from API
     ...generateMotionTokens(),
     ...generateAnimations(true), // Complete keyframe animations replacing Tailwind v4 removed animations
     ...generateBorderRadiusTokens(),
