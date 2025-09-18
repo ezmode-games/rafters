@@ -49,17 +49,22 @@ export class TokenRegistry {
   }
 
   /**
-   * Remove a token from the registry
+   * Remove a token from the registry and clean up all dependencies
    */
   remove(tokenName: string): boolean {
+    // Remove from dependency graph first
+    this.dependencyGraph.removeToken(tokenName);
+
+    // Remove from token registry
     return this.tokens.delete(tokenName);
   }
 
   /**
-   * Clear all tokens from the registry
+   * Clear all tokens from the registry and dependency graph
    */
   clear(): void {
     this.tokens.clear();
+    this.dependencyGraph.clear();
   }
 
   get(tokenName: string): Token | undefined {
@@ -208,5 +213,193 @@ export class TokenRegistry {
     } catch (error) {
       throw new Error(`Failed to regenerate token ${tokenName}: ${error}`);
     }
+  }
+
+  /**
+   * Add multiple dependencies efficiently using bulk operations
+   */
+  addDependencies(
+    dependencies: Array<{ tokenName: string; dependsOn: string[]; rule: string }>
+  ): void {
+    // Validate all tokens exist first
+    for (const { tokenName, dependsOn } of dependencies) {
+      if (!this.tokens.has(tokenName)) {
+        throw new Error(`Token ${tokenName} does not exist`);
+      }
+
+      for (const dep of dependsOn) {
+        if (!this.tokens.has(dep)) {
+          throw new Error(`Dependency token ${dep} does not exist`);
+        }
+      }
+    }
+
+    // Use bulk operation for better performance
+    this.dependencyGraph.addDependencies(dependencies);
+  }
+
+  /**
+   * Get comprehensive metrics about the token system
+   */
+  getMetrics(): {
+    totalTokens: number;
+    totalDependencies: number;
+    avgDependenciesPerToken: number;
+    maxDependencies: number;
+    isolated: string[];
+  } {
+    return this.dependencyGraph.getMetrics();
+  }
+
+  /**
+   * Get all tokens in the registry
+   */
+  getAllTokens(): string[] {
+    return Array.from(this.tokens.keys());
+  }
+
+  /**
+   * Get all tokens from the dependency graph (includes both tokens and their dependencies)
+   */
+  getAllTokensFromGraph(): string[] {
+    return this.dependencyGraph.getAllTokens();
+  }
+
+  /**
+   * Validate the integrity of the token registry and dependency graph
+   */
+  validate(): { isValid: boolean; errors: string[] } {
+    const errors: string[] = [];
+
+    // Validate dependency graph integrity
+    const graphValidation = this.dependencyGraph.validate();
+    errors.push(...graphValidation.errors);
+
+    // Validate that all tokens in dependency graph exist in registry
+    const graphTokens = this.dependencyGraph.getAllTokens();
+    for (const tokenName of graphTokens) {
+      if (!this.tokens.has(tokenName)) {
+        errors.push(`Token ${tokenName} exists in dependency graph but not in registry`);
+      }
+    }
+
+    // Validate that all token dependencies exist
+    for (const tokenName of this.tokens.keys()) {
+      const dependencies = this.dependencyGraph.getDependencies(tokenName);
+      for (const dep of dependencies) {
+        if (!this.tokens.has(dep)) {
+          errors.push(`Token ${tokenName} depends on ${dep} which doesn't exist in registry`);
+        }
+      }
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+    };
+  }
+
+  /**
+   * Get topological order of all tokens for regeneration
+   */
+  getTopologicalOrder(): string[] {
+    return this.dependencyGraph.topologicalSort();
+  }
+
+  /**
+   * Add dependency with automatic rule parsing and validation
+   */
+  addDependencyWithRuleParsing(
+    tokenName: string,
+    rule: string,
+    explicitDependsOn: string[] = []
+  ): void {
+    // Validate token exists
+    if (!this.tokens.has(tokenName)) {
+      throw new Error(`Token ${tokenName} does not exist`);
+    }
+
+    // Validate explicit dependencies exist
+    for (const dep of explicitDependsOn) {
+      if (!this.tokens.has(dep)) {
+        throw new Error(`Dependency token ${dep} does not exist`);
+      }
+    }
+
+    // Use dependency graph's rule parsing functionality
+    this.dependencyGraph.addDependencyWithRuleParsing(tokenName, rule, explicitDependsOn);
+  }
+
+  /**
+   * Update a token's generation rule
+   */
+  updateTokenRule(tokenName: string, newRule: string): void {
+    // Validate token exists
+    if (!this.tokens.has(tokenName)) {
+      throw new Error(`Token ${tokenName} does not exist`);
+    }
+
+    // Use dependency graph's rule update functionality
+    this.dependencyGraph.updateTokenRule(tokenName, newRule);
+  }
+
+  /**
+   * Validate a generation rule syntax
+   */
+  validateRule(rule: string): { isValid: boolean; error?: string } {
+    return this.dependencyGraph.validateRule(rule);
+  }
+
+  /**
+   * Get all tokens with generation rules
+   */
+  getTokensWithRules(): Array<{ tokenName: string; rule: string; dependencies: string[] }> {
+    return this.dependencyGraph.getTokensWithRules();
+  }
+
+  /**
+   * Validate all generation rules in the token system
+   */
+  validateAllRules(): { isValid: boolean; errors: Array<{ tokenName: string; error: string }> } {
+    return this.dependencyGraph.validateAllRules();
+  }
+
+  /**
+   * Get statistics about rule types used in the system
+   */
+  getRuleTypeStats(): { [ruleType: string]: number } {
+    return this.dependencyGraph.getRuleTypeStats();
+  }
+
+  /**
+   * Find tokens that use a specific rule type
+   */
+  getTokensByRuleType(ruleType: string): string[] {
+    return this.dependencyGraph.getTokensByRuleType(ruleType);
+  }
+
+  /**
+   * Parse rule dependencies for analysis
+   */
+  parseRuleDependencies(rule: string): string[] {
+    return this.dependencyGraph.parseRuleDependencies(rule);
+  }
+
+  /**
+   * Enhanced validation that includes both registry and rule validation
+   */
+  validateComplete(): {
+    isValid: boolean;
+    errors: string[];
+    ruleErrors: Array<{ tokenName: string; error: string }>;
+  } {
+    const registryValidation = this.validate();
+    const ruleValidation = this.validateAllRules();
+
+    return {
+      isValid: registryValidation.isValid && ruleValidation.isValid,
+      errors: registryValidation.errors,
+      ruleErrors: ruleValidation.errors,
+    };
   }
 }

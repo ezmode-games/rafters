@@ -84,6 +84,17 @@ export class GenerationRuleParser {
     if (!match) throw new Error(`Invalid calc rule: ${rule}`);
 
     const expression = match[1];
+
+    // Basic validation for incomplete expressions
+    if (
+      expression.endsWith('+') ||
+      expression.endsWith('-') ||
+      expression.endsWith('*') ||
+      expression.endsWith('/')
+    ) {
+      throw new Error(`Incomplete calc expression: ${expression}`);
+    }
+
     const tokens = this.extractTokens(expression); // Find all {token} references
 
     return { type: 'calc', expression, tokens };
@@ -147,9 +158,26 @@ export class GenerationRuleParser {
   }
 
   private extractTokens(expression: string): string[] {
+    // Check for empty token references {} before processing
+    if (expression.includes('{}')) {
+      throw new Error('Empty token reference {} found in calc expression');
+    }
+
     // Find all {token-name} references in expression
     const matches = expression.match(/\{([^}]+)\}/g) || [];
-    return matches.map((match) => match.slice(1, -1)); // Remove { }
+    const tokens = matches.map((match) => match.slice(1, -1)); // Remove { }
+
+    // Validate tokens are not empty or whitespace-only
+    for (const token of tokens) {
+      if (!token || token.trim().length === 0) {
+        throw new Error('Empty token reference found in calc expression');
+      }
+      if (token.includes(' ')) {
+        throw new Error(`Invalid token name "${token}" - token names cannot contain spaces`);
+      }
+    }
+
+    return tokens;
   }
 }
 
