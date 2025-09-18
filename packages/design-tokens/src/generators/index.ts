@@ -48,8 +48,7 @@ import { generateDepthScale } from './depth';
 import { generateFontFamilyTokens } from './font-family';
 import { generateFontWeightTokens } from './font-weight';
 import { generateGridTokens } from './grid';
-// TODO: Add heightScale generator when height tokens are implemented
-// import { generateHeightScale } from './height';
+import { generateHeightScale } from './height';
 import { generateLetterSpacingTokens } from './letter-spacing';
 import { generateMotionTokens } from './motion';
 import { generateOpacityTokens } from './opacity';
@@ -66,19 +65,39 @@ import { generateWidthTokens } from './width';
  * @returns Complete set of design tokens for a design system
  */
 export async function generateAllTokens(): Promise<Token[]> {
-  // Use default primary color for token generation
+  // Get ColorValue objects with AI intelligence from API
   const colorResult = await generateColorTokens({
-    baseColor: { l: 0.44, c: 0.01, h: 286 }, // Official grayscale primary
+    baseColor: { l: 0.44, c: 0.01, h: 286 }, // Rafters Gray primary
     apiUrl: 'https://rafters.realhandy.tech/api/color-intel',
     generateDarkMode: true,
   });
 
+  // Import TDD color functions
+  const { generateColorFamilyTokens, generateSemanticColorTokens } = await import('./color.js');
+
+  // Use the new TDD architecture - ignore old tokens, use colorValues
+  const familyTokens = generateColorFamilyTokens(colorResult.colorValues);
+
+  // Generate semantic tokens using ColorReference objects to reference families
+  const semanticMapping = {
+    primary: { family: 'primary', position: '600' },
+    secondary: { family: 'secondary', position: '600' },
+    accent: { family: 'accent', position: '600' },
+    destructive: { family: 'destructive', position: '600' },
+    success: { family: 'success', position: '600' },
+    warning: { family: 'warning', position: '600' },
+    info: { family: 'info', position: '600' },
+    neutral: { family: 'neutral', position: '500' },
+  };
+  const semanticTokens = generateSemanticColorTokens(familyTokens, semanticMapping);
+
   return [
     ...generateSpacingScale('linear', 4, 1.25, 12),
     ...generateDepthScale('exponential', 10),
-    // Height tokens removed - spacing scale generates h-* utilities automatically
+    ...generateHeightScale('linear', 2.5, 1.25), // Re-added height tokens
     ...generateTypographyScale('golden', 1),
-    ...colorResult.tokens, // AI-enhanced color tokens from API
+    ...familyTokens, // Color family tokens with complete intelligence
+    ...semanticTokens, // Semantic tokens with ColorReference values
     ...generateMotionTokens(),
     ...generateAnimations(true), // Complete keyframe animations replacing Tailwind v4 removed animations
     ...generateBorderRadiusTokens(),
