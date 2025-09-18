@@ -1,7 +1,8 @@
 /**
- * Touch Target Generator
+ * Touch Target Generator - Rafters-Enhanced Tokens
  *
- * Accessibility-focused sizing system for interactive elements
+ * WCAG compliance tokens with accessibility intelligence
+ * Provides meaningful sizing (touch-minimum vs w-11) for interactive elements
  */
 
 import type { Token } from '../index';

@@ -1,21 +1,24 @@
 /**
- * Typography Scale Generator
+ * Typography Scale Generator - Tailwind-Native Tokens
  *
- * Musical harmony-based typography system with responsive variants
- * Uses mathematical ratios from music theory for pleasing proportions
+ * Mathematical typography system that powers Tailwind utilities: text-*, leading-*
+ * Uses musical ratios (golden ratio, perfect fourth, etc.) for harmonious proportions
  */
 
 import type { Token } from '../index';
 
 /**
  * Musical and mathematical ratios for typography generation
+ * Based on musical intervals for harmonious proportions
  */
-const GOLDEN_RATIO = 1.618033988749;
-const MAJOR_SECOND = 1.125;
-const MINOR_THIRD = 1.2;
-const MAJOR_THIRD = 1.25;
-const PERFECT_FOURTH = 1.333;
-const PERFECT_FIFTH = 1.5;
+const MINOR_SECOND = 1.067; // 16:15 ratio
+const MAJOR_SECOND = 1.125; // 9:8 ratio
+const MINOR_THIRD = 1.2; // 6:5 ratio
+const MAJOR_THIRD = 1.25; // 5:4 ratio
+const PERFECT_FOURTH = 1.333; // 4:3 ratio
+const AUGMENTED_FOURTH = Math.SQRT2; // √2 ratio (tritone)
+const PERFECT_FIFTH = 1.5; // 3:2 ratio
+const GOLDEN_RATIO = 1.618033988749; // φ (phi)
 
 /**
  * Generate typography scale using golden ratio or musical intervals with responsive variants
@@ -24,28 +27,26 @@ const PERFECT_FIFTH = 1.5;
  * @param baseSize - Base font size in rem (default: 1rem = 16px)
  * @param generateResponsive - Generate viewport and container query variants (default: true)
  *
- * @returns Array of typography tokens with AI intelligence metadata and paired line heights
+ * @returns Array of typography tokens that power Tailwind text utilities
  *
  * @example
  * ```typescript
- * // Generate golden ratio typography for premium feel
- * const goldenType = generateTypographyScale('golden', 1, true);
- *
- * // Generate major third scale for balanced harmony
- * const harmonicType = generateTypographyScale('major-third', 1, true);
- *
- * // Generate perfect fifth for dramatic scaling
- * const dramaticType = generateTypographyScale('perfect-fifth', 1, true);
+ * // Generate mathematical typography scale
+ * const typography = generateTypographyScale('golden', 1);
+ * // Result: --text-lg: 1.125rem, --leading-lg: 1.5
+ * // Powers: text-lg, leading-lg utilities
  * ```
  */
 export function generateTypographyScale(
   system:
-    | 'golden'
+    | 'minor-second'
     | 'major-second'
     | 'minor-third'
     | 'major-third'
     | 'perfect-fourth'
-    | 'perfect-fifth' = 'golden',
+    | 'augmented-fourth'
+    | 'perfect-fifth'
+    | 'golden' = 'golden',
   baseSize = 1 // rem
 ): Token[] {
   const tokens: Token[] = [];
@@ -67,8 +68,8 @@ export function generateTypographyScale(
 
   let ratio: number;
   switch (system) {
-    case 'golden':
-      ratio = GOLDEN_RATIO;
+    case 'minor-second':
+      ratio = MINOR_SECOND;
       break;
     case 'major-second':
       ratio = MAJOR_SECOND;
@@ -82,14 +83,22 @@ export function generateTypographyScale(
     case 'perfect-fourth':
       ratio = PERFECT_FOURTH;
       break;
+    case 'augmented-fourth':
+      ratio = AUGMENTED_FOURTH;
+      break;
     case 'perfect-fifth':
       ratio = PERFECT_FIFTH;
+      break;
+    case 'golden':
+      ratio = GOLDEN_RATIO;
       break;
   }
 
   // Start from base (index 2), go down for xs/sm, up for lg+
   for (let i = 0; i < sizes.length; i++) {
     const steps = i - 2; // -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+
+    // Use original phi scale sequence
     const value = baseSize * ratio ** steps;
 
     // Determine cognitive load and usage context based on size
@@ -104,7 +113,6 @@ export function generateTypographyScale(
       category: 'font-size',
       namespace: 'font-size',
       semanticMeaning: `Typography size ${sizes[i]} using ${system} ratio - ${isDisplay ? 'display/hero' : isHeading ? 'heading' : 'body/ui'} text`,
-      mathRelationship: `${baseSize} * ${ratio}^${steps}`,
       scalePosition: i,
       generateUtilityClass: true,
       applicableComponents: ['text', 'heading', 'label', 'button'],
@@ -130,7 +138,6 @@ export function generateTypographyScale(
       category: 'line-height',
       namespace: 'line-height',
       semanticMeaning: `Line height optimized for ${sizes[i]} text readability - ${lineHeight >= 1.5 ? 'comfortable' : 'tight'} spacing`,
-      pairedWith: [`text-${sizes[i]}`],
       generateUtilityClass: true,
       applicableComponents: ['text', 'heading', 'paragraph'],
       accessibilityLevel: lineHeight >= 1.5 ? 'AAA' : 'AA',

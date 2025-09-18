@@ -14,6 +14,7 @@
  */
 
 // Import all generators from individual files
+export { generateAnimations } from './animations';
 export { generateAspectRatioTokens } from './aspect-ratio';
 export { generateBackdropTokens } from './backdrop';
 export { generateBorderRadiusTokens } from './border-radius';
@@ -36,6 +37,7 @@ export { generateWidthTokens } from './width';
 
 // Import for generateAllTokens function
 import type { Token } from '@rafters/shared';
+import { generateAnimations } from './animations';
 import { generateAspectRatioTokens } from './aspect-ratio';
 import { generateBackdropTokens } from './backdrop';
 import { generateBorderRadiusTokens } from './border-radius';
@@ -73,6 +75,7 @@ export async function generateAllTokens(): Promise<Token[]> {
     ...generateTypographyScale('golden', 1),
     ...colorTokens, // AI-enhanced color tokens from API
     ...generateMotionTokens(),
+    ...generateAnimations(true), // Complete keyframe animations replacing Tailwind v4 removed animations
     ...generateBorderRadiusTokens(),
     ...generateTouchTargetTokens(),
     ...generateOpacityTokens(),

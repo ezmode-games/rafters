@@ -21,7 +21,7 @@
     "test:preflight": "vitest run --passWithNoTests",
     "lint": "biome check .",
     "format": "biome format --write .",
-    "type-check": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "validate-standards": "tsx scripts/validate-standards.ts"
   },
   "devDependencies": {

@@ -1,7 +1,8 @@
 /**
- * Font Weight Generator
+ * Font Weight Generator - Rafters-Enhanced Tokens
  *
- * Typography weight system with semantic meaning
+ * Semantic font weights with usage intelligence
+ * Provides meaningful weights (font-readable vs font-normal) for different contexts
  */
 
 import type { Token } from '../index';
@@ -81,7 +82,7 @@ export function generateFontWeightTokens(): Token[] {
       name: weight.name,
       value: weight.value,
       category: 'font-weight',
-      namespace: 'font-weight',
+      namespace: 'font',
       semanticMeaning: weight.meaning,
       scalePosition: index,
       generateUtilityClass: true,

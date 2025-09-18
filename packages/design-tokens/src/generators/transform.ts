@@ -1,7 +1,8 @@
 /**
- * Transform Generator
+ * Transform Generator - Rafters-Enhanced Tokens
  *
- * Transform system for animations and interactions
+ * Semantic transform system with behavioral intelligence
+ * Provides meaningful transforms (scale-hover vs scale-110) for interactions
  */
 
 import type { Token } from '../index';

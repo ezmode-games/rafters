@@ -2,7 +2,6 @@
  * @rafters/design-tokens
  *
  * Comprehensive design token system with AI intelligence metadata
- * Built from Sami (UX) and Sally (Accessibility) requirements
  */
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
@@ -144,6 +143,7 @@ export type DesignSystem = z.infer<typeof DesignSystemSchema> & {
 // Import and re-export all generators from generators folder
 export {
   generateAllTokens,
+  generateAnimations,
   generateAspectRatioTokens,
   generateBackdropTokens,
   generateBorderRadiusTokens,
@@ -918,45 +918,8 @@ export const writeTokenFiles = async (
   };
   writeFileSync(registryFile, JSON.stringify(registryData, null, 2));
 
-  // Enrich color tokens with AI intelligence using TokenRegistry (skip in test mode)
-  const isTestMode =
-    process.env.NODE_ENV === 'test' || process.env.CI === 'true' || process.env.VITEST === 'true';
-
-  if (!isTestMode) {
-    const { TokenRegistry } = await import('./registry');
-    const registry = new TokenRegistry(allTokens);
-
-    // Process color tokens with AI intelligence
-    const colorTokens = allTokens.filter((token: Token) => token.category === 'color');
-
-    for (const token of colorTokens) {
-      try {
-        await registry.enrichColorToken(token.name);
-      } catch (error) {
-        console.log(
-          `    ⚠ Skipped ${token.name}: ${error instanceof Error ? error.message : 'Unknown error'}`
-        );
-      }
-    }
-
-    // Re-write the color tokens with intelligence
-    const processedColorTokens = registry
-      .list()
-      .filter((token: Token) => token.category === 'color');
-    if (processedColorTokens.length > 0) {
-      const colorFile = join(tokensDir, 'color.json');
-      const colorData = {
-        category: 'color',
-        generatedAt: new Date().toISOString(),
-        tokens: processedColorTokens.map((token: Token) => ({
-          ...token,
-          // Clean up undefined values for JSON
-          ...Object.fromEntries(Object.entries(token).filter(([_, v]) => v !== undefined)),
-        })),
-      };
-      writeFileSync(colorFile, JSON.stringify(colorData, null, 2));
-    }
-  }
+  // Note: Color token AI intelligence processing removed due to missing enrichColorToken method
+  // Color tokens are processed with their base intelligence metadata from generators
 
   // Generate CSS file for the requested format
   if (format === 'tailwind' || format === 'css') {

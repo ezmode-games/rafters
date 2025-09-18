@@ -1,7 +1,8 @@
 /**
- * Letter Spacing Generator
+ * Letter Spacing Generator - Tailwind-Native Tokens
  *
- * Typography spacing system for readability and emphasis
+ * Optical letter spacing that powers Tailwind utilities: tracking-*
+ * Provides proper letter spacing for different text sizes and contexts
  */
 
 import type { Token } from '../index';

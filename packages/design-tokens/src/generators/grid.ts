@@ -1,7 +1,8 @@
 /**
- * Grid Generator
+ * Grid Generator - Tailwind-Native Tokens
  *
- * CSS Grid layout system for responsive design
+ * CSS Grid system that powers Tailwind utilities: grid-cols-*, grid-rows-*
+ * Provides mathematical grid layouts for responsive design
  */
 
 import type { Token } from '../index';
