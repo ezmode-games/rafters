@@ -131,7 +131,7 @@ describe('Color Generator - TDD Architecture', () => {
       expect(semanticTokens.length).toBeGreaterThan(0);
 
       // Find primary token
-      const primaryToken = semanticTokens.find((t) => t.name === 'rafters-primary');
+      const primaryToken = semanticTokens.find((t) => t.name === 'primary');
       expect(primaryToken).toBeDefined();
 
       // Should have ColorReference value
@@ -152,7 +152,7 @@ describe('Color Generator - TDD Architecture', () => {
         primary: { family: 'ocean-blue', position: '600' },
       });
 
-      const foregroundToken = semanticTokens.find((t) => t.name === 'rafters-primary-foreground');
+      const foregroundToken = semanticTokens.find((t) => t.name === 'primary-foreground');
       expect(foregroundToken).toBeDefined();
 
       const colorRef = foregroundToken?.value as ColorReference;
@@ -168,7 +168,7 @@ describe('Color Generator - TDD Architecture', () => {
       const states = ['hover', 'active', 'focus', 'disabled'];
 
       states.forEach((state) => {
-        const stateToken = semanticTokens.find((t) => t.name === `rafters-primary-${state}`);
+        const stateToken = semanticTokens.find((t) => t.name === `primary-${state}`);
         expect(stateToken).toBeDefined();
 
         const colorRef = stateToken?.value as ColorReference;
@@ -183,7 +183,7 @@ describe('Color Generator - TDD Architecture', () => {
         primary: { family: 'ocean-blue', position: '600' },
       });
 
-      const primaryToken = semanticTokens.find((t) => t.name === 'rafters-primary');
+      const primaryToken = semanticTokens.find((t) => t.name === 'primary');
       expect(primaryToken?.category).toBe('color');
       expect(primaryToken?.namespace).toBe('rafters');
       expect(primaryToken?.semanticMeaning).toBeDefined();
@@ -198,13 +198,13 @@ describe('Color Generator - TDD Architecture', () => {
       });
 
       const surfaceTokens = [
-        'rafters-background',
-        'rafters-foreground',
-        'rafters-border',
-        'rafters-input',
-        'rafters-ring',
-        'rafters-muted',
-        'rafters-muted-foreground',
+        'background',
+        'foreground',
+        'border',
+        'input',
+        'ring',
+        'muted',
+        'muted-foreground',
       ];
 
       surfaceTokens.forEach((tokenName) => {
