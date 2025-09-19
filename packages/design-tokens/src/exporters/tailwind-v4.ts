@@ -132,22 +132,19 @@ function generateThemeBlock(registry: TokenRegistry): string[] {
       const colorFamilies = new Map<string, Token>();
       const processedFamilies = new Set<string>();
 
-      // Collect actual color family tokens (those with -number suffixes like neutral-50)
-      // These represent true color scale families, not semantic tokens
-      for (const token of categoryTokens) {
-        // Only process tokens that end with a number (like neutral-50, primary-100)
-        // These are the actual color family scale tokens
-        if (token.name.match(/-\d+$/)) {
-          if (typeof token.value === 'object' && token.value !== null && 'scale' in token.value) {
-            const colorValue = token.value as ColorValue;
-            if (colorValue.scale && colorValue.scale.length > 0) {
-              // Extract the color family name (remove the -50, -100 suffixes)
-              const familyName = token.name.replace(/-\d+$/, '');
-              if (!processedFamilies.has(familyName)) {
-                colorFamilies.set(familyName, token);
-                processedFamilies.add(familyName);
-              }
-            }
+      // Collect actual color family tokens (namespace 'color', category 'color-family' with ColorValue objects)
+      // Get family tokens from registry - they have the actual ColorValue objects with scales
+      const allTokens = registry.list();
+      const familyTokens = allTokens.filter(
+        (token) => token.namespace === 'color' && token.category === 'color-family'
+      );
+
+      for (const token of familyTokens) {
+        if (typeof token.value === 'object' && token.value !== null && 'scale' in token.value) {
+          const colorValue = token.value as ColorValue;
+          if (colorValue.scale && colorValue.scale.length > 0) {
+            colorFamilies.set(token.name, token);
+            processedFamilies.add(token.name);
           }
         }
       }
@@ -179,76 +176,36 @@ function generateThemeBlock(registry: TokenRegistry): string[] {
 
       // PASS 2: Semantic rafters assignments
       lines.push('  /* Rafters semantic color assignments */');
-      for (const token of categoryTokens) {
-        // Only process semantic tokens (not base color families)
-        const rule = registry.dependencyGraph.getGenerationRule(token.name);
-        const isColorFamily = colorFamilies.has(token.name);
-        const isScaleToken = rule?.startsWith('scale:');
-        const isStateToken = rule?.startsWith('state:');
-        const isNumberedToken = token.name.match(/-\d+$/); // Skip numbered tokens like neutral-50
+      // Process semantic tokens (namespace: 'rafters', category: 'color')
+      const semanticTokens = allTokens.filter(
+        (token) => token.namespace === 'rafters' && token.category === 'color'
+      );
 
-        // Process semantic tokens (not color families, scale tokens, state tokens, or numbered tokens)
-        if (!isColorFamily && !isScaleToken && !isStateToken && !isNumberedToken) {
-          // This is a semantic token like "primary", "background", etc.
-          if (typeof token.value === 'string') {
-            // Check if it's a color family reference like "stone-500"
-            if (token.value.includes('-') && token.value.match(/^[a-z]+-\d+$/)) {
-              // Color family reference - use CSS variable reference
-              lines.push(`  --rafters-${token.name}: var(--color-${token.value});`);
-            } else {
-              // Direct OKLCH value or other string
-              lines.push(`  --rafters-${token.name}: ${token.value};`);
-            }
-          } else if (typeof token.value === 'object' && token.value !== null) {
-            // ColorValue object - resolve to actual OKLCH value
-            const colorValue = token.value as ColorValue;
-
-            if (colorValue.value && typeof colorValue.value === 'string') {
-              // Check if it's a reference like "amethyst-500" or just a scale position like "500"
-              if (colorValue.value.includes('-')) {
-                // Reference to another color family like "amethyst-500"
-                lines.push(`  --rafters-${token.name}: var(--color-${colorValue.value});`);
-              } else if (colorValue.value.match(/^\d+$/)) {
-                // Scale position like "500" - need to resolve to OKLCH from the scale
-                const scalePosition = Number.parseInt(colorValue.value, 10);
-                const standardScale = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
-                const scaleIndex = standardScale.indexOf(scalePosition);
-
-                if (scaleIndex !== -1 && colorValue.scale && colorValue.scale[scaleIndex]) {
-                  const oklch = colorValue.scale[scaleIndex];
-                  const alpha =
-                    oklch.alpha !== undefined && oklch.alpha !== 1 ? ` / ${oklch.alpha}` : '';
-                  const scaleValue = `oklch(${oklch.l} ${oklch.c} ${oklch.h}${alpha})`;
-                  lines.push(`  --rafters-${token.name}: ${scaleValue};`);
-                } else if (colorValue.scale && colorValue.scale.length > 0) {
-                  // Fallback to middle of scale
-                  const fallbackIndex = Math.floor(colorValue.scale.length / 2);
-                  const oklch = colorValue.scale[fallbackIndex];
-                  if (oklch) {
-                    const alpha =
-                      oklch.alpha !== undefined && oklch.alpha !== 1 ? ` / ${oklch.alpha}` : '';
-                    const scaleValue = `oklch(${oklch.l} ${oklch.c} ${oklch.h}${alpha})`;
-                    lines.push(`  --rafters-${token.name}: ${scaleValue};`);
-                  }
-                }
-              } else {
-                // Direct OKLCH value or other format
-                lines.push(`  --rafters-${token.name}: ${colorValue.value};`);
-              }
-            } else if (colorValue.scale && colorValue.scale.length > 0) {
-              // No value field, use middle of scale (index 5 = 500)
-              const targetIndex = 5;
-              const oklch =
-                colorValue.scale[targetIndex] ||
-                colorValue.scale[Math.floor(colorValue.scale.length / 2)];
-              if (oklch) {
-                const alpha =
-                  oklch.alpha !== undefined && oklch.alpha !== 1 ? ` / ${oklch.alpha}` : '';
-                const scaleValue = `oklch(${oklch.l} ${oklch.c} ${oklch.h}${alpha})`;
-                lines.push(`  --rafters-${token.name}: ${scaleValue};`);
-              }
-            }
+      for (const token of semanticTokens) {
+        // Process semantic token based on its value type
+        if (typeof token.value === 'object' && token.value !== null && 'family' in token.value) {
+          // ColorReference object - convert to CSS variable reference
+          const colorRef = token.value as ColorReference;
+          lines.push(
+            `  --rafters-${token.name}: var(--color-${colorRef.family}-${colorRef.position});`
+          );
+        } else if (typeof token.value === 'string') {
+          // String value - check if it needs resolution or is already resolved
+          if (
+            token.value.startsWith('oklch(') ||
+            token.value.startsWith('rgb(') ||
+            token.value.startsWith('#')
+          ) {
+            // Direct color value
+            lines.push(`  --rafters-${token.name}: ${token.value};`);
+          } else {
+            // Might be a reference that needs resolution - convert to CSS variable
+            lines.push(`  --rafters-${token.name}: var(--color-${token.value});`);
           }
+        } else {
+          // Direct value conversion
+          const value = tokenValueToCss(token.value);
+          lines.push(`  --rafters-${token.name}: ${value};`);
         }
       }
     } else {
@@ -261,18 +218,24 @@ function generateThemeBlock(registry: TokenRegistry): string[] {
           case 'spacing':
             cssVarName = `--spacing-${token.name}`;
             break;
-          case 'font-size':
-            cssVarName = `--text-${token.name}`;
+          case 'font-size': {
+            // Remove 'text-' prefix if present to avoid --text-text-xs
+            const cleanName = token.name.startsWith('text-') ? token.name.slice(5) : token.name;
+            cssVarName = `--text-${cleanName}`;
             break;
+          }
           case 'font-weight':
             cssVarName = `--font-weight-${token.name}`;
             break;
           case 'font-family':
             cssVarName = `--font-${token.name}`;
             break;
-          case 'line-height':
-            cssVarName = `--leading-${token.name}`;
+          case 'line-height': {
+            // Remove 'leading-' prefix if present to avoid --leading-leading-xs
+            const cleanName = token.name.startsWith('leading-') ? token.name.slice(8) : token.name;
+            cssVarName = `--leading-${cleanName}`;
             break;
+          }
           case 'letter-spacing':
             cssVarName = `--tracking-${token.name}`;
             break;
@@ -482,18 +445,34 @@ function generateRootBlock(registry: TokenRegistry): string[] {
 function generateDarkModeBlock(registry: TokenRegistry): string[] {
   const lines: string[] = ['@media (prefers-color-scheme: dark) {', '  :root {'];
 
-  // Find all dark tokens
+  // Find all dark tokens (namespace: 'rafters', category: 'color', name ending with '-dark')
   const allTokens = registry.list();
-  const darkTokens = allTokens.filter((token) => token.name.endsWith('-dark'));
+  const darkTokens = allTokens.filter(
+    (token) =>
+      token.namespace === 'rafters' && token.category === 'color' && token.name.endsWith('-dark')
+  );
 
   for (const token of darkTokens) {
     const lightName = token.name.replace('-dark', '');
-    // Check if token value is a string reference to a color family
-    if (typeof token.value === 'string' && token.value.match(/^[a-z]+-\d+$/)) {
-      // It's a color family reference, use var()
-      lines.push(`    --rafters-${lightName}: var(--color-${token.value});`);
+
+    // Process dark token based on its value type
+    if (typeof token.value === 'object' && token.value !== null && 'family' in token.value) {
+      // ColorReference object - convert to CSS variable reference
+      const colorRef = token.value as ColorReference;
+      lines.push(
+        `    --rafters-${lightName}: var(--color-${colorRef.family}-${colorRef.position});`
+      );
+    } else if (typeof token.value === 'string') {
+      // Check if it's a color family reference like "stone-500"
+      if (token.value.includes('-') && token.value.match(/^[a-z]+-\d+$/)) {
+        // Color family reference - use CSS variable reference
+        lines.push(`    --rafters-${lightName}: var(--color-${token.value});`);
+      } else {
+        // Direct OKLCH value or other string
+        lines.push(`    --rafters-${lightName}: ${token.value};`);
+      }
     } else {
-      // Direct value
+      // Fallback to tokenValueToCss for other types
       const value = tokenValueToCss(token.value);
       lines.push(`    --rafters-${lightName}: ${value};`);
     }
@@ -613,10 +592,10 @@ function generateContainerQueries(registry: TokenRegistry): string[] {
   for (const token of containerTokens) {
     const size = token.value as string;
     lines.push(`@container (min-width: ${size}) {`);
-    lines.push(`  .container\\:${token.name}\\:block { display: block; }`);
-    lines.push(`  .container\\:${token.name}\\:hidden { display: none; }`);
-    lines.push(`  .container\\:${token.name}\\:flex { display: flex; }`);
-    lines.push(`  .container\\:${token.name}\\:grid { display: grid; }`);
+    lines.push(`  .container-${token.name}-block { display: block; }`);
+    lines.push(`  .container-${token.name}-hidden { display: none; }`);
+    lines.push(`  .container-${token.name}-flex { display: flex; }`);
+    lines.push(`  .container-${token.name}-grid { display: grid; }`);
     lines.push('}');
     lines.push('');
   }

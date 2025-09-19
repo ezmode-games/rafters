@@ -139,12 +139,81 @@ When using Rafters components, apply this decision process:
    - Include screen reader support
    - Ensure 44px minimum touch targets
 
+## CLI Usage
+
+The Rafters CLI enables AI agents to implement design intelligence through direct commands:
+
+### Installation & Setup
+\`\`\`bash
+# Initialize design system with embedded intelligence
+npx rafters init
+
+# Add components with cognitive load metadata
+npx rafters add button card dialog
+
+# Query component status and intelligence
+npx rafters list --details
+
+# Start MCP server for AI agent integration
+npx rafters mcp
+\`\`\`
+
+### AI Agent Integration via MCP
+The CLI provides a Model Context Protocol server with 7 specialized tools for **real-time design token intelligence querying and searching**. All design token metadata, cognitive load ratings, trust levels, and semantic relationships are queryable through the MCP interface:
+
+**1. get_color_intelligence** - **Search and analyze individual color tokens** including complete scale relationships, state variants, color harmonies, psychological impact data, and accessibility metadata
+
+**2. get_token_by_category** - **Query and filter all tokens by category** (color, spacing, motion) with cognitive load and trust level filtering for semantic token discovery
+
+**3. get_component_intelligence** - Access component design intelligence including cognitive load ratings, trust patterns, accessibility requirements, and usage guidelines
+
+**4. validate_color_combination** - Validate color combinations for cognitive load balance, trust level hierarchy, and attention economics with specific warnings and recommendations
+
+**5. get_accessible_colors** - Find WCAG AA/AAA compliant color combinations for given backgrounds with contrast validation
+
+**6. get_tokens_by_trust_level** - **Search and filter all design tokens by trust level** (low/medium/high/critical) for appropriate consequence matching and semantic discovery
+
+**7. calculate_cognitive_load** - Calculate total cognitive load for component combinations with budget management (15-point cognitive budget) and optimization recommendations
+
+### Command Intelligence
+- **init**: Detects project framework, configures intelligent defaults
+- **add**: Installs components with embedded design reasoning
+- **list**: Shows component intelligence metadata and usage patterns
+- **mcp**: Enables direct AI agent access to design system intelligence
+
+### MCP Integration Workflow
+AI agents can query design intelligence in real-time:
+
+1. **Design Decision Validation**: Use \`validate_color_combination\` and \`calculate_cognitive_load\` before implementing UI patterns
+2. **Context-Aware Component Selection**: Query \`get_component_intelligence\` to understand when and how to use specific components
+3. **Accessibility Compliance**: Use \`get_accessible_colors\` to ensure WCAG standards are met automatically
+4. **Trust Level Matching**: Query \`get_tokens_by_trust_level\` to match visual hierarchy with interaction consequences
+5. **Token Discovery & Search**: Use \`get_token_by_category\` and \`get_tokens_by_trust_level\` to search and discover semantically appropriate design tokens over arbitrary values
+
+### Design Token Intelligence Querying
+**CRITICAL CAPABILITY**: All design token intelligence is live-queryable through MCP. AI agents can search, filter, and analyze tokens by:
+- **Semantic meaning** (e.g., find all "destructive" tokens)
+- **Cognitive load ratings** (0-10 complexity scale)
+- **Trust levels** (low/medium/high/critical consequence matching)
+- **Category relationships** (color/spacing/motion token families)
+- **Accessibility compliance** (WCAG AA/AAA compatibility)
+- **Psychological impact** (color psychology and user perception data)
+
+**Example Token Intelligence Queries**:
+- "Find all high-trust color tokens" → \`get_tokens_by_trust_level("high")\`
+- "Get complete primary color intelligence" → \`get_color_intelligence("primary")\`
+- "Show all spacing tokens under cognitive load 3" → \`get_token_by_category("spacing")\` + filter
+- "Validate red + green combination" → \`validate_color_combination(["destructive", "success"])\`
+
+**Example MCP Query Flow**:
+- Agent needs to design a delete button → Queries \`get_component_intelligence\` for "Button" → Gets cognitive load 3/10, requires destructive variant → Queries \`get_tokens_by_trust_level\` for "critical" → Gets destructive color tokens → Validates with \`validate_color_combination\` → Implements with proper confirmation patterns
+
 ## Registry Usage
 
 All component implementation details, code examples, and complete intelligence are available via the registry API:
 
 - Registry root: /registry/index.json
-- All components: /registry/components/index.json  
+- All components: /registry/components/index.json
 - Individual components: /registry/components/{name}.json
 
 Each registry entry includes full JSDoc intelligence, usage patterns, design guides, and shadcn-compatible implementation details.
