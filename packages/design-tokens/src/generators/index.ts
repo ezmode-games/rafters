@@ -169,7 +169,6 @@ export async function generateAllTokens(): Promise<Token[]> {
     position: '500', // Neutral typically uses middle position
   };
 
-  console.log('Semantic mapping:', semanticMapping);
 
   const semanticTokens = generateSemanticColorTokens(familyTokens, semanticMapping);
 
