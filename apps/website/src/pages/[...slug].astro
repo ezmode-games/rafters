@@ -1,5 +1,6 @@
 ---
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { z } from 'zod';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import DocsLayout from '../layouts/DocsLayout.astro';
 import MarketingLayout from '../layouts/MarketingLayout.astro';
@@ -43,17 +44,27 @@ export async function getStaticPaths() {
   return paths;
 }
 
-type Props = {
+const PropsSchema = z.object({
+  doc: z.any(), // CollectionEntry types are complex, runtime validation for shape
+  collection: z.enum(['pages', 'docs']),
+});
+
+type Props = z.infer<typeof PropsSchema> & {
   doc: CollectionEntry<'pages'> | CollectionEntry<'docs'>;
-  collection: 'pages' | 'docs';
 };
 
-const { doc, collection } = Astro.props as Props;
+const validatedProps = PropsSchema.parse(Astro.props);
+const { doc, collection } = validatedProps as Props;
 const { Content } = await doc.render();
 
 // Determine layout based on frontmatter or collection
 let LayoutComponent: typeof BaseLayout | typeof DocsLayout | typeof MarketingLayout;
-let layoutProps: any = {
+let layoutProps: {
+  title?: string;
+  description?: string;
+  headerTitle?: string;
+  headerTitleClasses?: string;
+} = {
   title: doc.data.title,
   description: doc.data.description,
 };
