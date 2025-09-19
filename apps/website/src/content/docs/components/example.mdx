@@ -1,0 +1,68 @@
+---
+title: "Component Preview Example"
+description: "Demonstrating Shadow DOM component previews in MDX"
+cognitiveLoad: 3
+order: 10
+draft: true
+---
+
+import ComponentPreview from '../../../components/ComponentPreview.tsx'
+
+# Component Preview Example
+
+This page demonstrates how components can be previewed with isolated Shadow DOM rendering and design intelligence.
+
+## Button Component
+
+The button component has a cognitive load of 3/10 and includes attention economics guidance.
+
+<ComponentPreview 
+  component="button" 
+  variant="primary" 
+  props='{"children": "Primary Action"}' 
+  showIntelligence={true}
+  height="150px"
+  client:load
+/>
+
+## Different Button Variants
+
+<ComponentPreview 
+  component="button" 
+  variant="secondary" 
+  props='{"children": "Secondary Action"}' 
+  showIntelligence={false}
+  height="120px"
+  client:load
+/>
+
+## Container Component
+
+The container component has a cognitive load of 0/10 as it's a neutral structural element.
+
+<ComponentPreview 
+  component="container" 
+  showIntelligence={true}
+  height="200px"
+  client:load
+/>
+
+## Error Handling
+
+Here's what happens when a component doesn't exist:
+
+<ComponentPreview 
+  component="non-existent" 
+  height="150px"
+  client:load
+/>
+
+## Design Intelligence
+
+When `showIntelligence` is enabled, you can see the embedded design reasoning that helps AI agents make informed UX decisions:
+
+- **Cognitive Load**: Mental effort rating (0-10 scale)
+- **Attention Economics**: Visual hierarchy and usage rules  
+- **Trust Building**: Confidence patterns for different consequence levels
+
+This system enables 100% portable component documentation with real component previews.

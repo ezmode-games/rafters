@@ -66,12 +66,12 @@ const {
   
   article h2 {
     font-size: 1.875rem;
-    border-bottom: 1px solid #e5e7eb;
-    padding-bottom: 0.5rem;
+    margin-top: 3em;
   }
   
   article h3 {
     font-size: 1.5rem;
+    margin-top: 2rem;
   }
   
   article p {
@@ -123,6 +123,33 @@ const {
     background-color: transparent;
     padding: 0;
     color: inherit;
+  }
+
+  /* Tables */
+  article table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    text-align: left;
+  }
+
+  article tbody {
+    display: table-row-group;
+  }
+
+  article tr {
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  article td {
+    padding: 0.75rem 1rem 0.75rem 0;
+    vertical-align: top;
+    font-family: var(--font-sans);
+    font-weight: 300;
+  }
+
+  article td.font-medium {
+    font-weight: 500;
   }
   
   /* Custom Layout & Spacing Utilities */

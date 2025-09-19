@@ -1,0 +1,158 @@
+---
+title: "Component Documentation"
+description: "AI-driven component library with embedded design intelligence"
+cognitiveLoad: 2
+order: 1
+---
+
+import ComponentPreview from '../../../components/ComponentPreview.tsx'
+
+# Rafters Component Library
+
+Rafters components include embedded design intelligence that helps AI agents make informed UX decisions. Each component carries human design reasoning in machine-readable formats, enabling systematic design application.
+
+## Design Intelligence System
+
+Every component includes:
+- **Cognitive Load Ratings** (0-10 scale) for mental effort management
+- **Attention Economics** patterns for visual hierarchy guidance
+- **Trust Building** requirements for user confidence
+- **Accessibility Intelligence** for inclusive design patterns
+- **Usage Patterns** with clear DO/NEVER guidelines
+
+## Featured Components
+
+### Container - Invisible Structure
+**Cognitive Load: 0/10** → Reduces visual complexity through systematic content organization
+
+<ComponentPreview 
+  component="container" 
+  showIntelligence={true}
+  height="140px"
+  client:load
+/>
+
+The Container component provides invisible structural foundation for content layout. It controls width and spacing without competing for attention, making it the perfect building block for systematic page structures.
+
+[**View Container Documentation →**](/docs/components/container)
+
+### Grid - Intelligent Layout
+**Cognitive Load: 4/10** → Layout presets that respect Miller's Law and attention patterns
+
+<ComponentPreview 
+  component="grid" 
+  showIntelligence={true}
+  height="160px"
+  client:load
+/>
+
+The Grid component offers four semantic presets with embedded UX reasoning: Linear (democratic attention), Golden (hierarchical flow), Bento (complex showcases), and Custom (specialized layouts). Each preset includes cognitive load management and attention economics.
+
+[**View Grid Documentation →**](/docs/components/grid)
+
+### Dialog - Trust-Building Interactions
+**Cognitive Load: 6/10** → Modal patterns with progressive trust levels and escape hatches
+
+<ComponentPreview 
+  component="dialog" 
+  showIntelligence={true}
+  height="160px"
+  client:load
+/>
+
+The Dialog component adapts behavior based on trust levels (low, medium, high, critical) with appropriate visual weight, confirmation patterns, and escape mechanisms. It interrupts user flow deliberately with clear recovery paths.
+
+[**View Dialog Documentation →**](/docs/components/dialog)
+
+## Intelligence-Driven Design
+
+### Cognitive Load Management
+Components are rated on a 0-10 scale for mental effort required:
+- **0-2:** Invisible or effortless (Container, basic inputs)
+- **3-5:** Moderate attention required (Buttons, forms)
+- **6-8:** Significant cognitive investment (Dialogs, complex layouts)
+- **9-10:** Maximum mental effort (Critical decisions, data entry)
+
+### Attention Economics
+Each component understands its role in the attention hierarchy:
+- **Democratic:** Equal visual weight (Linear grids, lists)
+- **Hierarchical:** Clear primary/secondary patterns (Golden grids, typography)
+- **Focused:** Single point of attention (Dialogs, alerts)
+- **Complex:** Multiple attention points requiring careful management (Bento layouts)
+
+### Trust Building Patterns
+Components include trust-appropriate interaction patterns:
+- **Low Trust:** Minimal friction, easy reversal
+- **Medium Trust:** Clear context, moderate confirmation
+- **High Trust:** Detailed explanation, enhanced visual weight
+- **Critical Trust:** Progressive confirmation, multiple escape hatches
+
+## AI Agent Integration
+
+The component system is designed for AI consumption:
+
+```tsx
+// AI agents can read component intelligence
+const buttonIntelligence = {
+  cognitiveLoad: 3,
+  attentionEconomics: "Primary variant commands highest attention",
+  trustBuilding: "Destructive actions require confirmation patterns",
+  usagePatterns: {
+    dos: ["Maximum 1 primary button per section"],
+    nevers: ["Multiple primary buttons competing for attention"]
+  }
+}
+
+// And apply it systematically
+<Button variant="primary">Main Action</Button>
+<Button variant="secondary">Alternative</Button>
+```
+
+## Registry Integration
+
+All components are available through the registry API:
+
+```bash
+# Component intelligence metadata
+GET /registry/components/button.json
+
+# Complete registry overview
+GET /registry/index.json
+
+# AI-focused documentation
+GET /llms.txt
+```
+
+## Design System Foundations
+
+Components build on systematic design foundations:
+- **OKLCH Color Space** for perceptually uniform color relationships
+- **Golden Ratio Spacing** for harmonious proportional systems
+- **Semantic Tokens** for meaningful rather than arbitrary styling
+- **Progressive Enhancement** for universal accessibility
+
+## Getting Started
+
+1. **Explore Individual Components** - Each component page includes live previews, intelligence data, and usage guidelines
+2. **Understand Intelligence Patterns** - Learn how cognitive load, attention economics, and trust building inform component behavior
+3. **Apply Systematically** - Use embedded reasoning to make consistent design decisions
+4. **Integrate with AI Agents** - Leverage machine-readable intelligence for automated design application
+
+## Complete Component List
+
+The registry includes 18 components across different complexity and usage patterns:
+
+| Component | Cognitive Load | Primary Use Case |
+|-----------|----------------|------------------|
+| Container | 0/10 | Invisible layout structure |
+| Badge | 1/10 | Status indicators |
+| Button | 3/10 | User actions |
+| Grid | 4/10 | Layout organization |
+| Card | 4/10 | Content grouping |
+| Dialog | 6/10 | Modal interactions |
+| Tabs | 5/10 | Content navigation |
+| Form Controls | 3-5/10 | Data input |
+
+Each component includes comprehensive documentation with live previews, intelligence metadata, accessibility patterns, and usage guidelines designed for both human understanding and AI agent consumption.
+
+The system enables **Human-AI Design Collaboration** where humans create design intent, the system generates intelligence, and AI agents access this reasoning to create thoughtful user experiences.

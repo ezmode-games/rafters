@@ -1,0 +1,159 @@
+---
+title: "Select Component"
+description: "Dropdown selection component with intelligent option management"
+cognitiveLoad: 4
+trustLevel: "medium"
+attentionEconomics: "Reveals options on demand to reduce initial cognitive load"
+order: 7
+---
+
+import ComponentPreview from '../../../components/ComponentPreview.tsx'
+
+# Select Component
+
+Dropdown selection component that manages option complexity through progressive disclosure.
+
+<ComponentPreview 
+  component="select" 
+  showIntelligence={true}
+  height="250px"
+  client:load
+/>
+
+## Usage Guidelines
+
+| DO | NEVER |
+|:---|:------|
+| Limit options to 7±2 items when possible (Miller's Law) | Long lists without grouping or search |
+| Use clear, descriptive option labels | Ambiguous option labels |
+| Group related options with meaningful categories | Multiple select for single-choice scenarios |
+| Provide search for large option sets | Critical actions buried in option lists |
+
+## Accessibility Features
+
+- **WCAG AAA Compliance:** Keyboard navigation and screen reader support
+- **Focus Management:** Proper focus trapping within dropdown
+- **ARIA Support:** Role, state, and property announcements
+- **Keyboard Shortcuts:** Arrow keys, Enter, Escape, typing to filter
+
+## Cognitive Load Management
+
+| Option Count | Strategy | Cognitive Load |
+|--------------|----------|----------------|
+| 2-7 items | Simple dropdown | 2/10 |
+| 8-20 items | Grouped options | 4/10 |
+| 21+ items | Search + grouping | 6/10 |
+| Complex data | Multi-level select | 7/10 |
+
+## Select States
+
+### Default State
+
+<ComponentPreview 
+  component="select" 
+  variant="default"
+  height="150px"
+  client:load
+/>
+
+**Use for:** Standard option selection, form fields, filter controls
+
+### Open State
+
+<ComponentPreview 
+  component="select" 
+  variant="open"
+  props='{"defaultOpen": true}'
+  height="200px"
+  client:load
+/>
+
+**Shows:** Available options, current selection, keyboard navigation support
+
+### Error State
+
+<ComponentPreview 
+  component="select" 
+  variant="error"
+  props='{"error": true}'
+  height="150px"
+  client:load
+/>
+
+**Use for:** Required field validation, invalid selections, constraint violations
+
+### Disabled State
+
+<ComponentPreview 
+  component="select" 
+  variant="disabled"
+  props='{"disabled": true}'
+  height="150px"
+  client:load
+/>
+
+**Use for:** Conditional fields, loading states, read-only selections
+
+## Option Patterns
+
+### Simple Options
+
+<ComponentPreview 
+  component="select" 
+  variant="simple"
+  props='{"options": ["Option 1", "Option 2", "Option 3"]}'
+  height="180px"
+  client:load
+/>
+
+### Grouped Options
+
+<ComponentPreview 
+  component="select" 
+  variant="grouped"
+  props='{"grouped": true}'
+  height="220px"
+  client:load
+/>
+
+### Multi-Select
+
+<ComponentPreview 
+  component="select" 
+  variant="multi"
+  props='{"multiple": true}'
+  height="180px"
+  client:load
+/>
+
+## Usage Guidelines
+
+### DO
+
+- Limit options to 7±2 items when possible (Miller's Law)
+- Use clear, descriptive option labels
+- Group related options with meaningful categories
+- Provide search for large option sets
+
+### NEVER
+
+- Long lists without grouping or search
+- Ambiguous option labels
+- Multiple select for single-choice scenarios
+- Critical actions buried in option lists
+
+## Cognitive Load Management
+
+| Option Count | Strategy | Cognitive Load |
+|--------------|----------|----------------|
+| 2-7 items | Simple dropdown | 2/10 |
+| 8-20 items | Grouped options | 4/10 |
+| 21+ items | Search + grouping | 6/10 |
+| Complex data | Multi-level select | 7/10 |
+
+## Accessibility Features
+
+- **WCAG AAA Compliance:** Keyboard navigation and screen reader support
+- **Focus Management:** Proper focus trapping within dropdown
+- **ARIA Support:** Role, state, and property announcements
+- **Keyboard Shortcuts:** Arrow keys, Enter, Escape, typing to filter

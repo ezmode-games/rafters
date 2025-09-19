@@ -1,0 +1,125 @@
+---
+title: "Button Component"
+description: "Interactive button component with trust-building patterns and cognitive load management"
+cognitiveLoad: 3
+trustLevel: "medium"
+attentionEconomics: "Primary variant commands highest attention - use sparingly"
+order: 2
+---
+
+import ComponentPreview from '../../../components/ComponentPreview.tsx'
+
+# Button Component
+
+Interactive action triggers with embedded design intelligence for trust-building and attention management.
+
+<ComponentPreview 
+  component="button" 
+  showIntelligence={true}
+  height="200px"
+  client:load
+/>
+
+## Usage Guidelines
+
+| DO | NEVER |
+|:---|:------|
+| Use primary buttons for main user goals (maximum 1 per section) | Multiple primary buttons competing for attention |
+| Group related actions with consistent spacing | Vague labels like "Click here" or "Submit" |
+| Provide clear action labels that describe the outcome | Destructive actions without confirmation |
+| Use destructive variant for irreversible actions | Primary buttons for low-priority actions |
+
+## Accessibility Features
+
+- **WCAG AAA Compliance:** 44px minimum touch targets
+- **Keyboard Navigation:** Focus indicators and Enter/Space activation
+- **Screen Reader Support:** Descriptive labels and ARIA attributes
+- **Color Independence:** Clear visual hierarchy beyond color alone
+
+## Trust Building Patterns
+
+| Action Type | Trust Level | Pattern Required |
+|-------------|-------------|------------------|
+| Save changes | Low | Direct action |
+| Delete item | Medium | Single confirmation |
+| Delete account | High | Progressive confirmation |
+| Data export | Low | Direct action |
+
+## Button Variants
+
+### Primary Actions
+
+<ComponentPreview 
+  component="button" 
+  variant="primary"
+  height="120px"
+  client:load
+/>
+
+**Use for:** Main user goals, call-to-action buttons, form submissions
+
+### Secondary Actions
+
+<ComponentPreview 
+  component="button" 
+  variant="secondary"
+  height="120px"
+  client:load
+/>
+
+**Use for:** Supporting actions, alternative choices, cancel operations
+
+### Destructive Actions
+
+<ComponentPreview 
+  component="button" 
+  variant="destructive"
+  height="120px"
+  client:load
+/>
+
+**Use for:** Delete operations, irreversible actions, data removal
+
+### Ghost Actions
+
+<ComponentPreview 
+  component="button" 
+  variant="ghost"
+  height="120px"
+  client:load
+/>
+
+**Use for:** Subtle actions, menu items, minimal emphasis
+
+## Size Variations
+
+### Default Size
+
+<ComponentPreview 
+  component="button" 
+  variant="size-default"
+  props='{"size": "default"}'
+  height="100px"
+  client:load
+/>
+
+### Small Size
+
+<ComponentPreview 
+  component="button" 
+  variant="size-sm" 
+  props='{"size": "sm"}'
+  height="100px"
+  client:load
+/>
+
+### Large Size
+
+<ComponentPreview 
+  component="button" 
+  variant="size-lg"
+  props='{"size": "lg"}'
+  height="100px"
+  client:load
+/>
+
