@@ -17,6 +17,8 @@ import { ensureDirSync } from 'fs-extra';
 import sqids from 'sqids';
 import { z } from 'zod';
 
+// Export archive management
+export { DesignSystemArchive, fetchArchive } from './archive.js';
 // Export dependency tracking system - temporarily disabled for ES module issues
 // export type { TokenDependency } from './dependencies';
 // export { TokenDependencyGraph } from './dependencies';

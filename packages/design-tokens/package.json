@@ -36,6 +36,7 @@
     "@rafters/color-utils": "workspace:*",
     "@rafters/shared": "workspace:*",
     "fs-extra": "^11.2.0",
+    "jszip": "^3.10.1",
     "sqids": "^0.3.0",
     "zod": "catalog:"
   },

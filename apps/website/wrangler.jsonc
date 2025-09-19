@@ -4,7 +4,7 @@
  */
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "website",
+  "name": "rafters-website",
   "main": "./dist/_worker.js/index.js",
   "compatibility_date": "2025-09-06",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
@@ -14,5 +14,12 @@
   },
   "observability": {
     "enabled": true
-  }
+  },
+  "routes": [
+    {
+      "pattern": "rafters.realhandy.tech",
+      "zone_id": "bad23610704adb1dc65b05bc22d6fb6f",
+      "custom_domain": true
+    }
+  ]
 }

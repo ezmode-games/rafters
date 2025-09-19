@@ -9,6 +9,8 @@ import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { Token } from '@rafters/shared';
+import JSZip from 'jszip';
+import { z } from 'zod';
 
 /**
  * Archive structure interface matching DESIGN_SYSTEM_ARCHIVE.md
@@ -410,5 +412,191 @@ export class DesignSystemArchive {
     const filePath = join(this.archivePath, filename);
     const content = await readFile(filePath, 'utf8');
     return JSON.parse(content) as T;
+  }
+}
+
+/**
+ * SQID validation schema - 6-8 alphanumeric characters
+ */
+const SQIDSchema = z
+  .string()
+  .regex(/^[A-Za-z0-9]{6,8}$/, 'SQID must be 6-8 alphanumeric characters');
+
+/**
+ * Required archive files for validation
+ */
+const REQUIRED_ARCHIVE_FILES = [
+  'manifest.json',
+  'colors.json',
+  'typography.json',
+  'spacing.json',
+  'motion.json',
+  'shadows.json',
+  'borders.json',
+  'breakpoints.json',
+  'layout.json',
+  'fonts.json',
+] as const;
+
+/**
+ * Fetch design system archive from Rafters+ and extract to tokens directory
+ *
+ * @param sqid - Short Unique ID (6-8 alphanumeric characters) or "000000" for default
+ * @param targetPath - Directory to extract archive (default: ".rafters/tokens")
+ * @throws Error if network fails and no fallback available
+ */
+export async function fetchArchive(
+  sqid: string,
+  targetPath: string = '.rafters/tokens'
+): Promise<void> {
+  // Validate SQID format using Zod
+  const validationResult = SQIDSchema.safeParse(sqid);
+  if (!validationResult.success) {
+    throw new Error(`Invalid SQID format: ${sqid}. Must be 6-8 alphanumeric characters.`);
+  }
+  // Handle default system - use embedded tokens
+  if (sqid === '000000') {
+    await loadEmbeddedDefault(targetPath);
+    return;
+  }
+
+  // Fetch ZIP archive from network
+  let response: Response;
+  try {
+    response = await fetch(`https://rafters.realhandy.tech/archive/${sqid}`);
+  } catch (networkError) {
+    // Catch actual network errors (not HTTP errors)
+    if (
+      networkError instanceof TypeError ||
+      (networkError instanceof Error &&
+        (networkError.message.includes('ENOTFOUND') ||
+          networkError.message.includes('Failed to fetch')))
+    ) {
+      console.warn(`Network error fetching ${sqid}, falling back to default`);
+      await loadEmbeddedDefault(targetPath);
+      return;
+    }
+    throw networkError;
+  }
+
+  if (!response.ok) {
+    if (response.status === 404) {
+      console.warn(`Archive ${sqid} not found, falling back to default`);
+      await fetchArchive('000000', targetPath);
+      return;
+    }
+    throw new Error(`Failed to fetch archive: ${response.status} ${response.statusText}`);
+  }
+
+  // Download and extract ZIP
+  const zipBuffer = await response.arrayBuffer();
+  await extractArchive(zipBuffer, targetPath);
+
+  // Validate extracted files
+  await validateExtractedFiles(targetPath);
+}
+
+/**
+ * Extract ZIP archive to target directory
+ */
+async function extractArchive(zipBuffer: ArrayBuffer, targetPath: string): Promise<void> {
+  // Ensure target directory exists
+  await mkdir(targetPath, { recursive: true });
+
+  // Load ZIP from buffer
+  const zip = new JSZip();
+  const contents = await zip.loadAsync(zipBuffer);
+
+  // Extract all files
+  for (const [filename, file] of Object.entries(contents.files)) {
+    if (!file.dir) {
+      const content = await file.async('string');
+      const filePath = join(targetPath, filename);
+      await writeFile(filePath, content, 'utf-8');
+    }
+  }
+}
+
+/**
+ * Validate that all required files are present after extraction
+ */
+async function validateExtractedFiles(targetPath: string): Promise<void> {
+  for (const filename of REQUIRED_ARCHIVE_FILES) {
+    const filePath = join(targetPath, filename);
+    if (!existsSync(filePath)) {
+      throw new Error(`Required file missing from archive: ${filename}`);
+    }
+  }
+}
+
+/**
+ * Load embedded default archive that ships with CLI
+ */
+async function loadEmbeddedDefault(targetPath: string): Promise<void> {
+  try {
+    // Generate default tokens using the token generators
+    const { generateAllTokens } = await import('./generators/index.js');
+    const tokens = await generateAllTokens();
+
+    // Save as archive using DesignSystemArchive
+    const archive = new DesignSystemArchive(targetPath.replace('/.rafters/tokens', ''));
+    await archive.save(tokens, '000000');
+  } catch (_error) {
+    // If token generation fails, create a minimal default archive
+    await createMinimalDefaultArchive(targetPath);
+  }
+}
+
+/**
+ * Create minimal default archive for testing/fallback
+ */
+async function createMinimalDefaultArchive(targetPath: string): Promise<void> {
+  await mkdir(targetPath, { recursive: true });
+
+  // Create minimal manifest
+  const manifest = {
+    id: '000000',
+    name: 'Default Design System',
+    version: '1.0.0',
+    created: new Date().toISOString(),
+    updated: new Date().toISOString(),
+    primaryColor: { l: 50, c: 0.2, h: 240 },
+    intelligence: {
+      colorVisionTested: [] as string[],
+      contrastLevel: 'AA' as const,
+      components: {},
+    },
+    tokenCount: 1,
+    categories: ['color'],
+  };
+
+  // Create minimal files
+  const files = {
+    'manifest.json': manifest,
+    'colors.json': { families: [] as string[], tokens: [] as string[] },
+    'typography.json': {
+      scale: {},
+      lineHeight: [] as string[],
+      letterSpacing: [] as string[],
+      fontFamily: [] as string[],
+      fontWeight: [] as string[],
+    },
+    'spacing.json': { system: 'linear', tokens: [] as string[] },
+    'motion.json': { duration: [] as string[], easing: [] as string[], keyframes: [] as string[] },
+    'shadows.json': { elevation: [] as string[], depth: [] as string[] },
+    'borders.json': { radius: [] as string[], width: [] as string[] },
+    'breakpoints.json': { screens: [] as string[], containers: [] as string[] },
+    'layout.json': {
+      width: [] as string[],
+      height: [] as string[],
+      aspectRatio: [] as string[],
+      grid: [] as string[],
+    },
+    'fonts.json': { families: [] as string[], weights: [] as string[] },
+  };
+
+  for (const [filename, content] of Object.entries(files)) {
+    const filePath = join(targetPath, filename);
+    await writeFile(filePath, JSON.stringify(content, null, 2));
   }
 }
