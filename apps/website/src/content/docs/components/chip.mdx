@@ -1,0 +1,117 @@
+---
+title: "Chip Component"
+description: "Interactive tag component for selection, filtering, and data representation"
+cognitiveLoad: 2
+trustLevel: "low"
+attentionEconomics: "Compact visual elements that group related content without overwhelming"
+order: 12
+---
+
+import ComponentPreview from '../../../components/ComponentPreview.tsx'
+
+# Chip Component
+
+Compact, interactive elements used for tags, filters, selections, and data categorization.
+
+<ComponentPreview 
+  component="chip" 
+  showIntelligence={true}
+  height="150px"
+  client:load
+/>
+
+## Usage Guidelines
+
+| DO | NEVER |
+|:---|:------|
+| Group related chips with consistent spacing | Long text that breaks visual integrity |
+| Use clear, concise labels (1-3 words) | Critical functionality solely in removable chips |
+| Provide visual feedback for interactive states | Mixed interaction patterns within same group |
+| Limit chip groups to 7±2 items when possible | Chips for primary navigation or major actions |
+
+## Accessibility Features
+
+- **WCAG AAA Compliance:** Keyboard accessible with proper focus indicators
+- **Screen Reader Support:** Clear labels and state announcements
+- **Touch Targets:** 44px minimum for interactive elements
+- **Keyboard Navigation:** Enter/Space for selection, Delete for removal
+
+## Content Patterns
+
+| Use Case | Recommended Pattern | Cognitive Load |
+|----------|-------------------|----------------|
+| Content tags | Static chips | 1/10 |
+| Filter controls | Selectable chips | 2/10 |
+| Active selections | Removable chips | 2/10 |
+| User mentions | Avatar chips | 2/10 |
+
+## Chip Variations
+
+### Default Chip
+
+<ComponentPreview 
+  component="chip" 
+  variant="default"
+  height="100px"
+  client:load
+/>
+
+**Use for:** Content tagging, category labels, metadata display
+
+### Selectable Chip
+
+<ComponentPreview 
+  component="chip" 
+  variant="selectable"
+  props='{"selectable": true}'
+  height="100px"
+  client:load
+/>
+
+**Use for:** Filter controls, multi-select options, preference settings
+
+### Removable Chip
+
+<ComponentPreview 
+  component="chip" 
+  variant="removable"
+  props='{"removable": true}'
+  height="100px"
+  client:load
+/>
+
+**Use for:** Selected filters, active tags, dynamic content management
+
+### Avatar Chip
+
+<ComponentPreview 
+  component="chip" 
+  variant="avatar"
+  props='{"avatar": true}'
+  height="100px"
+  client:load
+/>
+
+**Use for:** User mentions, contact lists, team member displays
+
+## Chip States
+
+### Active State
+
+<ComponentPreview 
+  component="chip" 
+  variant="active"
+  props='{"active": true}'
+  height="100px"
+  client:load
+/>
+
+### Disabled State
+
+<ComponentPreview 
+  component="chip" 
+  variant="disabled"
+  props='{"disabled": true}'
+  height="100px"
+  client:load
+/>

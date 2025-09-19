@@ -1,14 +1,14 @@
 ---
 import { getCollection } from 'astro:content';
 
-// Get all foundation and component docs
-const foundationDocs = await getCollection('foundation', ({ data }) => {
+// Get all docs and filter by directory
+const allDocs = await getCollection('docs', ({ data }) => {
   return !data.draft;
 });
 
-const componentDocs = await getCollection('components', ({ data }) => {
-  return !data.draft;
-});
+// Split into foundation and components based on slug path
+const foundationDocs = allDocs.filter(doc => doc.slug.startsWith('foundation/'));
+const componentDocs = allDocs.filter(doc => doc.slug.startsWith('components/'));
 
 // Sort by order
 foundationDocs.sort((a, b) => (a.data.order || 999) - (b.data.order || 999));
@@ -25,7 +25,7 @@ const currentPath = Astro.url.pathname;
       <h3 class="text-sm font-semibold text-gray-900 mb-3">Foundation</h3>
       <ul class="space-y-1">
         {foundationDocs.map((doc) => {
-          const href = `/docs/foundation/${doc.slug}`;
+          const href = `/docs/${doc.slug}`;
           const isActive = currentPath === href;
           return (
             <li>
@@ -50,7 +50,7 @@ const currentPath = Astro.url.pathname;
       <h3 class="text-sm font-semibold text-gray-900 mb-3">Components</h3>
       <ul class="space-y-1">
         {componentDocs.map((doc) => {
-          const href = `/docs/components/${doc.slug}`;
+          const href = `/docs/${doc.slug}`;
           const isActive = currentPath === href;
           return (
             <li>

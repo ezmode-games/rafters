@@ -1,0 +1,89 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DocsLayout from '../layouts/DocsLayout.astro';
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+
+export async function getStaticPaths() {
+  // Get all collections
+  const pages = await getCollection('pages');
+  const docs = await getCollection('docs');
+
+  const paths: Array<{
+    params: { slug: string | undefined };
+    props: {
+      doc: CollectionEntry<'pages'> | CollectionEntry<'docs'>;
+      collection: 'pages' | 'docs';
+    };
+  }> = [];
+
+  // Add pages collection (huh, docs, etc.) - excluding index which has its own route
+  pages.forEach((page) => {
+    if (page.slug !== 'index') {
+      paths.push({
+        params: {
+          slug: page.slug
+        },
+        props: {
+          doc: page,
+          collection: 'pages'
+        },
+      });
+    }
+  });
+
+  // Add docs collection - slug already includes the path (foundation/getting-started, components/button, etc.)
+  docs.forEach((doc) => {
+    paths.push({
+      params: { slug: `docs/${doc.slug}` },
+      props: { doc, collection: 'docs' },
+    });
+  });
+
+  return paths;
+}
+
+type Props = {
+  doc: CollectionEntry<'pages'> | CollectionEntry<'docs'>;
+  collection: 'pages' | 'docs';
+};
+
+const { doc, collection } = Astro.props as Props;
+const { Content } = await doc.render();
+
+// Determine layout based on frontmatter or collection
+let LayoutComponent: typeof BaseLayout | typeof DocsLayout | typeof MarketingLayout;
+let layoutProps: any = {
+  title: doc.data.title,
+  description: doc.data.description,
+};
+
+if (collection === 'pages') {
+  const pageDoc = doc as CollectionEntry<'pages'>;
+  // Use pageLayout from frontmatter
+  switch (pageDoc.data.pageLayout) {
+    case 'marketing':
+      LayoutComponent = MarketingLayout;
+      layoutProps = {
+        ...layoutProps,
+        headerTitle: pageDoc.data.headerTitle,
+        headerTitleClasses: pageDoc.data.headerTitleClasses,
+      };
+      break;
+    case 'docs':
+      LayoutComponent = DocsLayout;
+      break;
+    case 'base':
+    default:
+      LayoutComponent = BaseLayout;
+      break;
+  }
+} else {
+  // Docs collection uses docs layout
+  LayoutComponent = DocsLayout;
+}
+---
+
+<LayoutComponent {...layoutProps}>
+  <Content />
+</LayoutComponent>

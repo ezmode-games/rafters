@@ -1,0 +1,159 @@
+---
+title: "Input Component"
+description: "Form input component with validation states and accessibility patterns"
+cognitiveLoad: 2
+trustLevel: "low"
+attentionEconomics: "Foundation element that supports user data entry"
+order: 5
+---
+
+import ComponentPreview from '../../../components/ComponentPreview.tsx'
+
+# Input Component
+
+Form input component with intelligent validation states and embedded accessibility patterns.
+
+<ComponentPreview 
+  component="input" 
+  showIntelligence={true}
+  height="200px"
+  client:load
+/>
+
+## Usage Guidelines
+
+| DO | NEVER |
+|:---|:------|
+| Use clear, descriptive placeholder text | Placeholder text as the only label |
+| Provide immediate validation feedback | Ambiguous error messages |
+| Group related inputs with consistent spacing | Validation on every keystroke for long inputs |
+| Use appropriate input types for data format | Required fields without clear indication |
+
+## Accessibility Features
+
+- **WCAG AAA Compliance:** Proper labeling and error association
+- **Keyboard Navigation:** Tab order and focus management
+- **Screen Reader Support:** ARIA labels and error announcements
+- **High Contrast:** Clear visual boundaries and state indicators
+
+## Validation Patterns
+
+| Input Type | Validation Timing | Pattern |
+|------------|------------------|---------|
+| Email | On blur | Format validation |
+| Password | On input | Strength indicator |
+| Required fields | On submit | Presence validation |
+| Optional fields | On blur | Format validation |
+
+## Input States
+
+### Default State
+
+<ComponentPreview 
+  component="input" 
+  variant="default"
+  height="120px"
+  client:load
+/>
+
+**Use for:** Standard text input, user registration, search fields
+
+### Error State
+
+<ComponentPreview 
+  component="input" 
+  variant="error"
+  props='{"error": true}'
+  height="140px"
+  client:load
+/>
+
+**Use for:** Validation failures, required field warnings, format errors
+
+### Success State
+
+<ComponentPreview 
+  component="input" 
+  variant="success"
+  props='{"success": true}'
+  height="140px"
+  client:load
+/>
+
+**Use for:** Validated input, confirmed entries, positive feedback
+
+### Disabled State
+
+<ComponentPreview 
+  component="input" 
+  variant="disabled"
+  props='{"disabled": true}'
+  height="120px"
+  client:load
+/>
+
+**Use for:** Inactive fields, conditional inputs, read-only data
+
+## Input Types
+
+### Text Input
+
+<ComponentPreview 
+  component="input" 
+  variant="text"
+  props='{"type": "text", "placeholder": "Enter your name"}'
+  height="100px"
+  client:load
+/>
+
+### Email Input
+
+<ComponentPreview 
+  component="input" 
+  variant="email"
+  props='{"type": "email", "placeholder": "Enter your email"}'
+  height="100px"
+  client:load
+/>
+
+### Password Input
+
+<ComponentPreview 
+  component="input" 
+  variant="password"
+  props='{"type": "password", "placeholder": "Enter your password"}'
+  height="100px"
+  client:load
+/>
+
+## Usage Guidelines
+
+### DO
+
+- Use clear, descriptive placeholder text
+- Provide immediate validation feedback
+- Group related inputs with consistent spacing
+- Use appropriate input types for data format
+
+### NEVER
+
+- Placeholder text as the only label
+- Ambiguous error messages
+- Validation on every keystroke for long inputs
+- Required fields without clear indication
+
+## Validation Patterns
+
+| Input Type | Validation Timing | Pattern |
+|------------|------------------|---------|
+| Email | On blur | Format validation |
+| Password | On input | Strength indicator |
+| Required fields | On submit | Presence validation |
+| Optional fields | On blur | Format validation |
+
+## Accessibility Features
+
+- **WCAG AAA Compliance:** Proper labeling and error association
+- **Keyboard Navigation:** Tab order and focus management
+- **Screen Reader Support:** ARIA labels and error announcements
+- **High Contrast:** Clear visual boundaries and state indicators

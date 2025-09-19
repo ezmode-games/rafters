@@ -1,0 +1,158 @@
+---
+title: "Tabs Component"
+description: "Content organization component with cognitive load management"
+cognitiveLoad: 5
+trustLevel: "medium"
+attentionEconomics: "Organizes content into digestible sections while maintaining context"
+order: 10
+---
+
+import ComponentPreview from '../../../components/ComponentPreview.tsx'
+
+# Tabs Component
+
+Content organization component that manages information architecture through contextual grouping.
+
+<ComponentPreview 
+  component="tabs" 
+  showIntelligence={true}
+  height="300px"
+  client:load
+/>
+
+## Usage Guidelines
+
+### DO
+
+- Limit tab count to 5-7 items for optimal cognitive load
+- Use clear, descriptive tab labels
+- Keep tab content contextually related
+- Provide visual indicators for active state
+
+### NEVER
+
+- Nest tabs within tabs (compounds complexity)
+- Long tab labels that break visual layout
+- Critical actions hidden in inactive tabs
+- Tabs for sequential processes (use steps instead)
+
+## Accessibility Features
+
+- **WCAG AAA Compliance:** Keyboard navigation with arrow keys and Tab
+- **Focus Management:** Proper focus indicators and tab sequence
+- **Screen Reader Support:** ARIA tabs pattern with role and state announcements
+- **Keyboard Shortcuts:** Arrow keys for tab navigation, Enter/Space for activation
+
+## Content Organization
+
+| Content Type | Recommended Tabs | Cognitive Load |
+|--------------|-----------------|----------------|
+| User profile | 3-4 sections | 4/10 |
+| Product details | 4-5 sections | 5/10 |
+| Admin settings | 5-7 sections | 6/10 |
+| Dashboard | 3-6 sections | 5/10 |
+
+## Tab Variations
+
+### Default Tabs
+
+<ComponentPreview 
+  component="tabs" 
+  variant="default"
+  height="250px"
+  client:load
+/>
+
+**Use for:** Related content sections, settings panels, dashboard views
+
+### Vertical Tabs
+
+<ComponentPreview 
+  component="tabs" 
+  variant="vertical"
+  props='{"orientation": "vertical"}'
+  height="250px"
+  client:load
+/>
+
+**Use for:** Navigation menus, preference panels, content with many sections
+
+### Pills Style
+
+<ComponentPreview 
+  component="tabs" 
+  variant="pills"
+  props='{"variant": "pills"}'
+  height="250px"
+  client:load
+/>
+
+**Use for:** Filter controls, category selection, toggle groups
+
+## Tab States
+
+### Active State
+
+<ComponentPreview 
+  component="tabs" 
+  variant="active"
+  height="200px"
+  client:load
+/>
+
+**Shows:** Current selection, highlighted content area
+
+### Hover State
+
+<ComponentPreview 
+  component="tabs" 
+  variant="hover"
+  height="200px"
+  client:load
+/>
+
+**Shows:** Interactive feedback, navigation affordance
+
+### Disabled State
+
+<ComponentPreview 
+  component="tabs" 
+  variant="disabled"
+  props='{"disabled": ["tab-2"]}'
+  height="200px"
+  client:load
+/>
+
+**Use for:** Conditional content, permission-based access, loading states
+
+## Usage Guidelines
+
+### DO
+
+- Limit tab count to 5-7 items for optimal cognitive load
+- Use clear, descriptive tab labels
+- Keep tab content contextually related
+- Provide visual indicators for active state
+
+### NEVER
+
+- Nest tabs within tabs (compounds complexity)
+- Long tab labels that break visual layout
+- Critical actions hidden in inactive tabs
+- Tabs for sequential processes (use steps instead)
+
+## Content Organization
+
+| Content Type | Recommended Tabs | Cognitive Load |
+|--------------|-----------------|----------------|
+| User profile | 3-4 sections | 4/10 |
+| Product details | 4-5 sections | 5/10 |
+| Admin settings | 5-7 sections | 6/10 |
+| Dashboard | 3-6 sections | 5/10 |
+
+## Accessibility Features
+
+- **WCAG AAA Compliance:** Keyboard navigation with arrow keys and Tab
+- **Focus Management:** Proper focus indicators and tab sequence
+- **Screen Reader Support:** ARIA tabs pattern with role and state announcements
+- **Keyboard Shortcuts:** Arrow keys for tab navigation, Enter/Space for activation

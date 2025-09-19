@@ -10,7 +10,7 @@
     "deploy": "node scripts/generate-token-cache.mjs && astro build && wrangler deploy",
     "cf-typegen": "wrangler types",
     "generate-tokens": "node scripts/generate-token-cache.mjs",
-    "test": "vitest run --passWithNoTests",
+    "test": "vitest run",
     "test:watch": "vitest",
     "test:unit": "vitest run --config vitest.config.ts --passWithNoTests",
     "test:spec": "vitest run --config vitest.config.ts --grep spec",
