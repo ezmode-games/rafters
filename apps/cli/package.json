@@ -22,8 +22,8 @@
   "scripts": {
     "build": "tsc --build",
     "dev": "tsc --build --watch",
-    "test": "vitest run",
-    "test:preflight": "vitest run",
+    "test": "vitest run --passWithNoTests",
+    "test:preflight": "vitest run --passWithNoTests",
     "lint": "biome check ",
     "format": "biome format --write",
     "typecheck": "tsc --noEmit",
