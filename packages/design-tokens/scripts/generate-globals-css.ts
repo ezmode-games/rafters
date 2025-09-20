@@ -4,9 +4,9 @@
  * Generate and display the complete globals.css output from Tailwind v4 exporter
  */
 
-import { exportToTailwindV4Complete } from '../src/exporters/tailwind-v4.js';
-import { generateAllTokens } from '../src/generators/index.js';
-import { TokenRegistry } from '../src/registry.js';
+import { exportToTailwindV4Complete } from '../src/exporters/tailwind-v4.ts';
+import { generateAllTokens } from '../src/generators/index.ts';
+import { TokenRegistry } from '../src/registry.ts';
 
 async function main() {
   console.log('🎨 Generating complete globals.css from Tailwind v4 exporter...\n');

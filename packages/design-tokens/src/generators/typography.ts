@@ -5,20 +5,8 @@
  * Uses musical ratios (golden ratio, perfect fourth, etc.) for harmonious proportions
  */
 
+import { MATHEMATICAL_CONSTANTS, MUSICAL_RATIOS } from '@rafters/math-utils';
 import type { Token } from '../index';
-
-/**
- * Musical and mathematical ratios for typography generation
- * Based on musical intervals for harmonious proportions
- */
-const MINOR_SECOND = 1.067; // 16:15 ratio
-const MAJOR_SECOND = 1.125; // 9:8 ratio
-const MINOR_THIRD = 1.2; // 6:5 ratio
-const MAJOR_THIRD = 1.25; // 5:4 ratio
-const PERFECT_FOURTH = 1.333; // 4:3 ratio
-const AUGMENTED_FOURTH = Math.SQRT2; // √2 ratio (tritone)
-const PERFECT_FIFTH = 1.5; // 3:2 ratio
-const GOLDEN_RATIO = 1.618033988749; // φ (phi)
 
 /**
  * Generate typography scale using golden ratio or musical intervals with responsive variants
@@ -69,28 +57,28 @@ export function generateTypographyScale(
   let ratio: number;
   switch (system) {
     case 'minor-second':
-      ratio = MINOR_SECOND;
+      ratio = MUSICAL_RATIOS['minor-second'];
       break;
     case 'major-second':
-      ratio = MAJOR_SECOND;
+      ratio = MUSICAL_RATIOS['major-second'];
       break;
     case 'minor-third':
-      ratio = MINOR_THIRD;
+      ratio = MUSICAL_RATIOS['minor-third'];
       break;
     case 'major-third':
-      ratio = MAJOR_THIRD;
+      ratio = MUSICAL_RATIOS['major-third'];
       break;
     case 'perfect-fourth':
-      ratio = PERFECT_FOURTH;
+      ratio = MUSICAL_RATIOS['perfect-fourth'];
       break;
     case 'augmented-fourth':
-      ratio = AUGMENTED_FOURTH;
+      ratio = MUSICAL_RATIOS['augmented-fourth'];
       break;
     case 'perfect-fifth':
-      ratio = PERFECT_FIFTH;
+      ratio = MUSICAL_RATIOS['perfect-fifth'];
       break;
     case 'golden':
-      ratio = GOLDEN_RATIO;
+      ratio = MATHEMATICAL_CONSTANTS.golden;
       break;
   }
 
@@ -106,6 +94,18 @@ export function generateTypographyScale(
     const isHeading = i >= 4;
     const isDisplay = i >= 9;
 
+    // Determine mathRelationship for non-base tokens
+    let mathRelationship: string | undefined;
+    if (steps !== 0) {
+      // Base token is at index 2, so reference it for all other tokens
+      const baseTokenName = 'text-base';
+      if (steps > 0) {
+        mathRelationship = `{${baseTokenName}} * ${system}^${steps}`;
+      } else {
+        mathRelationship = `{${baseTokenName}} * ${system}^${steps}`;
+      }
+    }
+
     // Base font size token
     tokens.push({
       name: `text-${sizes[i]}`,
@@ -113,6 +113,8 @@ export function generateTypographyScale(
       category: 'font-size',
       namespace: 'font-size',
       semanticMeaning: `Typography size ${sizes[i]} using ${system} ratio - ${isDisplay ? 'display/hero' : isHeading ? 'heading' : 'body/ui'} text`,
+      mathRelationship,
+      progressionSystem: system,
       scalePosition: i,
       generateUtilityClass: true,
       applicableComponents: ['text', 'heading', 'label', 'button'],

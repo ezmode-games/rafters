@@ -5,13 +5,8 @@
  * Provides intelligent durations and easing curves based on user research and interaction psychology
  */
 
+import { MATHEMATICAL_CONSTANTS, MUSICAL_RATIOS } from '@rafters/math-utils';
 import type { Token } from '../index';
-
-/**
- * Mathematical constants for timing relationships
- */
-const GOLDEN_RATIO = 1.618033988749;
-// const _FIBONACCI_SEQUENCE = [50, 75, 125, 200, 325, 525, 850]; // Unused
 
 /**
  * Generate motion tokens with typography-aligned expressiveness scale
@@ -58,16 +53,16 @@ export function generateMotionTokens(
   let ratio: number;
   switch (system) {
     case 'golden':
-      ratio = GOLDEN_RATIO; // 1.618
+      ratio = MATHEMATICAL_CONSTANTS.golden; // 1.618
       break;
     case 'major-third':
-      ratio = 1.25; // 5:4 ratio
+      ratio = MUSICAL_RATIOS['major-third']; // 5:4 ratio
       break;
     case 'perfect-fourth':
-      ratio = 1.333; // 4:3 ratio
+      ratio = MUSICAL_RATIOS['perfect-fourth']; // 4:3 ratio
       break;
     case 'perfect-fifth':
-      ratio = 1.5; // 3:2 ratio
+      ratio = MUSICAL_RATIOS['perfect-fifth']; // 3:2 ratio
       break;
   }
 
@@ -92,12 +87,26 @@ export function generateMotionTokens(
         ? ('medium' as const)
         : ('low' as const);
 
+    // Determine mathRelationship for non-base tokens
+    // 'standard' is the base (index 2), so other tokens derive from it
+    let mathRelationship: string | undefined;
+    if (i !== 2) {
+      // 'standard' is at index 2
+      const baseTokenName = 'standard';
+      const steps = i - 2; // Calculate steps from base
+      if (steps !== 0) {
+        mathRelationship = `{${baseTokenName}} * ${system}^${steps}`;
+      }
+    }
+
     tokens.push({
       name: expressiveness,
       value: `${Math.round(value)}ms`,
       category: 'motion',
       namespace: 'duration',
       semanticMeaning: `${expressiveness.charAt(0).toUpperCase() + expressiveness.slice(1)} motion timing using ${system} ratio - ${isSubtle ? 'subtle' : isEngaging ? 'engaging' : isImpactful ? 'impactful' : 'cinematic'} expressiveness`,
+      mathRelationship,
+      progressionSystem: system,
       scalePosition: i,
       // expressiveness: expressiveness, // Not in Token schema
       cognitiveLoad: cognitiveLoad,

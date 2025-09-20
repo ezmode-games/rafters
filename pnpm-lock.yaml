@@ -295,6 +295,9 @@ importers:
       '@rafters/color-utils':
         specifier: workspace:*
         version: link:../color-utils
+      '@rafters/math-utils':
+        specifier: workspace:*
+        version: link:../math-utils
       '@rafters/shared':
         specifier: workspace:*
         version: link:../shared
@@ -329,6 +332,8 @@ importers:
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@20.19.14)(jiti@1.21.7)(jsdom@26.1.0)(tsx@4.20.5)(yaml@2.8.1)
+
+  packages/math-utils: {}
 
   packages/shared:
     dependencies:

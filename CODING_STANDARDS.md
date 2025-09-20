@@ -2,6 +2,9 @@
 
 ## CRITICAL RULES - ZERO TOLERANCE
 
+This is a pnpm workspace. npm and npx can destroy the build and cache. not mention make a mess with the workspace.
+NEVER use npm or npx
+
 ### 1. PREFLIGHT IS MANDATORY
 
 ```bash

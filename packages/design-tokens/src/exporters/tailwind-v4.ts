@@ -177,6 +177,7 @@ function generateThemeBlock(registry: TokenRegistry): string[] {
       // PASS 2: Semantic rafters assignments
       lines.push('  /* Rafters semantic color assignments */');
       // Process semantic tokens (namespace: 'rafters', category: 'color')
+      // Include ALL tokens - both light and dark variants
       const semanticTokens = allTokens.filter(
         (token) => token.namespace === 'rafters' && token.category === 'color'
       );
@@ -374,11 +375,11 @@ function generateRootBlock(registry: TokenRegistry): string[] {
 
   // Build semantic mappings from token names and usage
   for (const token of allTokens) {
-    if (token.category === 'color') {
+    if (token.category === 'color' && !token.name.endsWith('-dark')) {
       const rule = registry.dependencyGraph.getGenerationRule(token.name);
 
       if (!rule || (!rule.startsWith('state:') && !rule.startsWith('scale:'))) {
-        // Base color token - create semantic mapping
+        // Base color token - create semantic mapping (skip -dark tokens)
         semanticMappings.set(`--${token.name}`, `var(--rafters-${token.name})`);
 
         // Check for semantic assignments in token metadata

@@ -270,6 +270,20 @@ export const TokenSchema = z.object({
   // Mathematical relationships
   generatedFrom: z.string().optional(),
   mathRelationship: z.string().optional(),
+  progressionSystem: z
+    .enum([
+      'linear',
+      'golden',
+      'major-third',
+      'minor-third',
+      'perfect-fourth',
+      'perfect-fifth',
+      'augmented-fourth',
+      'major-second',
+      'minor-second',
+      'custom',
+    ])
+    .optional(), // Mathematical system used
   scalePosition: z.number().optional(), // Position in color/spacing scale
 
   // Responsive behavior

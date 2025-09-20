@@ -63,3 +63,16 @@ export function generateSurfaceColor(baseColor: OKLCH): OKLCH {
 
   return surface;
 }
+
+/**
+ * Generate neutral color from base color
+ * More desaturated than surface colors, used for neutral grays and backgrounds
+ */
+export function generateNeutralColor(baseColor: OKLCH): OKLCH {
+  const neutral: OKLCH = {
+    ...baseColor,
+    c: Math.max(0.005, baseColor.c * 0.1), // Much more desaturated for neutral
+  };
+
+  return neutral;
+}

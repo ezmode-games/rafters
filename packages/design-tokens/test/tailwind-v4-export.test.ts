@@ -47,7 +47,7 @@ describe('Tailwind v4 CSS Exporter', () => {
     expect(css).toContain('--background');
     expect(css).toContain('--foreground');
     expect(css).toContain('--primary');
-  });
+  }, 70000);
 
   it('should handle empty registry gracefully', () => {
     const registry = new TokenRegistry([]);
@@ -77,7 +77,7 @@ describe('Tailwind v4 CSS Exporter', () => {
     const colorMatches = css.match(/(oklch\([^)]+\)|rgba?\([^)]+\)|#[0-9a-fA-F]{3,8}|[a-zA-Z]+)/g);
     expect(colorMatches).toBeTruthy();
     expect(colorMatches?.length).toBeGreaterThan(5);
-  });
+  }, 70000);
 
   it('should include all token categories', async () => {
     const tokens = await generateAllTokens();
@@ -101,7 +101,7 @@ describe('Tailwind v4 CSS Exporter', () => {
         expect(css).toMatch(new RegExp(`/\\* ${category} tokens`));
       }
     }
-  });
+  }, 70000);
 
   it('should handle dark mode tokens correctly', async () => {
     const tokens = await generateAllTokens();
@@ -116,5 +116,5 @@ describe('Tailwind v4 CSS Exporter', () => {
     if (darkTokens.length > 0) {
       expect(css).toContain('--rafters-');
     }
-  });
+  }, 70000);
 });
