@@ -79,9 +79,7 @@ describe('Event-Driven Registry Integration', () => {
     // Verify CSS was regenerated again
     cssContent = readFileSync(TEST_CSS_PATH, 'utf-8');
     expect(cssContent).toContain('@theme');
-
     // Step 7: Verify registry metrics
     expect(registry.size()).toBeGreaterThan(2); // At least initial tokens + new ones
-
   });
 });
