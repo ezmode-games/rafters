@@ -248,6 +248,22 @@ export const ColorReferenceSchema = z.object({
 
 export type ColorReference = z.infer<typeof ColorReferenceSchema>;
 
+// Progression System Types - exported for consistency across the codebase
+export const PROGRESSION_SYSTEMS = [
+  'linear',
+  'golden',
+  'major-third',
+  'minor-third',
+  'perfect-fourth',
+  'perfect-fifth',
+  'augmented-fourth',
+  'major-second',
+  'minor-second',
+  'custom',
+] as const;
+
+export type ProgressionSystem = (typeof PROGRESSION_SYSTEMS)[number];
+
 // Comprehensive Design Token Schema - Single Source of Truth
 export const TokenSchema = z.object({
   // Core token data
@@ -270,6 +286,7 @@ export const TokenSchema = z.object({
   // Mathematical relationships
   generatedFrom: z.string().optional(),
   mathRelationship: z.string().optional(),
+  progressionSystem: z.enum(PROGRESSION_SYSTEMS).optional(), // Mathematical system used
   scalePosition: z.number().optional(), // Position in color/spacing scale
 
   // Responsive behavior

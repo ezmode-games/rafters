@@ -1,343 +1,243 @@
 /**
- * TDD Tests for New Color Generator Architecture
+ * Color Generator v2 Tests
  *
- * Tests the new approach where:
- * 1. Color families are stored as ColorValue objects (9 tokens)
- * 2. Semantic tokens reference families with ColorReference objects (50+ tokens)
- * 3. All intelligence is preserved in the ColorValue objects
+ * Tests the schema-driven color generator that uses ColorValue intelligence
+ * and color-utils functions instead of hardcoded procedures.
  */
 
-import type { ColorReference, ColorValue, Token } from '@rafters/shared';
-import { ColorReferenceSchema, ColorValueSchema, TokenSchema } from '@rafters/shared';
-import { describe, expect, it } from 'vitest';
+import type { ColorValue } from '@rafters/shared';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { generateColorTokens } from '../../src/generators/color';
 
-// Import the functions we'll implement
-import {
-  generateColorFamilyTokens,
-  generateSemanticColorTokens,
-  selectSemanticColorFromSuggestions,
-} from '../../src/generators/color.js';
+// Mock the color-utils functions
+vi.mock('@rafters/color-utils', () => ({
+  calculateDarkModeReference: vi.fn(() => ({ family: 'mock-family', position: '300' })),
+  calculateForegroundReference: vi.fn(() => ({ family: 'neutral', position: '900' })),
+  generateColorStates: vi.fn(() => ({
+    hover: { family: 'mock-family', position: '700' },
+    active: { family: 'mock-family', position: '800' },
+    focus: { family: 'mock-family', position: '600' },
+    disabled: { family: 'neutral', position: '400' },
+  })),
+  selectSemanticColorFromSuggestions: vi.fn((_colorValue, _type) => ({ l: 0.5, c: 0.1, h: 0 })),
+  extractCognitiveLoad: vi.fn(() => 3),
+  extractTrustLevel: vi.fn(() => 'high'),
+  extractAccessibilityLevel: vi.fn(() => 'AA'),
+}));
 
-// Load fixture data
-const primaryGrayscaleFixture = await import('../fixtures/api-response-primary-grayscale.json');
-const validatedGrayscaleData = ColorValueSchema.parse(primaryGrayscaleFixture.default);
+// Mock fetch for API calls
+const mockColorValue: ColorValue = {
+  name: 'Test Color',
+  scale: [
+    { l: 0.95, c: 0.02, h: 240 }, // 50
+    { l: 0.9, c: 0.04, h: 240 }, // 100
+    { l: 0.8, c: 0.06, h: 240 }, // 200
+    { l: 0.7, c: 0.08, h: 240 }, // 300
+    { l: 0.6, c: 0.1, h: 240 }, // 400
+    { l: 0.5, c: 0.12, h: 240 }, // 500
+    { l: 0.4, c: 0.14, h: 240 }, // 600
+    { l: 0.3, c: 0.12, h: 240 }, // 700
+    { l: 0.2, c: 0.1, h: 240 }, // 800
+    { l: 0.1, c: 0.08, h: 240 }, // 900
+    { l: 0.05, c: 0.04, h: 240 }, // 950
+  ],
+  value: '600',
+  intelligence: {
+    suggestedName: 'Ocean Depths',
+    reasoning: 'Deep blue with calming properties',
+    emotionalImpact: 'Trustworthy and professional',
+    culturalContext: 'Universal positive associations',
+    accessibilityNotes: 'Good contrast across the scale',
+    usageGuidance: 'Ideal for primary actions and navigation',
+  },
+  harmonies: {
+    complementary: { l: 0.5, c: 0.12, h: 60 },
+    triadic: [
+      { l: 0.5, c: 0.12, h: 120 },
+      { l: 0.5, c: 0.12, h: 0 },
+    ],
+    analogous: [
+      { l: 0.5, c: 0.12, h: 210 },
+      { l: 0.5, c: 0.12, h: 270 },
+    ],
+    tetradic: [
+      { l: 0.5, c: 0.12, h: 90 },
+      { l: 0.5, c: 0.12, h: 180 },
+      { l: 0.5, c: 0.12, h: 270 },
+    ],
+    monochromatic: [
+      { l: 0.3, c: 0.12, h: 240 },
+      { l: 0.7, c: 0.12, h: 240 },
+    ],
+  },
+  accessibility: {
+    wcagAA: { normal: [[]], large: [[]] },
+    wcagAAA: { normal: [[]], large: [[]] },
+    onWhite: { wcagAA: true, wcagAAA: false, contrastRatio: 7.2, aa: [], aaa: [] },
+    onBlack: { wcagAA: true, wcagAAA: false, contrastRatio: 4.8, aa: [], aaa: [] },
+  },
+  analysis: { temperature: 'cool', isLight: false, name: 'test-color' },
+  atmosphericWeight: { distanceWeight: 0.4, temperature: 'cool', atmosphericRole: 'midground' },
+  perceptualWeight: { weight: 0.5, density: 'medium', balancingRecommendation: 'Balanced weight' },
+  semanticSuggestions: {
+    danger: [{ l: 0.5, c: 0.15, h: 0 }],
+    success: [{ l: 0.5, c: 0.15, h: 120 }],
+    warning: [{ l: 0.5, c: 0.15, h: 60 }],
+    info: [{ l: 0.5, c: 0.15, h: 200 }],
+  },
+};
 
-describe('Color Generator - TDD Architecture', () => {
-  describe('generateColorFamilyTokens', () => {
-    it('should generate 9 color family tokens with ColorValue objects', () => {
-      const colorValues: Record<string, ColorValue> = {
-        'default-primary': validatedGrayscaleData,
-        'neutral-grayscale': { ...validatedGrayscaleData, name: 'Neutral Grayscale' },
-        'secondary-complement': { ...validatedGrayscaleData, name: 'Secondary Complement' },
-        'accent-triadic': { ...validatedGrayscaleData, name: 'Accent Triadic' },
-        'highlight-tetradic': { ...validatedGrayscaleData, name: 'Highlight Tetradic' },
-        'darkest-danger': { ...validatedGrayscaleData, name: 'Darkest Danger' },
-        'brightest-success': { ...validatedGrayscaleData, name: 'Brightest Success' },
-        'balanced-warning': { ...validatedGrayscaleData, name: 'Balanced Warning' },
-        'quiet-info': { ...validatedGrayscaleData, name: 'Quiet Info' },
-      };
+const mockFetch = vi.fn();
+global.fetch = mockFetch;
 
-      const familyTokens = generateColorFamilyTokens(colorValues);
-
-      // Should generate exactly 9 family tokens
-      expect(familyTokens).toHaveLength(9);
-
-      // Each token should have category 'color-family'
-      familyTokens.forEach((token) => {
-        expect(token.category).toBe('color-family');
-        expect(token.namespace).toBe('color');
-      });
-
-      // Each token value should be a ColorValue object
-      familyTokens.forEach((token) => {
-        expect(typeof token.value).toBe('object');
-        expect('name' in token.value).toBe(true);
-        expect('scale' in token.value).toBe(true);
-        expect('intelligence' in token.value).toBe(true);
-
-        // Validate it's a proper ColorValue
-        expect(() => ColorValueSchema.parse(token.value)).not.toThrow();
-      });
-
-      // Should preserve ALL intelligence data
-      const primaryToken = familyTokens.find((t) => t.name === 'default-primary');
-      expect(primaryToken).toBeDefined();
-      const primaryColorValue = primaryToken?.value as ColorValue;
-      expect(primaryColorValue.intelligence).toBeDefined();
-      expect(primaryColorValue.harmonies).toBeDefined();
-      expect(primaryColorValue.accessibility).toBeDefined();
-      expect(primaryColorValue.semanticSuggestions).toBeDefined();
-    });
-
-    it('should generate tokens with proper naming from ColorValue intelligence', () => {
-      const colorValues: Record<string, ColorValue> = {
-        'ocean-blue': {
-          ...validatedGrayscaleData,
-          intelligence: {
-            ...(validatedGrayscaleData.intelligence ?? {}),
-            suggestedName: 'Ocean Blue',
-          },
-        },
-      };
-
-      const familyTokens = generateColorFamilyTokens(colorValues);
-
-      expect(familyTokens[0].name).toBe('ocean-blue');
-      const colorValue = familyTokens[0].value as ColorValue;
-      expect(colorValue.intelligence?.suggestedName).toBe('Ocean Blue');
-    });
-
-    it('should add AI metadata to family tokens', () => {
-      const colorValues: Record<string, ColorValue> = {
-        'test-family': validatedGrayscaleData,
-      };
-
-      const familyTokens = generateColorFamilyTokens(colorValues);
-      const token = familyTokens[0];
-
-      // Should have AI intelligence metadata
-      expect(token.cognitiveLoad).toBeDefined();
-      expect(token.trustLevel).toBeDefined();
-      expect(token.accessibilityLevel).toBeDefined();
-      expect(token.semanticMeaning).toBeDefined();
-      expect(token.generateUtilityClass).toBe(false); // Families don't generate utilities directly
+describe('Color Generator v2', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(mockColorValue),
     });
   });
 
-  describe('generateSemanticColorTokens', () => {
-    const mockFamilyTokens: Token[] = [
-      {
-        name: 'ocean-blue',
-        value: validatedGrayscaleData,
-        category: 'color-family',
-        namespace: 'color',
-        semanticMeaning: 'Ocean blue color family',
-      },
-      {
-        name: 'forest-green',
-        value: { ...validatedGrayscaleData, name: 'Forest Green' },
-        category: 'color-family',
-        namespace: 'color',
-        semanticMeaning: 'Forest green color family',
-      },
-    ];
-
-    it('should generate semantic tokens with ColorReference values', () => {
-      const semanticTokens = generateSemanticColorTokens(mockFamilyTokens, {
-        primary: { family: 'ocean-blue', position: '600' },
-        secondary: { family: 'forest-green', position: '500' },
+  describe('generateColorTokens', () => {
+    it('should generate family and semantic tokens', async () => {
+      const result = await generateColorTokens({
+        baseColor: { l: 0.44, c: 0.01, h: 286 },
+        apiUrl: 'https://test.api.com',
+        generateDarkMode: false,
       });
 
-      expect(semanticTokens.length).toBeGreaterThan(0);
-
-      // Find primary token
-      const primaryToken = semanticTokens.find((t) => t.name === 'primary');
-      expect(primaryToken).toBeDefined();
-
-      // Should have ColorReference value
-      expect(typeof primaryToken?.value).toBe('object');
-      expect(primaryToken?.value && 'family' in primaryToken.value).toBe(true);
-      expect(primaryToken?.value && 'position' in primaryToken.value).toBe(true);
-
-      const colorRef = primaryToken?.value as ColorReference;
-      expect(colorRef.family).toBe('ocean-blue');
-      expect(colorRef.position).toBe('600');
-
-      // Validate it's a proper ColorReference
-      expect(() => ColorReferenceSchema.parse(primaryToken?.value)).not.toThrow();
+      expect(result.familyTokens).toHaveLength(9); // 9 semantic roles
+      expect(result.semanticTokens.length).toBeGreaterThan(0);
+      expect(result.colorValues).toBeDefined();
     });
 
-    it('should generate foreground tokens for each semantic color', () => {
-      const semanticTokens = generateSemanticColorTokens(mockFamilyTokens, {
-        primary: { family: 'ocean-blue', position: '600' },
+    it('should use AI-generated family names', async () => {
+      const result = await generateColorTokens({
+        baseColor: { l: 0.44, c: 0.01, h: 286 },
+        apiUrl: 'https://test.api.com',
+        generateDarkMode: false,
       });
 
-      const foregroundToken = semanticTokens.find((t) => t.name === 'primary-foreground');
-      expect(foregroundToken).toBeDefined();
-
-      const colorRef = foregroundToken?.value as ColorReference;
-      expect(colorRef.family).toBeDefined(); // Should reference a neutral or contrasting family
-      expect(colorRef.position).toBeDefined(); // Should be calculated for contrast
+      const familyNames = result.familyTokens.map((t) => t.name);
+      expect(familyNames).toContain('ocean-depths'); // From mocked suggestedName
     });
 
-    it('should generate state tokens (hover, active, focus, disabled)', () => {
-      const semanticTokens = generateSemanticColorTokens(mockFamilyTokens, {
-        primary: { family: 'ocean-blue', position: '600' },
+    it('should create proper family tokens with ColorValue objects', async () => {
+      const result = await generateColorTokens({
+        baseColor: { l: 0.44, c: 0.01, h: 286 },
+        apiUrl: 'https://test.api.com',
+        generateDarkMode: false,
       });
 
-      const states = ['hover', 'active', 'focus', 'disabled'];
-
-      states.forEach((state) => {
-        const stateToken = semanticTokens.find((t) => t.name === `primary-${state}`);
-        expect(stateToken).toBeDefined();
-
-        const colorRef = stateToken?.value as ColorReference;
-        expect(colorRef.family).toBe('ocean-blue');
-        expect(colorRef.position).toBeDefined();
-        expect(colorRef.position).not.toBe('600'); // Should be different from base
-      });
+      const familyToken = result.familyTokens[0];
+      expect(familyToken.category).toBe('color-family');
+      expect(familyToken.namespace).toBe('color');
+      expect(familyToken.generateUtilityClass).toBe(false);
+      expect(typeof familyToken.value).toBe('object');
+      expect(familyToken.value).toHaveProperty('scale');
+      expect(familyToken.value).toHaveProperty('intelligence');
     });
 
-    it('should include proper AI metadata for semantic tokens', () => {
-      const semanticTokens = generateSemanticColorTokens(mockFamilyTokens, {
-        primary: { family: 'ocean-blue', position: '600' },
+    it('should create semantic tokens with ColorReference objects', async () => {
+      const result = await generateColorTokens({
+        baseColor: { l: 0.44, c: 0.01, h: 286 },
+        apiUrl: 'https://test.api.com',
+        generateDarkMode: false,
       });
 
-      const primaryToken = semanticTokens.find((t) => t.name === 'primary');
-      expect(primaryToken?.category).toBe('color');
-      expect(primaryToken?.namespace).toBe('rafters');
-      expect(primaryToken?.semanticMeaning).toBeDefined();
-      expect(primaryToken?.applicableComponents).toBeDefined();
-      expect(primaryToken?.trustLevel).toBe('critical'); // Primary should be critical
-      expect(primaryToken?.generateUtilityClass).toBe(true);
+      const semanticToken = result.semanticTokens.find((t) => t.name === 'primary');
+      expect(semanticToken).toBeDefined();
+      expect(semanticToken?.category).toBe('color');
+      expect(semanticToken?.namespace).toBe('rafters');
+      expect(semanticToken?.generateUtilityClass).toBe(true);
+      expect(semanticToken?.value).toHaveProperty('family');
+      expect(semanticToken?.value).toHaveProperty('position');
     });
 
-    it('should generate surface/UI tokens (background, foreground, border, etc.)', () => {
-      const semanticTokens = generateSemanticColorTokens(mockFamilyTokens, {
-        neutral: { family: 'ocean-blue', position: '600' },
+    it('should generate dark mode tokens when enabled', async () => {
+      const result = await generateColorTokens({
+        baseColor: { l: 0.44, c: 0.01, h: 286 },
+        apiUrl: 'https://test.api.com',
+        generateDarkMode: true,
       });
 
-      const surfaceTokens = [
-        'background',
-        'foreground',
-        'border',
-        'input',
-        'ring',
-        'muted',
-        'muted-foreground',
-      ];
-
-      surfaceTokens.forEach((tokenName) => {
-        const token = semanticTokens.find((t) => t.name === tokenName);
-        expect(token).toBeDefined();
-
-        const colorRef = token?.value as ColorReference;
-        expect(colorRef.family).toBeDefined();
-        expect(colorRef.position).toBeDefined();
-      });
-    });
-  });
-
-  describe('selectSemanticColorFromSuggestions', () => {
-    const mockColorValue: ColorValue = {
-      ...validatedGrayscaleData,
-      semanticSuggestions: {
-        danger: [
-          { l: 0.3, c: 0.15, h: 15, alpha: 1 }, // darkest
-          { l: 0.5, c: 0.12, h: 15, alpha: 1 }, // middle
-          { l: 0.7, c: 0.1, h: 15, alpha: 1 }, // lightest
-        ],
-        success: [
-          { l: 0.4, c: 0.12, h: 135, alpha: 1 }, // darkest
-          { l: 0.6, c: 0.14, h: 135, alpha: 1 }, // middle
-          { l: 0.8, c: 0.1, h: 135, alpha: 1 }, // brightest
-        ],
-        warning: [
-          { l: 0.5, c: 0.16, h: 45, alpha: 1 }, // middle
-          { l: 0.7, c: 0.14, h: 45, alpha: 1 },
-          { l: 0.3, c: 0.12, h: 45, alpha: 1 },
-        ],
-        info: [
-          { l: 0.6, c: 0.05, h: 220, alpha: 1 }, // quietest
-          { l: 0.5, c: 0.12, h: 220, alpha: 1 },
-          { l: 0.4, c: 0.18, h: 220, alpha: 1 },
-        ],
-      },
-    };
-
-    it('should select darkest color for destructive', () => {
-      const result = selectSemanticColorFromSuggestions(mockColorValue, 'destructive');
-
-      // Should return the darkest danger color (lowest lightness)
-      expect(result.l).toBe(0.3);
-      expect(result.h).toBe(15); // Red hue
+      const darkTokens = result.semanticTokens.filter((t) => t.name.endsWith('-dark'));
+      expect(darkTokens.length).toBeGreaterThan(0);
     });
 
-    it('should select brightest color for success', () => {
-      const result = selectSemanticColorFromSuggestions(mockColorValue, 'success');
-
-      // Should return the brightest success color (highest lightness)
-      expect(result.l).toBe(0.8);
-      expect(result.h).toBe(135); // Green hue
-    });
-
-    it('should select middle lightness for warning', () => {
-      const result = selectSemanticColorFromSuggestions(mockColorValue, 'warning');
-
-      // Should return the color closest to 0.5 lightness
-      expect(result.l).toBe(0.5);
-      expect(result.h).toBe(45); // Yellow/orange hue
-    });
-
-    it('should select quietest (lowest chroma) for info', () => {
-      const result = selectSemanticColorFromSuggestions(mockColorValue, 'info');
-
-      // Should return the color with lowest chroma
-      expect(result.c).toBe(0.05);
-      expect(result.h).toBe(220); // Blue hue
-    });
-
-    it('should throw error for invalid semantic type', () => {
-      expect(() => {
-        selectSemanticColorFromSuggestions(mockColorValue, 'invalid' as 'destructive');
-      }).toThrow('Invalid semantic type');
-    });
-
-    it('should throw error when no suggestions available', () => {
-      const emptyColorValue: ColorValue = {
-        ...validatedGrayscaleData,
-        semanticSuggestions: {
-          danger: [],
-          success: [],
-          warning: [],
-          info: [],
-        },
-      };
-
-      expect(() => {
-        selectSemanticColorFromSuggestions(emptyColorValue, 'destructive');
-      }).toThrow('No colors available');
-    });
-  });
-
-  describe('Integration: Complete Color System Generation', () => {
-    it('should generate complete system with families and semantic tokens', () => {
-      // This test will verify the complete flow works together
-      const colorValues: Record<string, ColorValue> = {
-        'primary-family': validatedGrayscaleData,
-        'neutral-family': { ...validatedGrayscaleData, name: 'Neutral' },
-      };
-
-      const familyTokens = generateColorFamilyTokens(colorValues);
-      const semanticTokens = generateSemanticColorTokens(familyTokens, {
-        primary: { family: 'primary-family', position: '600' },
-        neutral: { family: 'neutral-family', position: '500' },
+    it('should include all semantic roles including highlight', async () => {
+      const result = await generateColorTokens({
+        baseColor: { l: 0.44, c: 0.01, h: 286 },
+        apiUrl: 'https://test.api.com',
+        generateDarkMode: false,
       });
 
-      const allTokens = [...familyTokens, ...semanticTokens];
+      const semanticNames = result.semanticTokens.map((t) => t.name);
+      expect(semanticNames).toContain('primary');
+      expect(semanticNames).toContain('secondary');
+      expect(semanticNames).toContain('accent');
+      expect(semanticNames).toContain('highlight');
+      expect(semanticNames).toContain('neutral');
+      expect(semanticNames).toContain('destructive');
+      expect(semanticNames).toContain('success');
+      expect(semanticNames).toContain('warning');
+      expect(semanticNames).toContain('info');
+    });
 
-      // Should have both family and semantic tokens
-      expect(familyTokens.length).toBe(2);
-      expect(semanticTokens.length).toBeGreaterThan(10);
-
-      // All tokens should validate against Token schema
-      allTokens.forEach((token) => {
-        expect(() => TokenSchema.parse(token)).not.toThrow();
-      });
-
-      // Family tokens should have ColorValue objects
-      familyTokens.forEach((token) => {
-        expect(() => ColorValueSchema.parse(token.value)).not.toThrow();
-      });
-
-      // Semantic tokens should have ColorReference objects
-      const semanticColorTokens = semanticTokens.filter(
-        (t) => typeof t.value === 'object' && 'family' in t.value
+    it('should use color-utils functions for intelligent metadata extraction', async () => {
+      const { extractCognitiveLoad, extractTrustLevel, extractAccessibilityLevel } = await import(
+        '@rafters/color-utils'
       );
 
-      semanticColorTokens.forEach((token) => {
-        expect(() => ColorReferenceSchema.parse(token.value)).not.toThrow();
+      await generateColorTokens({
+        baseColor: { l: 0.44, c: 0.01, h: 286 },
+        apiUrl: 'https://test.api.com',
+        generateDarkMode: false,
       });
+
+      expect(extractCognitiveLoad).toHaveBeenCalled();
+      expect(extractTrustLevel).toHaveBeenCalled();
+      expect(extractAccessibilityLevel).toHaveBeenCalled();
+    });
+
+    it('should validate input configuration with Zod', async () => {
+      await expect(
+        generateColorTokens({
+          baseColor: { l: 2, c: 0.01, h: 286 }, // Invalid lightness > 1
+          apiUrl: 'https://test.api.com',
+          generateDarkMode: false,
+        })
+      ).rejects.toThrow();
+    });
+
+    it('should handle API errors gracefully', async () => {
+      mockFetch.mockResolvedValue({
+        ok: false,
+        status: 500,
+      });
+
+      await expect(
+        generateColorTokens({
+          baseColor: { l: 0.44, c: 0.01, h: 286 },
+          apiUrl: 'https://test.api.com',
+          generateDarkMode: false,
+        })
+      ).rejects.toThrow('API error: 500');
+    });
+
+    it('should generate UI tokens for interface elements', async () => {
+      const result = await generateColorTokens({
+        baseColor: { l: 0.44, c: 0.01, h: 286 },
+        apiUrl: 'https://test.api.com',
+        generateDarkMode: false,
+      });
+
+      const uiTokenNames = result.semanticTokens.map((t) => t.name);
+      expect(uiTokenNames).toContain('background');
+      expect(uiTokenNames).toContain('foreground');
+      expect(uiTokenNames).toContain('border');
+      expect(uiTokenNames).toContain('muted');
     });
   });
 });

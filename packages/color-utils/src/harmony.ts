@@ -780,7 +780,7 @@ export function calculatePerceptualWeight(color: OKLCH): {
 
   // Mark for AI to generate contextual balancing recommendations
   // AI will have access to the weight value and density to generate intelligent guidance
-  const balancingRecommendation = '<AI_GENERATE>';
+  const balancingRecommendation = 'Balanced weight';
 
   return {
     weight,

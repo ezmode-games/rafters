@@ -131,11 +131,11 @@ This system implements a sophisticated dependency graph with 5 powerful transfor
 
 #### 2. **Color State Transformations** - `state:hover`
 ```typescript
-// When primary changes, primary-hover automatically adjusts lightness
+// When primary-family changes, primary-hover references optimal state position
 "primary-hover": {
-  "dependsOn": ["primary"],
+  "dependsOn": ["primary-family"],
   "rule": "state:hover",
-  "value": "oklch(0.65 0.15 240)" // Auto-lightened from primary
+  "value": { "family": "primary", "position": "700" } // ColorReference to pre-computed state
 }
 ```
 
@@ -151,31 +151,85 @@ This system implements a sophisticated dependency graph with 5 powerful transfor
 
 #### 4. **Automatic Contrast Generation** - `contrast:auto`
 ```typescript
-// Find optimal contrast color automatically
+// Find optimal contrast color from pre-computed accessibility data
 "destructive-foreground": {
-  "dependsOn": ["destructive"],
+  "dependsOn": ["destructive-family"],
   "rule": "contrast:auto",
-  "value": "oklch(1 0 0)" // Auto-calculated white for contrast
+  "value": { "family": "neutral", "position": "50" } // ColorReference to optimal contrast
 }
 ```
 
 #### 5. **Lightness Inversion** - `invert`
 ```typescript
-// Dark mode tokens that auto-invert when base changes
+// Dark mode tokens reference pre-computed inversion positions
 "primary-dark": {
-  "dependsOn": ["primary"],
+  "dependsOn": ["primary-family"],
   "rule": "invert",
-  "value": "oklch(0.35 0.15 240)" // Auto-inverted lightness
+  "value": { "family": "primary", "position": "300" } // ColorReference to inverted position
+}
+```
+
+#### 6. **Plugin System** - Custom Rules with Full Registry Access
+```typescript
+// Custom rule plugin in .rafters/plugins/custom-state.js
+export default function customState(registry, tokenName, dependencies) {
+  const familyToken = registry.get(dependencies[0]);
+  const colorValue = familyToken.value;
+
+  // Full registry access - can read any token, check dependencies, etc.
+  // Return either string or ColorReference object
+  return { family: 'custom', position: 7 };
+}
+
+// Usage in token dependency
+"primary-custom": {
+  "dependsOn": ["primary-family"],
+  "rule": "custom-state",
+  "value": { "family": "custom", "position": "700" } // Result from plugin
+}
+```
+
+### Plugin System Architecture
+
+**Functional Plugin Design:**
+- **Simple Functions**: Rules are just functions with `(registry, tokenName, dependencies) => result`
+- **Full Registry Access**: Plugins can read any token, check dependencies, analyze the entire system
+- **Flexible Returns**: Can return strings or `{ family, position }` ColorReference objects
+- **Type Safety**: All plugin results validated with Zod schemas
+
+**Plugin Loading:**
+```typescript
+// Load plugins from both directories
+const context = await createRuleContext(registry, '/path/to/.rafters');
+
+// Scans for plugins in:
+// - .rafters/plugins/*.js|ts (user custom rules)
+// - design-tokens/src/plugins/*.js|ts (built-in rules)
+```
+
+**Plugin Development:**
+```typescript
+// .rafters/plugins/smart-contrast.ts
+export default function smartContrast(registry, tokenName, dependencies) {
+  const backgroundToken = registry.get(dependencies[0]);
+  const colorValue = backgroundToken.value;
+
+  // Use pre-computed WCAG pairs from ColorValue
+  const validPairs = colorValue.accessibility.wcagAA.normal;
+  // ... intelligent contrast selection logic
+
+  return { family: 'neutral', position: optimalPosition };
 }
 ```
 
 ### Dependency Graph Features
 
 - **Circular Dependency Detection**: Prevents infinite loops
-- **Topological Sorting**: Updates tokens in correct dependency order
+- **Topological Sorting**: Updates tokens in correct dependency order (Kahn's algorithm)
 - **Cascading Updates**: Change one token, automatically update dozens of dependents
 - **Performance Optimization**: Cached sorting and bulk operations
 - **Complete Validation**: Ensures dependency integrity across the entire system
+- **Plugin Integration**: Rules execute as plugins with full registry context
 
 ## 3. TokenRegistry System: The Runtime Intelligence Engine
 
@@ -334,11 +388,25 @@ While most design token systems use simple color strings, this system uses sophi
 ```typescript
 interface ColorValue {
   name: string;                         // Descriptive name ('ocean-depths')
-  scale: OKLCH[];                       // Complete 10-step OKLCH scale [50,100...900]
+  scale: OKLCH[];                       // Complete 11-step OKLCH scale [50,100...950]
   token?: string;                       // Semantic assignment ('primary')
   value?: string;                       // Current scale position ('600')
   use?: string;                         // Designer reasoning
-  states?: Record<string, string>;      // Auto-generated states {hover: '700'}
+
+  // Pre-computed ColorReference mappings for rules engine
+  stateReferences?: {
+    hover: ColorReference;              // { family: "primary", position: "700" }
+    active: ColorReference;             // { family: "primary", position: "800" }
+    focus: ColorReference;              // { family: "primary", position: "600" }
+    disabled: ColorReference;           // { family: "neutral", position: "400" }
+  };
+
+  foregroundReferences?: {
+    auto: ColorReference;               // { family: "neutral", position: "900" }
+    onDark: ColorReference;             // { family: "neutral", position: "100" }
+  };
+
+  darkModeReference?: ColorReference;   // { family: "primary", position: "300" }
 
   // AI Intelligence from Color Intelligence API
   intelligence?: {
@@ -359,18 +427,34 @@ interface ColorValue {
 ### Color Intelligence Example
 
 ```typescript
-// A sophisticated color token with complete intelligence
+// A sophisticated color token with complete intelligence and pre-computed references
 {
   "name": "ocean-depths",
   "scale": [
     { "l": 0.95, "c": 0.02, "h": 240 },  // 50  - Very light blue
     { "l": 0.85, "c": 0.05, "h": 240 },  // 100 - Light blue
     { "l": 0.75, "c": 0.08, "h": 240 },  // 200 - Medium-light
-    // ... complete 10-step scale
-    { "l": 0.15, "c": 0.08, "h": 240 }   // 900 - Very dark blue
+    // ... complete 11-step scale
+    { "l": 0.15, "c": 0.08, "h": 240 }   // 950 - Very dark blue
   ],
   "token": "primary",
   "value": "600",
+
+  // Pre-computed references for instant rule execution
+  "stateReferences": {
+    "hover": { "family": "ocean-depths", "position": "700" },
+    "active": { "family": "ocean-depths", "position": "800" },
+    "focus": { "family": "ocean-depths", "position": "600" },
+    "disabled": { "family": "neutral", "position": "400" }
+  },
+
+  "foregroundReferences": {
+    "auto": { "family": "neutral", "position": "900" },
+    "onDark": { "family": "neutral", "position": "100" }
+  },
+
+  "darkModeReference": { "family": "ocean-depths", "position": "300" },
+
   "intelligence": {
     "reasoning": "Medium-high lightness blue with moderate chroma creates trustworthy, professional appearance",
     "emotionalImpact": "Conveys trust, stability, and professionalism. Calming effect reduces anxiety.",
@@ -614,21 +698,21 @@ const tokens = generateAllTokens() // Generate fresh 240+ token system
 // Real-world example: Change brand color, update entire system
 const registry = new TokenRegistry(tokens);
 
-// 1. Update primary brand color
-await registry.set('primary', 'oklch(0.45 0.2 350)'); // New purple brand
+// 1. Update primary brand family with new ColorValue
+await registry.set('primary-family', newPurpleColorValue); // New purple brand with full intelligence
 
-// 2. Dependency system automatically updates:
-// → primary-hover (state:hover) → oklch(0.50 0.2 350)  // Lightened
-// → primary-active (state:active) → oklch(0.40 0.2 350) // Darkened
-// → primary-foreground (contrast:auto) → oklch(1 0 0)   // White contrast
-// → primary-dark (invert) → oklch(0.55 0.2 350)        // Dark mode variant
+// 2. Dependency system automatically updates using pre-computed references:
+// → primary-hover (state:hover) → { family: "primary", position: "700" } // Pre-computed optimal hover
+// → primary-active (state:active) → { family: "primary", position: "800" } // Pre-computed active state
+// → primary-foreground (contrast:auto) → { family: "neutral", position: "900" } // Pre-computed contrast
+// → primary-dark (invert) → { family: "primary", position: "300" } // Pre-computed dark mode
 
 // 3. Mathematical dependencies update too:
 // → logo-size (calc({primary-weight} * 2)) → 32px      // Calculated size
 // → brand-spacing (calc({primary-size} + 4px)) → 20px  // Calculated spacing
 
-console.log(registry.getDependents('primary'));
-// → ['primary-hover', 'primary-active', 'primary-foreground', 'primary-dark', 'logo-size', 'brand-spacing']
+console.log(registry.getDependents('primary-family'));
+// → ['primary-hover', 'primary-active', 'primary-foreground', 'primary-dark', 'primary', 'primary-light']
 ```
 
 ### 4. Export for Production

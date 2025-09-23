@@ -17,11 +17,12 @@
     "src"
   ],
   "scripts": {
-    "test": "vitest run --passWithNoTests",
-    "test:preflight": "vitest run --passWithNoTests",
-    "lint": "biome check .",
-    "format": "biome format --write .",
-    "type-check": "tsc --noEmit"
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:preflight": "vitest run",
+    "lint": "biome check",
+    "format": "biome format --write",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/apca-w3": "^0.1.3",

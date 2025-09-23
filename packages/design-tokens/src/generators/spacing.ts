@@ -5,20 +5,8 @@
  * These tokens enhance existing Tailwind utilities with mathematical relationships
  */
 
+import { MATHEMATICAL_CONSTANTS, MUSICAL_RATIOS } from '@rafters/math-utils';
 import type { Token } from '../index';
-
-/**
- * Musical and mathematical ratios for spacing generation
- * Based on musical intervals for harmonious proportions
- */
-const MINOR_SECOND = 1.067; // 16:15 ratio
-const MAJOR_SECOND = 1.125; // 9:8 ratio
-const MINOR_THIRD = 1.2; // 6:5 ratio
-const MAJOR_THIRD = 1.25; // 5:4 ratio
-const PERFECT_FOURTH = 1.333; // 4:3 ratio
-const AUGMENTED_FOURTH = Math.SQRT2; // √2 ratio (tritone)
-const PERFECT_FIFTH = 1.5; // 3:2 ratio
-const GOLDEN_RATIO = 1.618033988749; // φ (phi)
 
 /**
  * Generate spacing scale based on mathematical system
@@ -66,35 +54,35 @@ export function generateSpacingScale(
         name = i === 0 ? '0' : `${i}`;
         break;
       case 'minor-second':
-        valuePx = i === 0 ? 0 : baseUnit * MINOR_SECOND ** (i - 1);
+        valuePx = i === 0 ? 0 : baseUnit * MUSICAL_RATIOS['minor-second'] ** (i - 1);
         name = i === 0 ? '0' : `${i}`;
         break;
       case 'major-second':
-        valuePx = i === 0 ? 0 : baseUnit * MAJOR_SECOND ** (i - 1);
+        valuePx = i === 0 ? 0 : baseUnit * MUSICAL_RATIOS['major-second'] ** (i - 1);
         name = i === 0 ? '0' : `${i}`;
         break;
       case 'minor-third':
-        valuePx = i === 0 ? 0 : baseUnit * MINOR_THIRD ** (i - 1);
+        valuePx = i === 0 ? 0 : baseUnit * MUSICAL_RATIOS['minor-third'] ** (i - 1);
         name = i === 0 ? '0' : `${i}`;
         break;
       case 'major-third':
-        valuePx = i === 0 ? 0 : baseUnit * MAJOR_THIRD ** (i - 1);
+        valuePx = i === 0 ? 0 : baseUnit * MUSICAL_RATIOS['major-third'] ** (i - 1);
         name = i === 0 ? '0' : `${i}`;
         break;
       case 'perfect-fourth':
-        valuePx = i === 0 ? 0 : baseUnit * PERFECT_FOURTH ** (i - 1);
+        valuePx = i === 0 ? 0 : baseUnit * MUSICAL_RATIOS['perfect-fourth'] ** (i - 1);
         name = i === 0 ? '0' : `${i}`;
         break;
       case 'augmented-fourth':
-        valuePx = i === 0 ? 0 : baseUnit * AUGMENTED_FOURTH ** (i - 1);
+        valuePx = i === 0 ? 0 : baseUnit * MUSICAL_RATIOS['augmented-fourth'] ** (i - 1);
         name = i === 0 ? '0' : `${i}`;
         break;
       case 'perfect-fifth':
-        valuePx = i === 0 ? 0 : baseUnit * PERFECT_FIFTH ** (i - 1);
+        valuePx = i === 0 ? 0 : baseUnit * MUSICAL_RATIOS['perfect-fifth'] ** (i - 1);
         name = i === 0 ? '0' : `${i}`;
         break;
       case 'golden':
-        valuePx = i === 0 ? 0 : baseUnit * GOLDEN_RATIO ** (i - 1);
+        valuePx = i === 0 ? 0 : baseUnit * MATHEMATICAL_CONSTANTS.golden ** (i - 1);
         name = i === 0 ? '0' : `${i}`;
         break;
       case 'custom':
@@ -106,6 +94,18 @@ export function generateSpacingScale(
     // Convert pixels to rem (16px = 1rem)
     const valueRem = valuePx / 16;
 
+    // Determine mathRelationship for non-zero, non-base tokens
+    let mathRelationship: string | undefined;
+    if (i > 1 && valuePx > 0) {
+      // Skip 0 and base (1)
+      const baseTokenName = '1';
+      if (system === 'linear') {
+        mathRelationship = `{${baseTokenName}} * ${i}`;
+      } else {
+        mathRelationship = `{${baseTokenName}} * ${system}^${i - 1}`;
+      }
+    }
+
     // Base token only - Tailwind handles responsive variants automatically
     tokens.push({
       name,
@@ -113,6 +113,8 @@ export function generateSpacingScale(
       category: 'spacing',
       namespace: 'spacing',
       semanticMeaning: `${system === 'linear' ? 'Mathematical' : system === 'golden' ? 'Golden ratio' : 'Exponential'} spacing step ${i}`,
+      mathRelationship,
+      progressionSystem: system,
       scalePosition: i,
       generateUtilityClass: true,
       applicableComponents: ['all'],

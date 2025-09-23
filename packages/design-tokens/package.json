@@ -18,9 +18,10 @@
   ],
   "scripts": {
     "test": "vitest run",
+    "test:unit": "vitest run",
     "test:preflight": "vitest run",
-    "lint": "biome check .",
-    "format": "biome format --write .",
+    "lint": "biome check --fix --unsafe",
+    "format": "biome format --write",
     "typecheck": "tsc --noEmit",
     "validate-standards": "tsx scripts/validate-standards.ts"
   },
@@ -34,6 +35,7 @@
   },
   "dependencies": {
     "@rafters/color-utils": "workspace:*",
+    "@rafters/math-utils": "workspace:*",
     "@rafters/shared": "workspace:*",
     "fs-extra": "^11.2.0",
     "jszip": "^3.10.1",

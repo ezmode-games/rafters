@@ -9,6 +9,7 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "test": "vitest run",
+    "test:unit": "vitest run",
     "test:integration": "vitest run --config vitest.config.cloudflare.ts",
     "test:preflight": "vitest run && vitest run --config vitest.config.cloudflare.ts",
     "lint": "biome check .",

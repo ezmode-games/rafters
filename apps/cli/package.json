@@ -23,10 +23,11 @@
     "build": "tsc --build",
     "dev": "tsc --build --watch",
     "test": "vitest run --passWithNoTests",
+    "test:unit": "vitest run --passWithNoTests",
     "test:preflight": "vitest run --passWithNoTests",
-    "lint": "biome check .",
-    "format": "biome format --write .",
-    "type-check": "tsc --noEmit",
+    "lint": "biome check ",
+    "format": "biome format --write",
+    "typecheck": "tsc --noEmit",
     "prepublishOnly": "pnpm build"
   },
   "devDependencies": {

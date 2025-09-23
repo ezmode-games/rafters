@@ -12,11 +12,11 @@
     "generate-tokens": "node scripts/generate-token-cache.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:unit": "vitest run --config vitest.config.ts --passWithNoTests",
+    "test:unit": "vitest run --config vitest.config.ts",
     "test:spec": "vitest run --config vitest.config.ts --grep spec",
-    "test:component": "playwright test --config=playwright-ct.config.ts --pass-with-no-tests",
+    "test:component": "playwright test --config=playwright-ct.config.ts",
     "test:e2e": "playwright test",
-    "test:preflight": "vitest run --passWithNoTests && playwright test --config=playwright-ct.config.ts --pass-with-no-tests"
+    "test:preflight": "vitest run && playwright test --config=playwright-ct.config.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",

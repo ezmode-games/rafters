@@ -5,12 +5,8 @@
  * Provides contextual sizing beyond the mathematical spacing scale
  */
 
+import { MATHEMATICAL_CONSTANTS } from '@rafters/math-utils';
 import type { Token } from '../index';
-
-/**
- * Mathematical constants for height generation
- */
-const GOLDEN_RATIO = 1.618033988749;
 
 /**
  * Generate height scale for component sizing with responsive variants
@@ -50,7 +46,7 @@ export function generateHeightScale(
         value = baseUnit + i * 0.5; // 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6
         break;
       case 'golden':
-        value = baseUnit * GOLDEN_RATIO ** (i * 0.5);
+        value = baseUnit * MATHEMATICAL_CONSTANTS.golden ** (i * 0.5);
         break;
       case 'custom':
         value = baseUnit * multiplier ** (i * 0.5);
@@ -68,7 +64,12 @@ export function generateHeightScale(
       namespace: 'height',
       semanticMeaning: `Component height ${sizes[i]} for ${system} scale - ${meetsAccessibility ? 'meets' : 'below'} touch target guidelines`,
       mathRelationship:
-        system === 'linear' ? `${baseUnit} + ${i * 0.5}` : `${baseUnit} * ${multiplier}^${i * 0.5}`,
+        i === 0
+          ? undefined
+          : system === 'linear'
+            ? `{h-${sizes[0]}} + ${i * 0.5}rem`
+            : `{h-${sizes[0]}} * ${system}^${i * 0.5}`,
+      progressionSystem: system,
       scalePosition: i,
       touchTargetSize: touchTargetSizePx,
       generateUtilityClass: true,
