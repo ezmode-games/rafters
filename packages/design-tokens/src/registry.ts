@@ -86,7 +86,7 @@ export class TokenRegistry {
   updateToken(name: string, value: string): void {
     const oldValue = this.tokens.get(name)?.value;
     const existingToken = this.tokens.get(name);
-    
+
     if (!existingToken) {
       throw new Error(`Token "${name}" does not exist. Cannot update non-existent token.`);
     }
@@ -106,7 +106,7 @@ export class TokenRegistry {
         tokenName: name,
         oldValue,
         newValue: value,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
     }
   }
@@ -114,13 +114,13 @@ export class TokenRegistry {
   /**
    * Update multiple tokens efficiently and fire batch change event
    */
-  updateMultipleTokens(updates: Array<{name: string, value: string}>): void {
+  updateMultipleTokens(updates: Array<{ name: string; value: string }>): void {
     const changes: TokenChangeEvent[] = [];
-    
-    for (const {name, value} of updates) {
+
+    for (const { name, value } of updates) {
       const oldValue = this.tokens.get(name)?.value;
       const existingToken = this.tokens.get(name);
-      
+
       if (!existingToken) {
         throw new Error(`Token "${name}" does not exist. Cannot update non-existent token.`);
       }
@@ -131,21 +131,21 @@ export class TokenRegistry {
       };
 
       this.tokens.set(name, updatedToken);
-      
+
       changes.push({
         type: 'token-changed',
         tokenName: name,
         oldValue,
         newValue: value,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
     }
-    
+
     if (this.changeCallback) {
       this.changeCallback({
         type: 'tokens-batch-changed',
         changes,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
     }
   }
@@ -158,7 +158,7 @@ export class TokenRegistry {
       this.changeCallback({
         type: 'registry-initialized',
         tokenCount,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
     }
   }

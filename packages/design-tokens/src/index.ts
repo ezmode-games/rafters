@@ -19,6 +19,8 @@ import { z } from 'zod';
 
 // Export archive management
 export { DesignSystemArchive, fetchArchive } from './archive.js';
+// Export callback implementations
+export { createLocalCSSCallback } from './callbacks/local-css-callback.js';
 // Export dependency tracking system - temporarily disabled for ES module issues
 // export type { TokenDependency } from './dependencies';
 // export { TokenDependencyGraph } from './dependencies';
@@ -36,9 +38,13 @@ export { TokenRegistry } from './registry.js';
 // Export registry factory with self-initialization
 export { createEventDrivenTokenRegistry } from './registry-factory.js';
 // Export event types
-export type { RegistryEvent, RegistryChangeCallback, TokenChangeEvent, TokensBatchChangeEvent, RegistryInitializedEvent } from './types/events.js';
-// Export callback implementations
-export { createLocalCSSCallback } from './callbacks/local-css-callback.js';
+export type {
+  RegistryChangeCallback,
+  RegistryEvent,
+  RegistryInitializedEvent,
+  TokenChangeEvent,
+  TokensBatchChangeEvent,
+} from './types/events.js';
 
 // Import for internal use
 import { TokenRegistry } from './registry.js';

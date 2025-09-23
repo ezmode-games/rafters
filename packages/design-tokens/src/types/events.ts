@@ -1,6 +1,6 @@
 /**
  * Event types for the event-driven registry system
- * 
+ *
  * Supports real-time CSS generation and queue publishing
  * through swappable callback implementations
  */

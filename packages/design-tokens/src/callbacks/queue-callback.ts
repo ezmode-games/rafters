@@ -1,6 +1,6 @@
 /**
  * Queue Callback Implementation (Future)
- * 
+ *
  * Publishes registry change events to message queue for Rafters+ deployments
  */
 
@@ -12,7 +12,7 @@ interface QueueClient {
 }
 
 export function createQueueCallback(queueClient: QueueClient): RegistryChangeCallback {
-  return function(event: RegistryEvent): void {
+  return (event: RegistryEvent): void => {
     switch (event.type) {
       case 'token-changed':
         queueClient.publish('design-system.token-changed', event);
