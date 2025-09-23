@@ -1,7 +1,7 @@
-import { generateAllTokens } from '../packages/design-tokens/src/index.ts';
+import { mkdirSync, writeFileSync } from 'fs';
 import JSZip from 'jszip';
-import { writeFileSync, mkdirSync } from 'fs';
 import { dirname, join } from 'path';
+import { generateAllTokens } from '../packages/design-tokens/src/index.ts';
 
 async function createDefaultArchive() {
   try {
@@ -36,8 +36,15 @@ async function createDefaultArchive() {
 
     // Create required JSON files
     const requiredFiles = [
-      'colors.json', 'typography.json', 'spacing.json', 'motion.json',
-      'shadows.json', 'borders.json', 'breakpoints.json', 'layout.json', 'fonts.json'
+      'colors.json',
+      'typography.json',
+      'spacing.json',
+      'motion.json',
+      'shadows.json',
+      'borders.json',
+      'breakpoints.json',
+      'layout.json',
+      'fonts.json',
     ];
 
     for (const filename of requiredFiles) {
@@ -53,7 +60,7 @@ async function createDefaultArchive() {
     }
 
     console.log('Generating ZIP file...');
-    const content = await zip.generateAsync({type: 'nodebuffer'});
+    const content = await zip.generateAsync({ type: 'nodebuffer' });
 
     const outputPath = join(process.cwd(), 'apps/api/src/assets/rafters-000000.zip');
     mkdirSync(dirname(outputPath), { recursive: true });

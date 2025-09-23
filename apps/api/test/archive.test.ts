@@ -33,30 +33,31 @@ describe('/api/archive endpoint', () => {
   });
 
   describe('default system (000000)', () => {
-    it('should serve default archive response', async () => {
+    it('should return not implemented for default system', async () => {
       const response = await fetch(`${WORKER_URL}/api/archive/000000`);
 
-      expect(response.status).toBe(200);
-      expect(response.headers.get('Content-Type')).toBe('application/zip');
-      expect(response.headers.get('Content-Disposition')).toBe(
-        'attachment; filename="rafters-000000.zip"'
-      );
-      expect(response.headers.get('Cache-Control')).toBe('public, max-age=3600');
+      expect(response.status).toBe(501);
+      expect(response.headers.get('Content-Type')).toContain('application/json');
 
-      // Verify we get a response (fallback JSON for now)
-      const arrayBuffer = await response.arrayBuffer();
-      expect(arrayBuffer.byteLength).toBeGreaterThan(10);
+      const data = (await response.json()) as { error: string; message: string; sqid: string; requiredFiles: string[] };
+      expect(data.error).toBe('Archive generation not available');
+      expect(data.message).toContain('ZIP generation not supported');
+      expect(data.sqid).toBe('000000');
+      expect(data.requiredFiles).toHaveLength(10);
     });
 
-    it('should serve consistent archive content', async () => {
+    it('should return consistent not implemented response', async () => {
       const response1 = await fetch(`${WORKER_URL}/api/archive/000000`);
       const response2 = await fetch(`${WORKER_URL}/api/archive/000000`);
 
-      const buffer1 = await response1.arrayBuffer();
-      const buffer2 = await response2.arrayBuffer();
+      expect(response1.status).toBe(501);
+      expect(response2.status).toBe(501);
 
-      // Archives should be identical (deterministic generation)
-      expect(buffer1.byteLength).toBe(buffer2.byteLength);
+      const data1 = await response1.json() as { sqid: string; error: string };
+      const data2 = await response2.json() as { sqid: string; error: string };
+
+      expect(data1.sqid).toBe(data2.sqid);
+      expect(data1.error).toBe(data2.error);
     });
   });
 
@@ -104,10 +105,11 @@ describe('/api/archive endpoint', () => {
       );
     });
 
-    it('should set appropriate cache headers for default archive', async () => {
+    it('should return JSON response for default archive', async () => {
       const response = await fetch(`${WORKER_URL}/api/archive/000000`);
 
-      expect(response.headers.get('Cache-Control')).toBe('public, max-age=3600');
+      expect(response.status).toBe(501);
+      expect(response.headers.get('Content-Type')).toContain('application/json');
     });
   });
 });
