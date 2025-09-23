@@ -110,6 +110,11 @@ export class GenerationRuleParser {
       throw new Error(`Unclosed bracket in calc expression: ${expression}`);
     }
 
+    // Check for empty braces {} which are invalid
+    if (expression.includes('{}')) {
+      throw new Error(`Empty token reference in calc expression: ${expression}`);
+    }
+
     // Extract tokens wrapped in {}
     const tokenMatches = expression.match(/\{([^}]+)\}/g);
     if (tokenMatches) {

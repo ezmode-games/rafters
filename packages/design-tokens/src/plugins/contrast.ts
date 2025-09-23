@@ -142,7 +142,7 @@ export default function contrast(
       // Fallback to standard positions
       return {
         family: neutralFamily,
-        position: basePosition < 5 ? '900' : '100', // Dark text for light backgrounds, light text for dark
+        position: basePosition <= 5 ? '900' : '100', // Dark text for light backgrounds, light text for dark
       };
     }
   }
@@ -150,6 +150,6 @@ export default function contrast(
   // Last resort: Use same family with high contrast position
   return {
     family: familyTokenName,
-    position: basePosition < 5 ? '900' : '100',
+    position: basePosition <= 5 ? '900' : '100',
   };
 }
