@@ -6,13 +6,7 @@ const { ensureDirSync, writeFileSync, existsSync } = fs;
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import {
-  checkTailwindVersion,
-  fetchStudioTokens,
-  generateAllTokens,
-  injectCSSImport,
-  writeTokenFiles,
-} from '@rafters/design-tokens';
+import { checkTailwindVersion, createEventDrivenTokenRegistry } from '@rafters/design-tokens';
 import {
   type Config,
   configExists,
@@ -191,33 +185,21 @@ export async function initCommand(options: { yes?: boolean; config?: string } = 
     packageManager: answers.packageManager as 'npm' | 'yarn' | 'pnpm',
   };
 
-  // Get design tokens from Studio or create default
-  let tokenSet: Awaited<ReturnType<typeof fetchStudioTokens>>;
-  if (answers.studioShortcode) {
-    const tokenSpinner = ora('Fetching tokens from Studio...').start();
-    try {
-      tokenSet = await fetchStudioTokens(answers.studioShortcode);
-      tokenSpinner.succeed('Studio tokens loaded');
-    } catch (error) {
-      tokenSpinner.warn(
-        `Failed to fetch Studio tokens: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
-      // Generate default tokens using generators
-      const tokens = await generateAllTokens();
-      tokenSet = {
-        id: 'default',
-        name: 'Generated Design System',
-        tokens,
-      };
-    }
-  } else {
-    // Generate default tokens using generators
-    const tokens = await generateAllTokens();
-    tokenSet = {
-      id: 'default',
-      name: 'Generated Design System',
-      tokens,
-    };
+  // Create event-driven registry with auto-initialization and real-time CSS generation
+  const registrySpinner = ora('Initializing design system registry...').start();
+  try {
+    const tokensPath = join(cwd, '.rafters', 'tokens');
+    const shortcode = answers.studioShortcode || '000000';
+
+    // Registry handles everything: archive unpacking, token loading, callback setup
+    await createEventDrivenTokenRegistry(tokensPath, shortcode);
+
+    registrySpinner.succeed('Registry initialized with real-time CSS generation');
+  } catch (error) {
+    registrySpinner.fail(
+      `Registry initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+    throw error;
   }
 
   // Check if we're in test mode
@@ -345,15 +327,18 @@ export function cn(...inputs: ClassValue[]) {
       }
     }
 
-    // Write design tokens and registry
-    await writeTokenFiles(tokenSet, answers.tokenFormat, cwd);
+    // Registry already generated CSS during initialization with real-time callbacks
+    // The CSS file is automatically maintained at .rafters/tokens.css
 
     // Install complete design system CSS
     if (answers.tokenFormat === 'css' || answers.tokenFormat === 'tailwind') {
-      const cssResult = await injectCSSImport(config.cssFile ?? '', cwd);
+      const cssPath = join(cwd, '.rafters', 'tokens.css');
 
-      if (cssResult.action === 'replaced' && cssResult.backupPath) {
-        console.log(`Backed up existing ${config.cssFile} to ${cssResult.backupPath}`);
+      if (existsSync(cssPath)) {
+        console.log('✅ Design system CSS ready at .rafters/tokens.css');
+        console.log('💡 Real-time CSS regeneration is now active');
+      } else {
+        console.warn('⚠️  CSS file not found - registry may not have initialized properly');
       }
     }
 

@@ -19,6 +19,8 @@ import { z } from 'zod';
 
 // Export archive management
 export { DesignSystemArchive, fetchArchive } from './archive.js';
+// Export callback implementations
+export { createLocalCSSCallback } from './callbacks/local-css-callback.js';
 // Export dependency tracking system - temporarily disabled for ES module issues
 // export type { TokenDependency } from './dependencies';
 // export { TokenDependencyGraph } from './dependencies';
@@ -33,6 +35,16 @@ export {
 export { exportToTailwindV4Complete } from './exporters/tailwind-v4.js';
 // Export core TokenRegistry class
 export { TokenRegistry } from './registry.js';
+// Export registry factory with self-initialization
+export { createEventDrivenTokenRegistry } from './registry-factory.js';
+// Export event types
+export type {
+  RegistryChangeCallback,
+  RegistryEvent,
+  RegistryInitializedEvent,
+  TokenChangeEvent,
+  TokensBatchChangeEvent,
+} from './types/events.js';
 
 // Import for internal use
 import { TokenRegistry } from './registry.js';
@@ -92,8 +104,7 @@ export function tokenValueToCss(value: string | ColorValue | ColorReference): st
     return value.value;
   }
 
-  // Final fallback
-  console.warn('Unable to extract CSS value from ColorValue:', value);
+  // Final fallback - return transparent for unparseable values
   return 'transparent';
 }
 
@@ -687,8 +698,7 @@ export const createRegistry = (tokensDir: string): TokenSet => {
       name: 'Generated Token Registry',
       tokens,
     };
-  } catch (error) {
-    console.warn('Failed to read token files, using minimal fallback:', error);
+  } catch (_error) {
     // Minimal fallback if token files can't be read
     return {
       id: 'fallback',
@@ -735,8 +745,6 @@ export const fetchStudioTokens = async (
   shortcode: string,
   tokensDir?: string
 ): Promise<TokenSet> => {
-  console.log(`Fetching tokens for shortcode: ${shortcode}`);
-
   // In real implementation, would fetch and parse DesignSystem from API
   // For now, if we have a tokens directory, read from it; otherwise throw error
   if (tokensDir && existsSync(tokensDir)) {
@@ -879,8 +887,6 @@ export const writeTokenFiles = async (
   format: string,
   cwd: string
 ): Promise<void> => {
-  console.log(`Writing ${format} tokens for ${tokenSet.name} to ${cwd}`);
-
   // Import all generators and create complete token set
   const { generateAllTokens } = await import('./generators/index');
   const allTokens = await generateAllTokens();
@@ -949,14 +955,7 @@ export const writeTokenFiles = async (
     const cssContent = generateCSSFromTokens(allTokens);
     const cssFile = join(raftersDir, 'design-tokens.css');
     writeFileSync(cssFile, cssContent);
-    console.log(`  ✓ Generated design-tokens.css with ${format} format`);
   }
-
-  console.log(`  ✓ Generated ${allTokens.length} design tokens for Studio`);
-  console.log(
-    `  ✓ Created ${Object.keys(tokensByCategory).length} category files in .rafters/tokens/`
-  );
-  console.log('  ✓ Generated registry.json with AI intelligence metadata');
 };
 
 /**
@@ -1215,8 +1214,6 @@ export const regenerateCSS = async (cwd: string = process.cwd()): Promise<void> 
 
   // Write tokens to CSS file using configured format
   await writeTokenFiles(tokenSet, config.tokenFormat || 'tailwind', cwd);
-
-  console.log('CSS regenerated from .rafters/tokens/ JSON files including dark mode values');
 };
 
 // Export for CLI compatibility
