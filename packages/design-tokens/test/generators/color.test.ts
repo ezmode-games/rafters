@@ -73,8 +73,8 @@ const mockColorValue: ColorValue = {
   accessibility: {
     wcagAA: { normal: [[]], large: [[]] },
     wcagAAA: { normal: [[]], large: [[]] },
-    onWhite: { wcagAA: true, contrastRatio: 7.2, aa: [] },
-    onBlack: { wcagAA: true, contrastRatio: 4.8, aa: [] },
+    onWhite: { wcagAA: true, wcagAAA: false, contrastRatio: 7.2, aa: [], aaa: [] },
+    onBlack: { wcagAA: true, wcagAAA: false, contrastRatio: 4.8, aa: [], aaa: [] },
   },
   analysis: { temperature: 'cool', isLight: false, name: 'test-color' },
   atmosphericWeight: { distanceWeight: 0.4, temperature: 'cool', atmosphericRole: 'midground' },
