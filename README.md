@@ -131,6 +131,21 @@ rafters/
 
 **Distribution Model**: Design systems ship as ZIP archives (SQIDs - System Quality Intelligence Distributions). One file contains your entire design intelligence. Version controlled. Cryptographically signed.
 
+## Component Library
+
+Rafters includes 18+ production-ready components spanning the full interface spectrum:
+
+**Basic Elements**: Badge, Chip
+**Forms**: Input, Label, Select, Slider
+**Layout**: Container, Grid, Sidebar
+**Navigation**: Breadcrumb, Tabs
+**Feedback**: Toast, Progress, Tooltip
+**Overlays**: Dialog
+**Interactive**: Button, Card
+**Branding**: RaftersLogo
+
+Each component includes embedded cognitive load metadata, accessibility requirements, and trust-building patterns. AI agents understand not just what each component does, but when and how to use it appropriately.
+
 ## Getting Started
 
 ```bash
@@ -147,7 +162,7 @@ npx rafters mcp
 npx rafters studio
 ```
 
-That's it. You now have a mathematically-sound, AI-readable design system. Components work immediately with grayscale defaults. Run Studio later to add your brand personality.
+That's it. You now have a mathematically-sound, AI-readable design system with 18+ components that work immediately with grayscale defaults. Run Studio later to add your brand personality.
 
 ## For AI Agents
 
