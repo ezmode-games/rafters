@@ -172,17 +172,24 @@ describe('Generator Module', () => {
     it('should include atmospheric and perceptual weights', () => {
       const result = generateColorValue(red);
 
-      expect(typeof result.atmosphericWeight).toBe('number');
-      expect(typeof result.perceptualWeight).toBe('number');
-      expect(result.atmosphericWeight).toBeGreaterThanOrEqual(0);
-      expect(result.perceptualWeight).toBeGreaterThanOrEqual(0);
+      expect(typeof result.atmosphericWeight).toBe('object');
+      expect(typeof result.perceptualWeight).toBe('object');
+      expect(result.atmosphericWeight).toHaveProperty('distanceWeight');
+      expect(result.perceptualWeight).toHaveProperty('weight');
+      expect(result.atmosphericWeight.distanceWeight).toBeGreaterThanOrEqual(0);
+      expect(result.perceptualWeight.weight).toBeGreaterThanOrEqual(0);
     });
 
     it('should include semantic suggestions', () => {
       const result = generateColorValue(blue);
 
       expect(result.semanticSuggestions).toBeDefined();
-      expect(Array.isArray(result.semanticSuggestions)).toBe(true);
+      expect(typeof result.semanticSuggestions).toBe('object');
+      expect(result.semanticSuggestions).toHaveProperty('danger');
+      expect(result.semanticSuggestions).toHaveProperty('success');
+      expect(result.semanticSuggestions).toHaveProperty('warning');
+      expect(result.semanticSuggestions).toHaveProperty('info');
+      expect(Array.isArray(result.semanticSuggestions.danger)).toBe(true);
     });
   });
 
