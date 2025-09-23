@@ -33,6 +33,12 @@ export {
 export { exportToTailwindV4Complete } from './exporters/tailwind-v4.js';
 // Export core TokenRegistry class
 export { TokenRegistry } from './registry.js';
+// Export registry factory with self-initialization
+export { createEventDrivenTokenRegistry } from './registry-factory.js';
+// Export event types
+export type { RegistryEvent, RegistryChangeCallback, TokenChangeEvent, TokensBatchChangeEvent, RegistryInitializedEvent } from './types/events.js';
+// Export callback implementations
+export { createLocalCSSCallback } from './callbacks/local-css-callback.js';
 
 // Import for internal use
 import { TokenRegistry } from './registry.js';

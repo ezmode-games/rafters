@@ -9,6 +9,7 @@
 import type { Token } from '@rafters/shared';
 import { TokenDependencyGraph } from './dependencies';
 import { GenerationRuleExecutor, GenerationRuleParser } from './generation-rules';
+import type { RegistryChangeCallback, TokenChangeEvent } from './types/events.js';
 
 // Helper function to convert token values to CSS (simple inline implementation)
 
@@ -23,6 +24,7 @@ export class TokenRegistry {
   public dependencyGraph: TokenDependencyGraph = new TokenDependencyGraph();
   private ruleParser = new GenerationRuleParser();
   private ruleExecutor = new GenerationRuleExecutor(this);
+  private changeCallback?: RegistryChangeCallback;
 
   constructor(initialTokens?: Token[]) {
     if (initialTokens) {
@@ -71,19 +73,99 @@ export class TokenRegistry {
     return this.tokens.get(tokenName);
   }
 
-  async set(tokenName: string, value: string): Promise<void> {
-    const existingToken = this.tokens.get(tokenName);
+  /**
+   * Set change callback for real-time notifications
+   */
+  setChangeCallback(callback: RegistryChangeCallback): void {
+    this.changeCallback = callback;
+  }
+
+  /**
+   * Update a single token and fire change event
+   */
+  updateToken(name: string, value: string): void {
+    const oldValue = this.tokens.get(name)?.value;
+    const existingToken = this.tokens.get(name);
+    
     if (!existingToken) {
-      throw new Error(`Token "${tokenName}" does not exist. Cannot update non-existent token.`);
+      throw new Error(`Token "${name}" does not exist. Cannot update non-existent token.`);
     }
 
-    // Update only the value field, preserve all metadata
+    // Update the token
     const updatedToken: Token = {
       ...existingToken,
       value,
     };
 
-    this.tokens.set(tokenName, updatedToken);
+    this.tokens.set(name, updatedToken);
+
+    // Fire change callback
+    if (this.changeCallback) {
+      this.changeCallback({
+        type: 'token-changed',
+        tokenName: name,
+        oldValue,
+        newValue: value,
+        timestamp: Date.now()
+      });
+    }
+  }
+
+  /**
+   * Update multiple tokens efficiently and fire batch change event
+   */
+  updateMultipleTokens(updates: Array<{name: string, value: string}>): void {
+    const changes: TokenChangeEvent[] = [];
+    
+    for (const {name, value} of updates) {
+      const oldValue = this.tokens.get(name)?.value;
+      const existingToken = this.tokens.get(name);
+      
+      if (!existingToken) {
+        throw new Error(`Token "${name}" does not exist. Cannot update non-existent token.`);
+      }
+
+      const updatedToken: Token = {
+        ...existingToken,
+        value,
+      };
+
+      this.tokens.set(name, updatedToken);
+      
+      changes.push({
+        type: 'token-changed',
+        tokenName: name,
+        oldValue,
+        newValue: value,
+        timestamp: Date.now()
+      });
+    }
+    
+    if (this.changeCallback) {
+      this.changeCallback({
+        type: 'tokens-batch-changed',
+        changes,
+        timestamp: Date.now()
+      });
+    }
+  }
+
+  /**
+   * Fire registry initialized event
+   */
+  initializeRegistry(tokenCount: number): void {
+    if (this.changeCallback) {
+      this.changeCallback({
+        type: 'registry-initialized',
+        tokenCount,
+        timestamp: Date.now()
+      });
+    }
+  }
+
+  async set(tokenName: string, value: string): Promise<void> {
+    // Use updateToken for consistency and event firing
+    this.updateToken(tokenName, value);
 
     // Regenerate all dependent tokens
     await this.regenerateDependents(tokenName);
