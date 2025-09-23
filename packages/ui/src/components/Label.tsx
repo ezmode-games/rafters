@@ -1,44 +1,37 @@
 /**
- * Form label component with semantic variants and accessibility associations
+ * Text label component for form fields and descriptions
  *
- * @registry-name label
- * @registry-version 0.1.0
- * @registry-status published
- * @registry-path components/ui/Label.tsx
- * @registry-type registry:component
+ * @registryName label
+ * @registryVersion 0.1.0
+ * @registryStatus published
+ * @registryPath components/ui/Label.tsx
+ * @registryType registry:component
  *
- * @cognitive-load 2/10 - Provides clarity and reduces interpretation effort
- * @attention-economics Information hierarchy: field=required label, hint=helpful guidance, error=attention needed
- * @trust-building Clear requirement indication, helpful hints, non-punitive error messaging
- * @accessibility Form association, screen reader optimization, color-independent error indication
- * @semantic-meaning Variant meanings: field=input association, hint=guidance, error=validation feedback, success=confirmation
+ * @cognitiveLoad 1/10 - Simple text labels provide clear context with minimal mental effort
+ * @attentionEconomics Supportive element - provides context without competing for primary attention
+ * @trustBuilding Clear requirement indication and helpful guidance build user confidence
+ * @accessibility WCAG AAA compliant with proper form associations and screen reader support
+ * @semanticMeaning Required indicators and validation states communicate form field requirements
  *
- * @usage-patterns
- * DO: Always associate with input using htmlFor/id
- * DO: Use importance levels to guide user attention
- * DO: Provide visual and semantic marking for required fields
- * DO: Adapt styling based on form vs descriptive context
- * NEVER: Orphaned labels, unclear or ambiguous text, missing required indicators
+ * @usagePatterns
+ * DO: Always associate with inputs using htmlFor/id attributes
+ * DO: Clearly indicate required fields with visual markers
+ * DO: Use appropriate importance levels for information hierarchy
+ * NEVER: Orphaned labels without form associations or unclear text
  *
- * @design-guides
- * - Typography Intelligence: https://rafters.realhandy.tech/docs/llm/typography-intelligence
- * - Cognitive Load: https://rafters.realhandy.tech/docs/llm/cognitive-load
- * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
+ * @designGuides
+ * - Trust Building: https://rafters.realhandy.tech/docs/foundation/trust-building
+ * - Cognitive Load: https://rafters.realhandy.tech/docs/foundation/cognitive-load
  *
  * @dependencies @radix-ui/react-label
  *
  * @example
  * ```tsx
- * // Form label with required indication
+ * // Required field with clear association
  * <Label htmlFor="email" required>
  *   Email Address
  * </Label>
  * <Input id="email" type="email" />
- *
- * // Label with validation state
- * <Label variant="error" htmlFor="password">
- *   Password (required)
- * </Label>
  * ```
  */
 import * as LabelPrimitive from '@radix-ui/react-label';

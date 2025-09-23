@@ -1,42 +1,37 @@
 /**
- * Form input component with validation states and accessibility
+ * Text input component for data collection
  *
- * @registry-name input
- * @registry-version 0.1.0
- * @registry-status published
- * @registry-path components/ui/Input.tsx
- * @registry-type registry:component
+ * @registryName input
+ * @registryVersion 0.1.0
+ * @registryStatus published
+ * @registryPath components/ui/Input.tsx
+ * @registryType registry:component
  *
- * @cognitive-load 4/10 - Data entry with validation feedback requires user attention
- * @attention-economics State hierarchy: default=ready, focus=active input, error=requires attention, success=validation passed
- * @trust-building Clear validation feedback, error recovery patterns, progressive enhancement
- * @accessibility Screen reader labels, validation announcements, keyboard navigation, high contrast support
- * @semantic-meaning Type-appropriate validation: email=format validation, password=security indicators, number=range constraints
+ * @cognitiveLoad 2/10 - Simple data entry with clear expectations
+ * @attentionEconomics Secondary priority - should not compete with primary actions
+ * @trustBuilding Immediate validation feedback builds user confidence. Clear error states prevent confusion
+ * @accessibility WCAG AAA compliant with proper labeling, keyboard navigation, and screen reader support
+ * @semanticMeaning Variants indicate data type and validation requirements
  *
- * @usage-patterns
- * DO: Always pair with descriptive Label component
- * DO: Use helpful placeholders showing format examples
- * DO: Provide real-time validation for user confidence
- * DO: Use appropriate input types for sensitive data
- * NEVER: Label-less inputs, validation only on submit, unclear error messages
+ * @usagePatterns
+ * DO: Always pair with descriptive labels
+ * DO: Provide helpful placeholder examples showing expected format
+ * DO: Immediate validation feedback for user confidence
+ * NEVER: Label-less inputs or validation only on submit
  *
- * @design-guides
- * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
- * - Typography Intelligence: https://rafters.realhandy.tech/docs/llm/typography-intelligence
- * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
+ * @designGuides
+ * - Trust Building: https://rafters.realhandy.tech/docs/foundation/trust-building
+ * - Cognitive Load: https://rafters.realhandy.tech/docs/foundation/cognitive-load
  *
- * @dependencies none
+ * @dependencies None
  *
  * @example
  * ```tsx
- * // Basic input with validation
- * <Input variant="error" validationMessage="Required field" showValidation />
+ * // Standard text input with proper labeling
+ * <Input type="email" placeholder="user@example.com" />
  *
- * // Sensitive data input
- * <Input type="password" sensitive />
- *
- * // Real-time validation
- * <Input validationMode="live" variant="success" />
+ * // Error state with validation feedback
+ * <Input type="email" error="Please enter a valid email address" />
  * ```
  */
 import { cn } from '../lib/utils';

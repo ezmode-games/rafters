@@ -1,43 +1,35 @@
 /**
  * Layout container component for content width control and semantic structure
  *
- * @registry-name container
- * @registry-version 0.1.0
- * @registry-status published
- * @registry-path components/ui/Container.tsx
- * @registry-type registry:component
+ * @registryName container
+ * @registryVersion 0.1.0
+ * @registryStatus published
+ * @registryPath components/ui/Container.tsx
+ * @registryType registry:component
  *
- * @cognitive-load 0/10 - Invisible structure that reduces visual complexity
- * @attention-economics Neutral structural element: Controls content width and breathing room without competing for attention
- * @trust-building Predictable boundaries and consistent spacing patterns
+ * @cognitiveLoad 0/10 - Invisible structure that reduces visual complexity
+ * @attentionEconomics Neutral structural element that controls content width and breathing room without competing for attention
+ * @trustBuilding Predictable boundaries and consistent spacing patterns build familiarity
  * @accessibility Semantic HTML elements with proper landmark roles for screen readers
- * @semantic-meaning Content width control and semantic structure: main=primary content, section=grouped content, article=standalone content
+ * @semanticMeaning Content width control variants indicate content types and optimal reading experiences
  *
- * @usage-patterns
- * DO: Use padding prop for internal breathing room
- * DO: Control content boundaries with max-w-* classes
- * DO: Apply semantic structure with as="main|section|article"
- * DO: Maintain predictable component boundaries
- * NEVER: Use margins for content spacing (use padding instead)
- * NEVER: Unnecessarily nest containers or use fixed widths
+ * @usagePatterns
+ * DO: Use semantic HTML elements for proper document structure
+ * DO: Control content boundaries with responsive max-width utilities
+ * DO: Apply appropriate padding for content breathing room
+ * NEVER: Use margins for content spacing, unnecessarily nest containers
  *
- * @design-guides
- * - Negative Space: https://rafters.realhandy.tech/docs/llm/negative-space
- * - Typography Intelligence: https://rafters.realhandy.tech/docs/llm/typography-intelligence
- * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
+ * @designGuides
+ * - Negative Space: https://rafters.realhandy.tech/docs/foundation/negative-space
+ * - Attention Economics: https://rafters.realhandy.tech/docs/foundation/attention-economics
  *
- * @dependencies none
+ * @dependencies None
  *
  * @example
  * ```tsx
- * // Basic container with semantic structure
- * <Container as="main" padding="comfortable">
+ * // Semantic main content container
+ * <Container as="main" size="5xl" padding="8">
  *   Main page content
- * </Container>
- *
- * // Article container with prose styling
- * <Container as="article" variant="prose">
- *   Long form content with optimal reading width
  * </Container>
  * ```
  */

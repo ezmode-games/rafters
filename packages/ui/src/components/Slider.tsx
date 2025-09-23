@@ -1,49 +1,37 @@
 /**
- * Range slider component with precise value selection and accessibility features
+ * Range slider component for value selection with precise control
  *
- * @registry-name slider
- * @registry-version 0.1.0
- * @registry-status published
- * @registry-path components/ui/Slider.tsx
- * @registry-type registry:component
+ * @registryName slider
+ * @registryVersion 0.1.0
+ * @registryStatus published
+ * @registryPath components/ui/Slider.tsx
+ * @registryType registry:component
  *
- * @cognitive-load 3/10 - Value selection with immediate visual feedback
- * @attention-economics Value communication: visual track, precise labels, immediate feedback
- * @trust-building Immediate visual feedback, undo capability, clear value indication
- * @accessibility Keyboard increment/decrement, screen reader value announcements, touch-friendly handles
- * @semantic-meaning Range contexts: settings=configuration, filters=data selection, controls=media/volume
+ * @cognitiveLoad 3/10 - Visual value selection with immediate feedback
+ * @attentionEconomics Clear value communication with visual track and precise indicators
+ * @trustBuilding Immediate visual feedback and clear value indication build user confidence
+ * @accessibility WCAG AAA compliant with keyboard controls and screen reader support
+ * @semanticMeaning Range selection for settings, filters, and media controls
  *
- * @usage-patterns
- * DO: Show current value and units for clarity
- * DO: Use large thumb size for mobile and accessibility
- * DO: Provide visual markers for discrete value ranges
- * DO: Give immediate feedback with real-time updates
- * NEVER: Invisible ranges, unclear min/max values, tiny touch targets
+ * @usagePatterns
+ * DO: Show current values with appropriate units for clarity
+ * DO: Use accessible thumb sizes for precise control
+ * DO: Provide immediate visual feedback on value changes
+ * NEVER: Use unclear ranges or inadequate touch targets
  *
- * @design-guides
- * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
- * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
- * - Cognitive Load: https://rafters.realhandy.tech/docs/llm/cognitive-load
+ * @designGuides
+ * - Trust Building: https://rafters.realhandy.tech/docs/foundation/trust-building
+ * - Cognitive Load: https://rafters.realhandy.tech/docs/foundation/cognitive-load
  *
  * @dependencies @radix-ui/react-slider
  *
  * @example
  * ```tsx
- * // Basic slider with value display
- * <Slider
- *   defaultValue={[50]}
- *   max={100}
- *   step={1}
- *   className="w-full"
- * />
+ * // Value slider with display
+ * <Slider defaultValue={[50]} max={100} step={1} showValue />
  *
- * // Range slider with multiple handles
- * <Slider
- *   defaultValue={[25, 75]}
- *   max={100}
- *   step={5}
- *   className="w-full"
- * />
+ * // Range selection slider
+ * <Slider defaultValue={[25, 75]} max={100} step={5} />
  * ```
  */
 import * as SliderPrimitive from '@radix-ui/react-slider';

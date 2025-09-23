@@ -1,47 +1,40 @@
 /**
- * Tabbed interface component with keyboard navigation and ARIA compliance
+ * Tabbed interface component for organizing related content
  *
- * @registry-name tabs
- * @registry-version 0.1.0
- * @registry-status published
- * @registry-path components/ui/Tabs.tsx
- * @registry-type registry:component
+ * @registryName tabs
+ * @registryVersion 0.1.0
+ * @registryStatus published
+ * @registryPath components/ui/Tabs.tsx
+ * @registryType registry:component
  *
- * @cognitive-load 4/10 - Content organization with state management requires cognitive processing
- * @attention-economics Content organization: visible=current context, hidden=available contexts, active=user focus
- * @trust-building Persistent selection, clear active indication, predictable navigation patterns
- * @accessibility Arrow key navigation, tab focus management, panel association, screen reader support
- * @semantic-meaning Structure: tablist=navigation, tab=option, tabpanel=content, selected=current view
+ * @cognitiveLoad 3/10 - Content organization with clear navigation patterns
+ * @attentionEconomics Focused content display with clear active state indication
+ * @trustBuilding Persistent selection and predictable navigation patterns
+ * @accessibility WCAG AAA compliant with keyboard navigation and screen reader support
+ * @semanticMeaning Organizes related content into distinct, navigable sections
  *
- * @usage-patterns
- * DO: Use for related content showing different views of same data/context
- * DO: Provide clear, descriptive, scannable tab names (7±2 maximum)
- * DO: Make active state visually prominent and immediately clear
- * DO: Arrange tabs by frequency or logical workflow sequence
- * NEVER: More than 7 tabs, unrelated content sections, unclear active state
+ * @usagePatterns
+ * DO: Use for related content showing different views of the same context
+ * DO: Limit to 7 or fewer tabs for optimal cognitive load
+ * DO: Make active state visually prominent and clear
+ * NEVER: Use for unrelated content sections or unclear navigation
  *
- * @design-guides
- * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
- * - Cognitive Load: https://rafters.realhandy.tech/docs/llm/cognitive-load
- * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
+ * @designGuides
+ * - Attention Economics: https://rafters.realhandy.tech/docs/foundation/attention-economics
+ * - Cognitive Load: https://rafters.realhandy.tech/docs/foundation/cognitive-load
  *
  * @dependencies @radix-ui/react-tabs
  *
  * @example
  * ```tsx
- * // Basic tabs with content panels
+ * // Organized content tabs
  * <Tabs defaultValue="overview">
  *   <TabsList>
  *     <TabsTrigger value="overview">Overview</TabsTrigger>
  *     <TabsTrigger value="details">Details</TabsTrigger>
- *     <TabsTrigger value="settings">Settings</TabsTrigger>
  *   </TabsList>
- *   <TabsContent value="overview">
- *     Overview content
- *   </TabsContent>
- *   <TabsContent value="details">
- *     Details content
- *   </TabsContent>
+ *   <TabsContent value="overview">Overview content</TabsContent>
+ *   <TabsContent value="details">Details content</TabsContent>
  * </Tabs>
  * ```
  */

@@ -1,44 +1,39 @@
 /**
- * Navigation breadcrumb component for wayfinding and location context
+ * Navigation breadcrumb component for location context and wayfinding
  *
- * @registry-name breadcrumb
- * @registry-version 0.1.0
- * @registry-status published
- * @registry-path components/ui/Breadcrumb.tsx
- * @registry-type registry:component
+ * @registryName breadcrumb
+ * @registryVersion 0.1.0
+ * @registryStatus published
+ * @registryPath components/ui/Breadcrumb.tsx
+ * @registryType registry:component
  *
- * @cognitive-load 2/10 - Optimized for peripheral navigation aid with minimal cognitive overhead
- * @attention-economics Tertiary support: Never competes with primary content, provides spatial context only
- * @trust-building Low trust routine navigation with predictable, reliable wayfinding patterns
- * @accessibility Complete ARIA support with aria-current="page", aria-hidden separators, and keyboard navigation
- * @semantic-meaning Wayfinding system with spatial context and navigation hierarchy indication
+ * @cognitiveLoad 1/10 - Peripheral navigation aid with minimal cognitive overhead
+ * @attentionEconomics Tertiary support element that provides spatial context without competing for attention
+ * @trustBuilding Predictable wayfinding patterns build user confidence in navigation
+ * @accessibility WCAG AAA compliant with proper ARIA support and keyboard navigation
+ * @semanticMeaning Hierarchical navigation context showing user location within site structure
  *
- * @usage-patterns
- * DO: Provide spatial context and navigation hierarchy
- * DO: Use clear current page indication with aria-current="page"
- * DO: Implement truncation strategies for long paths (Miller's Law)
- * DO: Configure separators with proper accessibility attributes
- * NEVER: Use for primary actions, complex information, or critical alerts
+ * @usagePatterns
+ * DO: Provide clear navigation hierarchy and spatial context
+ * DO: Use appropriate separators for visual clarity
+ * DO: Implement truncation for long navigation paths
+ * NEVER: Use for primary actions or critical information
  *
- * @design-guides
- * - Wayfinding Intelligence: https://rafters.realhandy.tech/docs/llm/wayfinding-intelligence
- * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
- * - Navigation Integration: https://rafters.realhandy.tech/docs/llm/navigation-integration
+ * @designGuides
+ * - Attention Economics: https://rafters.realhandy.tech/docs/foundation/attention-economics
+ * - Navigation Patterns: https://rafters.realhandy.tech/docs/foundation/navigation-patterns
  *
  * @dependencies lucide-react
  *
  * @example
  * ```tsx
- * // Basic breadcrumb with navigation
- * <Breadcrumb separator="chevron-right">
- *   <BreadcrumbItem href="/">Home</BreadcrumbItem>
- *   <BreadcrumbItem href="/products">Products</BreadcrumbItem>
- *   <BreadcrumbItem current>Product Detail</BreadcrumbItem>
- * </Breadcrumb>
- *
- * // Breadcrumb with truncation for long paths
- * <Breadcrumb maxItems={3} collapseFrom="middle">
- *   // Long navigation path automatically truncated
+ * // Navigation breadcrumb
+ * <Breadcrumb>
+ *   <BreadcrumbItem><BreadcrumbLink href="/">Home</BreadcrumbLink></BreadcrumbItem>
+ *   <BreadcrumbSeparator />
+ *   <BreadcrumbItem><BreadcrumbLink href="/products">Products</BreadcrumbLink></BreadcrumbItem>
+ *   <BreadcrumbSeparator />
+ *   <BreadcrumbItem><BreadcrumbPage>Details</BreadcrumbPage></BreadcrumbItem>
  * </Breadcrumb>
  * ```
  */

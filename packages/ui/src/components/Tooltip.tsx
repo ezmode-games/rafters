@@ -1,45 +1,33 @@
 /**
- * Contextual tooltip component with smart timing and accessibility
+ * Contextual tooltip component for supplementary information
  *
- * @registry-name tooltip
- * @registry-version 0.1.0
- * @registry-status published
- * @registry-path components/ui/Tooltip.tsx
- * @registry-type registry:component
+ * @registryName tooltip
+ * @registryVersion 0.1.0
+ * @registryStatus published
+ * @registryPath components/ui/Tooltip.tsx
+ * @registryType registry:component
  *
- * @cognitive-load 2/10 - Contextual help without interrupting user workflow
- * @attention-economics Non-intrusive assistance: Smart delays prevent accidental triggers while ensuring help availability
- * @trust-building Reliable contextual guidance that builds user confidence through progressive disclosure
- * @accessibility Keyboard navigation, screen reader support, focus management, escape key handling
- * @semantic-meaning Contextual assistance: help=functionality explanation, definition=terminology clarification, action=shortcuts and outcomes, status=system state
+ * @cognitiveLoad 1/10 - Contextual help that doesn't interrupt workflow
+ * @attentionEconomics Non-intrusive assistance with smart timing to prevent accidental triggers
+ * @trustBuilding Reliable contextual guidance builds user confidence through progressive disclosure
+ * @accessibility WCAG AAA compliant with keyboard navigation and screen reader support
+ * @semanticMeaning Provides contextual assistance and clarification without essential information
  *
- * @usage-patterns
- * DO: Explain functionality without overwhelming users
- * DO: Clarify terminology contextually when needed
- * DO: Show shortcuts and expected action outcomes
- * DO: Provide feedback on system state changes
+ * @usagePatterns
+ * DO: Explain functionality and provide helpful context
+ * DO: Show keyboard shortcuts and action outcomes
+ * DO: Clarify terminology when needed
  * NEVER: Include essential information that should be visible by default
  *
- * @design-guides
- * - Cognitive Load: https://rafters.realhandy.tech/docs/llm/cognitive-load
- * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
- * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
+ * @designGuides
+ * - Cognitive Load: https://rafters.realhandy.tech/docs/foundation/cognitive-load
+ * - Trust Building: https://rafters.realhandy.tech/docs/foundation/trust-building
  *
  * @dependencies @radix-ui/react-tooltip
  *
  * @example
  * ```tsx
- * // Basic tooltip with help text
- * <Tooltip>
- *   <TooltipTrigger asChild>
- *     <Button variant="ghost">Help</Button>
- *   </TooltipTrigger>
- *   <TooltipContent>
- *     Click to open the help documentation
- *   </TooltipContent>
- * </Tooltip>
- *
- * // Tooltip with keyboard shortcut
+ * // Helpful tooltip with context
  * <Tooltip>
  *   <TooltipTrigger asChild>
  *     <Button>Save</Button>

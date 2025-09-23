@@ -1,28 +1,27 @@
 /**
  * Interactive button component for user actions
  *
- * @registry-name button
- * @registry-version 0.1.0
- * @registry-status published
- * @registry-path components/ui/Button.tsx
- * @registry-type registry:component
+ * @registryName button
+ * @registryVersion 0.1.0
+ * @registryStatus published
+ * @registryPath components/ui/Button.tsx
+ * @registryType registry:component
  *
- * @cognitive-load 3/10 - Simple action trigger with clear visual hierarchy
- * @attention-economics Size hierarchy: sm=tertiary actions, md=secondary interactions, lg=primary calls-to-action. Primary variant commands highest attention - use sparingly (maximum 1 per section)
- * @trust-building Destructive actions require confirmation patterns. Loading states prevent double-submission. Visual feedback reinforces user actions.
+ * @cognitiveLoad 3/10 - Simple action trigger with clear visual hierarchy
+ * @attentionEconomics Size hierarchy: sm=tertiary, md=secondary, lg=primary. Primary variant commands highest attention - use sparingly (maximum 1 per section)
+ * @trustBuilding Destructive actions require confirmation patterns. Loading states prevent double-submission. Visual feedback reinforces user actions.
  * @accessibility WCAG AAA compliant with 44px minimum touch targets, high contrast ratios, and screen reader optimization
- * @semantic-meaning Variant mapping: primary=main actions, secondary=supporting actions, destructive=irreversible actions with safety patterns
+ * @semanticMeaning Variant mapping: primary=main actions, secondary=supporting actions, destructive=irreversible actions with safety patterns
  *
- * @usage-patterns
- * DO: Primary: Main user goal, maximum 1 per section
- * DO: Secondary: Alternative paths, supporting actions
- * DO: Destructive: Permanent actions, requires confirmation patterns
+ * @usagePatterns
+ * DO: Primary buttons for main user goal, maximum 1 per section
+ * DO: Secondary buttons for alternative paths, supporting actions
+ * DO: Destructive variant for permanent actions, requires confirmation patterns
  * NEVER: Multiple primary buttons competing for attention
  *
- * @design-guides
- * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
- * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
- * - Component Patterns: https://rafters.realhandy.tech/docs/llm/component-patterns
+ * @designGuides
+ * - Attention Economics: https://rafters.realhandy.tech/docs/foundation/attention-economics
+ * - Trust Building: https://rafters.realhandy.tech/docs/foundation/trust-building
  *
  * @dependencies @radix-ui/react-slot
  *
@@ -33,9 +32,6 @@
  *
  * // Destructive action - requires confirmation UX
  * <Button variant="destructive" destructiveConfirm>Delete Account</Button>
- *
- * // Loading state - prevents double submission
- * <Button loading>Processing...</Button>
  * ```
  */
 import { Slot } from '@radix-ui/react-slot';

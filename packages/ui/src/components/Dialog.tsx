@@ -1,41 +1,39 @@
 /**
- * Modal dialog component with focus management and escape patterns
+ * Modal dialog component for important user interactions
  *
- * @registry-name dialog
- * @registry-version 0.1.0
- * @registry-status published
- * @registry-path components/ui/Dialog.tsx
- * @registry-type registry:component
+ * @registryName dialog
+ * @registryVersion 0.1.0
+ * @registryStatus published
+ * @registryPath components/ui/Dialog.tsx
+ * @registryType registry:component
  *
- * @cognitive-load 6/10 - Interrupts user flow, requires decision making
- * @attention-economics Attention capture: modal=full attention, drawer=partial attention, popover=contextual attention
- * @trust-building Clear close mechanisms, confirmation for destructive actions, non-blocking for informational content
- * @accessibility Focus trapping, escape key handling, backdrop dismissal, screen reader announcements
- * @semantic-meaning Usage patterns: modal=blocking workflow, drawer=supplementary, alert=urgent information
+ * @cognitiveLoad 6/10 - Interrupts user flow and requires focused decision making
+ * @attentionEconomics Captures full user attention and blocks interaction with underlying content
+ * @trustBuilding Clear close mechanisms and confirmation patterns for important actions
+ * @accessibility WCAG AAA compliant with focus trapping, keyboard navigation, and screen reader support
+ * @semanticMeaning Modal interruption for important decisions, confirmations, and detailed interactions
  *
- * @usage-patterns
- * DO: Low trust - Quick confirmations, save draft (size=sm, minimal friction)
- * DO: Medium trust - Publish content, moderate consequences (clear context)
- * DO: High trust - Payments, significant impact (detailed explanation)
- * DO: Critical trust - Account deletion, permanent loss (progressive confirmation)
- * NEVER: Routine actions, non-essential interruptions
+ * @usagePatterns
+ * DO: Use for important confirmations and complex interactions
+ * DO: Provide clear close mechanisms and escape patterns
+ * DO: Size appropriately for content complexity
+ * NEVER: Use for routine actions or non-essential interruptions
  *
- * @design-guides
- * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
- * - Cognitive Load: https://rafters.realhandy.tech/docs/llm/cognitive-load
- * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
+ * @designGuides
+ * - Trust Building: https://rafters.realhandy.tech/docs/foundation/trust-building
+ * - Cognitive Load: https://rafters.realhandy.tech/docs/foundation/cognitive-load
  *
  * @dependencies @radix-ui/react-dialog
  *
  * @example
  * ```tsx
- * // Critical trust dialog with confirmation
+ * // Confirmation dialog
  * <Dialog>
  *   <DialogTrigger asChild>
- *     <Button variant="destructive">Delete Account</Button>
+ *     <Button variant="destructive">Delete Item</Button>
  *   </DialogTrigger>
- *   <DialogContent trustLevel="critical" destructive>
- *     <DialogTitle>Delete Account</DialogTitle>
+ *   <DialogContent>
+ *     <DialogTitle>Confirm Deletion</DialogTitle>
  *     <DialogDescription>This action cannot be undone.</DialogDescription>
  *   </DialogContent>
  * </Dialog>

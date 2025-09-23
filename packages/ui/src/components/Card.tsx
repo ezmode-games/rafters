@@ -1,47 +1,37 @@
 import { cn } from '../lib/utils';
 /**
- * Flexible container component for grouping related content with semantic structure
+ * Content container component for grouping related information
  *
- * @registry-name card
- * @registry-version 0.1.0
- * @registry-status published
- * @registry-path components/ui/Card.tsx
- * @registry-type registry:component
+ * @registryName card
+ * @registryVersion 0.1.0
+ * @registryStatus published
+ * @registryPath components/ui/Card.tsx
+ * @registryType registry:component
  *
- * @cognitive-load 2/10 - Simple container with clear boundaries and minimal cognitive overhead
- * @attention-economics Neutral container: Content drives attention, elevation hierarchy for interactive states
- * @trust-building Consistent spacing, predictable interaction patterns, clear content boundaries
- * @accessibility Proper heading structure, landmark roles, keyboard navigation for interactive cards
- * @semantic-meaning Structural roles: article=standalone content, section=grouped content, aside=supplementary information
+ * @cognitiveLoad 1/10 - Invisible structure that reduces cognitive complexity
+ * @attentionEconomics Creates content boundaries and visual breathing room, helps users scan and process information
+ * @trustBuilding Consistent grouping patterns build familiarity and reduce user confusion
+ * @accessibility Proper semantic structure with headings and landmarks for screen readers
+ * @semanticMeaning Variants indicate content importance and relationship hierarchy
  *
- * @usage-patterns
- * DO: Group related information with clear visual boundaries
- * DO: Create interactive cards with hover states and focus management
- * DO: Establish information hierarchy with header, content, actions
- * DO: Implement responsive scaling with consistent proportions
- * NEVER: Use decorative containers without semantic purpose
+ * @usagePatterns
+ * DO: Group related information together
+ * DO: Use different card styles to indicate content hierarchy
+ * DO: Create scannable layouts with clear content boundaries
+ * NEVER: Single items that don't benefit from grouping, excessive nesting
  *
- * @design-guides
- * - Content Grouping: https://rafters.realhandy.tech/docs/llm/content-grouping
- * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
- * - Spatial Relationships: https://rafters.realhandy.tech/docs/llm/spatial-relationships
+ * @designGuides
+ * - Negative Space: https://rafters.realhandy.tech/docs/foundation/negative-space
+ * - Attention Economics: https://rafters.realhandy.tech/docs/foundation/attention-economics
  *
- * @dependencies none
+ * @dependencies None
  *
  * @example
  * ```tsx
- * // Basic card with content structure
+ * // Basic content grouping
  * <Card>
- *   <CardHeader>
- *     <CardTitle>Card Title</CardTitle>
- *     <CardDescription>Supporting description</CardDescription>
- *   </CardHeader>
- *   <CardContent>
- *     Main card content
- *   </CardContent>
- *   <CardFooter>
- *     <Button>Action</Button>
- *   </CardFooter>
+ *   <CardHeader><CardTitle>User Profile</CardTitle></CardHeader>
+ *   <CardContent>Profile information...</CardContent>
  * </Card>
  * ```
  */

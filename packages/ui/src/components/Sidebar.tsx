@@ -1,40 +1,35 @@
 /**
- * Comprehensive navigation sidebar with embedded wayfinding intelligence and progressive disclosure patterns
+ * Navigation sidebar component with collapsible state management
  *
- * @registry-name sidebar
- * @registry-version 0.1.0
- * @registry-status published
- * @registry-path components/ui/Sidebar.tsx
- * @registry-type registry:component
+ * @registryName sidebar
+ * @registryVersion 0.1.0
+ * @registryStatus published
+ * @registryPath components/ui/Sidebar.tsx
+ * @registryType registry:component
  *
- * @cognitive-load 6/10 - Navigation system with state management and wayfinding intelligence
- * @attention-economics Secondary support system: Never competes with primary content, uses muted variants and compact sizing for attention hierarchy
- * @trust-building Spatial consistency builds user confidence, zustand state persistence remembers preferences, Miller's Law enforcement prevents cognitive overload
- * @accessibility WCAG AAA compliance with skip links, keyboard navigation, screen reader optimization, and motion sensitivity support
- * @semantic-meaning Navigation intelligence: Progressive disclosure for complex hierarchies, semantic grouping by domain, wayfinding through active state indication with zustand state machine
+ * @cognitiveLoad 4/10 - Navigation system with clear hierarchy and state management
+ * @attentionEconomics Secondary support element that provides navigation without competing for primary attention
+ * @trustBuilding Spatial consistency and predictable state persistence build user confidence
+ * @accessibility WCAG AAA compliant with keyboard navigation and screen reader support
+ * @semanticMeaning Navigation structure with progressive disclosure and semantic grouping
  *
- * @usage-patterns
- * DO: Use for main navigation with collapsible state management
- * DO: Implement progressive disclosure for complex menu hierarchies
- * DO: Provide skip links and keyboard navigation patterns
- * DO: Integrate with zustand store for state persistence
- * NEVER: Complex menu logic within sidebar - use dedicated menu components
- * NEVER: Compete with primary content for attention
+ * @usagePatterns
+ * DO: Use for main application navigation with clear hierarchy
+ * DO: Implement collapsible state for space efficiency
+ * DO: Provide clear active state indication for current location
+ * NEVER: Compete with primary content or create navigation complexity
  *
- * @design-guides
- * - Navigation Intelligence: https://rafters.realhandy.tech/docs/llm/navigation-patterns
- * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
- * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
+ * @designGuides
+ * - Navigation Patterns: https://rafters.realhandy.tech/docs/foundation/navigation-patterns
+ * - Attention Economics: https://rafters.realhandy.tech/docs/foundation/attention-economics
  *
- * @dependencies @rafters/design-tokens, zustand, zod, lucide-react, class-variance-authority, clsx
+ * @dependencies zustand
  *
  * @example
  * ```tsx
- * // Basic sidebar with navigation items
- * <Sidebar collapsed={false} collapsible>
- *   <SidebarHeader>
- *     <SidebarTitle>Navigation</SidebarTitle>
- *   </SidebarHeader>
+ * // Collapsible navigation sidebar
+ * <Sidebar collapsible>
+ *   <SidebarHeader><SidebarTitle>Menu</SidebarTitle></SidebarHeader>
  *   <SidebarContent>
  *     <SidebarItem href="/dashboard">Dashboard</SidebarItem>
  *     <SidebarItem href="/settings">Settings</SidebarItem>

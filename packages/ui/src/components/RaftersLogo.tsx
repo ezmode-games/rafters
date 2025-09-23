@@ -1,3 +1,39 @@
+/**
+ * Rafters brand logo component with semantic color variants
+ *
+ * @registryName rafters-logo
+ * @registryVersion 0.1.0
+ * @registryStatus published
+ * @registryPath components/ui/RaftersLogo.tsx
+ * @registryType registry:component
+ *
+ * @cognitiveLoad 1/10 - Simple brand recognition element with minimal cognitive overhead
+ * @attentionEconomics Brand element that establishes identity without competing for primary attention
+ * @trustBuilding Consistent brand presentation builds familiarity and system confidence
+ * @accessibility WCAG AAA compliant with proper title and semantic color handling
+ * @semanticMeaning Brand identity element with size and color variants for different contexts
+ *
+ * @usagePatterns
+ * DO: Use for brand identification in headers and navigation
+ * DO: Choose appropriate size for layout context
+ * DO: Use semantic color variants for theme consistency
+ * NEVER: Use as decorative element or in competing visual contexts
+ *
+ * @designGuides
+ * - Brand Guidelines: https://rafters.realhandy.tech/docs/foundation/brand-guidelines
+ * - Attention Economics: https://rafters.realhandy.tech/docs/foundation/attention-economics
+ *
+ * @dependencies None
+ *
+ * @example
+ * ```tsx
+ * // Header logo with standard sizing
+ * <RaftersLogo size="md" variant="light" />
+ *
+ * // Large logo for landing pages
+ * <RaftersLogo size="xl" variant="dark" />
+ * ```
+ */
 import type React from 'react';
 import { cn } from '../lib/utils';
 

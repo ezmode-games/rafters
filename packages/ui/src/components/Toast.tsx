@@ -1,48 +1,37 @@
 /**
  * Toast notification component for temporary user feedback
  *
- * @registry-name toast
- * @registry-version 0.1.0
- * @registry-status published
- * @registry-path components/ui/Toast.tsx
- * @registry-type registry:component
+ * @registryName toast
+ * @registryVersion 0.1.0
+ * @registryStatus published
+ * @registryPath components/ui/Toast.tsx
+ * @registryType registry:component
  *
- * @cognitive-load 2/10 - Non-blocking notification requiring brief attention
- * @attention-economics Temporary interruption: Must be dismissible and time-appropriate for message urgency
- * @trust-building Immediate feedback for user actions builds confidence and confirms system responsiveness
- * @accessibility Screen reader announcements, keyboard dismissal, high contrast variants
- * @semantic-meaning Notification types: success=confirmation, error=failure with recovery, warning=caution, info=neutral updates
+ * @cognitiveLoad 2/10 - Non-blocking notification requiring brief attention
+ * @attentionEconomics Temporary interruption with smart timing based on message urgency
+ * @trustBuilding Immediate feedback for user actions builds confidence and confirms system responsiveness
+ * @accessibility WCAG AAA compliant with screen reader announcements and keyboard dismissal
+ * @semanticMeaning Notification variants communicate action outcomes and system states
  *
- * @usage-patterns
- * DO: Confirm successful operations (save, delete, send)
- * DO: Provide error recovery with clear next steps for failures
- * DO: Auto-dismiss info toasts (4-6 seconds), require user dismiss for errors
- * DO: Use semantic variants with appropriate colors and icons
- * NEVER: Critical information that shouldn't disappear, multiple simultaneous toasts
+ * @usagePatterns
+ * DO: Confirm successful operations with auto-dismissing toasts
+ * DO: Provide error recovery guidance with manual dismissal
+ * DO: Use appropriate timing for message urgency
+ * NEVER: Critical information that shouldn't disappear or multiple simultaneous toasts
  *
- * @design-guides
- * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
- * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
- * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
+ * @designGuides
+ * - Trust Building: https://rafters.realhandy.tech/docs/foundation/trust-building
+ * - Attention Economics: https://rafters.realhandy.tech/docs/foundation/attention-economics
  *
- * @dependencies @radix-ui/react-toast, lucide-react
+ * @dependencies @radix-ui/react-toast
  *
  * @example
  * ```tsx
- * // Success toast with auto-dismiss
+ * // Success confirmation toast
  * toast({
  *   title: "Changes saved",
- *   description: "Your settings have been updated successfully.",
- *   variant: "success",
- *   duration: 4000
- * })
- *
- * // Error toast requiring user action
- * toast({
- *   title: "Upload failed",
- *   description: "Please check your connection and try again.",
- *   variant: "destructive",
- *   duration: null // Manual dismiss only
+ *   description: "Your settings have been updated.",
+ *   variant: "success"
  * })
  * ```
  */

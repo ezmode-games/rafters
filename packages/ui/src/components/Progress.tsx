@@ -5,46 +5,39 @@ import { cn } from '../lib/utils';
 import { Button } from './Button';
 
 /**
- * Progress indicator component with time estimation and completion intelligence
+ * Progress indicator component for task completion feedback
  *
- * @registry-name progress
- * @registry-version 0.1.0
- * @registry-status published
- * @registry-path components/ui/Progress.tsx
- * @registry-type registry:component
+ * @registryName progress
+ * @registryVersion 0.1.0
+ * @registryStatus published
+ * @registryPath components/ui/Progress.tsx
+ * @registryType registry:component
  *
- * @cognitive-load 4/10 - Moderate attention required for progress monitoring
- * @attention-economics Temporal attention: Holds user attention during wait states with clear progress indication
- * @trust-building Accurate progress builds user confidence, clear completion states and next steps
- * @accessibility Screen reader announcements, keyboard navigation, high contrast support
- * @semantic-meaning Progress communication: determinate=known duration, indeterminate=unknown duration, completed=finished state
+ * @cognitiveLoad 3/10 - Visual progress indication with optional time estimation
+ * @attentionEconomics Holds user attention during wait states with clear progress feedback
+ * @trustBuilding Accurate progress indication builds user confidence in system responsiveness
+ * @accessibility WCAG AAA compliant with screen reader announcements and keyboard navigation
+ * @semanticMeaning Progress variants communicate task completion states and estimated timing
  *
- * @usage-patterns
- * DO: Provide accurate progress indication with time estimation
- * DO: Use visual patterns that match task characteristics
+ * @usagePatterns
+ * DO: Provide accurate progress indication for long-running tasks
  * DO: Show clear completion states and next steps
- * DO: Optimize information density based on cognitive load
- * NEVER: Inaccurate progress bars, missing completion feedback, unclear time estimates
+ * DO: Use appropriate variants for different task types
+ * NEVER: Show inaccurate progress or misleading time estimates
  *
- * @design-guides
- * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
- * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
- * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
+ * @designGuides
+ * - Trust Building: https://rafters.realhandy.tech/docs/foundation/trust-building
+ * - Attention Economics: https://rafters.realhandy.tech/docs/foundation/attention-economics
  *
- * @dependencies @radix-ui/react-progress, class-variance-authority
+ * @dependencies @radix-ui/react-progress
  *
  * @example
  * ```tsx
- * // Determinate progress with percentage
+ * // Basic progress indicator
  * <Progress value={65} max={100} />
  *
- * // Progress with time estimation
- * <Progress
- *   value={30}
- *   max={100}
- *   showTimeRemaining
- *   estimatedTimeRemaining="2 minutes"
- * />
+ * // Progress with completion feedback
+ * <Progress value={100} completionMessage="Upload complete!" />
  * ```
  */
 

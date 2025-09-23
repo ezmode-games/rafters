@@ -39,17 +39,17 @@ function parseJSDocFromSource(content: string, filename: string): ComponentManif
 
     const comment = parsed[0];
 
-    // Extract registry metadata (kebab-case tags)
-    const registryName = findTagValue(comment.tags, 'registry-name');
-    const registryVersion = findTagValue(comment.tags, 'registry-version') || '0.1.0';
-    const registryPath = findTagValue(comment.tags, 'registry-path');
-    const registryType = findTagValue(comment.tags, 'registry-type') || 'registry:component';
+    // Extract registry metadata (camelCase tags)
+    const registryName = findTagValue(comment.tags, 'registryName');
+    const registryVersion = findTagValue(comment.tags, 'registryVersion') || '0.1.0';
+    const registryPath = findTagValue(comment.tags, 'registryPath');
+    const registryType = findTagValue(comment.tags, 'registryType') || 'registry:component';
 
     if (!registryName) {
       return null;
     }
 
-    // Extract intelligence metadata using camelCase tags
+    // Extract intelligence metadata (prioritize camelCase, fallback to kebab-case)
     const cognitiveLoadRaw =
       findTagValue(comment.tags, 'cognitiveLoad') || findTagValue(comment.tags, 'cognitive-load');
     const cognitiveLoad = parseCognitiveLoad(cognitiveLoadRaw);
@@ -151,7 +151,7 @@ function findTagValue(tags: Spec[], tagName: string): string | null {
   const tag = tags.find((t) => t.tag === tagName);
   if (!tag) return null;
 
-  // For simple tags like @registry-name container, the value is in 'name' field
+  // For simple tags like @registryName container, the value is in 'name' field
   // For complex tags with descriptions, the value is in 'description' field
   const value = tag.name?.trim() || tag.description?.trim() || '';
   return value || null;

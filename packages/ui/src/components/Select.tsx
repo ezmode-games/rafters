@@ -1,35 +1,33 @@
 /**
- * Dropdown selection component with search and accessibility features
+ * Dropdown selection component for choosing from multiple options
  *
- * @registry-name select
- * @registry-version 0.1.0
- * @registry-status published
- * @registry-path components/ui/Select.tsx
- * @registry-type registry:component
+ * @registryName select
+ * @registryVersion 0.1.0
+ * @registryStatus published
+ * @registryPath components/ui/Select.tsx
+ * @registryType registry:component
  *
- * @cognitive-load 5/10 - Option selection with search functionality requires cognitive processing
- * @attention-economics State management: closed=compact display, open=full options, searching=filtered results
- * @trust-building Search functionality, clear selection indication, undo patterns for accidental selections
- * @accessibility Keyboard navigation, screen reader announcements, focus management, option grouping
- * @semantic-meaning Option structure: value=data, label=display, group=categorization, disabled=unavailable choices
+ * @cognitiveLoad 4/10 - Choice selection requires processing but clear options reduce complexity
+ * @attentionEconomics Controlled disclosure - collapsed shows selection, expanded reveals all options
+ * @trustBuilding Clear selection indication, search functionality for large lists, confirmation of choices
+ * @accessibility WCAG AAA compliant with keyboard navigation, screen reader support, and proper focus management
+ * @semanticMeaning Variants indicate option types and selection states
  *
- * @usage-patterns
- * DO: Use 3-12 choices for optimal cognitive load
- * DO: Provide clear, descriptive option text
- * DO: Pre-select most common/safe option when appropriate
- * DO: Enable search for 8+ options to reduce cognitive load
- * NEVER: Too many options without grouping, unclear option descriptions
+ * @usagePatterns
+ * DO: Use for 3-12 options for optimal cognitive load
+ * DO: Provide clear, descriptive option labels
+ * DO: Enable search for lists with 8+ options
+ * NEVER: Unclear option descriptions or too many options without grouping
  *
- * @design-guides
- * - Cognitive Load: https://rafters.realhandy.tech/docs/llm/cognitive-load
- * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
- * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
+ * @designGuides
+ * - Cognitive Load: https://rafters.realhandy.tech/docs/foundation/cognitive-load
+ * - Trust Building: https://rafters.realhandy.tech/docs/foundation/trust-building
  *
- * @dependencies @radix-ui/react-select, @radix-ui/react-icons
+ * @dependencies @radix-ui/react-select
  *
  * @example
  * ```tsx
- * // Basic select with options
+ * // Basic selection with clear options
  * <Select>
  *   <SelectTrigger>
  *     <SelectValue placeholder="Choose option..." />

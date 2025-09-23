@@ -1,46 +1,36 @@
 /**
  * Notification chip component for status indicators and count overlays
  *
- * @registry-name chip
- * @registry-version 0.1.0
- * @registry-status published
- * @registry-path components/ui/Chip.tsx
- * @registry-type registry:component
+ * @registryName chip
+ * @registryVersion 0.1.0
+ * @registryStatus published
+ * @registryPath components/ui/Chip.tsx
+ * @registryType registry:component
  *
- * @cognitive-load 5/10 - High visibility overlay requiring immediate attention (varies by variant)
- * @attention-economics Secondary overlay with maximum visibility without overwhelming primary content
- * @trust-building Critical status and count information builds user awareness and system transparency
- * @accessibility High contrast indicators, screen reader announcements, keyboard navigation support
- * @semantic-meaning Status communication: count=quantity indication, status=state indication, badge=feature marking, dot=simple presence indicator
+ * @cognitiveLoad 4/10 - High visibility overlay designed for immediate attention
+ * @attentionEconomics Secondary overlay that maximizes visibility without overwhelming primary content
+ * @trustBuilding Critical status and count information builds user awareness and system transparency
+ * @accessibility WCAG AAA compliant with high contrast and screen reader support
+ * @semanticMeaning Status communication variants for different notification types and urgency levels
  *
- * @usage-patterns
- * DO: Use for notification counts (unread messages, alerts, status updates)
- * DO: Provide status indicators (live, new, beta, premium features)
- * DO: Create urgent overlays that break component boundaries for maximum visibility
- * DO: Attach universally to buttons, cards, avatars, badges, any component
- * NEVER: Use for primary actions, complex information, or standalone content
+ * @usagePatterns
+ * DO: Use for notification counts and status indicators
+ * DO: Attach to buttons, avatars, and other interface elements
+ * DO: Create urgent overlays that break component boundaries for visibility
+ * NEVER: Use for primary actions or complex information display
  *
- * @design-guides
- * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
- * - Notification Intelligence: https://rafters.realhandy.tech/docs/llm/notification-intelligence
- * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
+ * @designGuides
+ * - Attention Economics: https://rafters.realhandy.tech/docs/foundation/attention-economics
+ * - Trust Building: https://rafters.realhandy.tech/docs/foundation/trust-building
  *
- * @dependencies class-variance-authority, clsx
+ * @dependencies None
  *
  * @example
  * ```tsx
- * // Notification count chip
+ * // Notification count overlay
  * <div className="relative">
  *   <Button>Messages</Button>
- *   <Chip variant="count" position="top-right">
- *     3
- *   </Chip>
- * </div>
- *
- * // Status indicator chip
- * <div className="relative">
- *   <Badge>Premium</Badge>
- *   <Chip variant="dot" position="top-right" color="success" />
+ *   <Chip variant="count" position="top-right" value={3} />
  * </div>
  * ```
  */
