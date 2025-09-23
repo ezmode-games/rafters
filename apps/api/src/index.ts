@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { processColorSeedBatch } from './lib/queue/consumer';
 import type { ColorSeedMessage } from './lib/queue/publisher';
+import { archive } from './routes/archive';
 import { colorIntel } from './routes/color-intel';
 import { seedQueue } from './routes/seed-queue';
 
@@ -26,6 +27,7 @@ app.use(
   })
 );
 
+app.route('/api/archive', archive);
 app.route('/api/color-intel', colorIntel);
 app.route('/api/seed-queue', seedQueue);
 

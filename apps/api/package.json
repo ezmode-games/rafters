@@ -19,8 +19,10 @@
   "dependencies": {
     "@hono/zod-validator": "catalog:",
     "@rafters/color-utils": "workspace:*",
+    "@rafters/design-tokens": "workspace:*",
     "@rafters/shared": "workspace:*",
     "hono": "^4.6.14",
+    "jszip": "^3.10.1",
     "zod": "catalog:"
   },
   "devDependencies": {
