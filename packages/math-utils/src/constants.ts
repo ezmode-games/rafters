@@ -57,15 +57,16 @@ export type ProgressionType =
   | keyof typeof MUSICAL_RATIOS // Musical intervals
   | keyof typeof MATHEMATICAL_CONSTANTS; // Mathematical constants
 
+// Pre-compute available ratios string to avoid repeated computation
+const AVAILABLE_RATIOS_STRING = Object.keys(ALL_RATIOS).join(', ');
+
 /**
  * Get ratio value by name with fallback
  */
 export function getRatio(name: string): number {
   const ratio = ALL_RATIOS[name as keyof typeof ALL_RATIOS];
   if (ratio === undefined) {
-    throw new Error(
-      `Unknown ratio: ${name}. Available ratios: ${Object.keys(ALL_RATIOS).join(', ')}`
-    );
+    throw new Error(`Unknown ratio: ${name}. Available ratios: ${AVAILABLE_RATIOS_STRING}`);
   }
   return ratio;
 }

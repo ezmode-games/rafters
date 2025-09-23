@@ -220,16 +220,28 @@ export function convertUnit(
  */
 export function evaluateWithUnits(
   expression: string,
-  _variables: Record<string, string> = {}
+  variables: Record<string, string> = {}
 ): string {
   // This is a simplified implementation
   // A full implementation would need a proper expression parser
 
+  // Substitute variables in the expression
+  let substituted = expression;
+  for (const [key, value] of Object.entries(variables)) {
+    // Replace all occurrences of the variable name with its value
+    // Use word boundaries to avoid partial replacements
+    substituted = substituted.replace(new RegExp(`\\b${key}\\b`, 'g'), value);
+  }
+
   // For now, handle simple cases
-  const simpleMultiplication = expression.match(/^(.+?)\s*\*\s*(.+)$/);
+  const simpleMultiplication = substituted.match(/^(.+?)\s*\*\s*(.+)$/);
   if (simpleMultiplication) {
-    const [, left, right] = simpleMultiplication;
-    return calculateWithUnits(left.trim(), '*', parseFloat(right.trim()));
+    const [, left, rightRaw] = simpleMultiplication;
+    // Handle the right operand which might be a number or have units
+    const right = rightRaw.trim();
+    const parsedRight = parseUnit(right);
+    // For multiplication, typically only the value is used, unit is preserved from left
+    return calculateWithUnits(left.trim(), '*', parsedRight.value);
   }
 
   const simpleAddition = expression.match(/^(.+?)\s*\+\s*(.+)$/);

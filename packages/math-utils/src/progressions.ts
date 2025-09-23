@@ -43,6 +43,7 @@ export interface ProgressionOptions {
 export function generateProgression(type: ProgressionType, options: ProgressionOptions): number[] {
   const { baseValue, steps, multiplier = 1.25, includeZero = false } = options;
   const result: number[] = [];
+  let cachedRatio: number | undefined;
 
   for (let i = 0; i < steps; i++) {
     let value: number;
@@ -59,10 +60,13 @@ export function generateProgression(type: ProgressionType, options: ProgressionO
       default:
         // Musical ratios or mathematical constants
         try {
-          const ratio = getRatio(type);
-          value = i === 0 && includeZero ? 0 : baseValue * ratio ** (includeZero ? i - 1 : i);
-        } catch (_error) {
-          throw new Error(`Invalid progression type: ${type}`);
+          // Get ratio once and reuse it
+          if (!cachedRatio) {
+            cachedRatio = getRatio(type);
+          }
+          value = i === 0 && includeZero ? 0 : baseValue * cachedRatio ** (includeZero ? i - 1 : i);
+        } catch (error) {
+          throw new Error(`Invalid progression type: ${type}`, { cause: error });
         }
     }
 

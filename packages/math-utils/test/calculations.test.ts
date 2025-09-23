@@ -41,7 +41,7 @@ describe('Mathematical Calculations', () => {
     it('should throw error for invalid expressions', () => {
       expect(() => {
         evaluateExpression('16 * unknown-ratio');
-      }).toThrow('Unsafe expression');
+      }).toThrow('Cannot evaluate expression');
     });
   });
 
