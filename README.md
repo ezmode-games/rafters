@@ -4,21 +4,17 @@
 
 **Your designer encodes their taste. We turn it into data structures. AI agents build interfaces that don't suck.**
 
-## The Problem We Actually Solved
+## The Real Problem with AI-Generated Interfaces
 
-We tried everything to teach AI good design. Built scrapers that collected the top 15,000 websites. Fed massive vector databases to AI models. Documented every design principle we could think of. Wrote prompts explaining color theory, typography, layout, and accessibility.
+AI agents rush in and generate interfaces that look technically correct but feel completely wrong. Bad spacing. Poor hierarchy. Accessibility violations. No sense of rhythm or proportion. They pattern match on surface similarities without understanding the reasoning behind design decisions.
 
-AI agents didn't care.
+Traditional design systems made it worse. Components without reasoning. Zero guidance on when to use what. AI agents can't distinguish between appropriate and inappropriate usage contexts. More options, worse outcomes.
 
-They would rush in, pattern match on surface-level similarities, and generate interfaces that looked technically correct but felt completely wrong. Bad spacing. Poor hierarchy. Accessibility violations. No sense of rhythm or proportion. By the time anyone realized the AI had made a mess, it was too late.
+## The Insight: Encode Taste as Queryable Data
 
-Traditional design systems? They just made things worse. They provide components without reasoning. AI agents cannot distinguish between appropriate and inappropriate usage contexts. More options, zero guidance.
+Stop trying to teach AI aesthetic judgment through prompts and documentation. That doesn't scale. Instead, encode human design intelligence directly into machine-readable data structures that AI agents can query in real-time.
 
-## The Insight: Stop Teaching, Start Embedding
-
-We realized we were solving the wrong problem. Instead of trying to teach AI aesthetic judgment (which may never work), we decided to embed human design intelligence directly into the system itself.
-
-Rafters is a design intelligence protocol. Every design decision—from your brand's specific blue to why buttons need 44px touch targets—gets encoded into machine-readable data structures. When AI builds interfaces using Rafters, it doesn't guess. It reads.
+Rafters is a design intelligence protocol. Every design decision—from your brand's specific blue to why buttons need 44px touch targets—gets encoded as queryable intelligence. When AI builds interfaces using Rafters, it doesn't guess. It reads the embedded reasoning and applies it systematically.
 
 ## How It Works
 
@@ -82,32 +78,17 @@ Designers use our Studio to override mathematical defaults with brand personalit
 
 Every override gets tracked in Git. AI agents understand your exceptions.
 
-### 5. MCP Server: Intelligence API for AI Agents
-Model Context Protocol server with 7 specialized tools:
+### 5. Registry System with llms.txt Discovery
+Complete registry API that follows the llmstxt.org specification for AI agent discovery:
 
-- `get_color_intelligence`: Complete color analysis with emotional impact, cultural context
-- `get_component_intelligence`: Cognitive load, trust patterns, accessibility requirements
-- `calculate_cognitive_load`: Total mental burden for component combinations
-- `validate_color_combination`: Check if colors work together
-- `get_accessible_colors`: Find WCAG-compliant color pairs
-- `get_tokens_by_trust_level`: Filter components by reliability requirements
-- `get_token_by_category`: Organized access to color, spacing, motion tokens
+- **llms.txt endpoint** (`/llms.txt`) - Standard AI discovery endpoint providing complete system overview, component intelligence, and usage patterns
+- **Registry APIs** - Structured JSON endpoints for real-time component and token intelligence
+- **Component metadata** - Cognitive load, attention economics, trust patterns, accessibility requirements embedded in each component
 
-AI agents query the server in real-time. No documentation reading. Direct intelligence access.
+AI agents discover Rafters through the standard llms.txt endpoint, then access structured intelligence through registry APIs.
 
-### 6. AI Intelligence Generation
-When mathematical rules aren't enough, we generate contextual intelligence using Claude:
-
-```json
-{
-  "emotionalImpact": "Creates urgency without panic through warm red hue",
-  "culturalContext": "Western: danger/importance, Eastern: prosperity/joy",
-  "psychologicalEffect": "Increases arousal, speeds decision-making",
-  "usageGuidance": "Reserve for critical actions, never decorative"
-}
-```
-
-This intelligence gets cached and versioned. Your design system learns.
+### 6. MCP Server for Real-Time Queries
+Model Context Protocol server enables AI agents to query design intelligence in real-time through specialized tools for token discovery, cognitive load calculation, accessibility validation, and component intelligence access. Direct API integration means agents don't read documentation—they query live intelligence.
 
 ## Architecture That Actually Scales
 
@@ -146,6 +127,19 @@ Rafters includes 18+ production-ready components spanning the full interface spe
 
 Each component includes embedded cognitive load metadata, accessibility requirements, and trust-building patterns. AI agents understand not just what each component does, but when and how to use it appropriately.
 
+### Custom Shadow DOM Component Preview System
+
+Unlike traditional documentation tools like Storybook, Rafters showcases component intelligence through a custom preview system built in ~500 lines:
+
+- **Shadow DOM isolation**: Perfect style encapsulation with zero conflicts
+- **Intelligence metadata display**: Shows cognitive load, attention economics, and trust building patterns directly in the preview
+- **Registry integration**: Automatically pulls component intelligence without manual story writing
+- **Dynamic prop handling**: JSON-based prop manipulation with live updates
+- **MDX seamless integration**: Works natively with documentation workflow
+- **Purpose-built for intelligence**: Designed specifically for showcasing embedded design intelligence, not just visual appearance
+
+This transforms component documentation from static visual demos into interactive design intelligence that shows AI agents exactly how each component affects user cognition and attention.
+
 ## Getting Started
 
 ```bash
@@ -166,36 +160,12 @@ That's it. You now have a mathematically-sound, AI-readable design system with 1
 
 ## For AI Agents
 
-Connect to our MCP server:
-
-```json
-{
-  "mcpServers": {
-    "rafters": {
-      "command": "npx",
-      "args": ["rafters", "mcp"]
-    }
-  }
-}
+Discover Rafters through the standard llms.txt endpoint:
+```
+https://rafters.realhandy.tech/llms.txt
 ```
 
-Query design intelligence:
-
-```typescript
-// Get color with full intelligence
-await mcp.call('get_color_intelligence', { tokenName: 'primary' })
-
-// Calculate cognitive load for a page
-await mcp.call('calculate_cognitive_load', {
-  components: ['Header', 'Button', 'Button', 'Form', 'Dialog']
-})
-
-// Find accessible color combinations
-await mcp.call('get_accessible_colors', {
-  background: 'surface',
-  level: 'AAA'
-})
-```
+This provides complete system overview, component intelligence, and usage patterns following the llmstxt.org specification. Use the MCP server for real-time design token intelligence querying and component validation during implementation.
 
 ## The Rafters Difference
 
@@ -203,10 +173,12 @@ await mcp.call('get_accessible_colors', {
 |---------------------------|---------|
 | Components without context | Components with embedded intelligence |
 | Documentation for humans | Machine-readable design reasoning |
+| Storybook for visual demos | Custom Shadow DOM preview with intelligence metadata |
 | Manual accessibility checks | Automatic WCAG AAA validation |
-| Guess at cognitive load | Calculated cognitive budgets |
-| Hope AI uses it right | Enforce correct usage through data |
-| Design drift over time | Git-tracked design decisions |
+| Guess at cognitive load | Calculated cognitive budgets with real-time validation |
+| Hope AI uses it right | Enforce correct usage through queryable data structures |
+| Design drift over time | Git-tracked design decisions with embedded reasoning |
+| Static documentation | Interactive intelligence showcases |
 | "Just use shadcn/ui" | Actually solve the AI interface problem |
 
 ## Contributing
@@ -267,14 +239,17 @@ pnpm preflight
 
 ## Technical Deep Dive
 
-For complete technical documentation, see [ARCHITECTURE.md](./docs/ARCHITECTURE.md).
+For complete technical documentation, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 
-Key concepts:
-- Dependency graph resolution algorithm
-- ColorValue object schema
-- Cognitive load calculation methodology
-- MCP server protocol implementation
-- SQID archive format specification
+Key concepts covered in detail:
+- Custom Shadow DOM component preview system architecture (~500 lines replacing Storybook)
+- Dependency graph resolution algorithm with topological sorting
+- ColorValue intelligence object schema with AI-generated insights
+- Cognitive load calculation methodology and budget enforcement
+- MCP server protocol implementation with 7 specialized tools
+- SQID archive format specification and distribution model
+- llms.txt endpoint implementation following llmstxt.org standards
+- Registry API architecture for structured component intelligence
 
 ## Why "Rafters"?
 
@@ -282,21 +257,21 @@ Rafters provide structural support in buildings—essential infrastructure that 
 
 ## Philosophy
 
-**Default safety through mathematics.** Start with formulas that can't be wrong.
+**Design intelligence as queryable data.** Stop hoping AI agents will learn good taste. Encode human design reasoning into machine-readable structures they can query systematically.
 
-**Intelligence on demand through metadata.** Embed human reasoning where math isn't enough.
+**Mathematical foundations with human overrides.** Start with mathematical relationships that can't be wrong, then layer on human design taste where math isn't sufficient.
 
-**Graceful degradation.** Even minimal implementations maintain baseline usability.
+**Real-time intelligence access.** AI agents don't read documentation—they query live intelligence through structured APIs and MCP protocols.
 
-**Git tracks everything.** Your design decisions become part of your codebase.
+**Cognitive load as a first-class concern.** Every design decision explicitly accounts for human mental processing limits and attention economics.
 
-## The Future
+## The Future of AI-Generated Interfaces
 
-AI agents are about to generate millions of interfaces. Most will be terrible. Rafters is our attempt to fix that before it becomes everyone's problem.
+AI agents are generating millions of interfaces. Most are terrible because they lack design reasoning.
 
-We're not trying to teach AI good taste. We're encoding taste into data structures AI already understands.
+Rafters solves this by encoding your designer's expertise as queryable data structures. Your brand's personality becomes parameterized intelligence. Your users' cognitive limits get systematically respected.
 
-Your designer's expertise, systematized. Your brand's personality, parameterized. Your users' cognitive limits, respected.
+This isn't about teaching AI good taste—it's about making human design intelligence accessible to AI systems that already understand data structures perfectly.
 
 Welcome to design intelligence as a protocol.
 

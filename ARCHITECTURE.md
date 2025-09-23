@@ -39,14 +39,24 @@
 6. **MCP → AI Agent**: AI agents query design intelligence for implementation decisions
 7. **API → Intelligence**: Color Intelligence API enriches tokens with AI-generated insights
 
-### Key Innovation: Design Taste as Data
+### Key Innovations
 
-Rafters encodes subjective design taste as objective, queryable data through:
+**Design Taste as Data**: Rafters encodes subjective design taste as objective, queryable data through:
 - **Mathematical relationships** between design elements
 - **Cognitive load calculations** for user experience
 - **Trust level hierarchies** for visual attention management
 - **Accessibility matrices** for inclusive design
 - **Semantic meaning** for contextual usage rules
+
+**Custom Shadow DOM Component Preview System**: Unlike traditional documentation tools (Storybook, Docusaurus, etc.), Rafters features a purpose-built component preview system:
+- **~500 lines of custom code** replacing heavy external dependencies
+- **Shadow DOM isolation** ensuring perfect style encapsulation
+- **Intelligence metadata display** showing cognitive load, attention economics, trust patterns
+- **Registry integration** automatically pulling component intelligence
+- **Dynamic prop handling** via JSON parsing with live updates
+- **MDX seamless integration** for comprehensive documentation workflow
+
+This architectural decision transforms component documentation from static visual demos into interactive design intelligence showcases, enabling AI agents to understand not just what components look like, but how they affect user cognition and attention.
 
 ## 2. Core Packages
 
@@ -642,12 +652,99 @@ apps/website/
 │   └── guides/
 └── components/
     ├── ui/
-    └── registry/
+    ├── registry/
+    └── preview/   # Custom Shadow DOM component preview system
 ```
 
-#### MDX Content Organization
+#### Custom Shadow DOM Component Preview System
+
+**Key Innovation**: Built in ~500 lines, this custom preview system replaces traditional documentation tools with intelligence-aware component showcasing:
+
 ```typescript
-// Content frontmatter structure
+class RaftersComponentPreview extends HTMLElement {
+  private shadowRoot: ShadowRoot;
+  private registry: ComponentRegistry;
+  private intelligence: ComponentIntelligence;
+  private props: ComponentProps;
+
+  constructor() {
+    super();
+    this.shadowRoot = this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.loadComponentIntelligence();
+    this.setupPropertyControls();
+    this.renderPreview();
+  }
+
+  private renderIntelligencePanel(): string {
+    return `
+      <div class="intelligence-metadata">
+        <div class="cognitive-load">
+          <label>Cognitive Load</label>
+          <div class="load-indicator" data-load="${this.intelligence.cognitiveLoad}">
+            ${this.intelligence.cognitiveLoad}/10
+          </div>
+        </div>
+
+        <div class="attention-economics">
+          <label>Attention Economics</label>
+          <p>${this.intelligence.attentionEconomics}</p>
+        </div>
+
+        <div class="trust-building">
+          <label>Trust Patterns</label>
+          <p>${this.intelligence.trustBuilding}</p>
+        </div>
+
+        <div class="accessibility-score">
+          <label>Accessibility</label>
+          <p>${this.intelligence.accessibility}</p>
+        </div>
+      </div>
+    `;
+  }
+
+  private setupPropertyControls(): void {
+    const propsPanel = this.shadowRoot.querySelector('.props-panel');
+
+    // Dynamic prop controls based on component schema
+    Object.entries(this.props).forEach(([key, propDef]) => {
+      const control = this.createPropControl(key, propDef);
+      control.addEventListener('change', (e) => {
+        this.updateComponentProp(key, e.target.value);
+        this.rerenderComponent();
+      });
+      propsPanel.appendChild(control);
+    });
+  }
+}
+
+customElements.define('rafters-component-preview', RaftersComponentPreview);
+```
+
+#### Shadow DOM Benefits Over Traditional Tools
+
+**Perfect Encapsulation**:
+- No CSS conflicts between preview and documentation styles
+- Component styles render exactly as in production
+- Multiple component previews can coexist without interference
+
+**Intelligence Integration**:
+- Registry metadata automatically pulled and displayed
+- Cognitive load calculations shown in real-time
+- Trust patterns and attention economics visible alongside visual preview
+- Accessibility scores and guidance integrated into preview experience
+
+**Dynamic Interaction**:
+- JSON-based prop manipulation with live updates
+- State changes reflected immediately in both component and intelligence metadata
+- Interactive cognitive load calculation as props change
+
+#### MDX Seamless Integration
+```typescript
+// Enhanced MDX frontmatter
 interface DocMeta {
   title: string;
   description: string;
@@ -655,19 +752,55 @@ interface DocMeta {
   cognitiveComplexity: number;
   readingTime: number;
   prerequisites: string[];
+  previewConfig: {
+    showIntelligence: boolean;
+    defaultProps: Record<string, any>;
+    cognitiveLoadDemo: boolean;
+    interactiveProps: string[];
+  };
+}
+
+// Component documentation with embedded previews
+function ComponentDocPage({ component }: { component: ComponentRegistry }) {
+  return (
+    <div className="component-docs">
+      <rafters-component-preview
+        component={component.name}
+        intelligence={JSON.stringify(component.intelligence)}
+        default-props={JSON.stringify(component.examples[0].props)}
+      />
+      <MDXContent component={component} />
+    </div>
+  );
 }
 ```
 
-#### Documentation Generation
+#### Advantages Over Storybook
+
+| Storybook | Rafters Preview System |
+|-----------|------------------------|
+| Visual component demos | Visual + intelligence metadata display |
+| Manual story writing | Automatic registry integration |
+| Basic prop controls | Dynamic JSON-based prop manipulation |
+| Static documentation | Live cognitive load calculations |
+| Separate from docs | Seamlessly integrated with MDX |
+| Generic tool | Purpose-built for design intelligence |
+| ~500KB bundle overhead | ~500 lines of custom code |
+| External dependency | Native to the system |
+
+#### Documentation Generation with Intelligence
 ```typescript
 generateComponentDocs(component: ComponentRegistry): MDXContent {
   return {
     title: component.name,
     sections: [
+      generateIntelligencePreview(component), // Custom Shadow DOM preview
       generateIntelligenceSection(component.intelligence),
+      generateCognitiveLoadAnalysis(component),
       generateAPISection(component.props),
       generateExamplesSection(component.examples),
-      generateAccessibilitySection(component.accessibility)
+      generateAccessibilitySection(component.accessibility),
+      generateUsagePatterns(component.intelligence.usageGuidance)
     ]
   };
 }
@@ -1645,6 +1778,15 @@ const routes = {
 - **Single source of truth**: No synchronization issues
 - **Type safety**: Structured tool definitions and responses
 - **Future-proof**: Standard protocol for AI tool integration
+
+### Why Custom Shadow DOM Preview System Instead of Storybook?
+- **Intelligence-first design**: Built to showcase cognitive load, attention economics, and trust patterns—not just visual appearance
+- **Perfect encapsulation**: Shadow DOM eliminates CSS conflicts that plague traditional documentation tools
+- **Lightweight implementation**: ~500 lines vs. massive Storybook bundle overhead
+- **Registry integration**: Automatically pulls component intelligence without manual story writing
+- **Dynamic JSON props**: Live prop manipulation reflecting real component usage
+- **MDX native integration**: Seamlessly works within documentation workflow
+- **AI agent optimization**: Designed specifically for AI agents to understand component intelligence, not just human visual browsing
 
 ## Conclusion
 
