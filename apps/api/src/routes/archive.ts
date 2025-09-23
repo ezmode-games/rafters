@@ -27,7 +27,8 @@ app.get('/:sqid', zValidator('param', sqidSchema), async (c) => {
       return c.json(
         {
           error: 'Archive generation not available',
-          message: 'ZIP generation not supported in Workers runtime. Please host pre-generated archive files.',
+          message:
+            'ZIP generation not supported in Workers runtime. Please host pre-generated archive files.',
           sqid: '000000',
           requiredFiles: [
             'manifest.json',
@@ -39,8 +40,8 @@ app.get('/:sqid', zValidator('param', sqidSchema), async (c) => {
             'borders.json',
             'breakpoints.json',
             'layout.json',
-            'fonts.json'
-          ]
+            'fonts.json',
+          ],
         },
         501 // Not Implemented
       );
@@ -64,6 +65,5 @@ app.get('/:sqid', zValidator('param', sqidSchema), async (c) => {
     );
   }
 });
-
 
 export { app as archive };

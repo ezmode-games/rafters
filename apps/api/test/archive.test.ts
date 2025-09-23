@@ -39,7 +39,12 @@ describe('/api/archive endpoint', () => {
       expect(response.status).toBe(501);
       expect(response.headers.get('Content-Type')).toContain('application/json');
 
-      const data = (await response.json()) as { error: string; message: string; sqid: string; requiredFiles: string[] };
+      const data = (await response.json()) as {
+        error: string;
+        message: string;
+        sqid: string;
+        requiredFiles: string[];
+      };
       expect(data.error).toBe('Archive generation not available');
       expect(data.message).toContain('ZIP generation not supported');
       expect(data.sqid).toBe('000000');
@@ -53,8 +58,8 @@ describe('/api/archive endpoint', () => {
       expect(response1.status).toBe(501);
       expect(response2.status).toBe(501);
 
-      const data1 = await response1.json() as { sqid: string; error: string };
-      const data2 = await response2.json() as { sqid: string; error: string };
+      const data1 = (await response1.json()) as { sqid: string; error: string };
+      const data2 = (await response2.json()) as { sqid: string; error: string };
 
       expect(data1.sqid).toBe(data2.sqid);
       expect(data1.error).toBe(data2.error);
