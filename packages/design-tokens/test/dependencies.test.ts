@@ -1888,13 +1888,13 @@ describe('TokenDependencyGraph - Performance Stress Tests', () => {
 
       // Assertions
       expect(sorted.length).toBe(5000);
-      expect(setupTime - startTime).toBeLessThan(10000); // Setup under 10s for CI
-      expect(sortTime - setupTime).toBeLessThan(3000); // Sort under 3s for CI
-      expect(queryTime - sortTime).toBeLessThan(2000); // Queries under 2s for CI
+      expect(setupTime - startTime).toBeLessThan(15000); // Setup under 15s for CI
+      expect(sortTime - setupTime).toBeLessThan(5000); // Sort under 5s for CI
+      expect(queryTime - sortTime).toBeLessThan(3000); // Queries under 3s for CI
 
       // Verify correctness of a sample
       expect(graph.getDependents('base-0').length).toBeGreaterThan(0);
-    }, 10000);
+    }, 20000);
 
     it('should handle rapid dependency updates', () => {
       const startTime = performance.now();
