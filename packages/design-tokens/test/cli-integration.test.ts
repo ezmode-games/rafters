@@ -2,7 +2,6 @@
  * Integration test for CLI init command with event-driven registry
  */
 
-import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';

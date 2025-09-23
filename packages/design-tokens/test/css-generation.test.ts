@@ -27,7 +27,7 @@ describe('CSS Generation Callback', () => {
   });
 
   it('should generate CSS file on registry initialization', async () => {
-    const registry = await createEventDrivenTokenRegistry(TEST_TOKENS_PATH, '000000');
+    const _registry = await createEventDrivenTokenRegistry(TEST_TOKENS_PATH, '000000');
 
     // Verify CSS file was created
     expect(existsSync(TEST_CSS_PATH)).toBe(true);

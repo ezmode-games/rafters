@@ -39,8 +39,8 @@ export async function createEventDrivenTokenRegistry(
 
     // Set up callback based on environment
     if (process.env.RAFTERS_PLUS) {
-      // Future: Queue-based callback - for now just log
-      console.log('[Rafters] Queue callback not yet implemented, falling back to local CSS');
+      // Future: Queue-based callback implementation
+      // For now, use local CSS callback as fallback
       const cssCallback = createLocalCSSCallback(registry, projectPath);
       registry.setChangeCallback(cssCallback);
     } else {

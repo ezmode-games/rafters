@@ -14,18 +14,13 @@ export function createLocalCSSCallback(
   registry: TokenRegistry,
   projectPath: string
 ): RegistryChangeCallback {
-  return (event: RegistryEvent): void => {
+  return (_event: RegistryEvent): void => {
     try {
       // Generate Tailwind CSS format by default
       const css = exportTokensFromRegistry(registry, 'tailwind');
       const cssPath = join(projectPath, '.rafters', 'tokens.css');
 
       writeFileSync(cssPath, css);
-
-      // Log the regeneration for development feedback
-      console.log(
-        `[Rafters] CSS regenerated: ${event.type} at ${new Date(event.timestamp).toISOString()}`
-      );
     } catch (error) {
       throw new Error(
         `CSS regeneration failed: ${error instanceof Error ? error.message : 'Unknown error'}`

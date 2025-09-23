@@ -52,9 +52,8 @@ describe('Registry Factory with Self-Initialization', () => {
 
       // Verify callback was set by testing it fires
       let callbackFired = false;
-      const originalCallback = (registry as any).changeCallback;
 
-      (registry as any).setChangeCallback(() => {
+      registry.setChangeCallback(() => {
         callbackFired = true;
       });
 
@@ -62,7 +61,7 @@ describe('Registry Factory with Self-Initialization', () => {
       expect(callbackFired).toBe(true);
     } catch (error) {
       if (error instanceof Error && error.message.includes('fetch failed')) {
-        console.log('Network test skipped due to environment limitations');
+        // Skip network test in environments without internet access
         return;
       }
       throw error;
