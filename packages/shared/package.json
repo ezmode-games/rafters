@@ -18,6 +18,7 @@
   ],
   "scripts": {
     "test": "vitest run",
+    "test:unit": "vitest run",
     "test:preflight": "vitest run",
     "lint": "biome check .",
     "format": "biome format --write .",

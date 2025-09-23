@@ -18,6 +18,7 @@
   ],
   "scripts": {
     "test": "vitest run --passWithNoTests",
+    "test:unit": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "test:integration": "echo \"UI package uses unit tests only - no Cloudflare Workers integration needed\"",
     "test:component": "playwright test --config playwright.config.component.ts --pass-with-no-tests",
