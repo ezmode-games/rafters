@@ -11,9 +11,13 @@
  */
 
 export function startMCPServer(): void {
-  throw new Error('MCP server is currently disabled. Implementation pending MCP SDK compatibility fixes.');
+  throw new Error(
+    'MCP server is currently disabled. Implementation pending MCP SDK compatibility fixes.'
+  );
 }
 
 export function createMCPTools(): void {
-  throw new Error('MCP tools are currently disabled. Implementation pending MCP SDK compatibility fixes.');
+  throw new Error(
+    'MCP tools are currently disabled. Implementation pending MCP SDK compatibility fixes.'
+  );
 }
