@@ -347,7 +347,7 @@ describe('CLI entry points', () => {
 
       const commandCalls = mockProgram.command.mock.calls.map((call) => call[0]);
 
-      expect(commandCalls).toEqual(['init', 'add <components...>', 'list', 'clean']);
+      expect(commandCalls).toEqual(['init', 'add <components...>', 'list', 'clean', 'mcp']);
     });
 
     it('should configure all commands with descriptions and options', async () => {
@@ -355,7 +355,7 @@ describe('CLI entry points', () => {
 
       // Each command should have at least one description call
       const descriptionCalls = mockProgram.description.mock.calls;
-      expect(descriptionCalls.length).toBeGreaterThanOrEqual(5); // 1 for program + 4 for commands
+      expect(descriptionCalls.length).toBeGreaterThanOrEqual(6); // 1 for program + 5 for commands
 
       // Some commands should have options
       const optionCalls = mockProgram.option.mock.calls;
@@ -363,7 +363,7 @@ describe('CLI entry points', () => {
 
       // All commands should have actions
       const actionCalls = mockProgram.action.mock.calls;
-      expect(actionCalls).toHaveLength(4); // One for each command
+      expect(actionCalls).toHaveLength(5); // One for each command
     });
   });
 

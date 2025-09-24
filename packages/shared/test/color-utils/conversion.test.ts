@@ -7,7 +7,7 @@
 
 import type { OKLCH } from '@rafters/shared';
 import { describe, expect, it } from 'vitest';
-import { hexToOKLCH, oklchToCSS, oklchToHex, roundOKLCH } from '../src/conversion';
+import { hexToOKLCH, oklchToCSS, oklchToHex, roundOKLCH } from '../../src/color-utils/conversion';
 
 describe('Conversion Module', () => {
   // Test colors

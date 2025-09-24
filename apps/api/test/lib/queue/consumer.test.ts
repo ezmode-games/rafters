@@ -92,7 +92,7 @@ describe('Queue Consumer Unit Tests', () => {
       consoleSpy.mockRestore();
     });
 
-    test('logs color name and suggested name', () => {
+    test('processes color data successfully', () => {
       const mockMessage = {
         ack: vi.fn(),
         retry: vi.fn(),
@@ -111,13 +111,9 @@ describe('Queue Consumer Unit Tests', () => {
         },
       };
 
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-
       consumer.handleSuccessResponse(mockMessage, colorData);
 
-      expect(consoleSpy).toHaveBeenCalledWith('Processed color seed: Test Color - Ocean Blue');
-
-      consoleSpy.mockRestore();
+      expect(mockMessage.ack).toHaveBeenCalledTimes(1);
     });
   });
 

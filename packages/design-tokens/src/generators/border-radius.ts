@@ -5,7 +5,7 @@
  * and component softness. Uses different mathematical progression than spacing.
  */
 
-import { MATHEMATICAL_CONSTANTS, MUSICAL_RATIOS } from '@rafters/math-utils';
+import { MATHEMATICAL_CONSTANTS, MUSICAL_RATIOS } from '@rafters/shared';
 import type { Token } from '../index';
 
 /**

@@ -9,8 +9,7 @@
   "references": [
     { "path": "../../packages/shared" },
     { "path": "../../packages/design-tokens" },
-    { "path": "../../packages/ui" },
-    { "path": "../../packages/color-utils" }
+    { "path": "../../packages/ui" }
   ],
   "include": ["src/**/*", "scripts/**/*"],
   "exclude": ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx", "dist", "test"]

@@ -25,13 +25,14 @@
     "test:preflight": "vitest run --passWithNoTests && playwright test --config playwright.config.component.ts --pass-with-no-tests",
     "lint": "biome check .",
     "format": "biome format --write .",
-    "type-check": "tsc --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",
     "@cloudflare/vitest-pool-workers": "catalog:",
     "@playwright/experimental-ct-react": "^1.42.0",
     "@playwright/test": "^1.42.0",
+    "@swc/core": "^1.13.5",
     "@testing-library/jest-dom": "catalog:",
     "@testing-library/react": "catalog:",
     "@testing-library/user-event": "catalog:",
@@ -41,6 +42,7 @@
     "comment-parser": "^1.4.0",
     "jsdom": "catalog:",
     "typescript": "catalog:",
+    "unbuild": "^3.6.1",
     "vitest": "catalog:"
   },
   "dependencies": {

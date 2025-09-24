@@ -34,7 +34,6 @@
  * ```
  */
 import { cn } from '../lib/utils';
-import './article-prose.css';
 
 /**
  * Container component props with layout intelligence

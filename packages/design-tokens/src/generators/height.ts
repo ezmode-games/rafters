@@ -5,7 +5,7 @@
  * Provides contextual sizing beyond the mathematical spacing scale
  */
 
-import { MATHEMATICAL_CONSTANTS } from '@rafters/math-utils';
+import { MATHEMATICAL_CONSTANTS } from '@rafters/shared';
 import type { Token } from '../index';
 
 /**

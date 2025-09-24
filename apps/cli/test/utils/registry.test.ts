@@ -16,7 +16,8 @@ describe('registry utility', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
-    vi.resetAllMocks();
+    mockFetch.mockReset();
+    mockConsoleWarn.mockClear(); // Clear calls but keep the mock implementation
     process.env = { ...originalEnv };
     delete process.env.RAFTERS_REGISTRY_URL;
     delete process.env.RAFTERS_REGISTRY_API_URL;
@@ -74,6 +75,9 @@ describe('registry utility', () => {
     it('should use deprecated RAFTERS_REGISTRY_API_URL and show warning', async () => {
       process.env.RAFTERS_REGISTRY_API_URL = 'https://legacy.api.com';
 
+      // Clear console warn mock to ensure we catch the call
+      mockConsoleWarn.mockClear();
+
       const mockResponse = {
         components: [{ name: 'dialog', description: 'A dialog component' }],
       };
@@ -90,6 +94,8 @@ describe('registry utility', () => {
         expect.any(Object)
       );
 
+      // The warning should have been called once during fetchComponentRegistry
+      expect(mockConsoleWarn).toHaveBeenCalledTimes(1);
       expect(mockConsoleWarn).toHaveBeenCalledWith(
         '[rafters-cli] RAFTERS_REGISTRY_API_URL is deprecated. Please use RAFTERS_REGISTRY_URL for /registry endpoint.'
       );
@@ -163,7 +169,7 @@ describe('registry utility', () => {
     it('should handle API response without components wrapper', async () => {
       const mockDirectResponse = {
         $schema: 'https://ui.shadcn.com/schema/registry.json',
-        name: 'Direct Registry Response',
+        name: 'Rafters AI Design Intelligence Registry',
         components: [{ name: 'alert', description: 'Alert component' }],
       };
 
@@ -386,7 +392,7 @@ describe('registry utility', () => {
       mockFetch.mockRejectedValueOnce(new Error('Registry unavailable'));
 
       await expect(fetchComponent('button')).rejects.toThrow(
-        "Component 'button' not found: Component not found"
+        "Component 'button' not found: Failed to fetch from registry: Component not found"
       );
     });
 

@@ -33,8 +33,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@rafters/shared': resolve(__dirname, '../shared/src'),
-      '@rafters/color-utils': resolve(__dirname, '../color-utils/src'),
-      '@rafters/math-utils': resolve(__dirname, '../math-utils/src'),
     },
   },
 });

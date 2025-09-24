@@ -16,7 +16,6 @@ export default defineConfig({
       // Monorepo package aliases for easy imports in tests
       '@rafters/ui': path.resolve(__dirname, './packages/ui/src'),
       '@rafters/shared': path.resolve(__dirname, './packages/shared/src'),
-      '@rafters/color-utils': path.resolve(__dirname, './packages/color-utils/src'),
       '@rafters/design-tokens': path.resolve(__dirname, './packages/design-tokens/src'),
 
       // Test utilities aliases

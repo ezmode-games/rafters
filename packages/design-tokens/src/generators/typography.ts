@@ -5,7 +5,7 @@
  * Uses musical ratios (golden ratio, perfect fourth, etc.) for harmonious proportions
  */
 
-import { MATHEMATICAL_CONSTANTS, MUSICAL_RATIOS } from '@rafters/math-utils';
+import { MATHEMATICAL_CONSTANTS, MUSICAL_RATIOS } from '@rafters/shared';
 import type { Token } from '../index';
 
 /**

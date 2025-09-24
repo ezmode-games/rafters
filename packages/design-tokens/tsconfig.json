@@ -1,10 +1,11 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "../../tsconfig.source.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "incremental": false,
-    "tsBuildInfoFile": null
+    "declaration": true,
+    "outDir": "./dist",
+    "skipLibCheck": true
   },
-  "include": ["src/**/*", "test/fixtures/generators/color.test.ts"],
-  "exclude": ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"]
+  "include": ["src/**/*"],
+  "exclude": ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx", "dist", "test"]
 }

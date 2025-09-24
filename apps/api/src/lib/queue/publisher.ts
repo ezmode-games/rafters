@@ -267,7 +267,6 @@ export class ColorSeedPublisher {
       }
     }
 
-    console.log(`Generated ${colors.length} spectrum colors for queue processing`);
     return this.publishBatch(colors, { batchId: `spectrum-${Date.now()}` });
   }
 

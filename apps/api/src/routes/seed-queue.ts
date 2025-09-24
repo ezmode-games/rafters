@@ -114,13 +114,6 @@ app.post('/spectrum', zValidator('json', SpectrumConfigSchema), async (c) => {
     const config = c.req.valid('json');
     const publisher = new ColorSeedPublisher(c.env.COLOR_SEED_QUEUE);
 
-    // Calculate expected number of colors
-    const expectedCount = config.lightnessSteps * config.chromaSteps * config.hueSteps;
-
-    console.log(
-      `Generating spectrum: ${config.lightnessSteps}L × ${config.chromaSteps}C × ${config.hueSteps}H = ${expectedCount} colors`
-    );
-
     const result = await publisher.publishSpectrum(config);
 
     if (!result.success) {

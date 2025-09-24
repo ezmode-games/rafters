@@ -43,7 +43,6 @@ export { Label } from './components/Label';
 export type { ProgressProps } from './components/Progress';
 export { Progress } from './components/Progress';
 export { RaftersLogo } from './components/RaftersLogo';
-export type { SelectProps } from './components/Select';
 export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/Select';
 export type { SidebarProps } from './components/Sidebar';
 export {
@@ -52,7 +51,6 @@ export {
   SidebarFooter,
   SidebarHeader,
   SidebarItem,
-  SidebarSection,
 } from './components/Sidebar';
 export type { SliderProps } from './components/Slider';
 export { Slider } from './components/Slider';

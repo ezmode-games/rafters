@@ -18,9 +18,9 @@ import sqids from 'sqids';
 import { z } from 'zod';
 
 // Export archive management
-export { DesignSystemArchive, fetchArchive } from './archive';
+export { DesignSystemArchive, fetchArchive } from './archive.js';
 // Export callback implementations
-export { createLocalCSSCallback } from './callbacks/local-css-callback';
+export { createLocalCSSCallback } from './callbacks/local-css-callback.js';
 // Export dependency tracking system - temporarily disabled for ES module issues
 // export type { TokenDependency } from './dependencies';
 // export { TokenDependencyGraph } from './dependencies';
@@ -30,13 +30,13 @@ export {
   exportToCSSVariables,
   exportTokensFromRegistry,
   exportToTailwindCSS,
-} from './export';
+} from './export.js';
 // Export complete tailwind v4 exporter
-export { exportToTailwindV4Complete } from './exporters/tailwind-v4';
+export { exportToTailwindV4Complete } from './exporters/tailwind-v4.js';
 // Export core TokenRegistry class
-export { TokenRegistry } from './registry';
+export { TokenRegistry } from './registry.js';
 // Export registry factory with self-initialization
-export { createEventDrivenTokenRegistry } from './registry-factory';
+export { createEventDrivenTokenRegistry } from './registry-factory.js';
 // Export event types
 export type {
   RegistryChangeCallback,

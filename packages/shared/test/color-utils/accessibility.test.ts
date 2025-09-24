@@ -14,7 +14,7 @@ import {
   generateAccessibilityMetadata,
   meetsAPCAStandard,
   meetsWCAGStandard,
-} from '../src/accessibility';
+} from '../../src/color-utils/accessibility';
 
 describe('Accessibility Module', () => {
   // Test colors

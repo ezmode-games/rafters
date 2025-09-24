@@ -5,7 +5,7 @@
  * These tokens enhance existing Tailwind utilities with mathematical relationships
  */
 
-import { MATHEMATICAL_CONSTANTS, MUSICAL_RATIOS } from '@rafters/math-utils';
+import { MATHEMATICAL_CONSTANTS, MUSICAL_RATIOS } from '@rafters/shared';
 import type { Token } from '../index';
 
 /**
