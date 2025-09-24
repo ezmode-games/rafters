@@ -22,6 +22,7 @@
     "@rafters/design-tokens": "workspace:*",
     "@rafters/shared": "workspace:*",
     "hono": "^4.6.14",
+    "sqids": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {

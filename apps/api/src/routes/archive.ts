@@ -1,28 +1,45 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
+import Sqids from 'sqids';
 import { z } from 'zod';
 
 const app = new Hono<{ Bindings: Env }>();
 
-// SQID validation schema - 6-8 alphanumeric characters
+// Initialize SQIDS decoder
+const sqids = new Sqids();
+
+// SQID validation schema - must be a valid SQID that can be decoded
 const sqidSchema = z.object({
   sqid: z
     .string()
-    .regex(/^[A-Za-z0-9]{6,8}$/, 'Invalid SQID format: must be 6-8 alphanumeric characters'),
+    .min(1, 'SQID cannot be empty')
+    .refine(
+      (value) => {
+        try {
+          const decoded = sqids.decode(value);
+          return decoded.length > 0; // Valid SQID should decode to array of numbers
+        } catch {
+          return false;
+        }
+      },
+      { message: 'Invalid SQID format: must be a valid SQID' }
+    ),
 });
 
 /**
  * GET /api/archive/:sqid
  * Serves design system archives as ZIP files
  *
- * SQID "000000" serves default system as backup for CLI embedded archive
+ * SQID "000000" is reserved for the default system (decodes to [844596300])
+ * This serves as a backup for CLI embedded archives
  * Custom SQIDs return 404 (future: database lookup)
  */
 app.get('/:sqid', zValidator('param', sqidSchema), async (c) => {
   const { sqid } = c.req.valid('param');
 
   try {
-    // Handle default system (backup for CLI embedded archive)
+    // Handle default system - "000000" is a valid SQID that decodes to [844596300]
+    // We use it as a reserved identifier for the default design system
     if (sqid === '000000') {
       return c.json(
         {

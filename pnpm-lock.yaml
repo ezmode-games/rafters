@@ -48,6 +48,9 @@ catalogs:
     jsdom:
       specifier: ^26.1.0
       version: 26.1.0
+    sqids:
+      specifier: ^0.3.0
+      version: 0.3.0
     tailwind-merge:
       specifier: 3.3.1
       version: 3.3.1
@@ -130,9 +133,9 @@ importers:
       hono:
         specifier: ^4.6.14
         version: 4.9.7
-      jszip:
-        specifier: ^3.10.1
-        version: 3.10.1
+      sqids:
+        specifier: 'catalog:'
+        version: 0.3.0
       zod:
         specifier: 'catalog:'
         version: 4.0.16
