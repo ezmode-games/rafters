@@ -463,7 +463,7 @@ export async function fetchArchive(
   // Fetch ZIP archive from network
   let response: Response;
   try {
-    response = await fetch(`https://rafters.realhandy.tech/archive/${sqid}`);
+    response = await fetch(`https://rafters.realhandy.tech/api/archive/${sqid}`);
   } catch (networkError) {
     // Catch actual network errors (not HTTP errors)
     if (
@@ -472,7 +472,7 @@ export async function fetchArchive(
         (networkError.message.includes('ENOTFOUND') ||
           networkError.message.includes('Failed to fetch')))
     ) {
-      console.warn(`Network error fetching ${sqid}, falling back to default`);
+      // Network error - silently fall back to default system
       await loadEmbeddedDefault(targetPath);
       return;
     }
@@ -481,7 +481,7 @@ export async function fetchArchive(
 
   if (!response.ok) {
     if (response.status === 404) {
-      console.warn(`Archive ${sqid} not found, falling back to default`);
+      // Archive not found - silently fall back to default system
       await fetchArchive('000000', targetPath);
       return;
     }

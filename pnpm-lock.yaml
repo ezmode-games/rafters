@@ -48,6 +48,9 @@ catalogs:
     jsdom:
       specifier: ^26.1.0
       version: 26.1.0
+    sqids:
+      specifier: ^0.3.0
+      version: 0.3.0
     tailwind-merge:
       specifier: 3.3.1
       version: 3.3.1
@@ -71,6 +74,10 @@ overrides:
 importers:
 
   .:
+    dependencies:
+      jszip:
+        specifier: ^3.10.1
+        version: 3.10.1
     devDependencies:
       '@biomejs/biome':
         specifier: ^2.2.4
@@ -117,12 +124,18 @@ importers:
       '@rafters/color-utils':
         specifier: workspace:*
         version: link:../../packages/color-utils
+      '@rafters/design-tokens':
+        specifier: workspace:*
+        version: link:../../packages/design-tokens
       '@rafters/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       hono:
         specifier: ^4.6.14
         version: 4.9.7
+      sqids:
+        specifier: 'catalog:'
+        version: 0.3.0
       zod:
         specifier: 'catalog:'
         version: 4.0.16
@@ -6980,6 +6993,14 @@ snapshots:
     optionalDependencies:
       vite: 7.1.5(@types/node@22.18.4)(jiti@1.21.7)(tsx@4.20.5)(yaml@2.8.1)
 
+  '@vitest/mocker@3.2.4(vite@7.1.5(@types/node@24.4.0)(jiti@1.21.7)(tsx@4.20.5)(yaml@2.8.1))':
+    dependencies:
+      '@vitest/spy': 3.2.4
+      estree-walker: 3.0.3
+      magic-string: 0.30.19
+    optionalDependencies:
+      vite: 7.1.5(@types/node@24.4.0)(jiti@1.21.7)(tsx@4.20.5)(yaml@2.8.1)
+
   '@vitest/pretty-format@3.2.4':
     dependencies:
       tinyrainbow: 2.0.0
@@ -9858,7 +9879,7 @@ snapshots:
     dependencies:
       '@types/chai': 5.2.2
       '@vitest/expect': 3.2.4
-      '@vitest/mocker': 3.2.4(vite@7.1.5(@types/node@22.18.4)(jiti@1.21.7)(tsx@4.20.5)(yaml@2.8.1))
+      '@vitest/mocker': 3.2.4(vite@7.1.5(@types/node@24.4.0)(jiti@1.21.7)(tsx@4.20.5)(yaml@2.8.1))
       '@vitest/pretty-format': 3.2.4
       '@vitest/runner': 3.2.4
       '@vitest/snapshot': 3.2.4
