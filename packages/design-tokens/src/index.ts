@@ -18,9 +18,9 @@ import sqids from 'sqids';
 import { z } from 'zod';
 
 // Export archive management
-export { DesignSystemArchive, fetchArchive } from './archive.js';
+export { DesignSystemArchive, fetchArchive } from './archive';
 // Export callback implementations
-export { createLocalCSSCallback } from './callbacks/local-css-callback.js';
+export { createLocalCSSCallback } from './callbacks/local-css-callback';
 // Export dependency tracking system - temporarily disabled for ES module issues
 // export type { TokenDependency } from './dependencies';
 // export { TokenDependencyGraph } from './dependencies';
@@ -30,13 +30,13 @@ export {
   exportToCSSVariables,
   exportTokensFromRegistry,
   exportToTailwindCSS,
-} from './export.js';
+} from './export';
 // Export complete tailwind v4 exporter
-export { exportToTailwindV4Complete } from './exporters/tailwind-v4.js';
+export { exportToTailwindV4Complete } from './exporters/tailwind-v4';
 // Export core TokenRegistry class
-export { TokenRegistry } from './registry.js';
+export { TokenRegistry } from './registry';
 // Export registry factory with self-initialization
-export { createEventDrivenTokenRegistry } from './registry-factory.js';
+export { createEventDrivenTokenRegistry } from './registry-factory';
 // Export event types
 export type {
   RegistryChangeCallback,
@@ -44,10 +44,10 @@ export type {
   RegistryInitializedEvent,
   TokenChangeEvent,
   TokensBatchChangeEvent,
-} from './types/events.js';
+} from './types/events';
 
 // Import for internal use
-import { TokenRegistry } from './registry.js';
+import { TokenRegistry } from './registry';
 
 export const generateShortCode = () => {
   const s = new sqids();
@@ -197,7 +197,7 @@ export {
   generateTransformTokens,
   generateTypographyScale,
   generateWidthTokens,
-} from './generators/index.js';
+} from './generators/index';
 
 /**
  * Generate CSS custom properties format
