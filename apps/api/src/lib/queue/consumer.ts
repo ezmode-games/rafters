@@ -34,11 +34,8 @@ export function isSuccessResponse(status: number): boolean {
  */
 export function handleSuccessResponse(
   message: Message<ColorSeedMessage>,
-  colorData: ColorValue
+  _colorData: ColorValue
 ): void {
-  console.log(
-    `Processed color seed: ${colorData.name || 'processed'} - ${colorData.intelligence?.suggestedName || 'unnamed'}`
-  );
   message.ack();
 }
 

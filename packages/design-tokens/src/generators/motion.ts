@@ -5,7 +5,7 @@
  * Provides intelligent durations and easing curves based on user research and interaction psychology
  */
 
-import { MATHEMATICAL_CONSTANTS, MUSICAL_RATIOS } from '@rafters/math-utils';
+import { MATHEMATICAL_CONSTANTS, MUSICAL_RATIOS } from '@rafters/shared';
 import type { Token } from '../index';
 
 /**

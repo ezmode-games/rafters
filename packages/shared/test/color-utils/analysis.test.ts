@@ -7,7 +7,11 @@
 
 import type { OKLCH } from '@rafters/shared';
 import { describe, expect, it } from 'vitest';
-import { calculateColorDistance, getColorTemperature, isLightColor } from '../src/analysis';
+import {
+  calculateColorDistance,
+  getColorTemperature,
+  isLightColor,
+} from '../../src/color-utils/analysis';
 
 describe('Analysis Module', () => {
   // Test colors

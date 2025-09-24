@@ -333,8 +333,8 @@ class AITestAnalyzer {
         suggestion: 'Add tests for error handling and edge cases',
       },
       {
-        package: '@rafters/color-utils',
-        file: 'src/oklch-converter.ts',
+        package: '@rafters/shared',
+        file: 'src/color-utils/oklch-converter.ts',
         uncoveredLines: [23, 34],
         severity: 'high',
         suggestion: 'Add tests for OKLCH color space conversion edge cases',

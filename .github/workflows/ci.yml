@@ -57,8 +57,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build CLI
-        run: cd apps/cli && pnpm build
-
-      - name: Build website
-        run: cd apps/website && pnpm build
+      - name: Build packages
+        run: pnpm build

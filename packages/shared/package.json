@@ -4,32 +4,44 @@
   "description": "Shared types, schemas, and utilities for the Rafters AI design intelligence system",
   "type": "module",
   "private": false,
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "development": "./src/index.ts",
-      "default": "./src/index.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "development": "./src/index.ts"
     }
   },
   "files": [
-    "src"
+    "src",
+    "dist"
   ],
   "scripts": {
+    "build": "unbuild",
+    "dev": "unbuild --stub",
+    "watch": "unbuild --watch",
     "test": "vitest run",
     "test:unit": "vitest run",
     "test:preflight": "vitest run",
     "lint": "biome check .",
     "format": "biome format --write .",
-    "type-check": "tsc --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@swc/core": "^1.13.5",
+    "@types/apca-w3": "^0.1.3",
+    "@types/chroma-js": "^2.4.4",
     "@types/react": "catalog:",
     "typescript": "catalog:",
+    "unbuild": "^3.6.1",
     "vitest": "catalog:"
   },
   "dependencies": {
+    "apca-w3": "catalog:",
+    "chroma-js": "^2.6.0",
+    "colorjs.io": "^0.5.2",
     "zod": "catalog:"
   },
   "peerDependencies": {

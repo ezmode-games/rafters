@@ -5,6 +5,7 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "build/**", "out/**"],
+      "inputs": ["src/**", "build.config.*", "package.json"],
       "env": ["NODE_ENV", "NEXT_PUBLIC_*", "VITE_*", "PUBLIC_*"]
     },
     "dev": {
@@ -61,8 +62,8 @@
       "env": ["NODE_ENV"]
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"],
-      "outputs": ["tsconfig.tsbuildinfo"],
+      "dependsOn": ["^build"],
+      "outputs": ["tsconfig.tsbuildinfo", "dist/.tsbuildinfo"],
       "cache": true
     },
     "lint": {

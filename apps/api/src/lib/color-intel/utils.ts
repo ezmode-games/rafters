@@ -1,5 +1,5 @@
-import { type ColorContext, roundOKLCH } from '@rafters/color-utils';
 import type { OKLCH } from '@rafters/shared';
+import { type ColorContext, roundOKLCH } from '@rafters/shared';
 
 async function generateWithWorkersAI(
   oklch: OKLCH,

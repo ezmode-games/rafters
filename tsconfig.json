@@ -3,5 +3,11 @@
   "extends": "./tsconfig.base.json",
   "files": [],
   "compilerOptions": {},
-  "references": [{ "path": "./apps/api" }, { "path": "./apps/cli" }]
+  "references": [
+    { "path": "./packages/shared" },
+    { "path": "./packages/design-tokens" },
+    { "path": "./apps/api" },
+    { "path": "./apps/cli" },
+    { "path": "./apps/website" }
+  ]
 }

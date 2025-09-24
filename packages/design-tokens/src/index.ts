@@ -44,10 +44,10 @@ export type {
   RegistryInitializedEvent,
   TokenChangeEvent,
   TokensBatchChangeEvent,
-} from './types/events.js';
+} from './types/events';
 
 // Import for internal use
-import { TokenRegistry } from './registry.js';
+import { TokenRegistry } from './registry';
 
 export const generateShortCode = () => {
   const s = new sqids();
@@ -197,7 +197,7 @@ export {
   generateTransformTokens,
   generateTypographyScale,
   generateWidthTokens,
-} from './generators/index.js';
+} from './generators/index';
 
 /**
  * Generate CSS custom properties format

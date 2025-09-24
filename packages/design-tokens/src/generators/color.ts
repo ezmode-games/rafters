@@ -5,7 +5,9 @@
  * and the rich intelligence from ColorValue objects.
  */
 
+import type { ColorReference, ColorValue, OKLCH, Token } from '@rafters/shared';
 import {
+  ColorValueSchema,
   calculateDarkModeReference,
   calculateForegroundReference,
   extractAccessibilityLevel,
@@ -13,9 +15,8 @@ import {
   extractTrustLevel,
   generateColorStates,
   selectSemanticColorFromSuggestions,
-} from '@rafters/color-utils';
-import type { ColorReference, ColorValue, OKLCH, Token } from '@rafters/shared';
-import { ColorValueSchema, TokenSchema } from '@rafters/shared';
+  TokenSchema,
+} from '@rafters/shared';
 import { z } from 'zod';
 
 // Configuration schema

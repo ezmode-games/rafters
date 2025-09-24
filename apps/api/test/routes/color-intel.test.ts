@@ -3,7 +3,7 @@
  * Tests route logic with spyOn mocking
  */
 
-import * as colorUtils from '@rafters/color-utils';
+import * as colorUtils from '@rafters/shared';
 import { ColorValueSchema } from '@rafters/shared';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import * as colorIntelUtils from '@/lib/color-intel/utils';

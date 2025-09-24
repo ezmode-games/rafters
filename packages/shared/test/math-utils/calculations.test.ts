@@ -8,7 +8,7 @@ import {
   evaluateExpression,
   findClosestProgressionStep,
   interpolate,
-} from '../src/calculations.js';
+} from '../../src/math-utils/calculations.js';
 
 describe('Mathematical Calculations', () => {
   describe('evaluateExpression', () => {

@@ -13,7 +13,7 @@ import {
   generateHarmony,
   generateOKLCHScale,
   generateSemanticColorSuggestions,
-} from '../src/harmony';
+} from '../../src/color-utils/harmony';
 
 describe('Harmony Module', () => {
   const baseColor: OKLCH = { l: 0.6, c: 0.15, h: 240 };

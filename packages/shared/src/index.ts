@@ -6,6 +6,10 @@
  * and reason about design systems.
  */
 
+export * from './color-utils/index.js';
+
+// Export consolidated utilities
+export * from './math-utils/index.js';
 // Export all types and schemas
 export * from './types';
 

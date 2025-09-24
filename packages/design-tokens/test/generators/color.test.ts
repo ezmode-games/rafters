@@ -10,20 +10,24 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { generateColorTokens } from '../../src/generators/color';
 
 // Mock the color-utils functions
-vi.mock('@rafters/color-utils', () => ({
-  calculateDarkModeReference: vi.fn(() => ({ family: 'mock-family', position: '300' })),
-  calculateForegroundReference: vi.fn(() => ({ family: 'neutral', position: '900' })),
-  generateColorStates: vi.fn(() => ({
-    hover: { family: 'mock-family', position: '700' },
-    active: { family: 'mock-family', position: '800' },
-    focus: { family: 'mock-family', position: '600' },
-    disabled: { family: 'neutral', position: '400' },
-  })),
-  selectSemanticColorFromSuggestions: vi.fn((_colorValue, _type) => ({ l: 0.5, c: 0.1, h: 0 })),
-  extractCognitiveLoad: vi.fn(() => 3),
-  extractTrustLevel: vi.fn(() => 'high'),
-  extractAccessibilityLevel: vi.fn(() => 'AA'),
-}));
+vi.mock('@rafters/shared', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    calculateDarkModeReference: vi.fn(() => ({ family: 'mock-family', position: '300' })),
+    calculateForegroundReference: vi.fn(() => ({ family: 'neutral', position: '900' })),
+    generateColorStates: vi.fn(() => ({
+      hover: { family: 'mock-family', position: '700' },
+      active: { family: 'mock-family', position: '800' },
+      focus: { family: 'mock-family', position: '600' },
+      disabled: { family: 'neutral', position: '400' },
+    })),
+    selectSemanticColorFromSuggestions: vi.fn((_colorValue, _type) => ({ l: 0.5, c: 0.1, h: 0 })),
+    extractCognitiveLoad: vi.fn(() => 3),
+    extractTrustLevel: vi.fn(() => 'high'),
+    extractAccessibilityLevel: vi.fn(() => 'AA'),
+  };
+});
 
 // Mock fetch for API calls
 const mockColorValue: ColorValue = {
@@ -187,7 +191,7 @@ describe('Color Generator v2', () => {
 
     it('should use color-utils functions for intelligent metadata extraction', async () => {
       const { extractCognitiveLoad, extractTrustLevel, extractAccessibilityLevel } = await import(
-        '@rafters/color-utils'
+        '@rafters/shared'
       );
 
       await generateColorTokens({

@@ -7,7 +7,12 @@
 
 import type { OKLCH } from '@rafters/shared';
 import { describe, expect, it } from 'vitest';
-import { adjustChroma, adjustHue, adjustLightness, blendColors } from '../src/manipulation';
+import {
+  adjustChroma,
+  adjustHue,
+  adjustLightness,
+  blendColors,
+} from '../../src/color-utils/manipulation';
 
 describe('Manipulation Module', () => {
   const baseColor: OKLCH = { l: 0.6, c: 0.15, h: 240 };

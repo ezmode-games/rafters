@@ -13,7 +13,7 @@ import {
   generateColorCacheKey,
   generateColorValue,
   validateOKLCH,
-} from '../src/generator';
+} from '../../src/color-utils/generator';
 
 describe('Generator Module', () => {
   // Test colors

@@ -8,7 +8,7 @@ import {
   generateModularScale,
   generateMusicalScale,
   generateProgression,
-} from '../src/progressions.js';
+} from '../../src/math-utils/progressions.js';
 
 describe('Mathematical Progressions', () => {
   describe('generateProgression', () => {

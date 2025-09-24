@@ -49,14 +49,6 @@ const NavigationPathSchema = z
   .string()
   .min(1, 'Path cannot be empty')
   .startsWith('/', 'Path must start with /');
-const _HrefSchema = z.string().refine((val) => {
-  try {
-    new URL(val);
-    return true;
-  } catch {
-    return val.startsWith('/');
-  }
-}, 'Must be a valid URL or path starting with /');
 
 // Simplified sidebar hook using navigation coordination
 export const useSidebar = () => {
@@ -642,7 +634,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
         aria-disabled={disabled}
         aria-busy={loading}
         title={collapsed && showTooltip ? String(children) : undefined}
-        {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
+        {...(props as unknown as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
       >
         {/* Icon with consistent sizing */}
         {icon && (
