@@ -103,21 +103,29 @@ describe('Main App', () => {
   test('queue handler processes batch messages', async () => {
     const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
-    // Mock the global fetch instead of worker.fetch for internal HTTP calls
-    const originalFetch = global.fetch;
-    global.fetch = vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          name: 'Test Color',
-          scale: [{ l: 0.5, c: 0.1, h: 180 }],
-          intelligence: { suggestedName: 'Test Color' },
+    // Create a mock environment with properly mocked Vectorize and AI services
+    const mockEnv = {
+      ...env,
+      VECTORIZE: {
+        getByIds: vi.fn().mockResolvedValue([]),
+        query: vi.fn().mockResolvedValue({ matches: [] }),
+        insert: vi.fn().mockResolvedValue({ count: 1 }),
+        upsert: vi.fn().mockResolvedValue({ count: 1 }),
+        deleteByIds: vi.fn().mockResolvedValue({ count: 0 }),
+        describe: vi
+          .fn()
+          .mockResolvedValue({ name: 'test-index', description: 'Test vectorize index' }),
+      },
+      AI: {
+        run: vi.fn().mockResolvedValue({
+          response: JSON.stringify({
+            suggestedName: 'Ocean Blue',
+            reasoning: 'This color evokes the calm depths of the ocean',
+            emotionalImpact: 'Calming and serene, promotes tranquility',
+          }),
         }),
-        {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      )
-    );
+      },
+    };
 
     const mockBatch: MessageBatch<ColorSeedMessage> = {
       queue: 'COLOR_SEED_QUEUE',
@@ -140,12 +148,11 @@ describe('Main App', () => {
       ackAll: vi.fn(),
     };
 
-    await worker.queue(mockBatch, env);
+    // biome-ignore lint/suspicious/noExplicitAny: Mock environment for testing
+    await worker.queue(mockBatch, mockEnv as any);
 
     expect(mockBatch.messages[0].ack).toHaveBeenCalled();
 
-    // Restore original fetch
-    global.fetch = originalFetch;
     consoleSpy.mockRestore();
   }, 10000); // 10 second timeout
 });
