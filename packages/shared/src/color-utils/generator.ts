@@ -6,8 +6,8 @@
  * Eliminates duplication of complex mathematical color logic
  */
 
-import type { ColorValue, OKLCH } from '@rafters/shared';
-import { ColorValueSchema, OKLCHSchema } from '@rafters/shared';
+import type { ColorValue, OKLCH } from '../types';
+import { ColorValueSchema, OKLCHSchema } from '../types';
 import {
   calculateWCAGContrast,
   findAccessibleColor,
