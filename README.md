@@ -101,9 +101,7 @@ rafters/
 ├── packages/
 │   ├── design-tokens/    # Dependency-aware token engine
 │   ├── ui/              # Components with cognitive metadata
-│   ├── color-utils/     # OKLCH color intelligence
-│   ├── math-utils/      # Mathematical foundations
-│   └── shared/          # Type definitions
+│   └── shared/          # Consolidated utilities: OKLCH color intelligence, mathematical foundations, types
 └── .rafters/            # Your design intelligence (Git-tracked)
     ├── tokens/          # Token registry with dependencies
     ├── registry/        # Component intelligence cache

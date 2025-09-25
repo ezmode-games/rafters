@@ -6,8 +6,22 @@
  */
 
 /**
- * Musical Intervals - Based on mathematical ratios from music theory
- * These create harmonious visual progressions similar to musical harmony
+ * Musical Intervals - Mathematical ratios from music theory for harmonic design progression.
+ *
+ * These ratios form the mathematical foundation of Rafters' spacing and typography systems.
+ * Based on the principle that mathematical relationships which create pleasing musical
+ * harmony also create pleasing visual harmony.
+ *
+ * Music theory provides mathematically precise ratios that have been refined over
+ * centuries to create pleasant auditory experiences. Applied to design, these same
+ * ratios create visual systems with inherent harmony and balance.
+ *
+ * Each ratio represents the frequency relationship between two musical notes:
+ * - Smaller ratios (minor-second) create subtle, tight progressions
+ * - Larger ratios (perfect-fifth) create bold, dramatic progressions
+ *
+ * These are cornerstone values for generating spacing scales, typography scales,
+ * and component sizing systems throughout Rafters.
  */
 export const MUSICAL_RATIOS = {
   'minor-second': 1.067, // 16:15 ratio - tight, subtle progression
@@ -61,7 +75,27 @@ export type ProgressionType =
 const AVAILABLE_RATIOS_STRING = Object.keys(ALL_RATIOS).join(', ');
 
 /**
- * Get ratio value by name with fallback
+ * Get ratio value by name with validation.
+ *
+ * Central accessor function for all mathematical ratios in the Rafters system.
+ * Used throughout the design token generation process to ensure consistent
+ * mathematical relationships across spacing, typography, and sizing systems.
+ *
+ * This function provides:
+ * - Type-safe ratio access with runtime validation
+ * - Detailed error messages for debugging
+ * - Single source of truth for all ratio values
+ * - Performance optimization through pre-computed lookup
+ *
+ * @param name - The ratio name (musical interval or mathematical constant)
+ * @returns The precise mathematical ratio value
+ * @throws Error with available options if ratio name is invalid
+ *
+ * @example
+ * ```typescript
+ * const golden = getRatio('golden'); // 1.618033988749
+ * const fourth = getRatio('perfect-fourth'); // 1.333
+ * ```
  */
 export function getRatio(name: string): number {
   const ratio = ALL_RATIOS[name as keyof typeof ALL_RATIOS];
@@ -72,7 +106,20 @@ export function getRatio(name: string): number {
 }
 
 /**
- * Check if a string is a valid ratio name
+ * Check if a string is a valid ratio name.
+ *
+ * Type guard function for validating ratio names before using getRatio().
+ * Essential for user input validation in Studio and CLI tools.
+ *
+ * @param name - String to validate as ratio name
+ * @returns True if name corresponds to a defined ratio
+ *
+ * @example
+ * ```typescript
+ * if (isValidRatio('golden')) {
+ *   const ratio = getRatio('golden'); // TypeScript knows this is safe
+ * }
+ * ```
  */
 export function isValidRatio(name: string): name is keyof typeof ALL_RATIOS {
   return name in ALL_RATIOS;
