@@ -12,7 +12,7 @@
     "test:unit": "vitest run",
     "test:integration": "vitest run --config vitest.config.cloudflare.ts",
     "test:preflight": "vitest run && vitest run --config vitest.config.cloudflare.ts",
-    "lint": "biome check .",
+    "lint": "biome check --fix .",
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit"
   },
