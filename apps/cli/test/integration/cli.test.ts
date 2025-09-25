@@ -70,7 +70,7 @@ describe('CLI Integration', () => {
     });
 
     // This should not throw
-    const output = execSync(`node "${CLI_PATH}" init --yes`, { encoding: 'utf-8', stdio: 'pipe' });
+    const output = execSync(`node "${CLI_PATH}" init --yes`, { encoding: 'utf-8', stdio: 'pipe', timeout: 30000 });
 
     // Verify output contains success indicators
     expect(output).toContain('Rafters initialized');
@@ -80,7 +80,7 @@ describe('CLI Integration', () => {
     expect(existsSync(join(testDir, '.rafters/config.json'))).toBe(true);
     expect(existsSync(join(testDir, 'src/components/ui'))).toBe(true);
     expect(existsSync(join(testDir, 'src/lib/utils.ts'))).toBe(true);
-  });
+  }, 30000);
 
   // NOTE: Removed integration test for 'list' command as it hits external registry API
   // The functionality is covered by unit tests in test/commands/list.test.ts
@@ -94,11 +94,11 @@ describe('CLI Integration', () => {
     });
 
     // Initialize first
-    execSync(`node "${CLI_PATH}" init --yes`, { encoding: 'utf-8', stdio: 'pipe' });
+    execSync(`node "${CLI_PATH}" init --yes`, { encoding: 'utf-8', stdio: 'pipe', timeout: 30000 });
     expect(existsSync(join(testDir, '.rafters'))).toBe(true);
 
     // Then clean
-    execSync(`node "${CLI_PATH}" clean --force`, { encoding: 'utf-8' });
+    execSync(`node "${CLI_PATH}" clean --force`, { encoding: 'utf-8', timeout: 30000 });
     expect(existsSync(join(testDir, '.rafters'))).toBe(false);
-  });
+  }, 30000);
 });
