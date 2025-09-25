@@ -9,7 +9,7 @@
 import type { Token } from '@rafters/shared';
 import { TokenDependencyGraph } from './dependencies';
 import { GenerationRuleExecutor, GenerationRuleParser } from './generation-rules';
-import type { RegistryChangeCallback, TokenChangeEvent } from './types/events.js';
+import type { RegistryChangeCallback, RegistryEvent, TokenChangeEvent } from './types/events.js';
 
 // Helper function to convert token values to CSS (simple inline implementation)
 
@@ -50,14 +50,12 @@ export class TokenRegistry {
     this.addToken(token);
 
     // Fire change callback for new token addition
-    if (this.changeCallback) {
-      this.changeCallback({
-        type: 'token-added',
-        tokenName: token.name,
-        token,
-        timestamp: Date.now(),
-      });
-    }
+    this.fireEvent({
+      type: 'token-added',
+      tokenName: token.name,
+      token,
+      timestamp: Date.now(),
+    });
   }
 
   /**
@@ -91,6 +89,15 @@ export class TokenRegistry {
   }
 
   /**
+   * Fire a registry event if callback is set
+   */
+  private fireEvent(event: RegistryEvent): void {
+    if (this.changeCallback) {
+      this.changeCallback(event);
+    }
+  }
+
+  /**
    * Update a single token and fire change event
    */
   updateToken(name: string, value: string): void {
@@ -110,15 +117,13 @@ export class TokenRegistry {
     this.tokens.set(name, updatedToken);
 
     // Fire change callback
-    if (this.changeCallback) {
-      this.changeCallback({
-        type: 'token-changed',
-        tokenName: name,
-        oldValue,
-        newValue: value,
-        timestamp: Date.now(),
-      });
-    }
+    this.fireEvent({
+      type: 'token-changed',
+      tokenName: name,
+      oldValue,
+      newValue: value,
+      timestamp: Date.now(),
+    });
   }
 
   /**
@@ -151,26 +156,22 @@ export class TokenRegistry {
       });
     }
 
-    if (this.changeCallback) {
-      this.changeCallback({
-        type: 'tokens-batch-changed',
-        changes,
-        timestamp: Date.now(),
-      });
-    }
+    this.fireEvent({
+      type: 'tokens-batch-changed',
+      changes,
+      timestamp: Date.now(),
+    });
   }
 
   /**
    * Fire registry initialized event
    */
   initializeRegistry(tokenCount: number): void {
-    if (this.changeCallback) {
-      this.changeCallback({
-        type: 'registry-initialized',
-        tokenCount,
-        timestamp: Date.now(),
-      });
-    }
+    this.fireEvent({
+      type: 'registry-initialized',
+      tokenCount,
+      timestamp: Date.now(),
+    });
   }
 
   async set(tokenName: string, value: string): Promise<void> {

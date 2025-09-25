@@ -1,17 +1,11 @@
 pre-commit:
   parallel: true
   jobs:
-    - name: biome lint and format
+    - name: lint and format
       run: pnpm biome check --write
 
     - name: typecheck
       run: pnpm typecheck
-
-    - name: build cli
-      run: cd apps/cli && pnpm build
-
-    - name: build website
-      run: cd apps/website && pnpm build
 
 pre-push:
   jobs:

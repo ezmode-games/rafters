@@ -29,14 +29,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint and format
-        run: pnpm biome check
-
-      - name: Type check
-        run: pnpm typecheck
-
-      - name: Test
-        run: pnpm test
+      - name: Preflight checks
+        run: pnpm preflight
 
   build:
     runs-on: ubuntu-latest
