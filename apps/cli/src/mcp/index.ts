@@ -4,20 +4,22 @@
  * Provides AI agents with direct access to design token intelligence,
  * component metadata, and design system reasoning.
  *
- * Based on shadcn's approach - embedded directly in CLI for single source of truth.
- *
- * Note: Implementation temporarily disabled due to MCP SDK import issues.
- * Will be re-enabled in a future release once SDK compatibility is resolved.
+ * Features:
+ * - Progressive intelligence delivery (immediate → quick → computed → deep)
+ * - Vector-based design reasoning with confidence scoring
+ * - Real-time streaming for live design collaboration
+ * - Cross-modal design intelligence (color-sound-texture-emotion)
+ * - Business context integration with predictive capabilities
  */
 
-export function startMCPServer(): void {
-  throw new Error(
-    'MCP server is currently disabled. Implementation pending MCP SDK compatibility fixes.'
-  );
+import { RaftersDesignIntelligenceServer } from './server.js';
+
+export async function startMCPServer(): Promise<void> {
+  const server = new RaftersDesignIntelligenceServer();
+  await server.start();
 }
 
 export function createMCPTools(): void {
-  throw new Error(
-    'MCP tools are currently disabled. Implementation pending MCP SDK compatibility fixes.'
-  );
+  // Tools are automatically registered in the server class
+  // This function exists for compatibility but is not needed
 }
