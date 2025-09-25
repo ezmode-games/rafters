@@ -3,13 +3,12 @@
  * Tests the service with real TokenRegistry operations and rule execution
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
-import { TokenRegistry } from '../src/registry';
 import type { Token } from '@rafters/shared';
-
+import { beforeEach, describe, expect, it } from 'vitest';
 // Import the service directly for integration testing
 // Note: Using relative path since exports might not be fully resolved
 import { DependencyIntelligenceService } from '../../../apps/cli/src/mcp/services/dependency-intelligence';
+import { TokenRegistry } from '../src/registry';
 
 // Create realistic tokens for integration testing
 const createIntegrationTokens = (): Token[] => [
@@ -122,9 +121,11 @@ describe('DependencyIntelligenceService Integration Tests', () => {
       if (impact.success) {
         expect(impact.data.tokenName).toBe('primary');
         expect(impact.data.newValue).toBe('oklch(0.6 0.25 120)');
-        
+
         // Should predict impact on primary-hover
-        const affectedToken = impact.data.affectedTokens.find(t => t.tokenName === 'primary-hover');
+        const affectedToken = impact.data.affectedTokens.find(
+          (t) => t.tokenName === 'primary-hover'
+        );
         expect(affectedToken).toBeDefined();
         expect(affectedToken?.confidence).toBeGreaterThan(0.5);
       }
@@ -168,8 +169,10 @@ describe('DependencyIntelligenceService Integration Tests', () => {
       if (validation.success) {
         expect(validation.data.isValid).toBe(false);
         expect(validation.data.errors.length).toBeGreaterThan(0);
-        
-        const circularError = validation.data.errors.find(e => e.errorType === 'circular-dependency');
+
+        const circularError = validation.data.errors.find(
+          (e) => e.errorType === 'circular-dependency'
+        );
         expect(circularError).toBeDefined();
       }
     });
@@ -218,7 +221,11 @@ describe('DependencyIntelligenceService Integration Tests', () => {
         dependencies: ['spacing-base', 'spacing-lg'],
       };
 
-      const result = await service.executeRule('calc({spacing-base} + {spacing-lg})', 'test-calc', context);
+      const result = await service.executeRule(
+        'calc({spacing-base} + {spacing-lg})',
+        'test-calc',
+        context
+      );
       expect(result.success).toBe(true);
 
       if (result.success && result.data.success) {
@@ -244,11 +251,13 @@ describe('DependencyIntelligenceService Integration Tests', () => {
       expect(result1.success).toBe(true);
       expect(result2.success).toBe(true);
       expect(time2).toBeLessThan(time1); // Cache should be faster
-      
+
       // Results should be identical
       if (result1.success && result2.success) {
         expect(result1.data.cascadeScope).toEqual(result2.data.cascadeScope);
-        expect(result1.data.performanceMetrics.depth).toEqual(result2.data.performanceMetrics.depth);
+        expect(result1.data.performanceMetrics.depth).toEqual(
+          result2.data.performanceMetrics.depth
+        );
       }
     });
 
@@ -265,7 +274,7 @@ describe('DependencyIntelligenceService Integration Tests', () => {
       }
 
       const largeRegistry = new TokenRegistry([...createIntegrationTokens(), ...manyTokens]);
-      
+
       // Create dependency chain
       for (let i = 1; i < 50; i++) {
         largeRegistry.dependencyGraph.addDependency(`token-${i}`, [`token-${i - 1}`], 'scale:1.1');
@@ -279,7 +288,7 @@ describe('DependencyIntelligenceService Integration Tests', () => {
 
       expect(analysis.success).toBe(true);
       expect(executionTime).toBeLessThan(500); // Should complete within 500ms even for large graphs
-      
+
       if (analysis.success) {
         expect(analysis.data.cascadeScope.length).toBeGreaterThan(40); // Should find the chain
         expect(analysis.data.performanceMetrics.complexity).toBeGreaterThan(0);
@@ -293,13 +302,13 @@ describe('DependencyIntelligenceService Integration Tests', () => {
         service.analyzeDependencies('primary'),
       ]);
 
-      expect(results.every(r => r.success)).toBe(true);
-      
+      expect(results.every((r) => r.success)).toBe(true);
+
       // All results should be consistent
-      if (results.every(r => r.success)) {
-        const cascadeSizes = results.map(r => r.success ? r.data.cascadeScope.length : 0);
-        const depths = results.map(r => r.success ? r.data.performanceMetrics.depth : 0);
-        
+      if (results.every((r) => r.success)) {
+        const cascadeSizes = results.map((r) => (r.success ? r.data.cascadeScope.length : 0));
+        const depths = results.map((r) => (r.success ? r.data.performanceMetrics.depth : 0));
+
         expect(Math.max(...cascadeSizes) - Math.min(...cascadeSizes)).toBe(0);
         expect(Math.max(...depths) - Math.min(...depths)).toBe(0);
       }
