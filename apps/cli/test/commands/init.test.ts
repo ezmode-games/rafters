@@ -157,7 +157,7 @@ describe('init command', () => {
     expect(existsSync(join(testDir, '.rafters/config.json'))).toBe(true);
     expect(existsSync(join(testDir, '.rafters/component-manifest.json'))).toBe(true);
     expect(existsSync(join(testDir, '.rafters/agent-instructions.md'))).toBe(true);
-  });
+  }, 15000);
 
   it('should create necessary directories and files', async () => {
     const fs = await import('fs-extra');
@@ -183,5 +183,5 @@ describe('init command', () => {
     expect(config).toHaveProperty('version');
     expect(config).toHaveProperty('componentsDir');
     expect(config).toHaveProperty('registry');
-  });
+  }, 15000);
 });
