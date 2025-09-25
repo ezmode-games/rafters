@@ -8,7 +8,7 @@ import { join, resolve } from 'node:path';
 import { ensureDirSync, existsSync, removeSync, writeJsonSync } from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-const CLI_PATH = resolve(__dirname, '../../dist/bin.js');
+const CLI_PATH = resolve(__dirname, '../../dist/bin.mjs');
 
 describe('CLI Integration', () => {
   let testDir: string;
