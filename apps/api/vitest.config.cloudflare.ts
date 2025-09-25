@@ -18,6 +18,11 @@ export default defineWorkersProject({
           queueConsumers: {
             COLOR_SEED_QUEUE: { maxBatchTimeout: 0.05 /* 50ms */ },
           },
+          vectorizeIndexes: {
+            VECTORIZE: {
+              preset: 'openai-text-embedding-ada-002',
+            },
+          },
         },
         wrangler: { configPath: './wrangler.jsonc' },
       },
