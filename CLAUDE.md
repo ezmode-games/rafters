@@ -56,7 +56,6 @@ pnpm --filter=@rafters/ui test:component
 
 # Test specific package
 pnpm --filter=shared test
-pnpm --filter=color-utils test
 ```
 
 ## Project Architecture
@@ -67,12 +66,10 @@ pnpm --filter=color-utils test
   - `apps/website/` - Documentation and marketing site
   - `apps/api/` - Hono backend for design system services
 
-- **Packages**: 5 core packages
+- **Packages**: 3 core packages
   - `packages/design-tokens/` - Revolutionary dependency-aware design token system
   - `packages/ui/` - Rafters component library with cognitive load intelligence
-  - `packages/color-utils/` - OKLCH color manipulation and AI intelligence
-  - `packages/math-utils/` - Mathematical utilities for design token generation
-  - `packages/shared/` - Shared utilities and types
+  - `packages/shared/` - Consolidated utilities: OKLCH color manipulation, mathematical foundations, types and schemas
 
 ### Design Token System Architecture
 The `@rafters/design-tokens` package implements a sophisticated dependency graph system:

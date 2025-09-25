@@ -29,6 +29,23 @@ This file provides GitHub Copilot with project-specific guidance for the Rafters
 - No impure functions in components
 - Use `useState(() => Math.random())` not `Math.random()` directly
 
+### 7. No Console Logs for User Feedback
+- Use proper UI components for feedback
+- Example: `<Alert message="Action successful" type="success" />`
+
+### 8. No Direct JSON Access for Tokens
+- Always use `TokenRegistry` for design tokens
+- Example: `const primaryColor = tokenRegistry.getToken('color.primary')`
+
+### 9. Component Intelligence Metadata
+- Every component must have JSDoc with cognitive load, attention economics, trust patterns
+- Use camelCase tags: `@cognitiveLoad`, `@attentionEconomics`, `@trustBuilding`
+
+### 10. No forEach Loops
+- Use `map`, `filter`, `reduce` for functional programming. Use `for..of` for async iteration
+- Example: `const squares = numbers.map(n => n * n)`
+
+
 ## Project Architecture
 
 ### Monorepo Structure
@@ -41,9 +58,7 @@ apps/
 packages/
   design-tokens/ - Dependency-aware design token system
   ui/            - Component library with cognitive load intelligence
-  color-utils/   - OKLCH color manipulation and AI intelligence
-  math-utils/    - Mathematical utilities for design token generation
-  shared/        - Shared utilities and types
+  shared/        - Shared math and color utilities and types
 ```
 
 ### Key Technologies

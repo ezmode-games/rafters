@@ -37,8 +37,42 @@ export type ColorContext = {
 };
 
 /**
- * Generate complete ColorValue with full mathematical intelligence
- * This is the single source of truth used by API, Studio, and generators
+ * Generate complete ColorValue with full mathematical intelligence.
+ *
+ * This is the cornerstone function of the Rafters color intelligence system.
+ * It transforms a simple OKLCH color into a complete ColorValue object containing:
+ *
+ * - **Mathematical Scale**: 11-step lightness scale (50-950) with base color at 600
+ * - **Accessibility Intelligence**: Pre-computed contrast matrices for instant lookup
+ * - **Color Harmonies**: Mathematically derived complementary, triadic, analogous relationships
+ * - **Interactive States**: Accessible hover/focus/active/disabled variants
+ * - **Perceptual Analysis**: Temperature, weight, and semantic role suggestions
+ * - **Cognitive Load Data**: Trust levels and attention economics for UI decisions
+ *
+ * Used by:
+ * - API: Real-time color intelligence generation
+ * - Studio: Interactive color exploration and brand customization
+ * - Design Tokens: Systematic token generation with dependencies
+ * - MCP Server: AI agent color intelligence queries
+ *
+ * The mathematical foundation ensures all generated values have inherent harmony
+ * and accessibility compliance, removing guesswork from color decisions.
+ *
+ * @param baseColor - OKLCH color object to analyze and expand
+ * @param context - Optional context for token assignment and state generation
+ * @returns Complete ColorValue object with full design intelligence
+ * @throws ZodError if input color is invalid
+ *
+ * @example
+ * ```typescript
+ * const color = { l: 0.6, c: 0.25, h: 250 };
+ * const colorValue = generateColorValue(color, {
+ *   token: 'primary',
+ *   generateStates: true,
+ *   semanticRole: 'brand'
+ * });
+ * // Returns complete ColorValue with scale, accessibility, harmonies, states
+ * ```
  */
 export function generateColorValue(baseColor: OKLCH, context: ColorContext = {}): ColorValue {
   // Validate input with Zod
@@ -196,8 +230,33 @@ export function generateColorValue(baseColor: OKLCH, context: ColorContext = {})
 }
 
 /**
- * Calculate mathematical color metadata for token generation
- * Provides consistent metadata calculation across all systems
+ * Calculate mathematical color metadata for token generation.
+ *
+ * Generates standardized metadata that enables AI agents to make intelligent
+ * color decisions based on mathematical properties and semantic context.
+ *
+ * This function provides the cognitive load intelligence that prevents
+ * AI-generated interfaces from overwhelming users with excessive visual weight.
+ *
+ * Calculates:
+ * - **Trust Level**: Based on semantic role (critical for destructive actions)
+ * - **Cognitive Load**: Mathematical formula considering lightness, chroma, and context
+ * - **Consequence Level**: Impact classification for risk assessment
+ *
+ * The cognitive load calculation uses:
+ * - Darker colors: Higher cognitive load (demand more attention)
+ * - Higher chroma: Increased processing requirement
+ * - Critical context: Additional attention weight for safety
+ *
+ * @param colorValue - Complete ColorValue object to analyze
+ * @returns Metadata object with trust level, cognitive load, and consequences
+ * @throws Error if no valid color found in scale
+ *
+ * @example
+ * ```typescript
+ * const metadata = calculateColorMetadata(primaryColorValue);
+ * // Returns: { trustLevel: 'high', cognitiveLoad: 6, consequence: 'significant' }
+ * ```
  */
 export function calculateColorMetadata(colorValue: ColorValue) {
   const baseColor = colorValue.scale[5] || colorValue.scale[0] || colorValue.scale.find(Boolean);
@@ -236,8 +295,30 @@ export function calculateColorMetadata(colorValue: ColorValue) {
 }
 
 /**
- * Generate cache key for color intelligence
- * Consistent cache key generation across API and Studio
+ * Generate cache key for color intelligence.
+ *
+ * Creates consistent, optimized cache keys for color intelligence lookups
+ * across all Rafters systems. Critical for performance optimization in:
+ * - API color generation endpoints
+ * - Studio real-time color exploration
+ * - MCP server intelligence queries
+ * - Design token dependency resolution
+ *
+ * Uses rounded OKLCH values to ensure cache hits for visually identical
+ * colors that may have minor floating-point differences.
+ *
+ * @param oklch - OKLCH color for cache key generation
+ * @param context - Optional context for cache segmentation
+ * @returns Optimized string cache key
+ *
+ * @example
+ * ```typescript
+ * const key = generateColorCacheKey(
+ *   { l: 0.6234567, c: 0.25123, h: 250.789 },
+ *   { token: 'primary' }
+ * );
+ * // Returns: "oklch-0.62-0.25-251-primary"
+ * ```
  */
 export function generateColorCacheKey(oklch: OKLCH, context?: ColorContext): string {
   // Use consistent rounding function
@@ -250,8 +331,28 @@ export function generateColorCacheKey(oklch: OKLCH, context?: ColorContext): str
 }
 
 /**
- * Validate OKLCH values for safety
- * Shared validation logic across all systems
+ * Validate OKLCH values for safety.
+ *
+ * Type guard function that ensures color objects conform to OKLCH schema
+ * before processing. Essential for preventing runtime errors in color
+ * intelligence generation.
+ *
+ * Uses Zod schema validation to check:
+ * - Lightness: 0-1 range
+ * - Chroma: 0-0.4 range (practical limit for most displays)
+ * - Hue: 0-360 degrees
+ * - Alpha: Optional 0-1 range
+ *
+ * @param oklch - Unknown value to validate as OKLCH
+ * @returns Type-safe boolean indicating valid OKLCH object
+ *
+ * @example
+ * ```typescript
+ * if (validateOKLCH(userInput)) {
+ *   // TypeScript knows userInput is OKLCH
+ *   const colorValue = generateColorValue(userInput);
+ * }
+ * ```
  */
 export function validateOKLCH(oklch: unknown): oklch is OKLCH {
   try {
