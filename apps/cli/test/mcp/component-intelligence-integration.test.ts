@@ -4,10 +4,10 @@
  * Tests for the Component Intelligence Service integration with the MCP server.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import type { ComponentManifest } from '@rafters/shared';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentIntelligenceService } from '../../src/mcp/services/component-intelligence';
 import { fetchComponent } from '../../src/utils/registry';
-import type { ComponentManifest } from '@rafters/shared';
 
 // Mock the registry fetch function
 vi.mock('../../src/utils/registry', () => ({
@@ -42,7 +42,8 @@ describe('MCP Component Intelligence Integration', () => {
           cognitiveLoad: 3,
           attentionEconomics: 'Primary action trigger with high attention weight',
           accessibility: 'WCAG AAA compliant with 44px minimum touch targets',
-          trustBuilding: 'Loading states prevent double-submission, confirmation patterns for destructive actions',
+          trustBuilding:
+            'Loading states prevent double-submission, confirmation patterns for destructive actions',
           semanticMeaning: 'Main user action component for critical workflows',
         },
       },

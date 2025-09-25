@@ -9,7 +9,7 @@
  * analysis of attention economics and user cognitive load.
  */
 
-import type { ComponentRegistry, Intelligence, OKLCH } from '@rafters/shared';
+import type { ComponentRegistry, Intelligence } from '@rafters/shared';
 import { z } from 'zod';
 
 // ===== SCHEMAS & TYPES =====
@@ -29,21 +29,25 @@ export const CompositionConstraintsSchema = z.object({
   maxAttentionPoints: z.number().min(1).max(5).default(3),
   requiresAccessibility: z.array(z.enum(['AA', 'AAA'])).default(['AA']),
   trustLevel: z.enum(['low', 'medium', 'high', 'critical']).default('medium'),
-  deviceConstraints: z.object({
-    minTouchTarget: z.number().default(44), // 44px WCAG minimum
-    maxElements: z.number().default(7), // Miller's rule
-  }).optional(),
+  deviceConstraints: z
+    .object({
+      minTouchTarget: z.number().default(44), // 44px WCAG minimum
+      maxElements: z.number().default(7), // Miller's rule
+    })
+    .optional(),
 });
 
 export type CompositionConstraints = z.infer<typeof CompositionConstraintsSchema>;
 
 export const ComponentLayoutSchema = z.object({
-  components: z.array(z.object({
-    name: z.string(),
-    position: z.object({ x: z.number(), y: z.number() }),
-    size: z.object({ width: z.number(), height: z.number() }),
-    zIndex: z.number().optional(),
-  })),
+  components: z.array(
+    z.object({
+      name: z.string(),
+      position: z.object({ x: z.number(), y: z.number() }),
+      size: z.object({ width: z.number(), height: z.number() }),
+      zIndex: z.number().optional(),
+    })
+  ),
   viewportSize: z.object({
     width: z.number(),
     height: z.number(),
@@ -53,7 +57,9 @@ export const ComponentLayoutSchema = z.object({
 export type ComponentLayout = z.infer<typeof ComponentLayoutSchema>;
 
 export const A11yContextSchema = z.object({
-  colorVisionTypes: z.array(z.enum(['normal', 'deuteranopia', 'protanopia', 'tritanopia'])).default(['normal']),
+  colorVisionTypes: z
+    .array(z.enum(['normal', 'deuteranopia', 'protanopia', 'tritanopia']))
+    .default(['normal']),
   contrastLevel: z.enum(['AA', 'AAA']).default('AA'),
   screenReader: z.boolean().default(false),
   motorImpairments: z.boolean().default(false),
@@ -70,17 +76,19 @@ export const IntelligenceResultSchema = z.object({
   timestamp: z.string(),
 });
 
-export type IntelligenceResult<T> = {
-  success: true;
-  data: T;
-  confidence: number;
-  timestamp: string;
-} | {
-  success: false;
-  error: string;
-  confidence: number;
-  timestamp: string;
-};
+export type IntelligenceResult<T> =
+  | {
+      success: true;
+      data: T;
+      confidence: number;
+      timestamp: string;
+    }
+  | {
+      success: false;
+      error: string;
+      confidence: number;
+      timestamp: string;
+    };
 
 export const ComponentIntelligenceAnalysisSchema = z.object({
   cognitiveLoadScore: z.number().min(0).max(10),
@@ -88,28 +96,34 @@ export const ComponentIntelligenceAnalysisSchema = z.object({
   attentionWeight: z.number().min(0).max(1),
   trustPatterns: z.array(z.string()),
   accessibilityGaps: z.array(z.string()),
-  recommendations: z.array(z.object({
-    type: z.enum(['cognitive', 'attention', 'accessibility', 'trust']),
-    priority: z.enum(['low', 'medium', 'high', 'critical']),
-    description: z.string(),
-    confidence: z.number().min(0).max(1),
-  })),
+  recommendations: z.array(
+    z.object({
+      type: z.enum(['cognitive', 'attention', 'accessibility', 'trust']),
+      priority: z.enum(['low', 'medium', 'high', 'critical']),
+      description: z.string(),
+      confidence: z.number().min(0).max(1),
+    })
+  ),
 });
 
 export type ComponentIntelligenceAnalysis = z.infer<typeof ComponentIntelligenceAnalysisSchema>;
 
 export const OptimizedCompositionSchema = z.object({
   optimizedLayout: ComponentLayoutSchema,
-  cognitiveLoadDistribution: z.array(z.object({
-    component: z.string(),
-    load: z.number(),
-    justification: z.string(),
-  })),
-  attentionFlow: z.array(z.object({
-    step: z.number(),
-    component: z.string(),
-    reason: z.string(),
-  })),
+  cognitiveLoadDistribution: z.array(
+    z.object({
+      component: z.string(),
+      load: z.number(),
+      justification: z.string(),
+    })
+  ),
+  attentionFlow: z.array(
+    z.object({
+      step: z.number(),
+      component: z.string(),
+      reason: z.string(),
+    })
+  ),
   improvements: z.array(z.string()),
   accessibilityScore: z.number().min(0).max(100),
 });
@@ -121,12 +135,14 @@ export const AttentionHierarchyAnalysisSchema = z.object({
   secondaryTargets: z.array(z.string()),
   visualWeight: z.record(z.string(), z.number()),
   attentionFlow: z.array(z.string()),
-  violations: z.array(z.object({
-    type: z.enum(['competing_primary', 'weak_hierarchy', 'cognitive_overload']),
-    components: z.array(z.string()),
-    severity: z.enum(['warning', 'error']),
-    suggestion: z.string(),
-  })),
+  violations: z.array(
+    z.object({
+      type: z.enum(['competing_primary', 'weak_hierarchy', 'cognitive_overload']),
+      components: z.array(z.string()),
+      severity: z.enum(['warning', 'error']),
+      suggestion: z.string(),
+    })
+  ),
 });
 
 export type AttentionHierarchyAnalysis = z.infer<typeof AttentionHierarchyAnalysisSchema>;
@@ -134,18 +150,23 @@ export type AttentionHierarchyAnalysis = z.infer<typeof AttentionHierarchyAnalys
 export const AccessibilityAnalysisSchema = z.object({
   wcagCompliance: z.object({
     level: z.enum(['A', 'AA', 'AAA', 'FAIL']),
-    violations: z.array(z.object({
-      guideline: z.string(),
-      description: z.string(),
-      impact: z.enum(['minor', 'moderate', 'serious', 'critical']),
-      suggestion: z.string(),
-    })),
+    violations: z.array(
+      z.object({
+        guideline: z.string(),
+        description: z.string(),
+        impact: z.enum(['minor', 'moderate', 'serious', 'critical']),
+        suggestion: z.string(),
+      })
+    ),
   }),
-  colorVisionAnalysis: z.record(z.string(), z.object({
-    accessible: z.boolean(),
-    contrastRatio: z.number(),
-    recommendations: z.array(z.string()),
-  })),
+  colorVisionAnalysis: z.record(
+    z.string(),
+    z.object({
+      accessible: z.boolean(),
+      contrastRatio: z.number(),
+      recommendations: z.array(z.string()),
+    })
+  ),
   touchTargetAnalysis: z.object({
     compliant: z.boolean(),
     minSize: z.number(),
@@ -176,7 +197,7 @@ export class CognitiveLoadModel {
     const baseLoad = Math.min(elements / this.MILLER_RULE_LIMIT, 1.0) * 4;
     const interactionLoad = Math.min(interactions / 3, 1.0) * 3;
     const complexityLoad = (complexity / 10) * 3;
-    
+
     return Math.min(baseLoad + interactionLoad + complexityLoad, 10);
   }
 
@@ -191,12 +212,12 @@ export class CognitiveLoadModel {
    * Calculate attention weight based on component hierarchy
    */
   calculateAttentionWeight(
-    componentName: string,
+    _componentName: string,
     intelligence: Intelligence,
-    context: ComponentAnalysisContext
+    _context: ComponentAnalysisContext
   ): number {
     const attentionEconomics = intelligence.attentionEconomics.toLowerCase();
-    
+
     if (attentionEconomics.includes('primary')) {
       return this.ATTENTION_SPAN_WEIGHTS.primary;
     }
@@ -222,11 +243,11 @@ export class ComponentIntelligenceService {
   async analyzeComponent(
     componentName: string,
     intelligence: Intelligence,
-    context: ComponentAnalysisContext = {}
+    context: Partial<ComponentAnalysisContext> = {}
   ): Promise<IntelligenceResult<ComponentIntelligenceAnalysis>> {
     try {
       const validatedContext = ComponentAnalysisContextSchema.parse(context);
-      
+
       // Extract cognitive elements from intelligence metadata
       const cognitiveLoad = intelligence.cognitiveLoad;
       const attentionWeight = this.cognitiveModel.calculateAttentionWeight(
@@ -237,7 +258,7 @@ export class ComponentIntelligenceService {
 
       // Analyze trust patterns
       const trustPatterns = this.extractTrustPatterns(intelligence.trustBuilding);
-      
+
       // Identify accessibility gaps
       const accessibilityGaps = this.identifyAccessibilityGaps(
         intelligence.accessibility,
@@ -283,26 +304,28 @@ export class ComponentIntelligenceService {
    */
   async optimizeComposition(
     components: readonly ComponentRegistry[],
-    constraints: CompositionConstraints = {}
+    constraints: Partial<CompositionConstraints> = {}
   ): Promise<IntelligenceResult<OptimizedComposition>> {
     try {
       const validatedConstraints = CompositionConstraintsSchema.parse(constraints);
-      
+
       // Calculate total cognitive load
-      const totalCognitiveLoad = components.reduce((sum, comp) => 
-        sum + comp.meta.rafters.intelligence.cognitiveLoad, 0);
-      
+      const totalCognitiveLoad = components.reduce(
+        (sum, comp) => sum + comp.meta.rafters.intelligence.cognitiveLoad,
+        0
+      );
+
       if (totalCognitiveLoad > validatedConstraints.maxCognitiveLoad) {
         // Optimize by reducing cognitive load
         const optimizedComponents = this.reduceCompositionComplexity(
           components,
           validatedConstraints
         );
-        
+
         const optimizedLayout = this.generateOptimizedLayout(optimizedComponents);
         const cognitiveLoadDistribution = this.calculateLoadDistribution(optimizedComponents);
         const attentionFlow = this.calculateAttentionFlow(optimizedComponents);
-        
+
         const composition: OptimizedComposition = {
           optimizedLayout,
           cognitiveLoadDistribution,
@@ -310,7 +333,7 @@ export class ComponentIntelligenceService {
           improvements: [
             `Reduced cognitive load from ${totalCognitiveLoad} to ${cognitiveLoadDistribution.reduce((sum, item) => sum + item.load, 0)}`,
             'Optimized attention hierarchy for better user flow',
-            'Applied Miller\'s 7±2 rule for element grouping',
+            "Applied Miller's 7±2 rule for element grouping",
           ],
           accessibilityScore: this.calculateAccessibilityScore(optimizedComponents),
         };
@@ -357,38 +380,39 @@ export class ComponentIntelligenceService {
   ): Promise<IntelligenceResult<AttentionHierarchyAnalysis>> {
     try {
       const validatedLayout = ComponentLayoutSchema.parse(layout);
-      
+
       // Validate viewport size
       if (validatedLayout.viewportSize.width <= 0 || validatedLayout.viewportSize.height <= 0) {
         throw new Error('Invalid viewport size: width and height must be positive');
       }
-      
+
       // Analyze attention hierarchy
       const visualWeights: Record<string, number> = {};
       const attentionFlow: string[] = [];
       let primaryTarget: string | undefined;
       const secondaryTargets: string[] = [];
-      
+
       // Calculate visual weights based on position and size
       for (const component of validatedLayout.components) {
         const weight = this.calculateVisualWeight(component, validatedLayout.viewportSize);
         visualWeights[component.name] = weight;
-        
+
         if (weight > 0.7 && !primaryTarget) {
           primaryTarget = component.name;
         } else if (weight > 0.4) {
           secondaryTargets.push(component.name);
         }
       }
-      
+
       // Generate attention flow (F-pattern for Western cultures)
-      const sortedComponents = validatedLayout.components
-        .sort((a, b) => a.position.y - b.position.y || a.position.x - b.position.x);
-      
+      const sortedComponents = validatedLayout.components.sort(
+        (a, b) => a.position.y - b.position.y || a.position.x - b.position.x
+      );
+
       for (const component of sortedComponents) {
         attentionFlow.push(component.name);
       }
-      
+
       // Identify violations
       const violations = this.identifyAttentionViolations(
         validatedLayout.components,
@@ -425,20 +449,20 @@ export class ComponentIntelligenceService {
   async validateAccessibility(
     _componentName: string,
     intelligence: Intelligence,
-    context: A11yContext = {}
+    context: Partial<A11yContext> = {}
   ): Promise<IntelligenceResult<AccessibilityAnalysis>> {
     try {
       const validatedContext = A11yContextSchema.parse(context);
-      
+
       // WCAG compliance analysis
       const wcagCompliance = this.analyzeWCAGCompliance(intelligence, validatedContext);
-      
+
       // Color vision analysis
       const colorVisionAnalysis = this.analyzeColorVision(intelligence, validatedContext);
-      
+
       // Touch target analysis
       const touchTargetAnalysis = this.analyzeTouchTargets(intelligence, validatedContext);
-      
+
       // Cognitive accessibility
       const cognitiveAccessibility = this.analyzeCognitiveAccessibility(intelligence);
 
@@ -470,13 +494,13 @@ export class ComponentIntelligenceService {
   private extractTrustPatterns(trustBuilding: string): string[] {
     const patterns: string[] = [];
     const lowerTrust = trustBuilding.toLowerCase();
-    
+
     if (lowerTrust.includes('confirmation')) patterns.push('confirmation_pattern');
     if (lowerTrust.includes('loading')) patterns.push('loading_state');
     if (lowerTrust.includes('feedback')) patterns.push('visual_feedback');
     if (lowerTrust.includes('error')) patterns.push('error_prevention');
     if (lowerTrust.includes('undo')) patterns.push('reversibility');
-    
+
     return patterns;
   }
 
@@ -486,7 +510,7 @@ export class ComponentIntelligenceService {
   ): string[] {
     const gaps: string[] = [];
     const lowerA11y = accessibility.toLowerCase();
-    
+
     if (!lowerA11y.includes('wcag')) gaps.push('wcag_compliance_unspecified');
     if (!lowerA11y.includes('keyboard')) gaps.push('keyboard_navigation');
     if (!lowerA11y.includes('screen reader')) gaps.push('screen_reader_support');
@@ -494,19 +518,19 @@ export class ComponentIntelligenceService {
     if (context.deviceContext === 'mobile' && !lowerA11y.includes('touch')) {
       gaps.push('touch_target_size');
     }
-    
+
     return gaps;
   }
 
   private generateRecommendations(
-    componentName: string,
+    _componentName: string,
     intelligence: Intelligence,
     context: ComponentAnalysisContext,
     cognitiveLoad: number,
     attentionWeight: number
   ): ComponentIntelligenceAnalysis['recommendations'] {
     const recommendations: ComponentIntelligenceAnalysis['recommendations'] = [];
-    
+
     // Cognitive load recommendations
     if (cognitiveLoad > 7) {
       recommendations.push({
@@ -516,19 +540,26 @@ export class ComponentIntelligenceService {
         confidence: 0.9,
       });
     }
-    
+
     // Attention recommendations
-    if (attentionWeight > 0.8 && intelligence.attentionEconomics.toLowerCase().includes('primary')) {
+    if (
+      attentionWeight > 0.8 &&
+      intelligence.attentionEconomics.toLowerCase().includes('primary')
+    ) {
       recommendations.push({
         type: 'attention',
         priority: 'medium',
-        description: 'High attention weight detected. Ensure only one primary attention target per section.',
+        description:
+          'High attention weight detected. Ensure only one primary attention target per section.',
         confidence: 0.85,
       });
     }
-    
+
     // Accessibility recommendations
-    if (intelligence.accessibility.toLowerCase().includes('aa') && context.userExpertise === 'novice') {
+    if (
+      intelligence.accessibility.toLowerCase().includes('aa') &&
+      context.userExpertise === 'novice'
+    ) {
       recommendations.push({
         type: 'accessibility',
         priority: 'high',
@@ -536,17 +567,18 @@ export class ComponentIntelligenceService {
         confidence: 0.8,
       });
     }
-    
+
     // Trust recommendations
     if (intelligence.trustBuilding.toLowerCase().includes('destructive')) {
       recommendations.push({
         type: 'trust',
         priority: 'critical',
-        description: 'Destructive action detected. Ensure confirmation patterns and clear error states.',
+        description:
+          'Destructive action detected. Ensure confirmation patterns and clear error states.',
         confidence: 0.95,
       });
     }
-    
+
     return recommendations;
   }
 
@@ -556,12 +588,13 @@ export class ComponentIntelligenceService {
   ): ComponentRegistry[] {
     // Sort components by cognitive load (ascending)
     const sortedComponents = [...components].sort(
-      (a, b) => a.meta.rafters.intelligence.cognitiveLoad - b.meta.rafters.intelligence.cognitiveLoad
+      (a, b) =>
+        a.meta.rafters.intelligence.cognitiveLoad - b.meta.rafters.intelligence.cognitiveLoad
     );
-    
+
     const optimized: ComponentRegistry[] = [];
     let totalLoad = 0;
-    
+
     for (const component of sortedComponents) {
       const componentLoad = component.meta.rafters.intelligence.cognitiveLoad;
       if (totalLoad + componentLoad <= constraints.maxCognitiveLoad) {
@@ -569,7 +602,7 @@ export class ComponentIntelligenceService {
         totalLoad += componentLoad;
       }
     }
-    
+
     return optimized;
   }
 
@@ -597,7 +630,7 @@ export class ComponentIntelligenceService {
   }
 
   private calculateLoadDistribution(components: readonly ComponentRegistry[]) {
-    return components.map(component => ({
+    return components.map((component) => ({
       component: component.name,
       load: component.meta.rafters.intelligence.cognitiveLoad,
       justification: `Component cognitive load based on intelligence metadata: ${component.meta.rafters.intelligence.attentionEconomics}`,
@@ -609,12 +642,12 @@ export class ComponentIntelligenceService {
     const sorted = [...components].sort((a, b) => {
       const aEcon = a.meta.rafters.intelligence.attentionEconomics.toLowerCase();
       const bEcon = b.meta.rafters.intelligence.attentionEconomics.toLowerCase();
-      
+
       if (aEcon.includes('primary') && !bEcon.includes('primary')) return -1;
       if (!aEcon.includes('primary') && bEcon.includes('primary')) return 1;
       if (aEcon.includes('secondary') && bEcon.includes('tertiary')) return -1;
       if (aEcon.includes('tertiary') && bEcon.includes('secondary')) return 1;
-      
+
       return 0;
     });
 
@@ -632,15 +665,15 @@ export class ComponentIntelligenceService {
     for (const component of components) {
       const a11y = component.meta.rafters.intelligence.accessibility.toLowerCase();
       let score = 60; // Base score
-      
+
       if (a11y.includes('wcag aaa')) score = 100;
       else if (a11y.includes('wcag aa')) score = 85;
       else if (a11y.includes('wcag a')) score = 70;
-      
+
       if (a11y.includes('keyboard')) score += 5;
       if (a11y.includes('screen reader')) score += 5;
       if (a11y.includes('high contrast')) score += 5;
-      
+
       totalScore += Math.min(score, 100);
       componentCount++;
     }
@@ -655,22 +688,21 @@ export class ComponentIntelligenceService {
     // Calculate visual weight based on position, size, and viewport
     const centerX = viewportSize.width / 2;
     const centerY = viewportSize.height / 2;
-    
+
     // Distance from center (normalized)
     const centerDistance = Math.sqrt(
-      Math.pow(component.position.x - centerX, 2) + 
-      Math.pow(component.position.y - centerY, 2)
+      (component.position.x - centerX) ** 2 + (component.position.y - centerY) ** 2
     );
     const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
-    const centerWeight = 1 - (centerDistance / maxDistance);
-    
+    const centerWeight = 1 - centerDistance / maxDistance;
+
     // Size weight (normalized)
-    const sizeWeight = (component.size.width * component.size.height) / 
-                      (viewportSize.width * viewportSize.height);
-    
+    const sizeWeight =
+      (component.size.width * component.size.height) / (viewportSize.width * viewportSize.height);
+
     // Z-index weight (give more importance to z-index)
     const zWeight = (component.zIndex || 0) / 10;
-    
+
     return Math.min(centerWeight * 0.3 + sizeWeight * 0.3 + zWeight * 0.4, 1.0);
   }
 
@@ -679,18 +711,18 @@ export class ComponentIntelligenceService {
     visualWeights: Record<string, number>
   ) {
     const violations: AttentionHierarchyAnalysis['violations'] = [];
-    
+
     // Check for competing primary attention targets
-    const primaryTargets = components.filter(comp => visualWeights[comp.name] > 0.7);
+    const primaryTargets = components.filter((comp) => visualWeights[comp.name] > 0.7);
     if (primaryTargets.length > 1) {
       violations.push({
         type: 'competing_primary',
-        components: primaryTargets.map(comp => comp.name),
+        components: primaryTargets.map((comp) => comp.name),
         severity: 'error',
         suggestion: 'Reduce visual weight of secondary elements to establish clear hierarchy',
       });
     }
-    
+
     // Check for weak hierarchy (all elements similar weight) - only if no competing primary
     if (violations.length === 0) {
       const weights = Object.values(visualWeights);
@@ -699,13 +731,13 @@ export class ComponentIntelligenceService {
       if (maxWeight - minWeight < 0.3) {
         violations.push({
           type: 'weak_hierarchy',
-          components: components.map(comp => comp.name),
+          components: components.map((comp) => comp.name),
           severity: 'warning',
           suggestion: 'Increase contrast between primary and secondary elements',
         });
       }
     }
-    
+
     return violations;
   }
 
@@ -713,11 +745,11 @@ export class ComponentIntelligenceService {
     const a11y = intelligence.accessibility.toLowerCase();
     let level: 'A' | 'AA' | 'AAA' | 'FAIL' = 'FAIL';
     const violations: AccessibilityAnalysis['wcagCompliance']['violations'] = [];
-    
+
     if (a11y.includes('wcag aaa')) level = 'AAA';
     else if (a11y.includes('wcag aa')) level = 'AA';
     else if (a11y.includes('wcag a')) level = 'A';
-    
+
     if (level === 'FAIL') {
       violations.push({
         guideline: 'WCAG 2.1',
@@ -726,7 +758,7 @@ export class ComponentIntelligenceService {
         suggestion: 'Ensure component meets at least WCAG AA standards',
       });
     }
-    
+
     if (!a11y.includes('keyboard')) {
       violations.push({
         guideline: 'WCAG 2.1.1',
@@ -735,33 +767,35 @@ export class ComponentIntelligenceService {
         suggestion: 'Ensure all interactive elements are keyboard accessible',
       });
     }
-    
+
     return { level, violations };
   }
 
   private analyzeColorVision(intelligence: Intelligence, context: A11yContext) {
-    const analysis: Record<string, {
-      accessible: boolean;
-      contrastRatio: number;
-      recommendations: string[];
-    }> = {};
-    
+    const analysis: Record<
+      string,
+      {
+        accessible: boolean;
+        contrastRatio: number;
+        recommendations: string[];
+      }
+    > = {};
+
     for (const visionType of context.colorVisionTypes) {
       analysis[visionType] = {
         accessible: intelligence.accessibility.toLowerCase().includes('contrast'),
         contrastRatio: 4.5, // Default assumption for AA
-        recommendations: visionType !== 'normal' ? 
-          ['Test with color vision simulation tools'] : [],
+        recommendations: visionType !== 'normal' ? ['Test with color vision simulation tools'] : [],
       };
     }
-    
+
     return analysis;
   }
 
   private analyzeTouchTargets(intelligence: Intelligence, _context: A11yContext) {
     const a11y = intelligence.accessibility.toLowerCase();
     const hasMinSize = a11y.includes('44px') || a11y.includes('touch target');
-    
+
     return {
       compliant: hasMinSize,
       minSize: hasMinSize ? 44 : 32, // Assume 32px if not specified
@@ -772,7 +806,7 @@ export class ComponentIntelligenceService {
   private analyzeCognitiveAccessibility(intelligence: Intelligence) {
     const cognitiveLoad = intelligence.cognitiveLoad;
     const score = Math.max(0, 100 - (cognitiveLoad - 1) * 12); // Penalty for high cognitive load
-    
+
     const suggestions: string[] = [];
     if (cognitiveLoad > 5) {
       suggestions.push('Simplify component interactions');
@@ -781,7 +815,7 @@ export class ComponentIntelligenceService {
     if (cognitiveLoad > 7) {
       suggestions.push('Consider breaking into multiple smaller components');
     }
-    
+
     return { score, simplificationSuggestions: suggestions };
   }
 }

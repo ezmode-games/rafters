@@ -8,13 +8,11 @@
  * to provide mathematical precision in design token relationships.
  */
 
+import type { ParsedRule } from '@rafters/design-tokens';
 import {
   GenerationRuleExecutor,
   GenerationRuleParser,
   TokenRegistry,
-} from '@rafters/design-tokens';
-import type {
-  ParsedRule,
 } from '@rafters/design-tokens';
 import { z } from 'zod';
 
@@ -397,15 +395,15 @@ export class DependencyIntelligenceService {
     try {
       // Parse the rule using the real parser
       const parsedRule = this.ruleParser.parse(rule);
-      
+
       // Set base token from context dependencies for rules that need it
       if (this.needsBaseToken(parsedRule) && context.dependencies.length > 0) {
         parsedRule.baseToken = context.dependencies[0];
       }
-      
+
       // Execute the rule using the real executor
       const result = this.ruleExecutor.execute(parsedRule, tokenName);
-      
+
       // Calculate confidence based on rule complexity and dependency availability
       const confidence = this.calculateExecutionConfidence(parsedRule, context);
 
@@ -422,7 +420,6 @@ export class DependencyIntelligenceService {
           inputTokens: parsedRule.tokens || context.dependencies,
           mathExpression: parsedRule.expression || rule,
           reasoning: this.generateExecutionReasoning(parsedRule, result),
-          baseToken: parsedRule.baseToken,
         },
       };
 
@@ -471,11 +468,11 @@ export class DependencyIntelligenceService {
             try {
               // Parse and execute the rule with the new base value
               const parsedRule = this.ruleParser.parse(rule);
-              
+
               // Create a temporary registry with the updated value for prediction
               const tempRegistry = this.createTempRegistry(tokenName, newValue);
               const tempExecutor = new GenerationRuleExecutor(tempRegistry);
-              
+
               // Set base token if needed
               if (this.needsBaseToken(parsedRule)) {
                 const dependencies = dependencyGraph.getDependencies(affectedToken);
@@ -483,10 +480,10 @@ export class DependencyIntelligenceService {
                   parsedRule.baseToken = dependencies[0];
                 }
               }
-              
+
               predictedValue = tempExecutor.execute(parsedRule, affectedToken);
               confidence = 0.85; // High confidence for successful rule execution
-            } catch (error) {
+            } catch (_error) {
               // Fallback to pattern-based prediction
               const ruleType = rule.split(':')[0] || rule.split('(')[0];
               predictedValue = `${ruleType}(${newValue})`;
@@ -578,7 +575,7 @@ export class DependencyIntelligenceService {
    */
   private calculateCascadeScope(tokenName: string): string[] {
     const cacheKey = `cascade_${tokenName}`;
-    
+
     // Check cache first
     const cached = this.getCachedResult(cacheKey);
     if (cached) {
@@ -601,10 +598,10 @@ export class DependencyIntelligenceService {
 
     traverse(tokenName);
     const cascadeScope = Array.from(result);
-    
+
     // Cache the result
     this.setCachedResult(cacheKey, cascadeScope);
-    
+
     return cascadeScope;
   }
 
@@ -613,7 +610,7 @@ export class DependencyIntelligenceService {
    */
   private calculateDependencyDepth(tokenName: string): number {
     const cacheKey = `depth_${tokenName}`;
-    
+
     // Check cache first
     const cached = this.getCachedResult(cacheKey);
     if (cached) {
@@ -633,10 +630,10 @@ export class DependencyIntelligenceService {
     };
 
     const result = getDepth(tokenName);
-    
+
     // Cache the result
     this.setCachedResult(cacheKey, result);
-    
+
     return result;
   }
 
@@ -733,7 +730,7 @@ export class DependencyIntelligenceService {
   private wouldCreateCircularDependency(tokenName: string, dependencies: string[]): boolean {
     // Use the TokenDependencyGraph's built-in method if available
     const dependencyGraph = this.tokenRegistry.dependencyGraph;
-    
+
     // Create a temporary copy to test the change
     const visited = new Set<string>();
     const recursionStack = new Set<string>();
@@ -752,7 +749,7 @@ export class DependencyIntelligenceService {
 
       // Get dependencies - use provided dependencies if this is the target token
       const deps = token === tokenName ? targetDeps : dependencyGraph.getDependencies(token);
-      
+
       for (const dep of deps) {
         if (hasCycle(dep, [])) {
           recursionStack.delete(token);
@@ -826,7 +823,10 @@ export class DependencyIntelligenceService {
   /**
    * Calculate execution confidence based on rule complexity and available dependencies
    */
-  private calculateExecutionConfidence(parsedRule: ParsedRule, context: RuleExecutionContext): number {
+  private calculateExecutionConfidence(
+    parsedRule: ParsedRule,
+    context: RuleExecutionContext
+  ): number {
     let confidence = 0.8; // Base confidence
 
     // Check if all required dependencies are available
@@ -889,15 +889,13 @@ export class DependencyIntelligenceService {
    */
   private createTempRegistry(tokenName: string, newValue: string): TokenRegistry {
     // Create a copy of all tokens
-    const allTokens = this.tokenRegistry.getAll();
-    
+    const allTokens = this.tokenRegistry.list();
+
     // Update the specific token with new value
-    const updatedTokens = allTokens.map(token => 
-      token.name === tokenName 
-        ? { ...token, value: newValue }
-        : token
+    const updatedTokens = allTokens.map((token) =>
+      token.name === tokenName ? { ...token, value: newValue } : token
     );
-    
+
     return new TokenRegistry(updatedTokens);
   }
 
@@ -1039,7 +1037,7 @@ export class DependencyIntelligenceService {
    */
   private getCachedResult(key: string): unknown | null {
     const cached = this.performanceCache.get(key);
-    if (cached && (Date.now() - cached.timestamp) < this.CACHE_TTL) {
+    if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
       return cached.value;
     }
     return null;

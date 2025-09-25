@@ -5,11 +5,7 @@
  * and provides intelligent analysis for Claude's design reasoning.
  */
 
-import {
-  GenerationRuleExecutor,
-  GenerationRuleParser,
-  TokenRegistry,
-} from '@rafters/design-tokens';
+import { TokenRegistry } from '@rafters/design-tokens';
 import type { Token } from '@rafters/shared';
 import { DependencyIntelligenceService } from '../apps/cli/src/mcp/services/dependency-intelligence';
 

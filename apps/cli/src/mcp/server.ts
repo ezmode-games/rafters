@@ -15,9 +15,16 @@ import {
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { createTokenRegistry, TokenRegistry } from '@rafters/design-tokens';
-import type { ColorIntelligence, ComponentIntelligence, ComponentRegistry, Intelligence, OKLCH, Token } from '@rafters/shared';
-import { fetchComponent } from '../utils/registry.js';
+import type {
+  ColorIntelligence,
+  ComponentRegistry,
+  Intelligence,
+  OKLCH,
+  Token,
+} from '@rafters/shared';
 import { z } from 'zod';
+import { fetchComponent } from '../utils/registry.js';
+import { ComponentIntelligenceService } from './services/component-intelligence.js';
 
 // Tool parameter schemas
 const ColorIntelligenceParamsSchema = z.object({
@@ -25,9 +32,7 @@ const ColorIntelligenceParamsSchema = z.object({
   depth: z.enum(['immediate', 'quick', 'computed', 'deep']).default('computed'),
 });
 
-const ComponentIntelligenceParamsSchema = z.object({
-  componentName: z.string(),
-});
+// ComponentIntelligenceParamsSchema removed as it's unused
 
 export class RaftersDesignIntelligenceServer {
   private server: Server;
@@ -176,9 +181,21 @@ export class RaftersDesignIntelligenceServer {
                 type: 'object',
                 properties: {
                   layoutComplexity: { type: 'number', minimum: 1, maximum: 10, default: 1 },
-                  userExpertise: { type: 'string', enum: ['novice', 'intermediate', 'expert'], default: 'novice' },
-                  taskUrgency: { type: 'string', enum: ['low', 'medium', 'high', 'critical'], default: 'medium' },
-                  deviceContext: { type: 'string', enum: ['mobile', 'tablet', 'desktop', 'kiosk'], default: 'desktop' },
+                  userExpertise: {
+                    type: 'string',
+                    enum: ['novice', 'intermediate', 'expert'],
+                    default: 'novice',
+                  },
+                  taskUrgency: {
+                    type: 'string',
+                    enum: ['low', 'medium', 'high', 'critical'],
+                    default: 'medium',
+                  },
+                  deviceContext: {
+                    type: 'string',
+                    enum: ['mobile', 'tablet', 'desktop', 'kiosk'],
+                    default: 'desktop',
+                  },
                 },
                 description: 'Analysis context parameters',
               },
@@ -200,15 +217,27 @@ export class RaftersDesignIntelligenceServer {
               constraints: {
                 type: 'object',
                 properties: {
-                  maxCognitiveLoad: { type: 'number', default: 7, description: 'Maximum cognitive load budget' },
-                  maxAttentionPoints: { type: 'number', default: 3, description: 'Maximum attention targets' },
+                  maxCognitiveLoad: {
+                    type: 'number',
+                    default: 7,
+                    description: 'Maximum cognitive load budget',
+                  },
+                  maxAttentionPoints: {
+                    type: 'number',
+                    default: 3,
+                    description: 'Maximum attention targets',
+                  },
                   requiresAccessibility: {
                     type: 'array',
                     items: { type: 'string', enum: ['AA', 'AAA'] },
                     default: ['AA'],
                     description: 'Required accessibility levels',
                   },
-                  trustLevel: { type: 'string', enum: ['low', 'medium', 'high', 'critical'], default: 'medium' },
+                  trustLevel: {
+                    type: 'string',
+                    enum: ['low', 'medium', 'high', 'critical'],
+                    default: 'medium',
+                  },
                 },
                 description: 'Composition constraints',
               },
@@ -279,7 +308,10 @@ export class RaftersDesignIntelligenceServer {
                 properties: {
                   colorVisionTypes: {
                     type: 'array',
-                    items: { type: 'string', enum: ['normal', 'deuteranopia', 'protanopia', 'tritanopia'] },
+                    items: {
+                      type: 'string',
+                      enum: ['normal', 'deuteranopia', 'protanopia', 'tritanopia'],
+                    },
                     default: ['normal'],
                   },
                   contrastLevel: { type: 'string', enum: ['AA', 'AAA'], default: 'AA' },
@@ -693,19 +725,21 @@ export class RaftersDesignIntelligenceServer {
     const params = z
       .object({
         componentName: z.string(),
-        context: z.object({
-          layoutComplexity: z.number().min(1).max(10).default(1),
-          userExpertise: z.enum(['novice', 'intermediate', 'expert']).default('novice'),
-          taskUrgency: z.enum(['low', 'medium', 'high', 'critical']).default('medium'),
-          deviceContext: z.enum(['mobile', 'tablet', 'desktop', 'kiosk']).default('desktop'),
-        }).optional(),
+        context: z
+          .object({
+            layoutComplexity: z.number().min(1).max(10).default(1),
+            userExpertise: z.enum(['novice', 'intermediate', 'expert']).default('novice'),
+            taskUrgency: z.enum(['low', 'medium', 'high', 'critical']).default('medium'),
+            deviceContext: z.enum(['mobile', 'tablet', 'desktop', 'kiosk']).default('desktop'),
+          })
+          .optional(),
       })
       .parse(args);
 
     try {
       // Fetch component from registry
       const component = await fetchComponent(params.componentName);
-      
+
       if (!component) {
         return {
           content: [
@@ -729,7 +763,8 @@ export class RaftersDesignIntelligenceServer {
               type: 'text',
               text: JSON.stringify({
                 error: `No intelligence metadata found for component "${params.componentName}"`,
-                suggestion: 'Component may not have been processed through Rafters intelligence pipeline',
+                suggestion:
+                  'Component may not have been processed through Rafters intelligence pipeline',
               }),
             },
           ],
@@ -758,7 +793,7 @@ export class RaftersDesignIntelligenceServer {
             {
               type: 'text',
               text: JSON.stringify({
-                error: result.error,
+                error: (result as { error: string }).error,
                 confidence: result.confidence,
               }),
             },
@@ -781,10 +816,25 @@ export class RaftersDesignIntelligenceServer {
                 recommendations: result.data.recommendations,
               },
               analysis: {
-                cognitiveLoadRating: result.data.cognitiveLoadScore > 7 ? 'high' : result.data.cognitiveLoadScore > 4 ? 'moderate' : 'low',
+                cognitiveLoadRating:
+                  result.data.cognitiveLoadScore > 7
+                    ? 'high'
+                    : result.data.cognitiveLoadScore > 4
+                      ? 'moderate'
+                      : 'low',
                 millerCompliance: result.data.millerRuleCompliance ? 'compliant' : 'violation',
-                attentionLevel: result.data.attentionWeight > 0.7 ? 'primary' : result.data.attentionWeight > 0.4 ? 'secondary' : 'tertiary',
-                trustRequirements: result.data.trustPatterns.length > 2 ? 'critical' : result.data.trustPatterns.length > 0 ? 'high' : 'standard',
+                attentionLevel:
+                  result.data.attentionWeight > 0.7
+                    ? 'primary'
+                    : result.data.attentionWeight > 0.4
+                      ? 'secondary'
+                      : 'tertiary',
+                trustRequirements:
+                  result.data.trustPatterns.length > 2
+                    ? 'critical'
+                    : result.data.trustPatterns.length > 0
+                      ? 'high'
+                      : 'standard',
               },
               context: params.context || {},
               confidence: result.confidence,
@@ -812,12 +862,14 @@ export class RaftersDesignIntelligenceServer {
     const params = z
       .object({
         components: z.array(z.string()),
-        constraints: z.object({
-          maxCognitiveLoad: z.number().default(7),
-          maxAttentionPoints: z.number().default(3),
-          requiresAccessibility: z.array(z.enum(['AA', 'AAA'])).default(['AA']),
-          trustLevel: z.enum(['low', 'medium', 'high', 'critical']).default('medium'),
-        }).optional(),
+        constraints: z
+          .object({
+            maxCognitiveLoad: z.number().default(7),
+            maxAttentionPoints: z.number().default(3),
+            requiresAccessibility: z.array(z.enum(['AA', 'AAA'])).default(['AA']),
+            trustLevel: z.enum(['low', 'medium', 'high', 'critical']).default('medium'),
+          })
+          .optional(),
       })
       .parse(args);
 
@@ -828,12 +880,12 @@ export class RaftersDesignIntelligenceServer {
         if (!component || !component.meta?.rafters?.intelligence) {
           return null;
         }
-        
+
         // Convert to ComponentRegistry format for the service
         return {
           name: component.name,
           type: component.type || 'registry:component',
-          files: component.files || [],
+          files: component.files ? component.files.map((f) => f.path) : [],
           meta: {
             rafters: {
               intelligence: {
@@ -849,7 +901,9 @@ export class RaftersDesignIntelligenceServer {
       });
 
       const componentResults = await Promise.all(componentPromises);
-      const validComponents = componentResults.filter((comp): comp is ComponentRegistry => comp !== null);
+      const validComponents = componentResults.filter(
+        (comp): comp is ComponentRegistry => comp !== null
+      );
 
       if (validComponents.length === 0) {
         return {
@@ -877,7 +931,7 @@ export class RaftersDesignIntelligenceServer {
             {
               type: 'text',
               text: JSON.stringify({
-                error: result.error,
+                error: (result as { error: string }).error,
                 confidence: result.confidence,
               }),
             },
@@ -887,11 +941,11 @@ export class RaftersDesignIntelligenceServer {
 
       // Calculate load summaries
       const originalLoad = validComponents.reduce(
-        (sum, comp) => sum + comp.meta.rafters.intelligence.cognitiveLoad, 
+        (sum, comp) => sum + comp.meta.rafters.intelligence.cognitiveLoad,
         0
       );
       const optimizedLoad = result.data.cognitiveLoadDistribution.reduce(
-        (sum, item) => sum + item.load, 
+        (sum, item) => sum + item.load,
         0
       );
 
@@ -938,12 +992,14 @@ export class RaftersDesignIntelligenceServer {
     const params = z
       .object({
         layout: z.object({
-          components: z.array(z.object({
-            name: z.string(),
-            position: z.object({ x: z.number(), y: z.number() }),
-            size: z.object({ width: z.number(), height: z.number() }),
-            zIndex: z.number().optional(),
-          })),
+          components: z.array(
+            z.object({
+              name: z.string(),
+              position: z.object({ x: z.number(), y: z.number() }),
+              size: z.object({ width: z.number(), height: z.number() }),
+              zIndex: z.number().optional(),
+            })
+          ),
           viewportSize: z.object({ width: z.number(), height: z.number() }),
         }),
       })
@@ -958,7 +1014,7 @@ export class RaftersDesignIntelligenceServer {
             {
               type: 'text',
               text: JSON.stringify({
-                error: result.error,
+                error: (result as { error: string }).error,
                 confidence: result.confidence,
               }),
             },
@@ -1008,20 +1064,24 @@ export class RaftersDesignIntelligenceServer {
     const params = z
       .object({
         componentName: z.string(),
-        context: z.object({
-          colorVisionTypes: z.array(z.enum(['normal', 'deuteranopia', 'protanopia', 'tritanopia'])).default(['normal']),
-          contrastLevel: z.enum(['AA', 'AAA']).default('AA'),
-          screenReader: z.boolean().default(false),
-          motorImpairments: z.boolean().default(false),
-          cognitiveImpairments: z.boolean().default(false),
-        }).optional(),
+        context: z
+          .object({
+            colorVisionTypes: z
+              .array(z.enum(['normal', 'deuteranopia', 'protanopia', 'tritanopia']))
+              .default(['normal']),
+            contrastLevel: z.enum(['AA', 'AAA']).default('AA'),
+            screenReader: z.boolean().default(false),
+            motorImpairments: z.boolean().default(false),
+            cognitiveImpairments: z.boolean().default(false),
+          })
+          .optional(),
       })
       .parse(args);
 
     try {
       // Fetch component from registry
       const component = await fetchComponent(params.componentName);
-      
+
       if (!component || !component.meta?.rafters?.intelligence) {
         return {
           content: [
@@ -1056,7 +1116,7 @@ export class RaftersDesignIntelligenceServer {
             {
               type: 'text',
               text: JSON.stringify({
-                error: result.error,
+                error: (result as { error: string }).error,
                 confidence: result.confidence,
               }),
             },
@@ -1081,7 +1141,9 @@ export class RaftersDesignIntelligenceServer {
                 violationCount: result.data.wcagCompliance.violations.length,
                 accessibilityScore: result.data.cognitiveAccessibility.score,
                 touchCompliant: result.data.touchTargetAnalysis.compliant,
-                colorVisionCompatible: Object.values(result.data.colorVisionAnalysis).every(analysis => analysis.accessible),
+                colorVisionCompatible: Object.values(result.data.colorVisionAnalysis).every(
+                  (analysis) => analysis.accessible
+                ),
               },
               confidence: result.confidence,
               timestamp: result.timestamp,

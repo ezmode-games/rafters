@@ -5,9 +5,9 @@
  * and accessibility intelligence features.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import type { ComponentRegistry, Intelligence } from '@rafters/shared';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { ComponentIntelligenceService } from '../../src/mcp/services/component-intelligence';
-import type { Intelligence, ComponentRegistry } from '@rafters/shared';
 
 describe('ComponentIntelligenceService', () => {
   let service: ComponentIntelligenceService;
@@ -17,8 +17,10 @@ describe('ComponentIntelligenceService', () => {
     cognitiveLoad: 3,
     attentionEconomics: 'Size hierarchy: sm=tertiary, md=secondary, lg=primary',
     accessibility: 'WCAG AAA compliant with 44px minimum touch targets, high contrast ratios',
-    trustBuilding: 'Destructive actions require confirmation patterns. Loading states prevent double-submission.',
-    semanticMeaning: 'Variant mapping: primary=main actions, secondary=supporting actions, destructive=irreversible actions',
+    trustBuilding:
+      'Destructive actions require confirmation patterns. Loading states prevent double-submission.',
+    semanticMeaning:
+      'Variant mapping: primary=main actions, secondary=supporting actions, destructive=irreversible actions',
   };
 
   const mockComplexComponentIntelligence: Intelligence = {
@@ -52,10 +54,7 @@ describe('ComponentIntelligenceService', () => {
 
   describe('analyzeComponent', () => {
     it('should analyze component with basic intelligence data', async () => {
-      const result = await service.analyzeComponent(
-        'button',
-        mockButtonIntelligence
-      );
+      const result = await service.analyzeComponent('button', mockButtonIntelligence);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -83,7 +82,7 @@ describe('ComponentIntelligenceService', () => {
             expect.objectContaining({
               type: 'cognitive',
               priority: 'high',
-            })
+            }),
           ])
         );
       }
@@ -101,7 +100,10 @@ describe('ComponentIntelligenceService', () => {
       };
 
       const primaryResult = await service.analyzeComponent('primary-button', primaryIntelligence);
-      const secondaryResult = await service.analyzeComponent('secondary-button', secondaryIntelligence);
+      const secondaryResult = await service.analyzeComponent(
+        'secondary-button',
+        secondaryIntelligence
+      );
 
       expect(primaryResult.success).toBe(true);
       expect(secondaryResult.success).toBe(true);
@@ -152,14 +154,14 @@ describe('ComponentIntelligenceService', () => {
       if (result.success) {
         const recommendations = result.data.recommendations;
         expect(recommendations.length).toBeGreaterThan(0);
-        
+
         // Should have cognitive load recommendation
         expect(recommendations).toEqual(
           expect.arrayContaining([
             expect.objectContaining({
               type: 'cognitive',
               priority: 'high',
-            })
+            }),
           ])
         );
 
@@ -169,7 +171,7 @@ describe('ComponentIntelligenceService', () => {
             expect.objectContaining({
               type: 'accessibility',
               priority: 'high',
-            })
+            }),
           ])
         );
       }
@@ -233,16 +235,15 @@ describe('ComponentIntelligenceService', () => {
         maxAttentionPoints: 2,
       };
 
-      const result = await service.optimizeComposition(
-        highCognitiveLoadComponents,
-        constraints
-      );
+      const result = await service.optimizeComposition(highCognitiveLoadComponents, constraints);
 
       expect(result.success).toBe(true);
       if (result.success) {
-        const totalOptimizedLoad = result.data.cognitiveLoadDistribution
-          .reduce((sum, item) => sum + item.load, 0);
-        
+        const totalOptimizedLoad = result.data.cognitiveLoadDistribution.reduce(
+          (sum, item) => sum + item.load,
+          0
+        );
+
         expect(totalOptimizedLoad).toBeLessThanOrEqual(constraints.maxCognitiveLoad);
         expect(result.data.improvements.length).toBeGreaterThan(0);
         expect(result.data.accessibilityScore).toBeGreaterThan(0);
@@ -281,7 +282,9 @@ describe('ComponentIntelligenceService', () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.improvements).toContain('Composition already optimized for cognitive load');
+        expect(result.data.improvements).toContain(
+          'Composition already optimized for cognitive load'
+        );
         expect(result.confidence).toBeGreaterThan(0.9);
       }
     });
@@ -386,12 +389,12 @@ describe('ComponentIntelligenceService', () => {
         expect(result.data.visualWeight).toHaveProperty('header');
         expect(result.data.visualWeight).toHaveProperty('main-content');
         expect(result.data.visualWeight).toHaveProperty('sidebar');
-        
+
         // Header should have highest visual weight due to z-index and position
         expect(result.data.visualWeight.header).toBeGreaterThan(
           result.data.visualWeight['main-content']
         );
-        
+
         expect(result.data.attentionFlow).toContain('header');
         expect(result.data.attentionFlow).toContain('main-content');
         expect(result.data.attentionFlow).toContain('sidebar');
@@ -409,7 +412,7 @@ describe('ComponentIntelligenceService', () => {
           },
           {
             name: 'button2',
-            position: { x: 400, y: 200 }, // More centered 
+            position: { x: 400, y: 200 }, // More centered
             size: { width: 700, height: 500 }, // Much larger size
             zIndex: 15,
           },
@@ -427,7 +430,7 @@ describe('ComponentIntelligenceService', () => {
             expect.objectContaining({
               type: 'competing_primary',
               severity: 'error',
-            })
+            }),
           ])
         );
       }
@@ -464,7 +467,7 @@ describe('ComponentIntelligenceService', () => {
             expect.objectContaining({
               type: 'weak_hierarchy',
               severity: 'warning',
-            })
+            }),
           ])
         );
       }
@@ -490,10 +493,7 @@ describe('ComponentIntelligenceService', () => {
         accessibility: 'WCAG AAA compliant with keyboard navigation and screen reader support',
       };
 
-      const result = await service.validateAccessibility(
-        'accessible-button',
-        aaaIntelligence
-      );
+      const result = await service.validateAccessibility('accessible-button', aaaIntelligence);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -508,22 +508,19 @@ describe('ComponentIntelligenceService', () => {
         accessibility: 'Basic styling with colors only',
       };
 
-      const result = await service.validateAccessibility(
-        'poor-a11y-button',
-        poorA11yIntelligence
-      );
+      const result = await service.validateAccessibility('poor-a11y-button', poorA11yIntelligence);
 
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.wcagCompliance.level).toBe('FAIL');
         expect(result.data.wcagCompliance.violations.length).toBeGreaterThan(0);
-        
+
         expect(result.data.wcagCompliance.violations).toEqual(
           expect.arrayContaining([
             expect.objectContaining({
               guideline: 'WCAG 2.1',
               impact: 'critical',
-            })
+            }),
           ])
         );
       }
@@ -546,7 +543,7 @@ describe('ComponentIntelligenceService', () => {
         expect(result.data.colorVisionAnalysis).toHaveProperty('normal');
         expect(result.data.colorVisionAnalysis).toHaveProperty('deuteranopia');
         expect(result.data.colorVisionAnalysis).toHaveProperty('protanopia');
-        
+
         // Deuteranopia and protanopia should have recommendations
         expect(result.data.colorVisionAnalysis.deuteranopia.recommendations).toContain(
           'Test with color vision simulation tools'
@@ -601,8 +598,10 @@ describe('ComponentIntelligenceService', () => {
         expect(lowResult.data.cognitiveAccessibility.score).toBeGreaterThan(
           highResult.data.cognitiveAccessibility.score
         );
-        
-        expect(highResult.data.cognitiveAccessibility.simplificationSuggestions.length).toBeGreaterThan(0);
+
+        expect(
+          highResult.data.cognitiveAccessibility.simplificationSuggestions.length
+        ).toBeGreaterThan(0);
         expect(highResult.data.cognitiveAccessibility.simplificationSuggestions).toContain(
           'Consider breaking into multiple smaller components'
         );
@@ -623,7 +622,7 @@ describe('ComponentIntelligenceService', () => {
   });
 
   describe('CognitiveLoadModel', () => {
-    it('should apply Miller\'s 7±2 rule correctly', async () => {
+    it("should apply Miller's 7±2 rule correctly", async () => {
       // Test component with exactly 7 elements (should be compliant)
       const sevenElementIntelligence: Intelligence = {
         ...mockButtonIntelligence,
