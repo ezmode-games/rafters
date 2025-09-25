@@ -21,9 +21,12 @@ import { z } from 'zod';
 export { DesignSystemArchive, fetchArchive } from './archive.js';
 // Export callback implementations
 export { createLocalCSSCallback } from './callbacks/local-css-callback.js';
-// Export dependency tracking system - temporarily disabled for ES module issues
-// export type { TokenDependency } from './dependencies';
-// export { TokenDependencyGraph } from './dependencies';
+// Export dependency tracking system - re-enable for dependency intelligence
+export type { TokenDependency } from './dependencies.js';
+export { TokenDependencyGraph } from './dependencies.js';
+// Export generation rule system
+export type { ParsedRule } from './generation-rules.js';
+export { GenerationRuleParser, GenerationRuleExecutor } from './generation-rules.js';
 // Export new clean export system
 export {
   exportColorScales,
