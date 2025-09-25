@@ -15,16 +15,16 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
 
-    // Type Checking (Practical Strict)
-    "strict": false, // Enable individual strict checks below for better control
-    "noImplicitAny": true, // Catch missing types
+    // Type Checking (Progressive Strict Mode)
+    "strict": false, // Enable individual strict checks for controlled migration
+    "noImplicitAny": true, // Catch missing types - ENFORCED
     "noImplicitReturns": true, // Functions must return consistently
     "noImplicitThis": true, // Catch this binding issues
     "strictBindCallApply": true, // Type-safe bind/call/apply
     "strictFunctionTypes": true, // Function parameter types contravariant
     "alwaysStrict": true, // Emit "use strict"
-    "strictNullChecks": false, // DISABLED - causes hundreds of errors in working code
-    "strictPropertyInitialization": false, // DISABLED - often impractical with DI/frameworks
+    "strictNullChecks": false, // DISABLED - gradual migration planned
+    "strictPropertyInitialization": false, // DISABLED - framework compatibility
 
     // Additional Type Safety (Non-strict)
     "noUnusedLocals": true,

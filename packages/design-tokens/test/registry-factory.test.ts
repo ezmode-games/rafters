@@ -39,7 +39,7 @@ describe('Registry Factory with Self-Initialization', () => {
     } catch (error) {
       // If network-dependent tests fail, that's expected in this environment
       if (error instanceof Error && error.message.includes('fetch failed')) {
-        console.log('Network test skipped due to environment limitations');
+        // Network test skipped due to environment limitations
         return;
       }
       throw error;

@@ -309,10 +309,10 @@ export function cn(...inputs: ClassValue[]) {
       const cssPath = join(cwd, '.rafters', 'tokens.css');
 
       if (existsSync(cssPath)) {
-        console.log('✅ Design system CSS ready at .rafters/tokens.css');
-        console.log('💡 Real-time CSS regeneration is now active');
+        console.log('Design system CSS ready at .rafters/tokens.css');
+        console.log('Real-time CSS regeneration is now active');
       } else {
-        console.warn('⚠️  CSS file not found - registry may not have initialized properly');
+        console.warn('CSS file not found - registry may not have initialized properly');
       }
     }
 

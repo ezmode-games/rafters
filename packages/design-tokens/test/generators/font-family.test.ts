@@ -137,10 +137,6 @@ describe('Font Family Generator', () => {
       for (const token of tokens) {
         const result = TokenSchema.safeParse(token);
         expect(result.success).toBe(true);
-
-        if (!result.success) {
-          console.log('Token validation failed:', token.name, result.error.errors);
-        }
       }
     });
 

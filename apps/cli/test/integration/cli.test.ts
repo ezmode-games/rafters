@@ -70,7 +70,11 @@ describe('CLI Integration', () => {
     });
 
     // This should not throw
-    const output = execSync(`node "${CLI_PATH}" init --yes`, { encoding: 'utf-8', stdio: 'pipe', timeout: 30000 });
+    const output = execSync(`node "${CLI_PATH}" init --yes`, {
+      encoding: 'utf-8',
+      stdio: 'pipe',
+      timeout: 30000,
+    });
 
     // Verify output contains success indicators
     expect(output).toContain('Rafters initialized');

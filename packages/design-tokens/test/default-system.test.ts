@@ -107,9 +107,9 @@ describe('Rafters Default System Generator', () => {
       expect(motionTokens.length).toBeGreaterThan(0);
 
       // Should have motion tokens (check actual names)
-      const motionNames = motionTokens.map((t) => t.name);
-      console.log('Actual motion token names:', motionNames.slice(0, 5));
-      expect(motionTokens.length).toBeGreaterThan(0); // Just verify we have motion tokens
+      const _motionNames = motionTokens.map((t) => t.name);
+      // Verify we have motion tokens
+      expect(motionTokens.length).toBeGreaterThan(0);
     }, 30000);
 
     it('should have all tokens with required metadata', async () => {

@@ -22,9 +22,7 @@ describe('Schema Validation for Mathematical Metadata', () => {
       const result = TokenSchema.safeParse(token);
       expect(result.success).toBe(true);
 
-      if (!result.success) {
-        console.log('Token validation failed:', token.name, result.error.errors);
-      }
+      // Token validation checked above
     }
 
     // Verify some tokens have mathRelationship
@@ -39,9 +37,7 @@ describe('Schema Validation for Mathematical Metadata', () => {
       const result = TokenSchema.safeParse(token);
       expect(result.success).toBe(true);
 
-      if (!result.success) {
-        console.log('Token validation failed:', token.name, result.error.errors);
-      }
+      // Token validation checked above
     }
 
     // Verify some tokens have mathRelationship
@@ -56,9 +52,7 @@ describe('Schema Validation for Mathematical Metadata', () => {
       const result = TokenSchema.safeParse(token);
       expect(result.success).toBe(true);
 
-      if (!result.success) {
-        console.log('Token validation failed:', token.name, result.error.errors);
-      }
+      // Token validation checked above
     }
 
     // Verify duration tokens have mathRelationship and motionDuration
@@ -79,9 +73,7 @@ describe('Schema Validation for Mathematical Metadata', () => {
       const result = TokenSchema.safeParse(token);
       expect(result.success).toBe(true);
 
-      if (!result.success) {
-        console.log('Token validation failed:', token.name, result.error.errors);
-      }
+      // Token validation checked above
     }
 
     // Verify some tokens have mathRelationship
@@ -96,9 +88,7 @@ describe('Schema Validation for Mathematical Metadata', () => {
       const result = TokenSchema.safeParse(token);
       expect(result.success).toBe(true);
 
-      if (!result.success) {
-        console.log('Token validation failed:', token.name, result.error.errors);
-      }
+      // Token validation checked above
     }
 
     // Verify some tokens have mathRelationship
@@ -131,7 +121,5 @@ describe('Schema Validation for Mathematical Metadata', () => {
     expect(fieldsUsed.has('scalePosition')).toBe(true);
     expect(fieldsUsed.has('motionDuration')).toBe(true);
     expect(fieldsUsed.has('progressionSystem')).toBe(true);
-
-    console.log('Mathematical metadata fields found:', Array.from(fieldsUsed));
   });
 });

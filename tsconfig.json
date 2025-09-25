@@ -2,12 +2,23 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "./tsconfig.base.json",
   "files": [],
-  "compilerOptions": {},
+  "compilerOptions": {
+    // Root configuration for monorepo orchestration
+    "composite": false,
+    "incremental": true,
+    "tsBuildInfoFile": "./.tsbuildinfo"
+  },
   "references": [
+    // Build order respects dependency graph
     { "path": "./packages/shared" },
     { "path": "./packages/design-tokens" },
+    { "path": "./packages/ui" },
     { "path": "./apps/api" },
     { "path": "./apps/cli" },
     { "path": "./apps/website" }
-  ]
+  ],
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  }
 }
