@@ -5,6 +5,7 @@ import type { ColorSeedMessage } from './lib/queue/publisher';
 import { archive } from './routes/archive';
 import { colorIntel } from './routes/color-intel';
 import { seedQueue } from './routes/seed-queue';
+import { uncertainty } from './routes/uncertainty';
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -30,6 +31,7 @@ app.use(
 app.route('/api/archive', archive);
 app.route('/api/color-intel', colorIntel);
 app.route('/api/seed-queue', seedQueue);
+app.route('/api/uncertainty/predictions', uncertainty);
 
 export default {
   fetch: app.fetch,
