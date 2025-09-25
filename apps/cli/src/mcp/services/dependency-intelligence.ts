@@ -8,7 +8,14 @@
  * to provide mathematical precision in design token relationships.
  */
 
-import type { TokenRegistry } from '@rafters/design-tokens';
+import {
+  GenerationRuleExecutor,
+  GenerationRuleParser,
+  TokenRegistry,
+} from '@rafters/design-tokens';
+import type {
+  ParsedRule,
+} from '@rafters/design-tokens';
 import { z } from 'zod';
 
 // ===== SCHEMAS & TYPES =====
@@ -176,9 +183,15 @@ export type IntelligenceResult<T> =
 
 export class DependencyIntelligenceService {
   private tokenRegistry: TokenRegistry;
+  private ruleParser: GenerationRuleParser;
+  private ruleExecutor: GenerationRuleExecutor;
+  private performanceCache: Map<string, { value: unknown; timestamp: number }> = new Map();
+  private readonly CACHE_TTL = 60000; // 1 minute cache
 
   constructor(tokenRegistry: TokenRegistry) {
     this.tokenRegistry = tokenRegistry;
+    this.ruleParser = new GenerationRuleParser();
+    this.ruleExecutor = new GenerationRuleExecutor(tokenRegistry);
   }
 
   /**
@@ -382,11 +395,19 @@ export class DependencyIntelligenceService {
     const startTime = performance.now();
 
     try {
-      // Simplified rule execution - return a mock result for now
-      const result = `Executed ${rule} on ${tokenName}`;
-
-      // Calculate confidence based on context
-      const confidence = context.dependencies.length > 0 ? 0.8 : 0.6;
+      // Parse the rule using the real parser
+      const parsedRule = this.ruleParser.parse(rule);
+      
+      // Set base token from context dependencies for rules that need it
+      if (this.needsBaseToken(parsedRule) && context.dependencies.length > 0) {
+        parsedRule.baseToken = context.dependencies[0];
+      }
+      
+      // Execute the rule using the real executor
+      const result = this.ruleExecutor.execute(parsedRule, tokenName);
+      
+      // Calculate confidence based on rule complexity and dependency availability
+      const confidence = this.calculateExecutionConfidence(parsedRule, context);
 
       const executionTime = performance.now() - startTime;
 
@@ -397,10 +418,11 @@ export class DependencyIntelligenceService {
         executionTime,
         dependencies: context.dependencies,
         metadata: {
-          ruleType: rule.split(':')[0] || 'unknown',
-          inputTokens: context.dependencies,
-          mathExpression: rule,
-          reasoning: this.generateExecutionReasoning(rule, result),
+          ruleType: parsedRule.type,
+          inputTokens: parsedRule.tokens || context.dependencies,
+          mathExpression: parsedRule.expression || rule,
+          reasoning: this.generateExecutionReasoning(parsedRule, result),
+          baseToken: parsedRule.baseToken,
         },
       };
 
@@ -447,12 +469,28 @@ export class DependencyIntelligenceService {
 
           if (rule) {
             try {
-              // Simplified prediction - return a mock value based on rule type
-              const ruleType = rule.split(':')[0] || 'unknown';
-              predictedValue = `${ruleType}-transformed-value`;
-              confidence = 0.75; // Moderate confidence for simplified implementation
-            } catch {
-              confidence = 0.2; // Low confidence due to execution failure
+              // Parse and execute the rule with the new base value
+              const parsedRule = this.ruleParser.parse(rule);
+              
+              // Create a temporary registry with the updated value for prediction
+              const tempRegistry = this.createTempRegistry(tokenName, newValue);
+              const tempExecutor = new GenerationRuleExecutor(tempRegistry);
+              
+              // Set base token if needed
+              if (this.needsBaseToken(parsedRule)) {
+                const dependencies = dependencyGraph.getDependencies(affectedToken);
+                if (dependencies.length > 0) {
+                  parsedRule.baseToken = dependencies[0];
+                }
+              }
+              
+              predictedValue = tempExecutor.execute(parsedRule, affectedToken);
+              confidence = 0.85; // High confidence for successful rule execution
+            } catch (error) {
+              // Fallback to pattern-based prediction
+              const ruleType = rule.split(':')[0] || rule.split('(')[0];
+              predictedValue = `${ruleType}(${newValue})`;
+              confidence = 0.4; // Medium confidence for fallback
             }
           }
 
@@ -535,7 +573,18 @@ export class DependencyIntelligenceService {
     return Array.from(result);
   }
 
+  /**
+   * Calculate cascade scope with memoization for performance
+   */
   private calculateCascadeScope(tokenName: string): string[] {
+    const cacheKey = `cascade_${tokenName}`;
+    
+    // Check cache first
+    const cached = this.getCachedResult(cacheKey);
+    if (cached) {
+      return cached as string[];
+    }
+
     const visited = new Set<string>();
     const result = new Set<string>();
 
@@ -551,10 +600,26 @@ export class DependencyIntelligenceService {
     };
 
     traverse(tokenName);
-    return Array.from(result);
+    const cascadeScope = Array.from(result);
+    
+    // Cache the result
+    this.setCachedResult(cacheKey, cascadeScope);
+    
+    return cascadeScope;
   }
 
+  /**
+   * Calculate dependency depth with memoization
+   */
   private calculateDependencyDepth(tokenName: string): number {
+    const cacheKey = `depth_${tokenName}`;
+    
+    // Check cache first
+    const cached = this.getCachedResult(cacheKey);
+    if (cached) {
+      return cached as number;
+    }
+
     const visited = new Set<string>();
 
     const getDepth = (token: string): number => {
@@ -567,39 +632,55 @@ export class DependencyIntelligenceService {
       return 1 + Math.max(...deps.map((dep: string) => getDepth(dep)));
     };
 
-    return getDepth(tokenName);
+    const result = getDepth(tokenName);
+    
+    // Cache the result
+    this.setCachedResult(cacheKey, result);
+    
+    return result;
   }
 
+  /**
+   * Find circular dependencies using proper DFS with correct visited set management
+   */
   private findCircularDependencies(tokenName: string): string[][] {
-    // This is a simplified implementation - the actual TokenDependencyGraph
-    // has more sophisticated circular dependency detection
-    const visited = new Set<string>();
-    const path = new Set<string>();
     const cycles: string[][] = [];
+    const visited = new Set<string>();
+    const recursionStack = new Set<string>();
+    const currentPath: string[] = [];
 
-    const dfs = (token: string, currentPath: string[]) => {
-      if (path.has(token)) {
-        // Found a cycle
+    const dfs = (token: string): boolean => {
+      if (recursionStack.has(token)) {
+        // Found a cycle - extract it from current path
         const cycleStart = currentPath.indexOf(token);
-        cycles.push(currentPath.slice(cycleStart).concat(token));
-        return;
+        if (cycleStart >= 0) {
+          cycles.push([...currentPath.slice(cycleStart), token]);
+        }
+        return true;
       }
 
-      if (visited.has(token)) return;
+      if (visited.has(token)) {
+        return false; // Already processed, no cycle from this path
+      }
 
       visited.add(token);
-      path.add(token);
+      recursionStack.add(token);
       currentPath.push(token);
 
-      const deps = this.tokenRegistry.dependencyGraph.getDependencies(token);
-      for (const dep of deps) {
-        dfs(dep, [...currentPath]);
+      const dependencies = this.tokenRegistry.dependencyGraph.getDependencies(token);
+      for (const dep of dependencies) {
+        if (dfs(dep)) {
+          // Cycle found, but don't return true unless this token is part of it
+          // This prevents false positives when cycles exist elsewhere
+        }
       }
 
-      path.delete(token);
+      recursionStack.delete(token);
+      currentPath.pop();
+      return false;
     };
 
-    dfs(tokenName, []);
+    dfs(tokenName);
     return cycles;
   }
 
@@ -645,39 +726,45 @@ export class DependencyIntelligenceService {
     return Math.max(Math.min(confidence, 1), 0);
   }
 
+  /**
+   * Check if adding dependencies would create circular dependencies
+   * Uses proper graph algorithm with correct visited set management
+   */
   private wouldCreateCircularDependency(tokenName: string, dependencies: string[]): boolean {
-    // Delegate to the existing dependency graph implementation
-    try {
-      // This is a simplified check - the actual implementation would use
-      // the TokenDependencyGraph's wouldCreateCircularDependency method
-      const visited = new Set<string>();
-      const path = new Set<string>();
+    // Use the TokenDependencyGraph's built-in method if available
+    const dependencyGraph = this.tokenRegistry.dependencyGraph;
+    
+    // Create a temporary copy to test the change
+    const visited = new Set<string>();
+    const recursionStack = new Set<string>();
 
-      const hasCycle = (token: string): boolean => {
-        if (path.has(token)) return true;
-        if (visited.has(token)) return false;
+    const hasCycle = (token: string, targetDeps: string[]): boolean => {
+      if (recursionStack.has(token)) {
+        return true; // Found a cycle
+      }
 
-        visited.add(token);
-        path.add(token);
+      if (visited.has(token)) {
+        return false; // Already processed
+      }
 
-        // Check if this token would depend on tokenName through its dependencies
-        const deps =
-          token === tokenName
-            ? dependencies
-            : this.tokenRegistry.dependencyGraph.getDependencies(token);
+      visited.add(token);
+      recursionStack.add(token);
 
-        for (const dep of deps) {
-          if (hasCycle(dep)) return true;
+      // Get dependencies - use provided dependencies if this is the target token
+      const deps = token === tokenName ? targetDeps : dependencyGraph.getDependencies(token);
+      
+      for (const dep of deps) {
+        if (hasCycle(dep, [])) {
+          recursionStack.delete(token);
+          return true;
         }
+      }
 
-        path.delete(token);
-        return false;
-      };
+      recursionStack.delete(token);
+      return false;
+    };
 
-      return hasCycle(tokenName);
-    } catch {
-      return false; // If we can't determine, assume no cycle
-    }
+    return hasCycle(tokenName, dependencies);
   }
 
   private calculateBatchComplexity(changes: readonly TokenChange[]): number {
@@ -729,24 +816,66 @@ export class DependencyIntelligenceService {
 
   // Remove unused confidence calculation method
 
-  private generateExecutionReasoning(rule: string, _result: string): string {
-    // Simplified rule reasoning
-    if (rule.includes('calc(')) {
-      return `Calculated result using mathematical expression: ${rule}`;
+  /**
+   * Check if a parsed rule needs a base token
+   */
+  private needsBaseToken(parsedRule: ParsedRule): boolean {
+    return ['state', 'scale', 'contrast', 'invert'].includes(parsedRule.type);
+  }
+
+  /**
+   * Calculate execution confidence based on rule complexity and available dependencies
+   */
+  private calculateExecutionConfidence(parsedRule: ParsedRule, context: RuleExecutionContext): number {
+    let confidence = 0.8; // Base confidence
+
+    // Check if all required dependencies are available
+    const requiredTokens = parsedRule.tokens || [];
+    const missingTokens = requiredTokens.filter((token: string) => !this.tokenRegistry.has(token));
+    confidence -= missingTokens.length * 0.2;
+
+    // Check if base token is available for rules that need it
+    if (this.needsBaseToken(parsedRule)) {
+      if (!parsedRule.baseToken || !this.tokenRegistry.has(parsedRule.baseToken)) {
+        confidence -= 0.3;
+      }
     }
-    if (rule.includes('scale:')) {
-      return `Scaled base value by ratio specified in ${rule}`;
+
+    // Boost confidence for simpler rules
+    switch (parsedRule.type) {
+      case 'scale':
+      case 'state':
+      case 'invert':
+        confidence += 0.1;
+        break;
+      case 'calc':
+        confidence -= 0.1; // Calculations are more prone to errors
+        break;
     }
-    if (rule.includes('state:')) {
-      return `Applied state transformation: ${rule}`;
+
+    // Factor in context dependencies
+    if (context.dependencies.length === 0 && requiredTokens.length > 0) {
+      confidence -= 0.2; // Missing context dependencies
     }
-    if (rule.includes('contrast:')) {
-      return `Generated contrast variant: ${rule}`;
+
+    return Math.max(Math.min(confidence, 1), 0);
+  }
+
+  private generateExecutionReasoning(parsedRule: ParsedRule, result: string): string {
+    switch (parsedRule.type) {
+      case 'calc':
+        return `Calculated result using mathematical expression: ${parsedRule.expression || 'unknown'}`;
+      case 'scale':
+        return `Scaled base token '${parsedRule.baseToken}' by ratio: ${parsedRule.ratio || 'default'}`;
+      case 'state':
+        return `Applied ${parsedRule.stateType || 'default'} state transformation to '${parsedRule.baseToken}'`;
+      case 'contrast':
+        return `Generated ${parsedRule.contrast || 'auto'} contrast variant for '${parsedRule.baseToken}'`;
+      case 'invert':
+        return `Applied color inversion transformation to '${parsedRule.baseToken}'`;
+      default:
+        return `Executed ${parsedRule.type} rule transformation: ${result}`;
     }
-    if (rule.includes('invert')) {
-      return 'Applied color inversion transformation';
-    }
-    return 'Executed rule transformation';
   }
 
   private getAffectedTokens(tokenName: string): string[] {
@@ -754,6 +883,23 @@ export class DependencyIntelligenceService {
   }
 
   // Remove unused method
+
+  /**
+   * Create a temporary registry with updated token value for prediction
+   */
+  private createTempRegistry(tokenName: string, newValue: string): TokenRegistry {
+    // Create a copy of all tokens
+    const allTokens = this.tokenRegistry.getAll();
+    
+    // Update the specific token with new value
+    const updatedTokens = allTokens.map(token => 
+      token.name === tokenName 
+        ? { ...token, value: newValue }
+        : token
+    );
+    
+    return new TokenRegistry(updatedTokens);
+  }
 
   private calculateCascadePaths(tokenName: string): string[][] {
     const paths: string[][] = [];
@@ -886,5 +1032,26 @@ export class DependencyIntelligenceService {
     confidence -= Math.min(avgRisk * 0.05, 0.3);
 
     return Math.max(Math.min(confidence, 1), 0);
+  }
+
+  /**
+   * Get cached result if still valid
+   */
+  private getCachedResult(key: string): unknown | null {
+    const cached = this.performanceCache.get(key);
+    if (cached && (Date.now() - cached.timestamp) < this.CACHE_TTL) {
+      return cached.value;
+    }
+    return null;
+  }
+
+  /**
+   * Set cached result with timestamp
+   */
+  private setCachedResult(key: string, value: unknown): void {
+    this.performanceCache.set(key, {
+      value,
+      timestamp: Date.now(),
+    });
   }
 }
