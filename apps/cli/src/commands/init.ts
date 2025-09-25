@@ -202,10 +202,6 @@ export async function initCommand(options: { yes?: boolean; config?: string } = 
     throw error;
   }
 
-  // Check if we're in test mode
-  const isTestMode =
-    process.env.NODE_ENV === 'test' || process.env.CI === 'true' || process.env.VITEST === 'true';
-
   // Create directories and files
   const setupSpinner = ora('Setting up Rafters...').start();
 
@@ -217,25 +213,16 @@ export async function initCommand(options: { yes?: boolean; config?: string } = 
     // Save config
     saveConfig(config, cwd);
 
-    // Fetch agent instructions from registry (skip in test mode)
+    // Fetch agent instructions from registry
     const agentInstructionsPath = join(raftersDir, 'agent-instructions.md');
-    if (isTestMode) {
-      // Use fallback instructions in test mode
-      const fallbackInstructions = `# Rafters AI Agent Instructions
-
-This project uses Rafters design system components with embedded intelligence.
-Visit https://rafters.realhandy.tech for complete documentation.
-`;
-      writeFileSync(agentInstructionsPath, fallbackInstructions);
-    } else {
-      try {
-        const response = await fetch(`${config.registry}/templates/agent-instructions`);
-        if (response.ok) {
-          const agentInstructions = await response.text();
-          writeFileSync(agentInstructionsPath, agentInstructions);
-        } else {
-          // Fallback to basic instructions
-          const fallbackInstructions = `# Rafters AI Agent Instructions
+    try {
+      const response = await fetch(`${config.registry}/templates/agent-instructions`);
+      if (response.ok) {
+        const agentInstructions = await response.text();
+        writeFileSync(agentInstructionsPath, agentInstructions);
+      } else {
+        // Fallback to basic instructions
+        const fallbackInstructions = `# Rafters AI Agent Instructions
 
 This project uses Rafters design system components with embedded intelligence.
 
@@ -255,17 +242,16 @@ This project uses Rafters design system components with embedded intelligence.
 - Component Registry: ${config.registry}/components
 - Design Intelligence: https://rafters.realhandy.tech
 `;
-          writeFileSync(agentInstructionsPath, fallbackInstructions);
-        }
-      } catch {
-        // Fallback if registry is unavailable
-        const fallbackInstructions = `# Rafters AI Agent Instructions
+        writeFileSync(agentInstructionsPath, fallbackInstructions);
+      }
+    } catch {
+      // Fallback if registry is unavailable
+      const fallbackInstructions = `# Rafters AI Agent Instructions
 
 This project uses Rafters design system components with embedded intelligence.
 Visit https://rafters.realhandy.tech for complete documentation.
 `;
-        writeFileSync(agentInstructionsPath, fallbackInstructions);
-      }
+      writeFileSync(agentInstructionsPath, fallbackInstructions);
     }
 
     // Create component manifest
@@ -286,35 +272,13 @@ Visit https://rafters.realhandy.tech for complete documentation.
 
     const utilsPath = join(libDir, 'utils.ts');
     if (!existsSync(utilsPath)) {
-      if (isTestMode) {
-        // Use fallback utils in test mode
-        const fallbackUtils = `import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-`;
-        writeFileSync(utilsPath, fallbackUtils);
-      } else {
-        try {
-          const response = await fetch(`${config.registry}/templates/utils`);
-          if (response.ok) {
-            const utilsContent = await response.text();
-            writeFileSync(utilsPath, utilsContent);
-          } else {
-            // Fallback to basic utils
-            const fallbackUtils = `import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-`;
-            writeFileSync(utilsPath, fallbackUtils);
-          }
-        } catch {
-          // Fallback if registry is unavailable
+      try {
+        const response = await fetch(`${config.registry}/templates/utils`);
+        if (response.ok) {
+          const utilsContent = await response.text();
+          writeFileSync(utilsPath, utilsContent);
+        } else {
+          // Fallback to basic utils
           const fallbackUtils = `import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -324,6 +288,16 @@ export function cn(...inputs: ClassValue[]) {
 `;
           writeFileSync(utilsPath, fallbackUtils);
         }
+      } catch {
+        // Fallback if registry is unavailable
+        const fallbackUtils = `import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+`;
+        writeFileSync(utilsPath, fallbackUtils);
       }
     }
 
@@ -344,22 +318,18 @@ export function cn(...inputs: ClassValue[]) {
 
     setupSpinner.succeed('Rafters setup complete');
 
-    // Install dependencies (skip in test/CI environments)
-    if (isTestMode) {
-      console.log('Skipping dependency installation in test mode');
-    } else {
-      const depsSpinner = ora('Installing core dependencies...').start();
-      const coreDeps = getCoreDependencies();
+    // Install dependencies
+    const depsSpinner = ora('Installing core dependencies...').start();
+    const coreDeps = getCoreDependencies();
 
-      try {
-        await installDependencies(coreDeps, config.packageManager, cwd);
-        depsSpinner.succeed('Core dependencies installed');
-      } catch (_error) {
-        depsSpinner.warn('Failed to install dependencies automatically. Please install manually:');
-        console.log(
-          `${config.packageManager} ${config.packageManager === 'npm' ? 'install' : 'add'} ${coreDeps.join(' ')}`
-        );
-      }
+    try {
+      await installDependencies(coreDeps, config.packageManager, cwd);
+      depsSpinner.succeed('Core dependencies installed');
+    } catch (_error) {
+      depsSpinner.warn('Failed to install dependencies automatically. Please install manually:');
+      console.log(
+        `${config.packageManager} ${config.packageManager === 'npm' ? 'install' : 'add'} ${coreDeps.join(' ')}`
+      );
     }
 
     console.log('Rafters initialized.');

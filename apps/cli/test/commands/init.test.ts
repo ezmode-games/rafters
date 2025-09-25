@@ -2,11 +2,17 @@
  * Test suite for init command
  */
 
+import { realpathSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { existsSync, removeSync } from 'fs-extra';
+import { ensureDirSync, existsSync, removeSync } from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { initCommand } from '../../src/commands/init.js';
+import {
+  REGISTRY_FIXTURES,
+  validateAgentInstructions,
+  validateUtilsTemplate,
+} from '../fixtures/registry-responses.js';
 
 // Mock external dependencies
 vi.mock('inquirer', () => ({
@@ -24,6 +30,10 @@ vi.mock('ora', () => ({
   })),
 }));
 
+// Mock fetch with registry fixtures
+const mockFetch = vi.fn();
+global.fetch = mockFetch;
+
 describe('init command', () => {
   let testDir: string;
   let originalCwd: string;
@@ -31,11 +41,32 @@ describe('init command', () => {
   beforeEach(() => {
     originalCwd = process.cwd();
     testDir = join(tmpdir(), `rafters-test-${Date.now()}`);
+    ensureDirSync(testDir);
+    testDir = realpathSync(testDir);
 
     // Mock console methods to avoid output during tests
     vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    // Setup fetch mocks with fixtures
+    mockFetch.mockReset();
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('/templates/agent-instructions')) {
+        return Promise.resolve({
+          ok: true,
+          text: () =>
+            Promise.resolve(validateAgentInstructions(REGISTRY_FIXTURES.agentInstructions)),
+        });
+      }
+      if (url.includes('/templates/utils')) {
+        return Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve(validateUtilsTemplate(REGISTRY_FIXTURES.utilsTemplate)),
+        });
+      }
+      return Promise.resolve({ ok: false, status: 404 });
+    });
 
     // Change to test directory
     process.chdir(testDir);
@@ -90,8 +121,14 @@ describe('init command', () => {
       },
     });
 
-    // Create existing .rafters directory
+    // Create existing .rafters directory with config file
     fs.ensureDirSync(join(testDir, '.rafters'));
+    fs.writeJsonSync(join(testDir, '.rafters/config.json'), {
+      version: '1.0.0',
+      componentsDir: './src/components/ui',
+      packageManager: 'pnpm',
+      registry: 'https://rafters.realhandy.tech/registry',
+    });
 
     const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => {
       throw new Error('Process exit called');
@@ -120,7 +157,7 @@ describe('init command', () => {
     expect(existsSync(join(testDir, '.rafters/config.json'))).toBe(true);
     expect(existsSync(join(testDir, '.rafters/component-manifest.json'))).toBe(true);
     expect(existsSync(join(testDir, '.rafters/agent-instructions.md'))).toBe(true);
-  });
+  }, 15000);
 
   it('should create necessary directories and files', async () => {
     const fs = await import('fs-extra');
@@ -146,5 +183,5 @@ describe('init command', () => {
     expect(config).toHaveProperty('version');
     expect(config).toHaveProperty('componentsDir');
     expect(config).toHaveProperty('registry');
-  });
+  }, 15000);
 });

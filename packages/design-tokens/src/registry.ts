@@ -48,6 +48,16 @@ export class TokenRegistry {
    */
   add(token: Token): void {
     this.addToken(token);
+
+    // Fire change callback for new token addition
+    if (this.changeCallback) {
+      this.changeCallback({
+        type: 'token-added',
+        tokenName: token.name,
+        token,
+        timestamp: Date.now(),
+      });
+    }
   }
 
   /**

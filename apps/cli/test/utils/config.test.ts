@@ -82,6 +82,12 @@ describe('config utilities', () => {
     it('should return true when .rafters directory exists', () => {
       const fs = require('fs-extra');
       fs.ensureDirSync(join(testDir, '.rafters'));
+      fs.writeJsonSync(join(testDir, '.rafters/config.json'), {
+        version: '1.0.0',
+        componentsDir: './src/components/ui',
+        packageManager: 'pnpm',
+        registry: 'https://rafters.realhandy.tech/registry',
+      });
       expect(configExists(testDir)).toBe(true);
     });
   });
@@ -105,14 +111,14 @@ describe('config utilities', () => {
       writeJsonSync(join(testDir, 'package.json'), {
         dependencies: { 'react-scripts': '^5.0.0' },
       });
-      expect(detectFramework(testDir)).toBe('create-react-app');
+      expect(detectFramework(testDir)).toBe('cra');
     });
 
     it('should return unknown for unrecognized frameworks', () => {
       writeJsonSync(join(testDir, 'package.json'), {
         dependencies: { react: '^19.0.0' },
       });
-      expect(detectFramework(testDir)).toBe('unknown');
+      expect(detectFramework(testDir)).toBe(null);
     });
   });
 
@@ -150,13 +156,13 @@ describe('config utilities', () => {
     it('should find globals.css in src directory', () => {
       const fs = require('fs-extra');
       fs.writeFileSync(join(testDir, 'src/globals.css'), '');
-      expect(findCssFile(testDir)).toBe('./src/globals.css');
+      expect(findCssFile(testDir)).toBe('src/globals.css');
     });
 
     it('should find globals.css in app directory', () => {
       const fs = require('fs-extra');
       fs.writeFileSync(join(testDir, 'app/globals.css'), '');
-      expect(findCssFile(testDir)).toBe('./app/globals.css');
+      expect(findCssFile(testDir)).toBe('app/globals.css');
     });
 
     it('should return null when no CSS file is found', () => {

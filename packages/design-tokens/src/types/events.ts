@@ -21,12 +21,23 @@ export interface TokensBatchChangeEvent {
   timestamp: number;
 }
 
+export interface TokenAddedEvent {
+  type: 'token-added';
+  tokenName: string;
+  token: Token;
+  timestamp: number;
+}
+
 export interface RegistryInitializedEvent {
   type: 'registry-initialized';
   tokenCount: number;
   timestamp: number;
 }
 
-export type RegistryEvent = TokenChangeEvent | TokensBatchChangeEvent | RegistryInitializedEvent;
+export type RegistryEvent =
+  | TokenChangeEvent
+  | TokensBatchChangeEvent
+  | TokenAddedEvent
+  | RegistryInitializedEvent;
 
 export type RegistryChangeCallback = (event: RegistryEvent) => void;

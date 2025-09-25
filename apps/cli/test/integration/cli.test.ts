@@ -82,21 +82,8 @@ describe('CLI Integration', () => {
     expect(existsSync(join(testDir, 'src/lib/utils.ts'))).toBe(true);
   });
 
-  it('should show list of available components', () => {
-    writeJsonSync(join(testDir, 'package.json'), {
-      name: 'test-project',
-      dependencies: {
-        react: '^19.0.0',
-      },
-    });
-
-    // Initialize first
-    execSync(`node "${CLI_PATH}" init --yes`, { encoding: 'utf-8', stdio: 'pipe' });
-
-    // Then list components
-    const output = execSync(`node "${CLI_PATH}" list`, { encoding: 'utf-8' });
-    expect(output).toContain('Components');
-  });
+  // NOTE: Removed integration test for 'list' command as it hits external registry API
+  // The functionality is covered by unit tests in test/commands/list.test.ts
 
   it('should clean up rafters configuration', () => {
     writeJsonSync(join(testDir, 'package.json'), {
