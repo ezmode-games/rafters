@@ -15,7 +15,8 @@ import {
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { createTokenRegistry, TokenRegistry } from '@rafters/design-tokens';
-import type { ColorIntelligence, ComponentIntelligence, OKLCH, Token } from '@rafters/shared';
+import type { ColorIntelligence, ComponentIntelligence, ComponentRegistry, Intelligence, OKLCH, Token } from '@rafters/shared';
+import { fetchComponent } from '../utils/registry.js';
 import { z } from 'zod';
 
 // Tool parameter schemas
@@ -31,6 +32,7 @@ const ComponentIntelligenceParamsSchema = z.object({
 export class RaftersDesignIntelligenceServer {
   private server: Server;
   private registry?: TokenRegistry;
+  private componentIntelligence: ComponentIntelligenceService;
 
   constructor() {
     this.server = new Server(
@@ -45,6 +47,7 @@ export class RaftersDesignIntelligenceServer {
       }
     );
 
+    this.componentIntelligence = new ComponentIntelligenceService();
     this.registerHandlers();
   }
 
@@ -169,6 +172,16 @@ export class RaftersDesignIntelligenceServer {
             type: 'object',
             properties: {
               componentName: { type: 'string', description: 'Component name to analyze' },
+              context: {
+                type: 'object',
+                properties: {
+                  layoutComplexity: { type: 'number', minimum: 1, maximum: 10, default: 1 },
+                  userExpertise: { type: 'string', enum: ['novice', 'intermediate', 'expert'], default: 'novice' },
+                  taskUrgency: { type: 'string', enum: ['low', 'medium', 'high', 'critical'], default: 'medium' },
+                  deviceContext: { type: 'string', enum: ['mobile', 'tablet', 'desktop', 'kiosk'], default: 'desktop' },
+                },
+                description: 'Analysis context parameters',
+              },
             },
             required: ['componentName'],
           },
@@ -184,13 +197,100 @@ export class RaftersDesignIntelligenceServer {
                 items: { type: 'string' },
                 description: 'Array of component names to optimize',
               },
-              targetLoad: {
-                type: 'number',
-                default: 7,
-                description: 'Target cognitive load budget',
+              constraints: {
+                type: 'object',
+                properties: {
+                  maxCognitiveLoad: { type: 'number', default: 7, description: 'Maximum cognitive load budget' },
+                  maxAttentionPoints: { type: 'number', default: 3, description: 'Maximum attention targets' },
+                  requiresAccessibility: {
+                    type: 'array',
+                    items: { type: 'string', enum: ['AA', 'AAA'] },
+                    default: ['AA'],
+                    description: 'Required accessibility levels',
+                  },
+                  trustLevel: { type: 'string', enum: ['low', 'medium', 'high', 'critical'], default: 'medium' },
+                },
+                description: 'Composition constraints',
               },
             },
             required: ['components'],
+          },
+        },
+        {
+          name: 'assess_attention_hierarchy',
+          description: 'Analyze visual attention hierarchy in component layouts',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              layout: {
+                type: 'object',
+                properties: {
+                  components: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        name: { type: 'string' },
+                        position: {
+                          type: 'object',
+                          properties: {
+                            x: { type: 'number' },
+                            y: { type: 'number' },
+                          },
+                          required: ['x', 'y'],
+                        },
+                        size: {
+                          type: 'object',
+                          properties: {
+                            width: { type: 'number' },
+                            height: { type: 'number' },
+                          },
+                          required: ['width', 'height'],
+                        },
+                        zIndex: { type: 'number', description: 'Optional z-index for layering' },
+                      },
+                      required: ['name', 'position', 'size'],
+                    },
+                  },
+                  viewportSize: {
+                    type: 'object',
+                    properties: {
+                      width: { type: 'number' },
+                      height: { type: 'number' },
+                    },
+                    required: ['width', 'height'],
+                  },
+                },
+                required: ['components', 'viewportSize'],
+              },
+            },
+            required: ['layout'],
+          },
+        },
+        {
+          name: 'validate_component_accessibility',
+          description: 'Comprehensive accessibility validation with WCAG compliance',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              componentName: { type: 'string', description: 'Component name to validate' },
+              context: {
+                type: 'object',
+                properties: {
+                  colorVisionTypes: {
+                    type: 'array',
+                    items: { type: 'string', enum: ['normal', 'deuteranopia', 'protanopia', 'tritanopia'] },
+                    default: ['normal'],
+                  },
+                  contrastLevel: { type: 'string', enum: ['AA', 'AAA'], default: 'AA' },
+                  screenReader: { type: 'boolean', default: false },
+                  motorImpairments: { type: 'boolean', default: false },
+                  cognitiveImpairments: { type: 'boolean', default: false },
+                },
+                description: 'Accessibility context',
+              },
+            },
+            required: ['componentName'],
           },
         },
       ],
@@ -220,6 +320,10 @@ export class RaftersDesignIntelligenceServer {
           return await this.handleComponentIntelligence(args);
         case 'optimize_component_composition':
           return await this.handleOptimizeComponentComposition(args);
+        case 'assess_attention_hierarchy':
+          return await this.handleAssessAttentionHierarchy(args);
+        case 'validate_component_accessibility':
+          return await this.handleValidateComponentAccessibility(args);
         default:
           throw new Error(`Unknown tool: ${name}`);
       }
@@ -586,74 +690,418 @@ export class RaftersDesignIntelligenceServer {
   }
 
   private async handleComponentIntelligence(args: unknown) {
-    const params = ComponentIntelligenceParamsSchema.parse(args);
+    const params = z
+      .object({
+        componentName: z.string(),
+        context: z.object({
+          layoutComplexity: z.number().min(1).max(10).default(1),
+          userExpertise: z.enum(['novice', 'intermediate', 'expert']).default('novice'),
+          taskUrgency: z.enum(['low', 'medium', 'high', 'critical']).default('medium'),
+          deviceContext: z.enum(['mobile', 'tablet', 'desktop', 'kiosk']).default('desktop'),
+        }).optional(),
+      })
+      .parse(args);
 
-    // Mock component intelligence - would fetch from registry in real implementation
-    const intelligence: ComponentIntelligence = {
-      cognitiveLoad: Math.floor(Math.random() * 5) + 1,
-      attentionHierarchy: 'Primary action component with high visibility requirements',
-      accessibilityRules: 'WCAG 2.1 AAA compliance required',
-      usageContext: 'Critical user actions requiring immediate attention',
-    };
-
-    return {
-      content: [
-        {
-          type: 'text',
-          text: JSON.stringify({
-            component: params.componentName,
-            intelligence,
-            analysis: {
-              cognitiveLoadRating: intelligence.cognitiveLoad > 3 ? 'high' : 'moderate',
-              attentionEconomics: 'primary',
-              trustRequirements: intelligence.cognitiveLoad > 4 ? 'critical' : 'high',
+    try {
+      // Fetch component from registry
+      const component = await fetchComponent(params.componentName);
+      
+      if (!component) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: `Component "${params.componentName}" not found`,
+                suggestion: 'Ensure the component name is correct and exists in the registry',
+              }),
             },
-          }),
-        },
-      ],
-    };
+          ],
+        };
+      }
+
+      // Extract intelligence metadata from component
+      const raftersIntelligence = component.meta?.rafters?.intelligence;
+      if (!raftersIntelligence) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: `No intelligence metadata found for component "${params.componentName}"`,
+                suggestion: 'Component may not have been processed through Rafters intelligence pipeline',
+              }),
+            },
+          ],
+        };
+      }
+
+      // Convert to Intelligence format
+      const intelligence: Intelligence = {
+        cognitiveLoad: raftersIntelligence.cognitiveLoad,
+        attentionEconomics: raftersIntelligence.attentionEconomics || '',
+        accessibility: raftersIntelligence.accessibility || '',
+        trustBuilding: raftersIntelligence.trustBuilding || '',
+        semanticMeaning: raftersIntelligence.semanticMeaning || '',
+      };
+
+      // Analyze with ComponentIntelligenceService
+      const result = await this.componentIntelligence.analyzeComponent(
+        params.componentName,
+        intelligence,
+        params.context || {}
+      );
+
+      if (!result.success) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: result.error,
+                confidence: result.confidence,
+              }),
+            },
+          ],
+        };
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              component: params.componentName,
+              intelligence: {
+                cognitiveLoadScore: result.data.cognitiveLoadScore,
+                millerRuleCompliance: result.data.millerRuleCompliance,
+                attentionWeight: result.data.attentionWeight,
+                trustPatterns: result.data.trustPatterns,
+                accessibilityGaps: result.data.accessibilityGaps,
+                recommendations: result.data.recommendations,
+              },
+              analysis: {
+                cognitiveLoadRating: result.data.cognitiveLoadScore > 7 ? 'high' : result.data.cognitiveLoadScore > 4 ? 'moderate' : 'low',
+                millerCompliance: result.data.millerRuleCompliance ? 'compliant' : 'violation',
+                attentionLevel: result.data.attentionWeight > 0.7 ? 'primary' : result.data.attentionWeight > 0.4 ? 'secondary' : 'tertiary',
+                trustRequirements: result.data.trustPatterns.length > 2 ? 'critical' : result.data.trustPatterns.length > 0 ? 'high' : 'standard',
+              },
+              context: params.context || {},
+              confidence: result.confidence,
+              timestamp: result.timestamp,
+            }),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              error: `Failed to analyze component: ${error instanceof Error ? error.message : String(error)}`,
+              component: params.componentName,
+            }),
+          },
+        ],
+      };
+    }
   }
 
   private async handleOptimizeComponentComposition(args: unknown) {
     const params = z
       .object({
         components: z.array(z.string()),
-        targetLoad: z.number().default(7),
+        constraints: z.object({
+          maxCognitiveLoad: z.number().default(7),
+          maxAttentionPoints: z.number().default(3),
+          requiresAccessibility: z.array(z.enum(['AA', 'AAA'])).default(['AA']),
+          trustLevel: z.enum(['low', 'medium', 'high', 'critical']).default('medium'),
+        }).optional(),
       })
       .parse(args);
 
-    // Mock optimization logic
-    const componentLoads = params.components.map((name) => ({
-      name,
-      currentLoad: Math.floor(Math.random() * 5) + 1,
-      optimizedLoad: Math.floor(Math.random() * 3) + 1,
-    }));
-
-    const totalCurrentLoad = componentLoads.reduce((sum, comp) => sum + comp.currentLoad, 0);
-    const totalOptimizedLoad = componentLoads.reduce((sum, comp) => sum + comp.optimizedLoad, 0);
-
-    return {
-      content: [
-        {
-          type: 'text',
-          text: JSON.stringify({
-            components: componentLoads,
-            optimization: {
-              currentLoad: totalCurrentLoad,
-              optimizedLoad: totalOptimizedLoad,
-              targetLoad: params.targetLoad,
-              improvement: totalCurrentLoad - totalOptimizedLoad,
-              withinBudget: totalOptimizedLoad <= params.targetLoad,
+    try {
+      // Fetch components from registry
+      const componentPromises = params.components.map(async (componentName) => {
+        const component = await fetchComponent(componentName);
+        if (!component || !component.meta?.rafters?.intelligence) {
+          return null;
+        }
+        
+        // Convert to ComponentRegistry format for the service
+        return {
+          name: component.name,
+          type: component.type || 'registry:component',
+          files: component.files || [],
+          meta: {
+            rafters: {
+              intelligence: {
+                cognitiveLoad: component.meta.rafters.intelligence.cognitiveLoad,
+                attentionEconomics: component.meta.rafters.intelligence.attentionEconomics || '',
+                accessibility: component.meta.rafters.intelligence.accessibility || '',
+                trustBuilding: component.meta.rafters.intelligence.trustBuilding || '',
+                semanticMeaning: component.meta.rafters.intelligence.semanticMeaning || '',
+              },
             },
-            recommendations: [
-              'Simplify high-complexity components',
-              'Use progressive disclosure patterns',
-              'Reduce visual noise in secondary elements',
-            ],
-          }),
-        },
-      ],
-    };
+          },
+        } as ComponentRegistry;
+      });
+
+      const componentResults = await Promise.all(componentPromises);
+      const validComponents = componentResults.filter((comp): comp is ComponentRegistry => comp !== null);
+
+      if (validComponents.length === 0) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: 'No valid components found with intelligence metadata',
+                requestedComponents: params.components,
+              }),
+            },
+          ],
+        };
+      }
+
+      // Optimize composition using ComponentIntelligenceService
+      const result = await this.componentIntelligence.optimizeComposition(
+        validComponents,
+        params.constraints || {}
+      );
+
+      if (!result.success) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: result.error,
+                confidence: result.confidence,
+              }),
+            },
+          ],
+        };
+      }
+
+      // Calculate load summaries
+      const originalLoad = validComponents.reduce(
+        (sum, comp) => sum + comp.meta.rafters.intelligence.cognitiveLoad, 
+        0
+      );
+      const optimizedLoad = result.data.cognitiveLoadDistribution.reduce(
+        (sum, item) => sum + item.load, 
+        0
+      );
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              components: result.data.cognitiveLoadDistribution,
+              optimization: {
+                originalLoad,
+                optimizedLoad,
+                maxLoad: params.constraints?.maxCognitiveLoad || 7,
+                improvement: originalLoad - optimizedLoad,
+                withinBudget: optimizedLoad <= (params.constraints?.maxCognitiveLoad || 7),
+                accessibilityScore: result.data.accessibilityScore,
+              },
+              attentionFlow: result.data.attentionFlow,
+              improvements: result.data.improvements,
+              optimizedLayout: result.data.optimizedLayout,
+              constraints: params.constraints || {},
+              confidence: result.confidence,
+              timestamp: result.timestamp,
+            }),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              error: `Failed to optimize component composition: ${error instanceof Error ? error.message : String(error)}`,
+              requestedComponents: params.components,
+            }),
+          },
+        ],
+      };
+    }
+  }
+
+  private async handleAssessAttentionHierarchy(args: unknown) {
+    const params = z
+      .object({
+        layout: z.object({
+          components: z.array(z.object({
+            name: z.string(),
+            position: z.object({ x: z.number(), y: z.number() }),
+            size: z.object({ width: z.number(), height: z.number() }),
+            zIndex: z.number().optional(),
+          })),
+          viewportSize: z.object({ width: z.number(), height: z.number() }),
+        }),
+      })
+      .parse(args);
+
+    try {
+      const result = await this.componentIntelligence.assessAttentionHierarchy(params.layout);
+
+      if (!result.success) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: result.error,
+                confidence: result.confidence,
+              }),
+            },
+          ],
+        };
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              attentionHierarchy: {
+                primaryTarget: result.data.primaryAttentionTarget,
+                secondaryTargets: result.data.secondaryTargets,
+                visualWeights: result.data.visualWeight,
+                attentionFlow: result.data.attentionFlow,
+                violations: result.data.violations,
+              },
+              analysis: {
+                hierarchyStrength: result.data.violations.length === 0 ? 'strong' : 'weak',
+                primaryCount: result.data.primaryAttentionTarget ? 1 : 0,
+                secondaryCount: result.data.secondaryTargets.length,
+                violationCount: result.data.violations.length,
+              },
+              confidence: result.confidence,
+              timestamp: result.timestamp,
+            }),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              error: `Failed to assess attention hierarchy: ${error instanceof Error ? error.message : String(error)}`,
+            }),
+          },
+        ],
+      };
+    }
+  }
+
+  private async handleValidateComponentAccessibility(args: unknown) {
+    const params = z
+      .object({
+        componentName: z.string(),
+        context: z.object({
+          colorVisionTypes: z.array(z.enum(['normal', 'deuteranopia', 'protanopia', 'tritanopia'])).default(['normal']),
+          contrastLevel: z.enum(['AA', 'AAA']).default('AA'),
+          screenReader: z.boolean().default(false),
+          motorImpairments: z.boolean().default(false),
+          cognitiveImpairments: z.boolean().default(false),
+        }).optional(),
+      })
+      .parse(args);
+
+    try {
+      // Fetch component from registry
+      const component = await fetchComponent(params.componentName);
+      
+      if (!component || !component.meta?.rafters?.intelligence) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: `Component "${params.componentName}" not found or missing intelligence metadata`,
+              }),
+            },
+          ],
+        };
+      }
+
+      // Convert to Intelligence format
+      const intelligence: Intelligence = {
+        cognitiveLoad: component.meta.rafters.intelligence.cognitiveLoad,
+        attentionEconomics: component.meta.rafters.intelligence.attentionEconomics || '',
+        accessibility: component.meta.rafters.intelligence.accessibility || '',
+        trustBuilding: component.meta.rafters.intelligence.trustBuilding || '',
+        semanticMeaning: component.meta.rafters.intelligence.semanticMeaning || '',
+      };
+
+      const result = await this.componentIntelligence.validateAccessibility(
+        params.componentName,
+        intelligence,
+        params.context || {}
+      );
+
+      if (!result.success) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: result.error,
+                confidence: result.confidence,
+              }),
+            },
+          ],
+        };
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              component: params.componentName,
+              accessibility: {
+                wcagCompliance: result.data.wcagCompliance,
+                colorVisionAnalysis: result.data.colorVisionAnalysis,
+                touchTargetAnalysis: result.data.touchTargetAnalysis,
+                cognitiveAccessibility: result.data.cognitiveAccessibility,
+              },
+              summary: {
+                overallLevel: result.data.wcagCompliance.level,
+                violationCount: result.data.wcagCompliance.violations.length,
+                accessibilityScore: result.data.cognitiveAccessibility.score,
+                touchCompliant: result.data.touchTargetAnalysis.compliant,
+                colorVisionCompatible: Object.values(result.data.colorVisionAnalysis).every(analysis => analysis.accessible),
+              },
+              confidence: result.confidence,
+              timestamp: result.timestamp,
+            }),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              error: `Failed to validate component accessibility: ${error instanceof Error ? error.message : String(error)}`,
+              component: params.componentName,
+            }),
+          },
+        ],
+      };
+    }
   }
 
   async start(): Promise<void> {
