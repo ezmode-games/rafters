@@ -8,7 +8,6 @@ import type { Token } from '@rafters/shared';
 import { beforeEach, describe, expect, it } from 'vitest';
 // Import the service from the CLI app
 import { DependencyIntelligenceService } from '../../../apps/cli/src/mcp/services/dependency-intelligence';
-import { GenerationRuleExecutor, GenerationRuleParser } from '../src/generation-rules';
 import { TokenRegistry } from '../src/registry';
 
 // Mock data for testing
@@ -217,7 +216,7 @@ describe('DependencyIntelligenceService Integration', () => {
   describe('Rule System Integration', () => {
     it('should analyze rules correctly', async () => {
       const rule = 'state:hover';
-      
+
       // Test that the service can analyze rules
       const result = await service.analyzeDependencies('primary-hover');
       expect(result.success).toBe(true);

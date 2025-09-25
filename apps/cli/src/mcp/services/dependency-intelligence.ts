@@ -8,9 +8,7 @@
  * to provide mathematical precision in design token relationships.
  */
 
-import {
-  TokenRegistry,
-} from '@rafters/design-tokens';
+import type { TokenRegistry } from '@rafters/design-tokens';
 import { z } from 'zod';
 
 // ===== SCHEMAS & TYPES =====
@@ -386,7 +384,7 @@ export class DependencyIntelligenceService {
     try {
       // Simplified rule execution - return a mock result for now
       const result = `Executed ${rule} on ${tokenName}`;
-      
+
       // Calculate confidence based on context
       const confidence = context.dependencies.length > 0 ? 0.8 : 0.6;
 

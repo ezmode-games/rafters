@@ -24,9 +24,6 @@ export { createLocalCSSCallback } from './callbacks/local-css-callback.js';
 // Export dependency tracking system - re-enable for dependency intelligence
 export type { TokenDependency } from './dependencies.js';
 export { TokenDependencyGraph } from './dependencies.js';
-// Export generation rule system
-export type { ParsedRule } from './generation-rules.js';
-export { GenerationRuleParser, GenerationRuleExecutor } from './generation-rules.js';
 // Export new clean export system
 export {
   exportColorScales,
@@ -36,6 +33,9 @@ export {
 } from './export.js';
 // Export complete tailwind v4 exporter
 export { exportToTailwindV4Complete } from './exporters/tailwind-v4.js';
+// Export generation rule system
+export type { ParsedRule } from './generation-rules.js';
+export { GenerationRuleExecutor, GenerationRuleParser } from './generation-rules.js';
 // Export core TokenRegistry class
 export { TokenRegistry } from './registry.js';
 // Export registry factory with self-initialization
