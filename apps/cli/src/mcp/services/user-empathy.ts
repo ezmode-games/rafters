@@ -10,6 +10,7 @@
  */
 
 import type { ColorVisionType, OKLCH } from '@rafters/shared';
+import { calculateWCAGContrast, meetsWCAGStandard } from '@rafters/shared';
 import { z } from 'zod';
 
 // ===== SCHEMAS & TYPES =====
@@ -458,23 +459,31 @@ export class UserEmpathyService {
         recommendation: string;
       }> = [];
 
-      // Check color contrast ratios
-      for (const colorPair of design.colors) {
-        // Simplified contrast check - approximate WCAG formula using OKLCH lightness
-        // In OKLCH, lightness already represents perceptual lightness similar to relative luminance
-        const textLuminance = Math.max(0.05, colorPair.oklch.l); // Assume text color
-        const backgroundLuminance = 0.95; // Assume light background
-        const contrastRatio =
-          (Math.max(textLuminance, backgroundLuminance) + 0.05) /
-          (Math.min(textLuminance, backgroundLuminance) + 0.05);
+      // Check color contrast ratios between likely foreground/background pairs
+      const textColors = design.colors.filter(c => c.usage.some(u => u.includes('text') || c.role.includes('text')));
+      const backgroundColors = design.colors.filter(c => c.usage.some(u => u.includes('background') || c.role.includes('background')));
 
-        if (contrastRatio < 4.5) {
-          wcagIssues.push({
-            type: 'contrast',
-            severity: contrastRatio < 3 ? 'critical' : 'high',
-            description: `Color ${colorPair.role} has insufficient contrast ratio: ${contrastRatio.toFixed(2)}`,
-            recommendation: `Increase contrast ratio to at least 4.5:1 for AA compliance`,
-          });
+      // If no specific text/background colors identified, check all combinations
+      const foregroundColors = textColors.length > 0 ? textColors : design.colors;
+      const backgroundColorsToCheck = backgroundColors.length > 0 ? backgroundColors : design.colors.filter(c => c.oklch.l > 0.5);
+
+      for (const fgColor of foregroundColors) {
+        for (const bgColor of backgroundColorsToCheck) {
+          // Skip comparing color with itself
+          if (fgColor === bgColor) continue;
+
+          // Use proper WCAG contrast calculation from shared utilities
+          const contrastRatio = calculateWCAGContrast(fgColor.oklch, bgColor.oklch);
+
+          // Check both AA levels for normal text
+          if (!meetsWCAGStandard(fgColor.oklch, bgColor.oklch, 'AA', 'normal')) {
+            wcagIssues.push({
+              type: 'contrast',
+              severity: contrastRatio < 3 ? 'critical' : 'high',
+              description: `Insufficient contrast between ${fgColor.role} and ${bgColor.role}: ${contrastRatio.toFixed(2)}:1`,
+              recommendation: `Increase contrast ratio to at least 4.5:1 for AA compliance (currently ${contrastRatio.toFixed(2)}:1)`,
+            });
+          }
         }
       }
 
