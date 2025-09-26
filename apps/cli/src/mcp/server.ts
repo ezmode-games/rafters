@@ -25,6 +25,7 @@ import type {
 import { z } from 'zod';
 import { fetchComponent } from '../utils/registry.js';
 import { ComponentIntelligenceService } from './services/component-intelligence.js';
+import { UserEmpathyService } from './services/user-empathy.js';
 
 // Tool parameter schemas
 const ColorIntelligenceParamsSchema = z.object({
@@ -38,6 +39,7 @@ export class RaftersDesignIntelligenceServer {
   private server: Server;
   private registry?: TokenRegistry;
   private componentIntelligence: ComponentIntelligenceService;
+  private userEmpathy: UserEmpathyService;
 
   constructor() {
     this.server = new Server(
@@ -53,6 +55,7 @@ export class RaftersDesignIntelligenceServer {
     );
 
     this.componentIntelligence = new ComponentIntelligenceService();
+    this.userEmpathy = new UserEmpathyService();
     this.registerHandlers();
   }
 
@@ -325,6 +328,252 @@ export class RaftersDesignIntelligenceServer {
             required: ['componentName'],
           },
         },
+        {
+          name: 'analyze_accessibility_impact',
+          description: 'Comprehensive accessibility impact analysis across user profiles',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              design: {
+                type: 'object',
+                properties: {
+                  colors: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        oklch: {
+                          type: 'object',
+                          properties: {
+                            l: { type: 'number', minimum: 0, maximum: 1 },
+                            c: { type: 'number', minimum: 0 },
+                            h: { type: 'number', minimum: 0, maximum: 360 },
+                          },
+                          required: ['l', 'c', 'h'],
+                        },
+                        role: { type: 'string' },
+                        usage: { type: 'array', items: { type: 'string' } },
+                      },
+                      required: ['oklch', 'role', 'usage'],
+                    },
+                  },
+                  components: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        type: { type: 'string' },
+                        properties: { type: 'object' },
+                        accessibility: {
+                          type: 'object',
+                          properties: {
+                            touchTarget: { type: 'number' },
+                            contrastRatio: { type: 'number' },
+                            keyboardNavigable: { type: 'boolean' },
+                          },
+                        },
+                      },
+                      required: ['type', 'properties'],
+                    },
+                  },
+                },
+                required: ['colors', 'components'],
+              },
+              userProfiles: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    id: { type: 'string' },
+                    name: { type: 'string' },
+                    colorVision: {
+                      type: 'string',
+                      enum: ['normal', 'deuteranopia', 'protanopia', 'tritanopia'],
+                    },
+                    culturalBackground: { type: 'array', items: { type: 'string' } },
+                    accessibilityNeeds: { type: 'array', items: { type: 'string' } },
+                  },
+                  required: [
+                    'id',
+                    'name',
+                    'colorVision',
+                    'culturalBackground',
+                    'accessibilityNeeds',
+                  ],
+                },
+                default: [],
+              },
+            },
+            required: ['design'],
+          },
+        },
+        {
+          name: 'simulate_color_vision_experience',
+          description: 'Simulate color vision experience for different color vision types',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              colors: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    l: { type: 'number', minimum: 0, maximum: 1 },
+                    c: { type: 'number', minimum: 0 },
+                    h: { type: 'number', minimum: 0, maximum: 360 },
+                  },
+                  required: ['l', 'c', 'h'],
+                },
+              },
+              visionTypes: {
+                type: 'array',
+                items: {
+                  type: 'string',
+                  enum: ['normal', 'deuteranopia', 'protanopia', 'tritanopia'],
+                },
+                default: ['normal', 'deuteranopia', 'protanopia', 'tritanopia'],
+              },
+            },
+            required: ['colors'],
+          },
+        },
+        {
+          name: 'analyze_cultural_sensitivity',
+          description: 'Analyze cultural sensitivity of design for global audiences',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              design: {
+                type: 'object',
+                properties: {
+                  colors: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        oklch: {
+                          type: 'object',
+                          properties: {
+                            l: { type: 'number', minimum: 0, maximum: 1 },
+                            c: { type: 'number', minimum: 0 },
+                            h: { type: 'number', minimum: 0, maximum: 360 },
+                          },
+                          required: ['l', 'c', 'h'],
+                        },
+                        role: { type: 'string' },
+                        usage: { type: 'array', items: { type: 'string' } },
+                      },
+                      required: ['oklch', 'role', 'usage'],
+                    },
+                  },
+                  layout: {
+                    type: 'object',
+                    properties: {
+                      direction: { type: 'string', enum: ['ltr', 'rtl'] },
+                      density: { type: 'string', enum: ['compact', 'comfortable', 'spacious'] },
+                    },
+                  },
+                },
+                required: ['colors'],
+              },
+              targetCultures: {
+                type: 'array',
+                items: { type: 'string' },
+                description: 'Array of target cultures (e.g., western, chinese, islamic, etc.)',
+              },
+            },
+            required: ['design', 'targetCultures'],
+          },
+        },
+        {
+          name: 'predict_user_reactions',
+          description: 'Predict user reactions across different demographic segments',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              design: {
+                type: 'object',
+                properties: {
+                  colors: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        oklch: {
+                          type: 'object',
+                          properties: {
+                            l: { type: 'number', minimum: 0, maximum: 1 },
+                            c: { type: 'number', minimum: 0 },
+                            h: { type: 'number', minimum: 0, maximum: 360 },
+                          },
+                          required: ['l', 'c', 'h'],
+                        },
+                        role: { type: 'string' },
+                        usage: { type: 'array', items: { type: 'string' } },
+                      },
+                      required: ['oklch', 'role', 'usage'],
+                    },
+                  },
+                  components: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        type: { type: 'string' },
+                        properties: { type: 'object' },
+                      },
+                      required: ['type', 'properties'],
+                    },
+                  },
+                  layout: {
+                    type: 'object',
+                    properties: {
+                      direction: { type: 'string', enum: ['ltr', 'rtl'] },
+                      density: { type: 'string', enum: ['compact', 'comfortable', 'spacious'] },
+                    },
+                  },
+                },
+                required: ['colors', 'components'],
+              },
+              userSegments: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    name: { type: 'string' },
+                    demographics: {
+                      type: 'object',
+                      properties: {
+                        ageRange: { type: 'string' },
+                        regions: { type: 'array', items: { type: 'string' } },
+                        techSavviness: { type: 'string', enum: ['low', 'medium', 'high'] },
+                      },
+                      required: ['ageRange', 'regions', 'techSavviness'],
+                    },
+                    preferences: {
+                      type: 'object',
+                      properties: {
+                        colorPreferences: { type: 'array', items: { type: 'string' } },
+                        layoutDensity: {
+                          type: 'string',
+                          enum: ['compact', 'comfortable', 'spacious'],
+                        },
+                        interactionStyle: {
+                          type: 'string',
+                          enum: ['touch', 'mouse', 'keyboard', 'voice'],
+                        },
+                      },
+                      required: ['colorPreferences', 'layoutDensity', 'interactionStyle'],
+                    },
+                    accessibilityNeeds: { type: 'array', items: { type: 'string' } },
+                  },
+                  required: ['name', 'demographics', 'preferences', 'accessibilityNeeds'],
+                },
+              },
+            },
+            required: ['design', 'userSegments'],
+          },
+        },
       ],
     }));
 
@@ -356,6 +605,14 @@ export class RaftersDesignIntelligenceServer {
           return await this.handleAssessAttentionHierarchy(args);
         case 'validate_component_accessibility':
           return await this.handleValidateComponentAccessibility(args);
+        case 'analyze_accessibility_impact':
+          return await this.handleAnalyzeAccessibilityImpact(args);
+        case 'simulate_color_vision_experience':
+          return await this.handleSimulateColorVisionExperience(args);
+        case 'analyze_cultural_sensitivity':
+          return await this.handleAnalyzeCulturalSensitivity(args);
+        case 'predict_user_reactions':
+          return await this.handlePredictUserReactions(args);
         default:
           throw new Error(`Unknown tool: ${name}`);
       }
@@ -1159,6 +1416,363 @@ export class RaftersDesignIntelligenceServer {
             text: JSON.stringify({
               error: `Failed to validate component accessibility: ${error instanceof Error ? error.message : String(error)}`,
               component: params.componentName,
+            }),
+          },
+        ],
+      };
+    }
+  }
+
+  private async handleAnalyzeAccessibilityImpact(args: unknown) {
+    const params = z
+      .object({
+        design: z.object({
+          colors: z.array(
+            z.object({
+              oklch: z.object({
+                l: z.number().min(0).max(1),
+                c: z.number().min(0),
+                h: z.number().min(0).max(360),
+              }),
+              role: z.string(),
+              usage: z.array(z.string()),
+            })
+          ),
+          components: z.array(
+            z.object({
+              type: z.string(),
+              properties: z.record(z.string(), z.unknown()),
+              accessibility: z
+                .object({
+                  keyboardNavigable: z.boolean(),
+                  touchTarget: z.number().optional(),
+                  contrastRatio: z.number().optional(),
+                })
+                .optional(),
+            })
+          ),
+        }),
+        userProfiles: z
+          .array(
+            z.object({
+              id: z.string(),
+              name: z.string(),
+              colorVision: z.enum(['normal', 'deuteranopia', 'protanopia', 'tritanopia']),
+              culturalBackground: z.array(z.string()),
+              accessibilityNeeds: z.array(z.string()),
+              languageDirection: z.enum(['ltr', 'rtl']).default('ltr'),
+              devicePreference: z.enum(['mobile', 'tablet', 'desktop']).default('desktop'),
+              cognitiveProfile: z
+                .object({
+                  processingSpeed: z.enum(['low', 'average', 'high']).default('average'),
+                  workingMemory: z.enum(['low', 'average', 'high']).default('average'),
+                  attentionControl: z.enum(['low', 'average', 'high']).default('average'),
+                })
+                .optional(),
+            })
+          )
+          .default([]),
+      })
+      .parse(args);
+
+    try {
+      const result = await this.userEmpathy.analyzeAccessibilityImpact(
+        params.design,
+        params.userProfiles
+      );
+
+      if (!result.success) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: (result as { error: string }).error,
+                confidence: result.confidence,
+              }),
+            },
+          ],
+        };
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              accessibilityAnalysis: {
+                wcagCompliance: result.data.wcagCompliance,
+                colorVisionImpact: result.data.colorVisionImpact,
+                cognitiveLoad: result.data.cognitiveLoad,
+                motorAccessibility: result.data.motorAccessibility,
+              },
+              confidence: result.confidence,
+              processingTime: result.processingTime,
+            }),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              error: `Failed to analyze accessibility impact: ${error instanceof Error ? error.message : String(error)}`,
+            }),
+          },
+        ],
+      };
+    }
+  }
+
+  private async handleSimulateColorVisionExperience(args: unknown) {
+    const params = z
+      .object({
+        colors: z.array(
+          z.object({
+            l: z.number().min(0).max(1),
+            c: z.number().min(0),
+            h: z.number().min(0).max(360),
+          })
+        ),
+        visionTypes: z
+          .array(z.enum(['normal', 'deuteranopia', 'protanopia', 'tritanopia']))
+          .default(['normal', 'deuteranopia', 'protanopia', 'tritanopia']),
+      })
+      .parse(args);
+
+    try {
+      const result = await this.userEmpathy.simulateColorVisionExperience(
+        params.colors,
+        params.visionTypes
+      );
+
+      if (!result.success) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: (result as { error: string }).error,
+                confidence: result.confidence,
+              }),
+            },
+          ],
+        };
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              visionSimulations: {
+                originalColors: result.data.originalColors,
+                simulations: result.data.simulations,
+              },
+              confidence: result.confidence,
+              processingTime: result.processingTime,
+            }),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              error: `Failed to simulate color vision experience: ${error instanceof Error ? error.message : String(error)}`,
+            }),
+          },
+        ],
+      };
+    }
+  }
+
+  private async handleAnalyzeCulturalSensitivity(args: unknown) {
+    const params = z
+      .object({
+        design: z.object({
+          colors: z.array(
+            z.object({
+              oklch: z.object({
+                l: z.number().min(0).max(1),
+                c: z.number().min(0),
+                h: z.number().min(0).max(360),
+              }),
+              role: z.string(),
+              usage: z.array(z.string()),
+            })
+          ),
+          components: z.array(
+            z.object({
+              type: z.string(),
+              properties: z.record(z.string(), z.unknown()),
+              accessibility: z
+                .object({
+                  keyboardNavigable: z.boolean(),
+                  touchTarget: z.number().optional(),
+                  contrastRatio: z.number().optional(),
+                })
+                .optional(),
+            })
+          ),
+          layout: z
+            .object({
+              direction: z.enum(['ltr', 'rtl']).default('ltr'),
+              density: z.enum(['compact', 'comfortable', 'spacious']).default('comfortable'),
+            })
+            .optional(),
+        }),
+        targetCultures: z.array(z.string()),
+      })
+      .parse(args);
+
+    try {
+      const result = await this.userEmpathy.analyzeCulturalSensitivity(
+        params.design,
+        params.targetCultures
+      );
+
+      if (!result.success) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: (result as { error: string }).error,
+                confidence: result.confidence,
+              }),
+            },
+          ],
+        };
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              culturalAnalysis: {
+                overallScore: result.data.overallScore,
+                culturalAnalysis: result.data.culturalAnalysis,
+                globalRecommendations: result.data.globalRecommendations,
+              },
+              confidence: result.confidence,
+              processingTime: result.processingTime,
+            }),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              error: `Failed to analyze cultural sensitivity: ${error instanceof Error ? error.message : String(error)}`,
+            }),
+          },
+        ],
+      };
+    }
+  }
+
+  private async handlePredictUserReactions(args: unknown) {
+    const params = z
+      .object({
+        design: z.object({
+          colors: z.array(
+            z.object({
+              oklch: z.object({
+                l: z.number().min(0).max(1),
+                c: z.number().min(0),
+                h: z.number().min(0).max(360),
+              }),
+              role: z.string(),
+              usage: z.array(z.string()),
+            })
+          ),
+          components: z.array(
+            z.object({
+              type: z.string(),
+              properties: z.record(z.string(), z.unknown()),
+              accessibility: z
+                .object({
+                  keyboardNavigable: z.boolean(),
+                  touchTarget: z.number().optional(),
+                  contrastRatio: z.number().optional(),
+                })
+                .optional(),
+            })
+          ),
+        }),
+        userSegments: z
+          .array(
+            z.object({
+              name: z.string(),
+              demographics: z.object({
+                ageRange: z.string(),
+                regions: z.array(z.string()),
+                techSavviness: z.enum(['low', 'medium', 'high']),
+              }),
+              preferences: z.object({
+                colorPreferences: z.array(z.string()),
+                layoutDensity: z.enum(['compact', 'comfortable', 'spacious']),
+                interactionStyle: z.enum(['touch', 'mouse', 'keyboard', 'voice']),
+              }),
+              accessibilityNeeds: z.array(z.string()),
+            })
+          )
+          .default([]),
+      })
+      .parse(args);
+
+    try {
+      const result = await this.userEmpathy.predictUserReactions(
+        params.design,
+        params.userSegments
+      );
+
+      if (!result.success) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: (result as { error: string }).error,
+                confidence: result.confidence,
+              }),
+            },
+          ],
+        };
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              userReactions: {
+                overallSentiment: result.data.overallSentiment,
+                segmentReactions: result.data.segmentReactions,
+                riskFactors: result.data.riskFactors,
+              },
+              confidence: result.confidence,
+              processingTime: result.processingTime,
+            }),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              error: `Failed to predict user reactions: ${error instanceof Error ? error.message : String(error)}`,
             }),
           },
         ],
