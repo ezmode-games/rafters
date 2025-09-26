@@ -84,14 +84,11 @@ export function scoreResponseQuality(intelligence: {
   if (intelligence.usageGuidance && intelligence.usageGuidance.length > 10) quality += 0.15;
 
   // Quality indicators (remaining 0.1 points)
-  if (intelligence.reasoning && intelligence.reasoning.includes('OKLCH')) quality += 0.02;
-  if (intelligence.accessibilityNotes && intelligence.accessibilityNotes.includes('WCAG'))
-    quality += 0.02;
-  if (intelligence.culturalContext && intelligence.culturalContext.includes('cultural'))
-    quality += 0.02;
+  if (intelligence.reasoning?.includes('OKLCH')) quality += 0.02;
+  if (intelligence.accessibilityNotes?.includes('WCAG')) quality += 0.02;
+  if (intelligence.culturalContext?.includes('cultural')) quality += 0.02;
   if (intelligence.emotionalImpact && intelligence.emotionalImpact.length > 50) quality += 0.02;
-  if (intelligence.usageGuidance && intelligence.usageGuidance.includes('recommend'))
-    quality += 0.02;
+  if (intelligence.usageGuidance?.includes('recommend')) quality += 0.02;
 
   return Math.min(quality, 1.0);
 }

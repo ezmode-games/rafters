@@ -25,6 +25,7 @@ import type {
 import { z } from 'zod';
 import { fetchComponent } from '../utils/registry.js';
 import { ComponentIntelligenceService } from './services/component-intelligence.js';
+import { PatternRecognitionService } from './services/pattern-recognition.js';
 import { UserEmpathyService } from './services/user-empathy.js';
 
 // Tool parameter schemas
@@ -39,6 +40,7 @@ export class RaftersDesignIntelligenceServer {
   private server: Server;
   private registry?: TokenRegistry;
   private componentIntelligence: ComponentIntelligenceService;
+  private patternRecognition: PatternRecognitionService;
   private userEmpathy: UserEmpathyService;
 
   constructor() {
@@ -55,6 +57,7 @@ export class RaftersDesignIntelligenceServer {
     );
 
     this.componentIntelligence = new ComponentIntelligenceService();
+    this.patternRecognition = new PatternRecognitionService();
     this.userEmpathy = new UserEmpathyService();
     this.registerHandlers();
   }
@@ -574,6 +577,221 @@ export class RaftersDesignIntelligenceServer {
             required: ['design', 'userSegments'],
           },
         },
+        {
+          name: 'analyze_design_patterns',
+          description:
+            'Analyze design patterns across multiple design systems for consistency and best practices',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              designSystems: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    name: { type: 'string' },
+                    version: { type: 'string' },
+                    colors: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          name: { type: 'string' },
+                          scale: {
+                            type: 'array',
+                            items: {
+                              type: 'object',
+                              properties: {
+                                l: { type: 'number', minimum: 0, maximum: 1 },
+                                c: { type: 'number', minimum: 0 },
+                                h: { type: 'number', minimum: 0, maximum: 360 },
+                              },
+                              required: ['l', 'c', 'h'],
+                            },
+                          },
+                        },
+                        required: ['name', 'scale'],
+                      },
+                    },
+                    components: { type: 'array', items: { type: 'string' } },
+                    patterns: { type: 'array', items: { type: 'string' } },
+                  },
+                  required: ['name', 'version', 'colors', 'components', 'patterns'],
+                },
+              },
+            },
+            required: ['designSystems'],
+          },
+        },
+        {
+          name: 'detect_design_drift',
+          description: 'Detect drift between baseline and current design system versions',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              baselineSystem: {
+                type: 'object',
+                properties: {
+                  name: { type: 'string' },
+                  version: { type: 'string' },
+                  colors: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        name: { type: 'string' },
+                        scale: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              l: { type: 'number', minimum: 0, maximum: 1 },
+                              c: { type: 'number', minimum: 0 },
+                              h: { type: 'number', minimum: 0, maximum: 360 },
+                            },
+                            required: ['l', 'c', 'h'],
+                          },
+                        },
+                      },
+                      required: ['name', 'scale'],
+                    },
+                  },
+                  components: { type: 'array', items: { type: 'string' } },
+                  patterns: { type: 'array', items: { type: 'string' } },
+                },
+                required: ['name', 'version', 'colors', 'components', 'patterns'],
+              },
+              currentSystem: {
+                type: 'object',
+                properties: {
+                  name: { type: 'string' },
+                  version: { type: 'string' },
+                  colors: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        name: { type: 'string' },
+                        scale: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              l: { type: 'number', minimum: 0, maximum: 1 },
+                              c: { type: 'number', minimum: 0 },
+                              h: { type: 'number', minimum: 0, maximum: 360 },
+                            },
+                            required: ['l', 'c', 'h'],
+                          },
+                        },
+                      },
+                      required: ['name', 'scale'],
+                    },
+                  },
+                  components: { type: 'array', items: { type: 'string' } },
+                  patterns: { type: 'array', items: { type: 'string' } },
+                },
+                required: ['name', 'version', 'colors', 'components', 'patterns'],
+              },
+            },
+            required: ['baselineSystem', 'currentSystem'],
+          },
+        },
+        {
+          name: 'evaluate_system_health',
+          description: 'Evaluate overall health and maturity of a design system',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              designSystem: {
+                type: 'object',
+                properties: {
+                  name: { type: 'string' },
+                  version: { type: 'string' },
+                  colors: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        name: { type: 'string' },
+                        scale: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              l: { type: 'number', minimum: 0, maximum: 1 },
+                              c: { type: 'number', minimum: 0 },
+                              h: { type: 'number', minimum: 0, maximum: 360 },
+                            },
+                            required: ['l', 'c', 'h'],
+                          },
+                        },
+                      },
+                      required: ['name', 'scale'],
+                    },
+                  },
+                  components: { type: 'array', items: { type: 'string' } },
+                  patterns: { type: 'array', items: { type: 'string' } },
+                },
+                required: ['name', 'version', 'colors', 'components', 'patterns'],
+              },
+            },
+            required: ['designSystem'],
+          },
+        },
+        {
+          name: 'track_pattern_evolution',
+          description:
+            'Track pattern evolution and predict future trends across design system versions',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              historicalData: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    timestamp: { type: 'number' },
+                    system: {
+                      type: 'object',
+                      properties: {
+                        name: { type: 'string' },
+                        version: { type: 'string' },
+                        colors: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              name: { type: 'string' },
+                              scale: {
+                                type: 'array',
+                                items: {
+                                  type: 'object',
+                                  properties: {
+                                    l: { type: 'number', minimum: 0, maximum: 1 },
+                                    c: { type: 'number', minimum: 0 },
+                                    h: { type: 'number', minimum: 0, maximum: 360 },
+                                  },
+                                  required: ['l', 'c', 'h'],
+                                },
+                              },
+                            },
+                            required: ['name', 'scale'],
+                          },
+                        },
+                        components: { type: 'array', items: { type: 'string' } },
+                        patterns: { type: 'array', items: { type: 'string' } },
+                      },
+                      required: ['name', 'version', 'colors', 'components', 'patterns'],
+                    },
+                  },
+                  required: ['timestamp', 'system'],
+                },
+              },
+            },
+            required: ['historicalData'],
+          },
+        },
       ],
     }));
 
@@ -613,6 +831,14 @@ export class RaftersDesignIntelligenceServer {
           return await this.handleAnalyzeCulturalSensitivity(args);
         case 'predict_user_reactions':
           return await this.handlePredictUserReactions(args);
+        case 'analyze_design_patterns':
+          return await this.handleAnalyzeDesignPatterns(args);
+        case 'detect_design_drift':
+          return await this.handleDetectDesignDrift(args);
+        case 'evaluate_system_health':
+          return await this.handleEvaluateSystemHealth(args);
+        case 'track_pattern_evolution':
+          return await this.handleTrackPatternEvolution(args);
         default:
           throw new Error(`Unknown tool: ${name}`);
       }
@@ -1773,6 +1999,349 @@ export class RaftersDesignIntelligenceServer {
             type: 'text',
             text: JSON.stringify({
               error: `Failed to predict user reactions: ${error instanceof Error ? error.message : String(error)}`,
+            }),
+          },
+        ],
+      };
+    }
+  }
+
+  private async handleAnalyzeDesignPatterns(args: unknown) {
+    const params = z
+      .object({
+        designSystems: z.array(
+          z.object({
+            name: z.string(),
+            version: z.string(),
+            colors: z.array(
+              z.object({
+                name: z.string(),
+                scale: z.array(
+                  z.object({
+                    l: z.number().min(0).max(1),
+                    c: z.number().min(0),
+                    h: z.number().min(0).max(360),
+                  })
+                ),
+              })
+            ),
+            components: z.array(z.string()),
+            patterns: z.array(z.string()),
+          })
+        ),
+      })
+      .parse(args);
+
+    try {
+      const result = await this.patternRecognition.analyzeDesignPatterns(params.designSystems);
+
+      if (!result.success) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: (result as { error: string }).error,
+                confidence: result.confidence,
+              }),
+            },
+          ],
+        };
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              patternAnalysis: {
+                patterns: result.data.patterns,
+                commonPatterns: result.data.commonPatterns,
+                antiPatterns: result.data.antiPatterns,
+                recommendations: result.data.recommendations,
+              },
+              systemCount: params.designSystems.length,
+              confidence: result.confidence,
+              processingTime: result.processingTime,
+            }),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              error: `Failed to analyze design patterns: ${error instanceof Error ? error.message : String(error)}`,
+            }),
+          },
+        ],
+      };
+    }
+  }
+
+  private async handleDetectDesignDrift(args: unknown) {
+    const params = z
+      .object({
+        baselineSystem: z.object({
+          name: z.string(),
+          version: z.string(),
+          colors: z.array(
+            z.object({
+              name: z.string(),
+              scale: z.array(
+                z.object({
+                  l: z.number().min(0).max(1),
+                  c: z.number().min(0),
+                  h: z.number().min(0).max(360),
+                })
+              ),
+            })
+          ),
+          components: z.array(z.string()),
+          patterns: z.array(z.string()),
+        }),
+        currentSystem: z.object({
+          name: z.string(),
+          version: z.string(),
+          colors: z.array(
+            z.object({
+              name: z.string(),
+              scale: z.array(
+                z.object({
+                  l: z.number().min(0).max(1),
+                  c: z.number().min(0),
+                  h: z.number().min(0).max(360),
+                })
+              ),
+            })
+          ),
+          components: z.array(z.string()),
+          patterns: z.array(z.string()),
+        }),
+      })
+      .parse(args);
+
+    try {
+      const result = await this.patternRecognition.detectDesignDrift(
+        params.baselineSystem,
+        params.currentSystem
+      );
+
+      if (!result.success) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: (result as { error: string }).error,
+                confidence: result.confidence,
+              }),
+            },
+          ],
+        };
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              driftAnalysis: {
+                driftScore: result.data.driftScore,
+                driftingElements: result.data.driftingElements,
+                timeline: result.data.timeline,
+                alerts: result.data.alerts,
+              },
+              systems: {
+                baseline: `${params.baselineSystem.name} v${params.baselineSystem.version}`,
+                current: `${params.currentSystem.name} v${params.currentSystem.version}`,
+              },
+              confidence: result.confidence,
+              processingTime: result.processingTime,
+            }),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              error: `Failed to detect design drift: ${error instanceof Error ? error.message : String(error)}`,
+            }),
+          },
+        ],
+      };
+    }
+  }
+
+  private async handleEvaluateSystemHealth(args: unknown) {
+    const params = z
+      .object({
+        designSystem: z.object({
+          name: z.string(),
+          version: z.string(),
+          colors: z.array(
+            z.object({
+              name: z.string(),
+              scale: z.array(
+                z.object({
+                  l: z.number().min(0).max(1),
+                  c: z.number().min(0),
+                  h: z.number().min(0).max(360),
+                })
+              ),
+            })
+          ),
+          components: z.array(z.string()),
+          patterns: z.array(z.string()),
+        }),
+      })
+      .parse(args);
+
+    try {
+      const result = await this.patternRecognition.evaluateSystemHealth(params.designSystem);
+
+      if (!result.success) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: (result as { error: string }).error,
+                confidence: result.confidence,
+              }),
+            },
+          ],
+        };
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              systemHealth: {
+                overallScore: result.data.overallScore,
+                dimensions: result.data.dimensions,
+                issues: result.data.issues,
+                trends: result.data.trends,
+                recommendations: result.data.recommendations,
+              },
+              system: `${params.designSystem.name} v${params.designSystem.version}`,
+              confidence: result.confidence,
+              processingTime: result.processingTime,
+            }),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              error: `Failed to evaluate system health: ${error instanceof Error ? error.message : String(error)}`,
+            }),
+          },
+        ],
+      };
+    }
+  }
+
+  private async handleTrackPatternEvolution(args: unknown) {
+    const params = z
+      .object({
+        historicalData: z.array(
+          z.object({
+            timestamp: z.number(),
+            system: z.object({
+              name: z.string(),
+              version: z.string(),
+              colors: z.array(
+                z.object({
+                  name: z.string(),
+                  scale: z.array(
+                    z.object({
+                      l: z.number().min(0).max(1),
+                      c: z.number().min(0),
+                      h: z.number().min(0).max(360),
+                    })
+                  ),
+                })
+              ),
+              components: z.array(z.string()),
+              patterns: z.array(z.string()),
+            }),
+          })
+        ),
+      })
+      .parse(args);
+
+    try {
+      // Extract pattern ID from first system name for now
+      const patternId =
+        params.historicalData.length > 0 ? params.historicalData[0].system.name : 'unknown';
+      const result = await this.patternRecognition.trackPatternEvolution(
+        patternId,
+        params.historicalData
+      );
+
+      if (!result.success) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: (result as { error: string }).error,
+                confidence: result.confidence,
+              }),
+            },
+          ],
+        };
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              evolutionAnalysis: {
+                patternId: result.data.patternId,
+                name: result.data.name,
+                category: result.data.category,
+                versions: result.data.versions,
+                trajectory: result.data.trajectory,
+                predictions: result.data.predictions,
+              },
+              dataPoints: params.historicalData.length,
+              timeSpan:
+                params.historicalData.length > 0
+                  ? {
+                      start: new Date(
+                        Math.min(...params.historicalData.map((d) => d.timestamp))
+                      ).toISOString(),
+                      end: new Date(
+                        Math.max(...params.historicalData.map((d) => d.timestamp))
+                      ).toISOString(),
+                    }
+                  : null,
+              confidence: result.confidence,
+              processingTime: result.processingTime,
+            }),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              error: `Failed to track pattern evolution: ${error instanceof Error ? error.message : String(error)}`,
             }),
           },
         ],
