@@ -262,10 +262,11 @@ export function simulateColorVision(oklch: OKLCH, visionType: ColorVisionType): 
 
   switch (visionType) {
     case 'deuteranopia': // Green-blind (most common)
-      // Compress green-red distinction, shift yellows toward red
-      if (h >= 60 && h <= 180) {
-        simulatedH = h + (h - 120) * 0.7; // Shift greens toward yellow/red
-        simulatedC = c * 0.6; // Reduce chroma in affected range
+      // Compress green-red distinction, shift greens toward reds
+      if (h >= 0 && h <= 180) {
+        // Shift greens (around 120°) toward reds (around 0°)
+        simulatedH = h * 0.3; // Much stronger compression toward red
+        simulatedC = c * 0.4; // Significantly reduce chroma
       }
       break;
 
@@ -278,9 +279,9 @@ export function simulateColorVision(oklch: OKLCH, visionType: ColorVisionType): 
       break;
 
     case 'tritanopia': // Blue-blind (rare)
-      // Compress blue-yellow distinction
+      // Compress blue-yellow distinction, shift blues toward yellow
       if (h >= 180 && h <= 300) {
-        simulatedH = h + (h - 240) * 0.8; // Shift blues toward cyan/magenta
+        simulatedH = h - (h - 180) * 0.5; // Shift toward yellow (60°)
         simulatedC = c * 0.7; // Reduce chroma in blue range
       }
       break;
@@ -459,9 +460,12 @@ export class UserEmpathyService {
 
       // Check color contrast ratios
       for (const colorPair of design.colors) {
-        // Simplified contrast check - in production would use proper WCAG formulas
-        const contrastRatio =
-          colorPair.oklch.l > 0.5 ? colorPair.oklch.l / 0.1 : 0.1 / colorPair.oklch.l;
+        // Simplified contrast check - approximate WCAG formula using OKLCH lightness
+        // In OKLCH, lightness already represents perceptual lightness similar to relative luminance
+        const textLuminance = Math.max(0.05, colorPair.oklch.l); // Assume text color
+        const backgroundLuminance = 0.95; // Assume light background
+        const contrastRatio = (Math.max(textLuminance, backgroundLuminance) + 0.05) /
+                             (Math.min(textLuminance, backgroundLuminance) + 0.05);
 
         if (contrastRatio < 4.5) {
           wcagIssues.push({
@@ -587,7 +591,7 @@ export class UserEmpathyService {
       return {
         success: true,
         data: result,
-        processingTime: Date.now() - startTime,
+        processingTime: Math.max(1, Date.now() - startTime), // Ensure at least 1ms
         confidence: 0.85, // High confidence in accessibility analysis
       };
     } catch (error) {
