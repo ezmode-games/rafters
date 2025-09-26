@@ -464,8 +464,9 @@ export class UserEmpathyService {
         // In OKLCH, lightness already represents perceptual lightness similar to relative luminance
         const textLuminance = Math.max(0.05, colorPair.oklch.l); // Assume text color
         const backgroundLuminance = 0.95; // Assume light background
-        const contrastRatio = (Math.max(textLuminance, backgroundLuminance) + 0.05) /
-                             (Math.min(textLuminance, backgroundLuminance) + 0.05);
+        const contrastRatio =
+          (Math.max(textLuminance, backgroundLuminance) + 0.05) /
+          (Math.min(textLuminance, backgroundLuminance) + 0.05);
 
         if (contrastRatio < 4.5) {
           wcagIssues.push({
