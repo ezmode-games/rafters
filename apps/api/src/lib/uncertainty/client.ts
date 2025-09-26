@@ -38,7 +38,7 @@ export interface UncertaintyClient {
 /**
  * Calculate input confidence based on input quality
  */
-export function calculateInputConfidence(oklch: { l: number; c: number; h: number }): number {
+function calculateInputConfidenceInternal(oklch: { l: number; c: number; h: number }): number {
   let confidence = 0.5; // Base confidence
 
   // OKLCH validity increases confidence
@@ -57,6 +57,9 @@ export function calculateInputConfidence(oklch: { l: number; c: number; h: numbe
 
   return Math.min(confidence, 0.95); // Cap at 95% input confidence
 }
+
+// Export the function for external use
+export const calculateInputConfidence = calculateInputConfidenceInternal;
 
 /**
  * Score AI response quality for outcome validation
@@ -146,6 +149,6 @@ export class D1UncertaintyClient implements UncertaintyClient {
   }
 
   calculateInputConfidence(input: unknown): number {
-    return calculateInputConfidence(input as { l: number; c: number; h: number });
+    return calculateInputConfidenceInternal(input as { l: number; c: number; h: number });
   }
 }
