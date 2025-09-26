@@ -451,8 +451,8 @@ export class UserEmpathyService {
   ): Promise<IntelligenceResult<AccessibilityImpact>> {
     const startTime = Date.now();
     console.log('[UserEmpathy] Analyzing accessibility impact for design with', {
-      colorCount: design.colors.length,
-      componentCount: design.components.length,
+      colorCount: design.colors?.length || 0,
+      componentCount: design.components?.length || 0,
     });
 
     try {
@@ -465,19 +465,19 @@ export class UserEmpathyService {
       }> = [];
 
       // Check color contrast ratios between likely foreground/background pairs
-      const textColors = design.colors.filter((c) =>
+      const textColors = (design.colors || []).filter((c) =>
         c.usage.some((u) => u.includes('text') || c.role.includes('text'))
       );
-      const backgroundColors = design.colors.filter((c) =>
+      const backgroundColors = (design.colors || []).filter((c) =>
         c.usage.some((u) => u.includes('background') || c.role.includes('background'))
       );
 
       // If no specific text/background colors identified, check all combinations
-      const foregroundColors = textColors.length > 0 ? textColors : design.colors;
+      const foregroundColors = textColors.length > 0 ? textColors : design.colors || [];
       const backgroundColorsToCheck =
         backgroundColors.length > 0
           ? backgroundColors
-          : design.colors.filter((c) => c.oklch.l > 0.5);
+          : (design.colors || []).filter((c) => c.oklch.l > 0.5);
 
       for (const fgColor of foregroundColors) {
         for (const bgColor of backgroundColorsToCheck) {
@@ -503,7 +503,7 @@ export class UserEmpathyService {
       const colorVisionImpact = await Promise.all(
         (['normal', 'deuteranopia', 'protanopia', 'tritanopia'] as ColorVisionType[]).map(
           async (visionType) => {
-            const simulatedColors = design.colors.map((color) => ({
+            const simulatedColors = (design.colors || []).map((color) => ({
               original: color.oklch,
               simulated: simulateColorVision(color.oklch, visionType),
               role: color.role,
@@ -556,7 +556,7 @@ export class UserEmpathyService {
       );
 
       // Cognitive Load Analysis
-      const componentComplexity = design.components.map((comp) => {
+      const componentComplexity = (design.components || []).map((comp) => {
         // Simplified cognitive load calculation
         const baseComplexity = comp.type === 'button' ? 2 : comp.type === 'form' ? 6 : 4;
         const propertyComplexity = Object.keys(comp.properties).length * 0.5;
@@ -567,7 +567,7 @@ export class UserEmpathyService {
         componentComplexity.reduce((sum, load) => sum + load, 0) / componentComplexity.length;
 
       // Motor Accessibility Analysis
-      const touchTargets = design.components.map((comp, _index) => ({
+      const touchTargets = (design.components || []).map((comp, _index) => ({
         component: comp.type,
         size: comp.accessibility?.touchTarget || 32, // Default assumption
         meetRequirements: (comp.accessibility?.touchTarget || 32) >= 44,
@@ -589,7 +589,7 @@ export class UserEmpathyService {
         cognitiveLoad: {
           overall: Math.round(overallCognitiveLoad),
           perComponent: Object.fromEntries(
-            design.components.map((comp, i) => [
+            (design.components || []).map((comp, i) => [
               `${comp.type}_${i}`,
               Math.round(componentComplexity[i]),
             ])
@@ -601,7 +601,7 @@ export class UserEmpathyService {
         },
         motorAccessibility: {
           touchTargets,
-          keyboardNavigation: design.components.every(
+          keyboardNavigation: (design.components || []).every(
             (comp) => comp.accessibility?.keyboardNavigable !== false
           ),
           issues: touchTargets
@@ -892,7 +892,7 @@ export class UserEmpathyService {
           }> = [];
 
           // Analyze color preferences
-          const designColors = design.colors.map((c) => categorizeColor(c.oklch));
+          const designColors = (design.colors || []).map((c) => categorizeColor(c.oklch));
           const colorMatch = designColors.some((color) =>
             segment.preferences.colorPreferences.includes(color)
           );
@@ -914,7 +914,7 @@ export class UserEmpathyService {
           });
 
           // Analyze tech savviness vs complexity
-          const componentCount = design.components.length;
+          const componentCount = design.components?.length || 0;
           const isComplex = componentCount > 5;
 
           if (isComplex && segment.demographics.techSavviness === 'low') {
@@ -938,7 +938,7 @@ export class UserEmpathyService {
           }
 
           // Analyze accessibility needs coverage
-          const hasAccessibilityFeatures = design.components.some((c) => c.accessibility);
+          const hasAccessibilityFeatures = (design.components || []).some((c) => c.accessibility);
           const needsAccessibility = segment.accessibilityNeeds.length > 0;
 
           if (needsAccessibility && !hasAccessibilityFeatures) {
