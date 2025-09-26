@@ -77,6 +77,19 @@ export const ColorIntelligenceSchema = z.object({
   culturalContext: z.string(),
   accessibilityNotes: z.string(),
   usageGuidance: z.string(),
+  metadata: z
+    .object({
+      predictionId: z.string(),
+      confidence: z.number().min(0).max(1),
+      uncertaintyBounds: z.object({
+        lower: z.number().min(0).max(1),
+        upper: z.number().min(0).max(1),
+        confidenceInterval: z.number().min(0).max(1),
+      }),
+      qualityScore: z.number().min(0).max(1),
+      method: z.enum(['bootstrap', 'quantile', 'ensemble', 'bayesian', 'conformal']),
+    })
+    .optional(),
 });
 
 export type ColorIntelligence = z.infer<typeof ColorIntelligenceSchema>;

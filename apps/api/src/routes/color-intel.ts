@@ -3,6 +3,11 @@ import { ColorValueSchema, generateColorValue, validateOKLCH } from '@rafters/sh
 import { Hono } from 'hono';
 import * as z from 'zod';
 import { generateColorIntelligence } from '../lib/color-intel/utils';
+import {
+  calculateInputConfidence,
+  D1UncertaintyClient,
+  scoreResponseQuality,
+} from '../lib/uncertainty/client';
 
 // Local OKLCH schema to avoid import issues
 const OKLCHSchema = z.object({
@@ -68,6 +73,9 @@ const ColorIntelRequest = z.object({
 const colorIntel = new Hono<{ Bindings: Env }>();
 
 colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
+  const startTime = Date.now();
+  let predictionId: string | undefined;
+
   try {
     const data = c.req.valid('json');
 
@@ -85,6 +93,9 @@ colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
     const oklch = data.oklch;
     const colorId = `oklch-${oklch.l.toFixed(2)}-${oklch.c.toFixed(2)}-${oklch.h.toFixed(0)}`;
     const vectorize = c.env.VECTORIZE;
+
+    // Initialize uncertainty client
+    const uncertaintyClient = new D1UncertaintyClient(c.env.DB);
 
     // Check for existing cached data
     let existingIntelligence = null;
@@ -119,12 +130,64 @@ colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
       usageGuidance: string;
       balancingGuidance?: string; // New field for perceptual weight recommendations
     };
+
+    // Calculate input confidence once for reuse
+    const inputConfidence = calculateInputConfidence(oklch);
+
     if (existingIntelligence) {
       // Reuse existing AI intelligence when expire flag is set
       intelligence = existingIntelligence;
     } else {
+      // Record prediction before AI generation
+      predictionId = await uncertaintyClient.recordPrediction({
+        service: 'component',
+        prediction: {
+          oklch: oklch,
+          expectedAnalysis: 'color_intelligence',
+          inputQuality: {
+            validOKLCH: true,
+            lightnessRange: oklch.l,
+            chromaLevel: oklch.c,
+            hueValue: oklch.h,
+          },
+        },
+        confidence: inputConfidence,
+        method: 'bootstrap',
+        context: {
+          requestId: colorId,
+          timestamp: new Date().toISOString(),
+          metadata: {
+            cached: false,
+            vectorizeEnabled: !!vectorize,
+          },
+        },
+      });
+
       // Generate new AI intelligence using Workers AI
       intelligence = await generateColorIntelligence(oklch, c.env.AI);
+
+      // Validate AI response quality and record outcome
+      if (predictionId) {
+        const responseQuality = scoreResponseQuality(intelligence);
+        const processingTime = Date.now() - startTime;
+
+        await uncertaintyClient.updateOutcome(predictionId, {
+          actualOutcome: {
+            intelligenceGenerated: true,
+            responseQuality: responseQuality,
+            completeness: {
+              suggestedName: !!intelligence.suggestedName,
+              reasoning: !!intelligence.reasoning,
+              emotionalImpact: !!intelligence.emotionalImpact,
+              culturalContext: !!intelligence.culturalContext,
+              accessibilityNotes: !!intelligence.accessibilityNotes,
+              usageGuidance: !!intelligence.usageGuidance,
+            },
+            processingTime: processingTime,
+            aiProvider: 'workers-ai',
+          },
+        });
+      }
     }
 
     // Replace any <AI_GENERATE> tokens with AI-generated content
@@ -135,10 +198,28 @@ colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
         `Weight: ${processedColorValue.perceptualWeight.weight.toFixed(2)} - ${processedColorValue.perceptualWeight.density} visual density`;
     }
 
+    // Calculate confidence metadata for the response
+    const confidenceMetadata = predictionId
+      ? {
+          predictionId,
+          confidence: inputConfidence,
+          uncertaintyBounds: {
+            lower: Math.max(0, inputConfidence - 0.1),
+            upper: Math.min(1, inputConfidence + 0.05),
+            confidenceInterval: 0.95,
+          },
+          qualityScore: scoreResponseQuality(intelligence),
+          method: 'bootstrap' as const,
+        }
+      : undefined;
+
     // Use mathematical color intelligence from generateColorValue
     const completeColorValue = {
       ...processedColorValue,
-      intelligence, // AI intelligence from Claude API
+      intelligence: {
+        ...intelligence, // AI intelligence from Workers AI
+        metadata: confidenceMetadata, // Add uncertainty quantification metadata
+      },
     };
 
     // Validate completeColorValue against ColorValueSchema
@@ -188,6 +269,23 @@ colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
     });
   } catch (error) {
     console.error('Color intelligence API error:', error);
+
+    // If we have a predictionId, record the error as an outcome
+    if (predictionId) {
+      try {
+        const uncertaintyClient = new D1UncertaintyClient(c.env.DB);
+        await uncertaintyClient.updateOutcome(predictionId, {
+          actualOutcome: {
+            intelligenceGenerated: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+            processingTime: Date.now() - startTime,
+            stage: 'error',
+          },
+        });
+      } catch (uncertaintyError) {
+        console.warn('Failed to record error outcome:', uncertaintyError);
+      }
+    }
 
     if (error instanceof z.ZodError) {
       return c.json(
