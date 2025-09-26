@@ -131,12 +131,14 @@ colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
       balancingGuidance?: string; // New field for perceptual weight recommendations
     };
 
+    // Calculate input confidence once for reuse
+    const inputConfidence = calculateInputConfidence(oklch);
+
     if (existingIntelligence) {
       // Reuse existing AI intelligence when expire flag is set
       intelligence = existingIntelligence;
     } else {
       // Record prediction before AI generation
-      const inputConfidence = calculateInputConfidence(oklch);
       predictionId = await uncertaintyClient.recordPrediction({
         service: 'component',
         prediction: {
@@ -200,10 +202,10 @@ colorIntel.post('/', zValidator('json', ColorIntelRequest), async (c) => {
     const confidenceMetadata = predictionId
       ? {
           predictionId,
-          confidence: calculateInputConfidence(oklch),
+          confidence: inputConfidence,
           uncertaintyBounds: {
-            lower: Math.max(0, calculateInputConfidence(oklch) - 0.1),
-            upper: Math.min(1, calculateInputConfidence(oklch) + 0.05),
+            lower: Math.max(0, inputConfidence - 0.1),
+            upper: Math.min(1, inputConfidence + 0.05),
             confidenceInterval: 0.95,
           },
           qualityScore: scoreResponseQuality(intelligence),
