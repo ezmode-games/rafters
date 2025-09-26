@@ -7,10 +7,7 @@
  */
 
 import { uuidv7 } from 'uuidv7';
-import type {
-  ConfidenceMethod,
-  ServiceType,
-} from '../schemas/uncertainty';
+import type { ConfidenceMethod, ServiceType } from '../schemas/uncertainty';
 
 export interface UncertaintyPrediction {
   service: ServiceType;

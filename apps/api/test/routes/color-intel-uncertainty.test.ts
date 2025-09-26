@@ -5,10 +5,7 @@
 
 import { ColorValueSchema } from '@rafters/shared';
 import { describe, expect, test } from 'vitest';
-import {
-  calculateInputConfidence,
-  scoreResponseQuality,
-} from '../../src/lib/uncertainty/client';
+import { calculateInputConfidence, scoreResponseQuality } from '../../src/lib/uncertainty/client';
 
 describe('Color Intelligence Uncertainty Integration', () => {
   test('calculates input confidence correctly', () => {
