@@ -450,6 +450,10 @@ export class UserEmpathyService {
     _userProfiles: readonly UserProfile[]
   ): Promise<IntelligenceResult<AccessibilityImpact>> {
     const startTime = Date.now();
+    console.log('[UserEmpathy] Analyzing accessibility impact for design with', {
+      colorCount: design.colors.length,
+      componentCount: design.components.length,
+    });
 
     try {
       // WCAG Compliance Analysis
@@ -606,10 +610,16 @@ export class UserEmpathyService {
         },
       };
 
+      const processingTime = Math.max(1, Date.now() - startTime);
+      console.log('[UserEmpathy] Accessibility analysis completed in', processingTime, 'ms', {
+        wcagAA: result.wcagCompliance.aa,
+        issueCount: wcagIssues.length,
+      });
+
       return {
         success: true,
         data: result,
-        processingTime: Math.max(1, Date.now() - startTime), // Ensure at least 1ms
+        processingTime,
         confidence: 0.85, // High confidence in accessibility analysis
       };
     } catch (error) {
@@ -630,6 +640,7 @@ export class UserEmpathyService {
     visionTypes: readonly ColorVisionType[]
   ): Promise<IntelligenceResult<VisionSimulation>> {
     const startTime = Date.now();
+    console.log('[UserEmpathy] Simulating color vision for', visionTypes.length, 'vision types');
 
     try {
       const originalColors = colors.map((oklch, index) => ({
@@ -697,10 +708,13 @@ export class UserEmpathyService {
         simulations,
       };
 
+      const processingTime = Date.now() - startTime;
+      console.log('[UserEmpathy] Color vision simulation completed in', processingTime, 'ms');
+
       return {
         success: true,
         data: result,
-        processingTime: Date.now() - startTime,
+        processingTime,
         confidence: 0.9, // High confidence in color vision simulation
       };
     } catch (error) {
@@ -721,6 +735,7 @@ export class UserEmpathyService {
     targetCultures: readonly string[]
   ): Promise<IntelligenceResult<CulturalSensitivityAnalysis>> {
     const startTime = Date.now();
+    console.log('[UserEmpathy] Analyzing cultural sensitivity for', targetCultures);
 
     try {
       const culturalAnalysis = await Promise.all(
@@ -834,10 +849,15 @@ export class UserEmpathyService {
         globalRecommendations,
       };
 
+      const processingTime = Date.now() - startTime;
+      console.log('[UserEmpathy] Cultural analysis completed in', processingTime, 'ms', {
+        overallScore: result.overallScore.toFixed(2),
+      });
+
       return {
         success: true,
         data: result,
-        processingTime: Date.now() - startTime,
+        processingTime,
         confidence: 0.8, // Good confidence in cultural analysis
       };
     } catch (error) {
@@ -859,6 +879,7 @@ export class UserEmpathyService {
     userSegments: readonly UserSegment[]
   ): Promise<IntelligenceResult<UserReactionPrediction>> {
     const startTime = Date.now();
+    console.log('[UserEmpathy] Predicting reactions for', userSegments.length, 'user segments');
 
     try {
       // Analyze reactions for each user segment
@@ -1061,10 +1082,16 @@ export class UserEmpathyService {
         riskFactors,
       };
 
+      const processingTime = Date.now() - startTime;
+      console.log('[UserEmpathy] Reaction prediction completed in', processingTime, 'ms', {
+        overallSentiment: result.overallSentiment,
+        riskFactors: result.riskFactors.length,
+      });
+
       return {
         success: true,
         data: result,
-        processingTime: Date.now() - startTime,
+        processingTime,
         confidence: overallConfidence,
       };
     } catch (error) {
