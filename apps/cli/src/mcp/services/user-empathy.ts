@@ -256,8 +256,9 @@ export function simulateColorVision(oklch: OKLCH, visionType: ColorVisionType): 
   // Convert OKLCH to approximate RGB for transformation
   const { l, c, h } = oklch;
 
-  // Simplified color vision simulation based on hue shifts and chroma reduction
-  // This is a simplified model - in production would use proper colorspace conversion
+  // Simplified color vision simulation using hue shifts and chroma reduction
+  // TODO: Replace with scientific CVD simulation from @rafters/shared (issue #195)
+  // Current implementation provides basic approximation pending proper LMS cone space calculations
   let simulatedH = h;
   let simulatedC = c;
 
@@ -460,12 +461,19 @@ export class UserEmpathyService {
       }> = [];
 
       // Check color contrast ratios between likely foreground/background pairs
-      const textColors = design.colors.filter(c => c.usage.some(u => u.includes('text') || c.role.includes('text')));
-      const backgroundColors = design.colors.filter(c => c.usage.some(u => u.includes('background') || c.role.includes('background')));
+      const textColors = design.colors.filter((c) =>
+        c.usage.some((u) => u.includes('text') || c.role.includes('text'))
+      );
+      const backgroundColors = design.colors.filter((c) =>
+        c.usage.some((u) => u.includes('background') || c.role.includes('background'))
+      );
 
       // If no specific text/background colors identified, check all combinations
       const foregroundColors = textColors.length > 0 ? textColors : design.colors;
-      const backgroundColorsToCheck = backgroundColors.length > 0 ? backgroundColors : design.colors.filter(c => c.oklch.l > 0.5);
+      const backgroundColorsToCheck =
+        backgroundColors.length > 0
+          ? backgroundColors
+          : design.colors.filter((c) => c.oklch.l > 0.5);
 
       for (const fgColor of foregroundColors) {
         for (const bgColor of backgroundColorsToCheck) {

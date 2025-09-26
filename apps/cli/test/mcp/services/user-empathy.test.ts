@@ -334,8 +334,12 @@ describe('UserEmpathyService', () => {
       const normalSim = result.data?.simulations.find((s) => s.visionType === 'normal');
       const deuteranopiaSim = result.data?.simulations.find((s) => s.visionType === 'deuteranopia');
 
-      // Normal vision should have perfect differentiability
+      // Normal vision should preserve original colors and have perfect differentiability
       expect(normalSim?.simulatedColors.every((c) => c.differentiability === 1)).toBe(true);
+      // Verify colors are unchanged for normal vision
+      normalSim?.simulatedColors.forEach((simColor, index) => {
+        expect(simColor.oklch).toEqual(testColors[index]);
+      });
 
       // Deuteranopia should have some differentiability loss
       expect(deuteranopiaSim?.overallImpact).toBeGreaterThan(0);
