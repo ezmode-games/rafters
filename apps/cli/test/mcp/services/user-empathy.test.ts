@@ -5,7 +5,7 @@
  * cultural sensitivity analysis, and user reaction prediction capabilities.
  */
 
-import type { ColorVisionType, OKLCH } from '@rafters/shared';
+import type { OKLCH } from '@rafters/shared';
 import { describe, expect, test } from 'vitest';
 import {
   CULTURAL_COLOR_MEANINGS,
@@ -539,7 +539,7 @@ describe('UserEmpathyService', () => {
 
   describe('Error Handling', () => {
     test('should handle invalid design specs gracefully', async () => {
-      const invalidDesign = { colors: null } as any;
+      const invalidDesign = { colors: null } as unknown as DesignSpec;
 
       const result = await service.analyzeAccessibilityImpact(invalidDesign, testUserProfiles);
 
