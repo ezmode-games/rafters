@@ -1,8 +1,8 @@
 pre-commit:
   parallel: true
   jobs:
-    - name: biome lint and format
-      run: pnpm biome check --write
+    - name: biome check
+      run: pnpm biome check --fix --unsafe
 
     - name: typecheck
       run: pnpm typecheck

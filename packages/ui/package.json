@@ -23,8 +23,7 @@
     "test:integration": "echo \"UI package uses unit tests only - no Cloudflare Workers integration needed\"",
     "test:component": "playwright test --config playwright.config.component.ts --pass-with-no-tests",
     "test:preflight": "vitest run --passWithNoTests && playwright test --config playwright.config.component.ts --pass-with-no-tests",
-    "lint": "biome check .",
-    "format": "biome format --write .",
+    "lint": "biome check --fix --unsafe .",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

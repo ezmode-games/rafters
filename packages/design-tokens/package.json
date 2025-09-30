@@ -26,7 +26,6 @@
     "test:unit": "vitest run",
     "test:preflight": "vitest run",
     "lint": "biome check --fix --unsafe",
-    "format": "biome format --write",
     "typecheck": "tsc --noEmit",
     "validate-standards": "tsx scripts/validate-standards.ts"
   },

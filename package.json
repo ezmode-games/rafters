@@ -36,7 +36,6 @@
     "test:distributed": "node scripts/distributed-test-coordinator.mjs",
     "typecheck": "turbo typecheck",
     "lint": "turbo lint",
-    "format": "turbo format",
     "check": "turbo check",
     "clean": "turbo clean && rm -rf node_modules",
     "changeset": "changeset",
