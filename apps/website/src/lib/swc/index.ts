@@ -4,9 +4,9 @@
  * Exports for JSDoc Intelligence parsing and TypeScript/JSX compilation
  */
 
+export type { AstroBuildConfig, AstroSWCError, BuildResult } from './AstroSWCBuilder';
 // Astro Build Orchestrator
 export { AstroSWCBuilder } from './AstroSWCBuilder';
-export type { AstroBuildConfig, AstroSWCError, BuildResult } from './AstroSWCBuilder';
 
 // React SSR Executor
 export { ReactSSRExecutor } from './ReactSSRExecutor';
