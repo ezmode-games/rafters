@@ -272,7 +272,11 @@ describe('ReactSSRExecutor', () => {
         module.exports = { default: Component };
       `;
 
-      const result = await executor.execute(compiledCode, { id: 42 }, { componentName: 'Component' });
+      const result = await executor.execute(
+        compiledCode,
+        { id: 42 },
+        { componentName: 'Component' }
+      );
 
       expect(result.html).toContain('data-id="42"');
     });
@@ -313,7 +317,9 @@ describe('ReactSSRExecutor', () => {
         module.exports = { default: BrokenComponent };
       `;
 
-      await expect(executor.execute(compiledCode, {}, { componentName: 'BrokenComponent' })).rejects.toThrow();
+      await expect(
+        executor.execute(compiledCode, {}, { componentName: 'BrokenComponent' })
+      ).rejects.toThrow();
 
       try {
         await executor.execute(compiledCode, {}, { componentName: 'BrokenComponent' });
@@ -330,7 +336,9 @@ describe('ReactSSRExecutor', () => {
     it('should throw ExecutionError for invalid JavaScript', async () => {
       const invalidCode = 'this is not valid javascript {{{';
 
-      await expect(executor.execute(invalidCode, {}, { componentName: 'Invalid' })).rejects.toThrow();
+      await expect(
+        executor.execute(invalidCode, {}, { componentName: 'Invalid' })
+      ).rejects.toThrow();
 
       try {
         await executor.execute(invalidCode, {}, { componentName: 'Invalid' });
@@ -347,7 +355,9 @@ describe('ReactSSRExecutor', () => {
         exports.alsoNotAFunction = 42;
       `;
 
-      await expect(executor.execute(compiledCode, {}, { componentName: 'Missing' })).rejects.toThrow();
+      await expect(
+        executor.execute(compiledCode, {}, { componentName: 'Missing' })
+      ).rejects.toThrow();
 
       try {
         await executor.execute(compiledCode, {}, { componentName: 'Missing' });
@@ -364,7 +374,9 @@ describe('ReactSSRExecutor', () => {
         module.exports = { default: 'not a function' };
       `;
 
-      await expect(executor.execute(compiledCode, {}, { componentName: 'NotFunction' })).rejects.toThrow();
+      await expect(
+        executor.execute(compiledCode, {}, { componentName: 'NotFunction' })
+      ).rejects.toThrow();
 
       try {
         await executor.execute(compiledCode, {}, { componentName: 'NotFunction' });

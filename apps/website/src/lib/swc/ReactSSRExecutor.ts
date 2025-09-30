@@ -108,8 +108,7 @@ export class ReactSSRExecutor {
    * - exports.name = func becomes module.name
    */
   private extractComponent(
-    // biome-ignore lint/suspicious/noExplicitAny: Module type is dynamic
-    module: any,
+    module: Record<string, unknown> & { default?: unknown },
     componentName: string
   ): React.ComponentType<unknown> {
     try {
@@ -129,7 +128,10 @@ export class ReactSSRExecutor {
         ComponentFunction = module[componentName];
       }
       // Case 4: Named export on default object (CommonJS exports.name)
-      else if (module.default?.[componentName] && typeof module.default[componentName] === 'function') {
+      else if (
+        module.default?.[componentName] &&
+        typeof module.default[componentName] === 'function'
+      ) {
         ComponentFunction = module.default[componentName];
       }
       // Case 5: Find first function in module exports
