@@ -5,7 +5,10 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { RegistryComponentFetcher, validateComponentName } from '../../../src/lib/swc/RegistryFetcher';
+import {
+  RegistryComponentFetcher,
+  validateComponentName,
+} from '../../../src/lib/swc/RegistryFetcher';
 
 describe('RegistryComponentFetcher', () => {
   let fetcher: RegistryComponentFetcher;
@@ -42,8 +45,12 @@ describe('RegistryComponentFetcher', () => {
     });
 
     it('should reject names with leading/trailing whitespace', () => {
-      expect(() => validateComponentName(' button')).toThrow('cannot have leading or trailing whitespace');
-      expect(() => validateComponentName('button ')).toThrow('cannot have leading or trailing whitespace');
+      expect(() => validateComponentName(' button')).toThrow(
+        'cannot have leading or trailing whitespace'
+      );
+      expect(() => validateComponentName('button ')).toThrow(
+        'cannot have leading or trailing whitespace'
+      );
     });
   });
 
@@ -55,7 +62,9 @@ describe('RegistryComponentFetcher', () => {
 
     it('should throw error for names exceeding 100 characters', async () => {
       const longName = 'a'.repeat(101);
-      await expect(fetcher.fetchComponent(longName)).rejects.toThrow('cannot exceed 100 characters');
+      await expect(fetcher.fetchComponent(longName)).rejects.toThrow(
+        'cannot exceed 100 characters'
+      );
     });
 
     it('should reject names with XSS characters', async () => {
@@ -80,7 +89,7 @@ describe('RegistryComponentFetcher', () => {
         'https://test-registry.example.com/registry/components/button',
         expect.objectContaining({
           headers: expect.objectContaining({
-            'Accept': 'application/json',
+            Accept: 'application/json',
             'User-Agent': 'rafters-swc/1.0.0',
           }),
         })
@@ -209,7 +218,13 @@ describe('RegistryComponentFetcher', () => {
           json: async () => ({
             name: componentName,
             type: 'registry:component',
-            files: [{ path: `${componentName}.tsx`, content: 'export default () => {}', type: 'component' }],
+            files: [
+              {
+                path: `${componentName}.tsx`,
+                content: 'export default () => {}',
+                type: 'component',
+              },
+            ],
           }),
         } as Response;
       });
@@ -254,7 +269,13 @@ describe('RegistryComponentFetcher', () => {
           json: async () => ({
             name: componentName,
             type: 'registry:component',
-            files: [{ path: `${componentName}.tsx`, content: 'export default () => {}', type: 'component' }],
+            files: [
+              {
+                path: `${componentName}.tsx`,
+                content: 'export default () => {}',
+                type: 'component',
+              },
+            ],
           }),
         } as Response;
       });
@@ -279,7 +300,13 @@ describe('RegistryComponentFetcher', () => {
           json: async () => ({
             name: componentName,
             type: 'registry:component',
-            files: [{ path: `${componentName}.tsx`, content: 'export default () => {}', type: 'component' }],
+            files: [
+              {
+                path: `${componentName}.tsx`,
+                content: 'export default () => {}',
+                type: 'component',
+              },
+            ],
           }),
         } as Response;
       });
@@ -305,7 +332,13 @@ describe('RegistryComponentFetcher', () => {
           json: async () => ({
             name: componentName,
             type: 'registry:component',
-            files: [{ path: `${componentName}.tsx`, content: 'export default () => {}', type: 'component' }],
+            files: [
+              {
+                path: `${componentName}.tsx`,
+                content: 'export default () => {}',
+                type: 'component',
+              },
+            ],
           }),
         } as Response;
       });

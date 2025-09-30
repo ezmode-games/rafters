@@ -303,9 +303,7 @@ describe('SWCCompiler', () => {
         }
       `;
 
-      await expect(
-        compiler.compile(source, { filename: 'Button.tsx' })
-      ).rejects.toMatchObject({
+      await expect(compiler.compile(source, { filename: 'Button.tsx' })).rejects.toMatchObject({
         name: 'CompilationError',
       });
     });
