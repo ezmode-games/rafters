@@ -3,13 +3,38 @@
  *
  * Executes compiled JavaScript components using React's renderToString
  * for static HTML generation at build time.
+ *
+ * Uses Node.js native module imports via temporary files for clean,
+ * reliable execution without custom require() implementations.
  */
 
+import { mkdir, unlink, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import type { ExecutionError, ExecutionResult } from './types';
 
 export class ReactSSRExecutor {
+  private tempDir = '.astro/swc-temp';
+  private initialized = false;
+
+  /**
+   * Initialize temp directory for component execution
+   */
+  private async init(): Promise<void> {
+    if (this.initialized) return;
+
+    try {
+      await mkdir(this.tempDir, { recursive: true });
+      this.initialized = true;
+    } catch (error) {
+      throw this.createExecutionError(error, undefined, 'creation');
+    }
+  }
+
+  /**
+   * Execute compiled component code and render to HTML
+   */
   async execute(
     compiledCode: string,
     props: Record<string, unknown> = {},
@@ -18,17 +43,29 @@ export class ReactSSRExecutor {
     const startTime = performance.now();
     const componentName = options.componentName || 'Component';
 
-    try {
-      // 1. Create component function from compiled code
-      const ComponentFunction = this.createComponentFromCode(compiledCode, componentName);
+    // Ensure temp directory exists
+    await this.init();
 
-      // 2. Sanitize props for React rendering
+    // Generate unique temp file path
+    const tempFile = join(this.tempDir, `${componentName}-${Date.now()}.js`);
+
+    try {
+      // 1. Write compiled code to temp file
+      await writeFile(tempFile, compiledCode, 'utf-8');
+
+      // 2. Import as Node.js module (supports both CommonJS and ESM)
+      const module = await import(tempFile);
+
+      // 3. Extract component function
+      const ComponentFunction = this.extractComponent(module, componentName);
+
+      // 4. Sanitize props for React rendering
       const sanitizedProps = this.sanitizeProps(props);
 
-      // 3. Create React element with props
+      // 5. Create React element with props
       const element = React.createElement(ComponentFunction, sanitizedProps);
 
-      // 4. Render to HTML string using renderToString
+      // 6. Render to HTML string
       const html = renderToString(element);
 
       const renderTime = performance.now() - startTime;
@@ -40,81 +77,59 @@ export class ReactSSRExecutor {
         props: sanitizedProps,
       };
     } catch (error) {
-      // Check if error is already an ExecutionError from createComponentFromCode
+      // Check if error is already an ExecutionError
       if (
         error &&
         typeof error === 'object' &&
         'name' in error &&
         error.name === 'ExecutionError'
       ) {
-        throw error; // Re-throw creation errors as-is
+        throw error;
       }
-      // Handle rendering errors
       throw this.createExecutionError(error, componentName, 'rendering');
+    } finally {
+      // 7. Clean up temp file
+      try {
+        await unlink(tempFile);
+      } catch (cleanupError) {
+        console.warn(`Failed to clean up temp file ${tempFile}:`, cleanupError);
+      }
     }
   }
 
-  private createComponentFromCode(
-    compiledCode: string,
-    componentName?: string
+  /**
+   * Extract component from module exports
+   * Supports: default export, named export, or direct function export
+   */
+  private extractComponent(
+    // biome-ignore lint/suspicious/noExplicitAny: Module type is dynamic
+    module: any,
+    componentName: string
   ): React.ComponentType<unknown> {
     try {
-      // Create safe execution context with required globals
-      const executionContext = this.createSafeExecutionContext();
-
-      // Execute compiled JavaScript in isolated context
-      // Order: parameters first, then the function body
-      const executeCode = new Function(
-        'React',
-        'require',
-        'exports',
-        'module',
-        'console',
-        compiledCode
-      );
-
-      executeCode(
-        executionContext.React,
-        executionContext.require,
-        executionContext.exports,
-        executionContext.module,
-        executionContext.console
-      );
-
-      // Extract component from module exports
       let ComponentFunction: React.ComponentType<unknown>;
 
-      if (executionContext.module.exports?.default) {
-        // Default export
-        ComponentFunction = executionContext.module.exports.default;
-      } else if (
-        executionContext.module.exports &&
-        typeof executionContext.module.exports === 'function'
-      ) {
-        // Direct function export
-        ComponentFunction = executionContext.module.exports;
-      } else if (
-        executionContext.exports &&
-        componentName &&
-        executionContext.exports[componentName]
-      ) {
-        // Named export matching component name
-        ComponentFunction = executionContext.exports[componentName];
-      } else if (executionContext.exports) {
-        // Find first function in named exports
-        const exportedFunctions = Object.values(executionContext.exports).filter(
+      // Try default export first
+      if (module.default && typeof module.default === 'function') {
+        ComponentFunction = module.default;
+      }
+      // Try named export matching component name
+      else if (module[componentName] && typeof module[componentName] === 'function') {
+        ComponentFunction = module[componentName];
+      }
+      // Find first function in exports
+      else {
+        const exportedFunctions = Object.values(module).filter(
           (value): value is React.ComponentType<unknown> => typeof value === 'function'
         );
         if (exportedFunctions.length > 0) {
           ComponentFunction = exportedFunctions[0];
         } else {
-          throw new Error('No React component found in compiled code exports');
+          throw new Error('No React component function found in module exports');
         }
-      } else {
-        throw new Error('No valid component export found in compiled code');
       }
 
-      // Validate component function
+      // Validate component is a function
       if (typeof ComponentFunction !== 'function') {
         throw new Error(`Expected component to be a function, got ${typeof ComponentFunction}`);
       }
@@ -125,24 +140,26 @@ export class ReactSSRExecutor {
     }
   }
 
+  /**
+   * Sanitize props for safe React rendering
+   * Removes functions and circular references
+   */
   private sanitizeProps(props: Record<string, unknown>): Record<string, unknown> {
     try {
       const sanitized: Record<string, unknown> = {};
 
       for (const [key, value] of Object.entries(props)) {
-        // Handle different value types
         if (value === null || value === undefined) {
-          // Keep null/undefined values
           sanitized[key] = value;
         } else if (typeof value === 'function') {
-          // Convert functions to undefined (React can't serialize functions)
+          // Skip functions (React can't serialize)
           sanitized[key] = undefined;
         } else if (typeof value === 'string' && value.startsWith('function')) {
-          // Convert string functions to undefined
+          // Skip string functions
           sanitized[key] = undefined;
         } else if (typeof value === 'object' && value !== null) {
           try {
-            // Test for circular references by attempting JSON serialization
+            // Test for circular references
             JSON.stringify(value);
             sanitized[key] = value;
           } catch {
@@ -150,7 +167,7 @@ export class ReactSSRExecutor {
             sanitized[key] = undefined;
           }
         } else {
-          // Keep primitive values (string, number, boolean)
+          // Keep primitives (string, number, boolean)
           sanitized[key] = value;
         }
       }
@@ -161,43 +178,9 @@ export class ReactSSRExecutor {
     }
   }
 
-  private createSafeExecutionContext(): {
-    React: typeof React;
-    require: (id: string) => unknown;
-    exports: Record<string, unknown>;
-    module: { exports: unknown };
-    console: {
-      log: (...args: unknown[]) => void;
-      warn: (...args: unknown[]) => void;
-      error: (...args: unknown[]) => void;
-    };
-  } {
-    return {
-      React,
-      require: (id: string) => {
-        // Minimal require implementation for essential modules
-        if (id === 'react') return React;
-        if (id === 'react/jsx-runtime') {
-          // Provide jsx runtime for React 19 automatic transformation
-          return {
-            jsx: React.createElement,
-            jsxs: React.createElement,
-            Fragment: React.Fragment,
-          };
-        }
-        throw new Error(`Module ${id} not available in execution context`);
-      },
-      exports: {},
-      module: { exports: {} },
-      console: {
-        // Safe console implementation for component logging
-        log: (...args: unknown[]) => console.log('[Component]', ...args),
-        warn: (...args: unknown[]) => console.warn('[Component]', ...args),
-        error: (...args: unknown[]) => console.error('[Component]', ...args),
-      },
-    };
-  }
-
+  /**
+   * Create properly typed ExecutionError
+   */
   private createExecutionError(
     error: unknown,
     componentName?: string,
