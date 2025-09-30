@@ -47,7 +47,8 @@ export class ReactSSRExecutor {
     await this.init();
 
     // Generate unique temp file path
-    const tempFile = join(this.tempDir, `${componentName}-${Date.now()}.js`);
+    // Use .cjs extension for CommonJS modules (SWC outputs CommonJS)
+    const tempFile = join(this.tempDir, `${componentName}-${Date.now()}.cjs`);
 
     try {
       // 1. Write compiled code to temp file
@@ -99,7 +100,12 @@ export class ReactSSRExecutor {
 
   /**
    * Extract component from module exports
-   * Supports: default export, named export, or direct function export
+   * Supports: ESM default/named exports, CommonJS module.exports
+   *
+   * When Node.js imports a CommonJS module via import():
+   * - module.exports.default becomes module.default.default
+   * - module.exports = func becomes module.default (the function itself)
+   * - exports.name = func becomes module.name
    */
   private extractComponent(
     // biome-ignore lint/suspicious/noExplicitAny: Module type is dynamic
@@ -109,21 +115,41 @@ export class ReactSSRExecutor {
     try {
       let ComponentFunction: React.ComponentType<unknown>;
 
-      // Try default export first
+      // Case 1: ESM default export OR CommonJS direct function (module.exports = func)
       if (module.default && typeof module.default === 'function') {
         ComponentFunction = module.default;
       }
-      // Try named export matching component name
+      // Case 2: CommonJS with nested default (module.exports = { default: func })
+      // When imported, this becomes module.default.default
+      else if (module.default?.default && typeof module.default.default === 'function') {
+        ComponentFunction = module.default.default;
+      }
+      // Case 3: Named export matching component name
       else if (module[componentName] && typeof module[componentName] === 'function') {
         ComponentFunction = module[componentName];
       }
-      // Find first function in exports
+      // Case 4: Named export on default object (CommonJS exports.name)
+      else if (module.default?.[componentName] && typeof module.default[componentName] === 'function') {
+        ComponentFunction = module.default[componentName];
+      }
+      // Case 5: Find first function in module exports
       else {
         const exportedFunctions = Object.values(module).filter(
           (value): value is React.ComponentType<unknown> => typeof value === 'function'
         );
         if (exportedFunctions.length > 0) {
           ComponentFunction = exportedFunctions[0];
+        }
+        // Case 6: Find first function in default object
+        else if (module.default && typeof module.default === 'object') {
+          const defaultExportedFunctions = Object.values(module.default).filter(
+            (value): value is React.ComponentType<unknown> => typeof value === 'function'
+          );
+          if (defaultExportedFunctions.length > 0) {
+            ComponentFunction = defaultExportedFunctions[0];
+          } else {
+            throw new Error('No React component function found in module exports');
+          }
         } else {
           throw new Error('No React component function found in module exports');
         }
