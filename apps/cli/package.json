@@ -27,8 +27,7 @@
     "test:integration": "pnpm build && vitest run test/integration/",
     "test:watch": "vitest",
     "test:preflight": "pnpm build && vitest run",
-    "lint": "biome check ",
-    "format": "biome format --write",
+    "lint": "biome check --fix --unsafe",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "pnpm build"
   },
