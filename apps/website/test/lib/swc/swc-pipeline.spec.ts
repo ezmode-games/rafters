@@ -5,9 +5,9 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { ReactSSRExecutor } from '../src/lib/swc/ReactSSRExecutor';
-import { RegistryComponentFetcher } from '../src/lib/swc/RegistryFetcher';
-import { SWCCompiler } from '../src/lib/swc/SWCCompiler';
+import { ReactSSRExecutor } from '../../../src/lib/swc/ReactSSRExecutor';
+import { RegistryComponentFetcher } from '../../../src/lib/swc/RegistryFetcher';
+import { SWCCompiler } from '../../../src/lib/swc/SWCCompiler';
 
 describe('SWC Pipeline: Fetch → Compile → Execute', () => {
   it('should render a simple button component from registry', async () => {

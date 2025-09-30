@@ -5,8 +5,8 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { ReactSSRExecutor } from '../src/lib/swc/ReactSSRExecutor';
-import type { ExecutionError } from '../src/lib/swc/types';
+import { ReactSSRExecutor } from '../../../src/lib/swc/ReactSSRExecutor';
+import type { ExecutionError } from '../../../src/lib/swc/types';
 
 describe('ReactSSRExecutor', () => {
   let executor: ReactSSRExecutor;
