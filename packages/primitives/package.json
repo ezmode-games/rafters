@@ -1,0 +1,49 @@
+{
+  "name": "@rafters/primitives",
+  "version": "0.1.0",
+  "description": "100% headless Web Components with WCAG AAA compliance (registry distribution)",
+  "type": "module",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "test:component": "playwright test --config playwright.config.ts --pass-with-no-tests",
+    "test:integration": "echo 'Primitives use unit and component tests only'",
+    "test:preflight": "vitest run && playwright test --pass-with-no-tests",
+    "lint": "biome check --fix --unsafe .",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "lit": "^3.2.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "catalog:",
+    "@playwright/test": "catalog:",
+    "@types/node": "catalog:",
+    "axe-core": "^4.10.3",
+    "jsdom": "catalog:",
+    "lit": "^3.2.1",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "keywords": [
+    "web-components",
+    "lit",
+    "headless",
+    "accessibility",
+    "wcag-aaa",
+    "section-508",
+    "aria",
+    "design-system",
+    "registry"
+  ]
+}
