@@ -1,0 +1,75 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import MarketingLayout from '../../layouts/MarketingLayout.astro';
+
+export async function getStaticPaths() {
+  const decisions = await getCollection('decisions');
+  return decisions.map((decision) => ({
+    params: { slug: decision.slug },
+    props: { decision },
+  }));
+}
+
+type Props = {
+  decision: CollectionEntry<'decisions'>;
+};
+
+const { decision } = Astro.props;
+const { Content } = await decision.render();
+
+const title = decision.data.title;
+const description = `Decision: ${decision.data.title} - ${decision.data.category} decision with ${decision.data.impact} impact`;
+---
+
+<MarketingLayout title={title} description={description} headerTitle={decision.data.title}>
+  <div class="mb-8">
+    <nav class="mb-6">
+      <a href="/decisions" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+        ← Back to Decisions
+      </a>
+    </nav>
+    
+    <div class="flex flex-wrap items-center gap-3 mb-6">
+      <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+        decision.data.status === 'completed' ? 'bg-green-100 text-green-800' :
+        decision.data.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800' :
+        decision.data.status === 'draft' ? 'bg-gray-100 text-gray-800' :
+        decision.data.status === 'deprecated' ? 'bg-red-100 text-red-800' :
+        decision.data.status === 'superseded' ? 'bg-purple-100 text-purple-800' :
+        'bg-gray-100 text-gray-800'
+      }`}>
+        {decision.data.status}
+      </span>
+      
+      <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+        decision.data.impact === 'critical' ? 'bg-red-100 text-red-800' :
+        decision.data.impact === 'major' ? 'bg-orange-100 text-orange-800' :
+        'bg-blue-100 text-blue-800'
+      }`}>
+        {decision.data.impact} impact
+      </span>
+      
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+        {decision.data.category}
+      </span>
+    </div>
+
+    {decision.data.authors && (
+      <div class="text-sm text-gray-600 mb-6">
+        By {decision.data.authors.join(', ')} on {new Date(decision.data.date).toLocaleDateString()}
+      </div>
+    )}
+
+    {decision.data.tags && decision.data.tags.length > 0 && (
+      <div class="flex flex-wrap gap-2 mb-8">
+        {decision.data.tags.map((tag) => (
+          <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700">
+            {tag}
+          </span>
+        ))}
+      </div>
+    )}
+  </div>
+
+  <Content />
+</MarketingLayout>

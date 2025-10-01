@@ -30,7 +30,24 @@ const pageCollection = defineCollection({
   }),
 });
 
+// Build decisions collection for architectural decision records
+const decisionsCollection = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    date: z.date(),
+    status: z.enum(['draft', 'in-progress', 'completed', 'deprecated', 'superseded']),
+    impact: z.enum(['minor', 'major', 'critical']),
+    category: z.enum(['architecture', 'developer-experience', 'ai-integration', 'performance', 'accessibility']),
+    tags: z.array(z.string()),
+    authors: z.array(z.string()),
+    supersededBy: z.string().optional(),
+    relatedDecisions: z.array(z.string()).optional(),
+  }),
+});
+
 export const collections = {
   docs: docsCollection,
   pages: pageCollection,
+  decisions: decisionsCollection,
 };
