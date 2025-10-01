@@ -111,7 +111,7 @@ describe('Color Generator v2', () => {
         generateDarkMode: false,
       });
 
-      expect(result.familyTokens).toHaveLength(9); // 9 semantic roles
+      expect(result.familyTokens).toHaveLength(10); // 10 semantic roles
       expect(result.semanticTokens.length).toBeGreaterThan(0);
       expect(result.colorValues).toBeDefined();
     });
@@ -183,6 +183,7 @@ describe('Color Generator v2', () => {
       expect(semanticNames).toContain('accent');
       expect(semanticNames).toContain('highlight');
       expect(semanticNames).toContain('neutral');
+      expect(semanticNames).toContain('muted');
       expect(semanticNames).toContain('destructive');
       expect(semanticNames).toContain('success');
       expect(semanticNames).toContain('warning');

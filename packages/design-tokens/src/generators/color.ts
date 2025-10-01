@@ -39,6 +39,7 @@ const SemanticRoleSchema = z.enum([
   'accent',
   'highlight',
   'neutral',
+  'muted',
   'destructive',
   'success',
   'warning',
@@ -157,6 +158,7 @@ function buildSemanticMapping(
     accent: primaryColorValue.harmonies.triadic[0],
     highlight: primaryColorValue.harmonies.tetradic[0],
     neutral: { ...baseColor, c: baseColor.c * 0.1 }, // Desaturated for neutral
+    muted: { ...baseColor, c: baseColor.c * 0.15 }, // Slightly more saturated than neutral
 
     // Use color-utils for intelligent semantic selection
     destructive: selectSemanticColorFromSuggestions(primaryColorValue, 'destructive'),
