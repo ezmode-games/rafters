@@ -224,8 +224,10 @@ function generateSemanticTokens(
 
     // Dark mode tokens if enabled
     if (generateDarkMode) {
-      // Brand/interactive colors should maintain perceptual weight in dark mode
-      const darkRef = calculateDarkModeReference(baseRef, colorValue, 'interactive');
+      // Determine semantic role for dark mode calculation
+      // Neutral and muted are backgrounds, others are interactive/brand colors
+      const darkModeRole = role === 'neutral' || role === 'muted' ? 'background' : 'interactive';
+      const darkRef = calculateDarkModeReference(baseRef, colorValue, darkModeRole);
       tokens.push(createSemanticToken(`${role}-dark`, darkRef));
 
       const darkForegroundRef = calculateForegroundReference(
@@ -294,9 +296,7 @@ function generateUITokens(
               name.includes('card') ||
               name.includes('popover') ||
               name === 'muted' ||
-              name === 'sidebar' ||
-              name === 'topbar' ||
-              name === 'menu'
+              name.includes('sidebar')
             ? 'background'
             : name.includes('border') || name.includes('hover') || name.includes('active')
               ? 'interactive'
