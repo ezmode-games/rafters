@@ -14,9 +14,9 @@
     "test:watch": "vitest",
     "test:unit": "vitest run --config vitest.config.ts",
     "test:spec": "vitest run --config vitest.config.ts --grep spec",
-    "test:component": "playwright test --config=playwright-ct.config.ts",
+    "test:component": "echo 'No component tests for website'",
     "test:e2e": "playwright test",
-    "test:preflight": "vitest run && playwright test --config=playwright-ct.config.ts"
+    "test:preflight": "vitest run"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",

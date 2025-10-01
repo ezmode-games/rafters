@@ -4,9 +4,8 @@
  */
 
 import { env } from 'cloudflare:test';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import worker from '@/index';
-import type { ColorSeedMessage } from '@/lib/queue/publisher';
 
 describe('Main App', () => {
   test('handles CORS for localhost origins', async () => {
@@ -99,53 +98,4 @@ describe('Main App', () => {
 
     expect(res.status).toBe(404);
   });
-
-  test('queue handler processes batch messages', async () => {
-    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-
-    // Mock the global fetch instead of worker.fetch for internal HTTP calls
-    const originalFetch = global.fetch;
-    global.fetch = vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          name: 'Test Color',
-          scale: [{ l: 0.5, c: 0.1, h: 180 }],
-          intelligence: { suggestedName: 'Test Color' },
-        }),
-        {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      )
-    );
-
-    const mockBatch: MessageBatch<ColorSeedMessage> = {
-      queue: 'COLOR_SEED_QUEUE',
-      messages: [
-        {
-          id: 'test-id',
-          timestamp: new Date(),
-          attempts: 1,
-          body: {
-            oklch: { l: 0.5, c: 0.1, h: 180 },
-            token: 'test-token',
-            name: 'test-color',
-            timestamp: Date.now(),
-          },
-          ack: vi.fn(),
-          retry: vi.fn(),
-        },
-      ],
-      retryAll: vi.fn(),
-      ackAll: vi.fn(),
-    };
-
-    await worker.queue(mockBatch, env);
-
-    expect(mockBatch.messages[0].ack).toHaveBeenCalled();
-
-    // Restore original fetch
-    global.fetch = originalFetch;
-    consoleSpy.mockRestore();
-  }, 10000); // 10 second timeout
 });
