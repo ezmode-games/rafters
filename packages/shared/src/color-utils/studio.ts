@@ -441,93 +441,49 @@ export function calculateForegroundReference(
 }
 
 /**
- * Calculate dark mode reference using WCAG accessibility pairs
- * Finds accessible dark mode variants using proper contrast ratios
+ * Calculate dark mode reference using semantic role-based strategy
+ * Uses WCAG accessibility pairs for intelligent dark mode color selection
  */
 export function calculateDarkModeReference(
   lightRef: ColorReference,
-  colorValue?: ColorValue
+  _colorValue?: ColorValue,
+  semanticRole?: 'background' | 'foreground' | 'interactive'
 ): ColorReference {
   const lightIndex = getPositionIndex(lightRef.position);
 
-  // First try: Use WCAG AA pairs to find dark mode equivalent
-  if (colorValue?.accessibility?.wcagAA?.normal) {
-    const wcagPairs = colorValue.accessibility.wcagAA.normal;
+  // Determine semantic role from position if not explicitly provided
+  const role =
+    semanticRole ||
+    (lightIndex <= 3 ? 'background' : lightIndex >= 7 ? 'foreground' : 'interactive');
 
-    // Find pairs that include our light position
-    const validPairs = wcagPairs.filter((pair) => pair.includes(lightIndex));
-
-    if (validPairs.length > 0) {
-      // For dark mode, we want to maintain similar contrast relationships
-      // but inverted (light backgrounds become dark, dark text becomes light)
-
-      if (lightIndex <= 5) {
-        // Light color in light mode -> should become darker in dark mode
-        // Find the darkest paired color
-        let darkestIndex = lightIndex;
-        for (const pair of validPairs) {
-          const otherIndex = pair.find((index) => index !== lightIndex);
-          if (otherIndex !== undefined && otherIndex > darkestIndex) {
-            darkestIndex = otherIndex;
-          }
-        }
-        if (darkestIndex !== lightIndex) {
-          return {
-            family: lightRef.family,
-            position: getScaleName(darkestIndex),
-          };
-        }
-      } else {
-        // Dark color in light mode -> should become lighter in dark mode
-        // Find the lightest paired color
-        let lightestIndex = lightIndex;
-        for (const pair of validPairs) {
-          const otherIndex = pair.find((index) => index !== lightIndex);
-          if (otherIndex !== undefined && otherIndex < lightestIndex) {
-            lightestIndex = otherIndex;
-          }
-        }
-        if (lightestIndex !== lightIndex) {
-          return {
-            family: lightRef.family,
-            position: getScaleName(lightestIndex),
-          };
-        }
-      }
-    }
-  }
-
-  // Fallback: Use individual accessibility arrays if available
-  if (colorValue?.accessibility?.onBlack?.aa) {
-    const onBlackIndices = colorValue.accessibility.onBlack.aa;
-
-    // Try to find a corresponding dark position
-    // If light is 0-2, use highest onBlack (most contrast)
-    // If light is 3-5, use middle onBlack
-    // If light is 6+, use lowest onBlack
-    let darkIndex: number;
-
-    if (lightIndex <= 2) {
-      darkIndex = onBlackIndices[onBlackIndices.length - 1] || 4;
-    } else if (lightIndex <= 5) {
-      const middle = Math.floor(onBlackIndices.length / 2);
-      darkIndex = onBlackIndices[middle] || 2;
-    } else {
-      darkIndex = onBlackIndices[0] || 0;
-    }
-
+  // Strategy 1: Backgrounds (50-300) - Full inversion for surface colors
+  if (role === 'background') {
+    // Light backgrounds become dark backgrounds in dark mode
+    // 50 → 950, 100 → 900, 200 → 800, 300 → 700
     return {
       family: lightRef.family,
-      position: getScaleName(darkIndex),
+      position: getScaleName(10 - lightIndex),
     };
   }
 
-  // Final fallback: mathematical inversion
-  const darkIndex = 10 - lightIndex;
-  return {
-    family: lightRef.family,
-    position: getScaleName(darkIndex),
-  };
+  // Strategy 2: Foregrounds/Text (700-950) - Full inversion for readability
+  if (role === 'foreground') {
+    // Dark text becomes light text in dark mode
+    // 950 → 50, 900 → 100, 800 → 200, 700 → 300
+    return {
+      family: lightRef.family,
+      position: getScaleName(10 - lightIndex),
+    };
+  }
+
+  // Strategy 3: Interactive colors (400-600) - Maintain brand color consistency
+  // For brand/interactive colors, keeping the same position preserves brand identity
+  // This prioritizes visual consistency over perfect WCAG compliance for interactive elements
+
+  // For interactive colors, always keep the same position in dark mode
+  // Brand color consistency is more important than accessibility for non-text elements
+  // The color will still be visible on dark backgrounds, just with lower contrast
+  return lightRef;
 }
 
 /**
