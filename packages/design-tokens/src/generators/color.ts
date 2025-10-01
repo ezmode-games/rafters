@@ -222,7 +222,8 @@ function generateSemanticTokens(
 
     // Dark mode tokens if enabled
     if (generateDarkMode) {
-      const darkRef = calculateDarkModeReference(baseRef, colorValue);
+      // Brand/interactive colors should maintain perceptual weight in dark mode
+      const darkRef = calculateDarkModeReference(baseRef, colorValue, 'interactive');
       tokens.push(createSemanticToken(`${role}-dark`, darkRef));
 
       const darkForegroundRef = calculateForegroundReference(
@@ -256,8 +257,6 @@ function generateUITokens(
   const surfaceDefinitions = [
     { name: 'background', position: '50', meaning: 'Primary background' },
     { name: 'foreground', position: '900', meaning: 'Primary text' },
-    { name: 'muted', position: '100', meaning: 'Muted background' },
-    { name: 'muted-foreground', position: '600', meaning: 'Muted text' },
     { name: 'border', position: '200', meaning: 'Border color' },
     { name: 'input', position: '200', meaning: 'Input border' },
     { name: 'ring', position: '400', meaning: 'Focus ring' },
@@ -265,6 +264,14 @@ function generateUITokens(
     { name: 'card-foreground', position: '900', meaning: 'Card text' },
     { name: 'popover', position: '50', meaning: 'Popover background' },
     { name: 'popover-foreground', position: '900', meaning: 'Popover text' },
+    { name: 'sidebar', position: '100', meaning: 'Sidebar background' },
+    { name: 'sidebar-foreground', position: '800', meaning: 'Sidebar text' },
+    { name: 'sidebar-primary', position: '600', meaning: 'Sidebar primary element' },
+    { name: 'sidebar-primary-foreground', position: '50', meaning: 'Sidebar primary text' },
+    { name: 'sidebar-accent', position: '100', meaning: 'Sidebar accent background' },
+    { name: 'sidebar-accent-foreground', position: '900', meaning: 'Sidebar accent text' },
+    { name: 'sidebar-border', position: '200', meaning: 'Sidebar border' },
+    { name: 'sidebar-ring', position: '400', meaning: 'Sidebar focus ring' },
   ];
 
   const tokens: Token[] = [];
@@ -274,9 +281,26 @@ function generateUITokens(
     tokens.push(createSemanticToken(name, ref, meaning));
 
     if (generateDarkMode) {
-      // Use color-utils for proper dark mode calculation
-      const neutralColorValue = colorValues[neutralFamilyName]; // Need to pass colorValues
-      const darkRef = calculateDarkModeReference(ref, neutralColorValue);
+      // Use color-utils for proper dark mode calculation with semantic role
+      const neutralColorValue = colorValues.neutral;
+
+      // Determine semantic role from token name
+      const semanticRole =
+        name.includes('foreground') || name.includes('text')
+          ? 'foreground'
+          : name.includes('background') ||
+              name.includes('card') ||
+              name.includes('popover') ||
+              name === 'muted' ||
+              name === 'sidebar' ||
+              name === 'topbar' ||
+              name === 'menu'
+            ? 'background'
+            : name.includes('border') || name.includes('hover') || name.includes('active')
+              ? 'interactive'
+              : 'interactive';
+
+      const darkRef = calculateDarkModeReference(ref, neutralColorValue, semanticRole);
       tokens.push(createSemanticToken(`${name}-dark`, darkRef, `${meaning} (dark)`));
     }
   });

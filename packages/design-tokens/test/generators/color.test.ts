@@ -241,7 +241,7 @@ describe('Color Generator v2', () => {
       expect(uiTokenNames).toContain('background');
       expect(uiTokenNames).toContain('foreground');
       expect(uiTokenNames).toContain('border');
-      expect(uiTokenNames).toContain('muted');
+      expect(uiTokenNames).toContain('sidebar');
     });
   });
 });
