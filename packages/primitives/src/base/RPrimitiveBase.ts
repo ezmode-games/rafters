@@ -106,13 +106,18 @@ export abstract class RPrimitiveBase extends LitElement {
    *
    * @param name - Event name
    * @param detail - Event detail payload
+   * @param timestamp - Optional timestamp (defaults to Date.now() for React 19 purity)
    */
-  protected dispatchPrimitiveEvent<T>(name: string, detail: T): void {
+  protected dispatchPrimitiveEvent<T>(
+    name: string,
+    detail: T,
+    timestamp: number = Date.now()
+  ): void {
     this.dispatchEvent(
       new CustomEvent(name, {
         detail: {
           value: detail,
-          timestamp: Date.now(),
+          timestamp,
         },
         bubbles: true,
         composed: true,
