@@ -20,7 +20,8 @@
       "!**/.turbo/**/*",
       "!**/.vscode/**/*",
       "!**/playwright/.cache/**/*",
-      "!**/test/components/**/*"
+      "!**/test/components/**/*",
+      "!/var/folders/**/*"
     ],
     "maxSize": 10485760
   },

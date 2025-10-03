@@ -15,18 +15,20 @@ export const UtilsTemplateSchema = z.string().min(1);
 export const ComponentRegistrySchema = z.object({
   $schema: z.string(),
   name: z.string(),
-  components: z.array(z.object({
-    name: z.string(),
-    description: z.string(),
-    meta: z.object({
-      rafters: z.object({
-        version: z.string(),
-        intelligence: z.object({
-          cognitiveLoad: z.number(),
+  components: z.array(
+    z.object({
+      name: z.string(),
+      description: z.string(),
+      meta: z.object({
+        rafters: z.object({
+          version: z.string(),
+          intelligence: z.object({
+            cognitiveLoad: z.number(),
+          }),
         }),
       }),
-    }),
-  })),
+    })
+  ),
 });
 
 // Schema for individual component response
@@ -34,11 +36,13 @@ export const ComponentSchema = z.object({
   name: z.string(),
   type: z.literal('registry:component'),
   description: z.string(),
-  files: z.array(z.object({
-    path: z.string(),
-    type: z.literal('registry:component'),
-    content: z.string(),
-  })),
+  files: z.array(
+    z.object({
+      path: z.string(),
+      type: z.literal('registry:component'),
+      content: z.string(),
+    })
+  ),
   dependencies: z.array(z.string()),
   meta: z.object({
     rafters: z.object({

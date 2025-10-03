@@ -27,11 +27,12 @@
     "test:integration": "pnpm build && vitest run test/integration/",
     "test:watch": "vitest",
     "test:preflight": "pnpm build && vitest run",
-    "lint": "biome check --fix --unsafe",
+    "lint": "biome check --fix --unsafe src test",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "pnpm build"
   },
   "devDependencies": {
+    "@anatine/zod-mock": "^3.14.0",
     "@biomejs/biome": "catalog:",
     "@types/fs-extra": "catalog:",
     "@types/inquirer": "^9.0.7",
@@ -40,9 +41,9 @@
     "vitest": "catalog:"
   },
   "dependencies": {
-    "@rafters/shared": "workspace:*",
-    "@rafters/design-tokens": "workspace:*",
     "@modelcontextprotocol/sdk": "^0.5.0",
+    "@rafters/design-tokens": "workspace:*",
+    "@rafters/shared": "workspace:*",
     "chalk": "^5.3.0",
     "clsx": "catalog:",
     "commander": "^12.1.0",
