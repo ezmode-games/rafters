@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@rafters/monorepo"]
+  "ignore": ["@rafters/primitives", "website", "@rafters/ui", "@rafters/api"]
 }

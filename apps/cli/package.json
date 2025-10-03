@@ -1,6 +1,6 @@
 {
   "name": "@rafters/cli",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "AI-first design intelligence CLI for generating semantic design tokens and components",
   "type": "module",
   "private": false,

@@ -53,11 +53,13 @@ async function generateTokenCache() {
 
   try {
     // Import generators dynamically (ESM modules)
-    const { generateAllTokens, generateColorTokens } = await import('@rafters/design-tokens');
+    const { generateAllTokens } = await import('@rafters/design-tokens');
 
     // Generate all tokens (both functions are now async)
     const allTokens = await generateAllTokens();
-    const colorTokens = await generateColorTokens();
+
+    // generateColorTokens requires config, get tokens from allTokens instead
+    const colorTokens = allTokens.filter(token => token.category === 'color');
 
     // Group tokens by category
     const tokensByCategory = allTokens.reduce((acc, token) => {
