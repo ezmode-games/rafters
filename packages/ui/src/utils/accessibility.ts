@@ -3,7 +3,11 @@
  *
  * @registryType registry:util
  * @registryVersion 0.1.0
+ * @registryPath utils/accessibility.ts
+ * @dependencies local:../base/types.ts
  */
+
+import type { AnnouncementOptions } from '../base/types';
 
 /**
  * Check if element meets WCAG AAA touch target size (44x44px)
@@ -113,4 +117,32 @@ export function restoreFocus(element: HTMLElement | null): void {
 export function generateAriaId(prefix: string, uuid?: string): string {
   const id = uuid ?? crypto.randomUUID();
   return `${prefix}-${id.slice(0, 8)}`;
+}
+
+/**
+ * Announce message to screen readers
+ * Creates temporary live region for accessibility announcements
+ *
+ * @param message - Text to announce
+ * @param options - Announcement options (politeness, timeout)
+ */
+export function announceToScreenReader(message: string, options: AnnouncementOptions = {}): void {
+  const { politeness = 'polite', timeout = 1000 } = options;
+
+  const announcement = document.createElement('div');
+  announcement.setAttribute('role', 'status');
+  announcement.setAttribute('aria-live', politeness);
+  announcement.setAttribute('aria-atomic', 'true');
+  announcement.style.position = 'absolute';
+  announcement.style.left = '-10000px';
+  announcement.style.width = '1px';
+  announcement.style.height = '1px';
+  announcement.style.overflow = 'hidden';
+  announcement.textContent = message;
+
+  document.body.appendChild(announcement);
+
+  setTimeout(() => {
+    announcement.remove();
+  }, timeout);
 }

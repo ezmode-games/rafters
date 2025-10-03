@@ -2,7 +2,7 @@
  * Base class for all Rafters primitives
  *
  * @registryName RPrimitiveBase
- * @registryType registry:primitive-base
+ * @registryType registry:base
  * @registryVersion 0.1.0
  * @registryStatus published
  * @registryPath base/RPrimitiveBase.ts
@@ -12,7 +12,7 @@
  *
  * @example
  * ```typescript
- * import { RPrimitiveBase } from '@rafters/primitives/base'
+ * import { RPrimitiveBase } from '../base/RPrimitiveBase.ts'
  *
  * @customElement('r-custom')
  * export class RCustom extends RPrimitiveBase {
@@ -24,7 +24,6 @@
  */
 import { LitElement } from 'lit';
 import { property, state } from 'lit/decorators.js';
-import type { AnnouncementOptions } from './types';
 
 export abstract class RPrimitiveBase extends LitElement {
   /**
@@ -61,34 +60,6 @@ export abstract class RPrimitiveBase extends LitElement {
    * Hover state (internal)
    */
   @state() protected _hovered = false;
-
-  /**
-   * Announce message to screen readers
-   * Creates temporary live region for accessibility announcements
-   *
-   * @param message - Text to announce
-   * @param options - Announcement options (politeness, timeout)
-   */
-  protected announceToScreenReader(message: string, options: AnnouncementOptions = {}): void {
-    const { politeness = 'polite', timeout = 1000 } = options;
-
-    const announcement = document.createElement('div');
-    announcement.setAttribute('role', 'status');
-    announcement.setAttribute('aria-live', politeness);
-    announcement.setAttribute('aria-atomic', 'true');
-    announcement.style.position = 'absolute';
-    announcement.style.left = '-10000px';
-    announcement.style.width = '1px';
-    announcement.style.height = '1px';
-    announcement.style.overflow = 'hidden';
-    announcement.textContent = message;
-
-    document.body.appendChild(announcement);
-
-    setTimeout(() => {
-      announcement.remove();
-    }, timeout);
-  }
 
   /**
    * Handle keyboard navigation

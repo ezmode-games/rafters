@@ -1,16 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "composite": true,
-    "incremental": true,
-    "tsBuildInfoFile": "./dist/.tsbuildinfo"
-  },
-  "references": [
-    { "path": "../../packages/shared" },
-    { "path": "../../packages/design-tokens" },
-    { "path": "../../packages/ui" }
-  ],
   "include": ["src/**/*", "scripts/**/*"],
   "exclude": ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx", "dist", "test"]
 }
