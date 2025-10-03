@@ -614,34 +614,6 @@ export type { TokenSet } from '@rafters/shared';
 export { TokenSetSchema } from '@rafters/shared';
 
 /**
- * Check Tailwind CSS version in project
- */
-export const checkTailwindVersion = async (cwd: string): Promise<string> => {
-  try {
-    const packageJsonPath = join(cwd, 'package.json');
-    if (!existsSync(packageJsonPath)) return 'v4';
-
-    const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
-    const deps = {
-      ...packageJson.dependencies,
-      ...packageJson.devDependencies,
-    };
-
-    if (deps.tailwindcss) {
-      const version = deps.tailwindcss;
-      if (version.startsWith('catalog:') || version.includes('@next')) {
-        return 'v4';
-      }
-      return 'v3';
-    }
-
-    return 'v4'; // Default to v4
-  } catch {
-    return 'v4';
-  }
-};
-
-/**
  * Create default grayscale tokens for CLI compatibility
  */
 /**
@@ -1221,7 +1193,6 @@ export const regenerateCSS = async (cwd: string = process.cwd()): Promise<void> 
 
 // Export for CLI compatibility
 export default {
-  checkTailwindVersion,
   createRegistry,
   createTokenRegistry,
   fetchStudioTokens,

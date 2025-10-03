@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import { ensureDirSync, existsSync, removeSync, writeJsonSync } from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
+  checkTailwindVersion,
   configExists,
   detectFramework,
   detectPackageManager,
@@ -167,6 +168,75 @@ describe('config utilities', () => {
 
     it('should return null when no CSS file is found', () => {
       expect(findCssFile(testDir)).toBeNull();
+    });
+  });
+
+  describe('checkTailwindVersion', () => {
+    it('should detect Tailwind v4 with caret version', () => {
+      writeJsonSync(join(testDir, 'package.json'), {
+        dependencies: { tailwindcss: '^4.0.0' },
+      });
+      expect(checkTailwindVersion(testDir)).toBe('v4');
+    });
+
+    it('should detect Tailwind v4 with tilde version', () => {
+      writeJsonSync(join(testDir, 'package.json'), {
+        dependencies: { tailwindcss: '~4.0.0' },
+      });
+      expect(checkTailwindVersion(testDir)).toBe('v4');
+    });
+
+    it('should detect Tailwind v4 with exact version', () => {
+      writeJsonSync(join(testDir, 'package.json'), {
+        dependencies: { tailwindcss: '4.0.0' },
+      });
+      expect(checkTailwindVersion(testDir)).toBe('v4');
+    });
+
+    it('should detect Tailwind v4 with @next tag', () => {
+      writeJsonSync(join(testDir, 'package.json'), {
+        dependencies: { tailwindcss: '@next' },
+      });
+      expect(checkTailwindVersion(testDir)).toBe('v4');
+    });
+
+    it('should detect Tailwind v4 with catalog reference', () => {
+      writeJsonSync(join(testDir, 'package.json'), {
+        dependencies: { tailwindcss: 'catalog:*' },
+      });
+      expect(checkTailwindVersion(testDir)).toBe('v4');
+    });
+
+    it('should detect Tailwind v3 with caret version', () => {
+      writeJsonSync(join(testDir, 'package.json'), {
+        dependencies: { tailwindcss: '^3.4.0' },
+      });
+      expect(checkTailwindVersion(testDir)).toBe('v3');
+    });
+
+    it('should detect Tailwind v3 with exact version', () => {
+      writeJsonSync(join(testDir, 'package.json'), {
+        dependencies: { tailwindcss: '3.4.1' },
+      });
+      expect(checkTailwindVersion(testDir)).toBe('v3');
+    });
+
+    it('should default to v4 when no tailwindcss dependency', () => {
+      writeJsonSync(join(testDir, 'package.json'), {
+        dependencies: { react: '^19.0.0' },
+      });
+      expect(checkTailwindVersion(testDir)).toBe('v4');
+    });
+
+    it('should default to v4 when no package.json exists', () => {
+      expect(checkTailwindVersion(testDir)).toBe('v4');
+    });
+
+    it('should check devDependencies as well', () => {
+      writeJsonSync(join(testDir, 'package.json'), {
+        devDependencies: { tailwindcss: '^4.1.0' },
+      });
+      expect(checkTailwindVersion(testDir)).toBe('v4');
     });
   });
 });
