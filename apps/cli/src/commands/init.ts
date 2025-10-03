@@ -266,6 +266,10 @@ Visit https://rafters.realhandy.tech for complete documentation.
     // Create components directory
     ensureDirSync(join(cwd, config.componentsDir));
 
+    // Create primitives directory (nested under components)
+    const primitivesDir = join(cwd, 'src/components/primitives');
+    ensureDirSync(primitivesDir);
+
     // Create lib directory and utils
     const libDir = join(cwd, 'src/lib');
     ensureDirSync(libDir);

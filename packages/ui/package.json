@@ -57,6 +57,7 @@
     "@radix-ui/react-toast": "^1.2.14",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@rafters/design-tokens": "workspace:*",
+    "@rafters/primitives": "workspace:*",
     "@rafters/shared": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "clsx": "catalog:",

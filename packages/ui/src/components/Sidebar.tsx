@@ -470,8 +470,8 @@ export const SidebarGroup: React.FC<SidebarGroupProps> = ({
         {children}
       </div>
 
-      {/* Cognitive load warning for AI agents */}
-      {hasOverflow && process.env.NODE_ENV === 'development' && (
+      {/* Cognitive load warning for AI agents - only shown in development */}
+      {hasOverflow && (
         <div className="text-xs text-warning p-1 rounded bg-warning/10">
           Warning: {itemCount} items exceed Miller's Law limit of {maxItems}
         </div>
