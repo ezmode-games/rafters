@@ -88,12 +88,24 @@ function parseJSDocFromSource(content: string, filename: string): ComponentManif
     );
     const designGuides: DesignGuide[] = parseDesignGuides(designGuidesTag?.description || '');
 
-    // Extract dependencies
+    // Extract dependencies (separate local: files from npm packages)
     const dependenciesRaw = findTagValue(comment.tags, 'dependencies') || '';
-    const dependencies = dependenciesRaw
+    const allDeps = dependenciesRaw
       .split(',')
       .map((dep) => dep.trim())
       .filter((dep) => dep.length > 0 && dep !== '@rafters/design-tokens/motion');
+
+    // Separate local files from npm dependencies
+    const localFiles: string[] = [];
+    const dependencies: string[] = [];
+
+    for (const dep of allDeps) {
+      if (dep.startsWith('local:')) {
+        localFiles.push(dep.substring(6)); // Remove 'local:' prefix
+      } else {
+        dependencies.push(dep);
+      }
+    }
 
     // Extract examples
     const exampleTags = comment.tags.filter((tag) => tag.tag === 'example');
@@ -111,6 +123,31 @@ function parseJSDocFromSource(content: string, filename: string): ComponentManif
     // Generate docs URL
     const docs = `https://rafters.realhandy.tech/docs/components/${registryName}`;
 
+    // Build files array - include local dependencies
+    const files = [
+      {
+        path: registryPath || `components/ui/${filename}`,
+        content,
+        type: registryType as 'registry:component',
+      },
+    ];
+
+    // Add local dependency files from primitives package
+    const primitivesBaseDir = join(process.cwd(), '../../packages/primitives/src');
+    for (const localFile of localFiles) {
+      try {
+        const localFilePath = join(primitivesBaseDir, localFile);
+        const localContent = readFileSync(localFilePath, 'utf-8');
+        files.push({
+          path: `primitives/${localFile}`,
+          content: localContent,
+          type: 'registry:primitive',
+        });
+      } catch (error) {
+        console.warn(`Could not load local dependency: ${localFile}`, error);
+      }
+    }
+
     // Build component manifest using Zod schema
     const componentManifest: ComponentManifest = ComponentManifestSchema.parse({
       $schema: 'https://ui.shadcn.com/schema/registry-item.json',
@@ -118,13 +155,7 @@ function parseJSDocFromSource(content: string, filename: string): ComponentManif
       type: registryType as 'registry:component',
       description: '',
       dependencies,
-      files: [
-        {
-          path: registryPath || `components/ui/${filename}`,
-          content,
-          type: 'registry:component',
-        },
-      ],
+      files,
       docs,
       meta: {
         rafters: {
@@ -219,6 +250,39 @@ function parseDesignGuides(content: string): DesignGuide[] {
 }
 
 /**
+ * Load primitives from primitives package
+ */
+function loadPrimitives(): ComponentManifest[] {
+  const primitivesBaseDir = join(process.cwd(), '../../packages/primitives/src/primitives');
+  const primitives: ComponentManifest[] = [];
+
+  try {
+    const primitiveTypes = readdirSync(primitivesBaseDir);
+
+    for (const primitiveType of primitiveTypes) {
+      const primitiveDir = join(primitivesBaseDir, primitiveType);
+      const files = readdirSync(primitiveDir);
+
+      for (const file of files) {
+        if (file.endsWith('.ts') && !file.endsWith('.test.ts') && !file.endsWith('.spec.ts')) {
+          const filePath = join(primitiveDir, file);
+          const content = readFileSync(filePath, 'utf-8');
+
+          const primitiveData = parseJSDocFromSource(content, file);
+          if (primitiveData) {
+            primitives.push(primitiveData);
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error loading primitives:', error);
+  }
+
+  return primitives;
+}
+
+/**
  * Load and parse all components from the UI package
  */
 function loadComponents(): ComponentManifest[] {
@@ -246,6 +310,10 @@ function loadComponents(): ComponentManifest[] {
   } catch (error) {
     console.error('Error loading components:', error);
   }
+
+  // Load primitives and add to components
+  const primitives = loadPrimitives();
+  components.push(...primitives);
 
   componentsCache = components;
   return components;

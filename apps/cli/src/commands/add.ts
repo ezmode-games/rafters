@@ -109,10 +109,15 @@ async function installSingleComponent(
     }
   }
 
-  // Write component file
-  const componentSpinner = ora(`Writing ${componentName} to ${componentPath}...`).start();
+  // Write files (primitives + component)
+  const componentSpinner = ora(`Writing ${componentName} files...`).start();
 
-  // Get component source from registry files
+  // Separate primitive and component files
+  const primitiveFiles =
+    componentManifest.files?.filter(
+      (f) => f.type === 'registry:primitive' || f.path.includes('primitives/')
+    ) || [];
+
   const componentFile = componentManifest.files?.find(
     (f) =>
       f.path.endsWith('.tsx') && f.type === 'registry:component' && !f.path.includes('.stories.')
@@ -123,11 +128,34 @@ async function installSingleComponent(
     return false;
   }
 
-  // Transform imports to use the project's alias configuration
-  const transformedContent = transformImports(componentFile.content, config.componentsDir, cwd);
+  // Write primitive files first (to src/components/primitives/)
+  for (const primitiveFile of primitiveFiles) {
+    if (!primitiveFile.content || primitiveFile.content.trim() === '') {
+      continue;
+    }
 
+    // Extract primitive path: primitives/button/r-button.ts
+    const primitivePath = primitiveFile.path.replace(/^.*primitives\//, 'primitives/');
+    const absolutePrimitivePath = join(cwd, 'src/components', primitivePath);
+
+    // Transform imports for primitives
+    const transformedPrimitiveContent = transformImports(
+      primitiveFile.content,
+      config.componentsDir,
+      cwd
+    );
+
+    writeFile(absolutePrimitivePath, transformedPrimitiveContent);
+  }
+
+  // Write React component file
+  const transformedContent = transformImports(componentFile.content, config.componentsDir, cwd);
   writeFile(absoluteComponentPath, transformedContent);
-  componentSpinner.succeed(`${componentName} written to ${componentPath}`);
+
+  const filesWritten = primitiveFiles.length + 1;
+  componentSpinner.succeed(
+    `${componentName} written (${filesWritten} file${filesWritten > 1 ? 's' : ''})`
+  );
 
   // Update component manifest
   const manifest = loadComponentManifest(cwd);

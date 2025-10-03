@@ -391,6 +391,7 @@ export const ComponentRegistrySchema = z.object({
     'registry:block',
     'registry:page',
     'registry:hook',
+    'registry:primitive',
   ]),
   files: z.array(z.string()),
   meta: z.object({
@@ -434,6 +435,7 @@ export const ComponentManifestSchema = z.object({
     'registry:block',
     'registry:page',
     'registry:hook',
+    'registry:primitive',
   ]),
   description: z.string().optional(),
   title: z.string().optional(),

@@ -21,7 +21,8 @@ export type {
   Result,
   ValidationState,
 } from './base/types';
-
+// Primitives
+export { RButton } from './primitives/button/r-button';
 // Utilities
 export {
   focusFirst,
@@ -39,6 +40,3 @@ export {
   preventDefaultForActionKeys,
   updateRovingTabindex,
 } from './utils/keyboard';
-
-// Primitives will be exported here as they are implemented
-// See issues #203-#226 for component implementations

@@ -105,16 +105,12 @@ export function restoreFocus(element: HTMLElement | null): void {
 }
 
 /**
- * Counter for generating unique ARIA IDs (React 19 purity compliant)
- */
-let ariaIdCounter = 0;
-
-/**
- * Generate unique ID for ARIA associations
+ * Generate unique ID for ARIA associations using crypto.randomUUID()
  *
  * @param prefix - ID prefix
- * @returns Unique ID
+ * @returns Unique ID (React 19 purity compliant when UUID passed from parent)
  */
-export function generateAriaId(prefix: string): string {
-  return `${prefix}-${++ariaIdCounter}`;
+export function generateAriaId(prefix: string, uuid?: string): string {
+  const id = uuid ?? crypto.randomUUID();
+  return `${prefix}-${id.slice(0, 8)}`;
 }
