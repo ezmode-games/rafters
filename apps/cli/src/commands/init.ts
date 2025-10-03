@@ -6,9 +6,10 @@ const { ensureDirSync, writeFileSync, existsSync } = fs;
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { checkTailwindVersion, createEventDrivenTokenRegistry } from '@rafters/design-tokens';
+import { createEventDrivenTokenRegistry } from '@rafters/design-tokens';
 import {
   type Config,
+  checkTailwindVersion,
   configExists,
   defaultConfig,
   detectFramework,
@@ -53,7 +54,7 @@ export async function initCommand(options: { yes?: boolean; config?: string } = 
   spinner.succeed('Prerequisites checked');
 
   // Check Tailwind version and warn about v3
-  const tailwindVersion = await checkTailwindVersion(cwd);
+  const tailwindVersion = checkTailwindVersion(cwd);
   if (tailwindVersion === 'v3') {
     console.log();
     console.log('Tailwind v3 detected. Rafters requires Tailwind CSS v4.');

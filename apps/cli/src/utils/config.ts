@@ -76,6 +76,36 @@ export function hasReact(cwd = process.cwd()): boolean {
   }
 }
 
+export function checkTailwindVersion(cwd = process.cwd()): 'v3' | 'v4' {
+  try {
+    const packageJsonPath = join(cwd, 'package.json');
+    if (!existsSync(packageJsonPath)) return 'v4';
+
+    const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
+    const deps = {
+      ...packageJson.dependencies,
+      ...packageJson.devDependencies,
+    };
+
+    if (deps.tailwindcss) {
+      const version = deps.tailwindcss;
+      // Check for v4 patterns: catalog:, @next, or starts with 4.x
+      if (
+        version.startsWith('catalog:') ||
+        version.includes('@next') ||
+        version.match(/^[\^~]?4\./)
+      ) {
+        return 'v4';
+      }
+      return 'v3';
+    }
+
+    return 'v4'; // Default to v4 if tailwindcss not found
+  } catch {
+    return 'v4';
+  }
+}
+
 export function detectFramework(cwd = process.cwd()): string | null {
   try {
     const packageJson = JSON.parse(readFileSync(join(cwd, 'package.json'), 'utf-8'));
