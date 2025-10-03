@@ -293,9 +293,7 @@ export class ProjectFactory {
     const projectName = projectPath.split('/').pop() || 'react-router-project';
     const parentDir = projectPath.substring(0, projectPath.lastIndexOf('/'));
 
-    const args = ['create-react-router@latest', projectName, '--typescript'];
-
-    await execa('npm', args, {
+    await execa('npm', ['create', 'react-router@latest', projectName, '--', '--typescript'], {
       cwd: parentDir,
       stdio: 'pipe',
     });
@@ -320,21 +318,25 @@ export class ProjectFactory {
     const parentDir = projectPath.substring(0, projectPath.lastIndexOf('/'));
 
     // Create Astro project with React integration
-    const args = [
-      'create-astro@latest',
-      projectName,
-      '--template',
-      'minimal',
-      '--typescript',
-      'strict',
-      '--no-install',
-      '--no-git',
-    ];
-
-    await execa('npm', args, {
-      cwd: parentDir,
-      stdio: 'pipe',
-    });
+    await execa(
+      'npm',
+      [
+        'create',
+        'astro@latest',
+        projectName,
+        '--',
+        '--template',
+        'minimal',
+        '--typescript',
+        'strict',
+        '--no-install',
+        '--no-git',
+      ],
+      {
+        cwd: parentDir,
+        stdio: 'pipe',
+      }
+    );
 
     // Add React integration
     await ProjectFactory.installDependencies(projectPath, packageManager);

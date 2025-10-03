@@ -34,12 +34,6 @@ describe('rafters init - Real Projects', () => {
         reject: false,
       });
 
-      // Debug output if failed
-      if (result.exitCode !== 0) {
-        console.log('STDOUT:', result.stdout);
-        console.log('STDERR:', result.stderr);
-      }
-
       // Verify success
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('Rafters initialized');
@@ -159,11 +153,6 @@ describe('rafters init - Real Projects', () => {
         reject: false,
       });
 
-      if (result.exitCode !== 0) {
-        console.log('STDOUT:', result.stdout);
-        console.log('STDERR:', result.stderr);
-      }
-
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('Rafters initialized');
 
@@ -194,11 +183,6 @@ describe('rafters init - Real Projects', () => {
         cwd: project.path,
         reject: false,
       });
-
-      if (result.exitCode !== 0) {
-        console.log('STDOUT:', result.stdout);
-        console.log('STDERR:', result.stderr);
-      }
 
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('Rafters initialized');
