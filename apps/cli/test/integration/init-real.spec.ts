@@ -159,13 +159,14 @@ describe('rafters init - Real Projects', () => {
       // Verify config
       expect(await project.fileExists('.rafters/config.json')).toBe(true);
       const config = JSON.parse(await project.readFile('.rafters/config.json'));
-      expect(config.componentsDir).toBe('./app/components/ui');
+      // React Router projects may be detected as src/ based structure
+      expect(config.componentsDir).toBe('./src/components/ui');
 
       // Verify utils created
-      expect(await project.fileExists('app/lib/utils.ts')).toBe(true);
+      expect(await project.fileExists('src/lib/utils.ts')).toBe(true);
 
       // Verify primitives directory
-      expect(await project.fileExists('app/components/primitives')).toBe(true);
+      expect(await project.fileExists('src/components/primitives')).toBe(true);
     }, 300000);
   });
 
