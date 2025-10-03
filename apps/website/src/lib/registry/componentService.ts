@@ -132,14 +132,14 @@ function parseJSDocFromSource(content: string, filename: string): ComponentManif
       },
     ];
 
-    // Add local dependency files from primitives package
-    const primitivesBaseDir = join(process.cwd(), '../../packages/primitives/src');
+    // Add local dependency files from UI package primitives
+    const primitivesBaseDir = join(process.cwd(), '../../packages/ui/src');
     for (const localFile of localFiles) {
       try {
         const localFilePath = join(primitivesBaseDir, localFile);
         const localContent = readFileSync(localFilePath, 'utf-8');
         files.push({
-          path: `primitives/${localFile}`,
+          path: localFile,
           content: localContent,
           type: 'registry:primitive',
         });
@@ -250,10 +250,10 @@ function parseDesignGuides(content: string): DesignGuide[] {
 }
 
 /**
- * Load primitives from primitives package
+ * Load primitives from UI package
  */
 function loadPrimitives(): ComponentManifest[] {
-  const primitivesBaseDir = join(process.cwd(), '../../packages/primitives/src/primitives');
+  const primitivesBaseDir = join(process.cwd(), '../../packages/ui/src/primitives');
   const primitives: ComponentManifest[] = [];
 
   try {
