@@ -1,6 +1,6 @@
 {
   "name": "@rafters/design-tokens",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Generated design systems and semantic tokens for Rafters AI intelligence system",
   "type": "module",
   "private": false,
