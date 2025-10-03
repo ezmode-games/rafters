@@ -144,6 +144,78 @@ describe('rafters init - Real Projects', () => {
     }, 300000);
   });
 
+  describe('React Router v7', () => {
+    beforeEach(async () => {
+      project = await ProjectFactory.create({
+        framework: 'react-router',
+        packageManager: 'pnpm',
+        withTailwind: true,
+      });
+    }, 300000);
+
+    it('should initialize Rafters in a real React Router v7 project', async () => {
+      const result = await execa('node', [CLI_PATH, 'init', '--yes'], {
+        cwd: project.path,
+        reject: false,
+      });
+
+      if (result.exitCode !== 0) {
+        console.log('STDOUT:', result.stdout);
+        console.log('STDERR:', result.stderr);
+      }
+
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain('Rafters initialized');
+
+      // Verify config
+      expect(await project.fileExists('.rafters/config.json')).toBe(true);
+      const config = JSON.parse(await project.readFile('.rafters/config.json'));
+      expect(config.componentsDir).toBe('./app/components/ui');
+
+      // Verify utils created
+      expect(await project.fileExists('app/lib/utils.ts')).toBe(true);
+
+      // Verify primitives directory
+      expect(await project.fileExists('app/components/primitives')).toBe(true);
+    }, 300000);
+  });
+
+  describe('Astro + React', () => {
+    beforeEach(async () => {
+      project = await ProjectFactory.create({
+        framework: 'astro',
+        packageManager: 'pnpm',
+        withTailwind: true,
+      });
+    }, 300000);
+
+    it('should initialize Rafters in a real Astro project', async () => {
+      const result = await execa('node', [CLI_PATH, 'init', '--yes'], {
+        cwd: project.path,
+        reject: false,
+      });
+
+      if (result.exitCode !== 0) {
+        console.log('STDOUT:', result.stdout);
+        console.log('STDERR:', result.stderr);
+      }
+
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain('Rafters initialized');
+
+      // Verify config
+      expect(await project.fileExists('.rafters/config.json')).toBe(true);
+      const config = JSON.parse(await project.readFile('.rafters/config.json'));
+      expect(config.componentsDir).toBe('./src/components/ui');
+
+      // Verify utils created
+      expect(await project.fileExists('src/lib/utils.ts')).toBe(true);
+
+      // Verify primitives directory
+      expect(await project.fileExists('src/components/primitives')).toBe(true);
+    }, 300000);
+  });
+
   describe('Error Cases', () => {
     it('should fail without package.json', async () => {
       project = await ProjectFactory.create({

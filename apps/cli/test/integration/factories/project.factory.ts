@@ -8,7 +8,13 @@ import { join } from 'node:path';
 import { execa } from 'execa';
 import fs from 'fs-extra';
 
-export type FrameworkType = 'nextjs-app' | 'nextjs-pages' | 'vite-react' | 'remix' | 'cra';
+export type FrameworkType =
+  | 'nextjs-app'
+  | 'nextjs-pages'
+  | 'vite-react'
+  | 'react-router'
+  | 'astro'
+  | 'cra';
 export type PackageManager = 'npm' | 'pnpm' | 'yarn';
 
 export interface ProjectOptions {
@@ -148,8 +154,11 @@ export class ProjectFactory {
       case 'vite-react':
         await ProjectFactory.scaffoldVite(projectPath, packageManager, withTailwind);
         break;
-      case 'remix':
-        await ProjectFactory.scaffoldRemix(projectPath, packageManager, withTailwind);
+      case 'react-router':
+        await ProjectFactory.scaffoldReactRouter(projectPath, packageManager, withTailwind);
+        break;
+      case 'astro':
+        await ProjectFactory.scaffoldAstro(projectPath, packageManager, withTailwind);
         break;
       case 'cra':
         await ProjectFactory.scaffoldCRA(projectPath, packageManager, withTailwind);
@@ -273,24 +282,82 @@ export class ProjectFactory {
   }
 
   /**
-   * Scaffold Remix project
+   * Scaffold React Router v7 project
    */
-  private static async scaffoldRemix(
+  private static async scaffoldReactRouter(
     projectPath: string,
     packageManager: PackageManager,
     withTailwind: boolean
   ): Promise<void> {
-    const args = ['create-remix@latest', projectPath, '--typescript', '--no-install'];
+    // React Router v7 uses create-react-router CLI
+    const projectName = projectPath.split('/').pop() || 'react-router-project';
+    const parentDir = projectPath.substring(0, projectPath.lastIndexOf('/'));
 
-    if (withTailwind) {
-      args.push('--tailwind');
-    }
+    const args = ['create-react-router@latest', projectName, '--typescript'];
 
-    await execa('npx', args, {
+    await execa('npm', args, {
+      cwd: parentDir,
       stdio: 'pipe',
     });
 
+    if (withTailwind) {
+      await ProjectFactory.installDependencies(projectPath, packageManager);
+      await ProjectFactory.addTailwindToReactRouter(projectPath, packageManager);
+    } else {
+      await ProjectFactory.installDependencies(projectPath, packageManager);
+    }
+  }
+
+  /**
+   * Scaffold Astro project
+   */
+  private static async scaffoldAstro(
+    projectPath: string,
+    packageManager: PackageManager,
+    withTailwind: boolean
+  ): Promise<void> {
+    const projectName = projectPath.split('/').pop() || 'astro-project';
+    const parentDir = projectPath.substring(0, projectPath.lastIndexOf('/'));
+
+    // Create Astro project with React integration
+    const args = [
+      'create-astro@latest',
+      projectName,
+      '--template',
+      'minimal',
+      '--typescript',
+      'strict',
+      '--no-install',
+      '--no-git',
+    ];
+
+    await execa('npm', args, {
+      cwd: parentDir,
+      stdio: 'pipe',
+    });
+
+    // Add React integration
     await ProjectFactory.installDependencies(projectPath, packageManager);
+
+    // Add @astrojs/react integration
+    const addCmd = packageManager === 'yarn' ? 'add' : 'add';
+    await execa(packageManager, [addCmd, '@astrojs/react', 'react', 'react-dom'], {
+      cwd: projectPath,
+      stdio: 'pipe',
+    });
+
+    // Update astro.config to include React
+    const astroConfig = `import { defineConfig } from 'astro/config';
+import react from '@astrojs/react';
+
+export default defineConfig({
+  integrations: [react()],
+});`;
+    await fs.writeFile(join(projectPath, 'astro.config.mjs'), astroConfig);
+
+    if (withTailwind) {
+      await ProjectFactory.addTailwindToAstro(projectPath, packageManager);
+    }
   }
 
   /**
@@ -411,5 +478,80 @@ module.exports = {
       cwd: projectPath,
       stdio: 'pipe',
     });
+  }
+
+  /**
+   * Add Tailwind CSS to React Router v7 project
+   */
+  private static async addTailwindToReactRouter(
+    projectPath: string,
+    packageManager: PackageManager
+  ): Promise<void> {
+    // Install Tailwind v4
+    const installCmd = packageManager === 'yarn' ? 'add' : 'add';
+    await execa(packageManager, [installCmd, '-D', 'tailwindcss@next'], {
+      cwd: projectPath,
+      stdio: 'pipe',
+    });
+
+    // Create PostCSS config for Tailwind v4
+    const postcssConfig = `export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+  },
+};`;
+    await fs.writeFile(join(projectPath, 'postcss.config.js'), postcssConfig);
+
+    // Add Tailwind v4 CSS import to app root
+    const cssPath = join(projectPath, 'app/root.css');
+    const tailwindCss = `@import "tailwindcss";
+`;
+
+    // Create or replace root.css
+    await fs.writeFile(cssPath, tailwindCss);
+  }
+
+  /**
+   * Add Tailwind CSS to Astro project
+   */
+  private static async addTailwindToAstro(
+    projectPath: string,
+    packageManager: PackageManager
+  ): Promise<void> {
+    // Install Tailwind v4
+    const installCmd = packageManager === 'yarn' ? 'add' : 'add';
+    await execa(packageManager, [installCmd, '-D', 'tailwindcss@next', '@tailwindcss/postcss'], {
+      cwd: projectPath,
+      stdio: 'pipe',
+    });
+
+    // Create PostCSS config for Tailwind v4
+    const postcssConfig = `export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+  },
+};`;
+    await fs.writeFile(join(projectPath, 'postcss.config.js'), postcssConfig);
+
+    // Create global CSS file with Tailwind import
+    const cssPath = join(projectPath, 'src/styles/global.css');
+    await fs.ensureDir(join(projectPath, 'src/styles'));
+    const tailwindCss = `@import "tailwindcss";
+`;
+    await fs.writeFile(cssPath, tailwindCss);
+
+    // Update astro.config to include Tailwind integration
+    const astroConfig = `import { defineConfig } from 'astro/config';
+import react from '@astrojs/react';
+
+export default defineConfig({
+  integrations: [react()],
+  vite: {
+    css: {
+      postcss: './postcss.config.js',
+    },
+  },
+});`;
+    await fs.writeFile(join(projectPath, 'astro.config.mjs'), astroConfig);
   }
 }
