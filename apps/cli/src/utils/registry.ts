@@ -88,7 +88,7 @@ export async function fetchComponentRegistry(): Promise<Registry> {
  */
 export async function fetchComponent(componentName: string): Promise<ComponentManifest | null> {
   try {
-    const data = await fetchFromRegistry(`/components/${encodeURIComponent(componentName)}`);
+    const data = await fetchFromRegistry(`/components/${encodeURIComponent(componentName)}.json`);
     return ComponentManifestSchema.parse(data);
   } catch (error) {
     // Try searching the full registry if direct fetch fails

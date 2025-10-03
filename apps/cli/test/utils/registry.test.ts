@@ -255,7 +255,7 @@ describe('registry utility', () => {
 
       expect(component).toEqual(mockComponent);
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://rafters.realhandy.tech/registry/components/button',
+        'https://rafters.realhandy.tech/registry/components/button.json',
         expect.any(Object)
       );
     });
@@ -290,7 +290,7 @@ describe('registry utility', () => {
       await fetchComponent(componentName);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://rafters.realhandy.tech/registry/components/alert-dialog',
+        'https://rafters.realhandy.tech/registry/components/alert-dialog.json',
         expect.any(Object)
       );
     });
