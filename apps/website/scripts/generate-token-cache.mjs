@@ -59,7 +59,7 @@ async function generateTokenCache() {
     const allTokens = await generateAllTokens();
 
     // generateColorTokens requires config, get tokens from allTokens instead
-    const colorTokens = allTokens.filter(token => token.category === 'color');
+    const colorTokens = allTokens.filter((token) => token.category === 'color');
 
     // Group tokens by category
     const tokensByCategory = allTokens.reduce((acc, token) => {
