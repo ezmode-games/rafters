@@ -7,7 +7,7 @@
  * @registryType registry:primitive
  *
  * @accessibility WCAG AAA - button role, keyboard navigation, 44px touch targets
- * @dependencies lit, local:base/RPrimitiveBase.ts
+ * @dependencies lit, local:../../base/RPrimitiveBase.ts, local:../../utils/keyboard.ts
  *
  * @example
  * ```html
@@ -19,6 +19,7 @@
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { RPrimitiveBase } from '../../base/RPrimitiveBase';
+import { isActionKey, preventDefaultForActionKeys } from '../../utils/keyboard';
 
 @customElement('r-button')
 export class RButton extends RPrimitiveBase {
@@ -31,7 +32,7 @@ export class RButton extends RPrimitiveBase {
    * Tab index for keyboard navigation
    * 0 = in tab order, -1 = not tabbable, >0 = custom tab order (avoid)
    */
-  @property({ type: Number }) override tabIndex = 0;
+  @property({ type: Number, reflect: true }) override tabIndex = 0;
 
   /**
    * Button type for form submission
@@ -57,9 +58,9 @@ export class RButton extends RPrimitiveBase {
     // Don't activate if disabled
     if (this.disabled) return;
 
-    // Enter or Space should activate button
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault(); // Prevent page scroll on Space
+    // Use keyboard utils for consistent behavior
+    if (isActionKey(e)) {
+      preventDefaultForActionKeys(e); // Prevent page scroll on Space
       this.click(); // Trigger click event
     }
   };

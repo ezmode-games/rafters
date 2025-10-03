@@ -67,6 +67,9 @@ export const ExampleSchema = z.object({
   description: z.string().optional(),
 });
 
+export type UsagePatterns = z.infer<typeof UsagePatternsSchema>;
+export type DesignGuide = z.infer<typeof DesignGuideSchema>;
+export type Example = z.infer<typeof ExampleSchema>;
 export type Intelligence = z.infer<typeof IntelligenceSchema>;
 
 // Color Intelligence Schema (from API)

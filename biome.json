@@ -19,7 +19,8 @@
       "!**/test-results/**/*",
       "!**/.turbo/**/*",
       "!**/.vscode/**/*",
-      "!**/playwright/.cache/**/*"
+      "!**/playwright/.cache/**/*",
+      "!**/test/components/**/*"
     ],
     "maxSize": 10485760
   },

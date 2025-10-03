@@ -6,7 +6,7 @@ import { defineConfig, devices } from '@playwright/experimental-ct-react';
  */
 export default defineConfig({
   testDir: './test',
-  testMatch: '**/*.component.{ts,tsx}',
+  testMatch: ['**/*.component.{ts,tsx}', '**/*.spec.{ts,tsx}'],
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -18,6 +18,8 @@ export default defineConfig({
   use: {
     trace: 'on-first-retry',
     ctPort: 3100,
+    ctTemplateDir: './playwright',
+    ctViteConfig: './playwright.vite.config.ts',
   },
 
   // Simplified browser testing for CI

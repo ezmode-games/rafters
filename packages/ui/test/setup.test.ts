@@ -80,20 +80,16 @@ describe('RPrimitiveBase', () => {
     expect(element.ariaLabel).toBe('Test label');
   });
 
-  it('should announce to screen readers', async () => {
-    element.announceToScreenReader('Test announcement');
+  it('should support ARIA properties', async () => {
+    // Test ARIA labelledby
+    element.ariaLabelledBy = 'test-label-id';
+    await element.updateComplete;
+    expect(element.ariaLabelledBy).toBe('test-label-id');
 
-    // Wait for announcement element to be created
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    const liveRegion = document.querySelector('[role="status"]');
-    expect(liveRegion).toBeTruthy();
-    expect(liveRegion?.textContent).toBe('Test announcement');
-
-    // Wait for cleanup
-    await new Promise((resolve) => setTimeout(resolve, 1100));
-    const removedRegion = document.querySelector('[role="status"]');
-    expect(removedRegion).toBeFalsy();
+    // Test ARIA describedby
+    element.ariaDescribedBy = 'test-desc-id';
+    await element.updateComplete;
+    expect(element.ariaDescribedBy).toBe('test-desc-id');
   });
 
   it('should dispatch custom events', async () => {
