@@ -107,39 +107,26 @@ export class TestProject {
 // biome-ignore lint/complexity/noStaticOnlyClass: Factory pattern for test scaffolding
 export class ProjectFactory {
   private static projectCounter = 0;
-  private static fixtureCache = new Map<string, string>();
 
   /**
-   * Create a new test project with the specified framework
-   * Uses cached fixture if available, otherwise scaffolds fresh
+   * Create a new test project from static fixtures
+   * Copies from test/fixtures/apps/ to temp directory for testing
    */
   static async create(options: ProjectOptions): Promise<TestProject> {
     const { framework, packageManager = 'pnpm', withTailwind = true, name } = options;
 
-    const cacheKey = `${framework}-${packageManager}-${withTailwind}`;
+    // Get fixture path from test/fixtures/apps/
+    const fixtureName = `${framework}${withTailwind ? '-tw' : ''}`;
+    const fixturePath = join(__dirname, '../fixtures/apps', fixtureName);
 
-    // Check if we have a cached fixture
-    let fixturePath = ProjectFactory.fixtureCache.get(cacheKey);
-
-    if (!fixturePath || !(await fs.pathExists(fixturePath))) {
-      // Create fixture project once
-      const fixtureName = `fixture-${framework}-${packageManager}${withTailwind ? '-tw' : ''}`;
-      fixturePath = join(tmpdir(), 'rafters-cli-fixtures', fixtureName);
-
-      await fs.ensureDir(join(fixturePath, '..'));
-
-      if (await fs.pathExists(fixturePath)) {
-        await fs.remove(fixturePath);
-      }
-
-      // Scaffold the fixture
-      await ProjectFactory.scaffoldFramework(framework, fixturePath, packageManager, withTailwind);
-
-      // Cache it
-      ProjectFactory.fixtureCache.set(cacheKey, fixturePath);
+    // Verify fixture exists
+    if (!(await fs.pathExists(fixturePath))) {
+      throw new Error(
+        `Fixture not found: ${fixturePath}\nRun: pnpm test:generate-fixtures to create it`
+      );
     }
 
-    // Copy fixture to test directory (excluding node_modules and other large dirs)
+    // Copy fixture to test directory
     const testName =
       name || `test-project-${framework}-${Date.now()}-${++ProjectFactory.projectCounter}`;
     const projectPath = join(tmpdir(), 'rafters-cli-tests', testName);

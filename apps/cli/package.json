@@ -27,6 +27,7 @@
     "test:integration": "pnpm build && vitest run test/integration/",
     "test:watch": "vitest",
     "test:preflight": "pnpm build && vitest run",
+    "test:generate-fixtures": "tsx scripts/generate-fixtures.ts",
     "lint": "biome check --fix --unsafe src test",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "pnpm build"
