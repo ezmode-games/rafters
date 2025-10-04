@@ -124,7 +124,7 @@ export const tokenFileWithInvalidToken = {
       value: '#ef4444',
       category: 'color',
       type: 'color',
-    }
+    },
   ],
   metadata: {
     count: 2,
@@ -162,8 +162,8 @@ export const tokenFileWithLowIntelligenceCoverage = {
       type: 'color',
       intelligence: {
         cognitiveLoad: 2,
-        semanticMeaning: 'Intelligent token'
-      }
+        semanticMeaning: 'Intelligent token',
+      },
     },
     {
       name: 'basic-color-1',
@@ -182,7 +182,7 @@ export const tokenFileWithLowIntelligenceCoverage = {
       value: '#f59e0b',
       category: 'color',
       type: 'color',
-    }
+    },
   ],
   metadata: {
     count: 4,
@@ -197,12 +197,48 @@ export const tokenFileWithModerateIntelligenceCoverage = {
   generated: '2024-01-01T00:00:00.000Z',
   tokens: [
     // 6 out of 10 tokens with intelligence = 60%
-    { name: 'space-1', value: '1rem', category: 'spacing', type: 'spacing', intelligence: { cognitiveLoad: 1 } },
-    { name: 'space-2', value: '2rem', category: 'spacing', type: 'spacing', intelligence: { cognitiveLoad: 1 } },
-    { name: 'space-3', value: '3rem', category: 'spacing', type: 'spacing', intelligence: { cognitiveLoad: 1 } },
-    { name: 'space-4', value: '4rem', category: 'spacing', type: 'spacing', intelligence: { cognitiveLoad: 1 } },
-    { name: 'space-5', value: '5rem', category: 'spacing', type: 'spacing', intelligence: { cognitiveLoad: 1 } },
-    { name: 'space-6', value: '6rem', category: 'spacing', type: 'spacing', intelligence: { cognitiveLoad: 1 } },
+    {
+      name: 'space-1',
+      value: '1rem',
+      category: 'spacing',
+      type: 'spacing',
+      intelligence: { cognitiveLoad: 1 },
+    },
+    {
+      name: 'space-2',
+      value: '2rem',
+      category: 'spacing',
+      type: 'spacing',
+      intelligence: { cognitiveLoad: 1 },
+    },
+    {
+      name: 'space-3',
+      value: '3rem',
+      category: 'spacing',
+      type: 'spacing',
+      intelligence: { cognitiveLoad: 1 },
+    },
+    {
+      name: 'space-4',
+      value: '4rem',
+      category: 'spacing',
+      type: 'spacing',
+      intelligence: { cognitiveLoad: 1 },
+    },
+    {
+      name: 'space-5',
+      value: '5rem',
+      category: 'spacing',
+      type: 'spacing',
+      intelligence: { cognitiveLoad: 1 },
+    },
+    {
+      name: 'space-6',
+      value: '6rem',
+      category: 'spacing',
+      type: 'spacing',
+      intelligence: { cognitiveLoad: 1 },
+    },
     { name: 'space-7', value: '7rem', category: 'spacing', type: 'spacing' },
     { name: 'space-8', value: '8rem', category: 'spacing', type: 'spacing' },
     { name: 'space-9', value: '9rem', category: 'spacing', type: 'spacing' },
@@ -221,10 +257,34 @@ export const tokenFileWithHighIntelligenceCoverage = {
   generated: '2024-01-01T00:00:00.000Z',
   tokens: [
     // 4 out of 5 tokens with intelligence = 80%
-    { name: 'color-1', value: '#1', category: 'color', type: 'color', intelligence: { cognitiveLoad: 1 } },
-    { name: 'color-2', value: '#2', category: 'color', type: 'color', intelligence: { cognitiveLoad: 1 } },
-    { name: 'color-3', value: '#3', category: 'color', type: 'color', intelligence: { cognitiveLoad: 1 } },
-    { name: 'color-4', value: '#4', category: 'color', type: 'color', intelligence: { cognitiveLoad: 1 } },
+    {
+      name: 'color-1',
+      value: '#1',
+      category: 'color',
+      type: 'color',
+      intelligence: { cognitiveLoad: 1 },
+    },
+    {
+      name: 'color-2',
+      value: '#2',
+      category: 'color',
+      type: 'color',
+      intelligence: { cognitiveLoad: 1 },
+    },
+    {
+      name: 'color-3',
+      value: '#3',
+      category: 'color',
+      type: 'color',
+      intelligence: { cognitiveLoad: 1 },
+    },
+    {
+      name: 'color-4',
+      value: '#4',
+      category: 'color',
+      type: 'color',
+      intelligence: { cognitiveLoad: 1 },
+    },
     { name: 'color-5', value: '#5', category: 'color', type: 'color' },
   ],
   metadata: {
@@ -243,8 +303,8 @@ export const tokenWithInvalidCognitiveLoad = {
   intelligence: {
     cognitiveLoad: 15, // Invalid: should be 1-10
     trustLevel: 'high' as const,
-    semanticMeaning: 'Invalid cognitive load'
-  }
+    semanticMeaning: 'Invalid cognitive load',
+  },
 };
 
 export const tokenFileWithInvalidCognitiveLoad = {
@@ -268,8 +328,8 @@ export const tokenWithInvalidTrustLevel = {
   intelligence: {
     cognitiveLoad: 2,
     trustLevel: 'invalid-level' as any, // Invalid enum value
-    semanticMeaning: 'Invalid trust level'
-  }
+    semanticMeaning: 'Invalid trust level',
+  },
 };
 
 export const tokenFileWithInvalidTrustLevel = {
@@ -297,8 +357,8 @@ export const tokenWithInvalidAccessibilityLevel = {
       wcagLevel: 'AAAA' as any, // Invalid: should be A, AA or AAA
       contrastRatio: 7.0,
     },
-    semanticMeaning: 'Invalid accessibility level'
-  }
+    semanticMeaning: 'Invalid accessibility level',
+  },
 };
 
 export const tokenFileWithInvalidAccessibilityLevel = {
@@ -325,7 +385,7 @@ export const tokenFileWithoutIntelligence = {
       category: 'spacing',
       type: 'spacing',
       // No intelligence metadata
-    }
+    },
   ],
   metadata: {
     count: 1,

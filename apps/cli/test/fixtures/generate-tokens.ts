@@ -18,8 +18,8 @@ export const sampleColorToken: Token = {
       wcagLevel: 'AAA',
       contrastRatio: 7.2,
     },
-    semanticMeaning: 'Primary brand color for main actions'
-  }
+    semanticMeaning: 'Primary brand color for main actions',
+  },
 };
 
 export const sampleTypographyToken: Token = {
@@ -33,8 +33,8 @@ export const sampleTypographyToken: Token = {
     accessibility: {
       wcagLevel: 'AAA',
     },
-    semanticMeaning: 'Base body text size'
-  }
+    semanticMeaning: 'Base body text size',
+  },
 };
 
 export const sampleSpacingToken: Token = {
@@ -45,16 +45,12 @@ export const sampleSpacingToken: Token = {
   intelligence: {
     cognitiveLoad: 1,
     trustLevel: 'medium',
-    semanticMeaning: 'Standard spacing for balanced layouts'
-  }
+    semanticMeaning: 'Standard spacing for balanced layouts',
+  },
 };
 
 // Mixed token set for comprehensive testing
-export const mixedTokenSet: Token[] = [
-  sampleColorToken,
-  sampleTypographyToken,
-  sampleSpacingToken
-];
+export const mixedTokenSet: Token[] = [sampleColorToken, sampleTypographyToken, sampleSpacingToken];
 
 // Multiple tokens of same category for grouping tests
 export const multipleColorTokens: Token[] = [
@@ -62,14 +58,14 @@ export const multipleColorTokens: Token[] = [
     name: 'red-500',
     value: '#ef4444',
     category: 'color',
-    namespace: 'color'
+    namespace: 'color',
   },
   {
     name: 'blue-500',
     value: '#3b82f6',
     category: 'color',
-    namespace: 'color'
-  }
+    namespace: 'color',
+  },
 ];
 
 export const multipleSpacingTokens: Token[] = [
@@ -77,20 +73,20 @@ export const multipleSpacingTokens: Token[] = [
     name: 'space-xs',
     value: '0.25rem',
     category: 'spacing',
-    namespace: 'spacing'
+    namespace: 'spacing',
   },
   {
     name: 'space-sm',
     value: '0.5rem',
     category: 'spacing',
-    namespace: 'spacing'
+    namespace: 'spacing',
   },
   {
     name: 'space-md',
     value: '1rem',
     category: 'spacing',
-    namespace: 'spacing'
-  }
+    namespace: 'spacing',
+  },
 ];
 
 // Large token set for performance/scale testing
@@ -101,8 +97,8 @@ export const largeColorTokenSet: Token[] = Array.from({ length: 50 }, (_, i) => 
   namespace: 'color',
   intelligence: {
     cognitiveLoad: Math.floor(i / 10) + 1,
-    semanticMeaning: `Color variant ${i}`
-  }
+    semanticMeaning: `Color variant ${i}`,
+  },
 }));
 
 // Token with comprehensive intelligence metadata
@@ -117,17 +113,17 @@ export const comprehensiveIntelligenceToken: Token = {
     accessibility: {
       wcagLevel: 'AAA',
       contrastRatio: 8.5,
-      screenReader: true
+      screenReader: true,
     },
-    semanticMeaning: 'Primary action color for main user goals'
-  }
+    semanticMeaning: 'Primary action color for main user goals',
+  },
 };
 
 // Token without category (for misc category testing)
 export const uncategorizedToken = {
   name: 'uncategorized-token',
   value: 'test',
-  namespace: 'misc'
+  namespace: 'misc',
   // No category property
 } as Token;
 
@@ -142,6 +138,6 @@ export const simpleToken: Token = {
   namespace: 'test',
   intelligence: {
     cognitiveLoad: 1,
-    semanticMeaning: 'Test token'
-  }
+    semanticMeaning: 'Test token',
+  },
 };

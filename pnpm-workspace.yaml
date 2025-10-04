@@ -1,6 +1,7 @@
 packages:
   - apps/*
   - packages/*
+  - '!apps/cli/test/fixtures/**'
 
 catalog:
   '@anthropic-ai/sdk': ^0.60.0

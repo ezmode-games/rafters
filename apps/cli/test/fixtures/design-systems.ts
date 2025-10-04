@@ -5,8 +5,8 @@
  * for testing cross-system pattern recognition capabilities.
  */
 
-import { generateOKLCHScale } from '@rafters/shared';
 import type { OKLCH } from '@rafters/shared';
+import { generateOKLCHScale } from '@rafters/shared';
 
 // Base color palette for Material Design
 const MATERIAL_COLORS = {
@@ -84,7 +84,7 @@ export const materialDesignSystem = generateDesignSystem(
     'Progress',
     'Snackbar',
     'Tooltip',
-    'Menu'
+    'Menu',
   ],
   [
     'elevation',
@@ -94,7 +94,7 @@ export const materialDesignSystem = generateDesignSystem(
     'border-radius-4dp',
     'ripple-effect',
     'state-overlay',
-    'focus-indicator'
+    'focus-indicator',
   ]
 );
 
@@ -120,7 +120,7 @@ export const antDesignSystem = generateDesignSystem(
     'Message',
     'Notification',
     'Modal',
-    'Drawer'
+    'Drawer',
   ],
   [
     'grid-24col',
@@ -130,7 +130,7 @@ export const antDesignSystem = generateDesignSystem(
     'hover-transitions',
     'focus-outline',
     'disabled-state',
-    'loading-state'
+    'loading-state',
   ]
 );
 
@@ -156,7 +156,7 @@ export const carbonDesignSystem = generateDesignSystem(
     'DatePicker',
     'FileUploader',
     'Loading',
-    'Pagination'
+    'Pagination',
   ],
   [
     'grid-16col',
@@ -166,7 +166,7 @@ export const carbonDesignSystem = generateDesignSystem(
     'border-radius-0',
     'focus-ring',
     'validation-states',
-    'data-visualization'
+    'data-visualization',
   ]
 );
 
@@ -199,7 +199,7 @@ export const chakraUISystem = generateDesignSystem(
     'Avatar',
     'Skeleton',
     'Spinner',
-    'Progress'
+    'Progress',
   ],
   [
     'spacing-4px',
@@ -209,7 +209,7 @@ export const chakraUISystem = generateDesignSystem(
     'responsive-values',
     'focus-shadow', // Similar to Material but different implementation
     'hover-elevate',
-    'theme-tokens'
+    'theme-tokens',
   ]
 );
 
@@ -241,15 +241,34 @@ export const comprehensiveDesignSystem = generateDesignSystem(
   },
   [
     // All common components from other systems
-    'Button', 'Card', 'TextField', 'Input', 'Modal', 'Tooltip',
+    'Button',
+    'Card',
+    'TextField',
+    'Input',
+    'Modal',
+    'Tooltip',
     // Plus additional ones
-    'Calendar', 'ColorPicker', 'DataGrid', 'TreeView', 'Timeline', 'Chart'
+    'Calendar',
+    'ColorPicker',
+    'DataGrid',
+    'TreeView',
+    'Timeline',
+    'Chart',
   ],
   [
     // Comprehensive pattern set
-    'elevation', 'motion', 'spacing-8dp', 'grid-12col', 'type-scale',
-    'focus-indicator', 'hover-states', 'loading-states', 'error-states',
-    'responsive-design', 'accessibility-features', 'dark-mode-support'
+    'elevation',
+    'motion',
+    'spacing-8dp',
+    'grid-12col',
+    'type-scale',
+    'focus-indicator',
+    'hover-states',
+    'loading-states',
+    'error-states',
+    'responsive-design',
+    'accessibility-features',
+    'dark-mode-support',
   ]
 );
 
@@ -284,11 +303,7 @@ export const driftTestSystems = {
         scale: Object.values(generateOKLCHScale({ l: 0.65, c: 0.2, h: 320 })),
       },
     ],
-    components: [
-      ...materialDesignSystem.components,
-      'NewComponent',
-      'AnotherComponent',
-    ],
+    components: [...materialDesignSystem.components, 'NewComponent', 'AnotherComponent'],
     patterns: materialDesignSystem.patterns.slice(0, -2), // Remove 2 patterns
   },
 };

@@ -96,10 +96,16 @@ test.describe('Accessibility utilities (browser-only)', () => {
       </div>
     );
 
+    // Wait for container to be fully mounted (webkit race condition)
+    await page.waitForSelector('[data-testid="container"]');
+
     const success = await page.evaluate(() => {
       const container = document.querySelector('[data-testid="container"]');
       return window.focusFirst(container);
     });
+
+    // Wait for focus to settle in webkit
+    await page.waitForTimeout(150);
 
     const activeElement = await page.evaluate(() => document.activeElement?.getAttribute('data-testid'));
 
