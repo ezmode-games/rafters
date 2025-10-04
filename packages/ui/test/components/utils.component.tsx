@@ -96,6 +96,9 @@ test.describe('Accessibility utilities (browser-only)', () => {
       </div>
     );
 
+    // Wait for container to be fully mounted (webkit race condition)
+    await page.waitForSelector('[data-testid="container"]');
+
     const success = await page.evaluate(() => {
       const container = document.querySelector('[data-testid="container"]');
       return window.focusFirst(container);
