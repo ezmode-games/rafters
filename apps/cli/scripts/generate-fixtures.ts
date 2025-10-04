@@ -1,11 +1,12 @@
 #!/usr/bin/env tsx
+
 /**
  * Generate static fixture projects for integration tests
  * Run with: pnpm tsx scripts/generate-fixtures.ts
  */
 
-import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { ProjectFactory } from '../test/integration/factories/project.factory';
 
 const __filename = fileURLToPath(import.meta.url);

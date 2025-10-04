@@ -4,9 +4,13 @@
  */
 
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { execa } from 'execa';
 import fs from 'fs-extra';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export type FrameworkType =
   | 'nextjs-app'
@@ -117,7 +121,7 @@ export class ProjectFactory {
 
     // Get fixture path from test/fixtures/apps/
     const fixtureName = `${framework}${withTailwind ? '-tw' : ''}`;
-    const fixturePath = join(__dirname, '../fixtures/apps', fixtureName);
+    const fixturePath = join(__dirname, '../../fixtures/apps', fixtureName);
 
     // Verify fixture exists
     if (!(await fs.pathExists(fixturePath))) {
@@ -149,9 +153,10 @@ export class ProjectFactory {
   }
 
   /**
-   * Scaffold a framework project
+   * Scaffold a framework project (used by fixture generator)
+   * Public method for generating static fixtures
    */
-  private static async scaffoldFramework(
+  static async scaffoldFramework(
     framework: FrameworkType,
     projectPath: string,
     packageManager: PackageManager,
@@ -189,15 +194,20 @@ export class ProjectFactory {
     packageManager: PackageManager,
     withTailwind: boolean
   ): Promise<void> {
+    const projectName = projectPath.split('/').pop() || 'nextjs-app-project';
+    const parentDir = projectPath.substring(0, projectPath.lastIndexOf('/'));
+
     const args = [
+      '--yes',
       'create-next-app@latest',
-      projectPath,
+      projectName,
       '--typescript',
       '--app',
       '--no-src-dir',
       '--import-alias',
       '@/*',
       `--${packageManager}`,
+      '--no-turbopack',
     ];
 
     if (withTailwind) {
@@ -206,20 +216,22 @@ export class ProjectFactory {
       args.push('--no-tailwind');
     }
 
-    args.push('--eslint'); // Always include ESLint
+    args.push('--eslint');
 
-    await execa('npx', args, {
+    const result = await execa('npx', args, {
+      cwd: parentDir,
       stdio: 'pipe',
-      env: {
-        ...process.env,
-        SKIP_INSTALL: 'true', // Skip npm install during creation
-      },
+      reject: false,
     });
 
-    // Manually install dependencies
+    if (result.exitCode !== 0) {
+      console.error('create-next-app STDOUT:', result.stdout);
+      console.error('create-next-app STDERR:', result.stderr);
+      throw new Error(`create-next-app failed with code ${result.exitCode}`);
+    }
+
     await ProjectFactory.installDependencies(projectPath, packageManager);
 
-    // Upgrade to Tailwind v4 if needed
     if (withTailwind) {
       await ProjectFactory.upgradeTailwindV4(projectPath, packageManager);
     }
@@ -233,15 +245,20 @@ export class ProjectFactory {
     packageManager: PackageManager,
     withTailwind: boolean
   ): Promise<void> {
+    const projectName = projectPath.split('/').pop() || 'nextjs-pages-project';
+    const parentDir = projectPath.substring(0, projectPath.lastIndexOf('/'));
+
     const args = [
+      '--yes',
       'create-next-app@latest',
-      projectPath,
+      projectName,
       '--typescript',
       '--no-app',
       '--no-src-dir',
       '--import-alias',
       '@/*',
       `--${packageManager}`,
+      '--no-turbopack',
     ];
 
     if (withTailwind) {
@@ -253,16 +270,12 @@ export class ProjectFactory {
     args.push('--eslint');
 
     await execa('npx', args, {
-      stdio: 'pipe',
-      env: {
-        ...process.env,
-        SKIP_INSTALL: 'true',
-      },
+      cwd: parentDir,
+      stdio: 'inherit',
     });
 
     await ProjectFactory.installDependencies(projectPath, packageManager);
 
-    // Upgrade to Tailwind v4 if needed
     if (withTailwind) {
       await ProjectFactory.upgradeTailwindV4(projectPath, packageManager);
     }
@@ -276,7 +289,6 @@ export class ProjectFactory {
     packageManager: PackageManager,
     withTailwind: boolean
   ): Promise<void> {
-    // Vite expects parent directory to exist, creates the project directory itself
     const projectName = projectPath.split('/').pop() || 'vite-project';
     const parentDir = projectPath.substring(0, projectPath.lastIndexOf('/'));
 
@@ -286,7 +298,6 @@ export class ProjectFactory {
     });
 
     if (withTailwind) {
-      // Add Tailwind to Vite project
       await ProjectFactory.installDependencies(projectPath, packageManager);
       await ProjectFactory.addTailwindToVite(projectPath, packageManager);
     } else {
@@ -302,7 +313,6 @@ export class ProjectFactory {
     packageManager: PackageManager,
     withTailwind: boolean
   ): Promise<void> {
-    // React Router v7 uses create-react-router CLI
     const projectName = projectPath.split('/').pop() || 'react-router-project';
     const parentDir = projectPath.substring(0, projectPath.lastIndexOf('/'));
 
@@ -330,7 +340,6 @@ export class ProjectFactory {
     const projectName = projectPath.split('/').pop() || 'astro-project';
     const parentDir = projectPath.substring(0, projectPath.lastIndexOf('/'));
 
-    // Create Astro project with React integration
     await execa(
       'npm',
       [
@@ -351,17 +360,14 @@ export class ProjectFactory {
       }
     );
 
-    // Add React integration
     await ProjectFactory.installDependencies(projectPath, packageManager);
 
-    // Add @astrojs/react integration
     const addCmd = packageManager === 'yarn' ? 'add' : 'add';
     await execa(packageManager, [addCmd, '@astrojs/react', 'react', 'react-dom'], {
       cwd: projectPath,
       stdio: 'pipe',
     });
 
-    // Update astro.config to include React
     const astroConfig = `import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 
@@ -401,6 +407,15 @@ export default defineConfig({
   ): Promise<void> {
     const installCommand = packageManager === 'yarn' ? 'install' : 'install';
 
+    // Create pnpm-workspace.yaml to isolate this project from parent workspace
+    if (packageManager === 'pnpm') {
+      const pnpmWorkspacePath = join(projectPath, 'pnpm-workspace.yaml');
+      await fs.writeFile(pnpmWorkspacePath, 'packages: []\n');
+
+      const npmrcPath = join(projectPath, '.npmrc');
+      await fs.writeFile(npmrcPath, 'shamefully-hoist=true\nauto-install-peers=true\n');
+    }
+
     await execa(packageManager, [installCommand], {
       cwd: projectPath,
       stdio: 'pipe',
@@ -414,14 +429,12 @@ export default defineConfig({
     projectPath: string,
     packageManager: PackageManager
   ): Promise<void> {
-    // Install Tailwind dependencies (v4)
     const installCmd = packageManager === 'yarn' ? 'add' : 'add';
     await execa(packageManager, [installCmd, '-D', 'tailwindcss@next'], {
       cwd: projectPath,
       stdio: 'pipe',
     });
 
-    // Create basic postcss config for Tailwind v4
     const postcssConfig = `export default {
   plugins: {
     '@tailwindcss/postcss': {},
@@ -429,8 +442,6 @@ export default defineConfig({
 };`;
     await fs.writeFile(join(projectPath, 'postcss.config.js'), postcssConfig);
 
-    // Tailwind v4 uses CSS imports instead of config files
-    // Replace existing CSS with Tailwind v4 imports
     const cssPath = join(projectPath, 'src/index.css');
     const tailwindCss = `@import "tailwindcss";
 `;
@@ -444,7 +455,6 @@ export default defineConfig({
     projectPath: string,
     packageManager: PackageManager
   ): Promise<void> {
-    // Similar to Vite, but for CRA structure
     const installCmd = packageManager === 'yarn' ? 'add' : 'add';
     await execa(packageManager, [installCmd, '-D', 'tailwindcss'], {
       cwd: projectPath,
@@ -488,7 +498,6 @@ module.exports = {
   ): Promise<void> {
     const installCmd = packageManager === 'yarn' ? 'add' : 'add';
 
-    // Install Tailwind v4 (currently in beta as @next)
     await execa(packageManager, [installCmd, '-D', 'tailwindcss@next'], {
       cwd: projectPath,
       stdio: 'pipe',
@@ -502,14 +511,12 @@ module.exports = {
     projectPath: string,
     packageManager: PackageManager
   ): Promise<void> {
-    // Install Tailwind v4
     const installCmd = packageManager === 'yarn' ? 'add' : 'add';
     await execa(packageManager, [installCmd, '-D', 'tailwindcss@next'], {
       cwd: projectPath,
       stdio: 'pipe',
     });
 
-    // Create PostCSS config for Tailwind v4
     const postcssConfig = `export default {
   plugins: {
     '@tailwindcss/postcss': {},
@@ -517,12 +524,10 @@ module.exports = {
 };`;
     await fs.writeFile(join(projectPath, 'postcss.config.js'), postcssConfig);
 
-    // Add Tailwind v4 CSS import to app root
     const cssPath = join(projectPath, 'app/root.css');
     const tailwindCss = `@import "tailwindcss";
 `;
 
-    // Create or replace root.css
     await fs.writeFile(cssPath, tailwindCss);
   }
 
@@ -533,14 +538,12 @@ module.exports = {
     projectPath: string,
     packageManager: PackageManager
   ): Promise<void> {
-    // Install Tailwind v4
     const installCmd = packageManager === 'yarn' ? 'add' : 'add';
     await execa(packageManager, [installCmd, '-D', 'tailwindcss@next', '@tailwindcss/postcss'], {
       cwd: projectPath,
       stdio: 'pipe',
     });
 
-    // Create PostCSS config for Tailwind v4
     const postcssConfig = `export default {
   plugins: {
     '@tailwindcss/postcss': {},
@@ -548,14 +551,12 @@ module.exports = {
 };`;
     await fs.writeFile(join(projectPath, 'postcss.config.js'), postcssConfig);
 
-    // Create global CSS file with Tailwind import
     const cssPath = join(projectPath, 'src/styles/global.css');
     await fs.ensureDir(join(projectPath, 'src/styles'));
     const tailwindCss = `@import "tailwindcss";
 `;
     await fs.writeFile(cssPath, tailwindCss);
 
-    // Update astro.config to include Tailwind integration
     const astroConfig = `import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 
