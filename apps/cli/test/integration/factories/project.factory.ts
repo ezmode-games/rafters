@@ -114,12 +114,7 @@ export class ProjectFactory {
    * Uses cached fixture if available, otherwise scaffolds fresh
    */
   static async create(options: ProjectOptions): Promise<TestProject> {
-    const {
-      framework,
-      packageManager = 'pnpm',
-      withTailwind = true,
-      name,
-    } = options;
+    const { framework, packageManager = 'pnpm', withTailwind = true, name } = options;
 
     const cacheKey = `${framework}-${packageManager}-${withTailwind}`;
 
@@ -145,7 +140,8 @@ export class ProjectFactory {
     }
 
     // Copy fixture to test directory (excluding node_modules and other large dirs)
-    const testName = name || `test-project-${framework}-${Date.now()}-${++ProjectFactory.projectCounter}`;
+    const testName =
+      name || `test-project-${framework}-${Date.now()}-${++ProjectFactory.projectCounter}`;
     const projectPath = join(tmpdir(), 'rafters-cli-tests', testName);
 
     await fs.ensureDir(join(projectPath, '..'));

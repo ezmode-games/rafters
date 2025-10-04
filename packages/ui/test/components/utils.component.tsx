@@ -102,7 +102,7 @@ test.describe('Accessibility utilities (browser-only)', () => {
     });
 
     // Wait for focus to settle in webkit
-    await page.waitForTimeout(50);
+    await page.waitForTimeout(150);
 
     const activeElement = await page.evaluate(() => document.activeElement?.getAttribute('data-testid'));
 
