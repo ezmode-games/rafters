@@ -1,6 +1,8 @@
 /**
  * Real Integration Tests for `rafters init` command
  * Tests against actual framework projects (Next.js, Vite, etc.)
+ *
+ * Uses cached fixture projects - first run creates fixtures, subsequent runs copy from cache.
  */
 
 import { join } from 'node:path';

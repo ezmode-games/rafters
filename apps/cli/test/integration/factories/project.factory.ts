@@ -107,30 +107,60 @@ export class TestProject {
 // biome-ignore lint/complexity/noStaticOnlyClass: Factory pattern for test scaffolding
 export class ProjectFactory {
   private static projectCounter = 0;
+  private static fixtureCache = new Map<string, string>();
 
   /**
    * Create a new test project with the specified framework
+   * Uses cached fixture if available, otherwise scaffolds fresh
    */
   static async create(options: ProjectOptions): Promise<TestProject> {
     const {
       framework,
       packageManager = 'pnpm',
       withTailwind = true,
-      name = `test-project-${framework}-${Date.now()}-${++ProjectFactory.projectCounter}`,
+      name,
     } = options;
 
-    const projectPath = join(tmpdir(), 'rafters-cli-tests', name);
+    const cacheKey = `${framework}-${packageManager}-${withTailwind}`;
 
-    // Ensure parent directory exists
+    // Check if we have a cached fixture
+    let fixturePath = ProjectFactory.fixtureCache.get(cacheKey);
+
+    if (!fixturePath || !(await fs.pathExists(fixturePath))) {
+      // Create fixture project once
+      const fixtureName = `fixture-${framework}-${packageManager}${withTailwind ? '-tw' : ''}`;
+      fixturePath = join(tmpdir(), 'rafters-cli-fixtures', fixtureName);
+
+      await fs.ensureDir(join(fixturePath, '..'));
+
+      if (await fs.pathExists(fixturePath)) {
+        await fs.remove(fixturePath);
+      }
+
+      // Scaffold the fixture
+      await ProjectFactory.scaffoldFramework(framework, fixturePath, packageManager, withTailwind);
+
+      // Cache it
+      ProjectFactory.fixtureCache.set(cacheKey, fixturePath);
+    }
+
+    // Copy fixture to test directory (excluding node_modules and other large dirs)
+    const testName = name || `test-project-${framework}-${Date.now()}-${++ProjectFactory.projectCounter}`;
+    const projectPath = join(tmpdir(), 'rafters-cli-tests', testName);
+
     await fs.ensureDir(join(projectPath, '..'));
 
-    // Remove if exists
     if (await fs.pathExists(projectPath)) {
       await fs.remove(projectPath);
     }
 
-    // Scaffold the project based on framework
-    await ProjectFactory.scaffoldFramework(framework, projectPath, packageManager, withTailwind);
+    // Copy fixture to test location, excluding node_modules, .next, dist, etc.
+    await fs.copy(fixturePath, projectPath, {
+      filter: (src) => {
+        const relativePath = src.replace(fixturePath, '');
+        return !/node_modules|\.next|dist|\.turbo|\.astro/.test(relativePath);
+      },
+    });
 
     return new TestProject(projectPath, framework, packageManager);
   }
