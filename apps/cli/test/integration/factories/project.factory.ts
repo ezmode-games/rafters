@@ -135,10 +135,14 @@ export class ProjectFactory {
       name || `test-project-${framework}-${Date.now()}-${++ProjectFactory.projectCounter}`;
     const projectPath = join(tmpdir(), 'rafters-cli-tests', testName);
 
+    // Ensure parent directory exists and remove any existing project
     await fs.ensureDir(join(projectPath, '..'));
 
+    // Force remove with retry for race conditions
     if (await fs.pathExists(projectPath)) {
       await fs.remove(projectPath);
+      // Wait a tick to ensure filesystem operations complete
+      await new Promise(resolve => setTimeout(resolve, 10));
     }
 
     // Copy fixture to test location, excluding node_modules, .next, dist, etc.
