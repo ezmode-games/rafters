@@ -142,7 +142,7 @@ export class ProjectFactory {
     if (await fs.pathExists(projectPath)) {
       await fs.remove(projectPath);
       // Wait a tick to ensure filesystem operations complete
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
     }
 
     // Copy fixture to test location, excluding node_modules, .next, dist, etc.
