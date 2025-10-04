@@ -184,4 +184,145 @@ describe('init command', () => {
     expect(config).toHaveProperty('componentsDir');
     expect(config).toHaveProperty('registry');
   }, 15000);
+
+  describe('config file loading', () => {
+    it('should load configuration from specified file', async () => {
+      const fs = await import('fs-extra');
+
+      // Create valid package.json with React
+      fs.writeJsonSync(join(testDir, 'package.json'), {
+        name: 'test-project',
+        dependencies: {
+          react: '^19.0.0',
+        },
+      });
+
+      // Create config file
+      const configFile = 'rafters.config.json';
+      fs.writeJsonSync(join(testDir, configFile), {
+        componentsDir: './components/custom',
+        cssFile: './styles/custom.css',
+        packageManager: 'yarn',
+        tokenFormat: 'css',
+        studioShortcode: '', // Empty for default
+      });
+
+      await initCommand({ config: configFile });
+
+      // Verify config was loaded correctly
+      const config = fs.readJsonSync(join(testDir, '.rafters/config.json'));
+      expect(config.componentsDir).toBe('./components/custom');
+      expect(config.packageManager).toBe('yarn');
+    }, 15000);
+
+    it('should exit with error if config file not found', async () => {
+      const fs = await import('fs-extra');
+
+      fs.writeJsonSync(join(testDir, 'package.json'), {
+        name: 'test-project',
+        dependencies: {
+          react: '^19.0.0',
+        },
+      });
+
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => {
+        throw new Error('Process exit called');
+      });
+
+      await expect(initCommand({ config: 'nonexistent.json' })).rejects.toThrow(
+        'Process exit called'
+      );
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it('should exit with error if config file contains invalid JSON', async () => {
+      const fs = await import('fs-extra');
+
+      fs.writeJsonSync(join(testDir, 'package.json'), {
+        name: 'test-project',
+        dependencies: {
+          react: '^19.0.0',
+        },
+      });
+
+      // Create invalid JSON file
+      const configFile = 'invalid.json';
+      fs.writeFileSync(join(testDir, configFile), '{ invalid json }');
+
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => {
+        throw new Error('Process exit called');
+      });
+
+      await expect(initCommand({ config: configFile })).rejects.toThrow('Process exit called');
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it('should use defaults for missing fields in config file', async () => {
+      const fs = await import('fs-extra');
+
+      fs.writeJsonSync(join(testDir, 'package.json'), {
+        name: 'test-project',
+        dependencies: {
+          react: '^19.0.0',
+        },
+      });
+
+      // Create minimal config file with only some fields
+      const configFile = 'minimal.config.json';
+      fs.writeJsonSync(join(testDir, configFile), {
+        componentsDir: './custom/components',
+        // Other fields will use defaults
+      });
+
+      await initCommand({ config: configFile });
+
+      const config = fs.readJsonSync(join(testDir, '.rafters/config.json'));
+      expect(config.componentsDir).toBe('./custom/components');
+      expect(config).toHaveProperty('tokenFormat');
+      expect(config).toHaveProperty('packageManager');
+    }, 15000);
+  });
+
+  describe('framework detection', () => {
+    it('should detect Next.js framework and create proper config', async () => {
+      const fs = await import('fs-extra');
+
+      fs.writeJsonSync(join(testDir, 'package.json'), {
+        name: 'test-project',
+        dependencies: {
+          react: '^19.0.0',
+          next: '^15.0.0',
+        },
+      });
+
+      await initCommand({ yes: true });
+
+      // Verify rafters was initialized
+      const config = fs.readJsonSync(join(testDir, '.rafters/config.json'));
+      expect(config).toHaveProperty('componentsDir');
+      expect(config).toHaveProperty('registry');
+      // Framework is used for detection but not stored in config
+    }, 15000);
+  });
+
+  describe('Tailwind version check', () => {
+    it('should exit with error if Tailwind v3 is detected', async () => {
+      const fs = await import('fs-extra');
+
+      fs.writeJsonSync(join(testDir, 'package.json'), {
+        name: 'test-project',
+        dependencies: {
+          react: '^19.0.0',
+          tailwindcss: '^3.4.0',
+        },
+      });
+
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => {
+        throw new Error('Process exit called');
+      });
+
+      await expect(initCommand({ yes: true })).rejects.toThrow('Process exit called');
+      expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+  });
 });
