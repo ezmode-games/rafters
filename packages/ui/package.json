@@ -22,11 +22,14 @@
     "test:watch": "vitest",
     "test:integration": "echo \"UI package uses unit tests only - no Cloudflare Workers integration needed\"",
     "test:component": "playwright test --config playwright.config.component.ts --pass-with-no-tests",
+    "test:a11y": "playwright test --config playwright.config.component.ts --grep a11y --pass-with-no-tests",
     "test:preflight": "vitest run --passWithNoTests && playwright test --config playwright.config.component.ts --pass-with-no-tests",
+    "validate:registry": "tsx scripts/validate-registry.ts",
     "lint": "biome check --fix --unsafe .",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
     "@biomejs/biome": "catalog:",
     "@cloudflare/vitest-pool-workers": "catalog:",
     "@playwright/experimental-ct-react": "^1.42.0",
@@ -39,6 +42,8 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
+    "axe-core": "^4.10.3",
+    "axe-html-reporter": "^2.2.11",
     "comment-parser": "^1.4.0",
     "jsdom": "catalog:",
     "typescript": "catalog:",
