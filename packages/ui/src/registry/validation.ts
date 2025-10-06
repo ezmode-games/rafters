@@ -75,8 +75,8 @@ export function validatePrimitive(entry: unknown): ComprehensiveValidationResult
   let passed = 0;
 
   // Validate WCAG AAA compliance
-  totalChecks++;
   if (primitive.accessibility.wcagLevel === 'AAA') {
+    totalChecks++;
     if (!validateWCAGAAAContrast(primitive.accessibility.contrastRequirement)) {
       errors.push({
         primitive: primitive.name,
@@ -99,10 +99,6 @@ export function validatePrimitive(entry: unknown): ComprehensiveValidationResult
     } else {
       passed++;
     }
-  } else {
-    passed++;
-    totalChecks++;
-    passed++;
   }
 
   // Validate cognitive load reasoning

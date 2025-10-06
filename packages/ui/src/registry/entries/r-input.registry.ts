@@ -1,8 +1,5 @@
-// TODO: Uncomment when registry types are created in #288
-// import type { PrimitiveRegistryEntry } from '../types';
-
-// Temporary type until #288 is merged
-type PrimitiveRegistryEntry = Record<string, unknown>;
+import type { PrimitiveRegistryEntry } from '../types';
+import { CognitiveLoadSchema } from '../types';
 
 export const rInputRegistryEntry: PrimitiveRegistryEntry = {
   name: 'r-input',
@@ -14,16 +11,16 @@ export const rInputRegistryEntry: PrimitiveRegistryEntry = {
     {
       framework: 'lit',
       path: 'primitives/input/r-input.ts',
-      language: 'typescript',
+      exports: ['RInput'],
     },
     {
       framework: 'react',
       path: 'components/Input.tsx',
-      language: 'typescript',
+      exports: ['Input'],
     },
   ],
 
-  cognitiveLoad: 2 as const,
+  cognitiveLoad: CognitiveLoadSchema.parse(2),
 
   accessibility: {
     wcagLevel: 'AAA',
@@ -52,21 +49,9 @@ export const rInputRegistryEntry: PrimitiveRegistryEntry = {
       'Never use red color alone to indicate errors',
     ],
     examples: [
-      {
-        title: 'Basic text input',
-        code: '<r-input value="" placeholder="Enter your name"></r-input>',
-        framework: 'lit',
-      },
-      {
-        title: 'Email input with validation',
-        code: '<r-input type="email" required pattern="[^@]+@[^@]+\\.[^@]+"></r-input>',
-        framework: 'lit',
-      },
-      {
-        title: 'Disabled input',
-        code: '<r-input value="Read only" disabled></r-input>',
-        framework: 'lit',
-      },
+      '<r-input value="" placeholder="Enter your name"></r-input>',
+      '<r-input type="email" required pattern="[^@]+@[^@]+\\.[^@]+"></r-input>',
+      '<r-input value="Read only" disabled></r-input>',
     ],
   },
 
@@ -99,9 +84,9 @@ export const rInputRegistryEntry: PrimitiveRegistryEntry = {
   },
 
   dependencies: [],
-  npmDependencies: ['lit'],
+  npmDependencies: [{ name: 'lit', version: '^3.0.0', optional: false }],
 
-  category: 'input',
+  category: 'form',
   tags: ['form', 'text-input', 'wcag-aaa', 'validation'],
 
   description: 'Headless text input primitive with validation states and ARIA support',

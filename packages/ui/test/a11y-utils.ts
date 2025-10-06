@@ -88,7 +88,7 @@ export async function runAxeScan(
   // Apply custom rules if provided
   if (options.rules) {
     for (const [ruleId, config] of Object.entries(options.rules)) {
-      if (config.enabled) {
+      if (!config.enabled) {
         builder.disableRules([ruleId]);
       }
     }

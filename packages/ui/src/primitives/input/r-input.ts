@@ -98,7 +98,6 @@ export class RInput extends RPrimitiveBase {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.setAttribute('role', 'textbox');
   }
 
   /**
@@ -179,17 +178,22 @@ export class RInput extends RPrimitiveBase {
 				?required=${this.required}
 				?readonly=${this.readonly}
 				?disabled=${this.disabled}
-				minlength=${this.minlength ?? ''}
-				maxlength=${this.maxlength ?? ''}
-				pattern=${this.pattern ?? ''}
-				autocomplete=${this.autocomplete ?? ''}
-				name=${this.name ?? ''}
+				${this.minlength != null ? html`minlength="${this.minlength}"` : ''}
+				${this.maxlength != null ? html`maxlength="${this.maxlength}"` : ''}
+				${this.pattern != null ? html`pattern="${this.pattern}"` : ''}
+				${this.autocomplete != null ? html`autocomplete="${this.autocomplete}"` : ''}
+				${this.name != null ? html`name="${this.name}"` : ''}
 				aria-invalid=${this.validationState === 'error' ? 'true' : 'false'}
-				aria-errormessage=${this.errorMessage || ''}
+				${this.errorMessage ? html`aria-describedby="error-${this.name || 'input'}"` : ''}
 				@input=${this._handleInput}
 				@change=${this._handleChange}
 				@blur=${this._handleInputBlur}
 			/>
+			${
+        this.errorMessage
+          ? html`<div id="error-${this.name || 'input'}" part="error" role="alert">${this.errorMessage}</div>`
+          : ''
+      }
 		`;
   }
 }
