@@ -92,6 +92,19 @@ export class RInput extends RPrimitiveBase {
   @property({ type: String }) name?: string;
 
   /**
+   * Input mode for mobile keyboards
+   */
+  @property({ type: String }) inputmode?:
+    | 'none'
+    | 'text'
+    | 'decimal'
+    | 'numeric'
+    | 'tel'
+    | 'search'
+    | 'email'
+    | 'url';
+
+  /**
    * Input reference
    */
   @query('input') private inputElement!: HTMLInputElement;
@@ -183,8 +196,13 @@ export class RInput extends RPrimitiveBase {
 				pattern=${this.pattern ?? ''}
 				autocomplete=${this.autocomplete ?? ''}
 				name=${this.name ?? ''}
+				inputmode=${this.inputmode ?? ''}
 				aria-invalid=${this.validationState === 'error' ? 'true' : 'false'}
 				aria-errormessage=${this.errorMessage || ''}
+				aria-label=${this.ariaLabel ?? ''}
+				aria-labelledby=${this.ariaLabelledBy ?? ''}
+				aria-describedby=${this.ariaDescribedBy ?? ''}
+				aria-required=${this.required ? 'true' : 'false'}
 				@input=${this._handleInput}
 				@change=${this._handleChange}
 				@blur=${this._handleInputBlur}

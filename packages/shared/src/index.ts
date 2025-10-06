@@ -7,7 +7,7 @@
  */
 
 export * from './color-utils/index.js';
-
+export * from './input-schemas';
 // Export consolidated utilities
 export * from './math-utils/index.js';
 // Export all types and schemas

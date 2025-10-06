@@ -17,13 +17,14 @@
  * DO: Always pair with descriptive labels
  * DO: Provide helpful placeholder examples showing expected format
  * DO: Immediate validation feedback for user confidence
+ * DO: Use schema prop with InputSchemas for automatic masking
  * NEVER: Label-less inputs or validation only on submit
  *
  * @designGuides
  * - Trust Building: https://rafters.realhandy.tech/docs/foundation/trust-building
  * - Cognitive Load: https://rafters.realhandy.tech/docs/foundation/cognitive-load
  *
- * @dependencies None
+ * @dependencies masky-js
  *
  * @example
  * ```tsx
@@ -32,15 +33,52 @@
  *
  * // Error state with validation feedback
  * <Input type="email" error="Please enter a valid email address" />
+ *
+ * // With automatic masking from schema
+ * <Input schema={InputSchemas.phoneUS} placeholder="Enter phone number" />
+ *
+ * // With explicit mask pattern
+ * <Input mask="(000) 000-0000" placeholder="Phone" />
  * ```
  */
+
+import { type MaskPreset, MaskPresets } from '@rafters/shared';
+import { useEffect, useRef } from 'react';
+import type { z } from 'zod';
 import { cn } from '../lib/utils';
+
+/**
+ * Infers mask pattern from Zod schema description.
+ *
+ * Only checks schema.description for preset hints to avoid brittle internal API usage.
+ * For advanced inference, provide mask explicitly or encode it in schema description.
+ *
+ * @param schema - Zod schema to analyze
+ * @returns Mask pattern string or null if no match found
+ * @example
+ * const schema = z.string().describe('phone-us');
+ * inferMask(schema); // Returns '(000) 000-0000'
+ */
+function inferMask(schema?: z.ZodType): string | null {
+  if (!schema) return null;
+
+  // Check description for preset hint
+  const desc = schema.description;
+  if (desc && desc in MaskPresets) {
+    return MaskPresets[desc as MaskPreset];
+  }
+
+  return null;
+}
+
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   variant?: 'default' | 'error' | 'success' | 'warning';
   validationMode?: 'live' | 'onBlur' | 'onSubmit';
   sensitive?: boolean;
   showValidation?: boolean;
   validationMessage?: string;
+  schema?: z.ZodType;
+  mask?: MaskPreset | string;
   ref?: React.Ref<HTMLInputElement>;
 }
 
@@ -50,11 +88,48 @@ export function Input({
   sensitive = false,
   showValidation = false,
   validationMessage,
+  schema,
+  mask,
   className,
   type,
   ref,
   ...props
 }: InputProps) {
+  // Mask logic: Determine which mask to apply
+  const appliedMask = mask || inferMask(schema);
+  const resolvedMask =
+    appliedMask && appliedMask in MaskPresets
+      ? MaskPresets[appliedMask as MaskPreset]
+      : appliedMask;
+
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  // Dynamic import of masky-js when mask is present
+  useEffect(() => {
+    if (!resolvedMask || !inputRef.current) {
+      return undefined;
+    }
+
+    let cleanup: (() => void) | undefined;
+
+    import('masky-js')
+      .then(() => {
+        // Masky auto-initializes from data-mask attribute
+        // Store cleanup function if needed
+        cleanup = () => {
+          // Masky cleanup happens automatically on element removal
+        };
+      })
+      .catch(() => {
+        // Silently fail if masky-js is not available
+        // This allows graceful degradation in environments without the dependency
+      });
+
+    return () => {
+      cleanup?.();
+    };
+  }, [resolvedMask]);
+
   // Trust-building: Visual indicators for sensitive data
   const isSensitiveData = sensitive || type === 'password' || type === 'email';
 
@@ -66,8 +141,16 @@ export function Input({
   return (
     <div className="relative">
       <input
-        ref={ref}
+        ref={(node) => {
+          inputRef.current = node;
+          if (typeof ref === 'function') {
+            ref(node);
+          } else if (ref) {
+            (ref as React.MutableRefObject<HTMLInputElement | null>).current = node;
+          }
+        }}
         type={type}
+        data-mask={resolvedMask || undefined}
         className={cn(
           // Base styles - using semantic tokens with motor accessibility
           'flex h-10 w-full rounded-md border px-3 py-2 text-sm',
