@@ -38,7 +38,7 @@ export const rInputRegistryEntry: PrimitiveRegistryEntry = {
   usageContext: {
     dos: [
       'Always provide clear labels using aria-label or associated label element',
-      'Show validation errors immediately on blur for better UX',
+      'Pass variant and validationMessage to show errors with Rafters design patterns',
       'Use appropriate input type (email, tel, url) for better mobile keyboards',
       'Provide placeholder text as hints, not as labels',
       'Use schema prop with InputSchemas for automatic masking',
@@ -47,7 +47,7 @@ export const rInputRegistryEntry: PrimitiveRegistryEntry = {
     donts: [
       'Never use placeholder as the only label (fails WCAG)',
       'Never disable autocomplete without user consent',
-      'Never validate on every keystroke (cognitive overload)',
+      'Never create custom error UI (use Rafters variant/validationMessage)',
       'Never use red color alone to indicate errors',
     ],
     examples: [
@@ -55,35 +55,36 @@ export const rInputRegistryEntry: PrimitiveRegistryEntry = {
       '<r-input type="email" required pattern="[^@]+@[^@]+\\.[^@]+"></r-input>',
       '<r-input value="Read only" disabled></r-input>',
       '<Input schema={InputSchemas.phoneUS} placeholder="Phone number" />',
+      '<Input variant="error" validationMessage="Email is required" />',
       '<Input mask="(000) 000-0000" inputmode="tel" placeholder="Phone" />',
-      '<Input schema={InputSchemas.dateUS} placeholder="MM/DD/YYYY" />',
+      '<Input variant="success" validationMessage="Email verified!" />',
     ],
   },
 
   rationale: {
-    purpose: 'Foundation primitive for all text-based user input',
+    purpose: 'Foundation primitive for all text-based user input with embedded design intelligence',
     attentionEconomics:
-      'Low cognitive load (2/10) as text inputs are universally understood. Validation shown on blur prevents keystroke-level anxiety.',
+      'Low cognitive load (2/10) as text inputs are universally understood. Validation messages use Rafters trust-building patterns.',
     trustBuilding:
-      'Immediate visual feedback on validation state. Clear error messages. Respects user input (no auto-correction unless explicit).',
+      'Visual feedback through variant styling. Error messages with proper ARIA. Sensitive data indicators. Respects user input.',
     cognitiveLoadReasoning:
-      'Rated 2/10 because inputs are familiar UI patterns. Validation adds minimal complexity when shown at appropriate times (blur, not keystroke).',
+      'Rated 2/10 because inputs are familiar UI patterns. Design intelligence handles validation presentation - AI agents control timing.',
     designPrinciples: [
-      'Progressive disclosure: Validation shown when needed',
-      'Trust building: Clear feedback without nagging',
-      'Accessibility first: WCAG AAA with proper ARIA',
+      'Design intelligence: Input shows HOW to display errors, AI agents decide WHEN',
+      'Trust building: Clear feedback with proper ARIA and visual indicators',
+      'Accessibility first: WCAG AAA with proper semantic markup',
       'Mobile-friendly: Appropriate input types trigger correct keyboards',
     ],
     tradeoffs: [
       {
-        decision: 'Validate on blur, not on input',
+        decision: 'Render validation message when provided, no conditional logic',
         reasoning:
-          'Prevents cognitive overload from real-time validation. Users can type freely without anxiety. Shows errors at natural pause points.',
+          'Design intelligence layer controls presentation. Application logic (InputGroup) controls behavior. Clear separation of concerns.',
       },
       {
-        decision: 'Use native input element with CSS parts',
+        decision: 'Use native input element with Rafters design patterns',
         reasoning:
-          'Maximum browser compatibility and form integration. CSS parts allow full styling without Shadow DOM piercing issues.',
+          'Maximum browser compatibility. Rafters styling encodes trust-building patterns for AI agents to learn from.',
       },
     ],
   },
