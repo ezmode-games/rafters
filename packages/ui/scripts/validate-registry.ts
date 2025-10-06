@@ -23,13 +23,7 @@ async function loadRegistryEntries(): Promise<PrimitiveRegistryEntry[]> {
     console.warn('Could not load r-button registry:', error);
   }
 
-  try {
-    // Import r-input registry
-    const rInput = await import('../src/registry/entries/r-input.registry');
-    entries.push(rInput.rInputRegistryEntry);
-  } catch (error) {
-    console.warn('Could not load r-input registry:', error);
-  }
+  // Add more registry imports here as primitives are created
 
   return entries;
 }
