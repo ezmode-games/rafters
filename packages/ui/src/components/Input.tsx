@@ -48,14 +48,16 @@ import { z } from 'zod';
 import { cn } from '../lib/utils';
 
 /**
- * Infer mask pattern from Zod schema
+ * Infers mask pattern from Zod schema description.
  *
- * Attempts to detect appropriate mask pattern by:
- * 1. Checking schema description for preset hint
- * 2. Pattern matching on regex validations
+ * Only checks schema.description for preset hints to avoid brittle internal API usage.
+ * For advanced inference, provide mask explicitly or encode it in schema description.
  *
  * @param schema - Zod schema to analyze
  * @returns Mask pattern string or null if no match found
+ * @example
+ * const schema = z.string().describe('phone-us');
+ * inferMask(schema); // Returns '(000) 000-0000'
  */
 function inferMask(schema?: z.ZodType): string | null {
   if (!schema) return null;
@@ -64,43 +66,6 @@ function inferMask(schema?: z.ZodType): string | null {
   const desc = schema.description;
   if (desc && desc in MaskPresets) {
     return MaskPresets[desc as MaskPreset];
-  }
-
-  // Pattern match on regex for common formats
-  if (schema instanceof z.ZodString) {
-    // Access internal checks array from ZodString definition
-    const def = schema._def as unknown as { checks?: Array<{ kind: string; regex?: RegExp }> };
-    const checks = def.checks || [];
-    const regexCheck = checks.find((c) => c.kind === 'regex');
-
-    if (regexCheck && 'regex' in regexCheck && regexCheck.regex) {
-      const pattern = regexCheck.regex.source;
-
-      // Match phone pattern: (XXX) XXX-XXXX or similar
-      if (/\(\d{3}\)\s*\d{3}-\d{4}/.test(pattern) || /^\d{10}$/.test(pattern)) {
-        return MaskPresets['phone-us'];
-      }
-
-      // Match SSN pattern: XXX-XX-XXXX
-      if (/\d{3}-\d{2}-\d{4}/.test(pattern) || /^\d{9}$/.test(pattern)) {
-        return MaskPresets['ssn-us'];
-      }
-
-      // Match credit card pattern: XXXX XXXX XXXX XXXX
-      if (/\d{16}/.test(pattern) || /\d{4}\s*\d{4}\s*\d{4}\s*\d{4}/.test(pattern)) {
-        return MaskPresets['credit-card'];
-      }
-
-      // Match date pattern: MM/DD/YYYY
-      if (/\d{2}\/\d{2}\/\d{4}/.test(pattern)) {
-        return MaskPresets['date-us'];
-      }
-
-      // Match ZIP code pattern: XXXXX
-      if (/^\d{5}$/.test(pattern)) {
-        return MaskPresets['zip-us'];
-      }
-    }
   }
 
   return null;
@@ -155,8 +120,9 @@ export function Input({
           // Masky cleanup happens automatically on element removal
         };
       })
-      .catch((error) => {
-        console.error('Failed to load masky-js:', error);
+      .catch(() => {
+        // Silently fail if masky-js is not available
+        // This allows graceful degradation in environments without the dependency
       });
 
     return () => {
