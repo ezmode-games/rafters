@@ -98,7 +98,6 @@ export class RInput extends RPrimitiveBase {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.setAttribute('role', 'textbox');
   }
 
   /**
