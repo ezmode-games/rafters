@@ -102,6 +102,7 @@ The `@rafters/design-tokens` package implements a sophisticated dependency graph
 5. **Use Zod for all external data** - Required for type safety
 6. **NO `.then()` chains** - Use async/await only
 7. **React 19 purity** - No impure functions in components
+8. **NEVER use `/tmp` directory** - All work files MUST be in workspace subdirectories to prevent data loss
 
 ### Development Workflow
 1. Make changes

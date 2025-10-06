@@ -4,17 +4,48 @@
 
 **Your designer encodes their taste. We turn it into data structures. AI agents build interfaces that don't suck.**
 
-## The Real Problem with AI-Generated Interfaces
+## The Real Problem: AI Agents Guess at Design
 
-AI agents rush in and generate interfaces that look technically correct but feel completely wrong. Bad spacing. Poor hierarchy. Accessibility violations. No sense of rhythm or proportion. They pattern match on surface similarities without understanding the reasoning behind design decisions.
+AI agents don't have taste. They guess at colors, spacing, hierarchy, and balance because design systems give them dumb data—hex codes, pixel values, component names—without the reasoning behind design decisions.
 
-Traditional design systems made it worse. Components without reasoning. Zero guidance on when to use what. AI agents can't distinguish between appropriate and inappropriate usage contexts. More options, worse outcomes.
+Designers and developers look at designs and apply taste. AI agents need **data that simulates taste**.
 
-## The Insight: Encode Taste as Queryable Data
+## The Rafters Solution: Three Registries of Design Intelligence
 
-Stop trying to teach AI aesthetic judgment through prompts and documentation. That doesn't scale. Instead, encode human design intelligence directly into machine-readable data structures that AI agents can query in real-time.
+Rafters eliminates guessing by converting every subjective design decision into objective, queryable data across three interconnected registries:
 
-Rafters is a design intelligence protocol. Every design decision—from your brand's specific blue to why buttons need 44px touch targets—gets encoded as queryable intelligence. When AI builds interfaces using Rafters, it doesn't guess. It reads the embedded reasoning and applies it systematically.
+### 1. **Token Registry** - What design values exist and why
+Every token contains mathematical, perceptual, and accessibility intelligence:
+- **OKLCH color scales**: Perceptually uniform 50-950 shades with pre-computed WCAG AAA contrast pairs (O(1) lookup)
+- **Musical spacing progressions**: Major-third (1.25) or golden ratio harmonics—not arbitrary pixel values
+- **Dependency rules**: 5 rule types (calc, state, scale, contrast, invert) that auto-regenerate 240+ tokens when base values change
+- **Perceptual metadata**: Atmospheric role (foreground/background), perceptual weight (0-1), harmonic tension
+
+### 2. **Component Registry** - What UI patterns exist and when to use them
+Every component contains cognitive and usage intelligence:
+- **Cognitive load ratings**: Button (3 points), Card (5 points), Dialog (6 points)—enforced 15-point budget per screen
+- **Semantic meaning**: "Primary actions demand attention—maximum 1 per section"
+- **Accessibility requirements**: WCAG AAA compliance, 44px touch targets, focus management
+- **Design rationale**: "Primary uses foreground-advancing colors for immediate attention. Secondary uses receding colors to support without competing."
+
+### 3. **Designer Decisions Archive** - Why choices were made
+Every override and decision gets documented:
+- **Color choices**: "Blue at 240° chosen for trust in financial context, optimal chroma at L=0.40-0.60"
+- **Spacing rationale**: "Major-third ratio creates natural visual rhythm, less aggressive than perfect-fourth"
+- **Cognitive budgets**: "User testing showed >15 interactive elements causes decision fatigue"
+
+## How AI Agents Use This (Zero Guessing)
+
+**Agent task:** "Create a signup form"
+
+**Query flow:**
+1. `registry.getCognitiveLoadBudget()` → 15 tokens
+2. `componentRegistry.query({type: "form"})` → Form (5) + Input (2 each) + Button (3) = 16 total → **OVER BUDGET**
+3. `registry.optimizeForBudget()` → Reduce to 3 inputs = 14 total ✓
+4. `tokenRegistry.query({accessibleOn: "surface-50", wcagLevel: "AAA"})` → Returns `["neutral-400"]` with pre-computed 7.2:1 contrast
+5. `tokenRegistry.getProgression("spacing", "major-third")` → `[4,5,6,8,10,13,16,20,25,32]` mathematical harmony
+
+**Result:** Accessible form with harmonious spacing, under cognitive budget—backed by designer's encoded taste, not guesses.
 
 ## How It Works
 
@@ -235,19 +266,61 @@ pnpm test:e2e
 pnpm preflight
 ```
 
+## What Makes This Work: Data-Driven Taste Simulation
+
+AI agents don't "feel" that spacing is awkward or colors clash. Instead, Rafters converts subjective design taste into measurable data:
+
+### **Color Taste → Perceptual Metadata**
+- **Designer feels:** "This blue is too aggressive"
+- **Agent queries:** `perceptualWeight: 0.85` (heavy), `atmosphericRole: "foreground-advancing"`, `harmonicTension: 0.7` (high stress)
+- **Agent concludes:** Heavy + advancing + high tension = too aggressive for backgrounds
+
+### **Spacing Taste → Mathematical Validation**
+- **Designer feels:** "This padding feels awkward"
+- **Agent queries:** `value: 14px`, `expectedProgression: [13, 16]`, `harmonicViolation: true`
+- **Agent concludes:** Not in musical progression = dissonant
+
+### **Hierarchy Taste → Cognitive Load Math**
+- **Designer feels:** "This page is overwhelming"
+- **Agent queries:** `totalLoad: 23`, `budget: 15`, `primaryActions: 3` (competing for attention)
+- **Agent concludes:** 53% over budget + attention conflict = overwhelming
+
+### **Balance Taste → Weight Distribution**
+- **Designer feels:** "Layout is lopsided"
+- **Agent queries:** `leftWeight: 2.1`, `rightWeight: 0.6`, `ratio: 3.5:1`
+- **Agent concludes:** Imbalanced perceptual weight distribution
+
+**This is how AI agents simulate taste without having taste.** Every subjective feeling gets encoded as queryable metrics.
+
 ## Technical Deep Dive
 
-For complete technical documentation, see [ARCHITECTURE.md](./ARCHITECTURE.md).
+### **packages/shared/color-utils** - OKLCH Color Intelligence
+- `generateOKLCHScale()`: Creates 50-950 scales with contrast-based lightness progression
+- `generateAccessibilityMetadata()`: Pre-computes all WCAG AA/AAA pairs for O(1) lookup
+- `generateHarmony()`: 11 harmonic relationships (complementary, triadic, split-complementary)
+- `calculateAtmosphericWeight()`: Leonardo-inspired depth perception (warm advances, cool recedes)
+- `calculatePerceptualWeight()`: Red feels heavier than blue—measurable at 0-1 scale
 
-Key concepts covered in detail:
-- Custom Shadow DOM component preview system architecture (~500 lines replacing Storybook)
-- Dependency graph resolution algorithm with topological sorting
-- ColorValue intelligence object schema with AI-generated insights
-- Cognitive load calculation methodology and budget enforcement
-- MCP server protocol implementation with 7 specialized tools
-- SQID archive format specification and distribution model
-- llms.txt endpoint implementation following llmstxt.org standards
-- Registry API architecture for structured component intelligence
+### **packages/shared/math-utils** - Mathematical Foundation
+- `generateProgression()`: Core function using musical ratios (minor-third: 1.2, major-third: 1.25, perfect-fourth: 1.333)
+- `generateModularScale()`: Typography scales in both directions from base size
+- `generateFibonacciLike()`: Custom ratio sequences for organic growth patterns
+- Unit-aware operations: Parse/convert/calculate with CSS units
+
+### **packages/design-tokens** - Intelligent Token System
+- **TokenRegistry**: O(1) storage with dependency graph tracking
+- **5 Rule Types**: `calc()`, `state:hover`, `scale:600`, `contrast:auto`, `invert`
+- **Dependency Engine**: Topological sort for cascading updates, circular dependency prevention
+- **Event System**: Real-time change notifications for reactive UIs
+- **20+ Generators**: Color, spacing, typography, motion, grid, accessibility, touch targets
+
+### **Architecture Highlights**
+- Custom Shadow DOM component preview system (~500 lines replacing Storybook)
+- Dependency graph resolution with topological sorting and cycle detection
+- ColorValue intelligence objects with pre-computed accessibility matrices
+- MCP server with 7 specialized tools for real-time agent queries
+- SQID archive format for portable design system distribution
+- llms.txt endpoint following llmstxt.org specification
 
 ## Why "Rafters"?
 
@@ -255,23 +328,33 @@ Rafters provide structural support in buildings—essential infrastructure that 
 
 ## Philosophy
 
-**Design intelligence as queryable data.** Stop hoping AI agents will learn good taste. Encode human design reasoning into machine-readable structures they can query systematically.
+**AI agents don't have taste. They need data.**
+Stop trying to teach AI aesthetic judgment. Designers encode their taste as decisions. Rafters converts those decisions into queryable intelligence. Agents simulate taste by querying perceptual metadata, mathematical relationships, and accessibility matrices.
 
-**Mathematical foundations with human overrides.** Start with mathematical relationships that can't be wrong, then layer on human design taste where math isn't sufficient.
+**Three registries eliminate guessing:**
+- **Token Registry**: What values exist (OKLCH scales, musical progressions, dependency rules, perceptual weights)
+- **Component Registry**: What patterns exist (cognitive load, semantic meaning, usage contexts, design rationale)
+- **Designer Decisions**: Why choices were made (color reasoning, spacing rationale, cognitive budgets)
 
-**Real-time intelligence access.** AI agents don't read documentation—they query live intelligence through structured APIs and MCP protocols.
+**Mathematical precision + human reasoning.**
+Start with OKLCH perceptual uniformity and musical ratio harmonics—relationships that are mathematically sound. Layer on designer overrides with embedded reasoning. Every deviation from math gets documented as queryable intelligence.
 
-**Cognitive load as a first-class concern.** Every design decision explicitly accounts for human mental processing limits and attention economics.
+**Real-time intelligence, not documentation.**
+AI agents query live registries through MCP protocols. `tokenRegistry.query({accessibleOn: "surface", wcagLevel: "AAA"})` returns pre-computed answers in milliseconds. No documentation reading. No guessing.
 
 ## The Future of AI-Generated Interfaces
 
-AI agents are generating millions of interfaces. Most are terrible because they lack design reasoning.
+AI agents generate millions of interfaces daily. Most suck because design systems give them dumb data—hex codes and pixel values without reasoning.
 
-Rafters solves this by encoding your designer's expertise as queryable data structures. Your brand's personality becomes parameterized intelligence. Your users' cognitive limits get systematically respected.
+**Rafters gives agents what they actually need:**
+- Perceptual weight instead of "this color feels heavy"
+- Harmonic tension metrics instead of "these colors clash"
+- Cognitive load budgets instead of "this page is overwhelming"
+- Mathematical progressions instead of "this spacing feels awkward"
 
-This isn't about teaching AI good taste—it's about making human design intelligence accessible to AI systems that already understand data structures perfectly.
+Your designer's expertise becomes parameterized intelligence. Their taste becomes queryable data structures. AI agents simulate design judgment without having judgment.
 
-Welcome to design intelligence as a protocol.
+**This isn't teaching AI taste. It's encoding human taste as data that AI already understands perfectly.**
 
 ## License
 
