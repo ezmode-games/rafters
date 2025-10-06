@@ -210,6 +210,153 @@ pnpm --filter=@rafters/ui test:component
 - OSS: Local CSS file updates
 - Rafters+: Queue-based distribution
 
+## Web Component Primitive Development
+
+### Primitive Architecture
+- **Primitives = Headless** (behavior only, no styling)
+- **Base Class**: All primitives extend `RPrimitiveBase` from `packages/ui/src/base/RPrimitiveBase.ts`
+- **Framework**: Lit-based web components
+- **WCAG Compliance**: AAA level mandatory (not AA)
+- **Testing**: Playwright + axe-core for accessibility, Vitest for unit tests
+
+### Required Files for Each Primitive (4 files + 3 updates)
+
+#### 1. Primitive Implementation
+**Location**: `packages/ui/src/primitives/[name]/r-[name].ts`
+
+Must include:
+- JSDoc with `@registryName`, `@registryVersion`, `@registryPath`, `@registryType`, `@accessibility`, `@dependencies`, `@example`
+- Extend `RPrimitiveBase`
+- Use `@customElement('r-[name]')` decorator
+- All properties use `@property()` decorator with proper types
+- ARIA role set in `connectedCallback()`
+- Keyboard navigation handlers
+- Event dispatching via `dispatchPrimitiveEvent()`
+- CSS parts for styling (`part="..."`)
+- Global type declaration for HTMLElementTagNameMap
+
+#### 2. Registry Entry
+**Location**: `packages/ui/src/registry/entries/r-[name].registry.ts`
+
+Must include all fields:
+- `name`, `displayName`, `version`, `status`
+- `sources` array (minimum: lit + react)
+- `cognitiveLoad` (branded type: `X as const`)
+- `accessibility` object (wcagLevel: 'AAA', ariaRole, keyboardNavigation, minimumTouchTarget: 44, etc.)
+- `usageContext` (dos, donts, examples)
+- `rationale` (purpose, attentionEconomics, trustBuilding, cognitiveLoadReasoning, designPrinciples, tradeoffs)
+- `dependencies` array (other primitives this depends on)
+- `npmDependencies`, `category`, `tags`, `description`, `docsUrl`
+- `createdAt`, `updatedAt` (use `new Date().toISOString()`)
+
+#### 3. Accessibility Tests
+**Location**: `packages/ui/test/primitives/r-[name].a11y.ts`
+
+Must include test suites for:
+- Automated axe-core WCAG AAA scans (default, disabled, with aria-label states)
+- ARIA attributes verification (role, labels, states)
+- Keyboard navigation (Tab, action keys specific to primitive)
+- Focus management (focusable, visible focus, disabled not focusable)
+- Touch target size (WCAG 2.5.5 AAA - 44x44px minimum)
+- Shadow DOM accessibility (if using shadow DOM)
+- Comprehensive report generation
+
+Use utilities from `../a11y-utils` (see issue #288 for complete implementation)
+
+#### 4. Unit Tests
+**Location**: `packages/ui/test/primitives/r-[name].test.ts`
+
+Must include test suites for:
+- Properties (all @property decorators)
+- Events (all custom events dispatched)
+- Validation logic (if applicable)
+- Public methods (focus, blur, etc.)
+- Accessibility attributes
+- Edge cases and error states
+
+Use `@open-wc/testing` with Vitest
+
+#### 5-7. Required Updates
+- **types**: Add to `packages/ui/src/types/custom-elements.d.ts` HTMLElementTagNameMap
+- **exports**: Add to `packages/ui/src/primitives/index.ts`
+- **registry**: Import and add to `packages/ui/src/registry/index.ts` primitiveRegistry array
+
+### Primitive Development Checklist
+
+Every primitive implementation must:
+- [ ] Extend RPrimitiveBase
+- [ ] Use Lit decorators (@customElement, @property, @query, @state)
+- [ ] Set ARIA role in connectedCallback()
+- [ ] Handle keyboard navigation (use utils from `utils/keyboard.ts`)
+- [ ] Dispatch events via dispatchPrimitiveEvent()
+- [ ] Include CSS parts for styling
+- [ ] Have complete JSDoc with registry metadata
+- [ ] Pass all WCAG AAA axe-core tests
+- [ ] Meet 44x44px touch target minimum
+- [ ] Have full keyboard navigation support
+- [ ] Include comprehensive unit tests
+- [ ] Be added to registry with complete metadata
+- [ ] Pass `pnpm --filter=@rafters/ui validate:registry`
+
+### Common Patterns
+
+**Event Dispatching**:
+```typescript
+this.dispatchPrimitiveEvent('r-input', {
+  value: this.value,
+  isValid: this.inputElement.validity.valid,
+});
+```
+
+**Keyboard Navigation**:
+```typescript
+import { isActionKey, preventDefaultForActionKeys } from '../../utils/keyboard';
+
+private _handleKeyDown = (e: KeyboardEvent): void => {
+  if (this.disabled) return;
+  if (isActionKey(e)) {
+    preventDefaultForActionKeys(e);
+    this.click();
+  }
+};
+```
+
+**CSS Parts**:
+```typescript
+<input part="input" />  // Allows ::part(input) styling
+```
+
+**Registry Metadata**:
+```typescript
+cognitiveLoad: 3 as const,  // Branded type enforced by Zod
+```
+
+### Accessibility Requirements (WCAG AAA)
+
+Every primitive must:
+- Contrast: 7:1 for normal text, 4.5:1 for large text (not 4.5:1 and 3:1)
+- Touch targets: 44x44px minimum (not 40x40px)
+- Keyboard: All functionality available via keyboard
+- Screen readers: Proper ARIA labels and roles
+- Focus: Visible focus indicators
+- Validation: aria-invalid and aria-errormessage for errors
+
+### Testing Commands for Primitives
+
+```bash
+# Run accessibility tests for specific primitive
+pnpm --filter=@rafters/ui test:a11y [name].a11y
+
+# Run unit tests for specific primitive
+pnpm --filter=@rafters/ui test [name].test
+
+# Validate registry after adding primitive
+pnpm --filter=@rafters/ui validate:registry
+
+# Run all tests
+pnpm --filter=@rafters/ui test
+```
+
 ## When in Doubt
 
 1. Check existing patterns in similar files
@@ -218,5 +365,6 @@ pnpm --filter=@rafters/ui test:component
 4. Test with `pnpm preflight` before committing
 5. Ensure React 19 purity requirements
 6. Validate cognitive load and accessibility patterns
+7. **For primitives**: Use r-button as reference implementation
 
 Remember: This is an AI-first design system. Every decision should serve both human developers and AI agents consuming the design intelligence.
