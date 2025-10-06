@@ -44,7 +44,7 @@
 
 import { type MaskPreset, MaskPresets } from '@rafters/shared';
 import { useEffect, useRef } from 'react';
-import { z } from 'zod';
+import type { z } from 'zod';
 import { cn } from '../lib/utils';
 
 /**
