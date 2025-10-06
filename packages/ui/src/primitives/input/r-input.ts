@@ -127,7 +127,7 @@ export class RInput extends RPrimitiveBase {
   /**
    * Handle blur event - trigger validation
    */
-  private _handleBlur = (): void => {
+  private _handleInputBlur = (): void => {
     if (this.required && !this.value) {
       this.validationState = 'error';
       this.errorMessage = 'This field is required';
@@ -151,14 +151,14 @@ export class RInput extends RPrimitiveBase {
   /**
    * Focus the input
    */
-  public focus(): void {
+  public override focus(): void {
     this.inputElement?.focus();
   }
 
   /**
    * Blur the input
    */
-  public blur(): void {
+  public override blur(): void {
     this.inputElement?.blur();
   }
 
@@ -188,7 +188,7 @@ export class RInput extends RPrimitiveBase {
 				aria-errormessage=${this.errorMessage || ''}
 				@input=${this._handleInput}
 				@change=${this._handleChange}
-				@blur=${this._handleBlur}
+				@blur=${this._handleInputBlur}
 			/>
 		`;
   }

@@ -1,4 +1,8 @@
-import type { PrimitiveRegistryEntry } from '../types';
+// TODO: Uncomment when registry types are created in #288
+// import type { PrimitiveRegistryEntry } from '../types';
+
+// Temporary type until #288 is merged
+type PrimitiveRegistryEntry = Record<string, unknown>;
 
 export const rInputRegistryEntry: PrimitiveRegistryEntry = {
   name: 'r-input',
