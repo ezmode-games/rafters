@@ -46,6 +46,7 @@
     "axe-html-reporter": "^2.2.11",
     "comment-parser": "^1.4.0",
     "jsdom": "catalog:",
+    "masky-js": "^1.0.1",
     "typescript": "catalog:",
     "unbuild": "^3.6.1",
     "vite-plugin-ts": "1.3.2-1",

@@ -19,6 +19,11 @@ export default defineConfig({
       'src/**/__tests__/**/*.test.*',
     ],
     exclude: ['test/**/*.spec.ts', 'test/**/*.e2e.ts', 'node_modules/**/*'],
+    server: {
+      deps: {
+        inline: ['masky-js'],
+      },
+    },
     coverage: {
       reporter: ['text', 'json', 'html'],
       exclude: [
