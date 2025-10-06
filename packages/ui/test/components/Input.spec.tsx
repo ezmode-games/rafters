@@ -258,9 +258,11 @@ test.describe('Input Component - Keyboard Navigation', () => {
     const input2 = page.getByTestId('input2');
 
     await page.keyboard.press('Tab');
+    await page.waitForTimeout(100); // Give WebKit time to process focus
     await expect(input1).toBeFocused();
 
     await page.keyboard.press('Tab');
+    await page.waitForTimeout(100); // Give WebKit time to process focus
     await expect(input2).toBeFocused();
   });
 
