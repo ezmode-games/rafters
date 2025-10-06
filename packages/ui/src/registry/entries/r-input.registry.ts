@@ -41,6 +41,8 @@ export const rInputRegistryEntry: PrimitiveRegistryEntry = {
       'Show validation errors immediately on blur for better UX',
       'Use appropriate input type (email, tel, url) for better mobile keyboards',
       'Provide placeholder text as hints, not as labels',
+      'Use schema prop with InputSchemas for automatic masking',
+      'Use inputmode attribute to optimize mobile keyboard display',
     ],
     donts: [
       'Never use placeholder as the only label (fails WCAG)',
@@ -52,6 +54,9 @@ export const rInputRegistryEntry: PrimitiveRegistryEntry = {
       '<r-input value="" placeholder="Enter your name"></r-input>',
       '<r-input type="email" required pattern="[^@]+@[^@]+\\.[^@]+"></r-input>',
       '<r-input value="Read only" disabled></r-input>',
+      '<Input schema={InputSchemas.phoneUS} placeholder="Phone number" />',
+      '<Input mask="(000) 000-0000" inputmode="tel" placeholder="Phone" />',
+      '<Input schema={InputSchemas.dateUS} placeholder="MM/DD/YYYY" />',
     ],
   },
 
@@ -84,7 +89,10 @@ export const rInputRegistryEntry: PrimitiveRegistryEntry = {
   },
 
   dependencies: [],
-  npmDependencies: [{ name: 'lit', version: '^3.0.0', optional: false }],
+  npmDependencies: [
+    { name: 'lit', version: '^3.0.0', optional: false },
+    { name: 'masky-js', version: '^1.0.0', optional: false },
+  ],
 
   category: 'form',
   tags: ['form', 'text-input', 'wcag-aaa', 'validation'],
