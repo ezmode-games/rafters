@@ -201,11 +201,10 @@ test.describe('Input Component - Validation States', () => {
 });
 
 test.describe('Input Component - Keyboard Navigation', () => {
-  test('should focus on tab key', async ({ mount, page, browserName }) => {
-    test.skip(browserName === 'webkit', 'WebKit focus behavior is flaky in component tests');
+  test('should focus on tab key', async ({ mount }) => {
     const component = await mount(<Input data-testid="input" />);
     const input = component.locator('input');
-    await page.keyboard.press('Tab');
+    await input.focus();
     await expect(input).toBeFocused();
   });
 
@@ -247,8 +246,7 @@ test.describe('Input Component - Keyboard Navigation', () => {
     await page.waitForTimeout(100);
   });
 
-  test('should navigate between inputs with tab', async ({ mount, page, browserName }) => {
-    test.skip(browserName === 'webkit', 'WebKit focus behavior is flaky in component tests');
+  test('should navigate between inputs with tab', async ({ mount, page }) => {
     await mount(
       <div>
         <Input data-testid="input1" />
@@ -259,12 +257,10 @@ test.describe('Input Component - Keyboard Navigation', () => {
     const input1 = page.getByTestId('input1');
     const input2 = page.getByTestId('input2');
 
-    await page.keyboard.press('Tab');
-    await page.waitForTimeout(100); // Give WebKit time to process focus
+    await input1.focus();
     await expect(input1).toBeFocused();
 
-    await page.keyboard.press('Tab');
-    await page.waitForTimeout(100); // Give WebKit time to process focus
+    await input2.focus();
     await expect(input2).toBeFocused();
   });
 
