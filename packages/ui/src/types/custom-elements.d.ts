@@ -19,6 +19,14 @@ declare global {
         name?: string;
         value?: string;
       };
+      'r-combobox': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        value?: string;
+        expanded?: boolean;
+        placeholder?: string;
+        name?: string;
+        disabled?: boolean;
+        'listbox-id'?: string;
+      };
       'r-input': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         type?: 'text' | 'email' | 'password' | 'search' | 'tel' | 'url' | 'number';
         value?: string;
