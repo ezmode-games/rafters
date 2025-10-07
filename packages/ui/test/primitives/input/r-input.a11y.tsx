@@ -16,7 +16,7 @@ import {
   verifyKeyboardAccessible,
   verifyTouchTargetSize,
   verifyValidationState,
-} from '../a11y-utils';
+} from '../../a11y-utils';
 
 test.describe('Input Component - WCAG AAA Compliance', () => {
   test('should pass axe-core accessibility scan for default variant', async ({ mount, page }) => {
