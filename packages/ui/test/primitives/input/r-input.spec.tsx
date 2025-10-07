@@ -11,14 +11,14 @@ import { expect, test } from '@playwright/experimental-ct-react';
 import { Input } from '../../src/components/Input';
 
 test.describe('Input Component - Visual Rendering', () => {
-  test('should render with default variant', async ({ mount }) => {
+  test('should render with default variant', async ({ mount, page: _page }) => {
     const component = await mount(<Input placeholder="Enter text" />);
     await expect(component).toBeVisible();
     const input = component.locator('input');
     await expect(input).toHaveAttribute('placeholder', 'Enter text');
   });
 
-  test('should render error variant with red border', async ({ mount, page }) => {
+  test('should render error variant with red border', async ({ mount, page: _page }) => {
     const component = await mount(<Input variant="error" data-testid="input" />);
     await expect(component).toBeVisible();
 
@@ -30,7 +30,7 @@ test.describe('Input Component - Visual Rendering', () => {
     expect(borderColor).toBeTruthy();
   });
 
-  test('should render success variant with green border', async ({ mount, page }) => {
+  test('should render success variant with green border', async ({ mount, page: _page }) => {
     const component = await mount(<Input variant="success" data-testid="input" />);
     await expect(component).toBeVisible();
 
@@ -42,7 +42,10 @@ test.describe('Input Component - Visual Rendering', () => {
     expect(borderColor).toBeTruthy();
   });
 
-  test('should render warning variant with yellow/orange border', async ({ mount, page }) => {
+  test('should render warning variant with yellow/orange border', async ({
+    mount,
+    page: _page,
+  }) => {
     const component = await mount(<Input variant="warning" data-testid="input" />);
     await expect(component).toBeVisible();
 
@@ -60,7 +63,7 @@ test.describe('Input Component - Visual Rendering', () => {
     await expect(message).toBeVisible();
   });
 
-  test('should show trust indicator for sensitive data', async ({ mount, page }) => {
+  test('should show trust indicator for sensitive data', async ({ mount, page: _page }) => {
     const component = await mount(<Input type="password" data-testid="input" />);
 
     const wrapper = await component.evaluateHandle((el) => el.parentElement);
@@ -71,7 +74,10 @@ test.describe('Input Component - Visual Rendering', () => {
     expect(hasTrustIndicator).toBe(true);
   });
 
-  test('should render without trust indicator for non-sensitive data', async ({ mount, page }) => {
+  test('should render without trust indicator for non-sensitive data', async ({
+    mount,
+    page: _page,
+  }) => {
     const component = await mount(<Input type="text" data-testid="input" />);
 
     const wrapper = await component.evaluateHandle((el) => el.parentElement);
@@ -87,14 +93,14 @@ test.describe('Input Component - Interactive Masking', () => {
   // NOTE: Mask attribute tests are in Input.test.tsx (unit tests)
   // Playwright component tests focus on user-visible behavior
 
-  test('should accept user input', async ({ mount }) => {
+  test('should accept user input', async ({ mount, page: _page }) => {
     const component = await mount(<Input data-testid="input" />);
     const input = component.locator('input');
     await input.fill('Hello World');
     await expect(input).toHaveValue('Hello World');
   });
 
-  test('should handle clearing input', async ({ mount }) => {
+  test('should handle clearing input', async ({ mount, page: _page }) => {
     const component = await mount(<Input data-testid="input" />);
     const input = component.locator('input');
     await input.fill('Test value');
@@ -141,7 +147,7 @@ test.describe('Input Component - Validation States', () => {
     await expect(page.getByText('Email format may be incorrect')).toBeVisible();
   });
 
-  test('should show error indicator dot', async ({ mount, page }) => {
+  test('should show error indicator dot', async ({ mount, page: _page }) => {
     const component = await mount(
       <Input variant="error" validationMessage="Error" data-testid="input" />
     );
@@ -154,7 +160,7 @@ test.describe('Input Component - Validation States', () => {
     expect(hasErrorIndicator).toBe(true);
   });
 
-  test('should show success indicator dot', async ({ mount, page }) => {
+  test('should show success indicator dot', async ({ mount, page: _page }) => {
     const component = await mount(
       <Input variant="success" validationMessage="Success" data-testid="input" />
     );
@@ -167,7 +173,7 @@ test.describe('Input Component - Validation States', () => {
     expect(hasSuccessIndicator).toBe(true);
   });
 
-  test('should show warning indicator dot', async ({ mount, page }) => {
+  test('should show warning indicator dot', async ({ mount, page: _page }) => {
     const component = await mount(
       <Input variant="warning" validationMessage="Warning" data-testid="input" />
     );
@@ -201,7 +207,7 @@ test.describe('Input Component - Validation States', () => {
 });
 
 test.describe('Input Component - Keyboard Navigation', () => {
-  test('should focus on tab key', async ({ mount }) => {
+  test('should focus on tab key', async ({ mount, page: _page }) => {
     const component = await mount(<Input data-testid="input" />);
     const input = component.locator('input');
     await input.focus();
@@ -226,13 +232,13 @@ test.describe('Input Component - Keyboard Navigation', () => {
   });
 
   test('should handle enter key in form context', async ({ mount, page }) => {
-    let formSubmitted = false;
+    let _formSubmitted = false;
 
-    const component = await mount(
+    const _component = await mount(
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          formSubmitted = true;
+          _formSubmitted = true;
         }}
       >
         <Input data-testid="input" />
@@ -273,7 +279,7 @@ test.describe('Input Component - Keyboard Navigation', () => {
 });
 
 test.describe('Input Component - Focus Management', () => {
-  test('should show focus ring on focus', async ({ mount, page }) => {
+  test('should show focus ring on focus', async ({ mount, page: _page }) => {
     const component = await mount(<Input data-testid="input" />);
     const input = component.locator('input');
     await input.focus();
@@ -286,7 +292,7 @@ test.describe('Input Component - Focus Management', () => {
     expect(hasOutline).toBe(true);
   });
 
-  test('should remove focus ring on blur', async ({ mount, page }) => {
+  test('should remove focus ring on blur', async ({ mount, page: _page }) => {
     const component = await mount(<Input data-testid="input" />);
     const input = component.locator('input');
     await input.focus();
@@ -305,7 +311,7 @@ test.describe('Input Component - Focus Management', () => {
 });
 
 test.describe('Input Component - Sensitive Data Trust Indicators', () => {
-  test('should show indicator for password fields', async ({ mount, page }) => {
+  test('should show indicator for password fields', async ({ mount, page: _page }) => {
     const component = await mount(<Input type="password" data-testid="input" />);
 
     const wrapper = await component.evaluateHandle((el) => el.parentElement);
@@ -317,7 +323,7 @@ test.describe('Input Component - Sensitive Data Trust Indicators', () => {
     expect(hasTrustDot).toBe(true);
   });
 
-  test('should show indicator for email fields', async ({ mount, page }) => {
+  test('should show indicator for email fields', async ({ mount, page: _page }) => {
     const component = await mount(<Input type="email" data-testid="input" />);
 
     const wrapper = await component.evaluateHandle((el) => el.parentElement);
@@ -328,7 +334,7 @@ test.describe('Input Component - Sensitive Data Trust Indicators', () => {
     expect(hasTrustDot).toBe(true);
   });
 
-  test('should show indicator when sensitive prop is true', async ({ mount, page }) => {
+  test('should show indicator when sensitive prop is true', async ({ mount, page: _page }) => {
     const component = await mount(<Input sensitive type="text" data-testid="input" />);
 
     const wrapper = await component.evaluateHandle((el) => el.parentElement);
@@ -363,7 +369,7 @@ test.describe('Input Component - Responsive Behavior', () => {
 });
 
 test.describe('Input Component - Disabled State', () => {
-  test('should render disabled state', async ({ mount }) => {
+  test('should render disabled state', async ({ mount, page: _page }) => {
     const component = await mount(<Input disabled data-testid="input" />);
     const input = component.locator('input');
     await expect(input).toBeDisabled();
@@ -382,7 +388,7 @@ test.describe('Input Component - Disabled State', () => {
 });
 
 test.describe('Input Component - ReadOnly State', () => {
-  test('should render readonly state', async ({ mount }) => {
+  test('should render readonly state', async ({ mount, page: _page }) => {
     const component = await mount(<Input readOnly value="Read only value" data-testid="input" />);
     const input = component.locator('input');
     await expect(input).toHaveAttribute('readonly');
@@ -397,7 +403,7 @@ test.describe('Input Component - ReadOnly State', () => {
     await expect(input).toHaveValue('Original');
   });
 
-  test('should be focusable when readonly', async ({ mount, page }) => {
+  test('should be focusable when readonly', async ({ mount, page: _page }) => {
     const component = await mount(<Input readOnly data-testid="input" />);
     const input = component.locator('input');
     await input.focus();
@@ -406,42 +412,42 @@ test.describe('Input Component - ReadOnly State', () => {
 });
 
 test.describe('Input Component - Type-Specific Behavior', () => {
-  test('should handle number type', async ({ mount }) => {
+  test('should handle number type', async ({ mount, page: _page }) => {
     const component = await mount(<Input type="number" data-testid="input" />);
     const input = component.locator('input');
     await input.fill('123');
     await expect(input).toHaveValue('123');
   });
 
-  test('should handle email type', async ({ mount }) => {
+  test('should handle email type', async ({ mount, page: _page }) => {
     const component = await mount(<Input type="email" data-testid="input" />);
     const input = component.locator('input');
     await input.fill('test@example.com');
     await expect(input).toHaveValue('test@example.com');
   });
 
-  test('should handle tel type', async ({ mount }) => {
+  test('should handle tel type', async ({ mount, page: _page }) => {
     const component = await mount(<Input type="tel" data-testid="input" />);
     const input = component.locator('input');
     await input.fill('555-1234');
     await expect(input).toHaveValue('555-1234');
   });
 
-  test('should handle url type', async ({ mount }) => {
+  test('should handle url type', async ({ mount, page: _page }) => {
     const component = await mount(<Input type="url" data-testid="input" />);
     const input = component.locator('input');
     await input.fill('https://example.com');
     await expect(input).toHaveValue('https://example.com');
   });
 
-  test('should handle search type', async ({ mount }) => {
+  test('should handle search type', async ({ mount, page: _page }) => {
     const component = await mount(<Input type="search" data-testid="input" />);
     const input = component.locator('input');
     await input.fill('search query');
     await expect(input).toHaveValue('search query');
   });
 
-  test('should mask password input', async ({ mount, page }) => {
+  test('should mask password input', async ({ mount, page: _page }) => {
     const component = await mount(<Input type="password" data-testid="input" />);
     const input = component.locator('input');
     await input.fill('secretpassword');
@@ -452,13 +458,13 @@ test.describe('Input Component - Type-Specific Behavior', () => {
 });
 
 test.describe('Input Component - Placeholder', () => {
-  test('should display placeholder text', async ({ mount }) => {
+  test('should display placeholder text', async ({ mount, page: _page }) => {
     const component = await mount(<Input placeholder="Enter your name" data-testid="input" />);
     const input = component.locator('input');
     await expect(input).toHaveAttribute('placeholder', 'Enter your name');
   });
 
-  test('should hide placeholder when input has value', async ({ mount }) => {
+  test('should hide placeholder when input has value', async ({ mount, page: _page }) => {
     const component = await mount(<Input placeholder="Placeholder" data-testid="input" />);
     const input = component.locator('input');
     await input.fill('Value');

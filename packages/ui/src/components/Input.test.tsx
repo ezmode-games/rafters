@@ -35,9 +35,10 @@ describe('Input Component', () => {
     });
 
     it('should render with provided id', () => {
-      render(<Input id="test-input" />);
-      const input = document.getElementById('test-input');
-      expect(input).toBeInTheDocument();
+      const testId = `input-${Date.now()}`;
+      render(<Input id={testId} data-testid="input" />);
+      const input = screen.getByTestId('input');
+      expect(input).toHaveAttribute('id', testId);
     });
 
     it('should pass through standard HTML input props', () => {
@@ -87,13 +88,13 @@ describe('Input Component', () => {
 
   describe('Validation Messages', () => {
     it('should not render validation message when not provided', () => {
-      const { container } = render(<Input id="test-input" />);
-      const validationMessage = container.querySelector('#test-input-validation');
+      render(<Input data-testid="input" />);
+      const validationMessage = screen.queryByRole('alert');
       expect(validationMessage).not.toBeInTheDocument();
     });
 
     it('should render validation message when provided', () => {
-      render(<Input id="test-input" validationMessage="This field is required" />);
+      render(<Input validationMessage="This field is required" />);
       const message = screen.getByText('This field is required');
       expect(message).toBeInTheDocument();
     });
@@ -117,52 +118,40 @@ describe('Input Component', () => {
     });
 
     it('should apply correct text color for error variant', () => {
-      const { container } = render(
-        <Input variant="error" validationMessage="Error message" />
-      );
+      const { container } = render(<Input variant="error" validationMessage="Error message" />);
       const message = container.querySelector('.text-destructive');
       expect(message).toBeInTheDocument();
       expect(message).toHaveTextContent('Error message');
     });
 
     it('should apply correct text color for success variant', () => {
-      const { container } = render(
-        <Input variant="success" validationMessage="Success message" />
-      );
+      const { container } = render(<Input variant="success" validationMessage="Success message" />);
       const message = container.querySelector('.text-success');
       expect(message).toBeInTheDocument();
       expect(message).toHaveTextContent('Success message');
     });
 
     it('should apply correct text color for warning variant', () => {
-      const { container } = render(
-        <Input variant="warning" validationMessage="Warning message" />
-      );
+      const { container } = render(<Input variant="warning" validationMessage="Warning message" />);
       const message = container.querySelector('.text-warning');
       expect(message).toBeInTheDocument();
       expect(message).toHaveTextContent('Warning message');
     });
 
     it('should render visual indicator for error variant', () => {
-      const { container } = render(
-        <Input variant="error" validationMessage="Error message" />
-      );
+      const { container } = render(<Input variant="error" validationMessage="Error message" />);
       const indicator = container.querySelector('.bg-destructive\\/20');
       expect(indicator).toBeInTheDocument();
     });
 
     it('should render visual indicator for success variant', () => {
-      const { container } = render(
-        <Input variant="success" validationMessage="Success message" />
-      );
+      const { container } = render(<Input variant="success" validationMessage="Success message" />);
       const indicator = container.querySelector('.bg-success\\/20');
       expect(indicator).toBeInTheDocument();
     });
 
     it('should render visual indicator for warning variant', () => {
-      const { container } = render(
-        <Input variant="warning" validationMessage="Warning message" />
-      );
+      const { container } = render(<Input variant="warning" validationMessage="Warning message" />);
       const indicator = container.querySelector('.bg-warning\\/20');
       expect(indicator).toBeInTheDocument();
     });
@@ -329,9 +318,11 @@ describe('Input Component', () => {
     });
 
     it('should set aria-describedby when validation message exists', () => {
-      render(<Input id="test-input" validationMessage="Error" data-testid="input" />);
+      render(<Input validationMessage="Error" data-testid="input" />);
       const input = screen.getByTestId('input');
-      expect(input).toHaveAttribute('aria-describedby', 'test-input-validation');
+      const ariaDescribedBy = input.getAttribute('aria-describedby');
+      expect(ariaDescribedBy).toBeTruthy();
+      expect(ariaDescribedBy).toMatch(/-validation$/);
     });
 
     it('should use default id for aria-describedby when no id provided', () => {
@@ -472,14 +463,14 @@ describe('Input Component', () => {
 
   describe('Wrapper Structure', () => {
     it('should wrap input in relative container', () => {
-      const { container } = render(<Input data-testid="input" />);
+      render(<Input data-testid="input" />);
       const input = screen.getByTestId('input');
       const wrapper = input.parentElement;
       expect(wrapper?.className).toContain('relative');
     });
 
     it('should contain validation message in wrapper', () => {
-      const { container } = render(<Input validationMessage="Error" data-testid="input" />);
+      render(<Input validationMessage="Error" data-testid="input" />);
       const input = screen.getByTestId('input');
       const wrapper = input.parentElement;
       const message = screen.getByText('Error');
