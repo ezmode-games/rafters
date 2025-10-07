@@ -46,30 +46,6 @@ declare global {
         checked?: boolean;
         disabled?: boolean;
       };
-      'r-select': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-        value?: string;
-        disabled?: boolean;
-        multiple?: boolean;
-        name?: string;
-      };
-      'r-switch': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-        checked?: boolean;
-        disabled?: boolean;
-        name?: string;
-        value?: string;
-      };
-      'r-textarea': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-        value?: string;
-        placeholder?: string;
-        required?: boolean;
-        readonly?: boolean;
-        disabled?: boolean;
-        minlength?: number;
-        maxlength?: number;
-        rows?: number;
-        cols?: number;
-        name?: string;
-      };
     }
   }
 }
