@@ -6,6 +6,7 @@
 export { RButton } from './button/r-button';
 export { RCheckbox } from './checkbox/r-checkbox';
 export { RCombobox } from './combobox/r-combobox';
+export { RDatepicker } from './datepicker/r-datepicker';
 export { RInput } from './input/r-input';
 export { RRadio } from './radio/r-radio';
 export { RSelect } from './select/r-select';
