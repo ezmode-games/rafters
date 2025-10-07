@@ -21,6 +21,7 @@
       "!**/.vscode/**/*",
       "!**/playwright/.cache/**/*",
       "!**/test/components/**/*",
+      "!**/test/primitives/**/*",
       "!/var/folders/**/*"
     ],
     "maxSize": 10485760

@@ -4,6 +4,7 @@
  */
 
 export { RButton } from './button/r-button';
+export { RCheckbox } from './checkbox/r-checkbox';
 export { RInput } from './input/r-input';
 export { RRadio } from './radio/r-radio';
 export { RSlider } from './slider/r-slider';

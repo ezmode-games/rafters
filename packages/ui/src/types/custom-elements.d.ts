@@ -12,6 +12,13 @@ declare global {
         type?: 'button' | 'submit' | 'reset';
         disabled?: boolean;
       };
+      'r-checkbox': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        checked?: boolean;
+        indeterminate?: boolean;
+        disabled?: boolean;
+        name?: string;
+        value?: string;
+      };
       'r-input': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         type?: 'text' | 'email' | 'password' | 'search' | 'tel' | 'url' | 'number';
         value?: string;
