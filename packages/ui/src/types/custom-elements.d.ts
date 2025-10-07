@@ -52,6 +52,12 @@ declare global {
         multiple?: boolean;
         name?: string;
       };
+      'r-switch': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        checked?: boolean;
+        disabled?: boolean;
+        name?: string;
+        value?: string;
+      };
     }
   }
 }
