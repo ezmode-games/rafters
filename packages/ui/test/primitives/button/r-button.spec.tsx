@@ -3,7 +3,7 @@
  */
 
 import { expect, test } from '@playwright/experimental-ct-react';
-import { Button } from '../../src/components/Button';
+import { Button } from '../../../src/components/Button';
 
 test('should render Button component', async ({ mount }) => {
   const component = await mount(<Button>Click me</Button>);
