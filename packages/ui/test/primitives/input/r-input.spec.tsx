@@ -292,7 +292,7 @@ test.describe('Input Component - Focus Management', () => {
     expect(hasOutline).toBe(true);
   });
 
-  test('should remove focus ring on blur', async ({ mount, page: _page }) => {
+  test('should remove focus ring on blur', async ({ mount, page }) => {
     const component = await mount(<Input data-testid="input" />);
     const input = component.locator('input');
     await input.focus();
