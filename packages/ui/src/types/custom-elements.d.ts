@@ -58,6 +58,18 @@ declare global {
         name?: string;
         value?: string;
       };
+      'r-textarea': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        value?: string;
+        placeholder?: string;
+        required?: boolean;
+        readonly?: boolean;
+        disabled?: boolean;
+        minlength?: number;
+        maxlength?: number;
+        rows?: number;
+        cols?: number;
+        name?: string;
+      };
     }
   }
 }
