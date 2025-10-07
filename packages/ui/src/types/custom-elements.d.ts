@@ -25,6 +25,12 @@ declare global {
         autocomplete?: string;
         name?: string;
       };
+      'r-radio': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        name: string;
+        value: string;
+        checked?: boolean;
+        disabled?: boolean;
+      };
     }
   }
 }
