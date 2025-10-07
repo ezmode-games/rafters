@@ -18,7 +18,6 @@
  */
 import { html } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { classMap } from 'lit/directives/class-map.js';
 import { RPrimitiveBase } from '../../base/RPrimitiveBase';
 
 @customElement('r-datepicker')
@@ -290,10 +289,9 @@ export class RDatepicker extends RPrimitiveBase {
     if (this.disabled) return;
 
     this.expanded = !this.expanded;
-    this.dispatchPrimitiveEvent(
-      this.expanded ? 'r-datepicker-open' : 'r-datepicker-close',
-      { expanded: this.expanded }
-    );
+    this.dispatchPrimitiveEvent(this.expanded ? 'r-datepicker-open' : 'r-datepicker-close', {
+      expanded: this.expanded,
+    });
   }
 
   /**
@@ -323,8 +321,9 @@ export class RDatepicker extends RPrimitiveBase {
           <span part="value">${this.value || 'Select date'}</span>
         </button>
 
-        ${this.expanded
-          ? html`
+        ${
+          this.expanded
+            ? html`
               <div
                 part="calendar"
                 role="dialog"
@@ -375,11 +374,12 @@ export class RDatepicker extends RPrimitiveBase {
                 </div>
               </div>
             `
-          : null}
+            : null
+        }
 
-        ${this.name
-          ? html`<input type="hidden" name="${this.name}" value="${this.value}" />`
-          : null}
+        ${
+          this.name ? html`<input type="hidden" name="${this.name}" value="${this.value}" />` : null
+        }
       </div>
     `;
   }

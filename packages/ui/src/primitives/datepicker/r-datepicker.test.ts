@@ -346,8 +346,8 @@ describe('r-datepicker primitive', () => {
       await element.updateComplete;
 
       const cells = element.shadowRoot?.querySelectorAll('[role="gridcell"]');
-      const selectedCell = Array.from(cells || []).find((cell) =>
-        cell.getAttribute('aria-selected') === 'true'
+      const selectedCell = Array.from(cells || []).find(
+        (cell) => cell.getAttribute('aria-selected') === 'true'
       );
 
       expect(selectedCell).toBeTruthy();
