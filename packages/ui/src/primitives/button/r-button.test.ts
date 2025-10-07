@@ -8,8 +8,8 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import '../../src/primitives/button/r-button.ts';
-import type { RButton } from '../../src/primitives/button/r-button.ts';
+import './r-button.ts';
+import type { RButton } from './r-button.ts';
 
 describe('r-button primitive', () => {
   let element: RButton;

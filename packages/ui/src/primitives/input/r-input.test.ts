@@ -8,8 +8,8 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import '../../src/primitives/input/r-input.ts';
-import type { RInput } from '../../src/primitives/input/r-input.ts';
+import './r-input.ts';
+import type { RInput } from './r-input.ts';
 
 describe('r-input primitive', () => {
   let element: RInput;

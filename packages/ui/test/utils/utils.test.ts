@@ -2,14 +2,14 @@
  * Utility function tests
  */
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { generateAriaId } from '../src/utils/accessibility.ts';
-import { FocusManager } from '../src/utils/focus.ts';
+import { generateAriaId } from '../../src/utils/accessibility.ts';
+import { FocusManager } from '../../src/utils/focus.ts';
 import {
   getNextIndex,
   isActionKey,
   isNavigationKey,
   updateRovingTabindex,
-} from '../src/utils/keyboard.ts';
+} from '../../src/utils/keyboard.ts';
 
 describe('Accessibility utilities', () => {
   let container: HTMLDivElement;

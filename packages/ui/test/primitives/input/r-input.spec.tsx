@@ -8,7 +8,7 @@
  */
 
 import { expect, test } from '@playwright/experimental-ct-react';
-import { Input } from '../../src/components/Input';
+import { Input } from '../../../src/components/Input';
 
 test.describe('Input Component - Visual Rendering', () => {
   test('should render with default variant', async ({ mount, page: _page }) => {

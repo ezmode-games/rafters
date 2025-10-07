@@ -9,7 +9,7 @@
  */
 
 import { expect, test } from '@playwright/experimental-ct-react';
-import { Input } from '../../src/components/Input';
+import { Input } from '../../../src/components/Input';
 import {
   runAxeScan,
   verifyFocusIndicator,
