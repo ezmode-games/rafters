@@ -6,7 +6,7 @@ import { defineConfig, devices } from '@playwright/experimental-ct-react';
  */
 export default defineConfig({
   testDir: './test',
-  testMatch: ['**/*.component.{ts,tsx}', '**/*.spec.{ts,tsx}'],
+  testMatch: ['**/*.component.{ts,tsx}', '**/*.spec.{ts,tsx}', '**/*.a11y.{ts,tsx}'],
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
