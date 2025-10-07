@@ -38,6 +38,12 @@ declare global {
         checked?: boolean;
         disabled?: boolean;
       };
+      'r-select': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        value?: string;
+        disabled?: boolean;
+        multiple?: boolean;
+        name?: string;
+      };
     }
   }
 }

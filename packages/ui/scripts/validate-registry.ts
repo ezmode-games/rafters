@@ -31,6 +31,14 @@ async function loadRegistryEntries(): Promise<PrimitiveRegistryEntry[]> {
     console.warn('Could not load r-input registry:', error);
   }
 
+  try {
+    // Import r-select registry
+    const rSelect = await import('../src/registry/entries/r-select.registry');
+    entries.push(rSelect.rSelectRegistryEntry);
+  } catch (error) {
+    console.warn('Could not load r-select registry:', error);
+  }
+
   return entries;
 }
 
