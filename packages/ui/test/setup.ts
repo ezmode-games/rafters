@@ -3,6 +3,7 @@
  * Configures jsdom environment for Web Components testing
  */
 
+import '@testing-library/jest-dom/vitest';
 import { vi } from 'vitest';
 
 // Suppress console warnings in tests

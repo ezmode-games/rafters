@@ -24,7 +24,7 @@
  * - Trust Building: https://rafters.realhandy.tech/docs/foundation/trust-building
  * - Cognitive Load: https://rafters.realhandy.tech/docs/foundation/cognitive-load
  *
- * @dependencies masky-js
+ * @dependencies r-input, masky-js
  *
  * @example
  * ```tsx
@@ -73,9 +73,7 @@ function inferMask(schema?: z.ZodType): string | null {
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   variant?: 'default' | 'error' | 'success' | 'warning';
-  validationMode?: 'live' | 'onBlur' | 'onSubmit';
   sensitive?: boolean;
-  showValidation?: boolean;
   validationMessage?: string;
   schema?: z.ZodType;
   mask?: MaskPreset | string;
@@ -84,9 +82,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 
 export function Input({
   variant = 'default',
-  validationMode = 'onBlur',
   sensitive = false,
-  showValidation = false,
   validationMessage,
   schema,
   mask,
@@ -133,11 +129,6 @@ export function Input({
   // Trust-building: Visual indicators for sensitive data
   const isSensitiveData = sensitive || type === 'password' || type === 'email';
 
-  // Validation intelligence: Choose appropriate feedback timing
-  const needsImmediateFeedback = variant === 'error' && validationMode === 'live';
-  // Intelligence reference - validation state detection
-  // const _hasValidationState = variant !== 'default';
-
   return (
     <div className="relative">
       <input
@@ -178,20 +169,15 @@ export function Input({
               variant === 'warning',
           },
 
-          // Enhanced styling for immediate feedback mode
-          needsImmediateFeedback && 'ring-2 ring-destructive/20',
-
           className
         )}
         aria-invalid={variant === 'error'}
-        aria-describedby={
-          showValidation && validationMessage ? `${props.id || 'input'}-validation` : undefined
-        }
+        aria-describedby={validationMessage ? `${props.id || 'input'}-validation` : undefined}
         {...props}
       />
 
       {/* Validation message with semantic meaning */}
-      {showValidation && validationMessage && (
+      {validationMessage && (
         <div
           id={`${props.id || 'input'}-validation`}
           className={cn('mt-1 text-xs flex items-center gap-1', {
@@ -200,7 +186,7 @@ export function Input({
             'text-warning': variant === 'warning',
           })}
           role={variant === 'error' ? 'alert' : 'status'}
-          aria-live={needsImmediateFeedback ? 'assertive' : 'polite'}
+          aria-live="polite"
         >
           {/* Visual indicator for validation state */}
           {variant === 'error' && (
