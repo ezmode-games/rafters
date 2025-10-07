@@ -72,13 +72,24 @@ describe('init command', () => {
     process.chdir(testDir);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     // Restore original directory
     process.chdir(originalCwd);
 
-    // Clean up test directory
+    // Clean up test directory with retries for node_modules cleanup issues
     if (existsSync(testDir)) {
-      removeSync(testDir);
+      try {
+        removeSync(testDir);
+      } catch (_error) {
+        // Retry once after a brief delay if cleanup fails (common with node_modules)
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        try {
+          removeSync(testDir);
+        } catch (retryError) {
+          // Log but don't fail test if cleanup still fails
+          console.warn(`Failed to cleanup test directory ${testDir}:`, retryError);
+        }
+      }
     }
 
     vi.restoreAllMocks();
