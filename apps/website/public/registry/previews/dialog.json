@@ -1,0 +1,43 @@
+{
+  "component": "dialog",
+  "baseClasses": [],
+  "propMappings": [
+    {
+      "propName": "size",
+      "values": {
+        "sm": ["w-full", "max-w-sm"],
+        "md": ["w-full", "max-w-md"],
+        "lg": ["w-full", "max-w-lg"],
+        "xl": ["w-full", "max-w-2xl"],
+        "full": ["w-[95vw]", "max-w-none", "h-[95vh]"]
+      }
+    },
+    {
+      "propName": "cognitiveComplexity",
+      "values": {
+        "simple": ["p-4", "gap-3"],
+        "moderate": ["p-6", "gap-4"],
+        "complex": ["p-8", "gap-6"]
+      }
+    }
+  ],
+  "allClasses": [
+    "w-full",
+    "max-w-sm",
+    "w-full",
+    "max-w-md",
+    "w-full",
+    "max-w-lg",
+    "w-full",
+    "max-w-2xl",
+    "w-[95vw]",
+    "max-w-none",
+    "h-[95vh]",
+    "p-4",
+    "gap-3",
+    "p-6",
+    "gap-4",
+    "p-8",
+    "gap-6"
+  ]
+}

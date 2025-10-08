@@ -1,0 +1,63 @@
+{
+  "component": "input",
+  "baseClasses": ["mt-1", "text-xs", "flex", "items-center", "gap-1"],
+  "propMappings": [
+    {
+      "propName": "variant",
+      "values": {
+        "default": ["border-input", "bg-background", "focus-visible:ring-primary"],
+        "error": [
+          "border-destructive",
+          "bg-destructive/10",
+          "focus-visible:ring-destructive",
+          "text-destructive-foreground"
+        ],
+        "success": [
+          "border-success",
+          "bg-success/10",
+          "focus-visible:ring-success",
+          "text-success-foreground"
+        ],
+        "warning": [
+          "border-warning",
+          "bg-warning/10",
+          "focus-visible:ring-warning",
+          "text-warning-foreground"
+        ]
+      }
+    },
+    {
+      "propName": "variant",
+      "values": {
+        "error": ["text-destructive"],
+        "success": ["text-success"],
+        "warning": ["text-warning"]
+      }
+    }
+  ],
+  "allClasses": [
+    "mt-1",
+    "text-xs",
+    "flex",
+    "items-center",
+    "gap-1",
+    "border-input",
+    "bg-background",
+    "focus-visible:ring-primary",
+    "border-destructive",
+    "bg-destructive/10",
+    "focus-visible:ring-destructive",
+    "text-destructive-foreground",
+    "border-success",
+    "bg-success/10",
+    "focus-visible:ring-success",
+    "text-success-foreground",
+    "border-warning",
+    "bg-warning/10",
+    "focus-visible:ring-warning",
+    "text-warning-foreground",
+    "text-destructive",
+    "text-success",
+    "text-warning"
+  ]
+}

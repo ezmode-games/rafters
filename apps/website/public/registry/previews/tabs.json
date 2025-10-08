@@ -1,0 +1,39 @@
+{
+  "component": "tabs",
+  "baseClasses": ["w-full"],
+  "propMappings": [
+    {
+      "propName": "variant",
+      "values": {
+        "default": ["rounded-md", "bg-muted", "p-1"],
+        "pills": ["bg-transparent", "gap-2"],
+        "underline": ["bg-transparent", "border-b", "border-border"]
+      }
+    },
+    {
+      "propName": "density",
+      "values": {
+        "compact": ["h-8", "gap-1"],
+        "comfortable": ["h-10", "gap-2"],
+        "spacious": ["h-12", "gap-3"]
+      }
+    }
+  ],
+  "allClasses": [
+    "w-full",
+    "rounded-md",
+    "bg-muted",
+    "p-1",
+    "bg-transparent",
+    "gap-2",
+    "bg-transparent",
+    "border-b",
+    "border-border",
+    "h-8",
+    "gap-1",
+    "h-10",
+    "gap-2",
+    "h-12",
+    "gap-3"
+  ]
+}

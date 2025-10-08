@@ -1,0 +1,53 @@
+{
+  "component": "tooltip",
+  "baseClasses": ["font-medium", "text-sm", "mb-1"],
+  "propMappings": [
+    {
+      "propName": "context",
+      "values": {
+        "help": ["bg-muted", "text-muted-foreground", "border-muted-foreground/20"],
+        "definition": ["bg-card", "text-card-foreground", "border-border"],
+        "action": ["bg-accent", "text-accent-foreground", "border-accent-foreground/20"],
+        "status": ["bg-secondary", "text-secondary-foreground", "border-secondary-foreground/30"],
+        "shortcut": [
+          "bg-popover",
+          "text-popover-foreground",
+          "border-primary/20",
+          "font-mono",
+          "text-xs"
+        ]
+      }
+    },
+    {
+      "propName": "complexity",
+      "values": {
+        "simple": ["max-w-xs"],
+        "detailed": ["max-w-sm"]
+      }
+    }
+  ],
+  "allClasses": [
+    "font-medium",
+    "text-sm",
+    "mb-1",
+    "bg-muted",
+    "text-muted-foreground",
+    "border-muted-foreground/20",
+    "bg-card",
+    "text-card-foreground",
+    "border-border",
+    "bg-accent",
+    "text-accent-foreground",
+    "border-accent-foreground/20",
+    "bg-secondary",
+    "text-secondary-foreground",
+    "border-secondary-foreground/30",
+    "bg-popover",
+    "text-popover-foreground",
+    "border-primary/20",
+    "font-mono",
+    "text-xs",
+    "max-w-xs",
+    "max-w-sm"
+  ]
+}

@@ -1,0 +1,211 @@
+{
+  "component": "badge",
+  "baseClasses": [
+    "relative",
+    "inline-flex",
+    "items-center",
+    "rounded-md",
+    "text-xs",
+    "font-medium",
+    "select-none"
+  ],
+  "propMappings": [
+    {
+      "propName": "size",
+      "values": {
+        "sm": ["text-xs"],
+        "lg": ["text-sm"]
+      }
+    },
+    {
+      "propName": "emphasis",
+      "values": {
+        "subtle": ["opacity-75", "border-0"],
+        "default": ["opacity-100", "border"],
+        "prominent": ["opacity-100", "border-2", "shadow-sm"]
+      }
+    },
+    {
+      "propName": "variant",
+      "values": {
+        "success": ["bg-success/20", "border-success/30", "text-success"],
+        "warning": ["bg-warning/20", "border-warning/30", "text-warning"],
+        "error": ["bg-destructive/20", "border-destructive/30", "text-destructive"],
+        "info": ["bg-info/20", "border-info/30", "text-info"],
+        "neutral": ["bg-muted", "border-muted-foreground/20", "text-muted-foreground"]
+      }
+    },
+    {
+      "propName": "size",
+      "values": {
+        "sm": ["px-1.5", "py-0.5"],
+        "md": ["px-2", "py-0.5"],
+        "lg": ["px-2.5", "py-1"]
+      }
+    },
+    {
+      "propName": "size",
+      "values": {
+        "sm": ["p-0.5"],
+        "md": ["p-1"],
+        "lg": ["p-1.5"]
+      }
+    },
+    {
+      "propName": "size",
+      "values": {
+        "sm": ["px-1.5", "py-0.5", "text-xs"],
+        "md": ["px-2", "py-0.5", "text-xs"],
+        "lg": ["px-2.5", "py-1", "text-sm"]
+      }
+    },
+    {
+      "propName": "emphasis",
+      "values": {
+        "subtle": ["opacity-75", "border-0"],
+        "default": ["opacity-100", "border"],
+        "prominent": ["opacity-100", "border-2", "shadow-sm"]
+      }
+    },
+    {
+      "propName": "variant",
+      "values": {
+        "success": ["bg-success/20", "border-success/30", "text-success"],
+        "warning": ["bg-warning/20", "border-warning/30", "text-warning"],
+        "error": ["bg-destructive/20", "border-destructive/30", "text-destructive"],
+        "info": ["bg-info/20", "border-info/30", "text-info"],
+        "neutral": ["bg-muted", "border-muted-foreground/20", "text-muted-foreground"]
+      }
+    },
+    {
+      "propName": "size",
+      "values": {
+        "sm": ["px-1.5", "py-0.5", "text-xs"],
+        "md": ["px-2", "py-0.5", "text-xs"],
+        "lg": ["px-2.5", "py-1", "text-sm"]
+      }
+    },
+    {
+      "propName": "emphasis",
+      "values": {
+        "subtle": ["opacity-75", "border-0"],
+        "default": ["opacity-100", "border"],
+        "prominent": ["opacity-100", "border-2", "shadow-sm"]
+      }
+    },
+    {
+      "propName": "variant",
+      "values": {
+        "success": ["bg-success/20", "border-success/30", "text-success"],
+        "warning": ["bg-warning/20", "border-warning/30", "text-warning"],
+        "error": ["bg-destructive/20", "border-destructive/30", "text-destructive"],
+        "info": ["bg-info/20", "border-info/30", "text-info"],
+        "neutral": ["bg-muted", "border-muted-foreground/20", "text-muted-foreground"]
+      }
+    }
+  ],
+  "allClasses": [
+    "relative",
+    "inline-flex",
+    "items-center",
+    "rounded-md",
+    "text-xs",
+    "font-medium",
+    "select-none",
+    "text-xs",
+    "text-sm",
+    "opacity-75",
+    "border-0",
+    "opacity-100",
+    "border",
+    "opacity-100",
+    "border-2",
+    "shadow-sm",
+    "bg-success/20",
+    "border-success/30",
+    "text-success",
+    "bg-warning/20",
+    "border-warning/30",
+    "text-warning",
+    "bg-destructive/20",
+    "border-destructive/30",
+    "text-destructive",
+    "bg-info/20",
+    "border-info/30",
+    "text-info",
+    "bg-muted",
+    "border-muted-foreground/20",
+    "text-muted-foreground",
+    "px-1.5",
+    "py-0.5",
+    "px-2",
+    "py-0.5",
+    "px-2.5",
+    "py-1",
+    "p-0.5",
+    "p-1",
+    "p-1.5",
+    "px-1.5",
+    "py-0.5",
+    "text-xs",
+    "px-2",
+    "py-0.5",
+    "text-xs",
+    "px-2.5",
+    "py-1",
+    "text-sm",
+    "opacity-75",
+    "border-0",
+    "opacity-100",
+    "border",
+    "opacity-100",
+    "border-2",
+    "shadow-sm",
+    "bg-success/20",
+    "border-success/30",
+    "text-success",
+    "bg-warning/20",
+    "border-warning/30",
+    "text-warning",
+    "bg-destructive/20",
+    "border-destructive/30",
+    "text-destructive",
+    "bg-info/20",
+    "border-info/30",
+    "text-info",
+    "bg-muted",
+    "border-muted-foreground/20",
+    "text-muted-foreground",
+    "px-1.5",
+    "py-0.5",
+    "text-xs",
+    "px-2",
+    "py-0.5",
+    "text-xs",
+    "px-2.5",
+    "py-1",
+    "text-sm",
+    "opacity-75",
+    "border-0",
+    "opacity-100",
+    "border",
+    "opacity-100",
+    "border-2",
+    "shadow-sm",
+    "bg-success/20",
+    "border-success/30",
+    "text-success",
+    "bg-warning/20",
+    "border-warning/30",
+    "text-warning",
+    "bg-destructive/20",
+    "border-destructive/30",
+    "text-destructive",
+    "bg-info/20",
+    "border-info/30",
+    "text-info",
+    "bg-muted",
+    "border-muted-foreground/20",
+    "text-muted-foreground"
+  ]
+}

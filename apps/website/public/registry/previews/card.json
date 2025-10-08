@@ -1,0 +1,104 @@
+{
+  "component": "card",
+  "baseClasses": ["rounded-lg", "border", "bg-card", "text-card-foreground", "transition-all"],
+  "propMappings": [
+    {
+      "propName": "prominence",
+      "values": {
+        "subtle": ["border-border", "shadow-sm"],
+        "default": ["border-border", "shadow-md"],
+        "elevated": ["border-border", "shadow-lg"]
+      }
+    },
+    {
+      "propName": "density",
+      "values": {
+        "compact": ["p-4"],
+        "comfortable": ["p-6"],
+        "spacious": ["p-8"]
+      }
+    },
+    {
+      "propName": "weight",
+      "values": {
+        "normal": ["font-normal"],
+        "medium": ["font-medium"],
+        "semibold": ["font-semibold"]
+      }
+    },
+    {
+      "propName": "prominence",
+      "values": {
+        "subtle": ["text-muted-foreground/70"],
+        "default": ["text-muted-foreground"]
+      }
+    },
+    {
+      "propName": "density",
+      "values": {
+        "compact": ["p-4"],
+        "comfortable": ["p-6"],
+        "spacious": ["p-8"]
+      }
+    },
+    {
+      "propName": "layout",
+      "values": {
+        "grid": ["grid", "grid-cols-1", "gap-4"],
+        "list": ["space-y-3"]
+      }
+    },
+    {
+      "propName": "density",
+      "values": {
+        "compact": ["p-4"],
+        "comfortable": ["p-6"],
+        "spacious": ["p-8"]
+      }
+    },
+    {
+      "propName": "justify",
+      "values": {
+        "start": ["justify-start"],
+        "center": ["justify-center"],
+        "end": ["justify-end"],
+        "between": ["justify-between"]
+      }
+    }
+  ],
+  "allClasses": [
+    "rounded-lg",
+    "border",
+    "bg-card",
+    "text-card-foreground",
+    "transition-all",
+    "border-border",
+    "shadow-sm",
+    "border-border",
+    "shadow-md",
+    "border-border",
+    "shadow-lg",
+    "p-4",
+    "p-6",
+    "p-8",
+    "font-normal",
+    "font-medium",
+    "font-semibold",
+    "text-muted-foreground/70",
+    "text-muted-foreground",
+    "p-4",
+    "p-6",
+    "p-8",
+    "grid",
+    "grid-cols-1",
+    "gap-4",
+    "space-y-3",
+    "p-4",
+    "p-6",
+    "p-8",
+    "justify-start",
+    "justify-center",
+    "justify-end",
+    "justify-between"
+  ]
+}

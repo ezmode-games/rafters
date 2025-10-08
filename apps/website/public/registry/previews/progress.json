@@ -1,0 +1,6 @@
+{
+  "component": "progress",
+  "baseClasses": ["space-y-2"],
+  "propMappings": [],
+  "allClasses": ["space-y-2"]
+}

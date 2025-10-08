@@ -70,6 +70,8 @@ export type { TooltipProps } from './components/Tooltip';
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './components/Tooltip';
 // Utilities
 export { cn } from './lib/utils';
+// Primitives
+export { RComponentPreview } from './primitives/preview/r-component-preview';
 // Providers
 export { KeyboardNavigationProvider } from './providers/KeyboardNavigationProvider';
 export { MotionCoordinator } from './providers/MotionCoordinator';

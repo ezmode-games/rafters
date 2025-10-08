@@ -1,0 +1,30 @@
+{
+  "component": "breadcrumb",
+  "baseClasses": ["flex", "items-center"],
+  "propMappings": [
+    {
+      "propName": "size",
+      "values": {
+        "sm": ["text-xs"],
+        "md": ["text-sm"],
+        "lg": ["text-base"]
+      }
+    },
+    {
+      "propName": "variant",
+      "values": {
+        "default": ["opacity-100"],
+        "minimal": ["opacity-75"]
+      }
+    }
+  ],
+  "allClasses": [
+    "flex",
+    "items-center",
+    "text-xs",
+    "text-sm",
+    "text-base",
+    "opacity-100",
+    "opacity-75"
+  ]
+}

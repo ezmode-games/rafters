@@ -1,0 +1,55 @@
+{
+  "component": "label",
+  "baseClasses": ["space-y-1"],
+  "propMappings": [
+    {
+      "propName": "importance",
+      "values": {
+        "critical": ["font-semibold"],
+        "standard": ["font-medium"],
+        "optional": ["font-normal", "opacity-75"]
+      }
+    },
+    {
+      "propName": "context",
+      "values": {
+        "form": ["cursor-pointer"],
+        "descriptive": ["cursor-default"],
+        "action": ["cursor-pointer", "hover:text-accent-foreground"]
+      }
+    },
+    {
+      "propName": "validationState",
+      "values": {
+        "error": ["text-destructive"],
+        "warning": ["text-warning"],
+        "success": ["text-success"]
+      }
+    },
+    {
+      "propName": "validationState",
+      "values": {
+        "error": ["text-destructive"],
+        "warning": ["text-warning"],
+        "success": ["text-success"]
+      }
+    }
+  ],
+  "allClasses": [
+    "space-y-1",
+    "font-semibold",
+    "font-medium",
+    "font-normal",
+    "opacity-75",
+    "cursor-pointer",
+    "cursor-default",
+    "cursor-pointer",
+    "hover:text-accent-foreground",
+    "text-destructive",
+    "text-warning",
+    "text-success",
+    "text-destructive",
+    "text-warning",
+    "text-success"
+  ]
+}

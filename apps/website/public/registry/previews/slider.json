@@ -1,0 +1,6 @@
+{
+  "component": "slider",
+  "baseClasses": ["relative", "flex", "w-full", "touch-none", "select-none", "items-center"],
+  "propMappings": [],
+  "allClasses": ["relative", "flex", "w-full", "touch-none", "select-none", "items-center"]
+}

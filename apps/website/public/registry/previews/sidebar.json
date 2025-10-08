@@ -1,0 +1,70 @@
+{
+  "component": "sidebar",
+  "baseClasses": ["flex-1", "min-w-0"],
+  "propMappings": [
+    {
+      "propName": "variant",
+      "values": {
+        "default": ["shadow-none"],
+        "floating": ["shadow-lg", "rounded-lg", "border"],
+        "overlay": ["fixed", "inset-y-0", "z-50", "shadow-xl"]
+      }
+    },
+    {
+      "propName": "position",
+      "values": {
+        "left": ["left-0"],
+        "right": ["right-0"]
+      }
+    },
+    {
+      "propName": "size",
+      "values": {
+        "compact": ["w-60"],
+        "comfortable": ["w-72"],
+        "spacious": ["w-80"]
+      }
+    },
+    {
+      "propName": "variant",
+      "values": {
+        "default": ["text-foreground"],
+        "primary": ["text-primary", "font-semibold"],
+        "secondary": ["text-muted-foreground"]
+      }
+    },
+    {
+      "propName": "variant",
+      "values": {
+        "default": ["text-foreground"],
+        "primary": ["text-primary", "font-semibold"],
+        "secondary": ["text-muted-foreground"]
+      }
+    }
+  ],
+  "allClasses": [
+    "flex-1",
+    "min-w-0",
+    "shadow-none",
+    "shadow-lg",
+    "rounded-lg",
+    "border",
+    "fixed",
+    "inset-y-0",
+    "z-50",
+    "shadow-xl",
+    "left-0",
+    "right-0",
+    "w-60",
+    "w-72",
+    "w-80",
+    "text-foreground",
+    "text-primary",
+    "font-semibold",
+    "text-muted-foreground",
+    "text-foreground",
+    "text-primary",
+    "font-semibold",
+    "text-muted-foreground"
+  ]
+}
