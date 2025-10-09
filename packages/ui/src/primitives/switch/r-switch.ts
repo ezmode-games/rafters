@@ -18,37 +18,46 @@
  * ```
  */
 import { html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 import { RPrimitiveBase } from '../../base/RPrimitiveBase';
 import { preventDefaultForActionKeys } from '../../utils/keyboard';
 
 @customElement('r-switch')
 export class RSwitch extends RPrimitiveBase {
+  static override properties = {
+    ...RPrimitiveBase.properties,
+    role: { type: String, reflect: true },
+    tabIndex: { type: Number, reflect: true },
+    checked: { type: Boolean, reflect: true },
+    name: { type: String },
+    value: { type: String },
+  };
+
   /**
    * Switch role for accessibility
    */
-  @property({ type: String, reflect: true }) override role = 'switch';
+  override role = 'switch';
 
   /**
    * Tab index for keyboard navigation
    * 0 = in tab order, -1 = not tabbable, >0 = custom tab order (avoid)
    */
-  @property({ type: Number, reflect: true }) override tabIndex = 0;
+  override tabIndex = 0;
 
   /**
    * Checked state - true for on, false for off
    */
-  @property({ type: Boolean, reflect: true }) checked = false;
+  checked = false;
 
   /**
    * Form field name
    */
-  @property({ type: String }) name?: string;
+  name?: string;
 
   /**
    * Form field value
    */
-  @property({ type: String }) value?: string;
+  value?: string;
 
   override connectedCallback(): void {
     super.connectedCallback();

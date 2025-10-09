@@ -25,50 +25,59 @@
  * ```
  */
 import { html } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { customElement, query } from 'lit/decorators.js';
 import { RPrimitiveBase } from '../../base/RPrimitiveBase';
 import { getNextIndex } from '../../utils/keyboard';
 
 @customElement('r-select')
 export class RSelect extends RPrimitiveBase {
+  static override properties = {
+    ...RPrimitiveBase.properties,
+    role: { type: String, reflect: true },
+    tabIndex: { type: Number, reflect: true },
+    value: { type: String, reflect: true },
+    multiple: { type: Boolean, reflect: true },
+    name: { type: String },
+    ariaActiveDescendant: { type: String, attribute: 'aria-activedescendant' },
+    ariaMultiselectable: { type: String, attribute: 'aria-multiselectable' },
+  };
+
   /**
    * Listbox role for accessibility
    */
-  @property({ type: String, reflect: true }) override role = 'listbox';
+  override role = 'listbox';
 
   /**
    * Tab index for keyboard navigation
    * 0 = in tab order, -1 = not tabbable
    */
-  @property({ type: Number, reflect: true }) override tabIndex = 0;
+  override tabIndex = 0;
 
   /**
    * Selected value(s)
    * For single select: string
    * For multiple select: comma-separated string
    */
-  @property({ type: String, reflect: true }) value = '';
+  value = '';
 
   /**
    * Whether the select supports multiple selection
    */
-  @property({ type: Boolean, reflect: true }) multiple = false;
+  multiple = false;
 
   /**
    * Form field name for form submission
    */
-  @property({ type: String }) name?: string;
+  name?: string;
 
   /**
    * Active descendant for ARIA (currently focused option)
    */
-  @property({ type: String, attribute: 'aria-activedescendant' })
   ariaActiveDescendant?: string;
 
   /**
    * ARIA multiselectable attribute
    */
-  @property({ type: String, attribute: 'aria-multiselectable' })
   get ariaMultiselectable(): string {
     return this.multiple ? 'true' : 'false';
   }
@@ -76,12 +85,12 @@ export class RSelect extends RPrimitiveBase {
   /**
    * Currently active option index
    */
-  @state() private _activeIndex = -1;
+  private _activeIndex = -1;
 
   /**
    * Option elements cache
    */
-  @state() private _options: HTMLElement[] = [];
+  private _options: HTMLElement[] = [];
 
   /**
    * Reference to the slot element
