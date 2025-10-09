@@ -18,43 +18,28 @@
  * ```
  */
 import { html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 import { RPrimitiveBase } from '../../base/RPrimitiveBase';
 import { preventDefaultForActionKeys } from '../../utils/keyboard';
 
 @customElement('r-checkbox')
 export class RCheckbox extends RPrimitiveBase {
-  /**
-   * Checkbox role for accessibility
-   */
-  @property({ type: String, reflect: true }) override role = 'checkbox';
+  static override properties = {
+    ...RPrimitiveBase.properties,
+    role: { type: String, reflect: true },
+    tabIndex: { type: Number, reflect: true },
+    checked: { type: Boolean, reflect: true },
+    indeterminate: { type: Boolean, reflect: true },
+    name: { type: String },
+    value: { type: String },
+  };
 
-  /**
-   * Tab index for keyboard navigation
-   * 0 = in tab order, -1 = not tabbable, >0 = custom tab order (avoid)
-   */
-  @property({ type: Number, reflect: true }) override tabIndex = 0;
-
-  /**
-   * Checked state
-   */
-  @property({ type: Boolean, reflect: true }) checked = false;
-
-  /**
-   * Indeterminate state (tri-state checkbox)
-   * Takes precedence over checked when true
-   */
-  @property({ type: Boolean, reflect: true }) indeterminate = false;
-
-  /**
-   * Form field name
-   */
-  @property({ type: String }) name?: string;
-
-  /**
-   * Form field value
-   */
-  @property({ type: String }) value?: string;
+  override role = 'checkbox';
+  override tabIndex = 0;
+  checked = false;
+  indeterminate = false;
+  name?: string;
+  value?: string;
 
   override connectedCallback(): void {
     super.connectedCallback();

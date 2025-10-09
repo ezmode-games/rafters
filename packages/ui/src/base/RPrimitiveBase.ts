@@ -23,43 +23,23 @@
  * ```
  */
 import { LitElement } from 'lit';
-import { property, state } from 'lit/decorators.js';
 
 export abstract class RPrimitiveBase extends LitElement {
-  /**
-   * Disabled state (reflects to attribute for CSS targeting)
-   */
-  @property({ type: Boolean, reflect: true }) disabled = false;
+  static override properties = {
+    disabled: { type: Boolean, reflect: true },
+    role: { type: String, reflect: true },
+    ariaLabel: { type: String, attribute: 'aria-label' },
+    ariaLabelledBy: { type: String, attribute: 'aria-labelledby' },
+    ariaDescribedBy: { type: String, attribute: 'aria-describedby' },
+  };
 
-  /**
-   * ARIA role for the component
-   */
-  @property({ type: String, reflect: true }) override role: string | null = null;
-
-  /**
-   * ARIA label for accessibility
-   */
-  @property({ attribute: 'aria-label' }) override ariaLabel: string | null = null;
-
-  /**
-   * ARIA labelledby reference
-   */
-  @property({ attribute: 'aria-labelledby' }) ariaLabelledBy?: string;
-
-  /**
-   * ARIA describedby reference
-   */
-  @property({ attribute: 'aria-describedby' }) ariaDescribedBy?: string;
-
-  /**
-   * Focus state (internal)
-   */
-  @state() protected _focused = false;
-
-  /**
-   * Hover state (internal)
-   */
-  @state() protected _hovered = false;
+  disabled = false;
+  override role: string | null = null;
+  override ariaLabel: string | null = null;
+  ariaLabelledBy?: string;
+  ariaDescribedBy?: string;
+  _focused = false;
+  _hovered = false;
 
   /**
    * Handle keyboard navigation
@@ -79,7 +59,7 @@ export abstract class RPrimitiveBase extends LitElement {
    * @param detail - Event detail payload
    * @param timestamp - Optional timestamp (defaults to Date.now() for React 19 purity)
    */
-  protected dispatchPrimitiveEvent<T>(
+  dispatchPrimitiveEvent<T>(
     name: string,
     detail: T,
     timestamp: number = Date.now()
