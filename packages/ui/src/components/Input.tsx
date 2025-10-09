@@ -43,6 +43,7 @@
  */
 
 import { type MaskPreset, MaskPresets } from '@rafters/shared';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { useEffect, useRef } from 'react';
 import type { z } from 'zod';
 import { cn } from '../lib/utils';
@@ -71,9 +72,32 @@ function inferMask(schema?: z.ZodType): string | null {
   return null;
 }
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  variant?: 'default' | 'error' | 'success' | 'warning';
-  sensitive?: boolean;
+const inputVariants = cva(
+  'flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-disabled transition-all motion-focus hover:opacity-hover min-h-[44px] sm:min-h-[40px]',
+  {
+    variants: {
+      variant: {
+        default: 'border-input bg-background focus-visible:ring-primary',
+        error:
+          'border-destructive bg-destructive/10 focus-visible:ring-destructive text-destructive-foreground',
+        success: 'border-success bg-success/10 focus-visible:ring-success text-success-foreground',
+        warning: 'border-warning bg-warning/10 focus-visible:ring-warning text-warning-foreground',
+      },
+      sensitive: {
+        true: 'shadow-sm border-2',
+        false: '',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      sensitive: false,
+    },
+  }
+);
+
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement>,
+    VariantProps<typeof inputVariants> {
   validationMessage?: string;
   schema?: z.ZodType;
   mask?: MaskPreset | string;
@@ -142,41 +166,12 @@ export function Input({
         }}
         type={type}
         data-mask={resolvedMask || undefined}
-        className={cn(
-          // Base styles - using semantic tokens with motor accessibility
-          'flex h-10 w-full rounded-md border px-3 py-2 text-sm',
-          'file:border-0 file:bg-transparent file:text-sm file:font-medium',
-          'placeholder:text-muted-foreground',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-          'disabled:cursor-not-allowed disabled:opacity-disabled',
-          'transition-all motion-focus',
-          'hover:opacity-hover',
-
-          // Motor accessibility: Enhanced touch targets on mobile
-          'min-h-[44px] sm:min-h-[40px]',
-
-          // Trust-building: Visual indicators for sensitive data
-          isSensitiveData && 'shadow-sm border-2',
-
-          // Validation intelligence: Semantic variants with clear meaning
-          {
-            'border-input bg-background focus-visible:ring-primary': variant === 'default',
-            'border-destructive bg-destructive/10 focus-visible:ring-destructive text-destructive-foreground':
-              variant === 'error',
-            'border-success bg-success/10 focus-visible:ring-success text-success-foreground':
-              variant === 'success',
-            'border-warning bg-warning/10 focus-visible:ring-warning text-warning-foreground':
-              variant === 'warning',
-          },
-
-          className
-        )}
+        className={cn(inputVariants({ variant, sensitive: isSensitiveData }), className)}
         aria-invalid={variant === 'error'}
         aria-describedby={validationMessage ? `${props.id || 'input'}-validation` : undefined}
         {...props}
       />
 
-      {/* Validation message with semantic meaning */}
       {validationMessage && (
         <div
           id={`${props.id || 'input'}-validation`}
@@ -188,7 +183,6 @@ export function Input({
           role={variant === 'error' ? 'alert' : 'status'}
           aria-live="polite"
         >
-          {/* Visual indicator for validation state */}
           {variant === 'error' && (
             <span
               className="w-3 h-3 rounded-full bg-destructive/20 flex items-center justify-center"
@@ -217,7 +211,6 @@ export function Input({
         </div>
       )}
 
-      {/* Trust-building indicator for sensitive data */}
       {isSensitiveData && (
         <div
           className="absolute right-2 top-2 w-2 h-2 rounded-full bg-primary/30"

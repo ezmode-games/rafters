@@ -35,6 +35,7 @@
  * ```
  */
 import '../primitives/button/r-button';
+import { cva, type VariantProps } from 'class-variance-authority';
 import type * as React from 'react';
 import { cn } from '../lib/utils';
 import type { RButton } from '../primitives/button/r-button';
@@ -52,17 +53,37 @@ declare module 'react' {
   }
 }
 
-export interface ButtonProps extends React.HTMLAttributes<HTMLElement> {
-  variant?:
-    | 'primary'
-    | 'secondary'
-    | 'destructive'
-    | 'success'
-    | 'warning'
-    | 'info'
-    | 'outline'
-    | 'ghost';
-  size?: 'sm' | 'md' | 'lg' | 'full';
+const buttonVariants = cva(
+  'inline-flex items-center justify-center rounded-md text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 transition-all hover:opacity-90 active:scale-95',
+  {
+    variants: {
+      variant: {
+        primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        success: 'bg-success text-success-foreground hover:bg-success/90',
+        warning: 'bg-warning text-warning-foreground hover:bg-warning/90',
+        info: 'bg-info text-info-foreground hover:bg-info/90',
+        outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+        ghost: 'hover:bg-accent hover:text-accent-foreground',
+      },
+      size: {
+        sm: 'h-8 px-3 text-xs',
+        md: 'h-10 px-4',
+        lg: 'h-12 px-6 text-base',
+        full: 'h-12 px-6 text-base w-full',
+      },
+    },
+    defaultVariants: {
+      variant: 'primary',
+      size: 'md',
+    },
+  }
+);
+
+export interface ButtonProps
+  extends React.HTMLAttributes<HTMLElement>,
+    VariantProps<typeof buttonVariants> {
   loading?: boolean;
   destructiveConfirm?: boolean;
   disabled?: boolean;
@@ -92,41 +113,9 @@ export function Button({
       aria-busy={loading}
       aria-label={shouldShowConfirmation ? `Confirm to ${children}` : undefined}
       className={cn(
-        // Base styles - using semantic tokens with proper interactive states
-        'inline-flex items-center justify-center rounded-md text-sm font-medium',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-        'disabled:pointer-events-none disabled:opacity-50',
-        'transition-all',
-        'hover:opacity-90 active:scale-95',
-
-        // Loading state reduces opacity for trust-building
+        buttonVariants({ variant, size }),
         loading && 'opacity-75 cursor-wait',
-
-        // Attention economics: Destructive actions get visual weight
         isDestructiveAction && 'font-semibold shadow-sm',
-
-        // Variants - all grayscale, using semantic tokens
-        {
-          'bg-primary text-primary-foreground hover:bg-primary/90': variant === 'primary',
-          'bg-secondary text-secondary-foreground hover:bg-secondary/80': variant === 'secondary',
-          'bg-destructive text-destructive-foreground hover:bg-destructive/90':
-            variant === 'destructive',
-          'bg-success text-success-foreground hover:bg-success/90': variant === 'success',
-          'bg-warning text-warning-foreground hover:bg-warning/90': variant === 'warning',
-          'bg-info text-info-foreground hover:bg-info/90': variant === 'info',
-          'border border-input bg-background hover:bg-accent hover:text-accent-foreground':
-            variant === 'outline',
-          'hover:bg-accent hover:text-accent-foreground': variant === 'ghost',
-        },
-
-        // Attention economics: Size hierarchy for cognitive load
-        {
-          'h-8 px-3 text-xs': size === 'sm',
-          'h-10 px-4': size === 'md',
-          'h-12 px-6 text-base': size === 'lg',
-          'h-12 px-6 text-base w-full': size === 'full',
-        },
-
         className
       )}
       {...props}

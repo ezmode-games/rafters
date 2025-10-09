@@ -24,6 +24,7 @@
     "test:component": "echo 'Component tests temporarily disabled - see https://github.com/real-handy/rafters/issues/XXX' && exit 0",
     "test:a11y": "echo 'A11y tests temporarily disabled - see https://github.com/real-handy/rafters/issues/XXX' && exit 0",
     "test:preflight": "vitest run --passWithNoTests",
+    "extract:preview": "tsx scripts/extract-preview-intelligence.ts",
     "validate:registry": "tsx scripts/validate-registry.ts",
     "lint": "biome check --fix --unsafe .",
     "typecheck": "tsc --noEmit"
