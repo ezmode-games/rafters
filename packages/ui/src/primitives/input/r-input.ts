@@ -44,14 +44,7 @@ export class RInput extends RPrimitiveBase {
   /**
    * Input type
    */
-  type:
-    | 'text'
-    | 'email'
-    | 'password'
-    | 'search'
-    | 'tel'
-    | 'url'
-    | 'number' = 'text';
+  type: 'text' | 'email' | 'password' | 'search' | 'tel' | 'url' | 'number' = 'text';
 
   /**
    * Input value
@@ -111,15 +104,7 @@ export class RInput extends RPrimitiveBase {
   /**
    * Input mode for mobile keyboards
    */
-  inputmode?:
-    | 'none'
-    | 'text'
-    | 'decimal'
-    | 'numeric'
-    | 'tel'
-    | 'search'
-    | 'email'
-    | 'url';
+  inputmode?: 'none' | 'text' | 'decimal' | 'numeric' | 'tel' | 'search' | 'email' | 'url';
 
   /**
    * Input reference

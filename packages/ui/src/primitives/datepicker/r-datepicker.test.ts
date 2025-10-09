@@ -342,6 +342,8 @@ describe('r-datepicker primitive', () => {
 
     it('should set aria-selected on selected date', async () => {
       element.value = '2024-03-15';
+      // Force display month to match the selected date
+      (element as unknown as { _displayMonth: string })._displayMonth = '2024-03';
       element.expanded = true;
       await element.updateComplete;
 
