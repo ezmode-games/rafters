@@ -17,51 +17,63 @@
  * ```
  */
 import { html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 import { RPrimitiveBase } from '../../base/RPrimitiveBase';
 
 @customElement('r-slider')
 export class RSlider extends RPrimitiveBase {
+  static override properties = {
+    ...RPrimitiveBase.properties,
+    role: { type: String, reflect: true },
+    tabIndex: { type: Number, reflect: true },
+    value: { type: Number },
+    min: { type: Number },
+    max: { type: Number },
+    step: { type: Number },
+    orientation: { type: String },
+    name: { type: String },
+  };
+
   /**
    * Slider role for accessibility
    */
-  @property({ type: String, reflect: true }) override role = 'slider';
+  override role = 'slider';
 
   /**
    * Tab index for keyboard navigation
    * 0 = in tab order, -1 = not tabbable when disabled
    */
-  @property({ type: Number, reflect: true }) override tabIndex = 0;
+  override tabIndex = 0;
 
   /**
    * Current value of the slider
    */
-  @property({ type: Number }) value = 0;
+  value = 0;
 
   /**
    * Minimum value
    */
-  @property({ type: Number }) min = 0;
+  min = 0;
 
   /**
    * Maximum value
    */
-  @property({ type: Number }) max = 100;
+  max = 100;
 
   /**
    * Step increment/decrement value
    */
-  @property({ type: Number }) step = 1;
+  step = 1;
 
   /**
    * Orientation of the slider
    */
-  @property({ type: String }) orientation: 'horizontal' | 'vertical' = 'horizontal';
+  orientation: 'horizontal' | 'vertical' = 'horizontal';
 
   /**
    * Name for form association
    */
-  @property({ type: String }) name?: string;
+  name?: string;
 
   override connectedCallback(): void {
     super.connectedCallback();

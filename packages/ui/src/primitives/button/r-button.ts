@@ -17,28 +17,35 @@
  * ```
  */
 import { html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 import { RPrimitiveBase } from '../../base/RPrimitiveBase';
 import { isActionKey, preventDefaultForActionKeys } from '../../utils/keyboard';
 
 @customElement('r-button')
 export class RButton extends RPrimitiveBase {
+  static override properties = {
+    ...RPrimitiveBase.properties,
+    role: { type: String, reflect: true },
+    tabIndex: { type: Number, reflect: true },
+    type: { type: String },
+  };
+
   /**
    * Button role for accessibility
    */
-  @property({ type: String, reflect: true }) override role = 'button';
+  override role = 'button';
 
   /**
    * Tab index for keyboard navigation
    * 0 = in tab order, -1 = not tabbable, >0 = custom tab order (avoid)
    */
-  @property({ type: Number, reflect: true }) override tabIndex = 0;
+  override tabIndex = 0;
 
   /**
    * Button type for form submission
    * button = no default action, submit = submits form, reset = resets form
    */
-  @property({ type: String }) type: 'button' | 'submit' | 'reset' = 'button';
+  type: 'button' | 'submit' | 'reset' = 'button';
 
   override connectedCallback(): void {
     super.connectedCallback();

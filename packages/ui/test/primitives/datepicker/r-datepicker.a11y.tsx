@@ -18,6 +18,9 @@ import {
   verifyTouchTargetSize,
 } from '../../a11y-utils';
 
+// Import the web component to ensure it's registered
+import '../../../src/primitives/datepicker/r-datepicker';
+
 // Simple React wrapper for the web component
 const RDatepickerWrapper = ({ 
   value = '', 
@@ -48,16 +51,6 @@ const RDatepickerWrapper = ({
 };
 
 test.describe('r-datepicker Primitive - WCAG AAA Compliance', () => {
-  test.beforeEach(async ({ page }) => {
-    // Register the custom element
-    await page.addScriptTag({
-      content: `
-        import('/packages/ui/src/primitives/datepicker/r-datepicker.ts');
-      `,
-      type: 'module',
-    });
-  });
-
   test('should pass axe-core accessibility scan for default state', async ({ mount, page }) => {
     await mount(<RDatepickerWrapper data-testid="datepicker" />);
     const results = await runAxeScan(page, { level: 'AAA' });
@@ -97,36 +90,27 @@ test.describe('r-datepicker Primitive - WCAG AAA Compliance', () => {
 });
 
 test.describe('r-datepicker Primitive - ARIA Attributes', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.addScriptTag({
-      content: `
-        import('/packages/ui/src/primitives/datepicker/r-datepicker.ts');
-      `,
-      type: 'module',
-    });
-  });
-
-  test('should have button role on toggle', async ({ mount, page }) => {
+  test('should have button role on toggle', async ({ mount }) => {
     const component = await mount(<RDatepickerWrapper />);
     const toggle = component.locator('[part="toggle"]');
-    
-    await verifyAriaRole(page, toggle, 'button');
+
+    await verifyAriaRole(toggle, 'button');
   });
 
-  test('should have grid role on calendar', async ({ mount, page }) => {
+  test('should have grid role on calendar', async ({ mount }) => {
     const component = await mount(<RDatepickerWrapper expanded={true} />);
     const grid = component.locator('[role="grid"]');
-    
+
     await expect(grid).toBeVisible();
-    await verifyAriaRole(page, grid, 'grid');
+    await verifyAriaRole(grid, 'grid');
   });
 
-  test('should have dialog role on calendar container', async ({ mount, page }) => {
+  test('should have dialog role on calendar container', async ({ mount }) => {
     const component = await mount(<RDatepickerWrapper expanded={true} />);
     const dialog = component.locator('[role="dialog"]');
-    
+
     await expect(dialog).toBeVisible();
-    await verifyAriaRole(page, dialog, 'dialog');
+    await verifyAriaRole(dialog, 'dialog');
   });
 
   test('should set aria-expanded on toggle button', async ({ mount }) => {
@@ -221,15 +205,6 @@ test.describe('r-datepicker Primitive - ARIA Attributes', () => {
 });
 
 test.describe('r-datepicker Primitive - Keyboard Navigation', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.addScriptTag({
-      content: `
-        import('/packages/ui/src/primitives/datepicker/r-datepicker.ts');
-      `,
-      type: 'module',
-    });
-  });
-
   test('should be keyboard accessible', async ({ mount, page }) => {
     const component = await mount(<RDatepickerWrapper />);
     await verifyKeyboardAccessible(page, component);
@@ -349,20 +324,11 @@ test.describe('r-datepicker Primitive - Keyboard Navigation', () => {
 });
 
 test.describe('r-datepicker Primitive - Focus Management', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.addScriptTag({
-      content: `
-        import('/packages/ui/src/primitives/datepicker/r-datepicker.ts');
-      `,
-      type: 'module',
-    });
-  });
-
-  test('should have visible focus indicator', async ({ mount, page }) => {
+  test('should have visible focus indicator', async ({ mount }) => {
     const component = await mount(<RDatepickerWrapper />);
     const toggle = component.locator('[part="toggle"]');
-    
-    await verifyFocusIndicator(page, toggle);
+
+    await verifyFocusIndicator(toggle);
   });
 
   test('should focus toggle button when tabbing', async ({ mount, page }) => {
@@ -418,53 +384,35 @@ test.describe('r-datepicker Primitive - Focus Management', () => {
 });
 
 test.describe('r-datepicker Primitive - Touch Target Size', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.addScriptTag({
-      content: `
-        import('/packages/ui/src/primitives/datepicker/r-datepicker.ts');
-      `,
-      type: 'module',
-    });
-  });
-
-  test('should meet WCAG AAA 44x44px minimum for toggle button', async ({ mount, page }) => {
+  test('should meet WCAG AAA 44x44px minimum for toggle button', async ({ mount }) => {
     const component = await mount(<RDatepickerWrapper />);
     const toggle = component.locator('[part="toggle"]');
-    
-    await verifyTouchTargetSize(page, toggle, 44);
+
+    await verifyTouchTargetSize(toggle, 'AAA');
   });
 
-  test('should meet WCAG AAA 44x44px minimum for navigation buttons', async ({ mount, page }) => {
+  test('should meet WCAG AAA 44x44px minimum for navigation buttons', async ({ mount }) => {
     const component = await mount(<RDatepickerWrapper expanded={true} />);
-    
+
     const prevBtn = component.locator('[part="prev-month"]');
     const nextBtn = component.locator('[part="next-month"]');
-    
-    await verifyTouchTargetSize(page, prevBtn, 44);
-    await verifyTouchTargetSize(page, nextBtn, 44);
+
+    await verifyTouchTargetSize(prevBtn, 'AAA');
+    await verifyTouchTargetSize(nextBtn, 'AAA');
   });
 
-  test('should meet WCAG AAA 44x44px minimum for date cells', async ({ mount, page }) => {
+  test('should meet WCAG AAA 44x44px minimum for date cells', async ({ mount }) => {
     const component = await mount(<RDatepickerWrapper expanded={true} />);
-    
+
     // Check a few date cells
     const cells = component.locator('[role="gridcell"]:not([part*="empty"])');
     const firstCell = cells.first();
-    
-    await verifyTouchTargetSize(page, firstCell, 44);
+
+    await verifyTouchTargetSize(firstCell, 'AAA');
   });
 });
 
 test.describe('r-datepicker Primitive - Screen Reader Support', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.addScriptTag({
-      content: `
-        import('/packages/ui/src/primitives/datepicker/r-datepicker.ts');
-      `,
-      type: 'module',
-    });
-  });
-
   test('should announce expanded state changes', async ({ mount }) => {
     const component = await mount(<RDatepickerWrapper />);
     const toggle = component.locator('[part="toggle"]');

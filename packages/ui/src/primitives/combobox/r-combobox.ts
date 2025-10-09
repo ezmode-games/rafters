@@ -22,52 +22,63 @@
  * ```
  */
 import { html } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { customElement, query } from 'lit/decorators.js';
 import { live } from 'lit/directives/live.js';
 import { RPrimitiveBase } from '../../base/RPrimitiveBase';
 import { getNextIndex } from '../../utils/keyboard';
 
 @customElement('r-combobox')
 export class RCombobox extends RPrimitiveBase {
+  static override properties = {
+    ...RPrimitiveBase.properties,
+    role: { type: String, reflect: true },
+    tabIndex: { type: Number, reflect: true },
+    value: { type: String },
+    expanded: { type: Boolean, reflect: true },
+    placeholder: { type: String },
+    name: { type: String },
+    listboxId: { type: String, attribute: 'listbox-id' },
+  };
+
   /**
    * Combobox role for accessibility
    */
-  @property({ type: String, reflect: true }) override role = 'combobox';
+  override role = 'combobox';
 
   /**
    * Tab index for keyboard navigation
    */
-  @property({ type: Number, reflect: true }) override tabIndex = 0;
+  override tabIndex = 0;
 
   /**
    * Current value of the combobox
    */
-  @property({ type: String }) value = '';
+  value = '';
 
   /**
    * Expanded state (listbox visible)
    */
-  @property({ type: Boolean, reflect: true }) expanded = false;
+  expanded = false;
 
   /**
    * Placeholder text
    */
-  @property({ type: String }) placeholder?: string;
+  placeholder?: string;
 
   /**
    * Form field name
    */
-  @property({ type: String }) name?: string;
+  name?: string;
 
   /**
    * ID for the listbox element (generated if not provided)
    */
-  @property({ type: String, attribute: 'listbox-id' }) listboxId = 'listbox';
+  listboxId = 'listbox';
 
   /**
    * Currently active option index for keyboard navigation
    */
-  @state() private activeIndex = -1;
+  private activeIndex = -1;
 
   /**
    * Reference to the input element

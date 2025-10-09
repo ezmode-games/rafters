@@ -17,37 +17,26 @@
  * ```
  */
 import { html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 import { RPrimitiveBase } from '../../base/RPrimitiveBase';
 import { getNextIndex, updateRovingTabindex } from '../../utils/keyboard';
 
 @customElement('r-radio')
 export class RRadio extends RPrimitiveBase {
-  /**
-   * Radio role for accessibility
-   */
-  @property({ type: String, reflect: true }) override role = 'radio';
+  static override properties = {
+    ...RPrimitiveBase.properties,
+    role: { type: String, reflect: true },
+    checked: { type: Boolean, reflect: true },
+    tabIndex: { type: Number, reflect: true },
+    name: { type: String, reflect: true },
+    value: { type: String },
+  };
 
-  /**
-   * Checked state
-   */
-  @property({ type: Boolean, reflect: true }) checked = false;
-
-  /**
-   * Tab index for keyboard navigation
-   * Only checked radio in group should be in tab order
-   */
-  @property({ type: Number, reflect: true }) override tabIndex = -1;
-
-  /**
-   * Name attribute for grouping radios
-   */
-  @property({ type: String, reflect: true }) name!: string;
-
-  /**
-   * Value of the radio button
-   */
-  @property({ type: String }) value!: string;
+  override role = 'radio';
+  checked = false;
+  override tabIndex = -1;
+  name!: string;
+  value!: string;
 
   override connectedCallback(): void {
     super.connectedCallback();

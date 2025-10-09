@@ -12,7 +12,7 @@ import { RPrimitiveBase } from '../src/base/RPrimitiveBase';
  */
 @customElement('r-test-primitive')
 class RTestPrimitive extends RPrimitiveBase {
-  render() {
+  override render() {
     return html`<div part="base"><slot></slot></div>`;
   }
 }

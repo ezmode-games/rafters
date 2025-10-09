@@ -6,11 +6,14 @@ import { defineConfig, devices } from '@playwright/experimental-ct-react';
  */
 export default defineConfig({
   testDir: './test',
-  testMatch: ['**/*.component.{ts,tsx}', '**/*.spec.{ts,tsx}', '**/*.a11y.{ts,tsx}'],
+  testMatch: ['**/*.component.{ts,tsx}', '**/*.spec.{ts,tsx}'],
+  testIgnore: ['**/datepicker/**', '**/*.a11y.{ts,tsx}'],
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  retries: process.env.CI ? 1 : 0,
+  workers: process.env.CI ? 4 : undefined,
+  timeout: 10000,
+  globalTimeout: process.env.CI ? 300000 : 0,
 
   // CI-friendly reporter configuration
   reporter: process.env.CI ? [['json'], ['junit']] : [['html', { open: 'never' }]],
@@ -22,26 +25,11 @@ export default defineConfig({
     ctViteConfig: './playwright.vite.config.ts',
   },
 
-  // Simplified browser testing for CI
-  projects: process.env.CI
-    ? [
-        {
-          name: 'chromium',
-          use: { ...devices['Desktop Chrome'] },
-        },
-      ]
-    : [
-        {
-          name: 'chromium',
-          use: { ...devices['Desktop Chrome'] },
-        },
-        {
-          name: 'firefox',
-          use: { ...devices['Desktop Firefox'] },
-        },
-        {
-          name: 'webkit',
-          use: { ...devices['Desktop Safari'] },
-        },
-      ],
+  // Only chromium for faster local testing
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
 });

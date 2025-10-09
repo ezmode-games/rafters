@@ -17,45 +17,54 @@
  * ```
  */
 import { html } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
+import { customElement, query } from 'lit/decorators.js';
 import { RPrimitiveBase } from '../../base/RPrimitiveBase';
 
 @customElement('r-datepicker')
 export class RDatepicker extends RPrimitiveBase {
+  static override properties = {
+    ...RPrimitiveBase.properties,
+    value: { type: String },
+    expanded: { type: Boolean, reflect: true },
+    min: { type: String },
+    max: { type: String },
+    name: { type: String },
+  };
+
   /**
    * Selected date value in ISO format (YYYY-MM-DD)
    */
-  @property({ type: String }) value = '';
+  value = '';
 
   /**
    * Whether the calendar is expanded
    */
-  @property({ type: Boolean, reflect: true }) expanded = false;
+  expanded = false;
 
   /**
    * Minimum selectable date (ISO format YYYY-MM-DD)
    */
-  @property({ type: String }) min?: string;
+  min?: string;
 
   /**
    * Maximum selectable date (ISO format YYYY-MM-DD)
    */
-  @property({ type: String }) max?: string;
+  max?: string;
 
   /**
    * Form field name
    */
-  @property({ type: String }) name?: string;
+  name?: string;
 
   /**
    * Currently displayed month (ISO format YYYY-MM)
    */
-  @state() private _displayMonth = '';
+  private _displayMonth = '';
 
   /**
    * Currently focused date in calendar (ISO format YYYY-MM-DD)
    */
-  @state() private _focusedDate = '';
+  private _focusedDate = '';
 
   /**
    * Grid container element

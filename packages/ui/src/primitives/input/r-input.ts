@@ -17,92 +17,94 @@
  * ```
  */
 import { html } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, query } from 'lit/decorators.js';
 import { live } from 'lit/directives/live.js';
 import { RPrimitiveBase } from '../../base/RPrimitiveBase';
 import type { ValidationState } from '../../base/types';
 
 @customElement('r-input')
 export class RInput extends RPrimitiveBase {
+  static override properties = {
+    ...RPrimitiveBase.properties,
+    type: { type: String },
+    value: { type: String },
+    placeholder: { type: String },
+    required: { type: Boolean, reflect: true },
+    readonly: { type: Boolean, reflect: true },
+    validationState: { type: String, reflect: true },
+    errorMessage: { type: String },
+    minlength: { type: Number },
+    maxlength: { type: Number },
+    pattern: { type: String },
+    autocomplete: { type: String },
+    name: { type: String },
+    inputmode: { type: String },
+  };
+
   /**
    * Input type
    */
-  @property({ type: String }) type:
-    | 'text'
-    | 'email'
-    | 'password'
-    | 'search'
-    | 'tel'
-    | 'url'
-    | 'number' = 'text';
+  type: 'text' | 'email' | 'password' | 'search' | 'tel' | 'url' | 'number' = 'text';
 
   /**
    * Input value
    */
-  @property({ type: String }) value = '';
+  value = '';
 
   /**
    * Placeholder text
    */
-  @property({ type: String }) placeholder = '';
+  placeholder = '';
 
   /**
    * Required field
    */
-  @property({ type: Boolean, reflect: true }) required = false;
+  required = false;
 
   /**
    * Read-only state
    */
-  @property({ type: Boolean, reflect: true }) readonly = false;
+  readonly = false;
 
   /**
    * Validation state
    */
-  @property({ type: String, reflect: true }) validationState?: ValidationState;
+  validationState?: ValidationState;
 
   /**
    * Error message
    */
-  @property({ type: String }) errorMessage = '';
+  errorMessage = '';
 
   /**
    * Min length
    */
-  @property({ type: Number }) minlength?: number;
+  minlength?: number;
 
   /**
    * Max length
    */
-  @property({ type: Number }) maxlength?: number;
+  maxlength?: number;
 
   /**
    * Pattern for validation
    */
-  @property({ type: String }) pattern?: string;
+  pattern?: string;
 
   /**
    * Autocomplete attribute
    */
-  @property({ type: String }) autocomplete?: string;
+  autocomplete?: string;
 
   /**
    * Input name for forms
    */
-  @property({ type: String }) name?: string;
+  name?: string;
 
   /**
    * Input mode for mobile keyboards
    */
-  @property({ type: String }) inputmode?:
-    | 'none'
-    | 'text'
-    | 'decimal'
-    | 'numeric'
-    | 'tel'
-    | 'search'
-    | 'email'
-    | 'url';
+  inputmode?: 'none' | 'text' | 'decimal' | 'numeric' | 'tel' | 'search' | 'email' | 'url';
 
   /**
    * Input reference

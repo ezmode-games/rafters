@@ -17,57 +17,70 @@
  * ```
  */
 import { html } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, query } from 'lit/decorators.js';
 import { live } from 'lit/directives/live.js';
 import { RPrimitiveBase } from '../../base/RPrimitiveBase';
 import type { ValidationState } from '../../base/types';
 
 @customElement('r-textarea')
 export class RTextarea extends RPrimitiveBase {
+  static override properties = {
+    ...RPrimitiveBase.properties,
+    value: { type: String },
+    placeholder: { type: String },
+    required: { type: Boolean, reflect: true },
+    readonly: { type: Boolean, reflect: true },
+    validationState: { type: String, reflect: true },
+    errorMessage: { type: String },
+    rows: { type: Number },
+    maxlength: { type: Number },
+    name: { type: String },
+  };
+
   /**
    * Textarea value
    */
-  @property({ type: String }) value = '';
+  value = '';
 
   /**
    * Placeholder text
    */
-  @property({ type: String }) placeholder = '';
+  placeholder = '';
 
   /**
    * Required field
    */
-  @property({ type: Boolean, reflect: true }) required = false;
+  required = false;
 
   /**
    * Read-only state
    */
-  @property({ type: Boolean, reflect: true }) readonly = false;
+  readonly = false;
 
   /**
    * Validation state
    */
-  @property({ type: String, reflect: true }) validationState?: ValidationState;
+  validationState?: ValidationState;
 
   /**
    * Error message
    */
-  @property({ type: String }) errorMessage = '';
+  errorMessage = '';
 
   /**
    * Number of visible text rows
    */
-  @property({ type: Number }) rows = 3;
+  rows = 3;
 
   /**
    * Max length
    */
-  @property({ type: Number }) maxlength?: number;
+  maxlength?: number;
 
   /**
    * Textarea name for forms
    */
-  @property({ type: String }) name?: string;
+  name?: string;
 
   /**
    * Textarea reference
