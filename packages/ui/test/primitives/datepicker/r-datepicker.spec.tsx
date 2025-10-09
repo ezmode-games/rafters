@@ -10,6 +10,9 @@
 import { expect, test } from '@playwright/experimental-ct-react';
 import React from 'react';
 
+// Import the web component to ensure it's registered
+import '../../../src/primitives/datepicker/r-datepicker';
+
 // Simple React wrapper for the web component
 const RDatepickerWrapper = ({ 
   value = '', 
@@ -40,16 +43,6 @@ const RDatepickerWrapper = ({
 };
 
 test.describe('r-datepicker Primitive - Integration Tests', () => {
-  test.beforeEach(async ({ page }) => {
-    // Register the custom element
-    await page.addScriptTag({
-      content: `
-        import('/packages/ui/src/primitives/datepicker/r-datepicker.ts');
-      `,
-      type: 'module',
-    });
-  });
-
   test('should render toggle button', async ({ mount }) => {
     const component = await mount(<RDatepickerWrapper />);
     await expect(component.locator('[part="toggle"]')).toBeVisible();
