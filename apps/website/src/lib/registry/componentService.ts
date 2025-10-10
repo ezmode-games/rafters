@@ -23,7 +23,7 @@ import {
   UsagePatternsSchema,
 } from '@rafters/shared';
 import { parse, type Spec } from 'comment-parser';
-import { processComponents as generateCriticalCSS } from './cssExtractor.js';
+import { extractCriticalCSS } from './cssExtractor.js';
 import { extractBaseClasses, extractClassMappings } from './cvaExtractor';
 
 // Cache for components to avoid re-parsing
@@ -32,7 +32,10 @@ let componentsCache: ComponentManifest[] | null = null;
 /**
  * Parse JSDoc comments from component source code using comment-parser
  */
-function parseJSDocFromSource(content: string, filename: string): ComponentManifest | null {
+async function parseJSDocFromSource(
+  content: string,
+  filename: string
+): Promise<ComponentManifest | null> {
   try {
     // Parse JSDoc comment using comment-parser
     const parsed = parse(content);
@@ -90,10 +93,28 @@ function parseJSDocFromSource(content: string, filename: string): ComponentManif
           }
         }
 
+        const classArray = Array.from(allClasses);
+
+        // Generate critical CSS for preview component
+        let css: string | undefined;
+        try {
+          const result = await extractCriticalCSS({
+            classes: classArray,
+            minify: true,
+          });
+          css = result.css;
+        } catch (error) {
+          console.warn(
+            `[componentService] CSS generation failed for ${registryName}:`,
+            error instanceof Error ? error.message : String(error)
+          );
+        }
+
         cva = {
           baseClasses,
           propMappings,
-          allClasses: Array.from(allClasses),
+          allClasses: classArray,
+          css,
         };
       }
     }
@@ -283,7 +304,7 @@ function parseDesignGuides(content: string): DesignGuide[] {
 /**
  * Load primitives from UI package
  */
-function loadPrimitives(): ComponentManifest[] {
+async function loadPrimitives(): Promise<ComponentManifest[]> {
   const primitivesBaseDir = join(process.cwd(), '../../packages/ui/src/primitives');
   const primitives: ComponentManifest[] = [];
 
@@ -309,7 +330,7 @@ function loadPrimitives(): ComponentManifest[] {
           const filePath = join(primitiveDir, file);
           const content = readFileSync(filePath, 'utf-8');
 
-          const primitiveData = parseJSDocFromSource(content, file);
+          const primitiveData = await parseJSDocFromSource(content, file);
           if (primitiveData) {
             primitives.push(primitiveData);
           }
@@ -326,7 +347,7 @@ function loadPrimitives(): ComponentManifest[] {
 /**
  * Load and parse all components from the UI package
  */
-function loadComponents(): ComponentManifest[] {
+async function loadComponents(): Promise<ComponentManifest[]> {
   if (componentsCache) {
     return componentsCache;
   }
@@ -342,7 +363,7 @@ function loadComponents(): ComponentManifest[] {
         const filePath = join(componentsDir, file);
         const content = readFileSync(filePath, 'utf-8');
 
-        const componentData = parseJSDocFromSource(content, file);
+        const componentData = await parseJSDocFromSource(content, file);
         if (componentData) {
           components.push(componentData);
         }
@@ -353,16 +374,10 @@ function loadComponents(): ComponentManifest[] {
   }
 
   // Load primitives and add to components
-  const primitives = loadPrimitives();
+  const primitives = await loadPrimitives();
   components.push(...primitives);
 
   componentsCache = components;
-
-  // Generate critical CSS for components with CVA intelligence
-  // Run asynchronously in background, don't block registry generation
-  generateCriticalCSS().catch((error) => {
-    console.error('[componentService] CSS generation failed:', error);
-  });
 
   return components;
 }
@@ -370,23 +385,23 @@ function loadComponents(): ComponentManifest[] {
 /**
  * Get all components for the registry
  */
-export function getAllComponents(): ComponentManifest[] {
-  return loadComponents();
+export async function getAllComponents(): Promise<ComponentManifest[]> {
+  return await loadComponents();
 }
 
 /**
  * Get a specific component by name
  */
-export function getComponent(name: string): ComponentManifest | null {
-  const components = loadComponents();
+export async function getComponent(name: string): Promise<ComponentManifest | null> {
+  const components = await loadComponents();
   return components.find((comp) => comp.name.toLowerCase() === name.toLowerCase()) || null;
 }
 
 /**
  * Get the registry manifest (components list endpoint)
  */
-export function getRegistryManifest(): RegistryResponse {
-  const components = loadComponents();
+export async function getRegistryManifest(): Promise<RegistryResponse> {
+  const components = await loadComponents();
 
   return RegistryResponseSchema.parse({
     $schema: 'https://rafters.dev/schemas/registry.json',
@@ -399,8 +414,8 @@ export function getRegistryManifest(): RegistryResponse {
 /**
  * Get registry metadata for the root registry endpoint
  */
-export function getRegistryMetadata(): RegistryResponse {
-  const components = loadComponents();
+export async function getRegistryMetadata(): Promise<RegistryResponse> {
+  const components = await loadComponents();
 
   // Calculate intelligence averages
   const totalCognitiveLoad = components.reduce((sum, comp) => {

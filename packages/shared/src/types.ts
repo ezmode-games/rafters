@@ -53,6 +53,7 @@ export const CVAIntelligenceSchema = z
     baseClasses: z.array(z.string()),
     propMappings: z.array(ClassMappingSchema),
     allClasses: z.array(z.string()),
+    css: z.string().optional(), // Generated critical CSS for preview component
   })
   .optional();
 
