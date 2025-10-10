@@ -24,7 +24,7 @@
  * - Trust Building: https://rafters.realhandy.tech/docs/foundation/trust-building
  * - Cognitive Load: https://rafters.realhandy.tech/docs/foundation/cognitive-load
  *
- * @dependencies r-input, masky-js
+ * @dependencies local:primitives/input/r-input.ts, masky-js, react
  *
  * @example
  * ```tsx
