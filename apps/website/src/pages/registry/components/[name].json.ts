@@ -30,16 +30,14 @@ export async function GET({ params }: { params: { name: string } }) {
       });
     }
 
-    // Remove previews from main response - they're available at separate endpoints
+    // Production endpoint: only return files and dependencies
+    // All metadata (CVA, previews, examples, intelligence) is for docs/tooling only
     const responseData = {
-      ...componentData,
-      meta: {
-        ...componentData.meta,
-        rafters: {
-          ...componentData.meta.rafters,
-          previews: undefined,
-        },
-      },
+      name: componentData.name,
+      type: componentData.type,
+      description: componentData.description,
+      dependencies: componentData.dependencies,
+      files: componentData.files,
     };
 
     return new Response(JSON.stringify(responseData), {

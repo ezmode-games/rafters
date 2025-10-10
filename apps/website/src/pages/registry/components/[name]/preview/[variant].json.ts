@@ -1,4 +1,3 @@
-import type { APIRoute } from 'astro';
 import { getComponent } from '../../../../../lib/registry/componentService';
 
 export const prerender = true;
@@ -9,13 +8,10 @@ export async function GET({ params }: { params: { name: string; variant: string 
     const variantName = params.variant;
 
     if (!componentName || !variantName) {
-      return new Response(
-        JSON.stringify({ error: 'Component name and variant are required' }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
+      return new Response(JSON.stringify({ error: 'Component name and variant are required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     const component = await getComponent(componentName);
@@ -28,9 +24,7 @@ export async function GET({ params }: { params: { name: string; variant: string 
     }
 
     // Find the preview for this variant
-    const preview = component.meta.rafters.previews?.find(
-      (p) => p.variant === variantName
-    );
+    const preview = component.meta.rafters.previews?.find((p) => p.variant === variantName);
 
     if (!preview) {
       return new Response(JSON.stringify({ error: 'Preview variant not found' }), {
@@ -56,9 +50,7 @@ export async function GET({ params }: { params: { name: string; variant: string 
 }
 
 export async function getStaticPaths() {
-  const { getRegistryMetadata } = await import(
-    '../../../../../lib/registry/componentService'
-  );
+  const { getRegistryMetadata } = await import('../../../../../lib/registry/componentService');
   const registry = await getRegistryMetadata();
 
   const paths = [];
