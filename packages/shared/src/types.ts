@@ -42,6 +42,23 @@ export const ComponentIntelligenceSchema = z.object({
 
 export type ComponentIntelligence = z.infer<typeof ComponentIntelligenceSchema>;
 
+// CVA (class-variance-authority) intelligence schemas
+export const ClassMappingSchema = z.object({
+  propName: z.string(),
+  values: z.record(z.string(), z.array(z.string())),
+});
+
+export const CVAIntelligenceSchema = z
+  .object({
+    baseClasses: z.array(z.string()),
+    propMappings: z.array(ClassMappingSchema),
+    allClasses: z.array(z.string()),
+  })
+  .optional();
+
+export type ClassMapping = z.infer<typeof ClassMappingSchema>;
+export type CVAIntelligence = z.infer<typeof CVAIntelligenceSchema>;
+
 // Rafters intelligence schemas for CLI compatibility
 export const IntelligenceSchema = z.object({
   cognitiveLoad: z.number().min(0).max(10),
@@ -49,6 +66,7 @@ export const IntelligenceSchema = z.object({
   accessibility: z.string(),
   trustBuilding: z.string(),
   semanticMeaning: z.string(),
+  cva: CVAIntelligenceSchema,
 });
 
 export const UsagePatternsSchema = z.object({
