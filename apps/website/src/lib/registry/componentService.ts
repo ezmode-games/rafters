@@ -253,9 +253,12 @@ function findTagValue(tags: Spec[], tagName: string): string | null {
   const tag = tags.find((t) => t.tag === tagName);
   if (!tag) return null;
 
-  // For simple tags like @registryName container, the value is in 'name' field
-  // For complex tags with descriptions, the value is in 'description' field
-  const value = tag.name?.trim() || tag.description?.trim() || '';
+  // For tags with both name and description (like @dependencies local:foo, npm-pkg)
+  // the parser splits at the first comma, putting first part in 'name' and rest in 'description'
+  // We need to concatenate both parts
+  const namePart = tag.name?.trim() || '';
+  const descPart = tag.description?.trim() || '';
+  const value = namePart && descPart ? `${namePart} ${descPart}` : namePart || descPart;
   return value || null;
 }
 

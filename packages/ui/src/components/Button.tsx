@@ -23,7 +23,7 @@
  * - Attention Economics: https://rafters.realhandy.tech/docs/foundation/attention-economics
  * - Trust Building: https://rafters.realhandy.tech/docs/foundation/trust-building
  *
- * @dependencies r-button
+ * @dependencies local:primitives/button/r-button.ts, class-variance-authority
  *
  * @example
  * ```tsx
