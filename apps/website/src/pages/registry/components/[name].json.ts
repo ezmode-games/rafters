@@ -30,7 +30,19 @@ export async function GET({ params }: { params: { name: string } }) {
       });
     }
 
-    return new Response(JSON.stringify(componentData), {
+    // Remove previews from main response - they're available at separate endpoints
+    const responseData = {
+      ...componentData,
+      meta: {
+        ...componentData.meta,
+        rafters: {
+          ...componentData.meta.rafters,
+          previews: undefined,
+        },
+      },
+    };
+
+    return new Response(JSON.stringify(responseData), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
