@@ -1,10 +1,5 @@
 // Rafters Component Library
 // Grayscale foundation components that Rafters dogfoods
-
-// Navigation and menu hooks
-export * from '../hooks';
-// Providers for menu coordination
-export * from '../providers';
 export type {
   BadgeEmphasis,
   BadgeProps,
@@ -92,33 +87,6 @@ export {
   SelectTrigger,
   SelectValue,
 } from './Select';
-export type {
-  SidebarContentProps,
-  SidebarFooterProps,
-  SidebarGroupContentProps,
-  SidebarGroupLabelProps,
-  SidebarGroupProps,
-  SidebarHeaderProps,
-  SidebarItemIconProps,
-  SidebarItemProps,
-  SidebarItemTextProps,
-  SidebarProps,
-  SidebarTitleProps,
-} from './Sidebar';
-export {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarItem,
-  SidebarItemIcon,
-  SidebarItemText,
-  SidebarTitle,
-  useSidebar,
-} from './Sidebar';
 export type { SliderProps } from './Slider';
 export { Slider } from './Slider';
 export { Tabs, TabsContent, TabsList, TabsTrigger } from './Tabs';

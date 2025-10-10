@@ -37,8 +37,8 @@
 import '../primitives/button/r-button';
 import { cva, type VariantProps } from 'class-variance-authority';
 import type * as React from 'react';
-import { cn } from '../lib/utils';
 import type { RButton } from '../primitives/button/r-button';
+import { cn } from '../utils';
 
 // Extend React types for custom element
 declare module 'react' {

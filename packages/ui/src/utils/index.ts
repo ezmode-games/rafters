@@ -12,6 +12,7 @@ export {
   restoreFocus,
   trapFocus,
 } from './accessibility';
+export { cn } from './cn';
 
 export { FocusManager } from './focus';
 

@@ -35,7 +35,7 @@
  * ```
  */
 import { AlertTriangle, CheckCircle, Info, Minus, XCircle } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '../utils';
 import type { ChipPosition, ChipVariant } from './Chip';
 import { Chip } from './Chip';
 

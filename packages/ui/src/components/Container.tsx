@@ -33,7 +33,7 @@
  * </Container>
  * ```
  */
-import { cn } from '../lib/utils';
+import { cn } from '../utils';
 
 /**
  * Container component props with layout intelligence
