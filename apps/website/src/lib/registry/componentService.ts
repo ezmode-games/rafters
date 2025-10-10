@@ -17,6 +17,7 @@ import {
   ExampleSchema,
   type Intelligence,
   IntelligenceSchema,
+  type Preview,
   type RegistryResponse,
   RegistryResponseSchema,
   type UsagePatterns,
@@ -25,6 +26,7 @@ import {
 import { parse, type Spec } from 'comment-parser';
 import { extractCriticalCSS } from './cssExtractor.js';
 import { extractBaseClasses, extractClassMappings } from './cvaExtractor';
+import { compileAllPreviews } from './previewCompiler.js';
 
 // Cache for components to avoid re-parsing
 let componentsCache: ComponentManifest[] | null = null;
@@ -175,6 +177,19 @@ async function parseJSDocFromSource(
     // Generate docs URL
     const docs = `https://rafters.realhandy.tech/docs/components/${registryName}`;
 
+    // Generate component previews if CVA intelligence exists
+    let previews: Preview[] | undefined;
+    if (cva) {
+      try {
+        previews = await compileAllPreviews(registryName, content, 'react');
+      } catch (error) {
+        console.warn(
+          `[componentService] Preview compilation failed for ${registryName}:`,
+          error instanceof Error ? error.message : String(error)
+        );
+      }
+    }
+
     // Build files array - include local dependencies
     const files = [
       {
@@ -216,6 +231,7 @@ async function parseJSDocFromSource(
           usagePatterns,
           designGuides,
           examples,
+          previews,
         },
       },
     });
