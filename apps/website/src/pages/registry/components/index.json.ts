@@ -9,6 +9,8 @@ import {
   getRegistryMetadata,
 } from '../../../lib/registry/componentService';
 
+export const prerender = true;
+
 export async function GET() {
   try {
     const registryData = await getRegistryMetadata();
