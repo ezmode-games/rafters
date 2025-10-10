@@ -116,7 +116,7 @@ describe('compileComponentPreview', () => {
 
 describe('compileAllPreviews', () => {
   it('should generate previews for component', async () => {
-    const previews = await compileAllPreviews('button', simpleButtonSource, 'react');
+    const previews = await compileAllPreviews('button', 'Button.tsx', simpleButtonSource, 'react');
 
     expect(previews.length).toBeGreaterThan(0);
     expect(previews[0].compiledJs).toBeTruthy();
@@ -124,14 +124,14 @@ describe('compileAllPreviews', () => {
   });
 
   it('should only include successful compilations', async () => {
-    const previews = await compileAllPreviews('invalid', invalidSource, 'react');
+    const previews = await compileAllPreviews('invalid', 'Invalid.tsx', invalidSource, 'react');
 
     // Should not include failed compilations
     expect(previews.length).toBe(0);
   });
 
   it('should generate default variant', async () => {
-    const previews = await compileAllPreviews('button', simpleButtonSource, 'react');
+    const previews = await compileAllPreviews('button', 'Button.tsx', simpleButtonSource, 'react');
 
     const defaultPreview = previews.find((p) => p.variant === 'default');
     expect(defaultPreview).toBeDefined();

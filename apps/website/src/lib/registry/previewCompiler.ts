@@ -5,9 +5,7 @@
  * Enables interactive component previews with Shadow DOM isolation.
  */
 
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { parse } from 'node:path';
 import type { Preview } from '@rafters/shared';
 import react from '@vitejs/plugin-react';
 import { build } from 'vite';
@@ -49,37 +47,41 @@ export async function compileComponentPreview(
     };
   }
 
-  // Create temporary directory for build
-  const tempDir = join(tmpdir(), `rafters-preview-${Date.now()}`);
-  const entryFile = join(tempDir, `preview-${variant}.tsx`);
-
   try {
-    // Create temp directory
-    mkdirSync(tempDir, { recursive: true });
-
-    // Write component source to temp file
-    writeFileSync(entryFile, componentContent, 'utf8');
+    // Use the actual component file location for proper import resolution
+    const { dir: componentDir } = parse(options.componentPath);
 
     // Configure Vite build
     const result = await build({
       configFile: false,
-      root: tempDir,
+      root: componentDir,
       build: {
         lib: {
-          entry: entryFile,
+          entry: options.componentPath,
           formats: ['es'],
           fileName: () => 'preview.js',
         },
         write: false, // Return output instead of writing
         minify: 'esbuild',
         rollupOptions: {
-          external: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
+          external: [
+            'react',
+            'react-dom',
+            'react/jsx-runtime',
+            'react/jsx-dev-runtime',
+            'class-variance-authority',
+            '@rafters/shared',
+            'masky-js',
+            /^@radix-ui\//,
+            /^@rafters\//,
+          ],
           output: {
             globals: {
               react: 'React',
               'react-dom': 'ReactDOM',
               'react/jsx-runtime': 'jsxRuntime',
               'react/jsx-dev-runtime': 'jsxDevRuntime',
+              'class-variance-authority': 'cva',
             },
           },
         },
@@ -125,13 +127,6 @@ export async function compileComponentPreview(
       sizeBytes: 0,
       error: `Vite build failed: ${errorMessage}`,
     };
-  } finally {
-    // Clean up temp directory
-    try {
-      rmSync(tempDir, { recursive: true, force: true });
-    } catch (cleanupError) {
-      console.warn('Failed to clean up temp directory:', cleanupError);
-    }
   }
 }
 
@@ -141,6 +136,7 @@ export async function compileComponentPreview(
  */
 export async function compileAllPreviews(
   componentName: string,
+  componentFilePath: string,
   componentContent: string,
   framework: 'react'
 ): Promise<Preview[]> {
@@ -151,7 +147,7 @@ export async function compileAllPreviews(
 
   for (const variant of variants) {
     const preview = await compileComponentPreview({
-      componentPath: `${componentName}.tsx`,
+      componentPath: componentFilePath,
       componentContent,
       framework,
       variant,
