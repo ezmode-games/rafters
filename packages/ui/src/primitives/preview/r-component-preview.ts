@@ -5,9 +5,17 @@
  * Fetches component intelligence from registry and renders with proper styling.
  */
 
-import type { ComponentManifest, CVAIntelligence } from '@rafters/shared';
+import { ComponentManifestSchema, type ComponentManifest, type CVAIntelligence } from '@rafters/shared';
 import { css, html, LitElement, unsafeCSS } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+
+/**
+ * State utility classes for disabled and loading states
+ */
+const STATE_CLASSES = {
+  DISABLED: ['opacity-50', 'cursor-not-allowed'],
+  LOADING: ['animate-pulse'],
+} as const;
 
 @customElement('r-component-preview')
 export class RComponentPreview extends LitElement {
@@ -78,8 +86,14 @@ export class RComponentPreview extends LitElement {
         );
       }
 
-      const data = await response.json();
-      this.componentData = data;
+      const rawData = await response.json();
+      const parseResult = ComponentManifestSchema.safeParse(rawData);
+
+      if (!parseResult.success) {
+        throw new Error('Invalid component data format');
+      }
+
+      this.componentData = parseResult.data;
       this.isLoading = false;
     } catch (err) {
       this.error = err instanceof Error ? err.message : 'Failed to load component';
@@ -121,10 +135,10 @@ export class RComponentPreview extends LitElement {
 
     // Add state classes
     if (this.disabled) {
-      classes.push('opacity-50', 'cursor-not-allowed');
+      classes.push(...STATE_CLASSES.DISABLED);
     }
     if (this.loading) {
-      classes.push('animate-pulse');
+      classes.push(...STATE_CLASSES.LOADING);
     }
 
     return classes.join(' ');
@@ -139,6 +153,18 @@ export class RComponentPreview extends LitElement {
     const cva: CVAIntelligence | undefined = this.componentData.meta?.rafters?.intelligence?.cva;
 
     return cva?.css || '';
+  }
+
+  /**
+   * Render critical CSS style block if available
+   */
+  private renderCriticalCSS() {
+    const criticalCSS = this.getCriticalCSS();
+    if (!criticalCSS) return '';
+
+    return html`<style>
+      ${unsafeCSS(criticalCSS)}
+    </style>`;
   }
 
   static override styles = css`
@@ -193,17 +219,10 @@ export class RComponentPreview extends LitElement {
       `;
     }
 
-    const criticalCSS = this.getCriticalCSS();
     const computedClasses = this.computeClasses();
 
     return html`
-      ${
-        criticalCSS
-          ? html`<style>
-            ${unsafeCSS(criticalCSS)}
-          </style>`
-          : ''
-      }
+      ${this.renderCriticalCSS()}
 
       <div class="preview-container">
         <button
