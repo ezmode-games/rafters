@@ -295,8 +295,7 @@ Every primitive implementation must:
 - [ ] Meet 44x44px touch target minimum
 - [ ] Have full keyboard navigation support
 - [ ] Include comprehensive unit tests
-- [ ] Be added to registry with complete metadata
-- [ ] Pass `pnpm --filter=@rafters/ui validate:registry`
+- [ ] Have complete JSDoc tags for registry (@registryName, @cognitiveLoad, @attentionEconomics, @trustBuilding, @semanticMeaning, @accessibility, @dependencies, @example)
 
 ### Common Patterns
 
@@ -350,11 +349,11 @@ pnpm --filter=@rafters/ui test:a11y [name].a11y
 # Run unit tests for specific primitive
 pnpm --filter=@rafters/ui test [name].test
 
-# Validate registry after adding primitive
-pnpm --filter=@rafters/ui validate:registry
-
 # Run all tests
 pnpm --filter=@rafters/ui test
+
+# Verify primitive appears in registry (website build validates JSDoc)
+pnpm --filter=website test test/pages/registry
 ```
 
 ## When in Doubt

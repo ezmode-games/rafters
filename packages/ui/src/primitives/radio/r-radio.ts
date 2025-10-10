@@ -6,6 +6,11 @@
  * @registryPath primitives/radio/r-radio.ts
  * @registryType registry:primitive
  *
+ * @cognitiveLoad 3
+ * @attentionEconomics Low-moderate cognitive load (3/10) as radio buttons are familiar. Arrow key navigation pattern requires brief learning but is standard.
+ * @trustBuilding Clear visual state (checked/unchecked). Predictable single-selection behavior. Roving tabindex reduces tab stops. Proper ARIA for screen readers.
+ * @semanticMeaning Foundation primitive for single-selection choice inputs following W3C ARIA radio pattern with WCAG AAA compliance
+ *
  * @accessibility WCAG AAA - radio role, keyboard navigation (Arrow keys), 44px touch targets
  * @dependencies lit, local:../../base/RPrimitiveBase.ts, local:../../utils/keyboard.ts
  *
