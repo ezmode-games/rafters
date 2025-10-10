@@ -5,7 +5,11 @@
  * Fetches component intelligence from registry and renders with proper styling.
  */
 
-import { ComponentManifestSchema, type ComponentManifest, type CVAIntelligence } from '@rafters/shared';
+import {
+  type ComponentManifest,
+  ComponentManifestSchema,
+  type CVAIntelligence,
+} from '@rafters/shared';
 import { css, html, LitElement, unsafeCSS } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
