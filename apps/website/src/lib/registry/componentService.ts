@@ -23,6 +23,7 @@ import {
   UsagePatternsSchema,
 } from '@rafters/shared';
 import { parse, type Spec } from 'comment-parser';
+import { processComponents as generateCriticalCSS } from './cssExtractor.js';
 import { extractBaseClasses, extractClassMappings } from './cvaExtractor';
 
 // Cache for components to avoid re-parsing
@@ -356,6 +357,13 @@ function loadComponents(): ComponentManifest[] {
   components.push(...primitives);
 
   componentsCache = components;
+
+  // Generate critical CSS for components with CVA intelligence
+  // Run asynchronously in background, don't block registry generation
+  generateCriticalCSS().catch((error) => {
+    console.error('[componentService] CSS generation failed:', error);
+  });
+
   return components;
 }
 
