@@ -29,17 +29,18 @@ export async function extractCriticalCSS(options: CriticalCSSOptions): Promise<C
     return { css: '', sizeBytes: 0, classCount: 0 };
   }
 
-  // Generate HTML template with all classes
-  const template = `<div class="${classes.join(' ')}"></div>`;
+  // Generate CSS import with HTML template containing all classes
+  const template = `@import "tailwindcss";\n<div class="${classes.join(' ')}"></div>`;
 
-  // Spawn Tailwind CLI process
-  const args = ['--input=-', '--output=-'];
+  // Spawn Tailwind CLI process using pnpm exec for local package
+  // Tailwind v4 CLI reads from stdin and outputs to stdout by default
+  const args = ['exec', 'tailwindcss'];
   if (minify) {
-    args.push('--minify');
+    args.push('-m');
   }
 
   return new Promise((resolve, reject) => {
-    const tailwind = spawn('tailwindcss', args, {
+    const tailwind = spawn('pnpm', args, {
       cwd: process.cwd(),
       stdio: ['pipe', 'pipe', 'pipe'],
     });
@@ -57,7 +58,7 @@ export async function extractCriticalCSS(options: CriticalCSSOptions): Promise<C
 
     tailwind.on('error', (error) => {
       if (error.message.includes('ENOENT')) {
-        reject(new Error('Tailwind CLI not available, run: pnpm add -D tailwindcss'));
+        reject(new Error('Tailwind CLI not available, run: pnpm add -D @tailwindcss/cli'));
       } else {
         reject(error);
       }
@@ -65,7 +66,11 @@ export async function extractCriticalCSS(options: CriticalCSSOptions): Promise<C
 
     tailwind.on('close', (code) => {
       if (code !== 0) {
-        reject(new Error(`Tailwind CSS generation failed: ${stderr}`));
+        reject(
+          new Error(
+            `Tailwind CSS generation failed (code ${code}): ${stderr || 'No error output'}\nStdout: ${stdout}`
+          )
+        );
         return;
       }
 

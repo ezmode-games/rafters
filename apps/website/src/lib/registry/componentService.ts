@@ -17,6 +17,7 @@ import {
   ExampleSchema,
   type Intelligence,
   IntelligenceSchema,
+  type Preview,
   type RegistryResponse,
   RegistryResponseSchema,
   type UsagePatterns,
@@ -25,6 +26,7 @@ import {
 import { parse, type Spec } from 'comment-parser';
 import { extractCriticalCSS } from './cssExtractor.js';
 import { extractBaseClasses, extractClassMappings } from './cvaExtractor';
+import { compileAllPreviews } from './previewCompiler.js';
 
 // Cache for components to avoid re-parsing
 let componentsCache: ComponentManifest[] | null = null;
@@ -175,6 +177,22 @@ async function parseJSDocFromSource(
     // Generate docs URL
     const docs = `https://rafters.realhandy.tech/docs/components/${registryName}`;
 
+    // Generate component previews if CVA intelligence exists
+    let previews: Preview[] | undefined;
+    if (cva) {
+      try {
+        // Construct full path to component file
+        const uiPackagePath = join(process.cwd(), '../../packages/ui/src/components');
+        const componentFilePath = join(uiPackagePath, filename);
+        previews = await compileAllPreviews(registryName, componentFilePath, content, 'react');
+      } catch (error) {
+        console.warn(
+          `[componentService] Preview compilation failed for ${registryName}:`,
+          error instanceof Error ? error.message : String(error)
+        );
+      }
+    }
+
     // Build files array - include local dependencies
     const files = [
       {
@@ -216,6 +234,7 @@ async function parseJSDocFromSource(
           usagePatterns,
           designGuides,
           examples,
+          previews,
         },
       },
     });
@@ -234,9 +253,12 @@ function findTagValue(tags: Spec[], tagName: string): string | null {
   const tag = tags.find((t) => t.tag === tagName);
   if (!tag) return null;
 
-  // For simple tags like @registryName container, the value is in 'name' field
-  // For complex tags with descriptions, the value is in 'description' field
-  const value = tag.name?.trim() || tag.description?.trim() || '';
+  // For tags with both name and description (like @dependencies local:foo, npm-pkg)
+  // the parser splits at the first comma, putting first part in 'name' and rest in 'description'
+  // We need to concatenate both parts
+  const namePart = tag.name?.trim() || '';
+  const descPart = tag.description?.trim() || '';
+  const value = namePart && descPart ? `${namePart} ${descPart}` : namePart || descPart;
   return value || null;
 }
 

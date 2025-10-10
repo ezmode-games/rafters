@@ -96,13 +96,14 @@ The `@rafters/design-tokens` package implements a sophisticated dependency graph
 
 ### ZERO TOLERANCE POLICIES
 1. **ALWAYS run `pnpm preflight` before commits** - Build WILL fail otherwise
-2. **NEVER use `npm` or `npx`** - Only pnpm in this workspace
-3. **NO `any` types** - Biome config causes build failure
-4. **NO emoji anywhere** - Code, comments, commits, documentation
-5. **Use Zod for all external data** - Required for type safety
-6. **NO `.then()` chains** - Use async/await only
-7. **React 19 purity** - No impure functions in components
-8. **NEVER use `/tmp` directory** - All work files MUST be in workspace subdirectories to prevent data loss
+2. **NEVER commit broken tests** - ALL tests must pass, NO skipping tests to make CI pass
+3. **NEVER use `npm` or `npx`** - Only pnpm in this workspace
+4. **NO `any` types** - Biome config causes build failure
+5. **NO emoji anywhere** - Code, comments, commits, documentation
+6. **Use Zod for all external data** - Required for type safety
+7. **NO `.then()` chains** - Use async/await only
+8. **React 19 purity** - No impure functions in components
+9. **NEVER use `/tmp` directory** - All work files MUST be in workspace subdirectories to prevent data loss
 
 ### Development Workflow
 1. Make changes

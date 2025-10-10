@@ -31,6 +31,10 @@ export default defineConfig({
                 // This ensures the registry data is bundled
                 'process.env.REGISTRY_BUILD': '"true"',
               },
+              ssr: {
+                // Don't bundle Vite and build tools - they run at build time only
+                external: ['vite', '@vitejs/plugin-react', 'rollup', 'esbuild'],
+              },
             },
           });
         },

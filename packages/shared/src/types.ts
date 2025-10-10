@@ -446,6 +446,18 @@ export const PublicDesignSystemSchema = z.object({
 
 export type PublicDesignSystem = z.infer<typeof PublicDesignSystemSchema>;
 
+// Component Preview Schema (pre-compiled framework variants)
+export const PreviewSchema = z.object({
+  framework: z.enum(['react', 'vue', 'svelte']),
+  variant: z.string(),
+  props: z.record(z.string(), z.unknown()),
+  compiledJs: z.string(),
+  sizeBytes: z.number(),
+  error: z.string().optional(),
+});
+
+export type Preview = z.infer<typeof PreviewSchema>;
+
 // Shadcn-compatible Component Manifest for Registry API
 export const ComponentManifestSchema = z.object({
   $schema: z.string().optional(),
@@ -489,6 +501,7 @@ export const ComponentManifestSchema = z.object({
           usagePatterns: UsagePatternsSchema.optional(),
           designGuides: z.array(DesignGuideSchema).optional(),
           examples: z.array(ExampleSchema).optional(),
+          previews: z.array(PreviewSchema).optional(),
         })
         .optional(),
     })

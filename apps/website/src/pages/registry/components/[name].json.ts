@@ -30,7 +30,17 @@ export async function GET({ params }: { params: { name: string } }) {
       });
     }
 
-    return new Response(JSON.stringify(componentData), {
+    // Production endpoint: only return files and dependencies
+    // All metadata (CVA, previews, examples, intelligence) is for docs/tooling only
+    const responseData = {
+      name: componentData.name,
+      type: componentData.type,
+      description: componentData.description,
+      dependencies: componentData.dependencies,
+      files: componentData.files,
+    };
+
+    return new Response(JSON.stringify(responseData), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
