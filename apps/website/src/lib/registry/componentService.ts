@@ -5,11 +5,12 @@
  * Uses shared Zod schemas for type safety and validation.
  */
 
-import { readdirSync, readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   type ComponentManifest,
   ComponentManifestSchema,
+  type CVAIntelligence,
   type DesignGuide,
   DesignGuideSchema,
   type Example,
@@ -22,6 +23,7 @@ import {
   UsagePatternsSchema,
 } from '@rafters/shared';
 import { parse, type Spec } from 'comment-parser';
+import { extractBaseClasses, extractClassMappings } from './cvaExtractor';
 
 // Cache for components to avoid re-parsing
 let componentsCache: ComponentManifest[] | null = null;
@@ -68,12 +70,40 @@ function parseJSDocFromSource(content: string, filename: string): ComponentManif
       findTagValue(comment.tags, 'semantic-meaning') ||
       '';
 
+    // Extract CVA class mappings if component uses class-variance-authority
+    let cva: CVAIntelligence | undefined;
+    if (
+      content.includes("from 'class-variance-authority'") ||
+      content.includes('from "class-variance-authority"')
+    ) {
+      const baseClasses = extractBaseClasses(content);
+      const propMappings = extractClassMappings(content);
+
+      if (baseClasses.length > 0 || propMappings.length > 0) {
+        const allClasses = new Set<string>(baseClasses);
+        for (const mapping of propMappings) {
+          for (const classes of Object.values(mapping.values)) {
+            for (const className of classes) {
+              allClasses.add(className);
+            }
+          }
+        }
+
+        cva = {
+          baseClasses,
+          propMappings,
+          allClasses: Array.from(allClasses),
+        };
+      }
+    }
+
     const intelligence: Intelligence = IntelligenceSchema.parse({
       cognitiveLoad,
       attentionEconomics,
       accessibility,
       trustBuilding,
       semanticMeaning,
+      cva,
     });
 
     // Extract usage patterns (camelCase or kebab-case)
@@ -141,7 +171,7 @@ function parseJSDocFromSource(content: string, filename: string): ComponentManif
         files.push({
           path: localFile,
           content: localContent,
-          type: 'registry:primitive',
+          type: 'registry:primitive' as const,
         });
       } catch (error) {
         console.warn(`Could not load local dependency: ${localFile}`, error);
@@ -261,6 +291,16 @@ function loadPrimitives(): ComponentManifest[] {
 
     for (const primitiveType of primitiveTypes) {
       const primitiveDir = join(primitivesBaseDir, primitiveType);
+
+      // Skip if not a directory (e.g., index.ts file)
+      try {
+        if (!statSync(primitiveDir).isDirectory()) {
+          continue;
+        }
+      } catch {
+        continue;
+      }
+
       const files = readdirSync(primitiveDir);
 
       for (const file of files) {

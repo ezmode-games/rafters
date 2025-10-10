@@ -1,50 +1,19 @@
 /**
- * Component Class Intelligence Extractor
+ * CVA (class-variance-authority) Extraction Utility
  *
- * Extracts prop-to-class mappings from React framework components using CVA (class-variance-authority).
- * Parses cva() configurations to determine which CSS classes are applied based on prop values.
- *
- * @example
- * ```bash
- * pnpm tsx scripts/extract-preview-intelligence.ts
- * ```
+ * Extracts base classes and prop-to-class mappings from components using CVA.
+ * Used by componentService to add CVA intelligence to registry metadata.
  */
-
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { z } from 'zod';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-const ClassMappingSchema = z.object({
-  propName: z.string(),
-  values: z.record(z.string(), z.array(z.string())),
-});
-
-const PreviewIntelligenceSchema = z.object({
-  component: z.string(),
-  baseClasses: z.array(z.string()),
-  propMappings: z.array(ClassMappingSchema),
-  allClasses: z.array(z.string()),
-});
 
 export interface ClassMapping {
   propName: string;
   values: Record<string, string[]>;
 }
 
-export interface PreviewIntelligence {
-  component: string;
-  baseClasses: string[];
-  propMappings: ClassMapping[];
-  allClasses: string[];
-}
-
 /**
  * Extract base classes from cva() first argument
  */
-export async function extractBaseClasses(source: string): Promise<string[]> {
+export function extractBaseClasses(source: string): string[] {
   const baseClasses: string[] = [];
 
   // Find cva() call and extract first argument (base classes)
@@ -62,7 +31,7 @@ export async function extractBaseClasses(source: string): Promise<string[]> {
  * Extract prop-to-class mappings from cva() variants object
  * Groups by prop name with all values as Record<string, string[]>
  */
-export async function extractClassMappings(source: string): Promise<ClassMapping[]> {
+export function extractClassMappings(source: string): ClassMapping[] {
   const mappings: ClassMapping[] = [];
 
   // Find cva() call - match the entire config object
@@ -91,7 +60,6 @@ export async function extractClassMappings(source: string): Promise<ClassMapping
   const variantsContent = cvaConfig.substring(variantsOpenBrace + 1, variantsEnd - 1);
 
   // Parse each variant prop group
-  // Need to handle nested objects properly, including multi-line string values
   const lines = variantsContent.split('\n');
   let currentProp: string | null = null;
   let currentValues: Record<string, string[]> = {};
@@ -227,97 +195,4 @@ export async function extractClassMappings(source: string): Promise<ClassMapping
   }
 
   return mappings;
-}
-
-/**
- * Process a single component file
- */
-export async function processComponent(path: string): Promise<PreviewIntelligence> {
-  let source: string;
-  try {
-    source = await readFile(path, 'utf-8');
-  } catch (_error) {
-    throw new Error(`Failed to read component: ${path}`);
-  }
-
-  // Extract component name from file path
-  const fileName = path.split('/').pop() || '';
-  const component = fileName.replace(/\.tsx?$/, '').toLowerCase();
-
-  // Extract base classes and prop mappings
-  const baseClasses = await extractBaseClasses(source);
-  const propMappings = await extractClassMappings(source);
-
-  // Collect all classes (base + mapped)
-  const allClasses = new Set<string>(baseClasses);
-  for (const mapping of propMappings) {
-    for (const classes of Object.values(mapping.values)) {
-      for (const className of classes) {
-        allClasses.add(className);
-      }
-    }
-  }
-
-  const intelligence: PreviewIntelligence = {
-    component,
-    baseClasses,
-    propMappings,
-    allClasses: Array.from(allClasses),
-  };
-
-  // Validate with Zod schema
-  PreviewIntelligenceSchema.parse(intelligence);
-
-  // Log warning if no cva() patterns found
-  if (baseClasses.length === 0 && propMappings.length === 0) {
-    console.warn(`No class mappings found for ${component}`);
-  }
-
-  return intelligence;
-}
-
-/**
- * Main entry point - process Button and Input components
- */
-export async function main(): Promise<void> {
-  const components = [
-    join(__dirname, '../src/components/Button.tsx'),
-    join(__dirname, '../src/components/Input.tsx'),
-  ];
-
-  // Ensure output directory exists
-  const outputDir = join(__dirname, '../../../apps/website/public/registry/previews');
-  try {
-    await mkdir(outputDir, { recursive: true });
-  } catch (_error) {
-    throw new Error('Preview registry directory not found');
-  }
-
-  const results: PreviewIntelligence[] = [];
-
-  for (const componentPath of components) {
-    try {
-      const intelligence = await processComponent(componentPath);
-      results.push(intelligence);
-      console.log(`Extracted intelligence for ${intelligence.component}`);
-
-      // Write output
-      const outputPath = join(outputDir, `${intelligence.component}.json`);
-      await writeFile(outputPath, JSON.stringify(intelligence, null, 2));
-      console.log(`Wrote intelligence to ${outputPath}`);
-    } catch (error) {
-      console.error(`Failed to process ${componentPath}:`, error);
-      // Continue processing remaining components
-    }
-  }
-
-  console.log(`\nProcessed ${results.length} components`);
-}
-
-// Run if executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((error) => {
-    console.error('Fatal error:', error);
-    process.exit(1);
-  });
 }
