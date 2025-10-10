@@ -33,7 +33,7 @@ export interface CompiledPreview {
 export async function compileComponentPreview(
   options: PreviewCompilationOptions
 ): Promise<CompiledPreview> {
-  const { componentContent, framework, variant = 'default', props = {} } = options;
+  const { framework, variant = 'default', props = {} } = options;
 
   // Validate framework
   if (!['react', 'vue', 'svelte'].includes(framework)) {

@@ -22,6 +22,7 @@
       "!**/playwright/.cache/**/*",
       "!**/test/components/**/*",
       "!**/test/primitives/**/*",
+      "!**/test/fixtures/**/*",
       "!/var/folders/**/*"
     ],
     "maxSize": 10485760
