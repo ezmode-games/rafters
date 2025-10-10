@@ -6,6 +6,11 @@
  * @registryPath primitives/button/r-button.ts
  * @registryType registry:primitive
  *
+ * @cognitiveLoad 2
+ * @attentionEconomics Low cognitive load - simple click interaction
+ * @trustBuilding Clear affordance with button role and keyboard support
+ * @semanticMeaning Foundation primitive for clickable actions with ARIA button pattern
+ *
  * @accessibility WCAG AAA - button role, keyboard navigation, 44px touch targets
  * @dependencies lit, local:../../base/RPrimitiveBase.ts, local:../../utils/keyboard.ts
  *

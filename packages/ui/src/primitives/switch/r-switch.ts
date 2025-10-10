@@ -6,6 +6,11 @@
  * @registryPath primitives/switch/r-switch.ts
  * @registryType registry:primitive
  *
+ * @cognitiveLoad 3
+ * @attentionEconomics Low cognitive load (3/10) as switches are familiar mobile UI patterns. Clear visual state indicators reduce cognitive burden.
+ * @trustBuilding Immediate visual feedback on state changes. ARIA attributes provide clear state to screen readers. Space key only (not Enter) follows switch pattern correctly.
+ * @semanticMeaning Binary on/off control following W3C ARIA switch pattern for immediate state changes
+ *
  * @accessibility WCAG AAA - switch role, keyboard (Space toggle), 44px touch targets
  * @dependencies lit, local:../../base/RPrimitiveBase.ts, local:../../utils/keyboard.ts
  *

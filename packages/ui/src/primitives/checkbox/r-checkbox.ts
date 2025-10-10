@@ -6,6 +6,11 @@
  * @registryPath primitives/checkbox/r-checkbox.ts
  * @registryType registry:primitive
  *
+ * @cognitiveLoad 3
+ * @attentionEconomics Low cognitive load - binary or tri-state selection
+ * @trustBuilding Clear visual state with proper ARIA checkbox role
+ * @semanticMeaning Foundation primitive for selection controls with checkbox pattern
+ *
  * @accessibility WCAG AAA - checkbox role, keyboard (Space toggle), 44px touch targets
  * @dependencies lit, local:../../base/RPrimitiveBase.ts, local:../../utils/keyboard.ts
  *

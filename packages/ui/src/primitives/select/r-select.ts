@@ -6,6 +6,11 @@
  * @registryPath primitives/select/r-select.ts
  * @registryType registry:primitive
  *
+ * @cognitiveLoad 4
+ * @attentionEconomics Moderate cognitive load (4/10) as selects require users to scan options and make decisions. Clear visual hierarchy and keyboard navigation reduce cognitive burden.
+ * @trustBuilding Visual feedback through aria-selected state. Keyboard navigation follows ARIA APG patterns. Clear focus indicators build user confidence.
+ * @semanticMeaning Foundation primitive for single or multiple selection from a list following W3C ARIA listbox pattern with WCAG AAA compliance
+ *
  * @accessibility WCAG AAA - listbox role, keyboard (Arrow keys, Home/End), 44px touch targets
  * @dependencies lit, local:../../base/RPrimitiveBase.ts, local:../../utils/keyboard.ts
  *

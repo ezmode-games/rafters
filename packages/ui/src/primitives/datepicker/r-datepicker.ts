@@ -6,6 +6,11 @@
  * @registryPath primitives/datepicker/r-datepicker.ts
  * @registryType registry:primitive
  *
+ * @cognitiveLoad 5
+ * @attentionEconomics Medium cognitive load (5/10) - calendar grids require spatial navigation. Clear visual hierarchy with today indicator and selected state.
+ * @trustBuilding Follows familiar calendar pattern. Visual feedback for selection. Keyboard navigation follows ARIA APG standard. Respects date constraints.
+ * @semanticMeaning Foundation primitive for single date selection following W3C ARIA date picker pattern with WCAG AAA compliance
+ *
  * @accessibility WCAG AAA - grid role for calendar, keyboard navigation (Arrow keys navigate days, Enter selects, Escape closes), 44px touch targets
  * @dependencies lit, local:../../base/RPrimitiveBase.ts, local:../../utils/keyboard.ts
  *

@@ -6,6 +6,11 @@
  * @registryPath primitives/textarea/r-textarea.ts
  * @registryType registry:primitive
  *
+ * @cognitiveLoad 3
+ * @attentionEconomics Low cognitive load - familiar multi-line text input
+ * @trustBuilding Clear textarea affordance with proper labeling and validation states
+ * @semanticMeaning Foundation primitive for multi-line text input with validation support
+ *
  * @accessibility WCAG AAA - textbox role, keyboard navigation, clear labels, 44px touch targets
  * @dependencies lit, local:../../base/RPrimitiveBase.ts, local:../../utils/keyboard.ts
  *

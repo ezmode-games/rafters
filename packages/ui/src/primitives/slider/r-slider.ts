@@ -6,6 +6,11 @@
  * @registryPath primitives/slider/r-slider.ts
  * @registryType registry:primitive
  *
+ * @cognitiveLoad 4
+ * @attentionEconomics Medium cognitive load - requires understanding of range and position
+ * @trustBuilding Clear visual feedback for value changes with ARIA slider role
+ * @semanticMeaning Foundation primitive for range selection with slider pattern
+ *
  * @accessibility WCAG AAA - slider role, keyboard (Arrow keys adjust), 44px touch targets
  * @dependencies lit, local:../../base/RPrimitiveBase.ts, local:../../utils/keyboard.ts
  *

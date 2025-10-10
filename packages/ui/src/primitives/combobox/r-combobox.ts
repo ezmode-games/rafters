@@ -6,7 +6,11 @@
  * @registryPath primitives/combobox/r-combobox.ts
  * @registryType registry:primitive
  *
- * @accessibility WCAG AAA - combobox role, keyboard navigation (Arrow keys, Escape), 44px touch targets
+ * @cognitiveLoad 5
+ * @attentionEconomics Medium cognitive load (5/10) as comboboxes require understanding of both input and selection. Progressive disclosure reduces initial cognitive load by hiding options until needed.
+ * @accessibility WCAG AAA - combobox role, keyboard navigation (Arrow keys, Escape, Home, End, Enter), 44px touch targets, proper ARIA attributes for screen readers
+ * @trustBuilding Clear keyboard navigation patterns. Visual feedback for active options. Proper ARIA attributes for screen readers. Respects user input with autocomplete disabled.
+ * @semanticMeaning Foundation primitive for searchable selection controls following W3C ARIA combobox pattern
  * @dependencies lit, local:../../base/RPrimitiveBase.ts, local:../../utils/keyboard.ts
  *
  * @example

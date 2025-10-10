@@ -6,6 +6,11 @@
  * @registryPath primitives/input/r-input.ts
  * @registryType registry:primitive
  *
+ * @cognitiveLoad 2
+ * @attentionEconomics Low cognitive load (2/10) as text inputs are universally understood. Validation messages use Rafters trust-building patterns.
+ * @trustBuilding Visual feedback through variant styling. Error messages with proper ARIA. Sensitive data indicators. Respects user input.
+ * @semanticMeaning Foundation primitive for all text-based user input with embedded design intelligence
+ *
  * @accessibility WCAG AAA - textbox role, keyboard navigation, clear labels
  * @dependencies lit, local:../../base/RPrimitiveBase.ts
  *
