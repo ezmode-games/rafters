@@ -59,7 +59,7 @@ export class RComponentPreview extends LitElement {
   /**
    * Fetch component data from registry when connected
    */
-  async connectedCallback() {
+  override async connectedCallback() {
     super.connectedCallback();
 
     if (!this.component) {
@@ -141,7 +141,7 @@ export class RComponentPreview extends LitElement {
     return cva?.css || '';
   }
 
-  static styles = css`
+  static override styles = css`
     :host {
       display: block;
     }
@@ -168,7 +168,7 @@ export class RComponentPreview extends LitElement {
     }
   `;
 
-  render() {
+  override render() {
     if (this.isLoading) {
       return html`
         <div class="preview-loading" role="status" aria-live="polite">
