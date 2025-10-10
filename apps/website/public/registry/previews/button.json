@@ -1,0 +1,99 @@
+{
+  "component": "button",
+  "baseClasses": [
+    "inline-flex",
+    "items-center",
+    "justify-center",
+    "rounded-md",
+    "text-sm",
+    "font-medium",
+    "focus-visible:outline-none",
+    "focus-visible:ring-2",
+    "focus-visible:ring-ring",
+    "focus-visible:ring-offset-2",
+    "disabled:pointer-events-none",
+    "disabled:opacity-50",
+    "transition-all",
+    "hover:opacity-90",
+    "active:scale-95"
+  ],
+  "propMappings": [
+    {
+      "propName": "variant",
+      "values": {
+        "primary": ["bg-primary", "text-primary-foreground", "hover:bg-primary/90"],
+        "secondary": ["bg-secondary", "text-secondary-foreground", "hover:bg-secondary/80"],
+        "destructive": ["bg-destructive", "text-destructive-foreground", "hover:bg-destructive/90"],
+        "success": ["bg-success", "text-success-foreground", "hover:bg-success/90"],
+        "warning": ["bg-warning", "text-warning-foreground", "hover:bg-warning/90"],
+        "info": ["bg-info", "text-info-foreground", "hover:bg-info/90"],
+        "outline": [
+          "border",
+          "border-input",
+          "bg-background",
+          "hover:bg-accent",
+          "hover:text-accent-foreground"
+        ],
+        "ghost": ["hover:bg-accent", "hover:text-accent-foreground"]
+      }
+    },
+    {
+      "propName": "size",
+      "values": {
+        "sm": ["h-8", "px-3", "text-xs"],
+        "md": ["h-10", "px-4"],
+        "lg": ["h-12", "px-6", "text-base"],
+        "full": ["h-12", "px-6", "text-base", "w-full"]
+      }
+    }
+  ],
+  "allClasses": [
+    "inline-flex",
+    "items-center",
+    "justify-center",
+    "rounded-md",
+    "text-sm",
+    "font-medium",
+    "focus-visible:outline-none",
+    "focus-visible:ring-2",
+    "focus-visible:ring-ring",
+    "focus-visible:ring-offset-2",
+    "disabled:pointer-events-none",
+    "disabled:opacity-50",
+    "transition-all",
+    "hover:opacity-90",
+    "active:scale-95",
+    "bg-primary",
+    "text-primary-foreground",
+    "hover:bg-primary/90",
+    "bg-secondary",
+    "text-secondary-foreground",
+    "hover:bg-secondary/80",
+    "bg-destructive",
+    "text-destructive-foreground",
+    "hover:bg-destructive/90",
+    "bg-success",
+    "text-success-foreground",
+    "hover:bg-success/90",
+    "bg-warning",
+    "text-warning-foreground",
+    "hover:bg-warning/90",
+    "bg-info",
+    "text-info-foreground",
+    "hover:bg-info/90",
+    "border",
+    "border-input",
+    "bg-background",
+    "hover:bg-accent",
+    "hover:text-accent-foreground",
+    "h-8",
+    "px-3",
+    "text-xs",
+    "h-10",
+    "px-4",
+    "h-12",
+    "px-6",
+    "text-base",
+    "w-full"
+  ]
+}

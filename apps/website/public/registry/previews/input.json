@@ -1,0 +1,105 @@
+{
+  "component": "input",
+  "baseClasses": [
+    "flex",
+    "h-10",
+    "w-full",
+    "rounded-md",
+    "border",
+    "px-3",
+    "py-2",
+    "text-sm",
+    "file:border-0",
+    "file:bg-transparent",
+    "file:text-sm",
+    "file:font-medium",
+    "placeholder:text-muted-foreground",
+    "focus-visible:outline-none",
+    "focus-visible:ring-2",
+    "focus-visible:ring-ring",
+    "focus-visible:ring-offset-2",
+    "disabled:cursor-not-allowed",
+    "disabled:opacity-disabled",
+    "transition-all",
+    "motion-focus",
+    "hover:opacity-hover",
+    "min-h-[44px]",
+    "sm:min-h-[40px]"
+  ],
+  "propMappings": [
+    {
+      "propName": "variant",
+      "values": {
+        "default": ["border-input", "bg-background", "focus-visible:ring-primary"],
+        "error": [
+          "border-destructive",
+          "bg-destructive/10",
+          "focus-visible:ring-destructive",
+          "text-destructive-foreground"
+        ],
+        "success": [
+          "border-success",
+          "bg-success/10",
+          "focus-visible:ring-success",
+          "text-success-foreground"
+        ],
+        "warning": [
+          "border-warning",
+          "bg-warning/10",
+          "focus-visible:ring-warning",
+          "text-warning-foreground"
+        ]
+      }
+    },
+    {
+      "propName": "sensitive",
+      "values": {
+        "true": ["shadow-sm", "border-2"],
+        "false": []
+      }
+    }
+  ],
+  "allClasses": [
+    "flex",
+    "h-10",
+    "w-full",
+    "rounded-md",
+    "border",
+    "px-3",
+    "py-2",
+    "text-sm",
+    "file:border-0",
+    "file:bg-transparent",
+    "file:text-sm",
+    "file:font-medium",
+    "placeholder:text-muted-foreground",
+    "focus-visible:outline-none",
+    "focus-visible:ring-2",
+    "focus-visible:ring-ring",
+    "focus-visible:ring-offset-2",
+    "disabled:cursor-not-allowed",
+    "disabled:opacity-disabled",
+    "transition-all",
+    "motion-focus",
+    "hover:opacity-hover",
+    "min-h-[44px]",
+    "sm:min-h-[40px]",
+    "border-input",
+    "bg-background",
+    "focus-visible:ring-primary",
+    "border-destructive",
+    "bg-destructive/10",
+    "focus-visible:ring-destructive",
+    "text-destructive-foreground",
+    "border-success",
+    "bg-success/10",
+    "focus-visible:ring-success",
+    "text-success-foreground",
+    "border-warning",
+    "bg-warning/10",
+    "focus-visible:ring-warning",
+    "text-warning-foreground",
+    "shadow-sm",
+    "border-2"
+  ]
+}
