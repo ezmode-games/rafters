@@ -7,7 +7,7 @@
 import { getComponent, getRegistryMetadata } from '../../../lib/registry/componentService';
 
 export async function getStaticPaths() {
-  const registry = getRegistryMetadata();
+  const registry = await getRegistryMetadata();
 
   return (
     registry.components?.map((component) => ({
@@ -18,7 +18,7 @@ export async function getStaticPaths() {
 
 export async function GET({ params }: { params: { name: string } }) {
   try {
-    const componentData = getComponent(params.name);
+    const componentData = await getComponent(params.name);
 
     if (!componentData) {
       return new Response(JSON.stringify({ error: `Component '${params.name}' not found` }), {

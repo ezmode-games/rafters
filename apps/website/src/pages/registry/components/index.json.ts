@@ -11,7 +11,7 @@ import {
 
 export async function GET() {
   try {
-    const registryData = getRegistryMetadata();
+    const registryData = await getRegistryMetadata();
 
     // Transform to simpler format for listing (shadcn-compatible)
     const componentsData = {

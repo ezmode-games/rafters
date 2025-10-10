@@ -8,7 +8,7 @@
 import { getRegistryMetadata } from '../lib/registry/componentService';
 
 export async function GET() {
-  const registry = getRegistryMetadata();
+  const registry = await getRegistryMetadata();
 
   // Sort components by cognitive load for logical presentation
   const _sortedComponents = registry.components.sort((a, b) => {
