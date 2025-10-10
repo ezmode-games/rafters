@@ -99,7 +99,12 @@ describe('compileComponentPreview', () => {
 
 describe('compileAllPreviews', () => {
   it('should generate previews for component', async () => {
-    const previews = await compileAllPreviews('button', TEST_BUTTON_PATH, testButtonSource, 'react');
+    const previews = await compileAllPreviews(
+      'button',
+      TEST_BUTTON_PATH,
+      testButtonSource,
+      'react'
+    );
 
     expect(previews.length).toBeGreaterThan(0);
     expect(previews[0].compiledJs).toBeTruthy();
@@ -119,7 +124,12 @@ describe('compileAllPreviews', () => {
   });
 
   it('should generate default variant', async () => {
-    const previews = await compileAllPreviews('button', TEST_BUTTON_PATH, testButtonSource, 'react');
+    const previews = await compileAllPreviews(
+      'button',
+      TEST_BUTTON_PATH,
+      testButtonSource,
+      'react'
+    );
 
     const defaultPreview = previews.find((p) => p.variant === 'default');
     expect(defaultPreview).toBeDefined();
