@@ -36,7 +36,7 @@
  */
 import * as SliderPrimitive from '@radix-ui/react-slider';
 
-import { cn } from '../lib/utils';
+import { cn } from '../utils';
 
 export interface SliderProps extends React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> {
   /** Motor accessibility: Enhanced thumb size for easier manipulation */

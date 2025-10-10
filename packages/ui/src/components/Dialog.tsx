@@ -40,7 +40,7 @@
  * ```
  */
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { cn } from '../lib/utils';
+import { cn } from '../utils';
 
 export interface DialogProps {
   // Trust-building intelligence

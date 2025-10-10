@@ -35,7 +35,7 @@
  * ```
  */
 import { forwardRef } from 'react';
-import { cn } from '../lib/utils';
+import { cn } from '../utils';
 
 export type ChipVariant = 'urgent' | 'new' | 'live' | 'beta' | 'premium' | 'count';
 export type ChipPosition = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';

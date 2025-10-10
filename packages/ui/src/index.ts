@@ -44,14 +44,6 @@ export type { ProgressProps } from './components/Progress';
 export { Progress } from './components/Progress';
 export { RaftersLogo } from './components/RaftersLogo';
 export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/Select';
-export type { SidebarProps } from './components/Sidebar';
-export {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarItem,
-} from './components/Sidebar';
 export type { SliderProps } from './components/Slider';
 export { Slider } from './components/Slider';
 export type { TabsProps } from './components/Tabs';
@@ -69,7 +61,4 @@ export {
 export type { TooltipProps } from './components/Tooltip';
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './components/Tooltip';
 // Utilities
-export { cn } from './lib/utils';
-// Providers
-export { KeyboardNavigationProvider } from './providers/KeyboardNavigationProvider';
-export { MotionCoordinator } from './providers/MotionCoordinator';
+export * from './utils';

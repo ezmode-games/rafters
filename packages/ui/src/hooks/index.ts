@@ -1,10 +1,5 @@
 /**
- * Hooks Index - Navigation and Menu Utilities
+ * Hooks Index - Custom Hooks
  *
- * Exports all custom hooks for navigation and menu coordination
+ * Exports all custom hooks for the UI library
  */
-
-export {
-  useSidebarItem,
-  useSidebarNavigation,
-} from './useSidebarNavigation';

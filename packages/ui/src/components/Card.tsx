@@ -1,4 +1,4 @@
-import { cn } from '../lib/utils';
+import { cn } from '../utils';
 /**
  * Content container component for grouping related information
  *

@@ -40,7 +40,7 @@
  */
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 
-import { cn } from '../lib/utils';
+import { cn } from '../utils';
 
 interface TabsProps extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.Root> {
   cognitiveLoad?: 'minimal' | 'standard' | 'complex';

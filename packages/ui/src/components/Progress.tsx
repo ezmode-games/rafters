@@ -1,7 +1,7 @@
 import * as ProgressPrimitive from '@radix-ui/react-progress';
 import { cva, type VariantProps } from 'class-variance-authority';
 import type { ComponentPropsWithoutRef, ElementRef } from 'react';
-import { cn } from '../lib/utils';
+import { cn } from '../utils';
 import { Button } from './Button';
 
 /**

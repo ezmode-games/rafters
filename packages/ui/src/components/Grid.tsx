@@ -34,7 +34,7 @@
  * </Grid>
  * ```
  */
-import { cn } from '../lib/utils';
+import { cn } from '../utils';
 
 /**
  * Responsive value type for breakpoint-aware properties
