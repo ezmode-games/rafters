@@ -7,10 +7,11 @@
 
 import { parse } from 'node:path';
 import type { Preview } from '@rafters/shared';
+// biome-ignore lint/style/useImportType: PreviewCVASchema is used at runtime with z.infer
 import { PreviewCVASchema } from '@rafters/shared';
-import type { z } from 'zod';
 import react from '@vitejs/plugin-react';
 import { build } from 'vite';
+import type { z } from 'zod';
 
 export interface PreviewCompilationOptions {
   componentPath: string;
