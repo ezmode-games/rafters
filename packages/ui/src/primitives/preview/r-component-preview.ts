@@ -42,7 +42,25 @@ export class RComponentPreview extends LitElement {
   /**
    * Dynamic props for class computation
    */
-  @property({ type: Object })
+  @property({
+    type: Object,
+    converter: {
+      fromAttribute: (value: string | null) => {
+        if (!value) return {};
+        try {
+          // Decode HTML entities that Astro adds to attribute values
+          const decoded = value
+            .replace(/&quot;/g, '"')
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>');
+          return JSON.parse(decoded);
+        } catch {
+          return {};
+        }
+      },
+    },
+  })
   props: Record<string, unknown> = {};
 
   /**
