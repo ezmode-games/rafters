@@ -9,18 +9,9 @@
  * @fires preview-error - Fired when preview loading fails
  */
 
-import type { Preview } from '@rafters/shared';
+import { type Preview, PreviewSchema } from '@rafters/shared';
 import { css, html, LitElement, unsafeCSS } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-
-interface CVAIntelligence {
-  baseClasses: string[];
-  propMappings: Array<{
-    propName: string;
-    values: Record<string, string[]>;
-  }>;
-  allClasses: string[];
-}
 
 @customElement('r-component-preview')
 export class RComponentPreview extends LitElement {
@@ -100,14 +91,10 @@ export class RComponentPreview extends LitElement {
         throw new Error(`Failed to fetch preview: ${response.statusText}`);
       }
 
-      const data = await response.json();
+      const json = await response.json();
+      const data = PreviewSchema.parse(json);
 
-      // Basic validation
-      if (!data.cva || !data.css || !data.dependencies) {
-        throw new Error('Invalid preview data: missing required fields');
-      }
-
-      this.previewData = data as Preview;
+      this.previewData = data;
       this.dispatchEvent(new CustomEvent('preview-loaded', { detail: data }));
     } catch (err) {
       this.error = err instanceof Error ? err.message : 'Failed to load preview';
@@ -126,7 +113,8 @@ export class RComponentPreview extends LitElement {
       return '';
     }
 
-    const cva = this.previewData.cva as CVAIntelligence;
+    const { cva } = this.previewData;
+
     const classes: string[] = [...cva.baseClasses];
 
     // Add mapped classes based on prop values

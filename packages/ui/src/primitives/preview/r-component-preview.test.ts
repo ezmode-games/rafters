@@ -192,7 +192,9 @@ describe('r-component-preview', () => {
       await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(errorHandler).toHaveBeenCalled();
-      expect(errorHandler.mock.calls[0][0].detail).toContain('missing required fields');
+      // Zod validation provides detailed error messages about missing fields
+      const errorMessage = errorHandler.mock.calls[0][0].detail;
+      expect(errorMessage).toMatch(/variant|props|compiledJs|cva|css|dependencies/);
     });
   });
 
