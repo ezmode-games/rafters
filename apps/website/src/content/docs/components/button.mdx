@@ -44,7 +44,7 @@ Interactive action triggers with embedded design intelligence for trust-building
 
 ### Primary Actions
 
-<r-component-preview component="button" variant="primary">
+<r-component-preview component="button" variant="default" props='{"variant":"primary"}'>
   Primary Button
 </r-component-preview>
 
@@ -52,7 +52,7 @@ Interactive action triggers with embedded design intelligence for trust-building
 
 ### Secondary Actions
 
-<r-component-preview component="button" variant="secondary">
+<r-component-preview component="button" variant="default" props='{"variant":"secondary"}'>
   Secondary Button
 </r-component-preview>
 
@@ -60,7 +60,7 @@ Interactive action triggers with embedded design intelligence for trust-building
 
 ### Destructive Actions
 
-<r-component-preview component="button" variant="destructive">
+<r-component-preview component="button" variant="default" props='{"variant":"destructive"}'>
   Delete Item
 </r-component-preview>
 
@@ -68,28 +68,56 @@ Interactive action triggers with embedded design intelligence for trust-building
 
 ### Ghost Actions
 
-<r-component-preview component="button" variant="ghost">
+<r-component-preview component="button" variant="default" props='{"variant":"ghost"}'>
   Ghost Button
 </r-component-preview>
 
 **Use for:** Subtle actions, menu items, minimal emphasis
 
-## Size Variations
+### Outline Actions
 
-### Default Size
-
-<r-component-preview component="button" variant="default">
-  Default Size
+<r-component-preview component="button" variant="default" props='{"variant":"outline"}'>
+  Outline Button
 </r-component-preview>
+
+**Use for:** Secondary actions with visual boundaries, form resets
+
+## Size Variations
 
 ### Small Size
 
-<r-component-preview component="button" variant="default">
-  Small Size
+<r-component-preview component="button" variant="default" props='{"variant":"primary", "size":"sm"}'>
+  Small Button
+</r-component-preview>
+
+### Medium Size (Default)
+
+<r-component-preview component="button" variant="default" props='{"variant":"primary", "size":"md"}'>
+  Medium Button
 </r-component-preview>
 
 ### Large Size
 
-<r-component-preview component="button" variant="default">
-  Large Size
+<r-component-preview component="button" variant="default" props='{"variant":"primary", "size":"lg"}'>
+  Large Button
+</r-component-preview>
+
+### Full Width
+
+<r-component-preview component="button" variant="default" props='{"variant":"primary", "size":"full"}'>
+  Full Width Button
+</r-component-preview>
+
+## State Variations
+
+### Disabled State
+
+<r-component-preview component="button" variant="default" props='{"variant":"primary"}' disabled>
+  Disabled Button
+</r-component-preview>
+
+### Loading State
+
+<r-component-preview component="button" variant="default" props='{"variant":"primary"}' loading>
+  Loading Button
 </r-component-preview>
