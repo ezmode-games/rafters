@@ -243,6 +243,9 @@ importers:
       '@rafters/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@rafters/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@swc/core':
         specifier: ^1.10.5
         version: 1.13.5(@swc/helpers@0.5.17)

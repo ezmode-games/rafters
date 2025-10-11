@@ -25,6 +25,7 @@
     "@astrojs/react": "^4.3.1",
     "@rafters/design-tokens": "workspace:*",
     "@rafters/shared": "workspace:*",
+    "@rafters/ui": "workspace:*",
     "@swc/core": "^1.10.5",
     "astro": "^5.13.7",
     "comment-parser": "^1.4.1",
