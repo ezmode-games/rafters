@@ -117,7 +117,6 @@ describe('compileAllPreviews', () => {
       'bg-gray-200',
       'text-gray-900',
     ],
-    css: '.inline-flex { display: inline-flex; }',
   };
   const mockCSS = '.inline-flex { display: inline-flex; }';
   const mockDependencies = ['react', 'class-variance-authority'];

@@ -7,6 +7,8 @@
 
 import { parse } from 'node:path';
 import type { Preview } from '@rafters/shared';
+import { PreviewCVASchema } from '@rafters/shared';
+import type { z } from 'zod';
 import react from '@vitejs/plugin-react';
 import { build } from 'vite';
 
@@ -139,12 +141,7 @@ export async function compileAllPreviews(
   componentFilePath: string,
   componentContent: string,
   framework: 'react',
-  cva: {
-    baseClasses: string[];
-    propMappings: Array<{ propName: string; values: Record<string, string[]> }>;
-    allClasses: string[];
-    css?: string;
-  },
+  cva: z.infer<typeof PreviewCVASchema>,
   css: string,
   dependencies: string[]
 ): Promise<Preview[]> {

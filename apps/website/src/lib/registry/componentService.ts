@@ -185,12 +185,17 @@ async function parseJSDocFromSource(
         const uiPackagePath = join(process.cwd(), '../../packages/ui/src/components');
         const componentFilePath = join(uiPackagePath, filename);
         const criticalCss = cva.css || '';
+        const previewCVA = {
+          baseClasses: cva.baseClasses,
+          propMappings: cva.propMappings,
+          allClasses: cva.allClasses,
+        };
         previews = await compileAllPreviews(
           registryName,
           componentFilePath,
           content,
           'react',
-          cva,
+          previewCVA,
           criticalCss,
           dependencies
         );

@@ -107,7 +107,6 @@ describe('Component Preview API ([name]/preview/[variant].json.ts)', () => {
           },
         ],
         allClasses: ['inline-flex', 'items-center', 'bg-blue-600', 'bg-gray-200'],
-        css: '.inline-flex { display: inline-flex; }',
       };
 
       const mockComponent = {
@@ -116,7 +115,10 @@ describe('Component Preview API ([name]/preview/[variant].json.ts)', () => {
         meta: {
           rafters: {
             intelligence: {
-              cva: mockCVA,
+              cva: {
+                ...mockCVA,
+                css: '.inline-flex { display: inline-flex; }',
+              },
             },
             previews: [
               {
@@ -270,7 +272,7 @@ describe('Component Preview API ([name]/preview/[variant].json.ts)', () => {
       expect(data.dependencies).toEqual([]);
     });
 
-    it('should handle undefined CSS in CVA gracefully', async () => {
+    it('should return 500 when CSS is missing from CVA intelligence', async () => {
       const mockCVA = {
         baseClasses: ['btn'],
         propMappings: [],
@@ -303,8 +305,8 @@ describe('Component Preview API ([name]/preview/[variant].json.ts)', () => {
       const response = await GET({ params: { name: 'button', variant: 'default' } });
       const data = await response.json();
 
-      expect(response.status).toBe(200);
-      expect(data.css).toBe('');
+      expect(response.status).toBe(500);
+      expect(data).toEqual({ error: 'CSS for CVA intelligence is missing or empty' });
     });
   });
 });
