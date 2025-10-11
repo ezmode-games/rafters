@@ -7,8 +7,11 @@
 
 import { parse } from 'node:path';
 import type { Preview } from '@rafters/shared';
+// biome-ignore lint/style/useImportType: PreviewCVASchema is used at runtime with z.infer
+import { PreviewCVASchema } from '@rafters/shared';
 import react from '@vitejs/plugin-react';
 import { build } from 'vite';
+import type { z } from 'zod';
 
 export interface PreviewCompilationOptions {
   componentPath: string;
@@ -138,7 +141,10 @@ export async function compileAllPreviews(
   componentName: string,
   componentFilePath: string,
   componentContent: string,
-  framework: 'react'
+  framework: 'react',
+  cva: z.infer<typeof PreviewCVASchema>,
+  css: string,
+  dependencies: string[]
 ): Promise<Preview[]> {
   // For now, just compile the default variant
   // Future: Parse component metadata to find all variants to generate
@@ -156,7 +162,12 @@ export async function compileAllPreviews(
 
     // Only include successful compilations in registry
     if (!preview.error) {
-      previews.push(preview);
+      previews.push({
+        ...preview,
+        cva,
+        css,
+        dependencies,
+      });
     } else {
       console.warn(`Preview compilation failed for ${componentName} ${variant}:`, preview.error);
     }

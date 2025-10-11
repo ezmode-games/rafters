@@ -60,6 +60,15 @@ export const CVAIntelligenceSchema = z
 export type ClassMapping = z.infer<typeof ClassMappingSchema>;
 export type CVAIntelligence = z.infer<typeof CVAIntelligenceSchema>;
 
+// CVA structure for preview rendering (without optional css field)
+export const PreviewCVASchema = z.object({
+  baseClasses: z.array(z.string()),
+  propMappings: z.array(ClassMappingSchema),
+  allClasses: z.array(z.string()),
+});
+
+export type PreviewCVA = z.infer<typeof PreviewCVASchema>;
+
 // Rafters intelligence schemas for CLI compatibility
 export const IntelligenceSchema = z.object({
   cognitiveLoad: z.number().min(0).max(10),
@@ -453,6 +462,9 @@ export const PreviewSchema = z.object({
   props: z.record(z.string(), z.unknown()),
   compiledJs: z.string(),
   sizeBytes: z.number(),
+  cva: PreviewCVASchema,
+  css: z.string(),
+  dependencies: z.array(z.string()),
   error: z.string().optional(),
 });
 
