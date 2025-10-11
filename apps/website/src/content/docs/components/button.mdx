@@ -7,18 +7,13 @@ attentionEconomics: "Primary variant commands highest attention - use sparingly"
 order: 2
 ---
 
-import ComponentPreview from '../../../components/ComponentPreview.tsx'
-
 # Button Component
 
 Interactive action triggers with embedded design intelligence for trust-building and attention management.
 
-<ComponentPreview 
-  component="button" 
-  showIntelligence={true}
-  height="200px"
-  client:load
-/>
+<r-component-preview component="button" variant="default">
+  Default Button
+</r-component-preview>
 
 ## Usage Guidelines
 
@@ -49,45 +44,33 @@ Interactive action triggers with embedded design intelligence for trust-building
 
 ### Primary Actions
 
-<ComponentPreview 
-  component="button" 
-  variant="primary"
-  height="120px"
-  client:load
-/>
+<r-component-preview component="button" variant="primary">
+  Primary Button
+</r-component-preview>
 
 **Use for:** Main user goals, call-to-action buttons, form submissions
 
 ### Secondary Actions
 
-<ComponentPreview 
-  component="button" 
-  variant="secondary"
-  height="120px"
-  client:load
-/>
+<r-component-preview component="button" variant="secondary">
+  Secondary Button
+</r-component-preview>
 
 **Use for:** Supporting actions, alternative choices, cancel operations
 
 ### Destructive Actions
 
-<ComponentPreview 
-  component="button" 
-  variant="destructive"
-  height="120px"
-  client:load
-/>
+<r-component-preview component="button" variant="destructive">
+  Delete Item
+</r-component-preview>
 
 **Use for:** Delete operations, irreversible actions, data removal
 
 ### Ghost Actions
 
-<ComponentPreview 
-  component="button" 
-  variant="ghost"
-  height="120px"
-  client:load
-/>
+<r-component-preview component="button" variant="ghost">
+  Ghost Button
+</r-component-preview>
 
 **Use for:** Subtle actions, menu items, minimal emphasis
 
@@ -95,31 +78,18 @@ Interactive action triggers with embedded design intelligence for trust-building
 
 ### Default Size
 
-<ComponentPreview 
-  component="button" 
-  variant="size-default"
-  props='{"size": "default"}'
-  height="100px"
-  client:load
-/>
+<r-component-preview component="button" variant="default">
+  Default Size
+</r-component-preview>
 
 ### Small Size
 
-<ComponentPreview 
-  component="button" 
-  variant="size-sm" 
-  props='{"size": "sm"}'
-  height="100px"
-  client:load
-/>
+<r-component-preview component="button" variant="default">
+  Small Size
+</r-component-preview>
 
 ### Large Size
 
-<ComponentPreview 
-  component="button" 
-  variant="size-lg"
-  props='{"size": "lg"}'
-  height="100px"
-  client:load
-/>
-
+<r-component-preview component="button" variant="default">
+  Large Size
+</r-component-preview>
