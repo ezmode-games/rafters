@@ -138,7 +138,15 @@ export async function compileAllPreviews(
   componentName: string,
   componentFilePath: string,
   componentContent: string,
-  framework: 'react'
+  framework: 'react',
+  cva: {
+    baseClasses: string[];
+    propMappings: Array<{ propName: string; values: Record<string, string[]> }>;
+    allClasses: string[];
+    css?: string;
+  },
+  css: string,
+  dependencies: string[]
 ): Promise<Preview[]> {
   // For now, just compile the default variant
   // Future: Parse component metadata to find all variants to generate
@@ -156,7 +164,12 @@ export async function compileAllPreviews(
 
     // Only include successful compilations in registry
     if (!preview.error) {
-      previews.push(preview);
+      previews.push({
+        ...preview,
+        cva,
+        css,
+        dependencies,
+      });
     } else {
       console.warn(`Preview compilation failed for ${componentName} ${variant}:`, preview.error);
     }

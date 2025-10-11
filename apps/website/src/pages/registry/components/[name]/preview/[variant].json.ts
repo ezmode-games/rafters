@@ -33,7 +33,26 @@ export async function GET({ params }: { params: { name: string; variant: string 
       });
     }
 
-    return new Response(JSON.stringify(preview, null, 2), {
+    // Include CVA intelligence, CSS, and dependencies for complete rendering
+    const cva = component.meta.rafters.intelligence?.cva;
+    const css = cva?.css || '';
+    const dependencies = component.dependencies || [];
+
+    if (!cva) {
+      return new Response(JSON.stringify({ error: 'CVA intelligence not found for preview' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const previewWithRenderingData = {
+      ...preview,
+      cva,
+      css,
+      dependencies,
+    };
+
+    return new Response(JSON.stringify(previewWithRenderingData, null, 2), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',

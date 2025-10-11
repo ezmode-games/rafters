@@ -98,17 +98,40 @@ describe('compileComponentPreview', () => {
 });
 
 describe('compileAllPreviews', () => {
-  it('should generate previews for component', async () => {
+  const mockCVA = {
+    baseClasses: ['inline-flex', 'items-center'],
+    propMappings: [
+      {
+        propName: 'variant',
+        values: {
+          primary: ['bg-blue-600', 'text-white'],
+          secondary: ['bg-gray-200', 'text-gray-900'],
+        },
+      },
+    ],
+    allClasses: ['inline-flex', 'items-center', 'bg-blue-600', 'text-white', 'bg-gray-200', 'text-gray-900'],
+    css: '.inline-flex { display: inline-flex; }',
+  };
+  const mockCSS = '.inline-flex { display: inline-flex; }';
+  const mockDependencies = ['react', 'class-variance-authority'];
+
+  it('should generate previews for component with CVA, CSS, and dependencies', async () => {
     const previews = await compileAllPreviews(
       'button',
       TEST_BUTTON_PATH,
       testButtonSource,
-      'react'
+      'react',
+      mockCVA,
+      mockCSS,
+      mockDependencies
     );
 
     expect(previews.length).toBeGreaterThan(0);
     expect(previews[0].compiledJs).toBeTruthy();
     expect(previews[0].framework).toBe('react');
+    expect(previews[0].cva).toEqual(mockCVA);
+    expect(previews[0].css).toBe(mockCSS);
+    expect(previews[0].dependencies).toEqual(mockDependencies);
   });
 
   it('should only include successful compilations', async () => {
@@ -116,23 +139,32 @@ describe('compileAllPreviews', () => {
       'invalid',
       INVALID_COMPONENT_PATH,
       invalidComponentSource,
-      'react'
+      'react',
+      mockCVA,
+      mockCSS,
+      mockDependencies
     );
 
     // Should not include failed compilations
     expect(previews.length).toBe(0);
   });
 
-  it('should generate default variant', async () => {
+  it('should generate default variant with rendering requirements', async () => {
     const previews = await compileAllPreviews(
       'button',
       TEST_BUTTON_PATH,
       testButtonSource,
-      'react'
+      'react',
+      mockCVA,
+      mockCSS,
+      mockDependencies
     );
 
     const defaultPreview = previews.find((p) => p.variant === 'default');
     expect(defaultPreview).toBeDefined();
     expect(defaultPreview?.compiledJs).toBeTruthy();
+    expect(defaultPreview?.cva).toEqual(mockCVA);
+    expect(defaultPreview?.css).toBe(mockCSS);
+    expect(defaultPreview?.dependencies).toEqual(mockDependencies);
   });
 });

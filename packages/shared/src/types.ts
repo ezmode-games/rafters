@@ -453,6 +453,14 @@ export const PreviewSchema = z.object({
   props: z.record(z.string(), z.unknown()),
   compiledJs: z.string(),
   sizeBytes: z.number(),
+  cva: z.object({
+    baseClasses: z.array(z.string()),
+    propMappings: z.array(ClassMappingSchema),
+    allClasses: z.array(z.string()),
+    css: z.string().optional(),
+  }),
+  css: z.string(),
+  dependencies: z.array(z.string()),
   error: z.string().optional(),
 });
 

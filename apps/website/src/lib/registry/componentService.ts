@@ -184,7 +184,16 @@ async function parseJSDocFromSource(
         // Construct full path to component file
         const uiPackagePath = join(process.cwd(), '../../packages/ui/src/components');
         const componentFilePath = join(uiPackagePath, filename);
-        previews = await compileAllPreviews(registryName, componentFilePath, content, 'react');
+        const criticalCss = cva.css || '';
+        previews = await compileAllPreviews(
+          registryName,
+          componentFilePath,
+          content,
+          'react',
+          cva,
+          criticalCss,
+          dependencies
+        );
       } catch (error) {
         console.warn(
           `[componentService] Preview compilation failed for ${registryName}:`,
