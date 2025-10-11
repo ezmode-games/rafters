@@ -109,7 +109,14 @@ describe('compileAllPreviews', () => {
         },
       },
     ],
-    allClasses: ['inline-flex', 'items-center', 'bg-blue-600', 'text-white', 'bg-gray-200', 'text-gray-900'],
+    allClasses: [
+      'inline-flex',
+      'items-center',
+      'bg-blue-600',
+      'text-white',
+      'bg-gray-200',
+      'text-gray-900',
+    ],
     css: '.inline-flex { display: inline-flex; }',
   };
   const mockCSS = '.inline-flex { display: inline-flex; }';
