@@ -3,16 +3,15 @@
  * Using fixture generators for realistic test data
  */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ReactAdapter } from '../../../../src/primitives/preview/adapters/react-adapter';
 import { createPreviewFixture } from '../../../../../shared/test/fixtures.js';
 
 // Helper to execute IIFE in test environment
 function executeIIFE(code: string) {
-  // Use eval to execute the code synchronously in jsdom
-  // This mimics how script tags work in real browsers
-  // biome-ignore lint/security/noGlobalEval: Required for test environment to execute component IIFEs
-  eval(code);
+  // Use Function constructor to execute the code synchronously in jsdom
+  // This mimics how script tags work in real browsers, but is safer than eval
+  new Function(code)();
 }
 
 describe('ReactAdapter', () => {
@@ -27,19 +26,19 @@ describe('ReactAdapter', () => {
 
     // Clear globals before each test
     // biome-ignore lint/performance/noDelete: Test cleanup requires deleting globals
-    delete (window as any).React;
+    delete (window as unknown as Record<string, unknown>).React;
     // biome-ignore lint/performance/noDelete: Test cleanup requires deleting globals
-    delete (window as any).ReactDOM;
+    delete (window as unknown as Record<string, unknown>).ReactDOM;
     // biome-ignore lint/performance/noDelete: Test cleanup requires deleting globals
-    delete (window as any).jsxRuntime;
+    delete (window as unknown as Record<string, unknown>).jsxRuntime;
     // biome-ignore lint/performance/noDelete: Test cleanup requires deleting globals
-    delete (window as any).jsxDevRuntime;
+    delete (window as unknown as Record<string, unknown>).jsxDevRuntime;
     // biome-ignore lint/performance/noDelete: Test cleanup requires deleting globals
-    delete (window as any).cva;
+    delete (window as unknown as Record<string, unknown>).cva;
     // biome-ignore lint/performance/noDelete: Test cleanup requires deleting globals
-    delete (window as any).shared;
+    delete (window as unknown as Record<string, unknown>).shared;
     // biome-ignore lint/performance/noDelete: Test cleanup requires deleting globals
-    delete (window as any).ComponentPreview;
+    delete (window as unknown as Record<string, unknown>).ComponentPreview;
 
     // Override mount to use eval instead of script tags in jsdom
     originalMount = adapter.mount.bind(adapter);
@@ -51,7 +50,7 @@ describe('ReactAdapter', () => {
         throw new Error('ComponentPreview global not found after script execution');
       }
 
-      const Component: any =
+      const Component: unknown =
         ComponentPreview.default ||
         Object.values(ComponentPreview).find(
           (exp) => typeof exp === 'function' && exp !== Object && exp !== Symbol
@@ -66,8 +65,8 @@ describe('ReactAdapter', () => {
       const React = window.React;
       const ReactDOM = window.ReactDOM;
 
-      (adapter as any).root = ReactDOM.createRoot(container);
-      (adapter as any).root.render(React.createElement(Component, props, children));
+      (adapter as unknown as { root: { render: (element: unknown) => void } }).root = ReactDOM.createRoot(container);
+      (adapter as unknown as { root: { render: (element: unknown) => void } }).root.render(React.createElement(Component, props, children));
     };
   });
 
@@ -296,7 +295,7 @@ describe('ReactAdapter', () => {
       expect(container.querySelector('.test')).toBeNull();
 
       // Re-mount (need to clear and re-set ComponentPreview)
-      delete (window as any).ComponentPreview;
+      delete (window as unknown as Record<string, unknown>).ComponentPreview;
       await adapter.mount(container, compiledJs, {});
       await new Promise((resolve) => setTimeout(resolve, 10));
       expect(container.querySelector('.test')).toBeDefined();
@@ -357,7 +356,7 @@ describe('ReactAdapter', () => {
 
         adapter.unmount();
         container.innerHTML = '';
-        delete (window as any).ComponentPreview;
+        delete (window as unknown as Record<string, unknown>).ComponentPreview;
 
         await adapter.mount(container, compiledJs, preview.props);
         await new Promise((resolve) => setTimeout(resolve, 10));
