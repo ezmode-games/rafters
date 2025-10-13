@@ -6,13 +6,15 @@
  * mock data for API endpoints during testing.
  */
 
-import { http, HttpResponse } from 'msw';
+import { HttpResponse, http } from 'msw';
+import { z } from 'zod';
+import type { ColorIntelligenceResponse, ComponentManifest } from '../src/types.js';
+import { ComponentManifestSchema } from '../src/types.js';
 import {
-  createComponentManifestFixture,
   createColorValueFixture,
+  createComponentManifestFixture,
   createTokenFixture,
 } from './fixtures.js';
-import type { ComponentManifest, ColorIntelligenceResponse } from '../src/types.js';
 
 /**
  * Base URL for API endpoints
@@ -51,7 +53,7 @@ export const componentHandlers = [
 
   // POST /api/registry - Create component (protected)
   http.post(`${API_BASE}/api/registry`, async ({ request }) => {
-    const body = (await request.json()) as ComponentManifest;
+    const body = ComponentManifestSchema.parse(await request.json());
 
     // Validate and return created manifest
     return HttpResponse.json(
@@ -65,7 +67,7 @@ export const componentHandlers = [
           },
         },
       },
-      { status: 201 },
+      { status: 201 }
     );
   }),
 ];
@@ -77,7 +79,7 @@ export const componentHandlers = [
 export const colorHandlers = [
   // POST /api/color-intel - Get AI color analysis
   http.post(`${API_BASE}/api/color-intel`, async ({ request }) => {
-    const body = (await request.json()) as { color: string };
+    const _body = (await request.json()) as { color: string };
 
     // Simulate AI analysis delay
     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -141,17 +143,18 @@ export const colorHandlers = [
 
   // POST /api/color-intel/batch - Batch color analysis
   http.post(`${API_BASE}/api/color-intel/batch`, async ({ request }) => {
-    const body = (await request.json()) as { colors: string[] };
+    const ColorBatchRequestSchema = z.object({ colors: z.array(z.string()) });
+    const body = ColorBatchRequestSchema.parse(await request.json());
 
     await new Promise((resolve) => setTimeout(resolve, 200));
 
-    const results = body.colors.map((color, index) =>
+    const results = body.colors.map((_color, index) =>
       createColorValueFixture({
         seed: index,
         overrides: {
           name: `color-${index}`,
         },
-      }),
+      })
     );
 
     return HttpResponse.json({ results });
@@ -179,7 +182,7 @@ export const tokenHandlers = [
 
   // POST /api/tokens/validate - Validate token structure
   http.post(`${API_BASE}/api/tokens/validate`, async ({ request }) => {
-    const body = await request.json();
+    const _body = await request.json();
 
     // Simulate validation
     return HttpResponse.json({
@@ -201,7 +204,7 @@ export const errorHandlers = [
         error: 'Component not found',
         code: 'COMPONENT_NOT_FOUND',
       },
-      { status: 404 },
+      { status: 404 }
     );
   }),
 
@@ -212,7 +215,7 @@ export const errorHandlers = [
         error: 'Authentication required',
         code: 'UNAUTHORIZED',
       },
-      { status: 401 },
+      { status: 401 }
     );
   }),
 
@@ -223,7 +226,7 @@ export const errorHandlers = [
         error: 'Internal server error',
         code: 'INTERNAL_ERROR',
       },
-      { status: 500 },
+      { status: 500 }
     );
   }),
 

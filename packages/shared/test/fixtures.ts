@@ -9,22 +9,22 @@
 import { faker } from '@faker-js/faker';
 import { fake, setFaker } from 'zod-schema-faker';
 import type {
-  ComponentManifest,
-  Preview,
   ColorValue,
-  Token,
-  OKLCH,
-  Intelligence,
+  ComponentManifest,
   CVAIntelligence,
+  Intelligence,
+  OKLCH,
+  Preview,
+  Token,
 } from '../src/types.js';
 import {
-  ComponentManifestSchema,
-  PreviewSchema,
   ColorValueSchema,
-  TokenSchema,
-  OKLCHSchema,
-  IntelligenceSchema,
+  ComponentManifestSchema,
   CVAIntelligenceSchema,
+  IntelligenceSchema,
+  OKLCHSchema,
+  PreviewSchema,
+  TokenSchema,
 } from '../src/types.js';
 
 // Initialize faker with zod-schema-faker
@@ -43,10 +43,7 @@ export interface FixtureOptions<T> {
  * Base fixture generator
  * Wraps zod-schema-faker with seed support and override merging
  */
-function generateFixture<T>(
-  schema: import('zod').ZodType<T>,
-  options: FixtureOptions<T> = {},
-): T {
+function generateFixture<T>(schema: import('zod').ZodType<T>, options: FixtureOptions<T> = {}): T {
   const { seed, overrides = {} } = options;
 
   // Set seed for deterministic generation
@@ -84,9 +81,7 @@ export function createOKLCHFixture(options: FixtureOptions<OKLCH> = {}): OKLCH {
 /**
  * Generate ColorValue fixture with realistic color data
  */
-export function createColorValueFixture(
-  options: FixtureOptions<ColorValue> = {},
-): ColorValue {
+export function createColorValueFixture(options: FixtureOptions<ColorValue> = {}): ColorValue {
   const defaults = {
     name: 'ocean-blue',
     scale: [
@@ -136,7 +131,7 @@ export function createTokenFixture(options: FixtureOptions<Token> = {}): Token {
  * Generate CVA Intelligence fixture
  */
 export function createCVAIntelligenceFixture(
-  options: FixtureOptions<CVAIntelligence> = {},
+  options: FixtureOptions<CVAIntelligence> = {}
 ): CVAIntelligence {
   const defaults = {
     baseClasses: [
@@ -151,11 +146,7 @@ export function createCVAIntelligenceFixture(
         propName: 'variant',
         values: {
           default: ['bg-primary', 'text-primary-foreground', 'hover:bg-primary/90'],
-          destructive: [
-            'bg-destructive',
-            'text-destructive-foreground',
-            'hover:bg-destructive/90',
-          ],
+          destructive: ['bg-destructive', 'text-destructive-foreground', 'hover:bg-destructive/90'],
           outline: ['border', 'border-input', 'hover:bg-accent'],
           ghost: ['hover:bg-accent', 'hover:text-accent-foreground'],
         },
@@ -201,14 +192,14 @@ export function createCVAIntelligenceFixture(
   return generateFixture(CVAIntelligenceSchema, {
     ...options,
     overrides: { ...defaults, ...options.overrides },
-  }) as CVAIntelligence;
+  });
 }
 
 /**
  * Generate Intelligence fixture
  */
 export function createIntelligenceFixture(
-  options: FixtureOptions<Intelligence> = {},
+  options: FixtureOptions<Intelligence> = {}
 ): Intelligence {
   const defaults = {
     cognitiveLoad: 3,
@@ -256,7 +247,7 @@ export function createPreviewFixture(options: FixtureOptions<Preview> = {}): Pre
  * Generate ComponentManifest fixture
  */
 export function createComponentManifestFixture(
-  options: FixtureOptions<ComponentManifest> = {},
+  options: FixtureOptions<ComponentManifest> = {}
 ): ComponentManifest {
   const defaults = {
     name: 'button',
@@ -305,12 +296,12 @@ export function createComponentManifestFixture(
 export function createFixtures<T>(
   generator: (options?: FixtureOptions<T>) => T,
   count: number,
-  baseOptions: FixtureOptions<T> = {},
+  baseOptions: FixtureOptions<T> = {}
 ): T[] {
   return Array.from({ length: count }, (_, index) =>
     generator({
       ...baseOptions,
       seed: baseOptions.seed !== undefined ? baseOptions.seed + index : undefined,
-    }),
+    })
   );
 }
