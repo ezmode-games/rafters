@@ -5,9 +5,9 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
-import { createCVAIntelligenceFixture, createPreviewFixture } from '../../../../../packages/shared/test/fixtures.js';
 import { PreviewSchema } from '@rafters/shared';
+import { describe, expect, it } from 'vitest';
+import { createCVAIntelligenceFixture } from '../../../../../packages/shared/test/fixtures.js';
 import {
   compileAllPreviews,
   compileComponentPreview,
