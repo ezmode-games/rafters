@@ -4,8 +4,8 @@
  */
 
 import { faker } from '@faker-js/faker';
-import { setFaker, fake } from 'zod-schema-faker';
 import { z } from 'zod/index.cjs';
+import { fake, setFaker } from 'zod-schema-faker';
 import { ComponentManifestSchema, PreviewSchema } from './packages/shared/src/types.js';
 
 // Configure faker instance
@@ -38,7 +38,7 @@ try {
   console.log('✓ ComponentManifestSchema:', JSON.stringify(manifestData, null, 2));
 
   // Validate the generated data
-  const validated = ComponentManifestSchema.parse(manifestData);
+  const _validated = ComponentManifestSchema.parse(manifestData);
   console.log('✓ Validation passed');
 } catch (error) {
   console.error('✗ ComponentManifestSchema failed:', error);

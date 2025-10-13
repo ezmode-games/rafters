@@ -3,24 +3,24 @@
  * Validates our fixture generation system with zod-schema-faker
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  createComponentManifestFixture,
-  createPreviewFixture,
-  createColorValueFixture,
-  createTokenFixture,
-  createOKLCHFixture,
-  createIntelligenceFixture,
-  createFixtures,
-} from './fixtures.js';
-import {
-  ComponentManifestSchema,
-  PreviewSchema,
   ColorValueSchema,
-  TokenSchema,
-  OKLCHSchema,
+  ComponentManifestSchema,
   IntelligenceSchema,
+  OKLCHSchema,
+  PreviewSchema,
+  TokenSchema,
 } from '../src/types.js';
+import {
+  createColorValueFixture,
+  createComponentManifestFixture,
+  createFixtures,
+  createIntelligenceFixture,
+  createOKLCHFixture,
+  createPreviewFixture,
+  createTokenFixture,
+} from './fixtures.js';
 
 describe('Fixture Generation System', () => {
   describe('OKLCH Fixtures', () => {

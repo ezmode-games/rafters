@@ -3,11 +3,11 @@
  * Demonstrates MSW usage with fixture generators
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
-import { http, HttpResponse } from 'msw';
-import { server } from './setup-msw.js';
-import { createComponentManifestFixture } from './fixtures.js';
+import { HttpResponse, http } from 'msw';
+import { beforeEach, describe, expect, it } from 'vitest';
 import type { ComponentManifest } from '../src/types.js';
+import { createComponentManifestFixture } from './fixtures.js';
+import { server } from './setup-msw.js';
 
 // Mock API client for testing
 class ComponentRegistryClient {
@@ -104,9 +104,9 @@ describe('Component Registry Integration', () => {
                 name: 'special',
                 description: 'A special test component',
               },
-            }),
+            })
           );
-        }),
+        })
       );
 
       const manifest = await client.getComponent('special');
@@ -118,11 +118,8 @@ describe('Component Registry Integration', () => {
     it('should simulate network errors', async () => {
       server.use(
         http.get(`${apiUrl}/api/registry/error`, () => {
-          return HttpResponse.json(
-            { error: 'Service unavailable' },
-            { status: 503 },
-          );
-        }),
+          return HttpResponse.json({ error: 'Service unavailable' }, { status: 503 });
+        })
       );
 
       await expect(client.getComponent('error')).rejects.toThrow();
@@ -132,10 +129,8 @@ describe('Component Registry Integration', () => {
       server.use(
         http.get(`${apiUrl}/api/registry/slow`, async () => {
           await new Promise((resolve) => setTimeout(resolve, 100));
-          return HttpResponse.json(
-            createComponentManifestFixture({ overrides: { name: 'slow' } }),
-          );
-        }),
+          return HttpResponse.json(createComponentManifestFixture({ overrides: { name: 'slow' } }));
+        })
       );
 
       const start = Date.now();
