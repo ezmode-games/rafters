@@ -7,18 +7,13 @@ attentionEconomics: "Primary variant commands highest attention - use sparingly"
 order: 2
 ---
 
-import ComponentPreview from '../../../components/ComponentPreview.tsx'
-
 # Button Component
 
 Interactive action triggers with embedded design intelligence for trust-building and attention management.
 
-<ComponentPreview 
-  component="button" 
-  showIntelligence={true}
-  height="200px"
-  client:load
-/>
+<r-component-preview component="button" variant="default" props='{"variant":"primary"}'>
+  Default Button
+</r-component-preview>
 
 ## Usage Guidelines
 
@@ -49,77 +44,80 @@ Interactive action triggers with embedded design intelligence for trust-building
 
 ### Primary Actions
 
-<ComponentPreview 
-  component="button" 
-  variant="primary"
-  height="120px"
-  client:load
-/>
+<r-component-preview component="button" variant="default" props='{"variant":"primary"}'>
+  Primary Button
+</r-component-preview>
 
 **Use for:** Main user goals, call-to-action buttons, form submissions
 
 ### Secondary Actions
 
-<ComponentPreview 
-  component="button" 
-  variant="secondary"
-  height="120px"
-  client:load
-/>
+<r-component-preview component="button" variant="default" props='{"variant":"secondary"}'>
+  Secondary Button
+</r-component-preview>
 
 **Use for:** Supporting actions, alternative choices, cancel operations
 
 ### Destructive Actions
 
-<ComponentPreview 
-  component="button" 
-  variant="destructive"
-  height="120px"
-  client:load
-/>
+<r-component-preview component="button" variant="default" props='{"variant":"destructive"}'>
+  Delete Item
+</r-component-preview>
 
 **Use for:** Delete operations, irreversible actions, data removal
 
 ### Ghost Actions
 
-<ComponentPreview 
-  component="button" 
-  variant="ghost"
-  height="120px"
-  client:load
-/>
+<r-component-preview component="button" variant="default" props='{"variant":"ghost"}'>
+  Ghost Button
+</r-component-preview>
 
 **Use for:** Subtle actions, menu items, minimal emphasis
 
+### Outline Actions
+
+<r-component-preview component="button" variant="default" props='{"variant":"outline"}'>
+  Outline Button
+</r-component-preview>
+
+**Use for:** Secondary actions with visual boundaries, form resets
+
 ## Size Variations
-
-### Default Size
-
-<ComponentPreview 
-  component="button" 
-  variant="size-default"
-  props='{"size": "default"}'
-  height="100px"
-  client:load
-/>
 
 ### Small Size
 
-<ComponentPreview 
-  component="button" 
-  variant="size-sm" 
-  props='{"size": "sm"}'
-  height="100px"
-  client:load
-/>
+<r-component-preview component="button" variant="default" props='{"variant":"primary", "size":"sm"}'>
+  Small Button
+</r-component-preview>
+
+### Medium Size (Default)
+
+<r-component-preview component="button" variant="default" props='{"variant":"primary", "size":"md"}'>
+  Medium Button
+</r-component-preview>
 
 ### Large Size
 
-<ComponentPreview 
-  component="button" 
-  variant="size-lg"
-  props='{"size": "lg"}'
-  height="100px"
-  client:load
-/>
+<r-component-preview component="button" variant="default" props='{"variant":"primary", "size":"lg"}'>
+  Large Button
+</r-component-preview>
 
+### Full Width
+
+<r-component-preview component="button" variant="default" props='{"variant":"primary", "size":"full"}'>
+  Full Width Button
+</r-component-preview>
+
+## State Variations
+
+### Disabled State
+
+<r-component-preview component="button" variant="default" props='{"variant":"primary"}' disabled>
+  Disabled Button
+</r-component-preview>
+
+### Loading State
+
+<r-component-preview component="button" variant="default" props='{"variant":"primary"}' loading>
+  Loading Button
+</r-component-preview>

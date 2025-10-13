@@ -114,8 +114,9 @@ export function Button({
       aria-label={shouldShowConfirmation ? `Confirm to ${children}` : undefined}
       className={cn(
         buttonVariants({ variant, size }),
-        loading && 'opacity-75 cursor-wait',
+        loading && 'opacity-75 cursor-pointer',
         isDestructiveAction && 'font-semibold shadow-sm',
+        'inline-flex items-center justify-center',
         className
       )}
       {...props}

@@ -12,6 +12,8 @@
 import { type Preview, PreviewSchema } from '@rafters/shared';
 import { css, html, LitElement, unsafeCSS } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import type { FrameworkAdapter } from './adapters/framework-adapter';
+import { ReactAdapter } from './adapters/react-adapter';
 
 @customElement('r-component-preview')
 export class RComponentPreview extends LitElement {
@@ -42,7 +44,25 @@ export class RComponentPreview extends LitElement {
   /**
    * Dynamic props for class computation
    */
-  @property({ type: Object })
+  @property({
+    type: Object,
+    converter: {
+      fromAttribute: (value: string | null) => {
+        if (!value) return {};
+        try {
+          // Decode HTML entities that Astro adds to attribute values
+          const decoded = value
+            .replace(/&quot;/g, '"')
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>');
+          return JSON.parse(decoded);
+        } catch {
+          return {};
+        }
+      },
+    },
+  })
   props: Record<string, unknown> = {};
 
   /**
@@ -64,11 +84,62 @@ export class RComponentPreview extends LitElement {
   private isLoading = false;
 
   /**
+   * Global stylesheet loaded once and shared across all instances
+   */
+  private static globalStylesheet: string | null = null;
+  private static stylesheetLoadPromise: Promise<void> | null = null;
+
+  /**
+   * Framework adapter for rendering compiled components
+   */
+  private adapter: FrameworkAdapter | null = null;
+
+  /**
+   * Container element for framework component mounting
+   */
+  private container: HTMLElement | null = null;
+
+  /**
    * Lifecycle: Fetch preview data when component connects to DOM
    */
   override async connectedCallback() {
     super.connectedCallback();
+    await this.loadGlobalStylesheet();
     await this.fetchPreviewData();
+    await this.renderFrameworkComponent();
+  }
+
+  /**
+   * Load global stylesheet once (shared across all instances)
+   */
+  private async loadGlobalStylesheet(): Promise<void> {
+    // If already loaded, return immediately
+    if (RComponentPreview.globalStylesheet !== null) {
+      return;
+    }
+
+    // If currently loading, wait for that promise
+    if (RComponentPreview.stylesheetLoadPromise !== null) {
+      return RComponentPreview.stylesheetLoadPromise;
+    }
+
+    // Start loading
+    RComponentPreview.stylesheetLoadPromise = (async () => {
+      try {
+        const response = await fetch('/globals.css');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch globals.css: ${response.statusText}`);
+        }
+        RComponentPreview.globalStylesheet = await response.text();
+      } catch (err) {
+        console.error('Failed to load global stylesheet:', err);
+        RComponentPreview.globalStylesheet = '';
+      } finally {
+        RComponentPreview.stylesheetLoadPromise = null;
+      }
+    })();
+
+    return RComponentPreview.stylesheetLoadPromise;
   }
 
   /**
@@ -140,6 +211,51 @@ export class RComponentPreview extends LitElement {
   }
 
   /**
+   * Render framework component using adapter
+   */
+  private async renderFrameworkComponent(): Promise<void> {
+    if (!this.previewData) return;
+
+    try {
+      // Get framework adapter (only React for now)
+      this.adapter = new ReactAdapter();
+      await this.adapter.loadRuntime();
+
+      // Create container for React mounting
+      this.container = document.createElement('div');
+      this.container.className = 'framework-component-container';
+
+      // Get slot content to pass as children
+      const children = this.textContent?.trim() || null;
+
+      // Mount the compiled component
+      await this.adapter.mount(this.container, this.previewData.compiledJs, this.props, children);
+
+      // Add container to shadow DOM (after first render completes)
+      await this.updateComplete;
+      const previewContainer = this.shadowRoot?.querySelector('.preview-container');
+      if (previewContainer) {
+        previewContainer.appendChild(this.container);
+      }
+    } catch (err) {
+      this.error = err instanceof Error ? err.message : 'Failed to render component';
+      this.requestUpdate();
+    }
+  }
+
+  /**
+   * Lifecycle: Cleanup on disconnect
+   */
+  override disconnectedCallback() {
+    super.disconnectedCallback();
+    if (this.adapter) {
+      this.adapter.unmount();
+      this.adapter = null;
+    }
+    this.container = null;
+  }
+
+  /**
    * Render the component preview
    */
   override render() {
@@ -172,27 +288,19 @@ export class RComponentPreview extends LitElement {
 			`;
     }
 
-    const computedClasses = this.computeClasses();
-
-    // Inject critical CSS into Shadow DOM
-    const criticalCSS = this.previewData.css || '';
+    // Inject complete global stylesheet into Shadow DOM
+    const globalCSS = RComponentPreview.globalStylesheet || '';
 
     return html`
 			<style>
-				${unsafeCSS(criticalCSS)}
+				${unsafeCSS(globalCSS)}
 			</style>
 			<div
 				class="preview-container"
 				role="region"
 				aria-label="Component preview"
 			>
-				<div
-					class="${computedClasses}"
-					?disabled="${this.disabled}"
-					aria-busy="${this.loading}"
-				>
-					<slot></slot>
-				</div>
+				<!-- React component will be mounted here by renderFrameworkComponent() -->
 			</div>
 		`;
   }

@@ -52,14 +52,20 @@ async function generateTokenCache() {
   console.log('🔄 Generating token cache...');
 
   try {
-    // Import generators dynamically (ESM modules)
-    const { generateAllTokens } = await import('@rafters/design-tokens');
+    // Import generators and exporters dynamically (ESM modules)
+    const { generateAllTokens, TokenRegistry, exportToTailwindV4Complete } = await import(
+      '@rafters/design-tokens'
+    );
 
     // Generate all tokens (both functions are now async)
     const allTokens = await generateAllTokens();
 
     // generateColorTokens requires config, get tokens from allTokens instead
     const colorTokens = allTokens.filter((token) => token.category === 'color');
+
+    // Generate complete Tailwind v4 stylesheet for CSS extraction
+    const registry = new TokenRegistry(allTokens);
+    const tailwindStylesheet = exportToTailwindV4Complete(registry);
 
     // Group tokens by category
     const tokensByCategory = allTokens.reduce((acc, token) => {
@@ -128,9 +134,24 @@ async function generateTokenCache() {
       )
     );
 
+    // Write Tailwind v4 stylesheet for CSS extraction
+    const tailwindThemeFile = join(cacheDir, 'tailwind-theme.ts');
+    const tailwindThemeContent = `/**
+ * Pre-generated Tailwind v4 Theme
+ * Generated at build time from @rafters/design-tokens
+ * DO NOT EDIT - regenerate with: pnpm generate-tokens
+ */
+
+export const TAILWIND_THEME = ${JSON.stringify(tailwindStylesheet)};
+`;
+    writeFileSync(tailwindThemeFile, tailwindThemeContent);
+
     console.log('✅ Token cache generated successfully');
     console.log(
       `📊 Stats: ${cacheData.stats.totalTokens} tokens, ${cacheData.stats.categories} categories`
+    );
+    console.log(
+      `📝 Generated Tailwind v4 theme: ${(tailwindStylesheet.length / 1024).toFixed(2)}KB`
     );
 
     return cacheData;

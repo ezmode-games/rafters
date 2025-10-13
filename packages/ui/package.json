@@ -11,6 +11,11 @@
       "types": "./src/index.ts",
       "development": "./src/index.ts",
       "default": "./src/index.ts"
+    },
+    "./web-components": {
+      "types": "./src/primitives/preview/r-component-preview.ts",
+      "development": "./src/primitives/preview/r-component-preview.ts",
+      "default": "./src/primitives/preview/r-component-preview.ts"
     }
   },
   "files": [

@@ -6,6 +6,8 @@
  */
 
 import { spawn } from 'node:child_process';
+import { writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 
 export interface CriticalCSSOptions {
   classes: string[];
@@ -29,12 +31,19 @@ export async function extractCriticalCSS(options: CriticalCSSOptions): Promise<C
     return { css: '', sizeBytes: 0, classCount: 0 };
   }
 
-  // Generate CSS import with HTML template containing all classes
-  const template = `@import "tailwindcss";\n<div class="${classes.join(' ')}"></div>`;
+  // Use complete design system CSS - need absolute path since temp file is in tmpdir
+  const globalsPath = resolve(process.cwd(), 'src/data/globals.css');
+  const template = `@import "tailwindcss";
+@import "${globalsPath}";
 
-  // Spawn Tailwind CLI process using pnpm exec for local package
-  // Tailwind v4 CLI reads from stdin and outputs to stdout by default
-  const args = ['exec', 'tailwindcss'];
+<div class="${classes.join(' ')}"></div>`;
+
+  // Write template to temp file in workspace (Tailwind v4 CLI needs to be in project to resolve @import)
+  const tempInputPath = resolve(process.cwd(), '.astro', `tailwind-input-${Date.now()}.css`);
+  await writeFile(tempInputPath, template);
+
+  // Spawn Tailwind CLI process using --input flag instead of stdin
+  const args = ['exec', 'tailwindcss', '--input', tempInputPath];
   if (minify) {
     args.push('-m');
   }
@@ -42,7 +51,7 @@ export async function extractCriticalCSS(options: CriticalCSSOptions): Promise<C
   return new Promise((resolve, reject) => {
     const tailwind = spawn('pnpm', args, {
       cwd: process.cwd(),
-      stdio: ['pipe', 'pipe', 'pipe'],
+      stdio: ['ignore', 'pipe', 'pipe'],
     });
 
     let stdout = '';
@@ -88,9 +97,5 @@ export async function extractCriticalCSS(options: CriticalCSSOptions): Promise<C
         classCount: classes.length,
       });
     });
-
-    // Write template to stdin
-    tailwind.stdin.write(template);
-    tailwind.stdin.end();
   });
 }

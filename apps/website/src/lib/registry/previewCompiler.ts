@@ -61,8 +61,9 @@ export async function compileComponentPreview(
       build: {
         lib: {
           entry: options.componentPath,
-          formats: ['es'],
+          formats: ['iife'],
           fileName: () => 'preview.js',
+          name: 'ComponentPreview',
         },
         write: false, // Return output instead of writing
         minify: 'esbuild',
@@ -79,12 +80,14 @@ export async function compileComponentPreview(
             /^@rafters\//,
           ],
           output: {
+            format: 'iife',
             globals: {
               react: 'React',
               'react-dom': 'ReactDOM',
               'react/jsx-runtime': 'jsxRuntime',
               'react/jsx-dev-runtime': 'jsxDevRuntime',
               'class-variance-authority': 'cva',
+              '@rafters/shared': 'shared',
             },
           },
         },
