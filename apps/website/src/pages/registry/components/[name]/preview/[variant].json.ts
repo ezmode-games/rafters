@@ -1,6 +1,12 @@
+import type { Preview } from '@rafters/shared';
 import { getComponent } from '../../../../../lib/registry/componentService';
 
-export const prerender = true;
+// In-memory cache for compiled previews
+// Clear cache by modifying this line
+const previewCache = new Map<string, Preview>(); // v2
+
+// NOTE: prerender disabled to allow dynamic routes in dev mode without getStaticPaths() errors
+// export const prerender = true;
 
 export async function GET({ params }: { params: { name: string; variant: string } }) {
   try {
@@ -14,58 +20,70 @@ export async function GET({ params }: { params: { name: string; variant: string 
       });
     }
 
-    const component = await getComponent(componentName);
+    // Check cache first
+    const cacheKey = `${componentName}:${variantName}`;
+    let preview = previewCache.get(cacheKey);
 
-    if (!component) {
-      return new Response(JSON.stringify({ error: 'Component not found' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    // Find the preview for this variant
-    const preview = component.meta.rafters.previews?.find((p) => p.variant === variantName);
-
+    // If not in cache, compile it
     if (!preview) {
-      return new Response(JSON.stringify({ error: 'Preview variant not found' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+      const component = await getComponent(componentName);
 
-    // Include CVA intelligence, CSS, and dependencies for complete rendering
-    const cva = component.meta.rafters.intelligence?.cva;
-    const dependencies = component.dependencies || [];
+      if (!component) {
+        return new Response(JSON.stringify({ error: 'Component not found' }), {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
 
-    if (!cva) {
-      return new Response(JSON.stringify({ error: 'CVA intelligence not found for preview' }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+      const cva = component.meta.rafters.intelligence?.cva;
+      const dependencies = component.dependencies || [];
 
-    if (!cva.css || cva.css.length === 0) {
-      return new Response(
-        JSON.stringify({ error: 'CSS for CVA intelligence is missing or empty' }),
-        {
+      if (!cva) {
+        return new Response(JSON.stringify({ error: 'CVA intelligence not found for preview' }), {
           status: 500,
           headers: { 'Content-Type': 'application/json' },
-        }
+        });
+      }
+
+      // Compile the preview on-demand
+      const { compileComponentPreview } = await import(
+        '../../../../../lib/registry/previewCompiler'
       );
+      const componentFile = component.files[0];
+      const componentPath = `/Users/seansilvius/projects/realhandy/rafters/packages/ui/src/${componentFile.path}`;
+
+      const compiledPreview = await compileComponentPreview({
+        componentPath,
+        componentContent: componentFile.content,
+        framework: 'react',
+        variant: variantName,
+        props: {},
+      });
+
+      if (compiledPreview.error) {
+        return new Response(JSON.stringify({ error: compiledPreview.error }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Build complete preview with CVA and CSS
+      preview = {
+        ...compiledPreview,
+        cva: {
+          baseClasses: cva.baseClasses,
+          propMappings: cva.propMappings,
+          allClasses: cva.allClasses,
+        },
+        css: cva.css,
+        dependencies,
+      };
+
+      // Cache it
+      previewCache.set(cacheKey, preview);
     }
 
-    const previewWithRenderingData = {
-      ...preview,
-      cva: {
-        baseClasses: cva.baseClasses,
-        propMappings: cva.propMappings,
-        allClasses: cva.allClasses,
-      },
-      css: cva.css,
-      dependencies,
-    };
-
-    return new Response(JSON.stringify(previewWithRenderingData, null, 2), {
+    return new Response(JSON.stringify(preview, null, 2), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
@@ -83,6 +101,7 @@ export async function GET({ params }: { params: { name: string; variant: string 
 
 export async function getStaticPaths() {
   const { getRegistryMetadata } = await import('../../../../../lib/registry/componentService');
+  const { compileAllPreviews } = await import('../../../../../lib/registry/previewCompiler');
   const registry = await getRegistryMetadata();
 
   const paths = [];
@@ -93,11 +112,32 @@ export async function getStaticPaths() {
     );
     const fullComponent = await fetchComponent(component.name);
 
-    if (fullComponent?.meta.rafters.previews) {
-      for (const preview of fullComponent.meta.rafters.previews) {
-        paths.push({
-          params: { name: component.name, variant: preview.variant },
-        });
+    // Compile previews on-demand during getStaticPaths
+    if (fullComponent) {
+      const cva = fullComponent.meta.rafters.intelligence?.cva;
+      if (cva) {
+        const componentFile = fullComponent.files[0];
+        const componentPath = `/Users/seansilvius/projects/realhandy/rafters/packages/ui/src/${componentFile.path}`;
+
+        const previews = await compileAllPreviews(
+          fullComponent.name,
+          componentPath,
+          componentFile.content,
+          'react',
+          cva,
+          cva.css,
+          fullComponent.dependencies
+        );
+
+        // Cache each preview for GET handler
+        for (const preview of previews) {
+          const cacheKey = `${fullComponent.name}:${preview.variant}`;
+          previewCache.set(cacheKey, preview);
+
+          paths.push({
+            params: { name: fullComponent.name, variant: preview.variant },
+          });
+        }
       }
     }
   }

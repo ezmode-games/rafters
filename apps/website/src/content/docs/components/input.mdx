@@ -11,7 +11,7 @@ order: 5
 
 Form input component with intelligent validation states and embedded accessibility patterns.
 
-<r-component-preview component="input" variant="default">
+<r-component-preview component="input" variant="default" props='{"type":"text","placeholder":"Enter text..."}'>
 </r-component-preview>
 
 ## Usage Guidelines
@@ -43,35 +43,35 @@ Form input component with intelligent validation states and embedded accessibili
 
 ### Default State
 
-<r-component-preview component="input" variant="default">
+<r-component-preview component="input" variant="default" props='{"type":"text","placeholder":"Enter text..."}'>
 </r-component-preview>
 
 **Use for:** Standard text input, user registration, search fields
 
 ### Error State
 
-<r-component-preview component="input" variant="default" props='{"variant":"error"}'>
+<r-component-preview component="input" variant="default" props='{"variant":"error","type":"email","placeholder":"user@example.com","validationMessage":"Please enter a valid email address"}'>
 </r-component-preview>
 
 **Use for:** Validation failures, required field warnings, format errors
 
 ### Success State
 
-<r-component-preview component="input" variant="default" props='{"variant":"success"}'>
+<r-component-preview component="input" variant="default" props='{"variant":"success","type":"email","placeholder":"user@example.com","validationMessage":"Email address is valid"}'>
 </r-component-preview>
 
 **Use for:** Validated input, confirmed entries, positive feedback
 
 ### Warning State
 
-<r-component-preview component="input" variant="default" props='{"variant":"warning"}'>
+<r-component-preview component="input" variant="default" props='{"variant":"warning","type":"password","placeholder":"Enter password","validationMessage":"Password should be at least 8 characters"}'>
 </r-component-preview>
 
 **Use for:** Potential issues, format suggestions, helpful hints
 
 ### Disabled State
 
-<r-component-preview component="input" variant="default" disabled>
+<r-component-preview component="input" variant="default" props='{"type":"text","placeholder":"Disabled field","disabled":true}'>
 </r-component-preview>
 
 **Use for:** Inactive fields, conditional inputs, read-only data
@@ -80,7 +80,7 @@ Form input component with intelligent validation states and embedded accessibili
 
 ### Sensitive Data
 
-<r-component-preview component="input" variant="default" props='{"sensitive":true}'>
+<r-component-preview component="input" variant="default" props='{"type":"password","placeholder":"Enter password","sensitive":true}'>
 </r-component-preview>
 
 **Use for:** Password fields, credit card numbers, SSN - adds visual emphasis for important data

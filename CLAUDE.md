@@ -95,15 +95,16 @@ The `@rafters/design-tokens` package implements a sophisticated dependency graph
 ## Critical Rules
 
 ### ZERO TOLERANCE POLICIES
-1. **ALWAYS run `pnpm preflight` before commits** - Build WILL fail otherwise
-2. **NEVER commit broken tests** - ALL tests must pass, NO skipping tests to make CI pass
-3. **NEVER use `npm` or `npx`** - Only pnpm in this workspace
-4. **NO `any` types** - Biome config causes build failure
-5. **NO emoji anywhere** - Code, comments, commits, documentation
-6. **Use Zod for all external data** - Required for type safety
-7. **NO `.then()` chains** - Use async/await only
-8. **React 19 purity** - No impure functions in components
-9. **NEVER use `/tmp` directory** - All work files MUST be in workspace subdirectories to prevent data loss
+1. **NEVER start, stop, restart, or interact with dev servers** - User manages servers in terminal. Starting/stopping servers creates process zombies and orphaned processes. ALWAYS ask user if server action needed.
+2. **ALWAYS run `pnpm preflight` before commits** - Build WILL fail otherwise
+3. **NEVER commit broken tests** - ALL tests must pass, NO skipping tests to make CI pass
+4. **NEVER use `npm` or `npx`** - Only pnpm in this workspace
+5. **NO `any` types** - Biome config causes build failure
+6. **NO emoji anywhere** - Code, comments, commits, documentation
+7. **Use Zod for all external data** - Required for type safety
+8. **NO `.then()` chains** - Use async/await only
+9. **React 19 purity** - No impure functions in components
+10. **NEVER use `/tmp` directory** - All work files MUST be in workspace subdirectories to prevent data loss
 
 ### Development Workflow
 1. Make changes

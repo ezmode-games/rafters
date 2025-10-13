@@ -1,6 +1,7 @@
 import cloudflare from '@astrojs/cloudflare';
 import mdx from '@astrojs/mdx';
 import react from '@astrojs/react';
+import tailwindcss from '@tailwindcss/vite';
 // @ts-check
 import { defineConfig } from 'astro/config';
 
@@ -15,6 +16,9 @@ export default defineConfig({
   }),
   build: {
     format: 'file',
+  },
+  vite: {
+    plugins: [tailwindcss()],
   },
   integrations: [
     react(),

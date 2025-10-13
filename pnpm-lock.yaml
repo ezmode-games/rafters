@@ -15,6 +15,9 @@ catalogs:
     '@hono/zod-validator':
       specifier: ^0.7.2
       version: 0.7.3
+    '@tailwindcss/vite':
+      specifier: ^4.1.14
+      version: 4.1.14
     '@testing-library/jest-dom':
       specifier: ^6.6.4
       version: 6.8.0
@@ -271,6 +274,9 @@ importers:
       '@tailwindcss/cli':
         specifier: ^4.1.14
         version: 4.1.14
+      '@tailwindcss/vite':
+        specifier: 'catalog:'
+        version: 4.1.14(vite@7.1.7(@types/node@24.4.0)(jiti@2.6.0)(lightningcss@1.30.1)(tsx@4.20.5)(yaml@2.8.1))
       '@types/node':
         specifier: 'catalog:'
         version: 24.4.0
@@ -2590,6 +2596,11 @@ packages:
   '@tailwindcss/oxide@4.1.14':
     resolution: {integrity: sha512-23yx+VUbBwCg2x5XWdB8+1lkPajzLmALEfMb51zZUBYaYVPDQvBSD/WYDqiVyBIo2BZFa3yw1Rpy3G2Jp+K0dw==}
     engines: {node: '>= 10'}
+
+  '@tailwindcss/vite@4.1.14':
+    resolution: {integrity: sha512-BoFUoU0XqgCUS1UXWhmDJroKKhNXeDzD7/XwabjkDIAbMnc4ULn5e2FuEuBbhZ6ENZoSYzKlzvZ44Yr6EUDUSA==}
+    peerDependencies:
+      vite: ^5.2.0 || ^6 || ^7
 
   '@testing-library/dom@10.4.1':
     resolution: {integrity: sha512-o4PXJQidqJl82ckFaXUeoAW+XysPLauYI43Abki5hABd853iMhitooc6znOnczgbTYmEP6U6/y1ZyKAIsvMKGg==}
@@ -7940,6 +7951,13 @@ snapshots:
       '@tailwindcss/oxide-wasm32-wasi': 4.1.14
       '@tailwindcss/oxide-win32-arm64-msvc': 4.1.14
       '@tailwindcss/oxide-win32-x64-msvc': 4.1.14
+
+  '@tailwindcss/vite@4.1.14(vite@7.1.7(@types/node@24.4.0)(jiti@2.6.0)(lightningcss@1.30.1)(tsx@4.20.5)(yaml@2.8.1))':
+    dependencies:
+      '@tailwindcss/node': 4.1.14
+      '@tailwindcss/oxide': 4.1.14
+      tailwindcss: 4.1.14
+      vite: 7.1.7(@types/node@24.4.0)(jiti@2.6.0)(lightningcss@1.30.1)(tsx@4.20.5)(yaml@2.8.1)
 
   '@testing-library/dom@10.4.1':
     dependencies:
