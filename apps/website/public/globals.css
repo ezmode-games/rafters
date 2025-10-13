@@ -1259,9 +1259,6 @@
   .text-red-800 {
     color: var(--color-red-800);
   }
-  .text-white {
-    color: var(--color-white);
-  }
   .text-yellow-800 {
     color: var(--color-yellow-800);
   }
