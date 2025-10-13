@@ -1,10 +1,13 @@
 /**
  * Tests for Component Preview Compiler
+ * Using fixture generators instead of inline mocks
  */
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { createCVAIntelligenceFixture, createPreviewFixture } from '../../../../../packages/shared/test/fixtures.js';
+import { PreviewSchema } from '@rafters/shared';
 import {
   compileAllPreviews,
   compileComponentPreview,
@@ -32,6 +35,23 @@ describe('compileComponentPreview', () => {
     expect(result.framework).toBe('react');
     expect(result.variant).toBe('primary');
     expect(result.sizeBytes).toBeGreaterThan(0);
+
+    // Validate compiled output contains IIFE wrapper
+    expect(result.compiledJs).toContain('ComponentPreview');
+  });
+
+  it('should externalize React and dependencies correctly', async () => {
+    const result = await compileComponentPreview({
+      componentPath: TEST_BUTTON_PATH,
+      componentContent: testButtonSource,
+      framework: 'react',
+      variant: 'default',
+    });
+
+    expect(result.error).toBeUndefined();
+    // Check that external dependencies are not bundled
+    expect(result.compiledJs).not.toContain('function createElement');
+    expect(result.compiledJs).not.toContain('react-dom');
   });
 
   it('should handle compilation errors gracefully', async () => {
@@ -95,33 +115,33 @@ describe('compileComponentPreview', () => {
     expect(result.sizeBytes).toBeGreaterThan(0);
     expect(typeof result.sizeBytes).toBe('number');
   });
+
+  it('should produce valid IIFE format', async () => {
+    const result = await compileComponentPreview({
+      componentPath: TEST_BUTTON_PATH,
+      componentContent: testButtonSource,
+      framework: 'react',
+      variant: 'default',
+    });
+
+    expect(result.error).toBeUndefined();
+    // IIFE should define ComponentPreview global
+    expect(result.compiledJs).toMatch(/var ComponentPreview\s*=/);
+  });
 });
 
 describe('compileAllPreviews', () => {
-  const mockCVA = {
-    baseClasses: ['inline-flex', 'items-center'],
-    propMappings: [
-      {
-        propName: 'variant',
-        values: {
-          primary: ['bg-blue-600', 'text-white'],
-          secondary: ['bg-gray-200', 'text-gray-900'],
-        },
+  it('should generate previews with CVA, CSS, and dependencies using fixtures', async () => {
+    // Use fixture generator instead of inline mock
+    const mockCVA = createCVAIntelligenceFixture({
+      seed: 42,
+      overrides: {
+        baseClasses: ['inline-flex', 'items-center'],
       },
-    ],
-    allClasses: [
-      'inline-flex',
-      'items-center',
-      'bg-blue-600',
-      'text-white',
-      'bg-gray-200',
-      'text-gray-900',
-    ],
-  };
-  const mockCSS = '.inline-flex { display: inline-flex; }';
-  const mockDependencies = ['react', 'class-variance-authority'];
+    });
+    const mockCSS = '.inline-flex { display: inline-flex; }';
+    const mockDependencies = ['react', 'class-variance-authority'];
 
-  it('should generate previews for component with CVA, CSS, and dependencies', async () => {
     const previews = await compileAllPreviews(
       'button',
       TEST_BUTTON_PATH,
@@ -138,9 +158,16 @@ describe('compileAllPreviews', () => {
     expect(previews[0].cva).toEqual(mockCVA);
     expect(previews[0].css).toBe(mockCSS);
     expect(previews[0].dependencies).toEqual(mockDependencies);
+
+    // Validate against Preview schema
+    expect(PreviewSchema.parse(previews[0])).toBeTruthy();
   });
 
   it('should only include successful compilations', async () => {
+    const mockCVA = createCVAIntelligenceFixture({ seed: 42 });
+    const mockCSS = '.test { color: red; }';
+    const mockDependencies = ['react'];
+
     const previews = await compileAllPreviews(
       'invalid',
       INVALID_COMPONENT_PATH,
@@ -155,7 +182,11 @@ describe('compileAllPreviews', () => {
     expect(previews.length).toBe(0);
   });
 
-  it('should generate default variant with rendering requirements', async () => {
+  it('should generate default variant with all required Preview fields', async () => {
+    const mockCVA = createCVAIntelligenceFixture({ seed: 42 });
+    const mockCSS = '.button { padding: 8px; }';
+    const mockDependencies = ['react', '@rafters/shared'];
+
     const previews = await compileAllPreviews(
       'button',
       TEST_BUTTON_PATH,
@@ -168,9 +199,50 @@ describe('compileAllPreviews', () => {
 
     const defaultPreview = previews.find((p) => p.variant === 'default');
     expect(defaultPreview).toBeDefined();
-    expect(defaultPreview?.compiledJs).toBeTruthy();
-    expect(defaultPreview?.cva).toEqual(mockCVA);
-    expect(defaultPreview?.css).toBe(mockCSS);
-    expect(defaultPreview?.dependencies).toEqual(mockDependencies);
+
+    if (defaultPreview) {
+      // Validate all required fields are present
+      expect(defaultPreview.compiledJs).toBeTruthy();
+      expect(defaultPreview.cva).toEqual(mockCVA);
+      expect(defaultPreview.css).toBe(mockCSS);
+      expect(defaultPreview.dependencies).toEqual(mockDependencies);
+      expect(defaultPreview.framework).toBe('react');
+      expect(defaultPreview.variant).toBe('default');
+
+      // Schema validation ensures all fields are correct
+      const validated = PreviewSchema.parse(defaultPreview);
+      expect(validated).toBeTruthy();
+    }
+  });
+
+  it('should generate deterministic previews with fixture seeds', async () => {
+    const mockCVA1 = createCVAIntelligenceFixture({ seed: 100 });
+    const mockCVA2 = createCVAIntelligenceFixture({ seed: 100 });
+
+    // Same seed should produce same CVA
+    expect(mockCVA1).toEqual(mockCVA2);
+
+    const previews1 = await compileAllPreviews(
+      'button',
+      TEST_BUTTON_PATH,
+      testButtonSource,
+      'react',
+      mockCVA1,
+      '.test {}',
+      ['react']
+    );
+
+    const previews2 = await compileAllPreviews(
+      'button',
+      TEST_BUTTON_PATH,
+      testButtonSource,
+      'react',
+      mockCVA2,
+      '.test {}',
+      ['react']
+    );
+
+    // CVA should be identical due to seed
+    expect(previews1[0]?.cva).toEqual(previews2[0]?.cva);
   });
 });

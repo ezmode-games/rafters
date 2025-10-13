@@ -12,11 +12,27 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs",
       "development": "./src/index.ts"
+    },
+    "./test/fixtures": {
+      "types": "./test/fixtures.ts",
+      "import": "./test/fixtures.ts",
+      "require": "./test/fixtures.ts"
+    },
+    "./test/setup-msw": {
+      "types": "./test/setup-msw.ts",
+      "import": "./test/setup-msw.ts",
+      "require": "./test/setup-msw.ts"
+    },
+    "./test/msw-handlers": {
+      "types": "./test/msw-handlers.ts",
+      "import": "./test/msw-handlers.ts",
+      "require": "./test/msw-handlers.ts"
     }
   },
   "files": [
     "src",
-    "dist"
+    "dist",
+    "test"
   ],
   "scripts": {
     "build": "unbuild",
