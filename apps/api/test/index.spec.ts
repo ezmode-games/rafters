@@ -4,7 +4,7 @@
  */
 
 import { env } from 'cloudflare:test';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import worker from '@/index';
 
 describe('Main App', () => {
@@ -49,6 +49,20 @@ describe('Main App', () => {
 
   test('routes to color-intel endpoint', async () => {
     env.SEED_QUEUE_API_KEY = 'test-key';
+
+    // Mock Workers AI binding to prevent real API calls and usage charges
+    env.AI.run = vi.fn().mockResolvedValue({
+      response: 'Mock AI intelligence response for testing',
+    });
+
+    // Mock Vectorize binding to prevent real vector DB calls and usage charges
+    env.VECTORIZE.getByIds = vi.fn().mockResolvedValue({
+      count: 0,
+      vectors: [],
+    });
+    env.VECTORIZE.upsert = vi.fn().mockResolvedValue({
+      mutationId: 'mock-mutation-123',
+    });
 
     const res = await worker.fetch(
       new Request('http://localhost/api/color-intel', {
