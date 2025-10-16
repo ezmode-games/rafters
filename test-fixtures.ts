@@ -3,8 +3,8 @@
  * Run: pnpm exec tsx test-fixtures.ts
  */
 
-import { z } from 'zod/index.cjs';
 import { zocker } from 'zocker';
+import { z } from 'zod/index.cjs';
 import { ComponentManifestSchema, PreviewSchema } from './packages/shared/src/types.js';
 
 // Test 1: Simple schema
