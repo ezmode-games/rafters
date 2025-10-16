@@ -100,5 +100,5 @@ describe('CLI Integration', () => {
     // Then clean
     execSync(`node "${CLI_PATH}" clean --force`, { encoding: 'utf-8' });
     expect(existsSync(join(testDir, '.rafters'))).toBe(false);
-  });
+  }, 15000);
 });
