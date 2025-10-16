@@ -2,13 +2,13 @@
 
 ## Executive Summary
 
-**Recommendation: zod-schema-faker v2.0.0-beta.8**
+**Recommendation: zocker v3.0.0 (Updated 2025-10-16)**
 
-After thorough evaluation of Zod v4-compatible fixture generation libraries, zod-schema-faker is the clear winner for our testing infrastructure.
+After re-evaluation and successful migration, zocker is now our standard fixture generation library for testing infrastructure. This replaces the previous recommendation of zod-schema-faker v2.0.0-beta.8.
 
 ### ⚠️ Known Limitations
 
-**zod-schema-faker does NOT support:**
+**zocker does NOT support:**
 - `.refine()` - Custom validation rules
 - `.superRefine()` - Advanced validation logic
 
@@ -30,52 +30,66 @@ After thorough evaluation of Zod v4-compatible fixture generation libraries, zod
 - MSW: 2.11.5 (already installed)
 - Node: 22+, TypeScript: 5.9.2
 
+## Migration History
+
+### 2025-10-16: Migrated to zocker v3.0.0
+
+Migrated from zod-schema-faker v2.0.0-beta.8 to zocker v3.0.0 for:
+- Stable release vs beta version
+- Better API design (immutable, fluent, composable)
+- More schema coverage (z.any, z.unknown, z.tuple)
+- Built-in faker integration (@faker-js/faker@10)
+- Better cyclic/recursive schema support
+
+See [Issue #347](https://github.com/anthropics/rafters/issues/347) for full migration details.
+
 ## Evaluation Results
 
-### Tested Libraries
+### Current Library: zocker v3.0.0
 
-1. **zod-schema-faker** v2.0.0-beta.8
-2. **zocker** v3.0.0
-3. **@anatine/zod-mock** v3.14.0 (existing)
+| Feature | Support | Notes |
+|---------|---------|-------|
+| Zod v4 | ✓ Native | Stable v3.0.0 release |
+| Faker Integration | ✓ Built-in | @faker-js/faker@10 included |
+| TypeScript | ✓ Excellent | Full type safety |
+| API Design | ✓ Immutable | Fluent, composable API |
+| z.any / z.unknown | ✓ Yes | Better coverage than zod-schema-faker |
+| z.tuple | ✓ Yes | Better coverage than zod-schema-faker |
+| Cyclic Schemas | ✓ Excellent | Superior handling |
 
-### Test Results
-
-| Library | Zod v4 | Faker | TypeScript | Status |
-|---------|--------|-------|------------|--------|
-| zod-schema-faker | ✓ Native | ✓ Full | ✓ Excellent | **RECOMMENDED** |
-| zocker | ✓ Native | ✗ None | ✓ Good | Works but limited |
-| @anatine/zod-mock | ⚠️ Unofficial | ✓ Full | ⚠️ Peer warnings | Not recommended |
-
-## Why zod-schema-faker?
+## Why zocker?
 
 ### Advantages
 
-1. **Official Zod v4 Support**: Beta version explicitly supports Zod v4
-2. **Faker Integration**: Uses @faker-js/faker v10 for realistic test data
-3. **Comprehensive Coverage**: Supports almost all Zod types
-4. **Clean API**: Simple `fake(schema)` interface
-5. **Active Development**: Recent updates (Sep 2025)
-6. **Customization**: Allows overriding default generators
-7. **Seed Support**: Deterministic generation for reproducible tests
+1. **Stable Release**: v3.0.0 (not beta)
+2. **Better API Design**: Immutable, fluent, composable
+3. **Built-in Faker**: @faker-js/faker@10 integrated
+4. **More Schema Coverage**: Supports z.any, z.unknown, z.tuple
+5. **Active Development**: Latest release October 2025
+6. **Advanced Customization**: .supply(), .override(), config methods
+7. **Seed Support**: Deterministic generation via .setSeed()
 
-### Disadvantages
+### API Comparison
 
-1. **Beta Status**: v2.0.0-beta.8 (acceptable for dev dependency)
-2. **Missing Types**: Some Zod types unsupported (.codec, .file, .intersection, .preprocess, .refine, .superRefine)
-3. **Peer Dependency**: Requires explicit faker installation (already done)
+```typescript
+// Before (zod-schema-faker) - global state mutation
+import { faker } from '@faker-js/faker';
+import { fake, setFaker } from 'zod-schema-faker';
+setFaker(faker); // Global mutation required
+const data = fake(schema);
 
-### Why Not zocker?
+// After (zocker) - immutable, fluent, composable
+import { zocker } from 'zocker';
+const data = zocker(schema)
+  .setSeed(42)
+  .supply(schema.shape.email, 'test@example.com')
+  .generate();
+```
 
-- No faker integration (generates pseudo-random strings like "Lorem ipsum...")
-- Cannot customize data generation easily
-- Less realistic test data
-- Good for schema validation, poor for realistic fixtures
+### Previous Libraries Considered
 
-### Why Not @anatine/zod-mock?
-
-- Peer dependency warnings with faker@10 and zod@4
-- No official Zod v4 support
-- Already installed in CLI package, not suitable for workspace-wide use
+- **zod-schema-faker v2.0.0-beta.8**: Beta status, less schema coverage
+- **@anatine/zod-mock v3.14.0**: Peer dependency warnings with Zod v4
 
 ## Implementation
 
@@ -83,9 +97,8 @@ After thorough evaluation of Zod v4-compatible fixture generation libraries, zod
 
 Already completed:
 ```bash
-pnpm add -D -w @faker-js/faker@10.0.0
+pnpm add -D -w zocker@^3.0.0
 pnpm add -D -w msw@2.11.5
-pnpm add -D -w zod-schema-faker@2.0.0-beta.8
 ```
 
 ### Package Structure
@@ -145,10 +158,10 @@ export const handlers = [
 
 **Status: COMPLETE**
 
-- ✓ Install zod-schema-faker@2.0.0-beta.8
-- ✓ Install @faker-js/faker@10.0.0
+- ✓ Install zocker@3.0.0 (migrated from zod-schema-faker)
 - ✓ Install msw@2.11.5
 - ✓ Remove incompatible zod-fixture
+- ✓ Remove deprecated zod-schema-faker
 - ✓ Configure workspace-level test setup
 
 ### Issue #338: Fixture Generator Implementation
@@ -337,7 +350,8 @@ Rationale:
 
 ## References
 
-- zod-schema-faker: https://github.com/soc221b/zod-schema-faker
+- zocker: https://github.com/LorisSigrist/zocker
+- zocker Documentation: https://zocker.sigrist.dev/
 - Zod v4 Release: https://zod.dev/v4
 - MSW Documentation: https://mswjs.io/
 - faker.js v10: https://fakerjs.dev/
@@ -345,5 +359,5 @@ Rationale:
 ---
 
 **Prepared by:** Claude Code
-**Date:** 2025-10-13
-**Status:** Ready for Review
+**Date:** 2025-10-13 (Updated 2025-10-16)
+**Status:** Migrated to zocker v3.0.0

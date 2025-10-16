@@ -70,12 +70,12 @@ importers:
       wrangler:
         specifier: ^4.34.0
         version: 4.40.0(@cloudflare/workers-types@4.20250924.0)
+      zocker:
+        specifier: ^3.0.0
+        version: 3.0.0(zod@4.0.16)
       zod:
         specifier: 'catalog:'
         version: 4.0.16
-      zod-schema-faker:
-        specifier: 2.0.0-beta.8
-        version: 2.0.0-beta.8
 
   apps/api:
     dependencies:
@@ -5935,8 +5935,10 @@ packages:
   youch@4.1.0-beta.10:
     resolution: {integrity: sha512-rLfVLB4FgQneDr0dv1oddCVZmKjcJ6yX6mS4pU82Mq/Dt9a3cLZQ62pDBL4AUO+uVrCvtWz3ZFUL2HFAFJ/BXQ==}
 
-  zod-schema-faker@2.0.0-beta.8:
-    resolution: {integrity: sha512-K39FxJDarc+LeANA3E1uVhyMvqmRFseEzfoZZQ73mqtcbfIKCKwPSc1ljQTn7Zbrb9x+1R8uHaGwIRVBCtSoBA==}
+  zocker@3.0.0:
+    resolution: {integrity: sha512-xSJz2M9AELZKzgpuuZPbTQdMv9263p/zSHDIj81B58X3334Xl6iJ/C3u6OQiOlsrWAoJSJsveBcIdz1eEPL0EA==}
+    peerDependencies:
+      zod: ^3.25.0 || ^4.0.0
 
   zod-to-json-schema@3.24.6:
     resolution: {integrity: sha512-h/z3PKvcTcTetyjl1fkj79MHNEjm+HpD6NXheWjzOekY7kV+lwDYnHw+ivHkijnCSMz1yJaWBD9vu/Fcmk+vEg==}
@@ -12366,10 +12368,11 @@ snapshots:
       cookie: 1.0.2
       youch-core: 0.3.3
 
-  zod-schema-faker@2.0.0-beta.8:
+  zocker@3.0.0(zod@4.0.16):
     dependencies:
       '@faker-js/faker': 10.0.0
       randexp: 0.5.3
+      zod: 4.0.16
 
   zod-to-json-schema@3.24.6(zod@3.25.76):
     dependencies:

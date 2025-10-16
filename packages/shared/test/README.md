@@ -4,7 +4,7 @@ This directory contains shared testing utilities for the Rafters monorepo.
 
 ## ⚠️ Known Limitations
 
-**zod-schema-faker** does not support:
+**zocker** does not support:
 - `.refine()` - Custom validation rules
 - `.superRefine()` - Advanced validation logic
 
@@ -326,6 +326,7 @@ When adding new schemas:
 
 ## References
 
-- [zod-schema-faker](https://github.com/soc221b/zod-schema-faker)
+- [zocker](https://github.com/LorisSigrist/zocker)
+- [zocker Documentation](https://zocker.sigrist.dev/)
 - [MSW Documentation](https://mswjs.io/)
 - [Vitest Testing Guide](https://vitest.dev/)

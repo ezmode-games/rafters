@@ -1,13 +1,12 @@
 /**
  * Test Fixtures Generator
- * Using zod-schema-faker for realistic test data generation
+ * Using zocker for realistic test data generation
  *
  * This module provides factory functions for generating test fixtures
  * from our Zod schemas with sensible defaults and customization options.
  */
 
-import { faker } from '@faker-js/faker';
-import { fake, setFaker } from 'zod-schema-faker';
+import { zocker } from 'zocker';
 import type {
   ColorValue,
   ComponentManifest,
@@ -27,9 +26,6 @@ import {
   TokenSchema,
 } from '../src/types.js';
 
-// Initialize faker with zod-schema-faker
-setFaker(faker);
-
 /**
  * Fixture Generation Options
  * Allows seeding for deterministic tests and partial overrides
@@ -41,18 +37,21 @@ export interface FixtureOptions<T> {
 
 /**
  * Base fixture generator
- * Wraps zod-schema-faker with seed support and override merging
+ * Wraps zocker with seed support and override merging
  */
 function generateFixture<T>(schema: import('zod').ZodType<T>, options: FixtureOptions<T> = {}): T {
   const { seed, overrides = {} } = options;
 
+  // Create zocker generator
+  let generator = zocker(schema);
+
   // Set seed for deterministic generation
   if (seed !== undefined) {
-    faker.seed(seed);
+    generator = generator.setSeed(seed);
   }
 
   // Generate base fixture
-  const baseFixture = fake(schema);
+  const baseFixture = generator.generate();
 
   // Deep merge overrides
   return {
