@@ -21,6 +21,12 @@ beforeAll(() => {
   server.listen({
     onUnhandledRequest: 'warn', // Warn about unhandled requests during development
   });
+
+  // Add error event listener to catch handler exceptions
+  server.events.on('unhandledException', ({ error, request }) => {
+    console.error('MSW Unhandled Exception:', error);
+    console.error('Request:', request.method, request.url);
+  });
 });
 
 afterEach(() => {

@@ -36,6 +36,26 @@ export interface FixtureOptions<T> {
 }
 
 /**
+ * Recursively convert BigInts to regular numbers
+ */
+function sanitizeBigInts(obj: unknown): unknown {
+  if (typeof obj === 'bigint') {
+    return Number(obj);
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(sanitizeBigInts);
+  }
+  if (obj !== null && typeof obj === 'object') {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      result[key] = sanitizeBigInts(value);
+    }
+    return result;
+  }
+  return obj;
+}
+
+/**
  * Base fixture generator
  * Wraps zocker with seed support and override merging
  */
@@ -53,9 +73,12 @@ function generateFixture<T>(schema: import('zod').ZodType<T>, options: FixtureOp
   // Generate base fixture
   const baseFixture = generator.generate();
 
+  // Convert any BigInts to regular numbers for JSON serialization
+  const sanitized = sanitizeBigInts(baseFixture);
+
   // Deep merge overrides
   return {
-    ...baseFixture,
+    ...sanitized,
     ...overrides,
   } as T;
 }
