@@ -1,13 +1,12 @@
 /**
  * Test Fixtures Generator
- * Using zod-schema-faker for realistic test data generation
+ * Using zocker for realistic test data generation
  *
  * This module provides factory functions for generating test fixtures
  * from our Zod schemas with sensible defaults and customization options.
  */
 
-import { faker } from '@faker-js/faker';
-import { fake, setFaker } from 'zod-schema-faker';
+import { zocker } from 'zocker';
 import type {
   ColorValue,
   ComponentManifest,
@@ -27,9 +26,6 @@ import {
   TokenSchema,
 } from '../src/types.js';
 
-// Initialize faker with zod-schema-faker
-setFaker(faker);
-
 /**
  * Fixture Generation Options
  * Allows seeding for deterministic tests and partial overrides
@@ -40,23 +36,49 @@ export interface FixtureOptions<T> {
 }
 
 /**
+ * Recursively convert BigInts to regular numbers
+ */
+function sanitizeBigInts(obj: unknown): unknown {
+  if (typeof obj === 'bigint') {
+    return Number(obj);
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(sanitizeBigInts);
+  }
+  if (obj !== null && typeof obj === 'object') {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      result[key] = sanitizeBigInts(value);
+    }
+    return result;
+  }
+  return obj;
+}
+
+/**
  * Base fixture generator
- * Wraps zod-schema-faker with seed support and override merging
+ * Wraps zocker with seed support and override merging
  */
 function generateFixture<T>(schema: import('zod').ZodType<T>, options: FixtureOptions<T> = {}): T {
   const { seed, overrides = {} } = options;
 
+  // Create zocker generator
+  let generator = zocker(schema);
+
   // Set seed for deterministic generation
   if (seed !== undefined) {
-    faker.seed(seed);
+    generator = generator.setSeed(seed);
   }
 
   // Generate base fixture
-  const baseFixture = fake(schema);
+  const baseFixture = generator.generate();
+
+  // Convert any BigInts to regular numbers for JSON serialization
+  const sanitized = sanitizeBigInts(baseFixture);
 
   // Deep merge overrides
   return {
-    ...baseFixture,
+    ...sanitized,
     ...overrides,
   } as T;
 }

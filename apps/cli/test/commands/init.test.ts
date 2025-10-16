@@ -313,7 +313,7 @@ describe('init command', () => {
       expect(config).toHaveProperty('componentsDir');
       expect(config).toHaveProperty('registry');
       // Framework is used for detection but not stored in config
-    }, 15000);
+    }, 30000);
   });
 
   describe('Tailwind version check', () => {

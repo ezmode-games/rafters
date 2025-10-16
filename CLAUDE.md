@@ -118,6 +118,8 @@ The `@rafters/design-tokens` package implements a sophisticated dependency graph
 - Integration tests: `test/component.spec.ts`
 - E2E tests: `test/component.e2e.ts`
 - Mock typing: Use `vi.mocked(func).mockReturnValue()`, never `as any`
+- Fixtures: Use `zocker` v3.0.0 for test fixture generation from Zod schemas
+- Test data: Import fixtures from `@rafters/shared/test/fixtures`
 
 ## Monorepo Operations
 
