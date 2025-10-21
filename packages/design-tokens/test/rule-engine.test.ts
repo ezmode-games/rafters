@@ -332,7 +332,7 @@ describe('Rule Engine', () => {
         category: 'spacing',
         namespace: 'spacing',
         semanticMeaning: 'Golden ratio spacing',
-        mathRelationship: '{spacing-base} * golden', // Explicit calc expression
+        generationRule: '{spacing-base} * golden', // Explicit calc expression
       };
       registry.add(calcToken);
       registry.addDependency('spacing-base-golden', ['spacing-base'], 'calc');

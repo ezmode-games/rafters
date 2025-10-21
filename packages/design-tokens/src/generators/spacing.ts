@@ -94,15 +94,15 @@ export function generateSpacingScale(
     // Convert pixels to rem (16px = 1rem)
     const valueRem = valuePx / 16;
 
-    // Determine mathRelationship for non-zero, non-base tokens
-    let mathRelationship: string | undefined;
+    // Determine generationRule for non-zero, non-base tokens
+    let generationRule: string | undefined;
     if (i > 1 && valuePx > 0) {
       // Skip 0 and base (1)
       const baseTokenName = '1';
       if (system === 'linear') {
-        mathRelationship = `{${baseTokenName}} * ${i}`;
+        generationRule = `{${baseTokenName}} * ${i}`;
       } else {
-        mathRelationship = `{${baseTokenName}} * ${system}^${i - 1}`;
+        generationRule = `{${baseTokenName}} * ${system}^${i - 1}`;
       }
     }
 
@@ -113,7 +113,7 @@ export function generateSpacingScale(
       category: 'spacing',
       namespace: 'spacing',
       semanticMeaning: `${system === 'linear' ? 'Mathematical' : system === 'golden' ? 'Golden ratio' : 'Exponential'} spacing step ${i}`,
-      mathRelationship,
+      generationRule,
       progressionSystem: system,
       scalePosition: i,
       generateUtilityClass: true,

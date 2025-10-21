@@ -87,15 +87,15 @@ export function generateMotionTokens(
         ? ('medium' as const)
         : ('low' as const);
 
-    // Determine mathRelationship for non-base tokens
+    // Determine generationRule for non-base tokens
     // 'standard' is the base (index 2), so other tokens derive from it
-    let mathRelationship: string | undefined;
+    let generationRule: string | undefined;
     if (i !== 2) {
       // 'standard' is at index 2
       const baseTokenName = 'standard';
       const steps = i - 2; // Calculate steps from base
       if (steps !== 0) {
-        mathRelationship = `{${baseTokenName}} * ${system}^${steps}`;
+        generationRule = `{${baseTokenName}} * ${system}^${steps}`;
       }
     }
 
@@ -105,7 +105,7 @@ export function generateMotionTokens(
       category: 'motion',
       namespace: 'duration',
       semanticMeaning: `${expressiveness.charAt(0).toUpperCase() + expressiveness.slice(1)} motion timing using ${system} ratio - ${isSubtle ? 'subtle' : isEngaging ? 'engaging' : isImpactful ? 'impactful' : 'cinematic'} expressiveness`,
-      mathRelationship,
+      generationRule,
       progressionSystem: system,
       scalePosition: i,
       // expressiveness: expressiveness, // Not in Token schema

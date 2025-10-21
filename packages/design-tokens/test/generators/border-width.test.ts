@@ -67,19 +67,19 @@ describe('Border Width Generator', () => {
       const tokens = generateBorderWidthTokens();
 
       const zero = tokens.find((t) => t.name === '0');
-      expect(zero?.mathRelationship).toBe('No border');
+      expect(zero?.generationRule).toBe('No border');
 
       const defaultWidth = tokens.find((t) => t.name === 'DEFAULT');
-      expect(defaultWidth?.mathRelationship).toBe('1px (1x pixel)');
+      expect(defaultWidth?.generationRule).toBe('1px (1x pixel)');
 
       const two = tokens.find((t) => t.name === '2');
-      expect(two?.mathRelationship).toBe('2px (2x pixel)');
+      expect(two?.generationRule).toBe('2px (2x pixel)');
 
       const four = tokens.find((t) => t.name === '4');
-      expect(four?.mathRelationship).toBe('4px (4x pixel)');
+      expect(four?.generationRule).toBe('4px (4x pixel)');
 
       const eight = tokens.find((t) => t.name === '8');
-      expect(eight?.mathRelationship).toBe('8px (8x pixel)');
+      expect(eight?.generationRule).toBe('8px (8x pixel)');
     });
 
     it('should include proper cognitive load progression', () => {
@@ -260,8 +260,8 @@ describe('Border Width Generator', () => {
 
       for (const token of borderTokens) {
         if (token.name !== '0') {
-          expect(token.mathRelationship).toContain('px');
-          expect(token.mathRelationship).toContain('pixel)');
+          expect(token.generationRule).toContain('px');
+          expect(token.generationRule).toContain('pixel)');
         }
       }
     });
@@ -278,7 +278,7 @@ describe('Border Width Generator', () => {
         expect(token).toHaveProperty('namespace', 'border');
         expect(token).toHaveProperty('semanticMeaning');
         expect(token).toHaveProperty('scalePosition');
-        expect(token).toHaveProperty('mathRelationship');
+        expect(token).toHaveProperty('generationRule');
         expect(token).toHaveProperty('generateUtilityClass', true);
         expect(token).toHaveProperty('applicableComponents');
         expect(token).toHaveProperty('accessibilityLevel', 'AAA');
@@ -347,13 +347,13 @@ describe('Border Width Generator', () => {
       const tokens = generateBorderWidthTokens();
 
       const two = tokens.find((t) => t.name === '2');
-      expect(two?.mathRelationship).toContain('2x pixel');
+      expect(two?.generationRule).toContain('2x pixel');
 
       const four = tokens.find((t) => t.name === '4');
-      expect(four?.mathRelationship).toContain('4x pixel');
+      expect(four?.generationRule).toContain('4x pixel');
 
       const eight = tokens.find((t) => t.name === '8');
-      expect(eight?.mathRelationship).toContain('8x pixel');
+      expect(eight?.generationRule).toContain('8x pixel');
     });
   });
 });

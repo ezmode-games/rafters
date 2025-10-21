@@ -66,16 +66,16 @@ describe('Backdrop Generator', () => {
       const tokens = generateBackdropTokens();
 
       const none = tokens.find((t) => t.name === 'none');
-      expect(none?.mathRelationship).toBe('No blur');
+      expect(none?.generationRule).toBe('No blur');
 
       const sm = tokens.find((t) => t.name === 'sm');
-      expect(sm?.mathRelationship).toBe('blur(4px)');
+      expect(sm?.generationRule).toBe('blur(4px)');
 
       const lg = tokens.find((t) => t.name === 'lg');
-      expect(lg?.mathRelationship).toBe('blur(16px)');
+      expect(lg?.generationRule).toBe('blur(16px)');
 
       const xl3 = tokens.find((t) => t.name === '3xl');
-      expect(xl3?.mathRelationship).toBe('blur(64px)');
+      expect(xl3?.generationRule).toBe('blur(64px)');
     });
 
     it('should include proper cognitive load progression', () => {
@@ -251,8 +251,8 @@ describe('Backdrop Generator', () => {
       const blurTokens = tokens.filter((t) => t.value !== '0');
 
       for (const token of blurTokens) {
-        expect(token.mathRelationship).toContain('blur(');
-        expect(token.mathRelationship).toContain('px)');
+        expect(token.generationRule).toContain('blur(');
+        expect(token.generationRule).toContain('px)');
       }
     });
   });
@@ -268,7 +268,7 @@ describe('Backdrop Generator', () => {
         expect(token).toHaveProperty('namespace', 'backdrop-blur');
         expect(token).toHaveProperty('semanticMeaning');
         expect(token).toHaveProperty('scalePosition');
-        expect(token).toHaveProperty('mathRelationship');
+        expect(token).toHaveProperty('generationRule');
         expect(token).toHaveProperty('generateUtilityClass', true);
         expect(token).toHaveProperty('applicableComponents');
         expect(token).toHaveProperty('accessibilityLevel', 'AAA');

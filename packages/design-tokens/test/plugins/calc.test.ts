@@ -25,14 +25,14 @@ describe('Calc Plugin', () => {
         value: '', // Will be calculated
         category: 'spacing',
         namespace: 'spacing',
-        mathRelationship: '{spacing-base} * 2',
+        generationRule: '{spacing-base} * 2',
       },
       {
         name: 'rounded-golden',
         value: '', // Will be calculated
         category: 'border-radius',
         namespace: 'border',
-        mathRelationship: '{rounded-sm} * golden',
+        generationRule: '{rounded-sm} * golden',
       },
       {
         name: 'spacing-base-2x', // Pattern-based naming
@@ -48,7 +48,7 @@ describe('Calc Plugin', () => {
   });
 
   describe('Mathematical Relationship Execution', () => {
-    it('should execute mathRelationship from token metadata', () => {
+    it('should execute generationRule from token metadata', () => {
       const result = calcPlugin(registry, 'spacing-double', ['spacing-base']);
       expect(result).toBe('32px');
     });
@@ -69,7 +69,7 @@ describe('Calc Plugin', () => {
   describe('Error Handling', () => {
     it('should throw error when token has no calc expression', () => {
       expect(() => {
-        calcPlugin(registry, 'spacing-base', []); // No mathRelationship or pattern
+        calcPlugin(registry, 'spacing-base', []); // No generationRule or pattern
       }).toThrow('Unsafe expression'); // The fallback pattern creates an unsafe expression
     });
 
@@ -82,13 +82,13 @@ describe('Calc Plugin', () => {
 
   describe('Mathematical Constants Integration', () => {
     it('should support golden ratio constant', () => {
-      // Token with golden ratio in mathRelationship
+      // Token with golden ratio in generationRule
       const goldenToken: Token = {
         name: 'test-golden',
         value: '',
         category: 'test',
         namespace: 'test',
-        mathRelationship: '{spacing-base} * golden',
+        generationRule: '{spacing-base} * golden',
       };
       registry.add(goldenToken);
 
@@ -102,7 +102,7 @@ describe('Calc Plugin', () => {
         value: '',
         category: 'test',
         namespace: 'test',
-        mathRelationship: '{spacing-base} * major-third',
+        generationRule: '{spacing-base} * major-third',
       };
       registry.add(majorThirdToken);
 
@@ -118,7 +118,7 @@ describe('Calc Plugin', () => {
         value: '',
         category: 'test',
         namespace: 'test',
-        mathRelationship: '{spacing-base} + {rounded-sm}',
+        generationRule: '{spacing-base} + {rounded-sm}',
       };
       registry.add(mixedToken);
 

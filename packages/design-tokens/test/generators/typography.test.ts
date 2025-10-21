@@ -28,7 +28,7 @@ describe('Typography Generator', () => {
       const base = fontSizeTokens.find((t) => t.name === 'text-base');
 
       expect(base?.value).toBe('1rem');
-      expect(base?.mathRelationship).toBeUndefined(); // Base token has no relationship
+      expect(base?.generationRule).toBeUndefined(); // Base token has no relationship
     });
 
     it('should generate mathematical relationships for derived sizes', () => {
@@ -36,10 +36,10 @@ describe('Typography Generator', () => {
       const fontSizeTokens = tokens.filter((t) => t.category === 'font-size');
 
       const lg = fontSizeTokens.find((t) => t.name === 'text-lg');
-      expect(lg?.mathRelationship).toBe('{text-base} * golden^1');
+      expect(lg?.generationRule).toBe('{text-base} * golden^1');
 
       const xl = fontSizeTokens.find((t) => t.name === 'text-xl');
-      expect(xl?.mathRelationship).toBe('{text-base} * golden^2');
+      expect(xl?.generationRule).toBe('{text-base} * golden^2');
     });
 
     it('should generate optimized line heights', () => {

@@ -46,9 +46,9 @@ describe('Height Generator', () => {
     it('should include mathematical relationships', () => {
       const tokens = generateHeightScale('golden', 2.5, 1.25);
 
-      expect(tokens[0].mathRelationship).toBeUndefined();
-      expect(tokens[1].mathRelationship).toContain('golden');
-      expect(tokens[2].mathRelationship).toContain('golden');
+      expect(tokens[0].generationRule).toBeUndefined();
+      expect(tokens[1].generationRule).toContain('golden');
+      expect(tokens[2].generationRule).toContain('golden');
     });
   });
 });

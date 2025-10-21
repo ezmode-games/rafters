@@ -67,7 +67,7 @@ export function generateBorderWidthTokens(): Token[] {
       namespace: 'border',
       semanticMeaning: border.meaning,
       scalePosition: index,
-      mathRelationship:
+      generationRule:
         border.value === '0px'
           ? 'No border'
           : `${border.value} (${Number.parseInt(border.value, 10)}x pixel)`,

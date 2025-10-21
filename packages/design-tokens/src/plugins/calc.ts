@@ -22,8 +22,8 @@ export default function calc(
   let expression = '';
 
   // Try to get expression from token metadata first
-  if (token && typeof token === 'object' && 'mathRelationship' in token) {
-    expression = (token as Token).mathRelationship || '';
+  if (token && typeof token === 'object' && 'generationRule' in token) {
+    expression = (token as Token).generationRule || '';
   } else {
     // Infer expression from token name pattern
     // Examples: "spacing-2x", "size-golden", "margin-triple"

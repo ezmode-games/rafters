@@ -14,7 +14,7 @@ import { generateSpacingScale } from '../src/generators/spacing.js';
 import { generateTypographyScale } from '../src/generators/typography.js';
 
 describe('Schema Validation for Mathematical Metadata', () => {
-  it('should validate typography tokens with mathRelationship metadata', () => {
+  it('should validate typography tokens with generationRule metadata', () => {
     const tokens = generateTypographyScale('golden', 1, false);
 
     for (const token of tokens) {
@@ -27,12 +27,12 @@ describe('Schema Validation for Mathematical Metadata', () => {
       }
     }
 
-    // Verify some tokens have mathRelationship
-    const tokensWithMath = tokens.filter((t) => t.mathRelationship);
+    // Verify some tokens have generationRule
+    const tokensWithMath = tokens.filter((t) => t.generationRule);
     expect(tokensWithMath.length).toBeGreaterThan(0);
   });
 
-  it('should validate spacing tokens with mathRelationship metadata', () => {
+  it('should validate spacing tokens with generationRule metadata', () => {
     const tokens = generateSpacingScale('golden', 4, 1.25, 6, false);
 
     for (const token of tokens) {
@@ -44,12 +44,12 @@ describe('Schema Validation for Mathematical Metadata', () => {
       }
     }
 
-    // Verify some tokens have mathRelationship
-    const tokensWithMath = tokens.filter((t) => t.mathRelationship);
+    // Verify some tokens have generationRule
+    const tokensWithMath = tokens.filter((t) => t.generationRule);
     expect(tokensWithMath.length).toBeGreaterThan(0);
   });
 
-  it('should validate motion tokens with mathRelationship and motionDuration metadata', () => {
+  it('should validate motion tokens with generationRule and motionDuration metadata', () => {
     const tokens = generateMotionTokens('golden', 75, false);
 
     for (const token of tokens) {
@@ -61,18 +61,18 @@ describe('Schema Validation for Mathematical Metadata', () => {
       }
     }
 
-    // Verify duration tokens have mathRelationship and motionDuration
+    // Verify duration tokens have generationRule and motionDuration
     const durationTokens = tokens.filter((t) => t.category === 'motion');
     expect(durationTokens.length).toBeGreaterThan(0);
 
-    const tokensWithMath = durationTokens.filter((t) => t.mathRelationship);
+    const tokensWithMath = durationTokens.filter((t) => t.generationRule);
     expect(tokensWithMath.length).toBeGreaterThan(0);
 
     const tokensWithDuration = durationTokens.filter((t) => t.motionDuration);
     expect(tokensWithDuration.length).toBeGreaterThan(0);
   });
 
-  it('should validate height tokens with mathRelationship metadata', () => {
+  it('should validate height tokens with generationRule metadata', () => {
     const tokens = generateHeightScale('golden', 2.5, 1.25, false);
 
     for (const token of tokens) {
@@ -84,12 +84,12 @@ describe('Schema Validation for Mathematical Metadata', () => {
       }
     }
 
-    // Verify some tokens have mathRelationship
-    const tokensWithMath = tokens.filter((t) => t.mathRelationship);
+    // Verify some tokens have generationRule
+    const tokensWithMath = tokens.filter((t) => t.generationRule);
     expect(tokensWithMath.length).toBeGreaterThan(0);
   });
 
-  it('should validate border-radius tokens with mathRelationship metadata', () => {
+  it('should validate border-radius tokens with generationRule metadata', () => {
     const tokens = generateBorderRadiusScale('golden', 4, 1.5, 6);
 
     for (const token of tokens) {
@@ -101,8 +101,8 @@ describe('Schema Validation for Mathematical Metadata', () => {
       }
     }
 
-    // Verify some tokens have mathRelationship
-    const tokensWithMath = tokens.filter((t) => t.mathRelationship);
+    // Verify some tokens have generationRule
+    const tokensWithMath = tokens.filter((t) => t.generationRule);
     expect(tokensWithMath.length).toBeGreaterThan(0);
   });
 
@@ -119,7 +119,7 @@ describe('Schema Validation for Mathematical Metadata', () => {
     // Collect all the mathematical metadata fields being used
     const fieldsUsed = new Set<string>();
     for (const token of tokens) {
-      if (token.mathRelationship) fieldsUsed.add('mathRelationship');
+      if (token.generationRule) fieldsUsed.add('generationRule');
       if (token.scalePosition !== undefined) fieldsUsed.add('scalePosition');
       if (token.motionDuration !== undefined) fieldsUsed.add('motionDuration');
       if (token.progressionSystem) fieldsUsed.add('progressionSystem');
@@ -127,7 +127,7 @@ describe('Schema Validation for Mathematical Metadata', () => {
     }
 
     // Verify we found the expected mathematical metadata fields
-    expect(fieldsUsed.has('mathRelationship')).toBe(true);
+    expect(fieldsUsed.has('generationRule')).toBe(true);
     expect(fieldsUsed.has('scalePosition')).toBe(true);
     expect(fieldsUsed.has('motionDuration')).toBe(true);
     expect(fieldsUsed.has('progressionSystem')).toBe(true);
