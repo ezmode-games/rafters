@@ -58,22 +58,22 @@ describe('Border Radius Generator', () => {
       const tokens = generateBorderRadiusScale('golden', 4, 1.5, 5);
 
       // Check 'none' token (no math relationship)
-      expect(tokens[0].mathRelationship).toBeUndefined();
+      expect(tokens[0].generationRule).toBeUndefined();
       expect(tokens[0].progressionSystem).toBe('golden');
       expect(tokens[0].scalePosition).toBe(0);
 
       // Check 'sm' token (base token, no math relationship)
-      expect(tokens[1].mathRelationship).toBeUndefined();
+      expect(tokens[1].generationRule).toBeUndefined();
       expect(tokens[1].progressionSystem).toBe('golden');
       expect(tokens[1].scalePosition).toBe(1);
 
       // Check 'md' token (first derived token)
-      expect(tokens[2].mathRelationship).toBe('{sm} * golden^1');
+      expect(tokens[2].generationRule).toBe('{sm} * golden^1');
       expect(tokens[2].progressionSystem).toBe('golden');
       expect(tokens[2].scalePosition).toBe(2);
 
       // Check 'lg' token
-      expect(tokens[3].mathRelationship).toBe('{sm} * golden^2');
+      expect(tokens[3].generationRule).toBe('{sm} * golden^2');
       expect(tokens[3].progressionSystem).toBe('golden');
       expect(tokens[3].scalePosition).toBe(3);
     });
@@ -157,8 +157,8 @@ describe('Border Radius Generator', () => {
       expect(tokens[1].value).toBe('0.25rem'); // Base: 4px
       expect(tokens[2].value).toBe('0.5rem'); // 4 * 2.0 = 8px
       expect(tokens[3].value).toBe('1rem'); // 4 * 2.0^2 = 16px
-      expect(tokens[2].mathRelationship).toBe('{sm} * custom^1');
-      expect(tokens[3].mathRelationship).toBe('{sm} * custom^2');
+      expect(tokens[2].generationRule).toBe('{sm} * custom^1');
+      expect(tokens[3].generationRule).toBe('{sm} * custom^2');
     });
 
     it('should handle different base units', () => {
@@ -188,7 +188,7 @@ describe('Border Radius Generator', () => {
 
       // Should use linear progression by default
       expect(tokens[1].progressionSystem).toBe('linear');
-      expect(tokens[2].mathRelationship).toBe('{sm} + 4px');
+      expect(tokens[2].generationRule).toBe('{sm} + 4px');
     });
 
     it('should maintain backward compatibility', () => {

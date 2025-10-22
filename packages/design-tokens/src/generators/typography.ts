@@ -94,15 +94,15 @@ export function generateTypographyScale(
     const isHeading = i >= 4;
     const isDisplay = i >= 9;
 
-    // Determine mathRelationship for non-base tokens
-    let mathRelationship: string | undefined;
+    // Determine generationRule for non-base tokens
+    let generationRule: string | undefined;
     if (steps !== 0) {
       // Base token is at index 2, so reference it for all other tokens
       const baseTokenName = 'text-base';
       if (steps > 0) {
-        mathRelationship = `{${baseTokenName}} * ${system}^${steps}`;
+        generationRule = `{${baseTokenName}} * ${system}^${steps}`;
       } else {
-        mathRelationship = `{${baseTokenName}} * ${system}^${steps}`;
+        generationRule = `{${baseTokenName}} * ${system}^${steps}`;
       }
     }
 
@@ -113,7 +113,7 @@ export function generateTypographyScale(
       category: 'font-size',
       namespace: 'font-size',
       semanticMeaning: `Typography size ${sizes[i]} using ${system} ratio - ${isDisplay ? 'display/hero' : isHeading ? 'heading' : 'body/ui'} text`,
-      mathRelationship,
+      generationRule,
       progressionSystem: system,
       scalePosition: i,
       generateUtilityClass: true,

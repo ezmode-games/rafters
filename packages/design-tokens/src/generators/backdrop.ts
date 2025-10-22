@@ -92,7 +92,7 @@ export function generateBackdropTokens(): Token[] {
       namespace: 'backdrop-blur',
       semanticMeaning: blur.meaning,
       scalePosition: index,
-      mathRelationship: blur.value === '0' ? 'No blur' : `blur(${blur.value})`,
+      generationRule: blur.value === '0' ? 'No blur' : `blur(${blur.value})`,
       generateUtilityClass: true,
       applicableComponents: ['modal', 'dialog', 'overlay', 'backdrop'],
       accessibilityLevel: 'AAA',

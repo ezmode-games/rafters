@@ -63,13 +63,13 @@ describe('Spacing Generator', () => {
       const tokens = generateSpacingScale('golden', 4, 1.25, 5);
 
       // Base tokens (0, 1) should not have math relationships
-      expect(tokens[0].mathRelationship).toBeUndefined();
-      expect(tokens[1].mathRelationship).toBeUndefined();
+      expect(tokens[0].generationRule).toBeUndefined();
+      expect(tokens[1].generationRule).toBeUndefined();
 
       // Derived tokens should have math relationships
-      expect(tokens[2].mathRelationship).toBe('{1} * golden^1');
-      expect(tokens[3].mathRelationship).toBe('{1} * golden^2');
-      expect(tokens[4].mathRelationship).toBe('{1} * golden^3');
+      expect(tokens[2].generationRule).toBe('{1} * golden^1');
+      expect(tokens[3].generationRule).toBe('{1} * golden^2');
+      expect(tokens[4].generationRule).toBe('{1} * golden^3');
     });
 
     it('should include progression system metadata', () => {
@@ -198,9 +198,9 @@ describe('Spacing Generator', () => {
     it('should include proper math relationships for linear system', () => {
       const tokens = generateSpacingScale('linear', 4, 1.25, 4);
 
-      expect(tokens[2].mathRelationship).toBe('{1} * 2');
-      expect(tokens[3].mathRelationship).toBe('{1} * 3');
-      expect(tokens[4].mathRelationship).toBe('{1} * 4');
+      expect(tokens[2].generationRule).toBe('{1} * 2');
+      expect(tokens[3].generationRule).toBe('{1} * 3');
+      expect(tokens[4].generationRule).toBe('{1} * 4');
     });
 
     it('should handle different base units correctly', () => {

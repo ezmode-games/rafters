@@ -90,15 +90,15 @@ export function generateBorderRadiusScale(
     const isStandard = i >= 3 && i <= 5; // lg, xl, 2xl
     const isDramatic = i >= 6; // 3xl, full
 
-    // Determine mathRelationship for non-zero, non-full tokens
-    let mathRelationship: string | undefined;
+    // Determine generationRule for non-zero, non-full tokens
+    let generationRule: string | undefined;
     if (i > 1 && name !== 'full') {
       const baseTokenName = 'sm'; // sm is the base (index 1)
       const steps = i - 1; // Calculate steps from base
       if (system === 'linear') {
-        mathRelationship = `{${baseTokenName}} + ${steps * absBaseUnit}px`;
+        generationRule = `{${baseTokenName}} + ${steps * absBaseUnit}px`;
       } else {
-        mathRelationship = `{${baseTokenName}} * ${system}^${steps}`;
+        generationRule = `{${baseTokenName}} * ${system}^${steps}`;
       }
     }
 
@@ -108,7 +108,7 @@ export function generateBorderRadiusScale(
       category: 'border-radius',
       namespace: 'border',
       semanticMeaning: `${name === 'none' ? 'Sharp' : name === 'full' ? 'Fully rounded' : 'Progressively rounded'} corners for ${isSubtle ? 'subtle' : isStandard ? 'standard' : 'dramatic'} visual softness`,
-      mathRelationship,
+      generationRule,
       progressionSystem: system,
       scalePosition: i,
       generateUtilityClass: true,

@@ -63,7 +63,7 @@ export function generateHeightScale(
       category: 'height',
       namespace: 'height',
       semanticMeaning: `Component height ${sizes[i]} for ${system} scale - ${meetsAccessibility ? 'meets' : 'below'} touch target guidelines`,
-      mathRelationship:
+      generationRule:
         i === 0
           ? undefined
           : system === 'linear'

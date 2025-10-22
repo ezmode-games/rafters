@@ -30,10 +30,10 @@ describe('Motion Generator', () => {
 
       const standard = durationTokens.find((t) => t.name === 'standard');
       expect(standard).toBeDefined();
-      expect(standard?.mathRelationship).toBeUndefined(); // Base token
+      expect(standard?.generationRule).toBeUndefined(); // Base token
 
       const engage = durationTokens.find((t) => t.name === 'engage');
-      expect(engage?.mathRelationship).toContain('golden');
+      expect(engage?.generationRule).toContain('golden');
       expect(engage?.progressionSystem).toBe('golden');
     });
 

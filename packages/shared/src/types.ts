@@ -327,9 +327,9 @@ export const TokenSchema = z.object({
   accessibilityLevel: z.enum(['AA', 'AAA']).optional(),
   consequence: z.enum(['reversible', 'significant', 'permanent', 'destructive']).optional(),
 
-  // Mathematical relationships
-  generatedFrom: z.string().optional(),
-  mathRelationship: z.string().optional(),
+  // Dependency tracking for automatic regeneration
+  dependsOn: z.array(z.string()).optional(), // Parent token(s) - empty = root token
+  generationRule: z.string().optional(), // How generated: "calc({base}*2)", "state:hover", etc
   progressionSystem: z.enum(PROGRESSION_SYSTEMS).optional(), // Mathematical system used
   scalePosition: z.number().optional(), // Position in color/spacing scale
 
