@@ -13,6 +13,6 @@ describe('Vitest Infrastructure', () => {
   });
 
   it('loads setup files correctly', () => {
-    expect(globalThis.setupComplete).toBe(true);
+    expect((globalThis as { setupComplete?: boolean }).setupComplete).toBe(true);
   });
 });
