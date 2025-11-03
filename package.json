@@ -15,7 +15,7 @@
     "test:unit": "pnpm -r test:unit",
     "test:component": "pnpm -r test:component",
     "test:e2e": "pnpm -r test:e2e",
-    "test:a11y": "pnpm -r test:a11y",
+    "test:a11y": "playwright test --grep @a11y",
     "test:quick": "pnpm test:unit && pnpm test:component",
     "test:all": "pnpm preflight && pnpm test:e2e",
     "test:watch": "pnpm -r test:unit --watch",
@@ -48,7 +48,6 @@
     "react-dom": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:",
-    "vitest-axe": "catalog:",
     "zod": "catalog:",
     "zocker": "catalog:"
   }

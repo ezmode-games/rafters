@@ -1,7 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll } from 'vitest';
-import { configureAxe } from 'vitest-axe';
 import { server } from './msw/server';
 
 // MSW setup - hybrid strategy: live in local dev, mocked in CI
@@ -16,13 +15,6 @@ if (shouldUseMSW) {
 // React Testing Library cleanup
 afterEach(() => {
   cleanup();
-});
-
-// Axe configuration for accessibility testing
-configureAxe({
-  rules: {
-    region: { enabled: false },
-  },
 });
 
 // Mark setup as complete for infrastructure tests
