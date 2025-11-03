@@ -8,6 +8,141 @@
 import { ALL_RATIOS, getRatio, type ProgressionType } from './constants.js';
 
 /**
+ * Tokenize an expression into numbers and operators
+ */
+function tokenize(expr: string): Array<string | number> {
+  const tokens: Array<string | number> = [];
+  let current = '';
+
+  for (let i = 0; i < expr.length; i++) {
+    const char = expr[i];
+    if (!char) continue;
+
+    if (char === ' ') {
+      continue;
+    }
+
+    if ('+-*/()'.includes(char)) {
+      if (current) {
+        const num = parseFloat(current);
+        if (!Number.isNaN(num)) {
+          tokens.push(num);
+        }
+        current = '';
+      }
+      tokens.push(char);
+    } else if (char) {
+      current += char;
+    }
+  }
+
+  if (current) {
+    const num = parseFloat(current);
+    if (!Number.isNaN(num)) {
+      tokens.push(num);
+    }
+  }
+
+  return tokens;
+}
+
+/**
+ * Recursive descent parser for mathematical expressions
+ * Grammar:
+ *   expression := term (('+' | '-') term)*
+ *   term       := factor (('*' | '/') factor)*
+ *   factor     := number | '(' expression ')' | '-' factor
+ */
+class ExpressionParser {
+  private tokens: Array<string | number>;
+  private position: number;
+
+  constructor(tokens: Array<string | number>) {
+    this.tokens = tokens;
+    this.position = 0;
+  }
+
+  private current(): string | number | undefined {
+    return this.tokens[this.position];
+  }
+
+  private consume(): string | number | undefined {
+    return this.tokens[this.position++];
+  }
+
+  parse(): number {
+    const result = this.expression();
+    if (this.position < this.tokens.length) {
+      throw new Error('Unexpected token after expression');
+    }
+    return result;
+  }
+
+  private expression(): number {
+    let left = this.term();
+
+    while (this.current() === '+' || this.current() === '-') {
+      const op = this.consume();
+      const right = this.term();
+
+      if (op === '+') {
+        left = left + right;
+      } else {
+        left = left - right;
+      }
+    }
+
+    return left;
+  }
+
+  private term(): number {
+    let left = this.factor();
+
+    while (this.current() === '*' || this.current() === '/') {
+      const op = this.consume();
+      const right = this.factor();
+
+      if (op === '*') {
+        left = left * right;
+      } else {
+        if (right === 0) {
+          throw new Error('Division by zero');
+        }
+        left = left / right;
+      }
+    }
+
+    return left;
+  }
+
+  private factor(): number {
+    const token = this.current();
+
+    if (typeof token === 'number') {
+      this.consume();
+      return token;
+    }
+
+    if (token === '(') {
+      this.consume(); // consume '('
+      const result = this.expression();
+      if (this.current() !== ')') {
+        throw new Error('Missing closing parenthesis');
+      }
+      this.consume(); // consume ')'
+      return result;
+    }
+
+    if (token === '-') {
+      this.consume(); // consume '-'
+      return -this.factor();
+    }
+
+    throw new Error(`Unexpected token: ${token}`);
+  }
+}
+
+/**
  * Safely evaluate mathematical expressions with ratio substitution
  *
  * @param expression - Mathematical expression (e.g., "16 * golden", "base * minor-third + 4")
@@ -50,19 +185,12 @@ export function evaluateExpression(
     processedExpression = processedExpression.replace(varRegex, String(varValue));
   }
 
-  // Validate expression contains only safe characters (numbers, operators, spaces, parentheses, letters for ratio names)
-  if (!/^[\d+\-*/.() a-zA-Z-]+$/.test(processedExpression)) {
-    throw new Error(`Unsafe expression: ${expression}`);
-  }
-
+  // Safe expression evaluation using recursive descent parser
+  // This eliminates the security vulnerability from using Function() constructor
   try {
-    // Use Function constructor for safer evaluation than eval()
-    // Security measures in place:
-    // 1. Input validated with strict regex (only numbers, operators, spaces, parentheses, letters for ratio names)
-    // 2. Variables are pre-substituted (no arbitrary code injection possible)
-    // 3. Expression scope is isolated (no access to external variables or DOM)
-    // 4. Result is validated to be a finite number
-    const result = new Function(`return ${processedExpression}`)();
+    const tokens = tokenize(processedExpression);
+    const parser = new ExpressionParser(tokens);
+    const result = parser.parse();
 
     if (typeof result !== 'number' || !Number.isFinite(result)) {
       throw new Error(`Invalid calculation result: ${result}`);
