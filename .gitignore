@@ -7,7 +7,6 @@ build
 .env.local
 .DS_Store
 coverage
-pnpm-lock.yaml
 .npmrc.approvals
 playwright-report
 test-results
