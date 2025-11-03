@@ -26,28 +26,30 @@
     "noFallthroughCasesInSwitch": true,
 
     "resolveJsonModule": true,
-    "allowImportingTsExtensions": false,
+    "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
 
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "noEmit": false,
+    "noEmit": true,
     "importHelpers": false,
     "downlevelIteration": false,
 
     "baseUrl": ".",
     "paths": {
-      "@rafters/design-tokens": ["./packages/design-tokens/src"],
-      "@rafters/ui": ["./packages/ui/src"],
-      "@rafters/shared": ["./packages/shared/src"]
+      "@rafters/shared": ["./packages/shared/src/index.ts"],
+      "@rafters/shared/*": ["./packages/shared/src/*"],
+      "@rafters/color-utils": ["./packages/color-utils/src/index.ts"],
+      "@rafters/color-utils/*": ["./packages/color-utils/src/*"],
+      "@rafters/math-utils": ["./packages/math-utils/src/index.ts"],
+      "@rafters/math-utils/*": ["./packages/math-utils/src/*"],
+      "@rafters/design-tokens": ["./packages/design-tokens/src/index.ts"],
+      "@rafters/design-tokens/*": ["./packages/design-tokens/src/*"]
     },
 
     "types": ["vitest/globals"]
   },
-  "exclude": ["node_modules", "dist", ".turbo", "coverage"]
+  "exclude": ["node_modules", ".turbo", "coverage"]
 }
