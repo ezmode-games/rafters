@@ -11,25 +11,21 @@ const UserSchema = z.object({
 
 describe('Zocker Infrastructure', () => {
   it('generates valid data from Zod schemas', () => {
-    const user = zocker(UserSchema, { seed: 42 }).generate();
+    const user = zocker(UserSchema).generate();
     expect(UserSchema.safeParse(user).success).toBe(true);
   });
 
   it('generates arrays of data', () => {
-    const users = zocker(z.array(UserSchema).length(10), {
-      seed: 123,
-    }).generate();
+    const users = zocker(z.array(UserSchema).length(10)).generate();
     expect(users).toHaveLength(10);
     for (const user of users) {
       expect(UserSchema.safeParse(user).success).toBe(true);
     }
   });
 
-  it('generates different data with different seeds', () => {
-    const generator1 = zocker(UserSchema, { seed: 42 });
-    const user1 = generator1.generate();
-    const generator2 = zocker(UserSchema, { seed: 123 });
-    const user2 = generator2.generate();
+  it('generates different data on each call', () => {
+    const user1 = zocker(UserSchema).generate();
+    const user2 = zocker(UserSchema).generate();
     expect(user1).not.toEqual(user2);
   });
 

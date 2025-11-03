@@ -13,7 +13,9 @@ export function generateTestData<T extends z.ZodTypeAny>(
   schema: T,
   options: { seed?: number } = {},
 ): z.infer<T> {
-  return zocker(schema, { seed: options.seed ?? 42 }).generate();
+  const generator =
+    options.seed !== undefined ? zocker(schema).setSeed(options.seed) : zocker(schema);
+  return generator.generate() as z.infer<T>;
 }
 
 /**
@@ -25,7 +27,9 @@ export function generateTestArray<T extends z.ZodTypeAny>(
   options: { seed?: number } = {},
 ): Array<z.infer<T>> {
   const arraySchema = z.array(schema).length(count);
-  return zocker(arraySchema, { seed: options.seed ?? 42 }).generate();
+  const generator =
+    options.seed !== undefined ? zocker(arraySchema).setSeed(options.seed) : zocker(arraySchema);
+  return generator.generate() as Array<z.infer<T>>;
 }
 
 /**
@@ -37,14 +41,22 @@ export function createFixtureFactory<T extends z.ZodTypeAny>(schema: T, baseSeed
 
   return {
     generate: (overrides?: Partial<z.infer<T>>): z.infer<T> => {
-      const generated = zocker(schema, { seed: baseSeed + counter }).generate();
+      const generated = zocker(schema)
+        .setSeed(baseSeed + counter)
+        .generate() as z.infer<T>;
       counter++;
-      return overrides ? { ...generated, ...overrides } : generated;
+      return overrides
+        ? ({ ...(generated as object), ...(overrides as object) } as z.infer<T>)
+        : generated;
     },
     generateMany: (count: number): Array<z.infer<T>> => {
       const items: Array<z.infer<T>> = [];
       for (let i = 0; i < count; i++) {
-        items.push(zocker(schema, { seed: baseSeed + counter }).generate());
+        items.push(
+          zocker(schema)
+            .setSeed(baseSeed + counter)
+            .generate() as z.infer<T>,
+        );
         counter++;
       }
       return items;

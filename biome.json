@@ -26,18 +26,27 @@
       "suspicious": {
         "noExplicitAny": "error",
         "noDebugger": "error",
-        "noVar": "error"
+        "noVar": "error",
+        "noFallthroughSwitchClause": "error",
+        "noImplicitAnyLet": "error"
       },
       "style": {
-        "useConst": "error"
+        "useConst": "error",
+        "noNonNullAssertion": "warn"
       },
       "complexity": {
-        "noForEach": "error"
+        "noForEach": "error",
+        "noUselessSwitchCase": "error"
       },
       "correctness": {
         "noUnusedVariables": "error",
         "noUndeclaredVariables": "error",
-        "noUnusedImports": "error"
+        "noUnusedImports": "error",
+        "noUnusedPrivateClassMembers": "error",
+        "useExhaustiveDependencies": "warn"
+      },
+      "nursery": {
+        "useExplicitType": "off"
       }
     }
   },
