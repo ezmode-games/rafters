@@ -1,0 +1,624 @@
+{
+  "version": "1.56.1",
+  "viteVersion": "6.4.1",
+  "registerSourceHash": "ea233d95b980072c81eb49458aee55f5d33fdb02",
+  "components": [
+    {
+      "id": "_home_sean_projects_real_handy_rafters_packages_ui_examples_react_dialog_BasicDialogExample",
+      "filename": "/home/sean/projects/real-handy/rafters/packages/ui/test/examples/react-dialog.spec.tsx",
+      "importSource": "../../examples/react-dialog",
+      "remoteName": "BasicDialogExample"
+    },
+    {
+      "id": "_home_sean_projects_real_handy_rafters_packages_ui_examples_react_dialog_ControlledDialogExample",
+      "filename": "/home/sean/projects/real-handy/rafters/packages/ui/test/examples/react-dialog.spec.tsx",
+      "importSource": "../../examples/react-dialog",
+      "remoteName": "ControlledDialogExample"
+    },
+    {
+      "id": "_home_sean_projects_real_handy_rafters_packages_ui_examples_react_dialog_DialogWithReactHookForm",
+      "filename": "/home/sean/projects/real-handy/rafters/packages/ui/test/examples/react-dialog.spec.tsx",
+      "importSource": "../../examples/react-dialog",
+      "remoteName": "DialogWithReactHookForm"
+    },
+    {
+      "id": "_home_sean_projects_real_handy_rafters_packages_ui_examples_react_dialog_NonModalDialogExample",
+      "filename": "/home/sean/projects/real-handy/rafters/packages/ui/test/examples/react-dialog.spec.tsx",
+      "importSource": "../../examples/react-dialog",
+      "remoteName": "NonModalDialogExample"
+    }
+  ],
+  "sources": {
+    "/home/sean/projects/real-handy/rafters/packages/ui/playwright/index.html": {
+      "timestamp": 1762227946000.696
+    },
+    "/home/sean/projects/real-handy/rafters/packages/ui/playwright/index.ts": {
+      "timestamp": 1762227950150.6768
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom/client.js": {
+      "timestamp": 1760641864119.4922
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/react@19.2.0/node_modules/react/index.js": {
+      "timestamp": 1760641864006.4902
+    },
+    "/home/sean/projects/real-handy/rafters/packages/ui/playwright/styles.css": {
+      "timestamp": 1762228894676.3967
+    },
+    "/home/sean/projects/real-handy/rafters/packages/ui/examples/react-dialog.tsx": {
+      "timestamp": 1762229147212.5283
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/react@19.2.0/node_modules/react/cjs/react.production.js": {
+      "timestamp": 1761070364782.7966
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/react@19.2.0/node_modules/react/jsx-runtime.js": {
+      "timestamp": 1760641864007.4902
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/index.js": {
+      "timestamp": 1760641401574.7773
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/@hookform+resolvers@5.2.2_react-hook-form@7.66.0_react@19.2.0_/node_modules/@hookform/resolvers/zod/dist/zod.mjs": {
+      "timestamp": 1761072848326.6125
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/react-hook-form@7.66.0_react@19.2.0/node_modules/react-hook-form/dist/index.esm.mjs": {
+      "timestamp": 1762228216108.4316
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom/cjs/react-dom-client.production.js": {
+      "timestamp": 1761070369132.7632
+    },
+    "/home/sean/projects/real-handy/rafters/packages/ui/src/components/ui/dialog.tsx": {
+      "timestamp": 1762232335202.8965
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/classic/external.js": {
+      "timestamp": 1761070386924.6367
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/index.js": {
+      "timestamp": 1760641399397.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/@hookform+resolvers@5.2.2_react-hook-form@7.66.0_react@19.2.0_/node_modules/@hookform/resolvers/dist/resolvers.mjs": {
+      "timestamp": 1761072848360.6113
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/react@19.2.0/node_modules/react/cjs/react-jsx-runtime.production.js": {
+      "timestamp": 1760641864010.4902
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/scheduler@0.27.0/node_modules/scheduler/index.js": {
+      "timestamp": 1760641864014.4902
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom/index.js": {
+      "timestamp": 1760641864119.4922
+    },
+    "/home/sean/projects/real-handy/rafters/packages/ui/src/primitives/outside-click.ts": {
+      "timestamp": 1762233136249.5935
+    },
+    "/home/sean/projects/real-handy/rafters/packages/ui/src/primitives/escape-keydown.ts": {
+      "timestamp": 1762227383917.3655
+    },
+    "/home/sean/projects/real-handy/rafters/packages/ui/src/primitives/dialog-aria.ts": {
+      "timestamp": 1762227380870.3801
+    },
+    "/home/sean/projects/real-handy/rafters/packages/ui/src/primitives/focus-trap.ts": {
+      "timestamp": 1762227381886.3752
+    },
+    "/home/sean/projects/real-handy/rafters/packages/ui/src/primitives/id-generator.ts": {
+      "timestamp": 1762227385947.3555
+    },
+    "/home/sean/projects/real-handy/rafters/packages/ui/src/primitives/portal.ts": {
+      "timestamp": 1762227382902.3704
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/index.js": {
+      "timestamp": 1761070386929.6367
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/classic/checks.js": {
+      "timestamp": 1760641399390.1943
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/classic/schemas.js": {
+      "timestamp": 1761070386937.6367
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/classic/errors.js": {
+      "timestamp": 1760641401570.7773
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/classic/parse.js": {
+      "timestamp": 1761070386934.6367
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/classic/compat.js": {
+      "timestamp": 1760641401568.7773
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/en.js": {
+      "timestamp": 1760641399392.7253
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/index.js": {
+      "timestamp": 1761237429098.6008
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/classic/iso.js": {
+      "timestamp": 1760641399397.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/classic/coerce.js": {
+      "timestamp": 1760641399390.7253
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/parse.js": {
+      "timestamp": 1760641399402.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/core.js": {
+      "timestamp": 1760641399391.7253
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/errors.js": {
+      "timestamp": 1760641399394.146
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/schemas.js": {
+      "timestamp": 1760641399406.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/checks.js": {
+      "timestamp": 1760641399390.1943
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/versions.js": {
+      "timestamp": 1760641399412.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/util.js": {
+      "timestamp": 1760641399412.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/regexes.js": {
+      "timestamp": 1760641399404.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/registries.js": {
+      "timestamp": 1760641399404.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js": {
+      "timestamp": 1760641399397.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/doc.js": {
+      "timestamp": 1760641399391.7253
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/function.js": {
+      "timestamp": 1760641399395.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/api.js": {
+      "timestamp": 1760641399388.7253
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/to-json-schema.js": {
+      "timestamp": 1760641399409.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/json-schema.js": {
+      "timestamp": 1760641398660.708
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/scheduler@0.27.0/node_modules/scheduler/cjs/scheduler.production.js": {
+      "timestamp": 1760641864017.4905
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom/cjs/react-dom.production.js": {
+      "timestamp": 1761070369166.763
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/parse.js": {
+      "timestamp": 1761070386934.6367
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/checks.js": {
+      "timestamp": 1761070386920.6367
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/schemas.js": {
+      "timestamp": 1761070386937.6367
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/core.js": {
+      "timestamp": 1761070386921.6367
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/versions.js": {
+      "timestamp": 1761237429125.601
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/errors.js": {
+      "timestamp": 1761237429090.6008
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/util.js": {
+      "timestamp": 1761070386943.6367
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/regexes.js": {
+      "timestamp": 1761070386936.6367
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/registries.js": {
+      "timestamp": 1761070386936.6367
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/doc.js": {
+      "timestamp": 1760641399391.7253
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/api.js": {
+      "timestamp": 1761070386918.6367
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/to-json-schema.js": {
+      "timestamp": 1761070386940.6367
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/az.js": {
+      "timestamp": 1760641399390.1943
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ar.js": {
+      "timestamp": 1760641399388.7253
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/json-schema.js": {
+      "timestamp": 1760641398660.708
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ca.js": {
+      "timestamp": 1760641399390.1943
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/bg.js": {
+      "timestamp": 1760641401566.7773
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/cs.js": {
+      "timestamp": 1760641399391.7253
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/da.js": {
+      "timestamp": 1760641401568.7773
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/de.js": {
+      "timestamp": 1760641399391.7253
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/be.js": {
+      "timestamp": 1760641399390.1943
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/eo.js": {
+      "timestamp": 1760641399392.7253
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/es.js": {
+      "timestamp": 1761070386924.6367
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/fa.js": {
+      "timestamp": 1760641399394.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/fi.js": {
+      "timestamp": 1760641399394.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/fr-CA.js": {
+      "timestamp": 1760641399394.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/fr.js": {
+      "timestamp": 1760641399395.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/he.js": {
+      "timestamp": 1760641399395.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/hu.js": {
+      "timestamp": 1760641399397.044
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/id.js": {
+      "timestamp": 1760641399397.044
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/is.js": {
+      "timestamp": 1760641401577.6082
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/it.js": {
+      "timestamp": 1760641399398.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ja.js": {
+      "timestamp": 1760641399398.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ka.js": {
+      "timestamp": 1761070386932.6367
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/kh.js": {
+      "timestamp": 1761070386932.6367
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/km.js": {
+      "timestamp": 1760641399398.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ko.js": {
+      "timestamp": 1760641399399.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/lt.js": {
+      "timestamp": 1761070386933.6367
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/mk.js": {
+      "timestamp": 1760641399399.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ms.js": {
+      "timestamp": 1760641399399.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/nl.js": {
+      "timestamp": 1760641399399.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/no.js": {
+      "timestamp": 1760641399400.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ota.js": {
+      "timestamp": 1760641399400.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/pl.js": {
+      "timestamp": 1760641399403.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ps.js": {
+      "timestamp": 1760641399404.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/pt.js": {
+      "timestamp": 1760641399404.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ru.js": {
+      "timestamp": 1760641399405.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/sl.js": {
+      "timestamp": 1760641399407.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/sv.js": {
+      "timestamp": 1760641399408.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/th.js": {
+      "timestamp": 1760641399408.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ta.js": {
+      "timestamp": 1760641399408.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/tr.js": {
+      "timestamp": 1760641399409.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/uk.js": {
+      "timestamp": 1760641399411.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ur.js": {
+      "timestamp": 1760641399411.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/vi.js": {
+      "timestamp": 1760641399412.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/zh-CN.js": {
+      "timestamp": 1760641399413.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/zh-TW.js": {
+      "timestamp": 1760641399413.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ua.js": {
+      "timestamp": 1761070386942.6367
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/yo.js": {
+      "timestamp": 1760641401589.7778
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/de.js": {
+      "timestamp": 1760641399391.7253
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ar.js": {
+      "timestamp": 1760641399388.7253
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/cs.js": {
+      "timestamp": 1760641399391.7253
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/en.js": {
+      "timestamp": 1760641399392.7253
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ca.js": {
+      "timestamp": 1760641399390.1943
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/az.js": {
+      "timestamp": 1760641399390.1943
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/eo.js": {
+      "timestamp": 1760641399392.7253
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/be.js": {
+      "timestamp": 1760641399390.1943
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/fa.js": {
+      "timestamp": 1760641399394.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/es.js": {
+      "timestamp": 1760641399394.146
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/fi.js": {
+      "timestamp": 1760641399394.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/fr.js": {
+      "timestamp": 1760641399395.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/he.js": {
+      "timestamp": 1760641399395.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/fr-CA.js": {
+      "timestamp": 1760641399394.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/hu.js": {
+      "timestamp": 1760641399397.044
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/id.js": {
+      "timestamp": 1760641399397.044
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/it.js": {
+      "timestamp": 1760641399398.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ja.js": {
+      "timestamp": 1760641399398.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ms.js": {
+      "timestamp": 1760641399399.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/mk.js": {
+      "timestamp": 1760641399399.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/nl.js": {
+      "timestamp": 1760641399399.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/no.js": {
+      "timestamp": 1760641399400.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ota.js": {
+      "timestamp": 1760641399400.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ps.js": {
+      "timestamp": 1760641399404.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/pl.js": {
+      "timestamp": 1760641399403.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/kh.js": {
+      "timestamp": 1760641399398.7256
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/pt.js": {
+      "timestamp": 1760641399404.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ru.js": {
+      "timestamp": 1760641399405.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/sl.js": {
+      "timestamp": 1760641399407.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ta.js": {
+      "timestamp": 1760641399408.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/sv.js": {
+      "timestamp": 1760641399408.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/th.js": {
+      "timestamp": 1760641399408.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/tr.js": {
+      "timestamp": 1760641399409.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ua.js": {
+      "timestamp": 1760641399411.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ur.js": {
+      "timestamp": 1760641399411.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/vi.js": {
+      "timestamp": 1760641399412.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/zh-TW.js": {
+      "timestamp": 1760641399413.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/zh-CN.js": {
+      "timestamp": 1760641399413.7258
+    },
+    "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ko.js": {
+      "timestamp": 1760641399399.7256
+    }
+  },
+  "deps": {
+    "/home/sean/projects/real-handy/rafters/packages/ui/examples/react-dialog.tsx": [
+      "/home/sean/projects/real-handy/rafters/packages/ui/examples/react-dialog.tsx",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/@hookform+resolvers@5.2.2_react-hook-form@7.66.0_react@19.2.0_/node_modules/@hookform/resolvers/zod/dist/zod.mjs",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/@hookform+resolvers@5.2.2_react-hook-form@7.66.0_react@19.2.0_/node_modules/@hookform/resolvers/dist/resolvers.mjs",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/react-hook-form@7.66.0_react@19.2.0/node_modules/react-hook-form/dist/index.esm.mjs",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/index.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/core.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/parse.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/errors.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/util.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/schemas.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/checks.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/regexes.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/doc.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/versions.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ar.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/az.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/be.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ca.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/cs.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/de.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/en.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/eo.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/es.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/fa.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/fi.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/fr.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/fr-CA.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/he.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/hu.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/id.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/it.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ja.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/kh.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ko.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/mk.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ms.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/nl.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/no.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ota.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ps.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/pl.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/pt.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ru.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/sl.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/sv.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ta.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/th.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/tr.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ua.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ur.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/vi.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/zh-CN.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/zh-TW.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/registries.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/function.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/api.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/to-json-schema.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/json-schema.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/index.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/classic/external.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/index.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/core.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/parse.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/errors.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/util.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/schemas.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/checks.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/regexes.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/doc.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/versions.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/index.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ar.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/az.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/be.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/bg.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ca.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/cs.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/da.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/de.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/en.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/eo.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/es.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/fa.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/fi.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/fr.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/fr-CA.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/he.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/hu.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/id.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/is.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/it.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ja.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ka.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/kh.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/km.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ko.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/lt.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/mk.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ms.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/nl.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/no.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ota.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ps.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/pl.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/pt.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ru.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/sl.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/sv.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ta.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/th.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/tr.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ua.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/uk.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/ur.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/vi.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/zh-CN.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/zh-TW.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/locales/yo.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/registries.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/api.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/to-json-schema.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/core/json-schema.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/classic/schemas.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/classic/checks.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/classic/iso.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/classic/parse.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/classic/errors.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/classic/compat.js",
+      "/home/sean/projects/real-handy/rafters/node_modules/.pnpm/zod@4.1.12/node_modules/zod/v4/classic/coerce.js",
+      "/home/sean/projects/real-handy/rafters/packages/ui/src/components/ui/dialog.tsx",
+      "/home/sean/projects/real-handy/rafters/packages/ui/src/primitives/dialog-aria.ts",
+      "/home/sean/projects/real-handy/rafters/packages/ui/src/primitives/escape-keydown.ts",
+      "/home/sean/projects/real-handy/rafters/packages/ui/src/primitives/focus-trap.ts",
+      "/home/sean/projects/real-handy/rafters/packages/ui/src/primitives/id-generator.ts",
+      "/home/sean/projects/real-handy/rafters/packages/ui/src/primitives/outside-click.ts",
+      "/home/sean/projects/real-handy/rafters/packages/ui/src/primitives/portal.ts"
+    ]
+  }
+}

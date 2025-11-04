@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "pnpm -r --parallel dev",
     "build": "pnpm -r build",
-    "test": "pnpm -r test run",
+    "test": "pnpm -r test",
     "test:unit": "pnpm -r test:unit",
     "test:component": "pnpm -r test:component",
     "test:e2e": "pnpm -r test:e2e",
