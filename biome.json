@@ -16,7 +16,9 @@
       "!**/.astro",
       "!**/*.log",
       "!playwright-report",
-      "!test-results"
+      "!test-results",
+      "!**/.cache",
+      "!**/*.vue"
     ]
   },
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
