@@ -23,7 +23,7 @@
     "lint": "biome check",
     "lint:fix": "biome check --write",
     "format": "biome format --write",
-    "preflight": "pnpm typecheck && pnpm lint && pnpm test:unit && pnpm test:component && pnpm test:a11y && pnpm build",
+    "preflight": "pnpm typecheck && pnpm lint && pnpm test:unit && pnpm test:a11y && pnpm build",
     "ci": "pnpm test:all",
     "clean": "pnpm -r clean && rm -rf node_modules"
   },
