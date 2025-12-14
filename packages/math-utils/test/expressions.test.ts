@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { evaluateExpression, isValidExpression } from '../../src/math/expressions.js';
+import { evaluateExpression, isValidExpression } from '../src/expressions.js';
 
 describe('evaluateExpression', () => {
   describe('basic arithmetic', () => {

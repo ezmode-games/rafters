@@ -6,6 +6,7 @@
 
 import * as React from 'react';
 import { createPortal } from 'react-dom';
+import classy from '../../primitives/classy';
 import {
   getDialogAriaProps,
   getOverlayAriaProps,
@@ -167,7 +168,7 @@ export function DialogOverlay({ asChild, forceMount, className, ...props }: Dial
 
   const overlayProps = {
     ...ariaProps,
-    className: `fixed inset-0 z-50 bg-black/80 ${className || ''}`.trim(),
+    className: classy('fixed inset-0 z-50 bg-black/80', className),
     ...props,
   };
 
@@ -262,21 +263,33 @@ export function DialogContent({
   if (!shouldRender) {
     return null;
   }
+  // Render using a centered container (avoid Tailwind arbitrary bracket classes)
+  const containerClass = classy(
+    'fixed inset-0 z-50 flex items-center justify-center p-4',
+    modal ? '' : '',
+  );
 
-  const contentProps = {
+  const innerClass = classy(className);
+
+  const innerProps = {
     ref: contentRef,
     id: contentId,
     ...ariaProps,
-    className:
-      `fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%] ${className || ''}`.trim(),
+    className: innerClass,
     ...props,
-  };
+  } as React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> };
 
+  // If asChild, clone the child with inner props
   if (asChild && React.isValidElement(props.children)) {
-    return React.cloneElement(props.children, contentProps as Partial<unknown>);
+    const child = React.cloneElement(props.children, innerProps as Partial<unknown>);
+    return <div className={containerClass}>{child}</div>;
   }
 
-  return <div {...contentProps} />;
+  return (
+    <div className={containerClass}>
+      <div {...innerProps} />
+    </div>
+  );
 }
 
 // ==================== Dialog.Title ====================

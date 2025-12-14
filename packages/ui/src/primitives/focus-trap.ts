@@ -4,7 +4,7 @@
  * SSR-safe: checks for window existence
  */
 
-export type CleanupFunction = () => void;
+import type { CleanupFunction } from './types';
 
 const FOCUSABLE_SELECTOR = [
   'a[href]',
@@ -46,24 +46,28 @@ export function createFocusTrap(element: HTMLElement): CleanupFunction {
   // Handle Tab key to cycle focus
   const handleKeyDown = (event: KeyboardEvent) => {
     if (event.key !== 'Tab') return;
-
     const focusable = getFocusableElements();
     if (focusable.length === 0) return;
 
-    const firstElement = focusable[0];
-    const lastElement = focusable[focusable.length - 1];
+    const active = document.activeElement as HTMLElement | null;
+    const currentIndex = active ? focusable.indexOf(active) : -1;
 
     if (event.shiftKey) {
-      // Shift+Tab: wrap from first to last
-      if (document.activeElement === firstElement) {
+      // Shift+Tab: move backward or wrap to last
+      const prevIndex = currentIndex > 0 ? currentIndex - 1 : focusable.length - 1;
+      const target = focusable[prevIndex];
+      if (target) {
         event.preventDefault();
-        lastElement?.focus();
+        target.focus();
       }
     } else {
-      // Tab: wrap from last to first
-      if (document.activeElement === lastElement) {
+      // Tab: move forward or wrap to first
+      const nextIndex =
+        currentIndex >= 0 && currentIndex < focusable.length - 1 ? currentIndex + 1 : 0;
+      const target = focusable[nextIndex];
+      if (target) {
         event.preventDefault();
-        firstElement?.focus();
+        target.focus();
       }
     }
   };

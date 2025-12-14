@@ -1,8 +1,6 @@
 node_modules
 dist
 build
-.astro
-.turbo
 *.log
 .env
 .env.local
@@ -11,5 +9,5 @@ coverage
 .npmrc.approvals
 playwright-report
 test-results
-*.turbo
-*.astro
+*.turbo/
+*.astro/
