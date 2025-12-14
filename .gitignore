@@ -10,3 +10,5 @@ coverage
 .npmrc.approvals
 playwright-report
 test-results
+*.turbo
+*.astro
