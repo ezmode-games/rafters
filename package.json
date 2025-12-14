@@ -1,13 +1,13 @@
 {
   "name": "rafters-monorepo",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=24.11.0",
-    "pnpm": ">=10.20.0"
+    "node": ">=24.12.0",
+    "pnpm": ">=10.25.0"
   },
-  "packageManager": "pnpm@10.20.0",
+  "packageManager": "pnpm@10.25.0",
   "scripts": {
     "dev": "pnpm -r --parallel dev",
     "build": "pnpm -r build",
@@ -48,7 +48,7 @@
     "react-dom": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:",
-    "zod": "catalog:",
-    "zocker": "catalog:"
+    "zocker": "catalog:",
+    "zod": "catalog:"
   }
 }
