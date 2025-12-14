@@ -7,7 +7,11 @@ const description = 'Real-time documentation of architectural decisions and desi
 const headerTitle = 'Build Decisions';
 
 const decisions = await getCollection('decisions');
-const sortedDecisions = decisions.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+type Decision = typeof decisions[number];
+const sortedDecisions = decisions.sort(
+  (a: Decision, b: Decision) =>
+    new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
 ---
 
 <MarketingLayout 
@@ -35,7 +39,7 @@ const sortedDecisions = decisions.sort((a, b) => new Date(b.data.date).getTime()
 
     <h2 class="text-2xl font-bold mb-6">Current Decisions</h2>
 
-    {sortedDecisions.map((decision) => (
+    {sortedDecisions.map((decision: Decision) => (
       <div class="bg-white border border-gray-200 rounded-lg p-6 mb-8 hover:shadow-md transition-shadow">
         <h3 class="text-xl font-semibold mb-3">
           <a href={`/decisions/${decision.slug}`} class="text-blue-600 hover:text-blue-800 no-underline">

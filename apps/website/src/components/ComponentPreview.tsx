@@ -204,7 +204,38 @@ export default function ComponentPreview({
       const html = generateComponentHTML(componentData, variant, parsedProps);
       mountPoint.innerHTML = html;
 
-      // Add event handlers
+      // Try to fetch compiled preview JS for this component/variant and inject it
+      (async () => {
+        try {
+          const previewUrl = `/registry/components/${component}/preview/${variant}.json`;
+          const resp = await fetch(previewUrl);
+          if (!resp.ok) return; // fallback to static HTML already rendered
+
+          const preview = await resp.json();
+          const compiledJs = preview?.compiledJs;
+          if (!compiledJs) return;
+
+          // Remove any previously injected preview scripts
+          const existing = shadowRoot.querySelectorAll('script[data-rafters-preview]');
+          existing.forEach((n) => {
+            n.remove();
+          });
+
+          // Inject compiled JS as a module script into the shadow root
+          const script = document.createElement('script');
+          script.type = 'module';
+          script.setAttribute('data-rafters-preview', `${component}:${variant}`);
+          // Use textContent to ensure the module executes in document scope
+          script.textContent = compiledJs;
+          shadowRoot.appendChild(script);
+        } catch (e) {
+          // non-fatal: keep the fallback HTML and silently continue
+          // eslint-disable-next-line no-console
+          console.warn('Failed to load compiled preview:', e);
+        }
+      })();
+
+      // Add event handlers for fallback/static HTML
       const buttons = mountPoint.querySelectorAll('.rafters-button');
       for (const button of buttons) {
         button.addEventListener('click', () => {

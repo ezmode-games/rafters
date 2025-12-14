@@ -78,8 +78,13 @@ async function parseComponent(
     dependencies: [],
     meta: {
       rafters: {
+        version: findTag(comment.tags, 'registryVersion') || '0.1.0',
         intelligence: {
-          cognitiveLoad: findTag(comment.tags, 'cognitiveLoad') || '',
+          cognitiveLoad: (() => {
+            const tagValue = findTag(comment.tags, 'cognitiveLoad');
+            const parsed = tagValue ? parseFloat(tagValue) : undefined;
+            return typeof parsed === 'number' && !Number.isNaN(parsed) ? parsed : 0;
+          })(),
           attentionEconomics: findTag(comment.tags, 'attentionEconomics') || '',
           trustBuilding: findTag(comment.tags, 'trustBuilding') || '',
           accessibility: findTag(comment.tags, 'accessibility') || '',

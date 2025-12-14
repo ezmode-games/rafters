@@ -53,6 +53,15 @@ export async function initCommand(options: { yes?: boolean; config?: string } = 
 
   spinner.succeed('Prerequisites checked');
 
+  // Extra safety: if the .rafters directory already exists (even without config.json)
+  // protect against race conditions where registry or other files exist but config.json
+  // may not have been written yet. Exit early to avoid EEXIST errors during setup.
+  const raftersDirCheck = join(cwd, '.rafters');
+  if (existsSync(raftersDirCheck)) {
+    spinner.fail('Rafters already initialized. Remove .rafters directory to reinitialize.');
+    process.exit(1);
+  }
+
   // Check Tailwind version and warn about v3
   const tailwindVersion = checkTailwindVersion(cwd);
   if (tailwindVersion === 'v3') {
