@@ -18,7 +18,8 @@
       "!playwright-report",
       "!test-results",
       "!**/.cache",
-      "!**/*.vue"
+      "!**/*.vue",
+      "!**/worker-configuration.d.ts"
     ]
   },
   "assist": { "actions": { "source": { "organizeImports": "on" } } },

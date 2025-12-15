@@ -3,8 +3,7 @@
  * Client-only, returns cleanup function
  */
 
-export type EscapeKeyHandler = (event: KeyboardEvent) => void;
-export type CleanupFunction = () => void;
+import type { CleanupFunction, EscapeKeyHandler } from './types';
 
 /**
  * Listen for Escape key and call handler

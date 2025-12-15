@@ -17,7 +17,7 @@ import {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
-} from './dialog';
+} from '../../src/components/ui/dialog';
 
 describe('Dialog - SSR Safety', () => {
   it('should render on server without errors', () => {

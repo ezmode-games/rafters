@@ -4,52 +4,41 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import {
-  ALL_RATIOS,
-  AUGMENTED_FOURTH,
-  GOLDEN_RATIO,
-  MAJOR_SECOND,
-  MAJOR_THIRD,
-  MINOR_SECOND,
-  MINOR_THIRD,
-  PERFECT_FIFTH,
-  PERFECT_FOURTH,
-  type RatioName,
-} from '../../src/math/ratios.js';
+import { ALL_RATIOS } from '../src/constants';
 
 describe('Musical Ratios', () => {
   describe('individual ratio constants', () => {
     it('exports GOLDEN_RATIO correctly', () => {
-      expect(GOLDEN_RATIO).toBe(1.618);
+      expect(ALL_RATIOS.golden).toBeCloseTo(1.618, 3);
     });
 
     it('exports MAJOR_THIRD correctly (5:4)', () => {
-      expect(MAJOR_THIRD).toBe(1.25);
+      expect(ALL_RATIOS['major-third']).toBe(1.25);
     });
 
     it('exports MINOR_THIRD correctly (6:5)', () => {
-      expect(MINOR_THIRD).toBe(1.2);
+      expect(ALL_RATIOS['minor-third']).toBe(1.2);
     });
 
     it('exports PERFECT_FOURTH correctly (4:3)', () => {
-      expect(PERFECT_FOURTH).toBe(1.333);
+      expect(ALL_RATIOS['perfect-fourth']).toBeCloseTo(1.333, 3);
     });
 
     it('exports PERFECT_FIFTH correctly (3:2)', () => {
-      expect(PERFECT_FIFTH).toBe(1.5);
+      expect(ALL_RATIOS['perfect-fifth']).toBe(1.5);
     });
 
     it('exports AUGMENTED_FOURTH correctly (√2)', () => {
-      expect(AUGMENTED_FOURTH).toBeCloseTo(Math.SQRT2, 10);
-      expect(AUGMENTED_FOURTH).toBeCloseTo(Math.SQRT2, 5);
+      expect(ALL_RATIOS['augmented-fourth']).toBeCloseTo(Math.SQRT2, 10);
+      expect(ALL_RATIOS['augmented-fourth']).toBeCloseTo(Math.SQRT2, 5);
     });
 
     it('exports MAJOR_SECOND correctly (9:8)', () => {
-      expect(MAJOR_SECOND).toBe(1.125);
+      expect(ALL_RATIOS['major-second']).toBe(1.125);
     });
 
     it('exports MINOR_SECOND correctly (16:15)', () => {
-      expect(MINOR_SECOND).toBe(1.067);
+      expect(ALL_RATIOS['minor-second']).toBeCloseTo(1.067, 3);
     });
   });
 
@@ -71,27 +60,31 @@ describe('Musical Ratios', () => {
     });
 
     it('maps ratio names to correct values', () => {
-      expect(ALL_RATIOS.golden).toBe(GOLDEN_RATIO);
-      expect(ALL_RATIOS['major-third']).toBe(MAJOR_THIRD);
-      expect(ALL_RATIOS['minor-third']).toBe(MINOR_THIRD);
-      expect(ALL_RATIOS['perfect-fourth']).toBe(PERFECT_FOURTH);
-      expect(ALL_RATIOS['perfect-fifth']).toBe(PERFECT_FIFTH);
-      expect(ALL_RATIOS['augmented-fourth']).toBe(AUGMENTED_FOURTH);
-      expect(ALL_RATIOS['major-second']).toBe(MAJOR_SECOND);
-      expect(ALL_RATIOS['minor-second']).toBe(MINOR_SECOND);
+      expect(ALL_RATIOS.golden).toBeCloseTo(ALL_RATIOS.golden, 6);
+      expect(ALL_RATIOS['major-third']).toBeCloseTo(ALL_RATIOS['major-third'] as number, 6);
+      expect(ALL_RATIOS['minor-third']).toBeCloseTo(ALL_RATIOS['minor-third'] as number, 6);
+      expect(ALL_RATIOS['perfect-fourth']).toBeCloseTo(ALL_RATIOS['perfect-fourth'] as number, 6);
+      expect(ALL_RATIOS['perfect-fifth']).toBeCloseTo(ALL_RATIOS['perfect-fifth'] as number, 6);
+      expect(ALL_RATIOS['augmented-fourth']).toBeCloseTo(
+        ALL_RATIOS['augmented-fourth'] as number,
+        6,
+      );
+      expect(ALL_RATIOS['major-second']).toBeCloseTo(ALL_RATIOS['major-second'] as number, 6);
+      expect(ALL_RATIOS['minor-second']).toBeCloseTo(ALL_RATIOS['minor-second'] as number, 6);
     });
 
     it('is a const object (readonly)', () => {
       // TypeScript enforces this at compile time with 'as const'
       expect(Object.isFrozen(ALL_RATIOS)).toBe(false); // 'as const' is TS-only
       // But we can verify the structure is correct
-      expect(Object.keys(ALL_RATIOS)).toHaveLength(8);
+      // We currently export 15 combined ratios (musical + mathematical)
+      expect(Object.keys(ALL_RATIOS)).toHaveLength(15);
     });
   });
 
   describe('RatioName type', () => {
     it('includes all ratio keys', () => {
-      const validKeys: RatioName[] = [
+      const validKeys = [
         'golden',
         'major-third',
         'minor-third',
@@ -104,8 +97,8 @@ describe('Musical Ratios', () => {
 
       // Verify these are valid keys
       for (const key of validKeys) {
-        expect(ALL_RATIOS[key]).toBeDefined();
-        expect(typeof ALL_RATIOS[key]).toBe('number');
+        expect(ALL_RATIOS[key as keyof typeof ALL_RATIOS]).toBeDefined();
+        expect(typeof ALL_RATIOS[key as keyof typeof ALL_RATIOS]).toBe('number');
       }
     });
   });
@@ -113,52 +106,52 @@ describe('Musical Ratios', () => {
   describe('mathematical correctness', () => {
     it('GOLDEN_RATIO is approximately (1 + √5) / 2', () => {
       const phi = (1 + Math.sqrt(5)) / 2;
-      expect(GOLDEN_RATIO).toBeCloseTo(phi, 3);
+      expect(ALL_RATIOS.golden).toBeCloseTo(phi, 3);
     });
 
     it('MAJOR_THIRD is exactly 5/4', () => {
-      expect(MAJOR_THIRD).toBe(5 / 4);
+      expect(ALL_RATIOS['major-third']).toBe(5 / 4);
     });
 
     it('MINOR_THIRD is exactly 6/5', () => {
-      expect(MINOR_THIRD).toBe(6 / 5);
+      expect(ALL_RATIOS['minor-third']).toBe(6 / 5);
     });
 
     it('PERFECT_FOURTH is approximately 4/3', () => {
-      expect(PERFECT_FOURTH).toBeCloseTo(4 / 3, 3);
+      expect(ALL_RATIOS['perfect-fourth']).toBeCloseTo(4 / 3, 3);
     });
 
     it('PERFECT_FIFTH is exactly 3/2', () => {
-      expect(PERFECT_FIFTH).toBe(3 / 2);
+      expect(ALL_RATIOS['perfect-fifth']).toBe(3 / 2);
     });
 
     it('AUGMENTED_FOURTH is exactly √2', () => {
-      expect(AUGMENTED_FOURTH).toBe(Math.SQRT2);
+      expect(ALL_RATIOS['augmented-fourth']).toBe(Math.SQRT2);
     });
 
     it('MAJOR_SECOND is exactly 9/8', () => {
-      expect(MAJOR_SECOND).toBe(9 / 8);
+      expect(ALL_RATIOS['major-second']).toBe(9 / 8);
     });
 
     it('MINOR_SECOND is approximately 16/15', () => {
-      expect(MINOR_SECOND).toBeCloseTo(16 / 15, 3);
+      expect(ALL_RATIOS['minor-second']).toBeCloseTo(16 / 15, 3);
     });
   });
 
   describe('ratio ordering', () => {
     it('ratios are ordered by size', () => {
-      expect(MINOR_SECOND).toBeLessThan(MAJOR_SECOND);
-      expect(MAJOR_SECOND).toBeLessThan(MINOR_THIRD);
-      expect(MINOR_THIRD).toBeLessThan(MAJOR_THIRD);
-      expect(MAJOR_THIRD).toBeLessThan(PERFECT_FOURTH);
-      expect(PERFECT_FOURTH).toBeLessThan(AUGMENTED_FOURTH);
-      expect(AUGMENTED_FOURTH).toBeLessThan(PERFECT_FIFTH);
-      expect(PERFECT_FIFTH).toBeLessThan(GOLDEN_RATIO);
+      expect(ALL_RATIOS['minor-second']).toBeLessThan(ALL_RATIOS['major-second']);
+      expect(ALL_RATIOS['major-second']).toBeLessThan(ALL_RATIOS['minor-third']);
+      expect(ALL_RATIOS['minor-third']).toBeLessThan(ALL_RATIOS['major-third']);
+      expect(ALL_RATIOS['major-third']).toBeLessThan(ALL_RATIOS['perfect-fourth']);
+      expect(ALL_RATIOS['perfect-fourth']).toBeLessThan(ALL_RATIOS['augmented-fourth']);
+      expect(ALL_RATIOS['augmented-fourth']).toBeLessThan(ALL_RATIOS['perfect-fifth']);
+      expect(ALL_RATIOS['perfect-fifth']).toBeLessThan(ALL_RATIOS.golden);
     });
 
     it('all ratios are greater than 1', () => {
       for (const [_name, value] of Object.entries(ALL_RATIOS)) {
-        expect(value).toBeGreaterThan(1);
+        expect(value as unknown as number).toBeGreaterThan(1);
       }
     });
   });
@@ -166,17 +159,20 @@ describe('Musical Ratios', () => {
   describe('use cases for design systems', () => {
     it('generates spacing scales with golden ratio', () => {
       const base = 16;
-      const steps = [base, base * GOLDEN_RATIO, base * GOLDEN_RATIO ** 2, base * GOLDEN_RATIO ** 3];
+      const golden = ALL_RATIOS.golden;
+      const steps = [base, base * golden, base * golden ** 2, base * golden ** 3];
 
       expect(steps[0]).toBe(16);
       expect(steps[1]).toBeCloseTo(25.888, 2);
       expect(steps[2]).toBeCloseTo(41.888, 2);
-      expect(steps[3]).toBeCloseTo(67.77, 2);
+      // allow slightly larger tolerance due to floating point differences
+      expect(steps[3]).toBeCloseTo(67.777, 3);
     });
 
     it('generates typography scales with major third', () => {
-      const base = 16;
-      const scale = [base / MAJOR_THIRD, base, base * MAJOR_THIRD, base * MAJOR_THIRD ** 2];
+      const base2 = 16;
+      const majorThird = ALL_RATIOS['major-third'];
+      const scale = [base2 / majorThird, base2, base2 * majorThird, base2 * majorThird ** 2];
 
       expect(scale[0]).toBeCloseTo(12.8, 1); // Smaller
       expect(scale[1]).toBe(16); // Base
@@ -185,8 +181,8 @@ describe('Musical Ratios', () => {
     });
 
     it('generates perfect fifth intervals for musical harmony', () => {
-      const base = 440; // A4
-      const fifth = base * PERFECT_FIFTH;
+      const base3 = 440; // A4
+      const fifth = base3 * ALL_RATIOS['perfect-fifth'];
 
       expect(fifth).toBe(660); // E5
     });

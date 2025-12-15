@@ -1,5 +1,8 @@
 # Primitives-Based Component Architecture: Proof of Concept
 
+**Vue files have been removed!**
+
+
 ## Executive Summary
 
 **Question:** Can framework-agnostic primitives power shadcn drop-in replacement components?
@@ -281,14 +284,7 @@ After comprehensive testing, **ZERO blockers** found:
 
 ### React Components
 - `/packages/ui/src/components/ui/dialog.tsx` - Dialog component
-- `/packages/ui/src/components/ui/dialog.test.tsx` - Comprehensive tests (15 tests)
-
-### Vue Components
-- `/packages/ui/src/components/ui/dialog.vue.ts` - Vue 3 Dialog
-
-### Examples
-- `/packages/ui/examples/react-dialog.tsx` - 5 React examples
-- `/packages/ui/examples/vue-dialog.vue` - Vue usage
+- `/packages/ui/test/components/ui/dialog.test.tsx` - Comprehensive tests (15 tests)
 
 ### Configuration
 - `/packages/ui/package.json` - Package config

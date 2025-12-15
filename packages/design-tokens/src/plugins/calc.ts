@@ -8,8 +8,8 @@
  * - Custom multipliers: calc({base} * 1.618)
  */
 
+import { ALL_RATIOS, evaluateExpression } from '@rafters/math-utils';
 import type { Token } from '@rafters/shared';
-import { ALL_RATIOS, evaluateExpression } from '@rafters/shared';
 import type { TokenRegistry } from '../registry';
 
 export default function calc(

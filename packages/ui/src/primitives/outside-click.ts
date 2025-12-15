@@ -3,8 +3,7 @@
  * Client-only, returns cleanup function
  */
 
-export type OutsideClickHandler = (event: MouseEvent | TouchEvent) => void;
-export type CleanupFunction = () => void;
+import type { CleanupFunction, OutsideClickHandler } from './types';
 
 /**
  * Listen for clicks outside an element
