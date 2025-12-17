@@ -13,7 +13,8 @@ export default defineWorkersConfig({
     include: ['test/**/*.test.ts'],
     poolOptions: {
       workers: {
-        wrangler: { configPath: './wrangler.jsonc' },
+        singleWorker: true,
+        wrangler: { configPath: './wrangler.test.jsonc' },
         miniflare: {
           compatibilityDate: '2025-09-06',
           compatibilityFlags: ['nodejs_compat'],
