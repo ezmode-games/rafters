@@ -42,13 +42,14 @@ export function hexToOKLCH(hex: string): OKLCH {
 
 /**
  * Round OKLCH values to standard precision for consistency
- * L and C: 2 decimal places, H: whole degrees, Alpha: 2 decimal places
+ * L and C: 3 decimal places (perceptually meaningful differentiation)
+ * H: whole degrees, Alpha: 2 decimal places
  * Prevents floating point precision issues and optimizes cache keys
  */
 export function roundOKLCH(oklch: OKLCH): OKLCH {
   return {
-    l: Math.round(oklch.l * 100) / 100, // 2 decimal places for lightness
-    c: Math.round(oklch.c * 100) / 100, // 2 decimal places for chroma
+    l: Math.round(oklch.l * 1000) / 1000, // 3 decimal places for lightness
+    c: Math.round(oklch.c * 1000) / 1000, // 3 decimal places for chroma
     h: Math.round(oklch.h), // Whole degrees for hue
     alpha: oklch.alpha !== undefined ? Math.round(oklch.alpha * 100) / 100 : 1, // 2 decimal places for alpha
   };

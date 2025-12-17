@@ -2,6 +2,9 @@ node_modules
 dist
 build
 *.log
+.dev.*
+.dev.vars
+**/.dev.vars
 .env
 .env.local
 .DS_Store
