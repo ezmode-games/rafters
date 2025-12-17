@@ -1,15 +1,29 @@
 {
-  "name": "api",
+  "name": "rafters-api",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:unit": "vitest run"
   },
   "dependencies": {
-    "hono": "^4.11.0"
+    "@hono/zod-openapi": "1.1.5",
+    "@rafters/color-utils": "workspace:^",
+    "@scalar/hono-api-reference": "^0.9.28",
+    "hono": "catalog:",
+    "stoker": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "catalog:",
+    "@rafters/shared": "workspace:^",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
     "wrangler": "^4.54.0"
   }
 }

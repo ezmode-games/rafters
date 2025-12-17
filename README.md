@@ -191,7 +191,7 @@ That's it. You now have a mathematically-sound, AI-readable design system with 1
 
 Discover Rafters through the standard llms.txt endpoint:
 ```
-https://rafters.realhandy.tech/llms.txt
+https://rafters.studio/llms.txt
 ```
 
 This provides complete system overview, component intelligence, and usage patterns following the llmstxt.org specification. Use the MCP server for real-time design token intelligence querying and component validation during implementation.
@@ -362,7 +362,7 @@ MIT
 
 ## Support
 
-- [Documentation](https://rafters.realhandy.tech)
+- [Documentation](https://rafters.studio)
 - [GitHub Issues](https://github.com/realhandy/rafters/issues)
 - [Discord](https://discord.gg/rafters)
 
