@@ -1,9 +1,36 @@
 import { roundOKLCH } from '@rafters/color-utils';
 import type { OKLCH } from '@rafters/shared';
+import {
+  buildConfidenceMetadata,
+  calculateInputConfidence,
+  scoreResponseQuality,
+  UncertaintyClient,
+} from '@/lib/uncertainty/client';
 
 interface ColorContext {
   token?: string;
   name?: string;
+}
+
+interface ColorIntelligence {
+  suggestedName: string;
+  reasoning: string;
+  emotionalImpact: string;
+  culturalContext: string;
+  accessibilityNotes: string;
+  usageGuidance: string;
+  balancingGuidance?: string;
+  metadata?: {
+    predictionId: string;
+    confidence: number;
+    uncertaintyBounds: {
+      lower: number;
+      upper: number;
+      confidenceInterval: number;
+    };
+    qualityScore: number;
+    method: 'bootstrap' | 'quantile' | 'ensemble' | 'bayesian' | 'conformal';
+  };
 }
 
 async function generateWithWorkersAI(
@@ -100,6 +127,80 @@ export function generateCacheKey(oklch: OKLCH): string {
   return `color-intel:${rounded.l}-${rounded.c}-${rounded.h}`;
 }
 
-export async function generateColorIntelligence(oklch: OKLCH, aiBinding: Ai) {
-  return generateWithWorkersAI(oklch, {}, undefined, aiBinding);
+/**
+ * Generate color intelligence with uncertainty quantification
+ *
+ * Records prediction before AI call and outcome after, attaching
+ * confidence metadata to the response.
+ */
+export async function generateColorIntelligence(
+  oklch: OKLCH,
+  aiBinding: Ai,
+  platformApi?: Fetcher,
+): Promise<ColorIntelligence> {
+  const startTime = Date.now();
+  const colorId = generateCacheKey(oklch);
+  const inputConfidence = calculateInputConfidence(oklch);
+
+  let predictionId: string | null = null;
+
+  // Record prediction before AI generation (if platform API available)
+  if (platformApi) {
+    const uncertaintyClient = new UncertaintyClient(platformApi);
+    predictionId = await uncertaintyClient.recordPrediction({
+      service: 'component',
+      prediction: {
+        oklch,
+        expectedAnalysis: 'color_intelligence',
+        inputQuality: {
+          validOKLCH: true,
+          lightnessRange: oklch.l,
+          chromaLevel: oklch.c,
+          hueValue: oklch.h,
+        },
+      },
+      confidence: inputConfidence,
+      method: 'bootstrap',
+      context: {
+        requestId: colorId,
+        timestamp: new Date().toISOString(),
+        metadata: { cached: false },
+      },
+    });
+  }
+
+  // Generate AI intelligence
+  const intelligence = await generateWithWorkersAI(oklch, {}, undefined, aiBinding);
+
+  // Record outcome after AI generation
+  if (platformApi && predictionId) {
+    const uncertaintyClient = new UncertaintyClient(platformApi);
+    const processingTime = Date.now() - startTime;
+
+    await uncertaintyClient.updateOutcome(predictionId, {
+      actualOutcome: {
+        intelligenceGenerated: true,
+        responseQuality: scoreResponseQuality(intelligence),
+        completeness: {
+          suggestedName: !!intelligence.suggestedName,
+          reasoning: !!intelligence.reasoning,
+          emotionalImpact: !!intelligence.emotionalImpact,
+          culturalContext: !!intelligence.culturalContext,
+          accessibilityNotes: !!intelligence.accessibilityNotes,
+          usageGuidance: !!intelligence.usageGuidance,
+        },
+        processingTime,
+        aiProvider: 'workers-ai',
+      },
+    });
+  }
+
+  // Build and attach confidence metadata
+  const qualityScore = scoreResponseQuality(intelligence);
+  const metadata = buildConfidenceMetadata(predictionId, inputConfidence, qualityScore);
+
+  return {
+    ...intelligence,
+    metadata: metadata ?? undefined,
+  };
 }
