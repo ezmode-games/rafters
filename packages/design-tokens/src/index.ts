@@ -14,3 +14,6 @@ export * from './plugins/state.js';
 export * from './registry.js';
 export * from './registry-factory.js';
 export * from './rule-engine.js';
+
+// Generators - produce complete base design system tokens
+export * from './generators/index.js';
