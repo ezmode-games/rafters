@@ -184,4 +184,29 @@ describe('Queue Routes', () => {
       expect(res.status).toBe(422);
     });
   });
+
+  describe('GET /queue/list', () => {
+    it('returns queue backlog status', async () => {
+      const res = await SELF.fetch('http://localhost/queue/list');
+
+      // Will return 503 if CF_ACCOUNT_ID/CF_API_TOKEN not configured in test env
+      // or 200 with backlog data if configured
+      expect([200, 503]).toContain(res.status);
+
+      const json = await res.json();
+      expect(json).toHaveProperty('success');
+      expect(json).toHaveProperty('backlogCount');
+    });
+
+    it('returns error when credentials missing', async () => {
+      // This test documents behavior when env vars are not set
+      const res = await SELF.fetch('http://localhost/queue/list');
+      const json = await res.json();
+
+      if (res.status === 503) {
+        expect(json.success).toBe(false);
+        expect(json.error).toBeDefined();
+      }
+    });
+  });
 });

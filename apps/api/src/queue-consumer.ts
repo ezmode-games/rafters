@@ -9,8 +9,8 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { processColorSeedBatch } from '@/lib/queue/consumer';
 import type { ColorSeedMessage } from '@/lib/queue/publisher';
-import { color } from '@/routes/color';
-import { queue } from '@/routes/queue';
+import color from '@/routes/color/color.index';
+import queue from '@/routes/queue/queue.index';
 
 // Create the same app structure as index.ts for internal API calls
 const app = new Hono<{ Bindings: Env }>();

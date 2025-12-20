@@ -11,7 +11,7 @@
     "producers": [
       {
         "queue": "color-processing-queue",
-        "binding": "COLOR_SEED_QUEUE"
+        "binding": "COLOR_QUEUE"
       }
     ],
     "consumers": [
