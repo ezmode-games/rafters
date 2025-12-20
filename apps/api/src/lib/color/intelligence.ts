@@ -13,7 +13,6 @@ interface ColorContext {
 }
 
 interface ColorIntelligence {
-  suggestedName: string;
   reasoning: string;
   emotionalImpact: string;
   culturalContext: string;
@@ -52,15 +51,7 @@ async function generateWithWorkersAI(
   const messages = [
     {
       role: 'system',
-      content: `You are a color naming specialist. Your job is to create UNIQUE, MEMORABLE names for colors.
-
-CRITICAL RULES:
-- NEVER use generic words: Azure, Ocean, Sky, Forest, Midnight, Royal, Deep, Soft, Light, Dark, Pale, Bright
-- NEVER use compound words like "Something Blue" or "Blue Something"
-- Names should be 1-2 words maximum, evocative and unexpected
-- Think: places, materials, moments, textures, emotions, objects
-- Good examples: Corsica, Patina, Driftwood, Verdigris, Clementine, Pewter, Thistle, Celadon
-- Bad examples: Ocean Blue, Deep Azure, Soft Sky, Royal Purple, Midnight Blue`,
+      content: `You are a color analysis specialist. Your job is to provide insights about colors in OKLCH color space, focusing on emotional impact, cultural context, accessibility, and usage guidance.`,
     },
     {
       role: 'user',
@@ -71,7 +62,6 @@ Hue: ${roundedColor.h}deg${contextInfo}
 
 Generate JSON:
 {
-  "suggestedName": "Single unique word or short phrase. NO generic color words.",
   "reasoning": "Why this OKLCH combination works. Reference L=${roundedColor.l}, C=${roundedColor.c}, H=${roundedColor.h} specifically.",
   "emotionalImpact": "Psychological response. Be specific to THIS color's unique position in OKLCH space.",
   "culturalContext": "Cross-cultural associations for this specific hue/chroma/lightness combination.",
@@ -112,7 +102,6 @@ Generate JSON:
   }
 
   return {
-    suggestedName: parsedResponse.suggestedName || 'Unknown Color',
     reasoning: parsedResponse.reasoning || 'No reasoning provided',
     emotionalImpact: parsedResponse.emotionalImpact || 'No emotional impact analysis',
     culturalContext: parsedResponse.culturalContext || 'No cultural context provided',
@@ -182,7 +171,6 @@ export async function generateColorIntelligence(
         intelligenceGenerated: true,
         responseQuality: scoreResponseQuality(intelligence),
         completeness: {
-          suggestedName: !!intelligence.suggestedName,
           reasoning: !!intelligence.reasoning,
           emotionalImpact: !!intelligence.emotionalImpact,
           culturalContext: !!intelligence.culturalContext,
