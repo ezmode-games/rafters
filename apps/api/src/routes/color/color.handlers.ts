@@ -4,6 +4,7 @@ import {
   calculatePerceptualWeight,
   calculateWCAGContrast,
   generateAccessibilityMetadata,
+  generateColorName,
   generateHarmony,
   generateOKLCHScale,
   generateSemanticColorSuggestions,
@@ -29,52 +30,6 @@ import type { GetColorRoute, SearchColorsRoute } from './color.routes';
 function parseOKLCH(param: string): OKLCH {
   const [l, c, h] = param.split('-').map(Number);
   return { l, c, h, alpha: 1 };
-}
-
-/**
- * Generate a basic color name from OKLCH values
- * This is a simple heuristic - AI provides better names
- */
-function generateBasicColorName(oklch: OKLCH): string {
-  const hue = oklch.h;
-  const lightness = oklch.l;
-  const chroma = oklch.c;
-
-  // Determine base hue name
-  let hueName: string;
-  if (chroma < 0.03) {
-    hueName = 'gray';
-  } else if (hue < 15 || hue >= 345) {
-    hueName = 'red';
-  } else if (hue < 45) {
-    hueName = 'orange';
-  } else if (hue < 75) {
-    hueName = 'yellow';
-  } else if (hue < 105) {
-    hueName = 'lime';
-  } else if (hue < 165) {
-    hueName = 'green';
-  } else if (hue < 195) {
-    hueName = 'teal';
-  } else if (hue < 255) {
-    hueName = 'blue';
-  } else if (hue < 285) {
-    hueName = 'violet';
-  } else if (hue < 315) {
-    hueName = 'purple';
-  } else {
-    hueName = 'magenta';
-  }
-
-  // Add lightness modifier
-  let prefix = '';
-  if (lightness < 0.25) {
-    prefix = 'dark-';
-  } else if (lightness > 0.75) {
-    prefix = 'light-';
-  }
-
-  return `${prefix}${hueName}`;
 }
 
 /**
@@ -128,7 +83,7 @@ function buildMathOnlyColorValue(oklch: OKLCH): ColorValue {
 
   // Build the ColorValue
   const colorValue: ColorValue = {
-    name: generateBasicColorName(oklch),
+    name: generateColorName(oklch),
     scale,
     tokenId: `color-${oklch.l.toFixed(3)}-${oklch.c.toFixed(3)}-${Math.round(oklch.h)}`,
 
@@ -170,7 +125,7 @@ function buildMathOnlyColorValue(oklch: OKLCH): ColorValue {
     analysis: {
       temperature,
       isLight: light,
-      name: generateBasicColorName(oklch),
+      name: generateColorName(oklch),
     },
 
     // Atmospheric weight
