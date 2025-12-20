@@ -5,6 +5,8 @@
 
 export * from './dependencies.js';
 export * from './generation-rules.js';
+// Generators - produce complete base design system tokens
+export * from './generators/index.js';
 // Subdirectories
 export * from './plugins/calc.js';
 export * from './plugins/contrast.js';
@@ -14,6 +16,3 @@ export * from './plugins/state.js';
 export * from './registry.js';
 export * from './registry-factory.js';
 export * from './rule-engine.js';
-
-// Generators - produce complete base design system tokens
-export * from './generators/index.js';

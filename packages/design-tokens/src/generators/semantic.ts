@@ -9,8 +9,8 @@
  * the underlying colors to change while semantic meaning stays consistent.
  */
 
-import type { Token, ColorReference } from '@rafters/shared';
-import type { ResolvedSystemConfig, GeneratorResult } from './types.js';
+import type { ColorReference, Token } from '@rafters/shared';
+import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
 
 /**
  * Semantic color definitions

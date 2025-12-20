@@ -475,10 +475,10 @@ export const TokenSchema = z.object({
 
   // Motion tokens (derived from spacing progression for cohesive feel)
   motionIntent: z.enum(['enter', 'exit', 'emphasis', 'transition']).optional(),
-  easingCurve: z
-    .tuple([z.number(), z.number(), z.number(), z.number()])
-    .optional(), // cubicBezier [x1, y1, x2, y2]
-  easingName: z.enum(['linear', 'ease-in', 'ease-out', 'ease-in-out', 'productive', 'expressive', 'spring']).optional(),
+  easingCurve: z.tuple([z.number(), z.number(), z.number(), z.number()]).optional(), // cubicBezier [x1, y1, x2, y2]
+  easingName: z
+    .enum(['linear', 'ease-in', 'ease-out', 'ease-in-out', 'productive', 'expressive', 'spring'])
+    .optional(),
   delayMs: z.number().optional(), // Delay before animation starts
 
   // Focus tokens (WCAG 2.2 compliance, derive from ring unless overridden)
@@ -488,7 +488,9 @@ export const TokenSchema = z.object({
   focusRingStyle: z.enum(['solid', 'dashed', 'double']).optional(),
 
   // Elevation (pairs depth with shadow, can be independent)
-  elevationLevel: z.enum(['surface', 'raised', 'overlay', 'sticky', 'modal', 'popover', 'tooltip']).optional(),
+  elevationLevel: z
+    .enum(['surface', 'raised', 'overlay', 'sticky', 'modal', 'popover', 'tooltip'])
+    .optional(),
   shadowToken: z.string().optional(), // Reference to paired shadow token
 
   // Export behavior

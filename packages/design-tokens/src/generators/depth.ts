@@ -4,79 +4,28 @@
  * Generates z-index tokens for stacking context management.
  * Uses a semantic naming system rather than arbitrary numbers.
  *
- * Each level has a clear purpose and enough gaps between values
- * to allow for intermediate layers when needed.
+ * This generator is a pure function - it receives depth definitions as input.
+ * Default depth levels are provided by the orchestrator from defaults.ts.
  */
 
 import type { Token } from '@rafters/shared';
-import type { ResolvedSystemConfig, GeneratorResult } from './types.js';
+import type { DepthDef } from './defaults.js';
+import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
 import { DEPTH_LEVELS } from './types.js';
 
 /**
- * Depth level definitions
- * Values have 10-unit gaps for insertion flexibility
+ * Generate depth (z-index) tokens from provided definitions
  */
-interface DepthDef {
-  value: number;
-  meaning: string;
-  contexts: string[];
-  stackingContext: boolean;
-}
-
-const DEPTH_DEFINITIONS: Record<string, DepthDef> = {
-  base: {
-    value: 0,
-    meaning: 'Base layer - document flow elements',
-    contexts: ['regular-content', 'in-flow-elements'],
-    stackingContext: false,
-  },
-  dropdown: {
-    value: 10,
-    meaning: 'Dropdown menus and select options',
-    contexts: ['dropdowns', 'select-menus', 'autocomplete'],
-    stackingContext: true,
-  },
-  sticky: {
-    value: 20,
-    meaning: 'Sticky elements - headers, navigation',
-    contexts: ['sticky-header', 'sticky-nav', 'floating-actions'],
-    stackingContext: true,
-  },
-  fixed: {
-    value: 30,
-    meaning: 'Fixed elements - always visible',
-    contexts: ['fixed-header', 'fixed-footer', 'fab-buttons'],
-    stackingContext: true,
-  },
-  modal: {
-    value: 40,
-    meaning: 'Modal dialogs - blocking overlays',
-    contexts: ['modals', 'dialogs', 'sheets'],
-    stackingContext: true,
-  },
-  popover: {
-    value: 50,
-    meaning: 'Popovers above modals',
-    contexts: ['popovers', 'nested-menus', 'command-palette'],
-    stackingContext: true,
-  },
-  tooltip: {
-    value: 60,
-    meaning: 'Tooltips - highest common layer',
-    contexts: ['tooltips', 'toast-notifications'],
-    stackingContext: true,
-  },
-};
-
-/**
- * Generate depth (z-index) tokens
- */
-export function generateDepthTokens(_config: ResolvedSystemConfig): GeneratorResult {
+export function generateDepthTokens(
+  _config: ResolvedSystemConfig,
+  depthDefs: Record<string, DepthDef>,
+): GeneratorResult {
   const tokens: Token[] = [];
   const timestamp = new Date().toISOString();
 
   for (const level of DEPTH_LEVELS) {
-    const def = DEPTH_DEFINITIONS[level]!;
+    const def = depthDefs[level];
+    if (!def) continue;
     const scaleIndex = DEPTH_LEVELS.indexOf(level);
 
     tokens.push({
@@ -94,7 +43,7 @@ export function generateDepthTokens(_config: ResolvedSystemConfig): GeneratorRes
         do:
           level === 'base'
             ? ['Let elements flow naturally', 'Avoid z-index unless needed']
-            : ['Use for ' + def.contexts.join(', '), 'Ensure proper isolation'],
+            : [`Use for ${def.contexts.join(', ')}`, 'Ensure proper isolation'],
         never: [
           'Use arbitrary z-index values',
           'Create z-index battles between components',
@@ -147,9 +96,7 @@ export function generateDepthTokens(_config: ResolvedSystemConfig): GeneratorRes
     value: JSON.stringify({
       gap: 10,
       note: 'Each level has 10-unit gaps for intermediate values',
-      levels: Object.fromEntries(
-        Object.entries(DEPTH_DEFINITIONS).map(([k, v]) => [k, v.value])
-      ),
+      levels: Object.fromEntries(Object.entries(depthDefs).map(([k, v]) => [k, v.value])),
     }),
     category: 'depth',
     namespace: 'depth',

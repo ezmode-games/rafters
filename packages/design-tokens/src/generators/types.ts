@@ -96,7 +96,8 @@ export const DEFAULT_SYSTEM_CONFIG: BaseSystemConfig = {
   baseSpacingUnit: 4,
   progressionRatio: 'minor-third', // 1.2 ratio
   fontFamily: "'Noto Sans Variable', sans-serif",
-  monoFontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace",
+  monoFontFamily:
+    "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace",
   // Rafters aesthetic overrides (happen to match pure math at baseSpacingUnit=4)
   baseFontSizeOverride: 16,
   baseRadiusOverride: 6,
@@ -114,7 +115,8 @@ export const PURE_MATH_CONFIG: BaseSystemConfig = {
   baseSpacingUnit: 4,
   progressionRatio: 'minor-third',
   fontFamily: "'Noto Sans Variable', sans-serif",
-  monoFontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace",
+  monoFontFamily:
+    "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace",
   // No overrides - pure mathematical derivation
 };
 
@@ -137,7 +139,19 @@ export type GeneratorFn = (config: ResolvedSystemConfig) => GeneratorResult;
 /**
  * Color scale positions (11 positions matching shadcn/Tailwind)
  */
-export const COLOR_SCALE_POSITIONS = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'] as const;
+export const COLOR_SCALE_POSITIONS = [
+  '50',
+  '100',
+  '200',
+  '300',
+  '400',
+  '500',
+  '600',
+  '700',
+  '800',
+  '900',
+  '950',
+] as const;
 
 export type ColorScalePosition = (typeof COLOR_SCALE_POSITIONS)[number];
 
@@ -194,21 +208,80 @@ export type SemanticIntent = (typeof SEMANTIC_INTENTS)[number];
 /**
  * Spacing scale names
  */
-export const SPACING_SCALE = ['0', '0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '5', '6', '7', '8', '9', '10', '11', '12', '14', '16', '20', '24', '28', '32', '36', '40', '44', '48', '52', '56', '60', '64', '72', '80', '96'] as const;
+export const SPACING_SCALE = [
+  '0',
+  '0.5',
+  '1',
+  '1.5',
+  '2',
+  '2.5',
+  '3',
+  '3.5',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+  '11',
+  '12',
+  '14',
+  '16',
+  '20',
+  '24',
+  '28',
+  '32',
+  '36',
+  '40',
+  '44',
+  '48',
+  '52',
+  '56',
+  '60',
+  '64',
+  '72',
+  '80',
+  '96',
+] as const;
 
 export type SpacingScale = (typeof SPACING_SCALE)[number];
 
 /**
  * Typography scale names
  */
-export const TYPOGRAPHY_SCALE = ['xs', 'sm', 'base', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl', '6xl', '7xl', '8xl', '9xl'] as const;
+export const TYPOGRAPHY_SCALE = [
+  'xs',
+  'sm',
+  'base',
+  'lg',
+  'xl',
+  '2xl',
+  '3xl',
+  '4xl',
+  '5xl',
+  '6xl',
+  '7xl',
+  '8xl',
+  '9xl',
+] as const;
 
 export type TypographyScale = (typeof TYPOGRAPHY_SCALE)[number];
 
 /**
  * Border radius scale names
  */
-export const RADIUS_SCALE = ['none', 'sm', 'DEFAULT', 'md', 'lg', 'xl', '2xl', '3xl', 'full'] as const;
+export const RADIUS_SCALE = [
+  'none',
+  'sm',
+  'DEFAULT',
+  'md',
+  'lg',
+  'xl',
+  '2xl',
+  '3xl',
+  'full',
+] as const;
 
 export type RadiusScale = (typeof RADIUS_SCALE)[number];
 
@@ -222,14 +295,30 @@ export type ShadowScale = (typeof SHADOW_SCALE)[number];
 /**
  * Depth (z-index) levels
  */
-export const DEPTH_LEVELS = ['base', 'dropdown', 'sticky', 'fixed', 'modal', 'popover', 'tooltip'] as const;
+export const DEPTH_LEVELS = [
+  'base',
+  'dropdown',
+  'sticky',
+  'fixed',
+  'modal',
+  'popover',
+  'tooltip',
+] as const;
 
 export type DepthLevel = (typeof DEPTH_LEVELS)[number];
 
 /**
  * Elevation levels (semantic z-index + shadow pairings)
  */
-export const ELEVATION_LEVELS = ['surface', 'raised', 'overlay', 'sticky', 'modal', 'popover', 'tooltip'] as const;
+export const ELEVATION_LEVELS = [
+  'surface',
+  'raised',
+  'overlay',
+  'sticky',
+  'modal',
+  'popover',
+  'tooltip',
+] as const;
 
 export type ElevationLevel = (typeof ELEVATION_LEVELS)[number];
 
@@ -243,7 +332,15 @@ export type MotionDurationScale = (typeof MOTION_DURATION_SCALE)[number];
 /**
  * Easing curve names
  */
-export const EASING_CURVES = ['linear', 'ease-in', 'ease-out', 'ease-in-out', 'productive', 'expressive', 'spring'] as const;
+export const EASING_CURVES = [
+  'linear',
+  'ease-in',
+  'ease-out',
+  'ease-in-out',
+  'productive',
+  'expressive',
+  'spring',
+] as const;
 
 export type EasingCurve = (typeof EASING_CURVES)[number];
 

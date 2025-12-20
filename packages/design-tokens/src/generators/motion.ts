@@ -4,130 +4,25 @@
  * Generates motion tokens (duration, easing, delay) derived from the spacing progression.
  * Uses minor-third (1.2) ratio for harmonious timing that feels connected to the spacing.
  *
- * Motion timing follows spacing to create a unified feel:
- * - Small spacing = fast animations
- * - Large spacing = slower, more deliberate animations
+ * This generator is a pure function - it receives motion definitions as input.
+ * Default motion values are provided by the orchestrator from defaults.ts.
  */
 
-import type { Token } from '@rafters/shared';
 import { getRatio } from '@rafters/math-utils';
-import type { ResolvedSystemConfig, GeneratorResult } from './types.js';
-import { MOTION_DURATION_SCALE, EASING_CURVES } from './types.js';
+import type { Token } from '@rafters/shared';
+import type { DurationDef, EasingDef } from './defaults.js';
+import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
+import { EASING_CURVES, MOTION_DURATION_SCALE } from './types.js';
 
 /**
- * Duration definitions
- * Base duration (150ms) scaled by minor-third progression
+ * Generate motion tokens from provided definitions
  */
-interface DurationDef {
-  multiplier: number;
-  meaning: string;
-  contexts: string[];
-  motionIntent: 'enter' | 'exit' | 'emphasis' | 'transition';
-}
-
-const DURATION_DEFINITIONS: Record<string, DurationDef> = {
-  instant: {
-    multiplier: 0,
-    meaning: 'Instant - no animation',
-    contexts: ['disabled-motion', 'prefers-reduced-motion'],
-    motionIntent: 'transition',
-  },
-  fast: {
-    multiplier: 0.667, // ~100ms at base 150
-    meaning: 'Fast - micro-interactions, hover states',
-    contexts: ['hover', 'focus', 'active', 'micro-feedback'],
-    motionIntent: 'transition',
-  },
-  normal: {
-    multiplier: 1, // 150ms
-    meaning: 'Normal - standard UI transitions',
-    contexts: ['buttons', 'toggles', 'state-changes'],
-    motionIntent: 'transition',
-  },
-  slow: {
-    multiplier: 1.5, // ~225ms
-    meaning: 'Slow - enter/exit animations',
-    contexts: ['modals', 'dialogs', 'panels', 'enter-exit'],
-    motionIntent: 'enter',
-  },
-  slower: {
-    multiplier: 2, // 300ms
-    meaning: 'Slower - emphasis, large element transitions',
-    contexts: ['page-transitions', 'hero-animations', 'emphasis'],
-    motionIntent: 'emphasis',
-  },
-};
-
-/**
- * Easing curve definitions
- * CSS cubic-bezier values for different motion feels
- */
-interface EasingDef {
-  curve: [number, number, number, number];
-  meaning: string;
-  contexts: string[];
-  css: string;
-}
-
-const EASING_DEFINITIONS: Record<string, EasingDef> = {
-  linear: {
-    curve: [0, 0, 1, 1],
-    meaning: 'Linear - constant speed, mechanical feel',
-    contexts: ['progress-bars', 'loading-spinners', 'opacity-fades'],
-    css: 'linear',
-  },
-  'ease-in': {
-    curve: [0.42, 0, 1, 1],
-    meaning: 'Ease in - starts slow, accelerates (exiting)',
-    contexts: ['exit-animations', 'elements-leaving'],
-    css: 'cubic-bezier(0.42, 0, 1, 1)',
-  },
-  'ease-out': {
-    curve: [0, 0, 0.58, 1],
-    meaning: 'Ease out - starts fast, decelerates (entering)',
-    contexts: ['enter-animations', 'elements-appearing'],
-    css: 'cubic-bezier(0, 0, 0.58, 1)',
-  },
-  'ease-in-out': {
-    curve: [0.42, 0, 0.58, 1],
-    meaning: 'Ease in-out - symmetric acceleration/deceleration',
-    contexts: ['state-changes', 'transforms', 'general-purpose'],
-    css: 'cubic-bezier(0.42, 0, 0.58, 1)',
-  },
-  productive: {
-    curve: [0.2, 0, 0.38, 0.9],
-    meaning: 'Productive - quick, efficient, minimal overshoot',
-    contexts: ['work-ui', 'data-displays', 'business-apps'],
-    css: 'cubic-bezier(0.2, 0, 0.38, 0.9)',
-  },
-  expressive: {
-    curve: [0.4, 0.14, 0.3, 1],
-    meaning: 'Expressive - dramatic, attention-grabbing',
-    contexts: ['marketing', 'onboarding', 'celebrations', 'emphasis'],
-    css: 'cubic-bezier(0.4, 0.14, 0.3, 1)',
-  },
-  spring: {
-    curve: [0.175, 0.885, 0.32, 1.275],
-    meaning: 'Spring - bouncy overshoot for playful feel',
-    contexts: ['buttons', 'icons', 'playful-ui', 'celebrations'],
-    css: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-  },
-};
-
-/**
- * Delay scale (derived from duration)
- */
-const DELAY_MULTIPLIERS = {
-  none: 0,
-  short: 0.5,
-  medium: 1,
-  long: 2,
-};
-
-/**
- * Generate motion tokens
- */
-export function generateMotionTokens(config: ResolvedSystemConfig): GeneratorResult {
+export function generateMotionTokens(
+  config: ResolvedSystemConfig,
+  durationDefs: Record<string, DurationDef>,
+  easingDefs: Record<string, EasingDef>,
+  delayMultipliers: Record<string, number>,
+): GeneratorResult {
   const tokens: Token[] = [];
   const timestamp = new Date().toISOString();
   const { baseTransitionDuration, progressionRatio } = config;
@@ -154,7 +49,8 @@ export function generateMotionTokens(config: ResolvedSystemConfig): GeneratorRes
 
   // Generate duration tokens
   for (const scale of MOTION_DURATION_SCALE) {
-    const def = DURATION_DEFINITIONS[scale]!;
+    const def = durationDefs[scale];
+    if (!def) continue;
     const scaleIndex = MOTION_DURATION_SCALE.indexOf(scale);
     const durationMs = Math.round(baseTransitionDuration * def.multiplier);
 
@@ -191,7 +87,8 @@ export function generateMotionTokens(config: ResolvedSystemConfig): GeneratorRes
 
   // Generate easing tokens
   for (const curve of EASING_CURVES) {
-    const def = EASING_DEFINITIONS[curve]!;
+    const def = easingDefs[curve];
+    if (!def) continue;
 
     tokens.push({
       name: `motion-easing-${curve}`,
@@ -224,7 +121,7 @@ export function generateMotionTokens(config: ResolvedSystemConfig): GeneratorRes
   }
 
   // Generate delay tokens
-  for (const [name, multiplier] of Object.entries(DELAY_MULTIPLIERS)) {
+  for (const [name, multiplier] of Object.entries(delayMultipliers)) {
     const delayMs = Math.round(baseTransitionDuration * multiplier);
 
     tokens.push({
@@ -291,9 +188,10 @@ export function generateMotionTokens(config: ResolvedSystemConfig): GeneratorRes
   ];
 
   for (const comp of composites) {
-    const durationDef = DURATION_DEFINITIONS[comp.duration]!;
+    const durationDef = durationDefs[comp.duration];
+    const easingDef = easingDefs[comp.easing];
+    if (!durationDef || !easingDef) continue;
     const durationMs = Math.round(baseTransitionDuration * durationDef.multiplier);
-    const easingDef = EASING_DEFINITIONS[comp.easing]!;
 
     tokens.push({
       name: comp.name,
@@ -304,7 +202,7 @@ export function generateMotionTokens(config: ResolvedSystemConfig): GeneratorRes
       usageContext: comp.contexts,
       motionDuration: durationMs,
       easingCurve: easingDef.curve,
-      easingName: comp.easing as typeof EASING_CURVES[number],
+      easingName: comp.easing as (typeof EASING_CURVES)[number],
       dependsOn: [`motion-duration-${comp.duration}`, `motion-easing-${comp.easing}`],
       description: `${comp.meaning}. Combines ${comp.duration} duration with ${comp.easing} easing.`,
       generatedAt: timestamp,

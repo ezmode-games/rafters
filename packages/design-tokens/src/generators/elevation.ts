@@ -5,89 +5,28 @@
  * This creates semantic "levels" that components can use for consistent
  * visual hierarchy across the design system.
  *
- * Each elevation level combines:
- * - Z-index (from depth tokens)
- * - Shadow (from shadow tokens)
- * - Semantic meaning for the MCP
+ * This generator is a pure function - it receives elevation definitions as input.
+ * Default elevation values are provided by the orchestrator from defaults.ts.
  */
 
 import type { Token } from '@rafters/shared';
-import type { ResolvedSystemConfig, GeneratorResult } from './types.js';
+import type { ElevationDef } from './defaults.js';
+import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
 import { ELEVATION_LEVELS } from './types.js';
 
 /**
- * Elevation definitions
- * Maps semantic levels to depth + shadow pairings
+ * Generate elevation tokens from provided definitions
  */
-interface ElevationDef {
-  depth: string;
-  shadow: string;
-  meaning: string;
-  contexts: string[];
-  useCase: string;
-}
-
-const ELEVATION_DEFINITIONS: Record<string, ElevationDef> = {
-  surface: {
-    depth: 'depth-base',
-    shadow: 'shadow-none',
-    meaning: 'Surface level - flat, in-flow elements',
-    contexts: ['page-content', 'inline-elements', 'flat-cards'],
-    useCase: 'Default level for content that doesn\'t need elevation',
-  },
-  raised: {
-    depth: 'depth-base',
-    shadow: 'shadow-sm',
-    meaning: 'Slightly raised - subtle depth without z-index change',
-    contexts: ['cards', 'panels', 'list-items'],
-    useCase: 'Cards and containers that need subtle visual separation',
-  },
-  overlay: {
-    depth: 'depth-dropdown',
-    shadow: 'shadow',
-    meaning: 'Overlay level - dropdowns and menus',
-    contexts: ['dropdowns', 'select-menus', 'autocomplete', 'context-menus'],
-    useCase: 'Elements that appear over content but aren\'t blocking',
-  },
-  sticky: {
-    depth: 'depth-sticky',
-    shadow: 'shadow-md',
-    meaning: 'Sticky level - persistent navigation',
-    contexts: ['sticky-header', 'sticky-sidebar', 'floating-nav'],
-    useCase: 'Elements that stick to viewport edges during scroll',
-  },
-  modal: {
-    depth: 'depth-modal',
-    shadow: 'shadow-lg',
-    meaning: 'Modal level - blocking dialogs',
-    contexts: ['modals', 'dialogs', 'sheets', 'drawers'],
-    useCase: 'Elements that block interaction with content below',
-  },
-  popover: {
-    depth: 'depth-popover',
-    shadow: 'shadow-xl',
-    meaning: 'Popover level - above modals',
-    contexts: ['popovers', 'nested-dialogs', 'command-palette'],
-    useCase: 'Elements that can appear above modals (rare)',
-  },
-  tooltip: {
-    depth: 'depth-tooltip',
-    shadow: 'shadow-lg',
-    meaning: 'Tooltip level - highest common UI',
-    contexts: ['tooltips', 'toast-notifications', 'snackbars'],
-    useCase: 'Transient information that appears above everything',
-  },
-};
-
-/**
- * Generate elevation tokens
- */
-export function generateElevationTokens(_config: ResolvedSystemConfig): GeneratorResult {
+export function generateElevationTokens(
+  _config: ResolvedSystemConfig,
+  elevationDefs: Record<string, ElevationDef>,
+): GeneratorResult {
   const tokens: Token[] = [];
   const timestamp = new Date().toISOString();
 
   for (const level of ELEVATION_LEVELS) {
-    const def = ELEVATION_DEFINITIONS[level]!;
+    const def = elevationDefs[level];
+    if (!def) continue;
     const scaleIndex = ELEVATION_LEVELS.indexOf(level);
 
     // Create composite elevation token
@@ -109,7 +48,10 @@ export function generateElevationTokens(_config: ResolvedSystemConfig): Generato
       generatedAt: timestamp,
       containerQueryAware: false,
       usagePatterns: {
-        do: [`Use for ${def.contexts.slice(0, 2).join(', ')}`, 'Apply both z-index and shadow together'],
+        do: [
+          `Use for ${def.contexts.slice(0, 2).join(', ')}`,
+          'Apply both z-index and shadow together',
+        ],
         never: [
           'Mix elevation levels within same component',
           'Use without considering stacking context',
@@ -148,10 +90,7 @@ export function generateElevationTokens(_config: ResolvedSystemConfig): Generato
     name: 'elevation-scale',
     value: JSON.stringify({
       levels: Object.fromEntries(
-        Object.entries(ELEVATION_DEFINITIONS).map(([k, v]) => [
-          k,
-          { depth: v.depth, shadow: v.shadow },
-        ])
+        Object.entries(elevationDefs).map(([k, v]) => [k, { depth: v.depth, shadow: v.shadow }]),
       ),
       note: 'Each elevation level pairs z-index with appropriate shadow',
     }),

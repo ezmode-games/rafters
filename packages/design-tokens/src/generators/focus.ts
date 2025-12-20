@@ -4,66 +4,21 @@
  * Generates focus ring tokens for WCAG 2.2 compliance.
  * Focus indicators are critical for keyboard navigation and accessibility.
  *
- * WCAG 2.2 Focus Visible requirements:
- * - Focus indicator must be at least 2px thick
- * - Must have 3:1 contrast against adjacent colors
- * - Must enclose the component or have minimum area
+ * This generator is a pure function - it receives focus configurations as input.
+ * Default focus values are provided by the orchestrator from defaults.ts.
  */
 
 import type { Token } from '@rafters/shared';
-import type { ResolvedSystemConfig, GeneratorResult } from './types.js';
+import type { FocusConfig } from './defaults.js';
+import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
 
 /**
- * Focus ring styles
+ * Generate focus tokens from provided configurations
  */
-const FOCUS_STYLES = ['solid', 'dashed', 'double'] as const;
-
-/**
- * Focus ring configurations for different contexts
- */
-interface FocusConfig {
-  width: number;
-  offset: number;
-  style: typeof FOCUS_STYLES[number];
-  meaning: string;
-  contexts: string[];
-}
-
-const FOCUS_CONFIGS: Record<string, FocusConfig> = {
-  default: {
-    width: 2,
-    offset: 2,
-    style: 'solid',
-    meaning: 'Default focus ring - suitable for most interactive elements',
-    contexts: ['buttons', 'links', 'inputs', 'selects'],
-  },
-  inset: {
-    width: 2,
-    offset: -2,
-    style: 'solid',
-    meaning: 'Inset focus ring - for elements where external ring would be cut off',
-    contexts: ['cards', 'containers', 'overflow-hidden'],
-  },
-  thick: {
-    width: 3,
-    offset: 2,
-    style: 'solid',
-    meaning: 'Thick focus ring - for high-visibility needs',
-    contexts: ['critical-actions', 'primary-cta', 'accessibility-mode'],
-  },
-  subtle: {
-    width: 1,
-    offset: 2,
-    style: 'solid',
-    meaning: 'Subtle focus ring - for dense UIs with many focusable elements',
-    contexts: ['table-cells', 'list-items', 'dense-ui'],
-  },
-};
-
-/**
- * Generate focus tokens
- */
-export function generateFocusTokens(config: ResolvedSystemConfig): GeneratorResult {
+export function generateFocusTokens(
+  config: ResolvedSystemConfig,
+  focusConfigs: Record<string, FocusConfig>,
+): GeneratorResult {
   const tokens: Token[] = [];
   const timestamp = new Date().toISOString();
   const { focusRingWidth } = config;
@@ -82,14 +37,8 @@ export function generateFocusTokens(config: ResolvedSystemConfig): GeneratorResu
     generatedAt: timestamp,
     containerQueryAware: false,
     usagePatterns: {
-      do: [
-        'Use for all focus-visible states',
-        'Ensure 3:1 contrast against adjacent colors',
-      ],
-      never: [
-        'Reduce below 2px',
-        'Remove focus rings without alternative indicator',
-      ],
+      do: ['Use for all focus-visible states', 'Ensure 3:1 contrast against adjacent colors'],
+      never: ['Reduce below 2px', 'Remove focus rings without alternative indicator'],
     },
   });
 
@@ -110,7 +59,7 @@ export function generateFocusTokens(config: ResolvedSystemConfig): GeneratorResu
   });
 
   // Generate focus ring configuration tokens
-  for (const [name, focusConfig] of Object.entries(FOCUS_CONFIGS)) {
+  for (const [name, focusConfig] of Object.entries(focusConfigs)) {
     tokens.push({
       name: name === 'default' ? 'focus-ring' : `focus-ring-${name}`,
       value: JSON.stringify({
@@ -203,14 +152,8 @@ export function generateFocusTokens(config: ResolvedSystemConfig): GeneratorResu
     generatedAt: timestamp,
     containerQueryAware: false,
     usagePatterns: {
-      do: [
-        'Use on containers with focusable children',
-        'Combine with child focus styles',
-      ],
-      never: [
-        'Use as replacement for child focus indicators',
-        'Apply to non-container elements',
-      ],
+      do: ['Use on containers with focusable children', 'Combine with child focus styles'],
+      never: ['Use as replacement for child focus indicators', 'Apply to non-container elements'],
     },
   });
 
@@ -235,14 +178,8 @@ export function generateFocusTokens(config: ResolvedSystemConfig): GeneratorResu
     generatedAt: timestamp,
     containerQueryAware: false,
     usagePatterns: {
-      do: [
-        'Apply in @media (forced-colors: active)',
-        'Use system color keywords',
-      ],
-      never: [
-        'Override in forced-colors mode',
-        'Use custom colors in high contrast',
-      ],
+      do: ['Apply in @media (forced-colors: active)', 'Use system color keywords'],
+      never: ['Override in forced-colors mode', 'Use custom colors in high contrast'],
     },
   });
 

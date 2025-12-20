@@ -4,62 +4,22 @@
  * Generates spacing tokens using mathematical progressions from @rafters/math-utils.
  * Default uses minor-third (1.2) ratio for harmonious, connected feel.
  *
- * Spacing is the foundation that motion, shadows, and other derived values build upon.
+ * This generator is a pure function - it receives spacing multipliers as input.
+ * Default spacing values are provided by the orchestrator from defaults.ts.
  */
 
-import type { Token } from '@rafters/shared';
 import { generateProgression, getRatio } from '@rafters/math-utils';
-import type { ResolvedSystemConfig, GeneratorResult } from './types.js';
+import type { Token } from '@rafters/shared';
+import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
 import { SPACING_SCALE } from './types.js';
 
 /**
- * Spacing scale multipliers for Tailwind-compatible output
- * Maps scale names to their multiplier of the base unit
- *
- * The progression uses minor-third (1.2) ratio for values above 4,
- * while maintaining Tailwind's established small values for compatibility.
+ * Generate spacing tokens from provided multipliers
  */
-const SPACING_MULTIPLIERS: Record<string, number> = {
-  '0': 0,
-  '0.5': 0.5,
-  '1': 1,
-  '1.5': 1.5,
-  '2': 2,
-  '2.5': 2.5,
-  '3': 3,
-  '3.5': 3.5,
-  '4': 4,
-  '5': 5,
-  '6': 6,
-  '7': 7,
-  '8': 8,
-  '9': 9,
-  '10': 10,
-  '11': 11,
-  '12': 12,
-  '14': 14,
-  '16': 16,
-  '20': 20,
-  '24': 24,
-  '28': 28,
-  '32': 32,
-  '36': 36,
-  '40': 40,
-  '44': 44,
-  '48': 48,
-  '52': 52,
-  '56': 56,
-  '60': 60,
-  '64': 64,
-  '72': 72,
-  '80': 80,
-  '96': 96,
-};
-
-/**
- * Generate spacing tokens
- */
-export function generateSpacingTokens(config: ResolvedSystemConfig): GeneratorResult {
+export function generateSpacingTokens(
+  config: ResolvedSystemConfig,
+  spacingMultipliers: Record<string, number>,
+): GeneratorResult {
   const tokens: Token[] = [];
   const timestamp = new Date().toISOString();
   const { baseSpacingUnit, progressionRatio } = config;
@@ -100,7 +60,8 @@ export function generateSpacingTokens(config: ResolvedSystemConfig): GeneratorRe
 
   // Generate tokens for each scale position
   for (const scale of SPACING_SCALE) {
-    const multiplier = SPACING_MULTIPLIERS[scale]!;
+    const multiplier = spacingMultipliers[scale];
+    if (multiplier === undefined) continue;
     const value = baseSpacingUnit * multiplier;
     const scaleIndex = SPACING_SCALE.indexOf(scale);
 
@@ -158,7 +119,10 @@ export function generateSpacingTokens(config: ResolvedSystemConfig): GeneratorRe
     category: 'spacing',
     namespace: 'spacing',
     semanticMeaning: 'Metadata about the spacing progression system',
-    description: `Spacing uses ${progressionRatio} progression (ratio ${ratioValue}) from base ${baseSpacingUnit}px. Sample values: ${progression.slice(0, 5).map((v) => Math.round(v)).join(', ')}...`,
+    description: `Spacing uses ${progressionRatio} progression (ratio ${ratioValue}) from base ${baseSpacingUnit}px. Sample values: ${progression
+      .slice(0, 5)
+      .map((v) => Math.round(v))
+      .join(', ')}...`,
     generatedAt: timestamp,
     containerQueryAware: false,
     usagePatterns: {

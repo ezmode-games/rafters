@@ -5,44 +5,59 @@
  * Validates config resolution, token generation, and mathematical relationships.
  */
 
-import { describe, it, expect } from 'vitest';
+import type { Token } from '@rafters/shared';
+import { describe, expect, it } from 'vitest';
 import {
-  // Config and types
-  resolveConfig,
+  BREAKPOINT_SCALE,
+  // Defaults for generators
+  DEFAULT_BREAKPOINTS,
+  DEFAULT_COLOR_SCALES,
+  DEFAULT_CONTAINER_BREAKPOINTS,
+  DEFAULT_DELAY_MULTIPLIERS,
+  DEFAULT_DEPTH_DEFINITIONS,
+  DEFAULT_DURATION_DEFINITIONS,
+  DEFAULT_EASING_DEFINITIONS,
+  DEFAULT_ELEVATION_DEFINITIONS,
+  DEFAULT_FOCUS_CONFIGS,
+  DEFAULT_FONT_WEIGHTS,
+  DEFAULT_RADIUS_DEFINITIONS,
+  DEFAULT_SHADOW_DEFINITIONS,
+  DEFAULT_SPACING_MULTIPLIERS,
   DEFAULT_SYSTEM_CONFIG,
-  PURE_MATH_CONFIG,
+  DEFAULT_TYPOGRAPHY_SCALE,
+  DEPTH_LEVELS,
+  EASING_CURVES,
+  ELEVATION_LEVELS,
   // Orchestration
   generateBaseSystem,
-  generateNamespaces,
-  toNamespaceJSON,
-  toTokenMap,
-  getAvailableNamespaces,
-  getGeneratorInfo,
+  generateBreakpointTokens,
   // Individual generators
   generateColorTokens,
-  generateSpacingTokens,
-  generateTypographyTokens,
-  generateSemanticTokens,
-  generateRadiusTokens,
-  generateShadowTokens,
   generateDepthTokens,
   generateElevationTokens,
-  generateMotionTokens,
   generateFocusTokens,
-  generateBreakpointTokens,
+  generateMotionTokens,
+  generateNamespaces,
+  generateRadiusTokens,
+  generateSemanticTokens,
+  generateShadowTokens,
+  generateSpacingTokens,
+  generateTypographyTokens,
+  getAvailableNamespaces,
+  getGeneratorInfo,
+  MOTION_DURATION_SCALE,
+  PURE_MATH_CONFIG,
+  RADIUS_SCALE,
+  // Config and types
+  resolveConfig,
+  SEMANTIC_INTENTS,
+  SHADOW_SCALE,
   // Scale constants
   SPACING_SCALE,
   TYPOGRAPHY_SCALE,
-  RADIUS_SCALE,
-  SHADOW_SCALE,
-  DEPTH_LEVELS,
-  ELEVATION_LEVELS,
-  MOTION_DURATION_SCALE,
-  EASING_CURVES,
-  BREAKPOINT_SCALE,
-  SEMANTIC_INTENTS,
+  toNamespaceJSON,
+  toTokenMap,
 } from '../src/generators/index.js';
-import type { Token } from '@rafters/shared';
 
 describe('Config Resolution', () => {
   describe('resolveConfig', () => {
@@ -161,7 +176,7 @@ describe('Token Structure Validation', () => {
   }
 
   describe('generateColorTokens', () => {
-    const result = generateColorTokens(resolvedConfig);
+    const result = generateColorTokens(resolvedConfig, DEFAULT_COLOR_SCALES);
 
     it('returns correct namespace', () => {
       expect(result.namespace).toBe('color');
@@ -179,22 +194,20 @@ describe('Token Structure Validation', () => {
     });
 
     it('generates neutral color scale', () => {
-      const neutralTokens = result.tokens.filter((t) =>
-        t.name.startsWith('neutral-') && t.name !== 'neutral'
+      const neutralTokens = result.tokens.filter(
+        (t) => t.name.startsWith('neutral-') && t.name !== 'neutral',
       );
       expect(neutralTokens.length).toBeGreaterThanOrEqual(11); // 50-950
     });
 
     it('color tokens have OKLCH values', () => {
-      const colorToken = result.tokens.find((t) =>
-        t.name === 'neutral-500'
-      );
+      const colorToken = result.tokens.find((t) => t.name === 'neutral-500');
       expect(colorToken?.value).toMatch(/oklch\(/);
     });
   });
 
   describe('generateSpacingTokens', () => {
-    const result = generateSpacingTokens(resolvedConfig);
+    const result = generateSpacingTokens(resolvedConfig, DEFAULT_SPACING_MULTIPLIERS);
 
     it('returns correct namespace', () => {
       expect(result.namespace).toBe('spacing');
@@ -229,7 +242,11 @@ describe('Token Structure Validation', () => {
   });
 
   describe('generateTypographyTokens', () => {
-    const result = generateTypographyTokens(resolvedConfig);
+    const result = generateTypographyTokens(
+      resolvedConfig,
+      DEFAULT_TYPOGRAPHY_SCALE,
+      DEFAULT_FONT_WEIGHTS,
+    );
 
     it('returns correct namespace', () => {
       expect(result.namespace).toBe('typography');
@@ -237,24 +254,18 @@ describe('Token Structure Validation', () => {
 
     it('generates font size tokens for all scale positions', () => {
       for (const scale of TYPOGRAPHY_SCALE) {
-        const token = result.tokens.find(
-          (t) => t.name === `font-size-${scale}`
-        );
+        const token = result.tokens.find((t) => t.name === `font-size-${scale}`);
         expect(token).toBeDefined();
       }
     });
 
     it('generates line height tokens', () => {
-      const lineHeightTokens = result.tokens.filter((t) =>
-        t.name.startsWith('line-height-')
-      );
+      const lineHeightTokens = result.tokens.filter((t) => t.name.startsWith('line-height-'));
       expect(lineHeightTokens.length).toBeGreaterThan(0);
     });
 
     it('generates font weight tokens', () => {
-      const fontWeightTokens = result.tokens.filter((t) =>
-        t.name.startsWith('font-weight-')
-      );
+      const fontWeightTokens = result.tokens.filter((t) => t.name.startsWith('font-weight-'));
       expect(fontWeightTokens.length).toBeGreaterThan(0);
     });
 
@@ -277,16 +288,12 @@ describe('Token Structure Validation', () => {
       const primaryToken = result.tokens.find((t) => t.name === 'primary');
       expect(primaryToken).toBeDefined();
 
-      const destructiveToken = result.tokens.find(
-        (t) => t.name === 'destructive'
-      );
+      const destructiveToken = result.tokens.find((t) => t.name === 'destructive');
       expect(destructiveToken).toBeDefined();
     });
 
     it('generates sidebar tokens', () => {
-      const sidebarTokens = result.tokens.filter((t) =>
-        t.name.startsWith('sidebar-')
-      );
+      const sidebarTokens = result.tokens.filter((t) => t.name.startsWith('sidebar-'));
       expect(sidebarTokens.length).toBeGreaterThan(0);
     });
 
@@ -305,7 +312,7 @@ describe('Token Structure Validation', () => {
   });
 
   describe('generateRadiusTokens', () => {
-    const result = generateRadiusTokens(resolvedConfig);
+    const result = generateRadiusTokens(resolvedConfig, DEFAULT_RADIUS_DEFINITIONS);
 
     it('returns correct namespace', () => {
       expect(result.namespace).toBe('radius');
@@ -343,7 +350,7 @@ describe('Token Structure Validation', () => {
   });
 
   describe('generateShadowTokens', () => {
-    const result = generateShadowTokens(resolvedConfig);
+    const result = generateShadowTokens(resolvedConfig, DEFAULT_SHADOW_DEFINITIONS);
 
     it('returns correct namespace', () => {
       expect(result.namespace).toBe('shadow');
@@ -370,7 +377,7 @@ describe('Token Structure Validation', () => {
   });
 
   describe('generateDepthTokens', () => {
-    const result = generateDepthTokens(resolvedConfig);
+    const result = generateDepthTokens(resolvedConfig, DEFAULT_DEPTH_DEFINITIONS);
 
     it('returns correct namespace', () => {
       expect(result.namespace).toBe('depth');
@@ -385,13 +392,9 @@ describe('Token Structure Validation', () => {
 
     it('depth values increase appropriately', () => {
       const baseDepth = result.tokens.find((t) => t.name === 'depth-base');
-      const tooltipDepth = result.tokens.find(
-        (t) => t.name === 'depth-tooltip'
-      );
+      const tooltipDepth = result.tokens.find((t) => t.name === 'depth-tooltip');
 
-      expect(Number(baseDepth?.value)).toBeLessThan(
-        Number(tooltipDepth?.value)
-      );
+      expect(Number(baseDepth?.value)).toBeLessThan(Number(tooltipDepth?.value));
     });
 
     it('all tokens have valid structure', () => {
@@ -402,7 +405,7 @@ describe('Token Structure Validation', () => {
   });
 
   describe('generateElevationTokens', () => {
-    const result = generateElevationTokens(resolvedConfig);
+    const result = generateElevationTokens(resolvedConfig, DEFAULT_ELEVATION_DEFINITIONS);
 
     it('returns correct namespace', () => {
       expect(result.namespace).toBe('elevation');
@@ -410,21 +413,15 @@ describe('Token Structure Validation', () => {
 
     it('generates tokens for all elevation levels', () => {
       for (const level of ELEVATION_LEVELS) {
-        const token = result.tokens.find(
-          (t) => t.name === `elevation-${level}`
-        );
+        const token = result.tokens.find((t) => t.name === `elevation-${level}`);
         expect(token).toBeDefined();
       }
     });
 
     it('elevation tokens have z-index and shadow components', () => {
       for (const level of ELEVATION_LEVELS) {
-        const zToken = result.tokens.find(
-          (t) => t.name === `elevation-${level}-z`
-        );
-        const shadowToken = result.tokens.find(
-          (t) => t.name === `elevation-${level}-shadow`
-        );
+        const zToken = result.tokens.find((t) => t.name === `elevation-${level}-z`);
+        const shadowToken = result.tokens.find((t) => t.name === `elevation-${level}-shadow`);
         expect(zToken).toBeDefined();
         expect(shadowToken).toBeDefined();
       }
@@ -438,7 +435,12 @@ describe('Token Structure Validation', () => {
   });
 
   describe('generateMotionTokens', () => {
-    const result = generateMotionTokens(resolvedConfig);
+    const result = generateMotionTokens(
+      resolvedConfig,
+      DEFAULT_DURATION_DEFINITIONS,
+      DEFAULT_EASING_DEFINITIONS,
+      DEFAULT_DELAY_MULTIPLIERS,
+    );
 
     it('returns correct namespace', () => {
       expect(result.namespace).toBe('motion');
@@ -446,33 +448,25 @@ describe('Token Structure Validation', () => {
 
     it('generates duration tokens for all scale positions', () => {
       for (const scale of MOTION_DURATION_SCALE) {
-        const token = result.tokens.find(
-          (t) => t.name === `motion-duration-${scale}`
-        );
+        const token = result.tokens.find((t) => t.name === `motion-duration-${scale}`);
         expect(token).toBeDefined();
       }
     });
 
     it('generates easing tokens for all curves', () => {
       for (const curve of EASING_CURVES) {
-        const token = result.tokens.find(
-          (t) => t.name === `motion-easing-${curve}`
-        );
+        const token = result.tokens.find((t) => t.name === `motion-easing-${curve}`);
         expect(token).toBeDefined();
       }
     });
 
     it('instant duration is 0ms', () => {
-      const instantToken = result.tokens.find(
-        (t) => t.name === 'motion-duration-instant'
-      );
+      const instantToken = result.tokens.find((t) => t.name === 'motion-duration-instant');
       expect(instantToken?.value).toBe('0ms');
     });
 
     it('normal duration matches base transition duration', () => {
-      const normalToken = result.tokens.find(
-        (t) => t.name === 'motion-duration-normal'
-      );
+      const normalToken = result.tokens.find((t) => t.name === 'motion-duration-normal');
       expect(normalToken?.value).toBe('150ms');
     });
 
@@ -484,24 +478,20 @@ describe('Token Structure Validation', () => {
   });
 
   describe('generateFocusTokens', () => {
-    const result = generateFocusTokens(resolvedConfig);
+    const result = generateFocusTokens(resolvedConfig, DEFAULT_FOCUS_CONFIGS);
 
     it('returns correct namespace', () => {
       expect(result.namespace).toBe('focus');
     });
 
     it('includes focus ring width token', () => {
-      const widthToken = result.tokens.find(
-        (t) => t.name === 'focus-ring-width'
-      );
+      const widthToken = result.tokens.find((t) => t.name === 'focus-ring-width');
       expect(widthToken).toBeDefined();
       expect(widthToken?.value).toBe('2px');
     });
 
     it('includes focus ring color token', () => {
-      const colorToken = result.tokens.find(
-        (t) => t.name === 'focus-ring-color'
-      );
+      const colorToken = result.tokens.find((t) => t.name === 'focus-ring-color');
       expect(colorToken).toBeDefined();
       expect(colorToken?.value).toBe('var(--ring)');
     });
@@ -519,7 +509,11 @@ describe('Token Structure Validation', () => {
   });
 
   describe('generateBreakpointTokens', () => {
-    const result = generateBreakpointTokens(resolvedConfig);
+    const result = generateBreakpointTokens(
+      resolvedConfig,
+      DEFAULT_BREAKPOINTS,
+      DEFAULT_CONTAINER_BREAKPOINTS,
+    );
 
     it('returns correct namespace', () => {
       expect(result.namespace).toBe('breakpoint');
@@ -527,28 +521,20 @@ describe('Token Structure Validation', () => {
 
     it('generates viewport breakpoints for all scale positions', () => {
       for (const scale of BREAKPOINT_SCALE) {
-        const token = result.tokens.find(
-          (t) => t.name === `breakpoint-${scale}`
-        );
+        const token = result.tokens.find((t) => t.name === `breakpoint-${scale}`);
         expect(token).toBeDefined();
       }
     });
 
     it('generates container query breakpoints', () => {
-      const cqTokens = result.tokens.filter((t) =>
-        t.name.startsWith('breakpoint-cq-')
-      );
+      const cqTokens = result.tokens.filter((t) => t.name.startsWith('breakpoint-cq-'));
       expect(cqTokens.length).toBeGreaterThan(0);
     });
 
     it('includes accessibility media queries', () => {
-      const reducedMotion = result.tokens.find(
-        (t) => t.name === 'breakpoint-motion-reduce'
-      );
+      const reducedMotion = result.tokens.find((t) => t.name === 'breakpoint-motion-reduce');
       const dark = result.tokens.find((t) => t.name === 'breakpoint-dark');
-      const highContrast = result.tokens.find(
-        (t) => t.name === 'breakpoint-high-contrast'
-      );
+      const highContrast = result.tokens.find((t) => t.name === 'breakpoint-high-contrast');
 
       expect(reducedMotion).toBeDefined();
       expect(dark).toBeDefined();
@@ -726,12 +712,8 @@ describe('Mathematical Relationships', () => {
       const base8Result = generateBaseSystem({ baseSpacingUnit: 8 });
 
       // Spacing should scale
-      const spacing4_base4 = base4Result.allTokens.find(
-        (t) => t.name === 'spacing-4'
-      );
-      const spacing4_base8 = base8Result.allTokens.find(
-        (t) => t.name === 'spacing-4'
-      );
+      const spacing4_base4 = base4Result.allTokens.find((t) => t.name === 'spacing-4');
+      const spacing4_base8 = base8Result.allTokens.find((t) => t.name === 'spacing-4');
 
       expect(spacing4_base4?.value).toBe('16px'); // 4 * 4
       expect(spacing4_base8?.value).toBe('32px'); // 8 * 4
@@ -753,9 +735,7 @@ describe('Mathematical Relationships', () => {
 
       // Metadata should reflect the ratio
       expect(minorThird.metadata.config.progressionRatio).toBe('minor-third');
-      expect(perfectFourth.metadata.config.progressionRatio).toBe(
-        'perfect-fourth'
-      );
+      expect(perfectFourth.metadata.config.progressionRatio).toBe('perfect-fourth');
     });
   });
 });

@@ -4,70 +4,23 @@
  * Generates border radius tokens using mathematical progressions.
  * Uses minor-third (1.2) ratio for harmonious radius scale.
  *
- * Base radius of 6px matches shadcn aesthetic.
+ * This generator is a pure function - it receives radius definitions as input.
+ * Default radius values are provided by the orchestrator from defaults.ts.
  */
 
-import type { Token } from '@rafters/shared';
 import { getRatio } from '@rafters/math-utils';
-import type { ResolvedSystemConfig, GeneratorResult } from './types.js';
+import type { Token } from '@rafters/shared';
+import type { RadiusDef } from './defaults.js';
+import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
 import { RADIUS_SCALE } from './types.js';
 
 /**
- * Radius scale multipliers
- * Follows a progression from the base radius
+ * Generate border radius tokens from provided definitions
  */
-const RADIUS_VALUES: Record<string, { multiplier: number | 'full' | 'none'; meaning: string; contexts: string[] }> = {
-  none: {
-    multiplier: 'none',
-    meaning: 'No border radius - sharp corners',
-    contexts: ['sharp-corners', 'table-cells', 'inline-elements'],
-  },
-  sm: {
-    multiplier: 0.5,
-    meaning: 'Small radius for subtle rounding',
-    contexts: ['badges', 'tags', 'small-elements', 'inline-blocks'],
-  },
-  DEFAULT: {
-    multiplier: 1,
-    meaning: 'Default radius - primary UI elements',
-    contexts: ['buttons', 'inputs', 'cards', 'dropdowns'],
-  },
-  md: {
-    multiplier: 1.2, // Minor third step up
-    meaning: 'Medium radius for containers',
-    contexts: ['cards', 'panels', 'dialogs'],
-  },
-  lg: {
-    multiplier: 1.44, // Two minor third steps
-    meaning: 'Large radius for prominent containers',
-    contexts: ['modals', 'large-cards', 'feature-panels'],
-  },
-  xl: {
-    multiplier: 1.728, // Three minor third steps
-    meaning: 'Extra large radius for emphasized elements',
-    contexts: ['hero-cards', 'featured-sections'],
-  },
-  '2xl': {
-    multiplier: 2.074, // Four minor third steps
-    meaning: 'Maximum meaningful radius',
-    contexts: ['pills', 'large-avatars', 'emphasized-buttons'],
-  },
-  '3xl': {
-    multiplier: 2.488, // Five minor third steps
-    meaning: 'Very large radius for special cases',
-    contexts: ['stadium-shapes', 'special-emphasis'],
-  },
-  full: {
-    multiplier: 'full',
-    meaning: 'Fully rounded - circles and pills',
-    contexts: ['avatars', 'pill-buttons', 'circular-elements'],
-  },
-};
-
-/**
- * Generate border radius tokens
- */
-export function generateRadiusTokens(config: ResolvedSystemConfig): GeneratorResult {
+export function generateRadiusTokens(
+  config: ResolvedSystemConfig,
+  radiusDefs: Record<string, RadiusDef>,
+): GeneratorResult {
   const tokens: Token[] = [];
   const timestamp = new Date().toISOString();
   const { baseRadius, progressionRatio } = config;
@@ -93,7 +46,8 @@ export function generateRadiusTokens(config: ResolvedSystemConfig): GeneratorRes
 
   // Generate tokens for each scale position
   for (const scale of RADIUS_SCALE) {
-    const def = RADIUS_VALUES[scale]!;
+    const def = radiusDefs[scale];
+    if (!def) continue;
     const scaleIndex = RADIUS_SCALE.indexOf(scale);
     let value: string;
     let mathRelationship: string;

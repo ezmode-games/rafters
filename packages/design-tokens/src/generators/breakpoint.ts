@@ -4,80 +4,30 @@
  * Generates responsive breakpoint tokens for Tailwind v4 compatibility.
  * Uses container queries as the default (containerQueryAware: true).
  *
- * Breakpoints follow common device patterns while remaining flexible
- * for custom container-based layouts.
+ * This generator is a pure function - it receives breakpoint definitions as input.
+ * Default breakpoints are provided by the orchestrator from defaults.ts.
  */
 
 import type { Token } from '@rafters/shared';
-import type { ResolvedSystemConfig, GeneratorResult } from './types.js';
+import type { BreakpointDef, ContainerBreakpointDef } from './defaults.js';
+import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
 import { BREAKPOINT_SCALE } from './types.js';
 
 /**
- * Breakpoint definitions
- * Values match Tailwind's default breakpoints for compatibility
+ * Generate breakpoint tokens from provided definitions
  */
-interface BreakpointDef {
-  minWidth: number;
-  meaning: string;
-  devices: string[];
-  contexts: string[];
-}
-
-const BREAKPOINT_DEFINITIONS: Record<string, BreakpointDef> = {
-  sm: {
-    minWidth: 640,
-    meaning: 'Small screens - landscape phones, small tablets',
-    devices: ['phone-landscape', 'small-tablet'],
-    contexts: ['mobile-first', 'compact-layouts'],
-  },
-  md: {
-    minWidth: 768,
-    meaning: 'Medium screens - tablets, small laptops',
-    devices: ['tablet-portrait', 'small-laptop'],
-    contexts: ['tablet-layouts', 'sidebar-visible'],
-  },
-  lg: {
-    minWidth: 1024,
-    meaning: 'Large screens - laptops, small desktops',
-    devices: ['tablet-landscape', 'laptop', 'small-desktop'],
-    contexts: ['desktop-layouts', 'multi-column'],
-  },
-  xl: {
-    minWidth: 1280,
-    meaning: 'Extra large screens - desktops',
-    devices: ['desktop', 'large-laptop'],
-    contexts: ['wide-layouts', 'dashboard'],
-  },
-  '2xl': {
-    minWidth: 1536,
-    meaning: 'Extra extra large screens - large desktops, monitors',
-    devices: ['large-desktop', 'external-monitor'],
-    contexts: ['ultra-wide', 'data-dense'],
-  },
-};
-
-/**
- * Container query breakpoints (for component-level responsiveness)
- * These are relative to container size, not viewport
- */
-const CONTAINER_BREAKPOINTS: Record<string, { minWidth: number; meaning: string }> = {
-  'cq-xs': { minWidth: 320, meaning: 'Extra small container - minimal space' },
-  'cq-sm': { minWidth: 384, meaning: 'Small container - card-sized' },
-  'cq-md': { minWidth: 448, meaning: 'Medium container - panel-sized' },
-  'cq-lg': { minWidth: 512, meaning: 'Large container - sidebar-sized' },
-  'cq-xl': { minWidth: 576, meaning: 'Extra large container - main content area' },
-};
-
-/**
- * Generate breakpoint tokens
- */
-export function generateBreakpointTokens(_config: ResolvedSystemConfig): GeneratorResult {
+export function generateBreakpointTokens(
+  _config: ResolvedSystemConfig,
+  breakpointDefs: Record<string, BreakpointDef>,
+  containerBreakpointDefs: Record<string, ContainerBreakpointDef>,
+): GeneratorResult {
   const tokens: Token[] = [];
   const timestamp = new Date().toISOString();
 
   // Viewport breakpoints (traditional media queries)
   for (const scale of BREAKPOINT_SCALE) {
-    const def = BREAKPOINT_DEFINITIONS[scale]!;
+    const def = breakpointDefs[scale];
+    if (!def) continue;
     const scaleIndex = BREAKPOINT_SCALE.indexOf(scale);
 
     tokens.push({
@@ -93,10 +43,7 @@ export function generateBreakpointTokens(_config: ResolvedSystemConfig): Generat
       description: `Viewport breakpoint at ${def.minWidth}px. Targets: ${def.devices.join(', ')}.`,
       generatedAt: timestamp,
       usagePatterns: {
-        do: [
-          'Use for page-level layout changes',
-          'Combine with container queries for components',
-        ],
+        do: ['Use for page-level layout changes', 'Combine with container queries for components'],
         never: [
           'Use viewport queries for component internals',
           'Assume specific device from breakpoint',
@@ -120,7 +67,7 @@ export function generateBreakpointTokens(_config: ResolvedSystemConfig): Generat
   }
 
   // Container query breakpoints
-  for (const [name, def] of Object.entries(CONTAINER_BREAKPOINTS)) {
+  for (const [name, def] of Object.entries(containerBreakpointDefs)) {
     tokens.push({
       name: `breakpoint-${name}`,
       value: `${def.minWidth}px`,
@@ -137,10 +84,7 @@ export function generateBreakpointTokens(_config: ResolvedSystemConfig): Generat
           'Use for component-level responsiveness',
           'Prefer over viewport queries for reusable components',
         ],
-        never: [
-          'Use for page-level layout',
-          'Forget to set container-type on parent',
-        ],
+        never: ['Use for page-level layout', 'Forget to set container-type on parent'],
       },
     });
 
@@ -160,7 +104,8 @@ export function generateBreakpointTokens(_config: ResolvedSystemConfig): Generat
 
   // Max-width variants for range queries
   for (const scale of BREAKPOINT_SCALE) {
-    const def = BREAKPOINT_DEFINITIONS[scale]!;
+    const def = breakpointDefs[scale];
+    if (!def) continue;
 
     tokens.push({
       name: `breakpoint-${scale}-max`,
@@ -190,14 +135,8 @@ export function generateBreakpointTokens(_config: ResolvedSystemConfig): Generat
     description: 'Media query for users preferring reduced motion.',
     generatedAt: timestamp,
     usagePatterns: {
-      do: [
-        'Use to disable or reduce animations',
-        'Provide alternative non-motion feedback',
-      ],
-      never: [
-        'Ignore reduced motion preference',
-        'Remove all visual feedback',
-      ],
+      do: ['Use to disable or reduce animations', 'Provide alternative non-motion feedback'],
+      never: ['Ignore reduced motion preference', 'Remove all visual feedback'],
     },
   });
 
@@ -241,14 +180,8 @@ export function generateBreakpointTokens(_config: ResolvedSystemConfig): Generat
     description: 'Media query for Windows High Contrast Mode.',
     generatedAt: timestamp,
     usagePatterns: {
-      do: [
-        'Use system color keywords',
-        'Ensure visible focus indicators',
-      ],
-      never: [
-        'Override with custom colors',
-        'Hide important visual information',
-      ],
+      do: ['Use system color keywords', 'Ensure visible focus indicators'],
+      never: ['Override with custom colors', 'Hide important visual information'],
     },
   });
 
@@ -256,11 +189,9 @@ export function generateBreakpointTokens(_config: ResolvedSystemConfig): Generat
   tokens.push({
     name: 'breakpoint-scale',
     value: JSON.stringify({
-      viewport: Object.fromEntries(
-        Object.entries(BREAKPOINT_DEFINITIONS).map(([k, v]) => [k, v.minWidth])
-      ),
+      viewport: Object.fromEntries(Object.entries(breakpointDefs).map(([k, v]) => [k, v.minWidth])),
       container: Object.fromEntries(
-        Object.entries(CONTAINER_BREAKPOINTS).map(([k, v]) => [k, v.minWidth])
+        Object.entries(containerBreakpointDefs).map(([k, v]) => [k, v.minWidth]),
       ),
       note: 'Container queries are preferred for component responsiveness',
     }),

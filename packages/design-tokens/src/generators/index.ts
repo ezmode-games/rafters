@@ -5,6 +5,9 @@
  * Each generator produces tokens for a specific namespace, which are then
  * combined and can be serialized to namespace-based JSON files.
  *
+ * Generators are pure functions - they receive configuration and default data
+ * as parameters, making them easy to customize and test.
+ *
  * The generators use:
  * - @rafters/math-utils for mathematical progressions (minor-third 1.2 ratio)
  * - OKLCH color space for perceptually uniform colors
@@ -12,62 +15,127 @@
  */
 
 import type { Token } from '@rafters/shared';
-import type { BaseSystemConfig, ResolvedSystemConfig, GeneratorFn } from './types.js';
-import { DEFAULT_SYSTEM_CONFIG, resolveConfig } from './types.js';
-
+import { generateBreakpointTokens } from './breakpoint.js';
 // Import all generators
 import { generateColorTokens } from './color.js';
-import { generateSpacingTokens } from './spacing.js';
-import { generateTypographyTokens } from './typography.js';
-import { generateSemanticTokens } from './semantic.js';
-import { generateRadiusTokens } from './radius.js';
-import { generateShadowTokens } from './shadow.js';
+// Import defaults
+import {
+  DEFAULT_BREAKPOINTS,
+  DEFAULT_COLOR_SCALES,
+  DEFAULT_CONTAINER_BREAKPOINTS,
+  DEFAULT_DELAY_MULTIPLIERS,
+  DEFAULT_DEPTH_DEFINITIONS,
+  DEFAULT_DURATION_DEFINITIONS,
+  DEFAULT_EASING_DEFINITIONS,
+  DEFAULT_ELEVATION_DEFINITIONS,
+  DEFAULT_FOCUS_CONFIGS,
+  DEFAULT_FONT_WEIGHTS,
+  DEFAULT_RADIUS_DEFINITIONS,
+  DEFAULT_SHADOW_DEFINITIONS,
+  DEFAULT_SPACING_MULTIPLIERS,
+  DEFAULT_TYPOGRAPHY_SCALE,
+} from './defaults.js';
 import { generateDepthTokens } from './depth.js';
 import { generateElevationTokens } from './elevation.js';
-import { generateMotionTokens } from './motion.js';
 import { generateFocusTokens } from './focus.js';
-import { generateBreakpointTokens } from './breakpoint.js';
+import { generateMotionTokens } from './motion.js';
+import { generateRadiusTokens } from './radius.js';
+import { generateSemanticTokens } from './semantic.js';
+import { generateShadowTokens } from './shadow.js';
+import { generateSpacingTokens } from './spacing.js';
+import type { BaseSystemConfig, ResolvedSystemConfig } from './types.js';
+import { DEFAULT_SYSTEM_CONFIG, resolveConfig } from './types.js';
+import { generateTypographyTokens } from './typography.js';
 
+export { generateBreakpointTokens } from './breakpoint.js';
 // Export all generators individually
 export { generateColorTokens } from './color.js';
-export { generateSpacingTokens } from './spacing.js';
-export { generateTypographyTokens } from './typography.js';
-export { generateSemanticTokens } from './semantic.js';
-export { generateRadiusTokens } from './radius.js';
-export { generateShadowTokens } from './shadow.js';
+// Export defaults for customization
+export * from './defaults.js';
 export { generateDepthTokens } from './depth.js';
 export { generateElevationTokens } from './elevation.js';
-export { generateMotionTokens } from './motion.js';
 export { generateFocusTokens } from './focus.js';
-export { generateBreakpointTokens } from './breakpoint.js';
-
+export { generateMotionTokens } from './motion.js';
+export { generateRadiusTokens } from './radius.js';
+export { generateSemanticTokens } from './semantic.js';
+export { generateShadowTokens } from './shadow.js';
+export { generateSpacingTokens } from './spacing.js';
 // Export types
 export * from './types.js';
+export { generateTypographyTokens } from './typography.js';
 
 /**
- * All available generators in dependency order
- * Generators that depend on others come after their dependencies
+ * Generator configuration - defines name and how to call each generator
+ * Generators are called in dependency order
  */
-const ALL_GENERATORS: Array<{ name: string; fn: GeneratorFn }> = [
-  // Foundation tokens (no dependencies)
-  { name: 'color', fn: generateColorTokens },
-  { name: 'spacing', fn: generateSpacingTokens },
-  { name: 'typography', fn: generateTypographyTokens },
-  { name: 'breakpoint', fn: generateBreakpointTokens },
+interface GeneratorDef {
+  name: string;
+  generate: (config: ResolvedSystemConfig) => { namespace: string; tokens: Token[] };
+}
 
-  // Semantic tokens (depend on color)
-  { name: 'semantic', fn: generateSemanticTokens },
+/**
+ * Create generator definitions that bind defaults to pure generator functions
+ */
+function createGeneratorDefs(): GeneratorDef[] {
+  return [
+    // Foundation tokens (no dependencies)
+    {
+      name: 'color',
+      generate: (config) => generateColorTokens(config, DEFAULT_COLOR_SCALES),
+    },
+    {
+      name: 'spacing',
+      generate: (config) => generateSpacingTokens(config, DEFAULT_SPACING_MULTIPLIERS),
+    },
+    {
+      name: 'typography',
+      generate: (config) =>
+        generateTypographyTokens(config, DEFAULT_TYPOGRAPHY_SCALE, DEFAULT_FONT_WEIGHTS),
+    },
+    {
+      name: 'breakpoint',
+      generate: (config) =>
+        generateBreakpointTokens(config, DEFAULT_BREAKPOINTS, DEFAULT_CONTAINER_BREAKPOINTS),
+    },
 
-  // Derived tokens (depend on spacing/foundation)
-  { name: 'radius', fn: generateRadiusTokens },
-  { name: 'shadow', fn: generateShadowTokens },
-  { name: 'depth', fn: generateDepthTokens },
-  { name: 'motion', fn: generateMotionTokens },
+    // Semantic tokens (depend on color)
+    { name: 'semantic', generate: (config) => generateSemanticTokens(config) },
 
-  // Composite tokens (depend on multiple)
-  { name: 'elevation', fn: generateElevationTokens },
-  { name: 'focus', fn: generateFocusTokens },
-];
+    // Derived tokens (depend on spacing/foundation)
+    {
+      name: 'radius',
+      generate: (config) => generateRadiusTokens(config, DEFAULT_RADIUS_DEFINITIONS),
+    },
+    {
+      name: 'shadow',
+      generate: (config) => generateShadowTokens(config, DEFAULT_SHADOW_DEFINITIONS),
+    },
+    {
+      name: 'depth',
+      generate: (config) => generateDepthTokens(config, DEFAULT_DEPTH_DEFINITIONS),
+    },
+    {
+      name: 'motion',
+      generate: (config) =>
+        generateMotionTokens(
+          config,
+          DEFAULT_DURATION_DEFINITIONS,
+          DEFAULT_EASING_DEFINITIONS,
+          DEFAULT_DELAY_MULTIPLIERS,
+        ),
+    },
+
+    // Composite tokens (depend on multiple)
+    {
+      name: 'elevation',
+      generate: (config) => generateElevationTokens(config, DEFAULT_ELEVATION_DEFINITIONS),
+    },
+    {
+      name: 'focus',
+      generate: (config) => generateFocusTokens(config, DEFAULT_FOCUS_CONFIGS),
+    },
+  ];
+}
 
 /**
  * Result of running all generators
@@ -133,8 +201,9 @@ export function generateBaseSystem(config: Partial<BaseSystemConfig> = {}): Gene
   const byNamespace = new Map<string, Token[]>();
   const allTokens: Token[] = [];
 
-  for (const { fn } of ALL_GENERATORS) {
-    const result = fn(resolvedConfig);
+  const generators = createGeneratorDefs();
+  for (const { generate } of generators) {
+    const result = generate(resolvedConfig);
     byNamespace.set(result.namespace, result.tokens);
     allTokens.push(...result.tokens);
   }
@@ -166,7 +235,7 @@ export function generateBaseSystem(config: Partial<BaseSystemConfig> = {}): Gene
  */
 export function generateNamespaces(
   namespaces: string[],
-  config: Partial<BaseSystemConfig> = {}
+  config: Partial<BaseSystemConfig> = {},
 ): GenerateAllResult {
   const mergedConfig: BaseSystemConfig = {
     ...DEFAULT_SYSTEM_CONFIG,
@@ -179,12 +248,11 @@ export function generateNamespaces(
   const byNamespace = new Map<string, Token[]>();
   const allTokens: Token[] = [];
 
-  const requestedGenerators = ALL_GENERATORS.filter(
-    (g) => namespaces.includes(g.name)
-  );
+  const generators = createGeneratorDefs();
+  const requestedGenerators = generators.filter((g) => namespaces.includes(g.name));
 
-  for (const { fn } of requestedGenerators) {
-    const result = fn(resolvedConfig);
+  for (const { generate } of requestedGenerators) {
+    const result = generate(resolvedConfig);
     byNamespace.set(result.namespace, result.tokens);
     allTokens.push(...result.tokens);
   }
@@ -250,7 +318,7 @@ export function toTokenMap(result: GenerateAllResult): Map<string, Token> {
  * Get list of all available namespaces
  */
 export function getAvailableNamespaces(): string[] {
-  return ALL_GENERATORS.map((g) => g.name);
+  return createGeneratorDefs().map((g) => g.name);
 }
 
 /**
@@ -262,7 +330,10 @@ export function getGeneratorInfo(): Array<{ name: string; description: string }>
     { name: 'spacing', description: 'Spacing scale using minor-third (1.2) progression' },
     { name: 'typography', description: 'Typography scale with font sizes, weights, line heights' },
     { name: 'breakpoint', description: 'Viewport and container query breakpoints' },
-    { name: 'semantic', description: 'Semantic color tokens (primary, destructive, success, etc.)' },
+    {
+      name: 'semantic',
+      description: 'Semantic color tokens (primary, destructive, success, etc.)',
+    },
     { name: 'radius', description: 'Border radius scale using minor-third progression' },
     { name: 'shadow', description: 'Shadow scale derived from spacing progression' },
     { name: 'depth', description: 'Z-index scale for stacking context management' },
