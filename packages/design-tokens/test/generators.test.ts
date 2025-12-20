@@ -50,7 +50,6 @@ import {
   RADIUS_SCALE,
   // Config and types
   resolveConfig,
-  SEMANTIC_INTENTS,
   SHADOW_SCALE,
   // Scale constants
   SPACING_SCALE,
@@ -171,7 +170,8 @@ describe('Token Structure Validation', () => {
     if (token.generatedAt !== undefined) {
       expect(typeof token.generatedAt).toBe('string');
       // Should be ISO timestamp
-      expect(() => new Date(token.generatedAt!)).not.toThrow();
+      const timestamp = token.generatedAt;
+      expect(() => new Date(timestamp)).not.toThrow();
     }
   }
 
