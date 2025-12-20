@@ -239,8 +239,8 @@ export type Example = z.infer<typeof ExampleSchema>;
 export type Intelligence = z.infer<typeof IntelligenceSchema>;
 
 // Color Intelligence Schema (from API with uncertainty quantification)
+// Note: Color naming is now deterministic via generateColorName() in @rafters/color-utils
 export const ColorIntelligenceSchema = z.object({
-  suggestedName: z.string(),
   reasoning: z.string(),
   emotionalImpact: z.string(),
   culturalContext: z.string(),

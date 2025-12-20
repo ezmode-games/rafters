@@ -42,8 +42,8 @@ describe('OKLCH Schema', () => {
 
 describe('ColorIntelligence Schema', () => {
   it('validates complete color intelligence', () => {
+    // Note: suggestedName removed - naming is now deterministic via generateColorName()
     const intelligence = {
-      suggestedName: 'Ocean Blue',
       reasoning: 'Resembles deep ocean water',
       emotionalImpact: 'Calm and trustworthy',
       culturalContext: 'Associated with stability in Western cultures',
@@ -67,7 +67,6 @@ describe('ColorIntelligence Schema', () => {
 
   it('validates without optional metadata', () => {
     const intelligence = {
-      suggestedName: 'Ocean Blue',
       reasoning: 'Resembles deep ocean water',
       emotionalImpact: 'Calm',
       culturalContext: 'Western stability',
@@ -80,7 +79,6 @@ describe('ColorIntelligence Schema', () => {
 
   it('rejects invalid confidence values', () => {
     const intelligence = {
-      suggestedName: 'Ocean Blue',
       reasoning: 'Test',
       emotionalImpact: 'Test',
       culturalContext: 'Test',
@@ -192,7 +190,6 @@ describe('ColorValue Schema', () => {
       token: 'primary',
       value: '500',
       intelligence: {
-        suggestedName: 'Ocean Blue',
         reasoning: 'Deep ocean color',
         emotionalImpact: 'Calm',
         culturalContext: 'Stability',

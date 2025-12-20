@@ -85,21 +85,20 @@ export function buildVectorMetadata(color: ColorValue): VectorMetadata {
 }
 
 /**
- * Combine intelligence fields into a single searchable text
- * Prioritizes name and emotional content for better semantic matching
+ * Combine color fields into a single searchable text
+ * Prioritizes deterministic name and emotional content for better semantic matching
  */
 export function buildEmbeddingText(color: ColorValue): string {
   const parts: string[] = [];
 
-  // Name is most important for searches like "ocean blue"
+  // Deterministic name is most important for searches like "ocean blue"
   if (color.name) {
     parts.push(color.name);
     parts.push(color.name); // Repeat for emphasis
   }
 
-  // Intelligence fields
+  // Intelligence fields (AI-generated analysis, not naming)
   if (color.intelligence) {
-    parts.push(color.intelligence.suggestedName);
     parts.push(color.intelligence.emotionalImpact);
     parts.push(color.intelligence.reasoning);
     parts.push(color.intelligence.culturalContext);
