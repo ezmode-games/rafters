@@ -45,12 +45,19 @@ const spectrumResponseSchema = z.object({
   estimatedProcessingTime: z.number().optional(), // in seconds
 });
 
+const listResponseSchema = z.object({
+  success: z.boolean(),
+  backlogCount: z.number(),
+  error: z.string().optional(),
+});
+
 export type AddOneRequest = z.infer<typeof addOneSchema>;
 export type BatchRequest = z.infer<typeof batchSchema>;
 export type ResponseOne = z.infer<typeof responseOneSchema>;
 export type ResponseBatch = z.infer<typeof responseBatchSchema>;
 export type SpectrumRequest = z.infer<typeof spectrumRequestSchema>;
 export type SpectrumResponse = z.infer<typeof spectrumResponseSchema>;
+export type ListResponse = z.infer<typeof listResponseSchema>;
 
 const tags: string[] = ['Queue'];
 
@@ -108,6 +115,20 @@ export const spectrum = createRoute({
   },
 });
 
+export const list = createRoute({
+  method: 'get',
+  path: '/queue/list',
+  tags,
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(listResponseSchema, 'Queue backlog status'),
+    [HttpStatusCodes.SERVICE_UNAVAILABLE]: jsonContent(
+      listResponseSchema,
+      'Queue service unavailable or not configured',
+    ),
+  },
+});
+
 export type QueueRoute = typeof queue;
 export type BatchRoute = typeof batch;
 export type SpectrumRoute = typeof spectrum;
+export type ListRoute = typeof list;

@@ -12,8 +12,9 @@
   },
   "routes": [
     {
-      "pattern": "api.rafters.studio/*",
-      "zone_id": "142da5fc1cd70bb8bb80be9926f83750"
+      "pattern": "api.rafters.studio",
+      "zone_id": "142da5fc1cd70bb8bb80be9926f83750",
+      "custom_domain": true
     }
   ],
   "vectorize": [
@@ -28,10 +29,6 @@
   "services": [
     {
       "binding": "CORE_API",
-      "service": "api"
-    },
-    {
-      "binding": "PLATFORM_API",
       "service": "realhandy-api"
     }
   ],
@@ -39,7 +36,7 @@
     "producers": [
       {
         "queue": "color-processing-queue",
-        "binding": "COLOR_SEED_QUEUE"
+        "binding": "COLOR_QUEUE"
       }
     ],
     "consumers": [
