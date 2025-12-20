@@ -1,4 +1,16 @@
-import type { OKLCH } from '@rafters/shared';
+import {
+  calculateAPCAContrast,
+  calculateAtmosphericWeight,
+  calculatePerceptualWeight,
+  calculateWCAGContrast,
+  generateAccessibilityMetadata,
+  generateHarmony,
+  generateOKLCHScale,
+  generateSemanticColorSuggestions,
+  getColorTemperature,
+  isLightColor,
+} from '@rafters/color-utils';
+import type { ColorValue, OKLCH } from '@rafters/shared';
 import * as HttpStatusCodes from 'stoker/http-status-codes';
 import {
   buildQueryFilter,
@@ -20,23 +32,188 @@ function parseOKLCH(param: string): OKLCH {
 }
 
 /**
+ * Generate a basic color name from OKLCH values
+ * This is a simple heuristic - AI provides better names
+ */
+function generateBasicColorName(oklch: OKLCH): string {
+  const hue = oklch.h;
+  const lightness = oklch.l;
+  const chroma = oklch.c;
+
+  // Determine base hue name
+  let hueName: string;
+  if (chroma < 0.03) {
+    hueName = 'gray';
+  } else if (hue < 15 || hue >= 345) {
+    hueName = 'red';
+  } else if (hue < 45) {
+    hueName = 'orange';
+  } else if (hue < 75) {
+    hueName = 'yellow';
+  } else if (hue < 105) {
+    hueName = 'lime';
+  } else if (hue < 165) {
+    hueName = 'green';
+  } else if (hue < 195) {
+    hueName = 'teal';
+  } else if (hue < 255) {
+    hueName = 'blue';
+  } else if (hue < 285) {
+    hueName = 'violet';
+  } else if (hue < 315) {
+    hueName = 'purple';
+  } else {
+    hueName = 'magenta';
+  }
+
+  // Add lightness modifier
+  let prefix = '';
+  if (lightness < 0.25) {
+    prefix = 'dark-';
+  } else if (lightness > 0.75) {
+    prefix = 'light-';
+  }
+
+  return `${prefix}${hueName}`;
+}
+
+/**
+ * Build ColorValue from OKLCH using pure math (no AI)
+ * Fast path for generators and testing
+ */
+function buildMathOnlyColorValue(oklch: OKLCH): ColorValue {
+  // Generate the 11-position scale
+  const scaleRecord = generateOKLCHScale(oklch);
+  const scalePositions = [
+    '50',
+    '100',
+    '200',
+    '300',
+    '400',
+    '500',
+    '600',
+    '700',
+    '800',
+    '900',
+    '950',
+  ];
+  const scale = scalePositions
+    .map((pos) => scaleRecord[pos])
+    .filter((v): v is OKLCH => v !== undefined);
+
+  // Generate harmonies
+  const harmony = generateHarmony(oklch);
+
+  // Generate accessibility metadata
+  const accessibilityMeta = generateAccessibilityMetadata(scale);
+
+  // Calculate contrast on white/black
+  const white: OKLCH = { l: 1, c: 0, h: 0, alpha: 1 };
+  const black: OKLCH = { l: 0, c: 0, h: 0, alpha: 1 };
+  const contrastOnWhite = calculateWCAGContrast(oklch, white);
+  const contrastOnBlack = calculateWCAGContrast(oklch, black);
+  const apcaOnWhite = calculateAPCAContrast(oklch, white);
+  const apcaOnBlack = calculateAPCAContrast(oklch, black);
+
+  // Get analysis
+  const temperature = getColorTemperature(oklch);
+  const light = isLightColor(oklch);
+
+  // Get weights
+  const atmospheric = calculateAtmosphericWeight(oklch);
+  const perceptual = calculatePerceptualWeight(oklch);
+
+  // Get semantic suggestions
+  const semanticSuggestions = generateSemanticColorSuggestions(oklch);
+
+  // Build the ColorValue
+  const colorValue: ColorValue = {
+    name: generateBasicColorName(oklch),
+    scale,
+    tokenId: `color-${oklch.l.toFixed(3)}-${oklch.c.toFixed(3)}-${Math.round(oklch.h)}`,
+
+    // Harmonies - map to schema format
+    harmonies: {
+      complementary: harmony.complementary,
+      triadic: [harmony.triadic1, harmony.triadic2],
+      analogous: [harmony.analogous1, harmony.analogous2],
+      tetradic: [harmony.tetradic1, harmony.tetradic2, harmony.tetradic3],
+      monochromatic: scale.slice(0, 5), // First 5 scale positions
+    },
+
+    // Accessibility
+    accessibility: {
+      wcagAA: accessibilityMeta.wcagAA,
+      wcagAAA: accessibilityMeta.wcagAAA,
+      onWhite: {
+        wcagAA: contrastOnWhite >= 4.5,
+        wcagAAA: contrastOnWhite >= 7,
+        contrastRatio: contrastOnWhite,
+        aa: accessibilityMeta.onWhite.aa,
+        aaa: accessibilityMeta.onWhite.aaa,
+      },
+      onBlack: {
+        wcagAA: contrastOnBlack >= 4.5,
+        wcagAAA: contrastOnBlack >= 7,
+        contrastRatio: contrastOnBlack,
+        aa: accessibilityMeta.onBlack.aa,
+        aaa: accessibilityMeta.onBlack.aaa,
+      },
+      apca: {
+        onWhite: apcaOnWhite,
+        onBlack: apcaOnBlack,
+        minFontSize: Math.abs(apcaOnWhite) >= 60 ? 16 : Math.abs(apcaOnWhite) >= 45 ? 24 : 32,
+      },
+    },
+
+    // Analysis
+    analysis: {
+      temperature,
+      isLight: light,
+      name: generateBasicColorName(oklch),
+    },
+
+    // Atmospheric weight
+    atmosphericWeight: atmospheric,
+
+    // Perceptual weight
+    perceptualWeight: perceptual,
+
+    // Semantic suggestions
+    semanticSuggestions,
+  };
+
+  return colorValue;
+}
+
+/**
  * GET /color/:oklch
  * Get a color by exact OKLCH values
  *
- * TODO: Implement buildColorValue() when generator system is rebuilt
- * - generateColorValue() was deleted, needs redesign
- * - Should compose: generateOKLCHScale, generateHarmony, generateAccessibilityMetadata,
- *   calculateAtmosphericWeight, calculatePerceptualWeight, generateSemanticColorSuggestions
- * - Plus AI intelligence from generateColorIntelligence()
+ * Query params:
+ * - adhoc=true: Fast path using pure math (no AI, no vector lookup)
+ * - sync=true: Wait for AI generation if not cached (requires !adhoc)
  */
 export const getColor: AppRouteHandler<GetColorRoute> = async (c) => {
   const { oklch: oklchParam } = c.req.valid('param');
-  const { sync: _sync } = c.req.valid('query');
+  const { sync: _sync, adhoc } = c.req.valid('query');
 
   const oklch = parseOKLCH(oklchParam);
   const vectorId = `${oklch.l.toFixed(3)}-${oklch.c.toFixed(3)}-${Math.round(oklch.h)}`;
 
-  // Try cache lookup
+  // Fast path: ad-hoc math-only response (no AI, no vector lookup)
+  if (adhoc) {
+    const colorValue = buildMathOnlyColorValue(oklch);
+    return c.json(
+      {
+        color: colorValue,
+        status: 'found' as const,
+      },
+      HttpStatusCodes.OK,
+    );
+  }
+
+  // Standard path: Try cache lookup first
   try {
     const results = await c.env.VECTORIZE.getByIds([vectorId]);
     if (results.length > 0 && results[0]?.metadata) {
@@ -50,18 +227,19 @@ export const getColor: AppRouteHandler<GetColorRoute> = async (c) => {
       );
     }
   } catch {
-    // Cache miss or error
+    // Cache miss or error - fall through to generation
   }
 
-  // TODO: Generator system needs rebuild
-  // For now, return not implemented
+  // TODO: AI generation path needs rebuild
+  // For now, return math-only as fallback with 'generating' status
+  const colorValue = buildMathOnlyColorValue(oklch);
   return c.json(
     {
-      color: null,
-      status: 'queued' as const,
-      requestId: `stub-${vectorId}`,
+      color: colorValue,
+      status: 'generating' as const,
+      requestId: `pending-ai-${vectorId}`,
     },
-    HttpStatusCodes.ACCEPTED,
+    HttpStatusCodes.OK,
   );
 };
 

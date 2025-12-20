@@ -50,14 +50,14 @@ describe('Color Routes', () => {
   });
 
   describe('GET /color/{oklch}', () => {
-    it('returns queued status for uncached color', async () => {
+    it('returns generating status for uncached color without adhoc', async () => {
       const res = await SELF.fetch('http://localhost/color/0.500-0.120-240');
 
-      expect(res.status).toBe(202);
+      expect(res.status).toBe(200);
       const json = await res.json();
-      expect(json.status).toBe('queued');
-      expect(json.color).toBeNull();
-      expect(json.requestId).toContain('stub-');
+      expect(json.status).toBe('generating');
+      expect(json.color).toBeDefined();
+      expect(json.requestId).toContain('pending-ai-');
     });
 
     it('validates OKLCH format', async () => {
@@ -73,6 +73,113 @@ describe('Color Routes', () => {
 
       // OpenAPI validation returns 422 Unprocessable Entity
       expect(res.status).toBe(422);
+    });
+
+    describe('adhoc=true (math-only fast path)', () => {
+      it('returns found status with full ColorValue', async () => {
+        const res = await SELF.fetch('http://localhost/color/0.700-0.150-260?adhoc=true');
+
+        expect(res.status).toBe(200);
+        const json = await res.json();
+        expect(json.status).toBe('found');
+        expect(json.color).toBeDefined();
+        expect(json.requestId).toBeUndefined();
+      });
+
+      it('includes 11-position scale', async () => {
+        const res = await SELF.fetch('http://localhost/color/0.700-0.150-260?adhoc=true');
+        const json = await res.json();
+
+        expect(json.color.scale).toHaveLength(11);
+        expect(json.color.scale[0]).toHaveProperty('l');
+        expect(json.color.scale[0]).toHaveProperty('c');
+        expect(json.color.scale[0]).toHaveProperty('h');
+        expect(json.color.scale[0]).toHaveProperty('alpha');
+      });
+
+      it('includes color harmonies', async () => {
+        const res = await SELF.fetch('http://localhost/color/0.700-0.150-260?adhoc=true');
+        const json = await res.json();
+
+        expect(json.color.harmonies).toBeDefined();
+        expect(json.color.harmonies.complementary).toBeDefined();
+        expect(json.color.harmonies.triadic).toHaveLength(2);
+        expect(json.color.harmonies.analogous).toHaveLength(2);
+        expect(json.color.harmonies.tetradic).toHaveLength(3);
+        expect(json.color.harmonies.monochromatic).toHaveLength(5);
+      });
+
+      it('includes accessibility metadata', async () => {
+        const res = await SELF.fetch('http://localhost/color/0.700-0.150-260?adhoc=true');
+        const json = await res.json();
+
+        expect(json.color.accessibility).toBeDefined();
+        expect(json.color.accessibility.wcagAA).toBeDefined();
+        expect(json.color.accessibility.wcagAAA).toBeDefined();
+        expect(json.color.accessibility.onWhite).toBeDefined();
+        expect(json.color.accessibility.onBlack).toBeDefined();
+        expect(json.color.accessibility.apca).toBeDefined();
+        expect(typeof json.color.accessibility.apca.onWhite).toBe('number');
+        expect(typeof json.color.accessibility.apca.onBlack).toBe('number');
+      });
+
+      it('includes analysis with temperature and lightness', async () => {
+        const res = await SELF.fetch('http://localhost/color/0.700-0.150-260?adhoc=true');
+        const json = await res.json();
+
+        expect(json.color.analysis).toBeDefined();
+        expect(['warm', 'cool', 'neutral']).toContain(json.color.analysis.temperature);
+        expect(typeof json.color.analysis.isLight).toBe('boolean');
+        expect(json.color.analysis.name).toBeDefined();
+      });
+
+      it('includes atmospheric and perceptual weight', async () => {
+        const res = await SELF.fetch('http://localhost/color/0.700-0.150-260?adhoc=true');
+        const json = await res.json();
+
+        expect(json.color.atmosphericWeight).toBeDefined();
+        expect(json.color.perceptualWeight).toBeDefined();
+      });
+
+      it('includes semantic suggestions', async () => {
+        const res = await SELF.fetch('http://localhost/color/0.700-0.150-260?adhoc=true');
+        const json = await res.json();
+
+        expect(json.color.semanticSuggestions).toBeDefined();
+        expect(json.color.semanticSuggestions.danger).toBeDefined();
+        expect(json.color.semanticSuggestions.success).toBeDefined();
+        expect(json.color.semanticSuggestions.warning).toBeDefined();
+        expect(json.color.semanticSuggestions.info).toBeDefined();
+      });
+
+      it('generates correct basic color name from hue', async () => {
+        // Test violet (hue 260)
+        const violetRes = await SELF.fetch('http://localhost/color/0.700-0.150-260?adhoc=true');
+        const violetJson = await violetRes.json();
+        expect(violetJson.color.name).toBe('violet');
+
+        // Test red (hue 10)
+        const redRes = await SELF.fetch('http://localhost/color/0.500-0.200-10?adhoc=true');
+        const redJson = await redRes.json();
+        expect(redJson.color.name).toBe('red');
+
+        // Test gray (low chroma)
+        const grayRes = await SELF.fetch('http://localhost/color/0.500-0.020-180?adhoc=true');
+        const grayJson = await grayRes.json();
+        expect(grayJson.color.name).toBe('gray');
+      });
+
+      it('adds lightness prefix for very light or dark colors', async () => {
+        // Test light prefix (lightness > 0.75)
+        const lightRes = await SELF.fetch('http://localhost/color/0.850-0.150-260?adhoc=true');
+        const lightJson = await lightRes.json();
+        expect(lightJson.color.name).toBe('light-violet');
+
+        // Test dark prefix (lightness < 0.25)
+        const darkRes = await SELF.fetch('http://localhost/color/0.200-0.150-260?adhoc=true');
+        const darkJson = await darkRes.json();
+        expect(darkJson.color.name).toBe('dark-violet');
+      });
     });
   });
 });

@@ -56,12 +56,18 @@ export const getColor = createRoute({
     }),
     query: z.object({
       sync: z.coerce.boolean().default(false).describe('Wait for AI generation if not cached'),
+      adhoc: z.coerce
+        .boolean()
+        .default(false)
+        .describe(
+          'Return ad-hoc math-only response (no AI, no vector lookup). Returns full ColorValue schema using pure calculations. Ideal for design token generators and testing where sub-second response is needed.',
+        ),
     }),
   },
   tags: ['Color'],
   summary: 'Get color by OKLCH values',
   description:
-    'Retrieves a color from the cache or generates it. Use sync=true to wait for generation.',
+    'Retrieves a color from the cache or generates it. Use sync=true to wait for generation. Use adhoc=true for instant math-only responses (no AI/vector lookup) - ideal for design token generators and testing.',
   responses: {
     [HttpStatusCodes.OK]: jsonContent(ColorResponseSchema, 'Color found or generated'),
     [HttpStatusCodes.ACCEPTED]: jsonContent(ColorResponseSchema, 'Color queued for generation'),
