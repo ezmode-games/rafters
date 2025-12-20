@@ -436,6 +436,17 @@ export const TokenSchema = z.object({
   accessibilityLevel: z.enum(['AA', 'AAA']).optional(),
   consequence: z.enum(['reversible', 'significant', 'permanent', 'destructive']).optional(),
 
+  // Designer intent - captures WHY values deviate from computed defaults
+  // Git blame shows WHAT changed and WHEN; these fields explain the reasoning
+  overrideReason: z.string().optional(), // "Cards need visual anchoring in data-dense layouts"
+  appliesWhen: z.array(z.string()).optional(), // ["data-heavy interfaces", "dashboard contexts"]
+  usagePatterns: z
+    .object({
+      do: z.array(z.string()), // ["Use for primary actions", "Pair with muted backgrounds"]
+      never: z.array(z.string()), // ["Multiple primary buttons competing", "On busy backgrounds"]
+    })
+    .optional(),
+
   // Dependency tracking for automatic regeneration
   dependsOn: z.array(z.string()).optional(), // Parent token(s) - empty = root token
   generationRule: z.string().optional(), // How generated: "calc({base}*2)", "state:hover", etc
@@ -443,11 +454,15 @@ export const TokenSchema = z.object({
   scalePosition: z.number().optional(), // Position in color/spacing scale
   mathRelationship: z.string().optional(), // Mathematical expression for calc() rules
 
-  // Responsive behavior
-  containerQueryAware: z.boolean().optional(),
-  pointerTypeAware: z.boolean().optional(),
-  reducedMotionAware: z.boolean().optional(),
+  // Responsive behavior (containerQueryAware is default true for modern tokens)
+  containerQueryAware: z.boolean().optional().default(true),
+  pointerTypeAware: z.boolean().optional(), // Adapts to fine/coarse pointer
+  reducedMotionAware: z.boolean().optional(), // Respects prefers-reduced-motion
   viewportAware: z.boolean().optional(), // Should generate responsive variants
+
+  // Localization (MVP+1: RTL/LTR support, basic locale spacing)
+  textDirection: z.enum(['ltr', 'rtl', 'auto']).optional(),
+  localeAware: z.boolean().optional(), // Token varies by locale
 
   // Component associations
   applicableComponents: z.array(z.string()).optional(), // ["button", "input", "card"]
@@ -457,6 +472,26 @@ export const TokenSchema = z.object({
   interactionType: z.enum(['hover', 'focus', 'active', 'disabled', 'loading']).optional(),
   animationSafe: z.boolean().optional(), // Safe for vestibular disorders
   highContrastMode: z.string().optional(), // Value for high contrast mode
+
+  // Motion tokens (derived from spacing progression for cohesive feel)
+  motionIntent: z.enum(['enter', 'exit', 'emphasis', 'transition']).optional(),
+  easingCurve: z.tuple([z.number(), z.number(), z.number(), z.number()]).optional(), // cubicBezier [x1, y1, x2, y2]
+  easingName: z
+    .enum(['linear', 'ease-in', 'ease-out', 'ease-in-out', 'productive', 'expressive', 'spring'])
+    .optional(),
+  delayMs: z.number().optional(), // Delay before animation starts
+
+  // Focus tokens (WCAG 2.2 compliance, derive from ring unless overridden)
+  focusRingWidth: z.string().optional(), // e.g., "2px", "3px"
+  focusRingColor: z.string().optional(), // Reference to ring token or override
+  focusRingOffset: z.string().optional(), // e.g., "2px"
+  focusRingStyle: z.enum(['solid', 'dashed', 'double']).optional(),
+
+  // Elevation (pairs depth with shadow, can be independent)
+  elevationLevel: z
+    .enum(['surface', 'raised', 'overlay', 'sticky', 'modal', 'popover', 'tooltip'])
+    .optional(),
+  shadowToken: z.string().optional(), // Reference to paired shadow token
 
   // Export behavior
   generateUtilityClass: z.boolean().optional(), // Should create @utility class
@@ -482,6 +517,9 @@ export const TokenSchema = z.object({
 });
 
 export type Token = z.infer<typeof TokenSchema>;
+
+// Extract TokenUsagePatterns type for convenience
+export type TokenUsagePatterns = NonNullable<Token['usagePatterns']>;
 
 // Legacy alias for backward compatibility
 export const SemanticTokenSchema = TokenSchema;
