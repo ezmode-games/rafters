@@ -12,6 +12,34 @@ interface ColorContext {
   name?: string;
 }
 
+/**
+ * Sanitize JSON string by escaping unescaped newlines within quoted strings
+ * AI models often output literal newlines inside JSON string values which breaks parsing
+ */
+function sanitizeJsonNewlines(jsonString: string): string {
+  let result = '';
+  let inString = false;
+  let i = 0;
+
+  while (i < jsonString.length) {
+    const char = jsonString[i];
+    const prevChar = i > 0 ? jsonString[i - 1] : '';
+
+    if (char === '"' && prevChar !== '\\') {
+      inString = !inString;
+      result += char;
+    } else if (inString && char === '\n') {
+      // Replace literal newline with escaped newline inside strings
+      result += '\\n';
+    } else {
+      result += char;
+    }
+    i++;
+  }
+
+  return result;
+}
+
 interface ColorIntelligence {
   reasoning: string;
   emotionalImpact: string;
@@ -93,11 +121,29 @@ Generate JSON:
   );
 
   let parsedResponse: Record<string, string>;
+  let jsonString = response.response;
   try {
-    const jsonMatch = response.response.match(/\{[\s\S]*\}/);
-    const jsonString = jsonMatch ? jsonMatch[0] : response.response;
+    // Extract JSON from response, handling markdown code fences
+
+    // Remove markdown code fences if present
+    const codeBlockMatch = jsonString.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (codeBlockMatch) {
+      jsonString = codeBlockMatch[1].trim();
+    }
+
+    // Fall back to finding raw JSON object
+    if (!jsonString.startsWith('{')) {
+      const jsonMatch = jsonString.match(/\{[\s\S]*\}/);
+      jsonString = jsonMatch ? jsonMatch[0] : jsonString;
+    }
+
+    // Sanitize: Replace unescaped newlines within JSON string values
+    // This handles AI responses that contain literal newlines in quoted strings
+    jsonString = sanitizeJsonNewlines(jsonString);
+
     parsedResponse = JSON.parse(jsonString);
   } catch (_error) {
+    console.error('JSON parse error:', _error, 'JSON:', jsonString.substring(0, 200));
     throw new Error('Invalid AI response format');
   }
 
@@ -134,53 +180,63 @@ export async function generateColorIntelligence(
   let predictionId: string | null = null;
 
   // Record prediction before AI generation (if platform API available)
+  // Non-blocking: don't let uncertainty tracking failures break AI generation
   if (platformApi) {
-    const uncertaintyClient = new UncertaintyClient(platformApi);
-    predictionId = await uncertaintyClient.recordPrediction({
-      service: 'component',
-      prediction: {
-        oklch,
-        expectedAnalysis: 'color_intelligence',
-        inputQuality: {
-          validOKLCH: true,
-          lightnessRange: oklch.l,
-          chromaLevel: oklch.c,
-          hueValue: oklch.h,
+    try {
+      const uncertaintyClient = new UncertaintyClient(platformApi);
+      predictionId = await uncertaintyClient.recordPrediction({
+        service: 'component',
+        prediction: {
+          oklch,
+          expectedAnalysis: 'color_intelligence',
+          inputQuality: {
+            validOKLCH: true,
+            lightnessRange: oklch.l,
+            chromaLevel: oklch.c,
+            hueValue: oklch.h,
+          },
         },
-      },
-      confidence: inputConfidence,
-      method: 'bootstrap',
-      context: {
-        requestId: colorId,
-        timestamp: new Date().toISOString(),
-        metadata: { cached: false },
-      },
-    });
+        confidence: inputConfidence,
+        method: 'bootstrap',
+        context: {
+          requestId: colorId,
+          timestamp: new Date().toISOString(),
+          metadata: { cached: false },
+        },
+      });
+    } catch (err) {
+      console.warn('Uncertainty prediction recording failed:', err);
+    }
   }
 
   // Generate AI intelligence
   const intelligence = await generateWithWorkersAI(oklch, {}, undefined, aiBinding);
 
   // Record outcome after AI generation
+  // Non-blocking: don't let uncertainty tracking failures break the response
   if (platformApi && predictionId) {
-    const uncertaintyClient = new UncertaintyClient(platformApi);
-    const processingTime = Date.now() - startTime;
+    try {
+      const uncertaintyClient = new UncertaintyClient(platformApi);
+      const processingTime = Date.now() - startTime;
 
-    await uncertaintyClient.updateOutcome(predictionId, {
-      actualOutcome: {
-        intelligenceGenerated: true,
-        responseQuality: scoreResponseQuality(intelligence),
-        completeness: {
-          reasoning: !!intelligence.reasoning,
-          emotionalImpact: !!intelligence.emotionalImpact,
-          culturalContext: !!intelligence.culturalContext,
-          accessibilityNotes: !!intelligence.accessibilityNotes,
-          usageGuidance: !!intelligence.usageGuidance,
+      await uncertaintyClient.updateOutcome(predictionId, {
+        actualOutcome: {
+          intelligenceGenerated: true,
+          responseQuality: scoreResponseQuality(intelligence),
+          completeness: {
+            reasoning: !!intelligence.reasoning,
+            emotionalImpact: !!intelligence.emotionalImpact,
+            culturalContext: !!intelligence.culturalContext,
+            accessibilityNotes: !!intelligence.accessibilityNotes,
+            usageGuidance: !!intelligence.usageGuidance,
+          },
+          processingTime,
+          aiProvider: 'workers-ai',
         },
-        processingTime,
-        aiProvider: 'workers-ai',
-      },
-    });
+      });
+    } catch (err) {
+      console.warn('Uncertainty outcome recording failed:', err);
+    }
   }
 
   // Build and attach confidence metadata

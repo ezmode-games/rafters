@@ -22,16 +22,19 @@
   "vectorize": [
     {
       "binding": "VECTORIZE",
-      "index_name": "rafters-colors"
+      "index_name": "rafters-colors",
+      "remote": true
     }
   ],
   "ai": {
-    "binding": "AI"
+    "binding": "AI",
+    "remote": true
   },
   "services": [
     {
       "binding": "CORE_API",
-      "service": "realhandy-api"
+      "service": "realhandy-api",
+      "remote": true
     }
   ],
   "queues": {

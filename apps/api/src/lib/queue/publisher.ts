@@ -244,6 +244,7 @@ export class ColorSeedPublisher {
             l: Math.round(lightness * 100) / 100,
             c: Math.round(chroma * 100) / 100,
             h: Math.round(hue),
+            alpha: 1,
           };
 
           colors.push({

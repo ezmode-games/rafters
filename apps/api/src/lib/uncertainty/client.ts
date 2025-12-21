@@ -111,7 +111,7 @@ export class UncertaintyClient {
    */
   async recordPrediction(request: CreatePredictionRequest): Promise<string | null> {
     try {
-      const response = await this.platformApi.fetch('http://internal/predictions', {
+      const response = await this.platformApi.fetch('http://internal/uncertainty/predictions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(request),
@@ -135,11 +135,14 @@ export class UncertaintyClient {
    */
   async updateOutcome(predictionId: string, request: UpdateOutcomeRequest): Promise<boolean> {
     try {
-      const response = await this.platformApi.fetch(`http://internal/predictions/${predictionId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(request),
-      });
+      const response = await this.platformApi.fetch(
+        `http://internal/uncertainty/predictions/${predictionId}`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(request),
+        },
+      );
 
       return response.ok;
     } catch (error) {
