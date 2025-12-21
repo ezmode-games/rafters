@@ -559,10 +559,9 @@ export function generateOKLCHScale(baseColor: OKLCH): Record<string, OKLCH> {
 /**
  * Generate semantic color system with intelligent background/foreground suggestions - Pure OKLCH
  * Currently unused but preserved for future semantic color system features
+ * @internal
  */
-// Preserved for future semantic color system features
-// @ts-expect-error - Unused function preserved for future use
-function _generateSemanticColorSystem(baseColor: OKLCH) {
+export function generateSemanticColorSystem(baseColor: OKLCH) {
   const suggestions = generateSemanticColorSuggestions(baseColor);
   const semanticSystem: {
     [K in keyof typeof suggestions]: {

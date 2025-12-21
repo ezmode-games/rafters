@@ -56,6 +56,7 @@ export function getChromaCategory(chroma: number): ChromaCategory {
 
 /**
  * Metadata stored with each vector for filtering and retrieval
+ * Note: Vectorize only supports primitive types, so color is stored as JSON string
  */
 export interface VectorMetadata {
   // Indexed fields for filtering
@@ -64,12 +65,37 @@ export interface VectorMetadata {
   chroma: ChromaCategory;
   token?: string; // semantic role if assigned
 
-  // Full color data for retrieval
+  // Full color data serialized as JSON string (Vectorize doesn't support nested objects)
+  color_json: string;
+}
+
+/**
+ * Parsed metadata with full ColorValue object (for use after retrieval)
+ */
+export interface ParsedVectorMetadata {
+  hue_category: HueCategory;
+  lightness: LightnessCategory;
+  chroma: ChromaCategory;
+  token?: string;
   color: ColorValue;
 }
 
 /**
+ * Parse vector metadata, deserializing the color JSON
+ */
+export function parseVectorMetadata(metadata: VectorMetadata): ParsedVectorMetadata {
+  return {
+    hue_category: metadata.hue_category,
+    lightness: metadata.lightness,
+    chroma: metadata.chroma,
+    token: metadata.token,
+    color: JSON.parse(metadata.color_json) as ColorValue,
+  };
+}
+
+/**
  * Build vector metadata from ColorValue
+ * Serializes color as JSON string since Vectorize doesn't support nested objects
  */
 export function buildVectorMetadata(color: ColorValue): VectorMetadata {
   // Get base color from scale[5] (the 500 step) or first available
@@ -80,7 +106,7 @@ export function buildVectorMetadata(color: ColorValue): VectorMetadata {
     lightness: getLightnessCategory(baseColor.l),
     chroma: getChromaCategory(baseColor.c),
     token: color.token,
-    color,
+    color_json: JSON.stringify(color),
   };
 }
 

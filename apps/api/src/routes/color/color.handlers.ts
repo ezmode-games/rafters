@@ -13,12 +13,15 @@ import {
 } from '@rafters/color-utils';
 import type { ColorValue, OKLCH } from '@rafters/shared';
 import * as HttpStatusCodes from 'stoker/http-status-codes';
+import { generateColorIntelligence } from '@/lib/color/intelligence';
 import {
   buildQueryFilter,
   type ChromaCategory,
+  generateColorEmbedding,
   generateQueryEmbedding,
   type HueCategory,
   type LightnessCategory,
+  parseVectorMetadata,
   type VectorMetadata,
 } from '@/lib/color/vector';
 import type { AppRouteHandler } from '@/lib/types';
@@ -151,7 +154,7 @@ function buildMathOnlyColorValue(oklch: OKLCH): ColorValue {
  */
 export const getColor: AppRouteHandler<GetColorRoute> = async (c) => {
   const { oklch: oklchParam } = c.req.valid('param');
-  const { sync: _sync, adhoc } = c.req.valid('query');
+  const { sync, adhoc } = c.req.valid('query');
 
   const oklch = parseOKLCH(oklchParam);
   const vectorId = `${oklch.l.toFixed(3)}-${oklch.c.toFixed(3)}-${Math.round(oklch.h)}`;
@@ -172,10 +175,11 @@ export const getColor: AppRouteHandler<GetColorRoute> = async (c) => {
   try {
     const results = await c.env.VECTORIZE.getByIds([vectorId]);
     if (results.length > 0 && results[0]?.metadata) {
-      const metadata = results[0].metadata as unknown as VectorMetadata;
+      const rawMetadata = results[0].metadata as unknown as VectorMetadata;
+      const parsed = parseVectorMetadata(rawMetadata);
       return c.json(
         {
-          color: metadata.color,
+          color: parsed.color,
           status: 'found' as const,
         },
         HttpStatusCodes.OK,
@@ -185,17 +189,70 @@ export const getColor: AppRouteHandler<GetColorRoute> = async (c) => {
     // Cache miss or error - fall through to generation
   }
 
-  // TODO: AI generation path needs rebuild
-  // For now, return math-only as fallback with 'generating' status
+  // If not sync, return math-only immediately
+  if (!sync) {
+    const colorValue = buildMathOnlyColorValue(oklch);
+    return c.json(
+      {
+        color: colorValue,
+        status: 'generating' as const,
+        requestId: `pending-ai-${vectorId}`,
+      },
+      HttpStatusCodes.OK,
+    );
+  }
+
+  // Sync mode: Generate AI intelligence and store to Vectorize
   const colorValue = buildMathOnlyColorValue(oklch);
-  return c.json(
-    {
-      color: colorValue,
-      status: 'generating' as const,
-      requestId: `pending-ai-${vectorId}`,
-    },
-    HttpStatusCodes.OK,
-  );
+
+  try {
+    // Generate AI intelligence with uncertainty quantification
+    const intelligence = await generateColorIntelligence(oklch, c.env.AI, c.env.CORE_API);
+
+    // Add intelligence to color value
+    const colorWithIntelligence: ColorValue = {
+      ...colorValue,
+      intelligence: {
+        reasoning: intelligence.reasoning,
+        emotionalImpact: intelligence.emotionalImpact,
+        culturalContext: intelligence.culturalContext,
+        accessibilityNotes: intelligence.accessibilityNotes,
+        usageGuidance: intelligence.usageGuidance,
+        balancingGuidance: intelligence.balancingGuidance,
+        metadata: intelligence.metadata,
+      },
+    };
+
+    // Generate embedding and store to Vectorize
+    const { embedding, metadata } = await generateColorEmbedding(colorWithIntelligence, c.env.AI);
+
+    await c.env.VECTORIZE.upsert([
+      {
+        id: vectorId,
+        values: embedding,
+        metadata: metadata as unknown as Record<string, string | number | boolean | string[]>,
+      },
+    ]);
+
+    return c.json(
+      {
+        color: colorWithIntelligence,
+        status: 'found' as const,
+      },
+      HttpStatusCodes.OK,
+    );
+  } catch (error) {
+    // AI generation failed - return math-only with error info
+    console.error('AI generation failed:', error);
+    return c.json(
+      {
+        color: colorValue,
+        status: 'error' as const,
+        error: error instanceof Error ? error.message : 'AI generation failed',
+      },
+      HttpStatusCodes.OK,
+    );
+  }
 };
 
 /**
@@ -226,9 +283,10 @@ export const searchColors: AppRouteHandler<SearchColorsRoute> = async (c) => {
 
   // Map results to response format
   const results = searchResults.matches.map((match) => {
-    const metadata = match.metadata as unknown as VectorMetadata;
+    const rawMetadata = match.metadata as unknown as VectorMetadata;
+    const parsed = parseVectorMetadata(rawMetadata);
     return {
-      color: metadata.color,
+      color: parsed.color,
       score: match.score,
     };
   });

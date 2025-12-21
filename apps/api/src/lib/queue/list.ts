@@ -34,7 +34,7 @@ const BACKLOG_QUERY = `
 query QueueBacklog($accountId: String!, $queueId: String!, $since: Time!, $until: Time!) {
   viewer {
     accounts(filter: { accountTag: $accountId }) {
-      queuesBacklogAdaptiveGroups(
+      queueBacklogAdaptiveGroups(
         filter: { queueId: $queueId, datetime_geq: $since, datetime_leq: $until }
         limit: 1
         orderBy: [datetime_DESC]
@@ -57,7 +57,7 @@ interface GraphQLResponse {
   data?: {
     viewer?: {
       accounts?: Array<{
-        queuesBacklogAdaptiveGroups?: Array<{
+        queueBacklogAdaptiveGroups?: Array<{
           avg?: {
             backlog?: number;
             bytes?: number;
@@ -116,7 +116,7 @@ export async function fetchQueueStatus(config: QueueStatusConfig): Promise<Queue
       };
     }
 
-    const backlogData = data.data?.viewer?.accounts?.[0]?.queuesBacklogAdaptiveGroups?.[0];
+    const backlogData = data.data?.viewer?.accounts?.[0]?.queueBacklogAdaptiveGroups?.[0];
     const backlogCount = backlogData?.avg?.backlog ?? 0;
 
     return { backlogCount };
