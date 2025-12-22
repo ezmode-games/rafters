@@ -1,16 +1,22 @@
 /**
  * Motion Generator
  *
- * Generates motion tokens (duration, easing, delay) derived from the spacing progression.
- * Uses minor-third (1.2) ratio for harmonious timing that feels connected to the spacing.
+ * Generates motion tokens (duration, easing, delay) using mathematical progressions
+ * from @rafters/math-utils. Uses minor-third (1.2) ratio by default for harmonious
+ * timing that feels connected to the spacing system.
+ *
+ * This generator uses step-based progression: value = base * ratio^step
+ * - step 0 = base value
+ * - step 1 = base * ratio (slower)
+ * - step -1 = base / ratio (faster)
  *
  * This generator is a pure function - it receives motion definitions as input.
  * Default motion values are provided by the orchestrator from defaults.ts.
  */
 
-import { getRatio } from '@rafters/math-utils';
+import { createProgression } from '@rafters/math-utils';
 import type { Token } from '@rafters/shared';
-import type { DurationDef, EasingDef } from './defaults.js';
+import type { DelayDef, DurationDef, EasingDef } from './defaults.js';
 import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
 import { EASING_CURVES, MOTION_DURATION_SCALE } from './types.js';
 
@@ -21,12 +27,14 @@ export function generateMotionTokens(
   config: ResolvedSystemConfig,
   durationDefs: Record<string, DurationDef>,
   easingDefs: Record<string, EasingDef>,
-  delayMultipliers: Record<string, number>,
+  delayDefs: Record<string, DelayDef>,
 ): GeneratorResult {
   const tokens: Token[] = [];
   const timestamp = new Date().toISOString();
   const { baseTransitionDuration, progressionRatio } = config;
-  const ratioValue = getRatio(progressionRatio);
+
+  // Create progression for computing values
+  const progression = createProgression(progressionRatio as 'minor-third');
 
   // Base duration token
   tokens.push({
@@ -37,7 +45,7 @@ export function generateMotionTokens(
     semanticMeaning: 'Base transition duration - all motion timing derives from this',
     usageContext: ['calculation-reference'],
     progressionSystem: progressionRatio as 'minor-third',
-    description: `Base duration (${baseTransitionDuration}ms). Motion uses ${progressionRatio} ratio (${ratioValue}).`,
+    description: `Base duration (${baseTransitionDuration}ms). Motion uses ${progressionRatio} progression (ratio ${progression.ratio}).`,
     generatedAt: timestamp,
     containerQueryAware: false,
     reducedMotionAware: true,
@@ -52,7 +60,21 @@ export function generateMotionTokens(
     const def = durationDefs[scale];
     if (!def) continue;
     const scaleIndex = MOTION_DURATION_SCALE.indexOf(scale);
-    const durationMs = Math.round(baseTransitionDuration * def.multiplier);
+
+    let durationMs: number;
+    let mathRelationship: string;
+
+    if (def.step === 'instant') {
+      durationMs = 0;
+      mathRelationship = '0';
+    } else {
+      // Use progression.compute() for step-based calculation
+      durationMs = Math.round(progression.compute(baseTransitionDuration, def.step));
+      mathRelationship =
+        def.step === 0
+          ? `${baseTransitionDuration}ms (base)`
+          : `${baseTransitionDuration} × ${progression.ratio}^${def.step}`;
+    }
 
     tokens.push({
       name: `motion-duration-${scale}`,
@@ -65,8 +87,8 @@ export function generateMotionTokens(
       progressionSystem: progressionRatio as 'minor-third',
       motionIntent: def.motionIntent,
       motionDuration: durationMs,
-      mathRelationship: `${baseTransitionDuration}ms × ${def.multiplier}`,
-      dependsOn: scale === 'instant' ? [] : ['motion-duration-base'],
+      mathRelationship,
+      dependsOn: def.step === 'instant' ? [] : ['motion-duration-base'],
       description: `Duration ${scale}: ${durationMs}ms. ${def.meaning}`,
       generatedAt: timestamp,
       containerQueryAware: false,
@@ -121,8 +143,21 @@ export function generateMotionTokens(
   }
 
   // Generate delay tokens
-  for (const [name, multiplier] of Object.entries(delayMultipliers)) {
-    const delayMs = Math.round(baseTransitionDuration * multiplier);
+  for (const [name, def] of Object.entries(delayDefs)) {
+    let delayMs: number;
+    let mathRelationship: string;
+
+    if (def.step === 'none') {
+      delayMs = 0;
+      mathRelationship = '0';
+    } else {
+      // Use progression.compute() for step-based calculation
+      delayMs = Math.round(progression.compute(baseTransitionDuration, def.step));
+      mathRelationship =
+        def.step === 0
+          ? `${baseTransitionDuration}ms (base)`
+          : `${baseTransitionDuration} × ${progression.ratio}^${def.step}`;
+    }
 
     tokens.push({
       name: `motion-delay-${name}`,
@@ -139,8 +174,8 @@ export function generateMotionTokens(
               ? ['modal-content', 'after-transition']
               : ['emphasis', 'dramatic-reveals'],
       delayMs,
-      mathRelationship: `${baseTransitionDuration}ms × ${multiplier}`,
-      dependsOn: name === 'none' ? [] : ['motion-duration-base'],
+      mathRelationship,
+      dependsOn: def.step === 'none' ? [] : ['motion-duration-base'],
       description: `Delay ${name}: ${delayMs}ms. Based on duration progression.`,
       generatedAt: timestamp,
       containerQueryAware: false,
@@ -191,7 +226,13 @@ export function generateMotionTokens(
     const durationDef = durationDefs[comp.duration];
     const easingDef = easingDefs[comp.easing];
     if (!durationDef || !easingDef) continue;
-    const durationMs = Math.round(baseTransitionDuration * durationDef.multiplier);
+
+    let durationMs: number;
+    if (durationDef.step === 'instant') {
+      durationMs = 0;
+    } else {
+      durationMs = Math.round(progression.compute(baseTransitionDuration, durationDef.step));
+    }
 
     tokens.push({
       name: comp.name,
@@ -216,9 +257,9 @@ export function generateMotionTokens(
     name: 'motion-progression',
     value: JSON.stringify({
       ratio: progressionRatio,
-      ratioValue,
+      ratioValue: progression.ratio,
       baseDuration: baseTransitionDuration,
-      note: 'Motion timing derived from spacing progression for unified feel',
+      note: 'Motion timing uses step-based progression (base * ratio^step) for unified feel',
     }),
     category: 'motion',
     namespace: 'motion',

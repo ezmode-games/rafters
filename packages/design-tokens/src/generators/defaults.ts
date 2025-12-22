@@ -354,39 +354,46 @@ export const DEFAULT_ELEVATION_DEFINITIONS: Record<string, ElevationDef> = {
 // =============================================================================
 
 export interface DurationDef {
-  multiplier: number;
+  /** Steps from base using the progression ratio (0 = base, negative = faster, positive = slower) */
+  step: number | 'instant';
   meaning: string;
   contexts: string[];
   motionIntent: 'enter' | 'exit' | 'emphasis' | 'transition';
 }
 
+/**
+ * Duration scale using step-based progression.
+ * Values are computed as: baseDuration * ratio^step
+ * With minor-third (1.2) and baseDuration of 150ms:
+ *   step -1 = 125ms, step 0 = 150ms, step 1 = 180ms, step 2 = 216ms, etc.
+ */
 export const DEFAULT_DURATION_DEFINITIONS: Record<string, DurationDef> = {
   instant: {
-    multiplier: 0,
+    step: 'instant',
     meaning: 'Instant - no animation',
     contexts: ['disabled-motion', 'prefers-reduced-motion'],
     motionIntent: 'transition',
   },
   fast: {
-    multiplier: 0.667,
+    step: -1,
     meaning: 'Fast - micro-interactions, hover states',
     contexts: ['hover', 'focus', 'active', 'micro-feedback'],
     motionIntent: 'transition',
   },
   normal: {
-    multiplier: 1,
+    step: 0,
     meaning: 'Normal - standard UI transitions',
     contexts: ['buttons', 'toggles', 'state-changes'],
     motionIntent: 'transition',
   },
   slow: {
-    multiplier: 1.5,
+    step: 1,
     meaning: 'Slow - enter/exit animations',
     contexts: ['modals', 'dialogs', 'panels', 'enter-exit'],
     motionIntent: 'enter',
   },
   slower: {
-    multiplier: 2,
+    step: 2,
     meaning: 'Slower - emphasis, large element transitions',
     contexts: ['page-transitions', 'hero-animations', 'emphasis'],
     motionIntent: 'emphasis',
@@ -445,11 +452,22 @@ export const DEFAULT_EASING_DEFINITIONS: Record<string, EasingDef> = {
   },
 };
 
-export const DEFAULT_DELAY_MULTIPLIERS: Record<string, number> = {
-  none: 0,
-  short: 0.5,
-  medium: 1,
-  long: 2,
+export interface DelayDef {
+  /** Steps from base using the progression ratio (0 = base, negative = shorter, positive = longer) */
+  step: number | 'none';
+}
+
+/**
+ * Delay scale using step-based progression.
+ * Values are computed as: baseDuration * ratio^step
+ * With minor-third (1.2) and baseDuration of 150ms:
+ *   step -1 = 125ms, step 0 = 150ms, step 1 = 180ms, step 2 = 216ms, etc.
+ */
+export const DEFAULT_DELAY_DEFINITIONS: Record<string, DelayDef> = {
+  none: { step: 'none' },
+  short: { step: -1 },
+  medium: { step: 0 },
+  long: { step: 1 },
 };
 
 // =============================================================================
@@ -500,54 +518,61 @@ export const DEFAULT_FOCUS_CONFIGS: Record<string, FocusConfig> = {
 // =============================================================================
 
 export interface RadiusDef {
-  multiplier: number | 'full' | 'none';
+  /** Steps from base using the progression ratio (0 = base, negative = smaller, positive = larger) */
+  step: number | 'full' | 'none';
   meaning: string;
   contexts: string[];
 }
 
+/**
+ * Radius scale using step-based progression.
+ * Values are computed as: baseRadius * ratio^step
+ * With minor-third (1.2) and baseRadius of 4px:
+ *   step -1 = 3.33px, step 0 = 4px, step 1 = 4.8px, step 2 = 5.76px, etc.
+ */
 export const DEFAULT_RADIUS_DEFINITIONS: Record<string, RadiusDef> = {
   none: {
-    multiplier: 'none',
+    step: 'none',
     meaning: 'No border radius - sharp corners',
     contexts: ['sharp-corners', 'table-cells', 'inline-elements'],
   },
   sm: {
-    multiplier: 0.5,
+    step: -1,
     meaning: 'Small radius for subtle rounding',
     contexts: ['badges', 'tags', 'small-elements', 'inline-blocks'],
   },
   DEFAULT: {
-    multiplier: 1,
+    step: 0,
     meaning: 'Default radius - primary UI elements',
     contexts: ['buttons', 'inputs', 'cards', 'dropdowns'],
   },
   md: {
-    multiplier: 1.2,
+    step: 1,
     meaning: 'Medium radius for containers',
     contexts: ['cards', 'panels', 'dialogs'],
   },
   lg: {
-    multiplier: 1.44,
+    step: 2,
     meaning: 'Large radius for prominent containers',
     contexts: ['modals', 'large-cards', 'feature-panels'],
   },
   xl: {
-    multiplier: 1.728,
+    step: 3,
     meaning: 'Extra large radius for emphasized elements',
     contexts: ['hero-cards', 'featured-sections'],
   },
   '2xl': {
-    multiplier: 2.074,
+    step: 4,
     meaning: 'Maximum meaningful radius',
     contexts: ['pills', 'large-avatars', 'emphasized-buttons'],
   },
   '3xl': {
-    multiplier: 2.488,
+    step: 5,
     meaning: 'Very large radius for special cases',
     contexts: ['stadium-shapes', 'special-emphasis'],
   },
   full: {
-    multiplier: 'full',
+    step: 'full',
     meaning: 'Fully rounded - circles and pills',
     contexts: ['avatars', 'pill-buttons', 'circular-elements'],
   },
