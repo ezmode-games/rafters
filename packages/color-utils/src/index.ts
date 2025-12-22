@@ -3,10 +3,87 @@
  * OKLCH color manipulation utilities for Rafters design system
  */
 
-export * from './accessibility.js';
-export * from './analysis.js';
-export * from './conversion.js';
-export * from './harmony.js';
-export * from './manipulation.js';
-export * from './naming/index.js';
-export * from './validation-alerts.js';
+// Accessibility
+export {
+  type AccessibilityMetadata,
+  calculateAPCAContrast,
+  calculateWCAGContrast,
+  findAccessibleColor,
+  generateAccessibilityMetadata,
+  meetsAPCAStandard,
+  meetsWCAGStandard,
+} from './accessibility.js';
+
+// Analysis
+export { calculateColorDistance, getColorTemperature, isLightColor } from './analysis.js';
+
+// Builder
+export { type BuildColorValueOptions, buildColorValue } from './builder.js';
+
+// Conversion
+export { hexToOKLCH, oklchToCSS, oklchToHex, roundOKLCH } from './conversion.js';
+
+// Harmony
+export {
+  calculateAtmosphericWeight,
+  calculatePerceptualWeight,
+  generateHarmony,
+  generateOKLCHScale,
+  generateRaftersHarmony,
+  generateSemanticColorSuggestions,
+  generateSemanticColorSystem,
+  generateSemanticColors,
+} from './harmony.js';
+
+// Manipulation
+export {
+  adjustChroma,
+  adjustHue,
+  adjustLightness,
+  blendColors,
+  darken,
+  generateNeutralColor,
+  generateSurfaceColor,
+  lighten,
+} from './manipulation.js';
+
+// Naming
+export {
+  BLUE_HUB,
+  C_BUCKET_COUNT,
+  type ChromaBand,
+  GREEN_HUB,
+  generateColorName,
+  generateColorNameWithMetadata,
+  getAllBuckets,
+  getCBucket,
+  getChromaBand,
+  getExpandedMaterialWord,
+  getHBucket,
+  getLBucket,
+  getLightnessBand,
+  getSubIndex,
+  H_BUCKET_COUNT,
+  HUE_HUBS,
+  type HueCell,
+  type HueHub,
+  type HueMatrix,
+  hasExpandedHub,
+  INTENSITY_WORDS,
+  type IntensityWord,
+  L_BUCKET_COUNT,
+  type LightnessBand,
+  LUMINOSITY_WORDS,
+  type LuminosityWord,
+  MATERIAL_WORDS,
+  type MaterialWord,
+  RED_HUB,
+  TOTAL_COMBINATIONS,
+} from './naming/index.js';
+
+// Validation
+export {
+  type AccessibilityAlert,
+  type SemanticMapping,
+  validateSemanticMappings,
+} from './validation-alerts.js';

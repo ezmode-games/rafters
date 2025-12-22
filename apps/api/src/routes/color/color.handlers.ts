@@ -1,16 +1,4 @@
-import {
-  calculateAPCAContrast,
-  calculateAtmosphericWeight,
-  calculatePerceptualWeight,
-  calculateWCAGContrast,
-  generateAccessibilityMetadata,
-  generateColorName,
-  generateHarmony,
-  generateOKLCHScale,
-  generateSemanticColorSuggestions,
-  getColorTemperature,
-  isLightColor,
-} from '@rafters/color-utils';
+import { buildColorValue } from '@rafters/color-utils';
 import type { ColorValue, OKLCH } from '@rafters/shared';
 import * as HttpStatusCodes from 'stoker/http-status-codes';
 import { generateColorIntelligence } from '@/lib/color/intelligence';
@@ -36,115 +24,6 @@ function parseOKLCH(param: string): OKLCH {
 }
 
 /**
- * Build ColorValue from OKLCH using pure math (no AI)
- * Fast path for generators and testing
- */
-function buildMathOnlyColorValue(oklch: OKLCH): ColorValue {
-  // Generate the 11-position scale
-  const scaleRecord = generateOKLCHScale(oklch);
-  const scalePositions = [
-    '50',
-    '100',
-    '200',
-    '300',
-    '400',
-    '500',
-    '600',
-    '700',
-    '800',
-    '900',
-    '950',
-  ];
-  const scale = scalePositions
-    .map((pos) => scaleRecord[pos])
-    .filter((v): v is OKLCH => v !== undefined);
-
-  // Generate harmonies
-  const harmony = generateHarmony(oklch);
-
-  // Generate accessibility metadata
-  const accessibilityMeta = generateAccessibilityMetadata(scale);
-
-  // Calculate contrast on white/black
-  const white: OKLCH = { l: 1, c: 0, h: 0, alpha: 1 };
-  const black: OKLCH = { l: 0, c: 0, h: 0, alpha: 1 };
-  const contrastOnWhite = calculateWCAGContrast(oklch, white);
-  const contrastOnBlack = calculateWCAGContrast(oklch, black);
-  const apcaOnWhite = calculateAPCAContrast(oklch, white);
-  const apcaOnBlack = calculateAPCAContrast(oklch, black);
-
-  // Get analysis
-  const temperature = getColorTemperature(oklch);
-  const light = isLightColor(oklch);
-
-  // Get weights
-  const atmospheric = calculateAtmosphericWeight(oklch);
-  const perceptual = calculatePerceptualWeight(oklch);
-
-  // Get semantic suggestions
-  const semanticSuggestions = generateSemanticColorSuggestions(oklch);
-
-  // Build the ColorValue
-  const colorValue: ColorValue = {
-    name: generateColorName(oklch),
-    scale,
-    tokenId: `color-${oklch.l.toFixed(3)}-${oklch.c.toFixed(3)}-${Math.round(oklch.h)}`,
-
-    // Harmonies - map to schema format
-    harmonies: {
-      complementary: harmony.complementary,
-      triadic: [harmony.triadic1, harmony.triadic2],
-      analogous: [harmony.analogous1, harmony.analogous2],
-      tetradic: [harmony.tetradic1, harmony.tetradic2, harmony.tetradic3],
-      monochromatic: scale.slice(0, 5), // First 5 scale positions
-    },
-
-    // Accessibility
-    accessibility: {
-      wcagAA: accessibilityMeta.wcagAA,
-      wcagAAA: accessibilityMeta.wcagAAA,
-      onWhite: {
-        wcagAA: contrastOnWhite >= 4.5,
-        wcagAAA: contrastOnWhite >= 7,
-        contrastRatio: contrastOnWhite,
-        aa: accessibilityMeta.onWhite.aa,
-        aaa: accessibilityMeta.onWhite.aaa,
-      },
-      onBlack: {
-        wcagAA: contrastOnBlack >= 4.5,
-        wcagAAA: contrastOnBlack >= 7,
-        contrastRatio: contrastOnBlack,
-        aa: accessibilityMeta.onBlack.aa,
-        aaa: accessibilityMeta.onBlack.aaa,
-      },
-      apca: {
-        onWhite: apcaOnWhite,
-        onBlack: apcaOnBlack,
-        minFontSize: Math.abs(apcaOnWhite) >= 60 ? 16 : Math.abs(apcaOnWhite) >= 45 ? 24 : 32,
-      },
-    },
-
-    // Analysis
-    analysis: {
-      temperature,
-      isLight: light,
-      name: generateColorName(oklch),
-    },
-
-    // Atmospheric weight
-    atmosphericWeight: atmospheric,
-
-    // Perceptual weight
-    perceptualWeight: perceptual,
-
-    // Semantic suggestions
-    semanticSuggestions,
-  };
-
-  return colorValue;
-}
-
-/**
  * GET /color/:oklch
  * Get a color by exact OKLCH values
  *
@@ -161,7 +40,7 @@ export const getColor: AppRouteHandler<GetColorRoute> = async (c) => {
 
   // Fast path: ad-hoc math-only response (no AI, no vector lookup)
   if (adhoc) {
-    const colorValue = buildMathOnlyColorValue(oklch);
+    const colorValue = buildColorValue(oklch);
     return c.json(
       {
         color: colorValue,
@@ -191,7 +70,7 @@ export const getColor: AppRouteHandler<GetColorRoute> = async (c) => {
 
   // If not sync, return math-only immediately
   if (!sync) {
-    const colorValue = buildMathOnlyColorValue(oklch);
+    const colorValue = buildColorValue(oklch);
     return c.json(
       {
         color: colorValue,
@@ -203,7 +82,7 @@ export const getColor: AppRouteHandler<GetColorRoute> = async (c) => {
   }
 
   // Sync mode: Generate AI intelligence and store to Vectorize
-  const colorValue = buildMathOnlyColorValue(oklch);
+  const colorValue = buildColorValue(oklch);
 
   try {
     // Generate AI intelligence with uncertainty quantification
