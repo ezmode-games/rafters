@@ -5,6 +5,7 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  createProgression,
   generateFibonacciLike,
   generateModularScale,
   generateMusicalScale,
@@ -239,6 +240,122 @@ describe('generateModularScale', () => {
     expect(result.larger[2]).toBe(31.25); // H3
     expect(result.larger[3]).toBeCloseTo(39.06, 2); // H2
     expect(result.larger[4]).toBeCloseTo(48.83, 2); // H1
+  });
+});
+
+describe('createProgression', () => {
+  describe('minor-third progression', () => {
+    const progression = createProgression('minor-third');
+
+    it('exposes type and ratio', () => {
+      expect(progression.type).toBe('minor-third');
+      expect(progression.ratio).toBe(1.2);
+    });
+
+    it('computes step 0 as base value', () => {
+      expect(progression.compute(4, 0)).toBe(4);
+      expect(progression.compute(16, 0)).toBe(16);
+    });
+
+    it('computes positive steps (larger values)', () => {
+      expect(progression.compute(4, 1)).toBeCloseTo(4.8, 2); // 4 * 1.2
+      expect(progression.compute(4, 2)).toBeCloseTo(5.76, 2); // 4 * 1.2^2
+      expect(progression.compute(4, 3)).toBeCloseTo(6.912, 2); // 4 * 1.2^3
+    });
+
+    it('computes negative steps (smaller values)', () => {
+      expect(progression.compute(4, -1)).toBeCloseTo(3.333, 2); // 4 / 1.2
+      expect(progression.compute(4, -2)).toBeCloseTo(2.778, 2); // 4 / 1.2^2
+    });
+
+    it('generates sequence from start step', () => {
+      const seq = progression.generateSequence(4, 5, { startStep: -1 });
+      expect(seq).toHaveLength(5);
+      expect(seq[0]).toBeCloseTo(3.333, 2); // step -1
+      expect(seq[1]).toBeCloseTo(4, 2); // step 0
+      expect(seq[2]).toBeCloseTo(4.8, 2); // step 1
+      expect(seq[3]).toBeCloseTo(5.76, 2); // step 2
+      expect(seq[4]).toBeCloseTo(6.912, 2); // step 3
+    });
+
+    it('generates sequence with includeZero', () => {
+      const seq = progression.generateSequence(4, 3, { includeZero: true });
+      expect(seq[0]).toBe(0);
+      // When includeZero is true, the remaining values start from step 1
+      expect(seq[1]).toBeCloseTo(4.8, 2); // step 1
+      expect(seq[2]).toBeCloseTo(5.76, 2); // step 2
+    });
+  });
+
+  describe('golden ratio progression', () => {
+    const progression = createProgression('golden');
+
+    it('exposes type and ratio', () => {
+      expect(progression.type).toBe('golden');
+      expect(progression.ratio).toBeCloseTo(1.618, 3);
+    });
+
+    it('computes values correctly', () => {
+      expect(progression.compute(10, 0)).toBe(10);
+      expect(progression.compute(10, 1)).toBeCloseTo(16.18, 2);
+      expect(progression.compute(10, -1)).toBeCloseTo(6.18, 2);
+    });
+  });
+
+  describe('linear progression', () => {
+    const progression = createProgression('linear');
+
+    it('exposes type and ratio', () => {
+      expect(progression.type).toBe('linear');
+      expect(progression.ratio).toBe(1);
+    });
+
+    it('computes as base * (step + 1)', () => {
+      expect(progression.compute(4, 0)).toBe(4); // 4 * 1
+      expect(progression.compute(4, 1)).toBe(8); // 4 * 2
+      expect(progression.compute(4, 2)).toBe(12); // 4 * 3
+    });
+  });
+
+  describe('exponential progression', () => {
+    const progression = createProgression('exponential');
+
+    it('uses default multiplier of 1.25', () => {
+      expect(progression.ratio).toBe(1.25);
+    });
+
+    it('computes exponential values', () => {
+      expect(progression.compute(16, 0)).toBe(16);
+      expect(progression.compute(16, 1)).toBe(20); // 16 * 1.25
+      expect(progression.compute(16, 2)).toBe(25); // 16 * 1.25^2
+    });
+  });
+
+  describe('design-tokens use cases', () => {
+    it('radius scale with minor-third', () => {
+      const progression = createProgression('minor-third');
+      const baseRadius = 4;
+
+      // Radius scale: sm(-1), DEFAULT(0), md(1), lg(2), xl(3), 2xl(4), 3xl(5)
+      expect(progression.compute(baseRadius, -1)).toBeCloseTo(3.33, 2); // sm
+      expect(progression.compute(baseRadius, 0)).toBe(4); // DEFAULT
+      expect(progression.compute(baseRadius, 1)).toBeCloseTo(4.8, 2); // md
+      expect(progression.compute(baseRadius, 2)).toBeCloseTo(5.76, 2); // lg
+      expect(progression.compute(baseRadius, 3)).toBeCloseTo(6.91, 2); // xl
+      expect(progression.compute(baseRadius, 4)).toBeCloseTo(8.29, 2); // 2xl
+      expect(progression.compute(baseRadius, 5)).toBeCloseTo(9.95, 2); // 3xl
+    });
+
+    it('motion duration scale with minor-third', () => {
+      const progression = createProgression('minor-third');
+      const baseDuration = 150;
+
+      // Duration scale: fast(-1), normal(0), slow(1), slower(2)
+      expect(progression.compute(baseDuration, -1)).toBeCloseTo(125, 0); // fast
+      expect(progression.compute(baseDuration, 0)).toBe(150); // normal
+      expect(progression.compute(baseDuration, 1)).toBeCloseTo(180, 0); // slow
+      expect(progression.compute(baseDuration, 2)).toBeCloseTo(216, 0); // slower
+    });
   });
 });
 

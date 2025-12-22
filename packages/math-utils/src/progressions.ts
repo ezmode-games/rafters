@@ -8,6 +8,164 @@
 import { getRatio, type ProgressionType } from './constants.js';
 
 /**
+ * A progression object that can compute values at any step from a base value.
+ * This is the preferred interface for generators to use as it allows computing
+ * values on-demand without pre-generating entire sequences.
+ */
+export interface Progression {
+  /** The ratio type used for this progression */
+  readonly type: ProgressionType;
+  /** The numeric ratio value */
+  readonly ratio: number;
+
+  /**
+   * Compute a value at a given step from the base value
+   *
+   * @param base - The base value to scale from
+   * @param step - Steps from base (0 = base, negative = smaller, positive = larger)
+   * @returns The computed value at that step
+   *
+   * @example
+   * ```typescript
+   * const progression = createProgression('minor-third');
+   * progression.compute(4, 0);  // 4 (base)
+   * progression.compute(4, 1);  // 4.8 (4 * 1.2)
+   * progression.compute(4, 2);  // 5.76 (4 * 1.2^2)
+   * progression.compute(4, -1); // 3.333 (4 / 1.2)
+   * ```
+   */
+  compute(base: number, step: number): number;
+
+  /**
+   * Generate an array of values from the progression
+   *
+   * @param base - The base value to scale from
+   * @param steps - Number of steps to generate
+   * @param options - Additional options
+   * @returns Array of computed values
+   */
+  generateSequence(
+    base: number,
+    steps: number,
+    options?: { includeZero?: boolean; startStep?: number },
+  ): number[];
+}
+
+/**
+ * Create a progression object for computing values using a mathematical ratio.
+ *
+ * This is the recommended way to use progressions in generators. Instead of
+ * hardcoding multipliers like `[0.5, 1, 1.2, 1.44, 1.728]`, you can compute
+ * values dynamically: `progression.compute(base, step)`.
+ *
+ * @param type - The progression type (musical ratio, mathematical constant, etc.)
+ * @returns A Progression object with compute and generateSequence methods
+ *
+ * @example
+ * ```typescript
+ * // For radius tokens with minor-third progression
+ * const progression = createProgression('minor-third');
+ * const baseRadius = 4;
+ *
+ * // Generate scale values
+ * const sm = progression.compute(baseRadius, -1); // 3.333
+ * const md = progression.compute(baseRadius, 0);  // 4 (base)
+ * const lg = progression.compute(baseRadius, 1);  // 4.8
+ * const xl = progression.compute(baseRadius, 2);  // 5.76
+ *
+ * // Or generate a sequence
+ * const scale = progression.generateSequence(baseRadius, 5, { startStep: -1 });
+ * // [3.333, 4, 4.8, 5.76, 6.912]
+ * ```
+ */
+export function createProgression(type: ProgressionType): Progression {
+  // Handle special cases first
+  if (type === 'linear') {
+    return {
+      type,
+      ratio: 1,
+      compute(base: number, step: number): number {
+        return base * (step + 1);
+      },
+      generateSequence(
+        base: number,
+        steps: number,
+        options: { includeZero?: boolean; startStep?: number } = {},
+      ): number[] {
+        const { includeZero = false, startStep = 0 } = options;
+        const result: number[] = [];
+        for (let i = 0; i < steps; i++) {
+          const step = startStep + i;
+          if (i === 0 && includeZero) {
+            result.push(0);
+          } else {
+            result.push(base * (step + 1));
+          }
+        }
+        return result;
+      },
+    };
+  }
+
+  if (type === 'exponential') {
+    // For exponential, use a default multiplier (can't parameterize via createProgression)
+    const defaultMultiplier = 1.25;
+    return {
+      type,
+      ratio: defaultMultiplier,
+      compute(base: number, step: number): number {
+        return base * defaultMultiplier ** step;
+      },
+      generateSequence(
+        base: number,
+        steps: number,
+        options: { includeZero?: boolean; startStep?: number } = {},
+      ): number[] {
+        const { includeZero = false, startStep = 0 } = options;
+        const result: number[] = [];
+        for (let i = 0; i < steps; i++) {
+          const step = startStep + i;
+          if (i === 0 && includeZero) {
+            result.push(0);
+          } else {
+            result.push(base * defaultMultiplier ** step);
+          }
+        }
+        return result;
+      },
+    };
+  }
+
+  // Musical ratios and mathematical constants
+  const ratio = getRatio(type);
+
+  return {
+    type,
+    ratio,
+    compute(base: number, step: number): number {
+      return base * ratio ** step;
+    },
+    generateSequence(
+      base: number,
+      steps: number,
+      options: { includeZero?: boolean; startStep?: number } = {},
+    ): number[] {
+      const { includeZero = false, startStep = 0 } = options;
+      const result: number[] = [];
+      for (let i = 0; i < steps; i++) {
+        const step = startStep + i;
+        if (i === 0 && includeZero) {
+          result.push(0);
+        } else {
+          result.push(base * ratio ** step);
+        }
+      }
+      return result;
+    },
+  };
+}
+
+/**
  * Options for generating mathematical progressions
  */
 export interface ProgressionOptions {

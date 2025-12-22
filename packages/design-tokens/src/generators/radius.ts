@@ -1,14 +1,19 @@
 /**
  * Border Radius Generator
  *
- * Generates border radius tokens using mathematical progressions.
- * Uses minor-third (1.2) ratio for harmonious radius scale.
+ * Generates border radius tokens using mathematical progressions from @rafters/math-utils.
+ * Uses minor-third (1.2) ratio by default for harmonious radius scale.
+ *
+ * This generator uses step-based progression: value = base * ratio^step
+ * - step 0 = base value
+ * - step 1 = base * ratio (larger)
+ * - step -1 = base / ratio (smaller)
  *
  * This generator is a pure function - it receives radius definitions as input.
  * Default radius values are provided by the orchestrator from defaults.ts.
  */
 
-import { getRatio } from '@rafters/math-utils';
+import { createProgression } from '@rafters/math-utils';
 import type { Token } from '@rafters/shared';
 import type { RadiusDef } from './defaults.js';
 import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
@@ -24,7 +29,9 @@ export function generateRadiusTokens(
   const tokens: Token[] = [];
   const timestamp = new Date().toISOString();
   const { baseRadius, progressionRatio } = config;
-  const ratioValue = getRatio(progressionRatio);
+
+  // Create progression for computing values
+  const progression = createProgression(progressionRatio as 'minor-third');
 
   // Base radius token
   tokens.push({
@@ -35,7 +42,7 @@ export function generateRadiusTokens(
     semanticMeaning: 'Base border radius - all other radii derive from this value',
     usageContext: ['calculation-reference'],
     progressionSystem: progressionRatio as 'minor-third',
-    description: `Base radius (${baseRadius}px). Scale uses ${progressionRatio} progression (${ratioValue}).`,
+    description: `Base radius (${baseRadius}px). Scale uses ${progressionRatio} progression (ratio ${progression.ratio}).`,
     generatedAt: timestamp,
     containerQueryAware: false,
     usagePatterns: {
@@ -52,16 +59,20 @@ export function generateRadiusTokens(
     let value: string;
     let mathRelationship: string;
 
-    if (def.multiplier === 'none') {
+    if (def.step === 'none') {
       value = '0';
       mathRelationship = '0';
-    } else if (def.multiplier === 'full') {
+    } else if (def.step === 'full') {
       value = '9999px';
       mathRelationship = 'infinite (9999px)';
     } else {
-      const computed = Math.round(baseRadius * def.multiplier * 100) / 100;
+      // Use progression.compute() for step-based calculation
+      const computed = Math.round(progression.compute(baseRadius, def.step) * 100) / 100;
       value = `${computed}px`;
-      mathRelationship = `${baseRadius} × ${def.multiplier}`;
+      mathRelationship =
+        def.step === 0
+          ? `${baseRadius}px (base)`
+          : `${baseRadius} × ${progression.ratio}^${def.step}`;
     }
 
     tokens.push({
@@ -74,7 +85,7 @@ export function generateRadiusTokens(
       scalePosition: scaleIndex,
       progressionSystem: progressionRatio as 'minor-third',
       mathRelationship,
-      dependsOn: def.multiplier === 'none' || def.multiplier === 'full' ? [] : ['radius-base'],
+      dependsOn: def.step === 'none' || def.step === 'full' ? [] : ['radius-base'],
       description: `Border radius ${scale}: ${value} (${mathRelationship})`,
       generatedAt: timestamp,
       containerQueryAware: false,
