@@ -524,3 +524,17 @@ export type TokenUsagePatterns = NonNullable<Token['usagePatterns']>;
 // Legacy alias for backward compatibility
 export const SemanticTokenSchema = TokenSchema;
 export type SemanticToken = Token;
+
+/**
+ * Namespace File Schema
+ * File format for .rafters/tokens/{namespace}.rafters.json files
+ */
+export const NamespaceFileSchema = z.object({
+  $schema: z.string(),
+  namespace: z.string(),
+  version: z.string(),
+  generatedAt: z.string(),
+  tokens: z.array(TokenSchema),
+});
+
+export type NamespaceFile = z.infer<typeof NamespaceFileSchema>;
