@@ -7,6 +7,7 @@ export * from './dependencies.js';
 export * from './generation-rules.js';
 // Generators - produce complete base design system tokens
 export * from './generators/index.js';
+export * from './persistence/index.js';
 // Subdirectories
 export * from './plugins/calc.js';
 export * from './plugins/contrast.js';
