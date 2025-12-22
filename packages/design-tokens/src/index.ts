@@ -4,6 +4,8 @@
  */
 
 export * from './dependencies.js';
+// Exporters - convert tokens to various output formats
+export * from './exporters/index.js';
 export * from './generation-rules.js';
 // Generators - produce complete base design system tokens
 export * from './generators/index.js';
