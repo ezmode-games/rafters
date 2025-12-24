@@ -35,15 +35,18 @@ export function generateSpacingTokens(
   });
 
   // Base unit token - the foundation everything else derives from
+  // Convert px to rem (assuming 16px root font size)
+  const baseRem = baseSpacingUnit / 16;
+
   tokens.push({
     name: 'spacing-base',
-    value: `${baseSpacingUnit}px`,
+    value: `${baseRem}rem`,
     category: 'spacing',
     namespace: 'spacing',
     semanticMeaning: 'Foundation spacing unit - all spacing derives from this value',
     usageContext: ['base-unit', 'calculation-reference'],
     progressionSystem: progressionRatio as 'minor-third',
-    description: `Base spacing unit (${baseSpacingUnit}px). Multiply by scale values for actual spacing.`,
+    description: `Base spacing unit (${baseRem}rem / ${baseSpacingUnit}px at 16px root). Multiply by scale values for actual spacing.`,
     generatedAt: timestamp,
     containerQueryAware: true,
     usagePatterns: {
@@ -89,9 +92,10 @@ export function generateSpacingTokens(
       usageContext = ['hero-spacing', 'page-margins', 'major-sections'];
     }
 
+    const remValue = value / 16;
     tokens.push({
       name: `spacing-${scale}`,
-      value: value === 0 ? '0' : `${value}px`,
+      value: value === 0 ? '0' : `${remValue}rem`,
       category: 'spacing',
       namespace: 'spacing',
       semanticMeaning: meaning,
@@ -101,7 +105,7 @@ export function generateSpacingTokens(
       mathRelationship: `${baseSpacingUnit} * ${multiplier}`,
       dependsOn: ['spacing-base'],
       generationRule: `calc({spacing-base} * ${multiplier})`,
-      description: `Spacing at scale ${scale} = ${value}px (${baseSpacingUnit}px × ${multiplier})`,
+      description: `Spacing at scale ${scale} = ${remValue}rem (${baseSpacingUnit}px × ${multiplier})`,
       generatedAt: timestamp,
       containerQueryAware: true,
     });
@@ -119,7 +123,7 @@ export function generateSpacingTokens(
     category: 'spacing',
     namespace: 'spacing',
     semanticMeaning: 'Metadata about the spacing progression system',
-    description: `Spacing uses ${progressionRatio} progression (ratio ${ratioValue}) from base ${baseSpacingUnit}px. Sample values: ${progression
+    description: `Spacing uses ${progressionRatio} progression (ratio ${ratioValue}) from base ${baseRem}rem. Sample values: ${progression
       .slice(0, 5)
       .map((v) => Math.round(v))
       .join(', ')}...`,

@@ -33,16 +33,19 @@ export function generateRadiusTokens(
   // Create progression for computing values
   const progression = createProgression(progressionRatio as 'minor-third');
 
+  // Convert px to rem (assuming 16px root font size)
+  const baseRadiusRem = baseRadius / 16;
+
   // Base radius token
   tokens.push({
     name: 'radius-base',
-    value: `${baseRadius}px`,
+    value: `${baseRadiusRem}rem`,
     category: 'radius',
     namespace: 'radius',
     semanticMeaning: 'Base border radius - all other radii derive from this value',
     usageContext: ['calculation-reference'],
     progressionSystem: progressionRatio as 'minor-third',
-    description: `Base radius (${baseRadius}px). Scale uses ${progressionRatio} progression (ratio ${progression.ratio}).`,
+    description: `Base radius (${baseRadiusRem}rem / ${baseRadius}px). Scale uses ${progressionRatio} progression (ratio ${progression.ratio}).`,
     generatedAt: timestamp,
     containerQueryAware: false,
     usagePatterns: {
@@ -63,16 +66,17 @@ export function generateRadiusTokens(
       value = '0';
       mathRelationship = '0';
     } else if (def.step === 'full') {
-      value = '9999px';
+      value = '9999px'; // Full radius stays in px as it's a special case
       mathRelationship = 'infinite (9999px)';
     } else {
       // Use progression.compute() for step-based calculation
-      const computed = Math.round(progression.compute(baseRadius, def.step) * 100) / 100;
-      value = `${computed}px`;
+      const computedPx = Math.round(progression.compute(baseRadius, def.step) * 100) / 100;
+      const computedRem = Math.round((computedPx / 16) * 100) / 100;
+      value = `${computedRem}rem`;
       mathRelationship =
         def.step === 0
-          ? `${baseRadius}px (base)`
-          : `${baseRadius} × ${progression.ratio}^${def.step}`;
+          ? `${baseRadiusRem}rem (base)`
+          : `${baseRadiusRem} × ${progression.ratio}^${def.step}`;
     }
 
     tokens.push({

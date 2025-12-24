@@ -84,16 +84,18 @@ export function generateTypographyTokens(
     },
   });
 
-  // Base font size token
+  // Base font size token - use rem (1rem = 16px)
+  const baseFontSizeRem = baseFontSize / 16;
+
   tokens.push({
     name: 'font-size-base',
-    value: `${baseFontSize}px`,
+    value: `${baseFontSizeRem}rem`,
     category: 'typography',
     namespace: 'typography',
     semanticMeaning: 'Base font size - all other sizes derive from this',
     usageContext: ['body-text', 'calculation-reference'],
     progressionSystem: progressionRatio as 'minor-third',
-    description: `Base font size (${baseFontSize}px). Typography scale uses ${progressionRatio} ratio (${ratioValue}).`,
+    description: `Base font size (${baseFontSizeRem}rem). Typography scale uses ${progressionRatio} ratio (${ratioValue}).`,
     generatedAt: timestamp,
     containerQueryAware: true,
     usagePatterns: {

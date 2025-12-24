@@ -15,6 +15,14 @@ import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
 /**
  * Generate focus tokens from provided configurations
  */
+/**
+ * Convert px value to rem string
+ */
+function pxToRem(px: number): string {
+  const rem = Math.round((px / 16) * 1000) / 1000;
+  return `${rem}rem`;
+}
+
 export function generateFocusTokens(
   config: ResolvedSystemConfig,
   focusConfigs: Record<string, FocusConfig>,
@@ -23,17 +31,19 @@ export function generateFocusTokens(
   const timestamp = new Date().toISOString();
   const { focusRingWidth } = config;
 
-  // Base focus width token
+  // Base focus width token - use rem
+  const focusRingWidthRem = pxToRem(focusRingWidth);
+
   tokens.push({
     name: 'focus-ring-width',
-    value: `${focusRingWidth}px`,
+    value: focusRingWidthRem,
     category: 'focus',
     namespace: 'focus',
     semanticMeaning: 'Default focus ring width - WCAG 2.2 requires minimum 2px',
     usageContext: ['focus-indicators', 'keyboard-navigation'],
     accessibilityLevel: 'AA',
-    focusRingWidth: `${focusRingWidth}px`,
-    description: `Focus ring width ${focusRingWidth}px. WCAG 2.2 requires minimum 2px for visibility.`,
+    focusRingWidth: focusRingWidthRem,
+    description: `Focus ring width ${focusRingWidthRem}. WCAG 2.2 requires minimum 2px for visibility.`,
     generatedAt: timestamp,
     containerQueryAware: false,
     usagePatterns: {
@@ -60,11 +70,14 @@ export function generateFocusTokens(
 
   // Generate focus ring configuration tokens
   for (const [name, focusConfig] of Object.entries(focusConfigs)) {
+    const widthRem = pxToRem(focusConfig.width);
+    const offsetRem = pxToRem(focusConfig.offset);
+
     tokens.push({
       name: name === 'default' ? 'focus-ring' : `focus-ring-${name}`,
       value: JSON.stringify({
-        width: `${focusConfig.width}px`,
-        offset: `${focusConfig.offset}px`,
+        width: widthRem,
+        offset: offsetRem,
         style: focusConfig.style,
         color: 'var(--ring)',
       }),
@@ -72,13 +85,13 @@ export function generateFocusTokens(
       namespace: 'focus',
       semanticMeaning: focusConfig.meaning,
       usageContext: focusConfig.contexts,
-      focusRingWidth: `${focusConfig.width}px`,
+      focusRingWidth: widthRem,
       focusRingColor: 'var(--ring)',
-      focusRingOffset: `${focusConfig.offset}px`,
+      focusRingOffset: offsetRem,
       focusRingStyle: focusConfig.style,
       dependsOn: ['ring', 'focus-ring-width'],
       accessibilityLevel: focusConfig.width >= 2 ? 'AA' : undefined,
-      description: `${focusConfig.meaning}. Width: ${focusConfig.width}px, Offset: ${focusConfig.offset}px.`,
+      description: `${focusConfig.meaning}. Width: ${widthRem}, Offset: ${offsetRem}.`,
       generatedAt: timestamp,
       containerQueryAware: false,
       highContrastMode: 'Highlight',
@@ -99,10 +112,7 @@ export function generateFocusTokens(
     });
 
     // Also create CSS-ready outline shorthand
-    const outlineValue =
-      focusConfig.offset >= 0
-        ? `${focusConfig.width}px ${focusConfig.style} var(--ring)`
-        : `${focusConfig.width}px ${focusConfig.style} var(--ring)`;
+    const outlineValue = `${widthRem} ${focusConfig.style} var(--ring)`;
 
     tokens.push({
       name: name === 'default' ? 'focus-outline' : `focus-outline-${name}`,
@@ -112,19 +122,19 @@ export function generateFocusTokens(
       semanticMeaning: `CSS outline shorthand for ${name} focus ring`,
       usageContext: ['css-outline-property'],
       dependsOn: ['ring'],
-      description: `CSS outline value: ${outlineValue}. Use with outline-offset: ${focusConfig.offset}px.`,
+      description: `CSS outline value: ${outlineValue}. Use with outline-offset: ${offsetRem}.`,
       generatedAt: timestamp,
       containerQueryAware: false,
     });
 
     tokens.push({
       name: name === 'default' ? 'focus-offset' : `focus-offset-${name}`,
-      value: `${focusConfig.offset}px`,
+      value: offsetRem,
       category: 'focus',
       namespace: 'focus',
       semanticMeaning: `Focus ring offset for ${name} style`,
-      focusRingOffset: `${focusConfig.offset}px`,
-      description: `Focus offset ${focusConfig.offset}px for ${name} focus style.`,
+      focusRingOffset: offsetRem,
+      description: `Focus offset ${offsetRem} for ${name} focus style.`,
       generatedAt: timestamp,
       containerQueryAware: false,
     });
@@ -134,8 +144,8 @@ export function generateFocusTokens(
   tokens.push({
     name: 'focus-within-ring',
     value: JSON.stringify({
-      width: `${focusRingWidth}px`,
-      offset: '0px',
+      width: focusRingWidthRem,
+      offset: '0',
       style: 'solid',
       color: 'var(--ring)',
     }),
@@ -143,9 +153,9 @@ export function generateFocusTokens(
     namespace: 'focus',
     semanticMeaning: 'Focus ring for containers with focused descendants',
     usageContext: ['form-groups', 'card-actions', 'list-containers'],
-    focusRingWidth: `${focusRingWidth}px`,
+    focusRingWidth: focusRingWidthRem,
     focusRingColor: 'var(--ring)',
-    focusRingOffset: '0px',
+    focusRingOffset: '0',
     focusRingStyle: 'solid',
     dependsOn: ['ring'],
     description: 'Focus indicator for containers using :focus-within pseudo-class.',
@@ -161,8 +171,8 @@ export function generateFocusTokens(
   tokens.push({
     name: 'focus-high-contrast',
     value: JSON.stringify({
-      width: '3px',
-      offset: '2px',
+      width: pxToRem(3),
+      offset: pxToRem(2),
       style: 'solid',
       color: 'Highlight',
     }),
@@ -170,8 +180,8 @@ export function generateFocusTokens(
     namespace: 'focus',
     semanticMeaning: 'Focus ring for Windows High Contrast Mode',
     usageContext: ['high-contrast-mode', 'forced-colors'],
-    focusRingWidth: '3px',
-    focusRingOffset: '2px',
+    focusRingWidth: pxToRem(3),
+    focusRingOffset: pxToRem(2),
     focusRingStyle: 'solid',
     highContrastMode: 'Highlight',
     description: 'High contrast focus ring using system Highlight color.',

@@ -15,6 +15,14 @@ import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
 import { SHADOW_SCALE } from './types.js';
 
 /**
+ * Convert px value to rem string
+ */
+function pxToRem(px: number): string {
+  const rem = Math.round((px / 16) * 1000) / 1000;
+  return `${rem}rem`;
+}
+
+/**
  * Generate shadow CSS value from definition
  */
 function generateShadowValue(def: ShadowDef, baseSpacing: number): string {
@@ -24,21 +32,23 @@ function generateShadowValue(def: ShadowDef, baseSpacing: number): string {
 
   const shadows: string[] = [];
 
-  // Primary shadow
-  const yOffset = Math.round(def.yOffset * baseSpacing * 100) / 100;
-  const blur = Math.round(def.blur * baseSpacing * 100) / 100;
-  const spread = Math.round(def.spread * baseSpacing * 100) / 100;
+  // Primary shadow - use rem for all measurements
+  const yOffsetPx = Math.round(def.yOffset * baseSpacing * 100) / 100;
+  const blurPx = Math.round(def.blur * baseSpacing * 100) / 100;
+  const spreadPx = Math.round(def.spread * baseSpacing * 100) / 100;
 
-  shadows.push(`0 ${yOffset}px ${blur}px ${spread}px rgb(0 0 0 / ${def.opacity})`);
+  shadows.push(
+    `0 ${pxToRem(yOffsetPx)} ${pxToRem(blurPx)} ${pxToRem(spreadPx)} rgb(0 0 0 / ${def.opacity})`,
+  );
 
   // Inner shadow for more depth if defined
   if (def.innerShadow) {
-    const innerY = Math.round(def.innerShadow.yOffset * baseSpacing * 100) / 100;
-    const innerBlur = Math.round(def.innerShadow.blur * baseSpacing * 100) / 100;
-    const innerSpread = Math.round(def.innerShadow.spread * baseSpacing * 100) / 100;
+    const innerYPx = Math.round(def.innerShadow.yOffset * baseSpacing * 100) / 100;
+    const innerBlurPx = Math.round(def.innerShadow.blur * baseSpacing * 100) / 100;
+    const innerSpreadPx = Math.round(def.innerShadow.spread * baseSpacing * 100) / 100;
 
     shadows.push(
-      `0 ${innerY}px ${innerBlur}px ${innerSpread}px rgb(0 0 0 / ${def.innerShadow.opacity})`,
+      `0 ${pxToRem(innerYPx)} ${pxToRem(innerBlurPx)} ${pxToRem(innerSpreadPx)} rgb(0 0 0 / ${def.innerShadow.opacity})`,
     );
   }
 
@@ -57,17 +67,19 @@ export function generateShadowTokens(
   const { baseSpacingUnit, progressionRatio } = config;
   const ratioValue = getRatio(progressionRatio);
 
-  // Shadow reference token
+  // Shadow reference token - use rem
+  const baseSpacingRem = baseSpacingUnit / 16;
+
   tokens.push({
     name: 'shadow-base-unit',
-    value: `${baseSpacingUnit}px`,
+    value: `${baseSpacingRem}rem`,
     category: 'shadow',
     namespace: 'shadow',
     semanticMeaning: 'Base unit for shadow calculations - tied to spacing for consistency',
     usageContext: ['calculation-reference'],
     progressionSystem: progressionRatio as 'minor-third',
     dependsOn: ['spacing-base'],
-    description: `Shadows derive from spacing base (${baseSpacingUnit}px) for visual consistency.`,
+    description: `Shadows derive from spacing base (${baseSpacingRem}rem) for visual consistency.`,
     generatedAt: timestamp,
     containerQueryAware: false,
   });
@@ -128,13 +140,13 @@ export function generateShadowTokens(
   for (const { name, desc, color, opacity } of coloredShadows) {
     const baseDef = shadowDefs.DEFAULT;
     if (!baseDef) continue;
-    const yOffset = Math.round(baseDef.yOffset * baseSpacingUnit * 100) / 100;
-    const blur = Math.round(baseDef.blur * baseSpacingUnit * 100) / 100;
-    const spread = Math.round(baseDef.spread * baseSpacingUnit * 100) / 100;
+    const yOffsetPx = Math.round(baseDef.yOffset * baseSpacingUnit * 100) / 100;
+    const blurPx = Math.round(baseDef.blur * baseSpacingUnit * 100) / 100;
+    const spreadPx = Math.round(baseDef.spread * baseSpacingUnit * 100) / 100;
 
     tokens.push({
       name,
-      value: `0 ${yOffset}px ${blur}px ${spread}px color-mix(in oklch, ${color} ${opacity * 100}%, transparent)`,
+      value: `0 ${pxToRem(yOffsetPx)} ${pxToRem(blurPx)} ${pxToRem(spreadPx)} color-mix(in oklch, ${color} ${opacity * 100}%, transparent)`,
       category: 'shadow',
       namespace: 'shadow',
       semanticMeaning: desc,

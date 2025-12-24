@@ -66,39 +66,32 @@ export function generateBreakpointTokens(
     });
   }
 
-  // Container query breakpoints
+  // Container query breakpoints (Tailwind v4 style with --container-* and rem)
   for (const [name, def] of Object.entries(containerBreakpointDefs)) {
+    const pxValue = def.width * 16; // Convert rem to px for documentation
+
     tokens.push({
-      name: `breakpoint-${name}`,
-      value: `${def.minWidth}px`,
+      name: `container-${name}`,
+      value: `${def.width}rem`,
       category: 'breakpoint',
       namespace: 'breakpoint',
       semanticMeaning: def.meaning,
       usageContext: ['component-responsive', 'container-queries'],
       containerQueryAware: true,
       viewportAware: false,
-      description: `Container query breakpoint at ${def.minWidth}px. ${def.meaning}.`,
+      description: `Container query size @${name} = ${def.width}rem (${pxValue}px). ${def.meaning}.`,
       generatedAt: timestamp,
       usagePatterns: {
         do: [
-          'Use for component-level responsiveness',
-          'Prefer over viewport queries for reusable components',
+          `Use @${name}: variant for component responsiveness`,
+          'Add @container to parent element first',
+          'Prefer container queries over viewport for reusable components',
         ],
-        never: ['Use for page-level layout', 'Forget to set container-type on parent'],
+        never: [
+          'Use for page-level layout (use screen-* instead)',
+          'Forget to add @container class to parent',
+        ],
       },
-    });
-
-    // Container query syntax
-    tokens.push({
-      name: `container-${name}`,
-      value: `(min-width: ${def.minWidth}px)`,
-      category: 'breakpoint',
-      namespace: 'breakpoint',
-      semanticMeaning: `Container query for ${name}`,
-      dependsOn: [`breakpoint-${name}`],
-      containerQueryAware: true,
-      description: `Container query: @container (min-width: ${def.minWidth}px)`,
-      generatedAt: timestamp,
     });
   }
 
@@ -191,14 +184,14 @@ export function generateBreakpointTokens(
     value: JSON.stringify({
       viewport: Object.fromEntries(Object.entries(breakpointDefs).map(([k, v]) => [k, v.minWidth])),
       container: Object.fromEntries(
-        Object.entries(containerBreakpointDefs).map(([k, v]) => [k, v.minWidth]),
+        Object.entries(containerBreakpointDefs).map(([k, v]) => [k, `${v.width}rem`]),
       ),
-      note: 'Container queries are preferred for component responsiveness',
+      note: 'Container queries use --container-* theme variables with rem values. Use @xs:, @sm:, @md:, etc. variants.',
     }),
     category: 'breakpoint',
     namespace: 'breakpoint',
     semanticMeaning: 'Breakpoint scale reference',
-    description: 'Complete breakpoint scale for viewport and container queries.',
+    description: 'Complete breakpoint scale for viewport (px) and container queries (rem).',
     generatedAt: timestamp,
     containerQueryAware: true,
   });

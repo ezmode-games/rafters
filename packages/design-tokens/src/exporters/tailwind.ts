@@ -2,10 +2,10 @@
  * Tailwind v4 CSS Exporter
  *
  * Converts TokenRegistry contents to Tailwind v4 CSS format with:
- * - @theme block for design system values
- * - :root semantic variables (shadcn compatible)
+ * - @theme block for raw color scales
+ * - :root --rafters-* namespace tokens (light/dark mode)
+ * - Semantic variables that switch via prefers-color-scheme
  * - @theme inline bridge pattern
- * - Dark mode support
  *
  * @see https://tailwindcss.com/docs/theme
  * @see https://ui.shadcn.com/docs/theming
@@ -18,38 +18,84 @@ import type { TokenRegistry } from '../registry.js';
  * Options for Tailwind CSS export
  */
 export interface TailwindExportOptions {
-  /** Include comments with token metadata */
+  /** Include comments with token metadata (default: false) */
   includeComments?: boolean;
-  /** Dark mode selector (default: '.dark') */
-  darkModeSelector?: string;
   /** Include @import "tailwindcss" at top */
   includeImport?: boolean;
 }
 
 /**
- * Token with optional theme variant for dark mode support
+ * Group tokens by their namespace
  */
-interface TokenWithVariant extends Token {
-  themeVariant?: 'light' | 'dark';
+interface GroupedTokens {
+  semantic: Token[];
+  color: Token[];
+  spacing: Token[];
+  typography: Token[];
+  radius: Token[];
+  shadow: Token[];
+  depth: Token[];
+  motion: Token[];
+  breakpoint: Token[];
+  elevation: Token[];
+  focus: Token[];
+  other: Token[];
 }
 
 /**
- * Group tokens by their namespace and theme variant
+ * Semantic color mappings for the Rafters namespace
+ * Maps semantic names to their light and dark mode color references
+ *
+ * Color family names from API cache (api.rafters.studio):
+ * - silver-true-glacier: cyan/teal (h:180)
+ * - silver-bold-fire-truck: red (h:0)
+ * - silver-true-honey: amber/gold (h:60)
+ * - silver-true-citrine: lime/green (h:90)
+ * - silver-true-sky: blue (h:210)
+ * - silver-true-violet: violet/purple (h:270)
  */
-interface GroupedTokens {
-  semantic: { light: TokenWithVariant[]; dark: TokenWithVariant[] };
-  color: TokenWithVariant[];
-  spacing: TokenWithVariant[];
-  typography: TokenWithVariant[];
-  radius: TokenWithVariant[];
-  shadow: TokenWithVariant[];
-  depth: TokenWithVariant[];
-  motion: TokenWithVariant[];
-  breakpoint: TokenWithVariant[];
-  elevation: TokenWithVariant[];
-  focus: TokenWithVariant[];
-  other: TokenWithVariant[];
-}
+const RAFTERS_SEMANTIC_MAPPINGS: Record<string, { light: string; dark: string }> = {
+  background: { light: 'neutral-50', dark: 'neutral-950' },
+  foreground: { light: 'neutral-950', dark: 'neutral-50' },
+  card: { light: 'neutral-50', dark: 'neutral-950' },
+  'card-foreground': { light: 'neutral-950', dark: 'neutral-50' },
+  popover: { light: 'neutral-50', dark: 'neutral-950' },
+  'popover-foreground': { light: 'neutral-950', dark: 'neutral-50' },
+  primary: { light: 'neutral-900', dark: 'neutral-50' },
+  'primary-foreground': { light: 'neutral-50', dark: 'neutral-900' },
+  secondary: { light: 'neutral-100', dark: 'neutral-800' },
+  'secondary-foreground': { light: 'neutral-900', dark: 'neutral-50' },
+  muted: { light: 'neutral-100', dark: 'neutral-800' },
+  'muted-foreground': { light: 'neutral-500', dark: 'neutral-400' },
+  accent: { light: 'silver-true-glacier-100', dark: 'silver-true-glacier-800' },
+  'accent-foreground': { light: 'silver-true-glacier-900', dark: 'silver-true-glacier-50' },
+  destructive: { light: 'silver-bold-fire-truck-500', dark: 'silver-bold-fire-truck-600' },
+  'destructive-foreground': { light: 'neutral-50', dark: 'neutral-50' },
+  success: { light: 'silver-true-citrine-500', dark: 'silver-true-citrine-600' },
+  'success-foreground': { light: 'neutral-50', dark: 'neutral-50' },
+  warning: { light: 'silver-true-honey-500', dark: 'silver-true-honey-600' },
+  'warning-foreground': { light: 'neutral-950', dark: 'neutral-50' },
+  info: { light: 'silver-true-sky-500', dark: 'silver-true-sky-600' },
+  'info-foreground': { light: 'neutral-50', dark: 'neutral-50' },
+  highlight: { light: 'silver-true-violet-200', dark: 'silver-true-violet-700' },
+  'highlight-foreground': { light: 'silver-true-violet-900', dark: 'silver-true-violet-50' },
+  border: { light: 'neutral-200', dark: 'neutral-800' },
+  input: { light: 'neutral-200', dark: 'neutral-800' },
+  ring: { light: 'neutral-950', dark: 'neutral-300' },
+  'sidebar-background': { light: 'neutral-50', dark: 'neutral-950' },
+  'sidebar-foreground': { light: 'neutral-950', dark: 'neutral-50' },
+  'sidebar-primary': { light: 'neutral-900', dark: 'neutral-50' },
+  'sidebar-primary-foreground': { light: 'neutral-50', dark: 'neutral-900' },
+  'sidebar-accent': { light: 'neutral-100', dark: 'neutral-800' },
+  'sidebar-accent-foreground': { light: 'neutral-900', dark: 'neutral-50' },
+  'sidebar-border': { light: 'neutral-200', dark: 'neutral-800' },
+  'sidebar-ring': { light: 'neutral-950', dark: 'neutral-300' },
+  'chart-1': { light: 'silver-true-glacier-500', dark: 'silver-true-glacier-400' },
+  'chart-2': { light: 'silver-true-sky-500', dark: 'silver-true-sky-400' },
+  'chart-3': { light: 'silver-true-citrine-500', dark: 'silver-true-citrine-400' },
+  'chart-4': { light: 'silver-true-honey-500', dark: 'silver-true-honey-400' },
+  'chart-5': { light: 'silver-true-violet-500', dark: 'silver-true-violet-400' },
+};
 
 /**
  * Convert a token value to CSS string
@@ -90,22 +136,11 @@ function formatNumber(value: number, decimals = 3): string {
 }
 
 /**
- * Convert token name to CSS custom property name
- */
-function tokenToCSSVar(token: Token, prefix = ''): string {
-  const name = token.name;
-  if (prefix) {
-    return `--${prefix}-${name}`;
-  }
-  return `--${name}`;
-}
-
-/**
- * Group tokens by namespace and theme variant
+ * Group tokens by namespace
  */
 function groupTokens(tokens: Token[]): GroupedTokens {
   const groups: GroupedTokens = {
-    semantic: { light: [], dark: [] },
+    semantic: [],
     color: [],
     spacing: [],
     typography: [],
@@ -120,48 +155,42 @@ function groupTokens(tokens: Token[]): GroupedTokens {
   };
 
   for (const token of tokens) {
-    const tokenWithVariant = token as TokenWithVariant;
-
     switch (token.namespace) {
       case 'semantic':
-        if (tokenWithVariant.themeVariant === 'dark') {
-          groups.semantic.dark.push(tokenWithVariant);
-        } else {
-          groups.semantic.light.push(tokenWithVariant);
-        }
+        groups.semantic.push(token);
         break;
       case 'color':
-        groups.color.push(tokenWithVariant);
+        groups.color.push(token);
         break;
       case 'spacing':
-        groups.spacing.push(tokenWithVariant);
+        groups.spacing.push(token);
         break;
       case 'typography':
-        groups.typography.push(tokenWithVariant);
+        groups.typography.push(token);
         break;
       case 'radius':
-        groups.radius.push(tokenWithVariant);
+        groups.radius.push(token);
         break;
       case 'shadow':
-        groups.shadow.push(tokenWithVariant);
+        groups.shadow.push(token);
         break;
       case 'depth':
-        groups.depth.push(tokenWithVariant);
+        groups.depth.push(token);
         break;
       case 'motion':
-        groups.motion.push(tokenWithVariant);
+        groups.motion.push(token);
         break;
       case 'breakpoint':
-        groups.breakpoint.push(tokenWithVariant);
+        groups.breakpoint.push(token);
         break;
       case 'elevation':
-        groups.elevation.push(tokenWithVariant);
+        groups.elevation.push(token);
         break;
       case 'focus':
-        groups.focus.push(tokenWithVariant);
+        groups.focus.push(token);
         break;
       default:
-        groups.other.push(tokenWithVariant);
+        groups.other.push(token);
     }
   }
 
@@ -169,61 +198,53 @@ function groupTokens(tokens: Token[]): GroupedTokens {
 }
 
 /**
- * Generate :root block with semantic tokens
+ * Generate :root block with --rafters-* namespace and dark mode via media query
  */
-function generateRootBlock(tokens: Token[], includeComments: boolean): string {
-  if (tokens.length === 0) return '';
-
+function generateRootBlock(): string {
   const lines: string[] = [];
   lines.push(':root {');
 
-  for (const token of tokens) {
-    const value = tokenValueToCSS(token);
-    const varName = tokenToCSSVar(token);
-
-    if (includeComments && token.description) {
-      lines.push(`  /* ${token.description} */`);
-    }
-    lines.push(`  ${varName}: ${value};`);
+  // Light mode --rafters-* tokens
+  for (const [name, mapping] of Object.entries(RAFTERS_SEMANTIC_MAPPINGS)) {
+    lines.push(`  --rafters-${name}: var(--color-${mapping.light});`);
   }
+
+  lines.push('');
+
+  // Dark mode --rafters-dark-* tokens
+  for (const [name, mapping] of Object.entries(RAFTERS_SEMANTIC_MAPPINGS)) {
+    lines.push(`  --rafters-dark-${name}: var(--color-${mapping.dark});`);
+  }
+
+  lines.push('');
+
+  // Semantic tokens default to light mode
+  for (const name of Object.keys(RAFTERS_SEMANTIC_MAPPINGS)) {
+    lines.push(`  --${name}: var(--rafters-${name});`);
+  }
+
+  lines.push('');
+
+  // Dark mode override via prefers-color-scheme
+  lines.push('  @media (prefers-color-scheme: dark) {');
+  for (const name of Object.keys(RAFTERS_SEMANTIC_MAPPINGS)) {
+    lines.push(`    --${name}: var(--rafters-dark-${name});`);
+  }
+  lines.push('  }');
 
   lines.push('}');
   return lines.join('\n');
 }
 
 /**
- * Generate dark mode block with semantic overrides
+ * Generate @theme block with raw color scales and utility tokens
  */
-function generateDarkBlock(tokens: Token[], selector: string, includeComments: boolean): string {
-  if (tokens.length === 0) return '';
-
+function generateThemeBlock(groups: GroupedTokens): string {
   const lines: string[] = [];
-  lines.push(`${selector} {`);
-
-  for (const token of tokens) {
-    const value = tokenValueToCSS(token);
-    const varName = tokenToCSSVar(token);
-
-    if (includeComments && token.description) {
-      lines.push(`  /* ${token.description} */`);
-    }
-    lines.push(`  ${varName}: ${value};`);
-  }
-
-  lines.push('}');
-  return lines.join('\n');
-}
-
-/**
- * Generate @theme inline block with utility bridges
- */
-function generateThemeBlock(groups: GroupedTokens, includeComments: boolean): string {
-  const lines: string[] = [];
-  lines.push('@theme inline {');
+  lines.push('@theme {');
 
   // Color scales with --color- prefix
   if (groups.color.length > 0) {
-    if (includeComments) lines.push('  /* Color scales */');
     for (const token of groups.color) {
       const value = tokenValueToCSS(token);
       lines.push(`  --color-${token.name}: ${value};`);
@@ -232,34 +253,25 @@ function generateThemeBlock(groups: GroupedTokens, includeComments: boolean): st
   }
 
   // Semantic color bridges (reference :root variables)
-  if (groups.semantic.light.length > 0) {
-    if (includeComments) lines.push('  /* Semantic color bridges */');
-    for (const token of groups.semantic.light) {
-      if (token.category === 'color') {
-        lines.push(`  --color-${token.name}: var(--${token.name});`);
-      }
-    }
-    lines.push('');
+  for (const name of Object.keys(RAFTERS_SEMANTIC_MAPPINGS)) {
+    lines.push(`  --color-${name}: var(--${name});`);
   }
+  lines.push('');
 
   // Spacing tokens
   if (groups.spacing.length > 0) {
-    if (includeComments) lines.push('  /* Spacing */');
     for (const token of groups.spacing) {
       const value = tokenValueToCSS(token);
-      lines.push(`  --${token.name}: ${value};`);
+      lines.push(`  --spacing-${token.name}: ${value};`);
     }
     lines.push('');
   }
 
   // Typography tokens
   if (groups.typography.length > 0) {
-    if (includeComments) lines.push('  /* Typography */');
     for (const token of groups.typography) {
       const value = tokenValueToCSS(token);
       lines.push(`  --${token.name}: ${value};`);
-
-      // Add companion line-height if present
       if (token.lineHeight) {
         lines.push(`  --${token.name}--line-height: ${token.lineHeight};`);
       }
@@ -269,27 +281,24 @@ function generateThemeBlock(groups: GroupedTokens, includeComments: boolean): st
 
   // Radius tokens
   if (groups.radius.length > 0) {
-    if (includeComments) lines.push('  /* Border radius */');
     for (const token of groups.radius) {
       const value = tokenValueToCSS(token);
-      lines.push(`  --${token.name}: ${value};`);
+      lines.push(`  --radius-${token.name}: ${value};`);
     }
     lines.push('');
   }
 
   // Shadow tokens
   if (groups.shadow.length > 0) {
-    if (includeComments) lines.push('  /* Shadows */');
     for (const token of groups.shadow) {
       const value = tokenValueToCSS(token);
-      lines.push(`  --${token.name}: ${value};`);
+      lines.push(`  --shadow-${token.name}: ${value};`);
     }
     lines.push('');
   }
 
   // Depth (z-index) tokens
   if (groups.depth.length > 0) {
-    if (includeComments) lines.push('  /* Z-index / Depth */');
     for (const token of groups.depth) {
       const value = tokenValueToCSS(token);
       lines.push(`  --${token.name}: ${value};`);
@@ -297,9 +306,8 @@ function generateThemeBlock(groups: GroupedTokens, includeComments: boolean): st
     lines.push('');
   }
 
-  // Motion tokens (duration, easing, delay)
+  // Motion tokens
   if (groups.motion.length > 0) {
-    if (includeComments) lines.push('  /* Motion */');
     for (const token of groups.motion) {
       const value = tokenValueToCSS(token);
       lines.push(`  --${token.name}: ${value};`);
@@ -309,7 +317,6 @@ function generateThemeBlock(groups: GroupedTokens, includeComments: boolean): st
 
   // Breakpoint tokens
   if (groups.breakpoint.length > 0) {
-    if (includeComments) lines.push('  /* Breakpoints */');
     for (const token of groups.breakpoint) {
       const value = tokenValueToCSS(token);
       lines.push(`  --${token.name}: ${value};`);
@@ -319,7 +326,6 @@ function generateThemeBlock(groups: GroupedTokens, includeComments: boolean): st
 
   // Elevation tokens
   if (groups.elevation.length > 0) {
-    if (includeComments) lines.push('  /* Elevation */');
     for (const token of groups.elevation) {
       const value = tokenValueToCSS(token);
       lines.push(`  --${token.name}: ${value};`);
@@ -329,7 +335,6 @@ function generateThemeBlock(groups: GroupedTokens, includeComments: boolean): st
 
   // Focus tokens
   if (groups.focus.length > 0) {
-    if (includeComments) lines.push('  /* Focus rings */');
     for (const token of groups.focus) {
       const value = tokenValueToCSS(token);
       lines.push(`  --${token.name}: ${value};`);
@@ -339,7 +344,6 @@ function generateThemeBlock(groups: GroupedTokens, includeComments: boolean): st
 
   // Other tokens
   if (groups.other.length > 0) {
-    if (includeComments) lines.push('  /* Other */');
     for (const token of groups.other) {
       const value = tokenValueToCSS(token);
       lines.push(`  --${token.name}: ${value};`);
@@ -370,7 +374,7 @@ function generateThemeBlock(groups: GroupedTokens, includeComments: boolean): st
  * ```
  */
 export function tokensToTailwind(tokens: Token[], options: TailwindExportOptions = {}): string {
-  const { includeComments = false, darkModeSelector = '.dark', includeImport = true } = options;
+  const { includeImport = true } = options;
 
   if (tokens.length === 0) {
     throw new Error('Registry is empty');
@@ -379,33 +383,20 @@ export function tokensToTailwind(tokens: Token[], options: TailwindExportOptions
   const groups = groupTokens(tokens);
   const sections: string[] = [];
 
-  // Header comment
-  sections.push('/* Generated by Rafters - DO NOT EDIT */');
-
   // Tailwind import
   if (includeImport) {
     sections.push('@import "tailwindcss";');
+    sections.push('');
   }
 
+  // @theme block with raw color scales and utility tokens
+  const themeBlock = generateThemeBlock(groups);
+  sections.push(themeBlock);
   sections.push('');
 
-  // :root block with semantic tokens (light mode)
-  const rootBlock = generateRootBlock(groups.semantic.light, includeComments);
-  if (rootBlock) {
-    sections.push(rootBlock);
-    sections.push('');
-  }
-
-  // .dark block with semantic overrides
-  const darkBlock = generateDarkBlock(groups.semantic.dark, darkModeSelector, includeComments);
-  if (darkBlock) {
-    sections.push(darkBlock);
-    sections.push('');
-  }
-
-  // @theme inline block with utility bridges
-  const themeBlock = generateThemeBlock(groups, includeComments);
-  sections.push(themeBlock);
+  // :root block with --rafters-* namespace and dark mode
+  const rootBlock = generateRootBlock();
+  sections.push(rootBlock);
 
   return sections.join('\n');
 }
