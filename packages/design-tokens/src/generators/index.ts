@@ -15,11 +15,16 @@
  */
 
 import type { Token } from '@rafters/shared';
+import { type ToDTCGOptions, toDTCG } from '../exporters/dtcg.js';
+import { registryToTailwind, type TailwindExportOptions } from '../exporters/tailwind.js';
+import { registryToTypeScript, type TypeScriptExportOptions } from '../exporters/typescript.js';
+import { TokenRegistry } from '../registry.js';
 import { generateBreakpointTokens } from './breakpoint.js';
 // Import all generators
-import { generateColorTokens } from './color.js';
+import { buildColorScaleFromBase, generateColorTokens } from './color.js';
 // Import defaults
 import {
+  type ColorScaleInput,
   DEFAULT_BREAKPOINTS,
   DEFAULT_COLOR_SCALES,
   DEFAULT_CONTAINER_BREAKPOINTS,
@@ -31,6 +36,7 @@ import {
   DEFAULT_FOCUS_CONFIGS,
   DEFAULT_FONT_WEIGHTS,
   DEFAULT_RADIUS_DEFINITIONS,
+  DEFAULT_SEMANTIC_COLOR_BASES,
   DEFAULT_SHADOW_DEFINITIONS,
   DEFAULT_SPACING_MULTIPLIERS,
   DEFAULT_TYPOGRAPHY_SCALE,
@@ -49,7 +55,7 @@ import { generateTypographyTokens } from './typography.js';
 
 export { generateBreakpointTokens } from './breakpoint.js';
 // Export all generators individually
-export { generateColorTokens } from './color.js';
+export { buildColorScaleFromBase, generateColorTokens } from './color.js';
 // Export defaults for customization
 export * from './defaults.js';
 export { generateDepthTokens } from './depth.js';
@@ -76,12 +82,25 @@ interface GeneratorDef {
 /**
  * Create generator definitions that bind defaults to pure generator functions
  */
+/**
+ * Build the complete color scales array from:
+ * 1. Pre-defined color scales (neutral)
+ * 2. Semantic color bases (computed via math)
+ */
+function buildAllColorScales(): ColorScaleInput[] {
+  const semanticScales = Object.entries(DEFAULT_SEMANTIC_COLOR_BASES).map(([name, base]) =>
+    buildColorScaleFromBase(name, base),
+  );
+
+  return [...DEFAULT_COLOR_SCALES, ...semanticScales];
+}
+
 function createGeneratorDefs(): GeneratorDef[] {
   return [
     // Foundation tokens (no dependencies)
     {
       name: 'color',
-      generate: (config) => generateColorTokens(config, DEFAULT_COLOR_SCALES),
+      generate: (config) => generateColorTokens(config, buildAllColorScales()),
     },
     {
       name: 'spacing',
@@ -326,7 +345,10 @@ export function getAvailableNamespaces(): string[] {
  */
 export function getGeneratorInfo(): Array<{ name: string; description: string }> {
   return [
-    { name: 'color', description: 'Neutral color family with 11-position OKLCH scale' },
+    {
+      name: 'color',
+      description: 'Neutral and semantic color families with 11-position OKLCH scale',
+    },
     { name: 'spacing', description: 'Spacing scale using minor-third (1.2) progression' },
     { name: 'typography', description: 'Typography scale with font sizes, weights, line heights' },
     { name: 'breakpoint', description: 'Viewport and container query breakpoints' },
@@ -341,4 +363,108 @@ export function getGeneratorInfo(): Array<{ name: string; description: string }>
     { name: 'elevation', description: 'Elevation levels pairing depth with shadows' },
     { name: 'focus', description: 'Focus ring tokens for WCAG 2.2 compliance' },
   ];
+}
+
+// =============================================================================
+// BUILD DEFAULTS
+// =============================================================================
+
+/**
+ * Options for building and exporting the default token system
+ */
+export interface BuildDefaultsOptions {
+  /** Configuration overrides for the base system */
+  config?: Partial<BaseSystemConfig>;
+
+  /** Export format options */
+  exports?: {
+    /** DTCG format options */
+    dtcg?: ToDTCGOptions | boolean;
+    /** Tailwind v4 CSS options */
+    tailwind?: TailwindExportOptions | boolean;
+    /** TypeScript options */
+    typescript?: TypeScriptExportOptions | boolean;
+  };
+}
+
+/**
+ * Result of building the default token system
+ */
+export interface BuildDefaultsResult {
+  /** The generated token system */
+  system: GenerateAllResult;
+
+  /** TokenRegistry populated with all tokens */
+  registry: TokenRegistry;
+
+  /** Exported formats (if requested) */
+  exports: {
+    dtcg?: ReturnType<typeof toDTCG>;
+    tailwind?: string;
+    typescript?: string;
+  };
+}
+
+/**
+ * Build the complete Rafters default token system with exports.
+ *
+ * This is the primary entry point for generating a complete design token system
+ * with the Rafters palette (zinc neutral + semantic colors) and exporting to
+ * various formats.
+ *
+ * @param options - Configuration and export options
+ * @returns Generated system, registry, and exports
+ *
+ * @example
+ * ```typescript
+ * // Generate with all exports
+ * const result = buildDefaults({
+ *   exports: {
+ *     dtcg: true,
+ *     tailwind: { includeComments: true },
+ *     typescript: { format: 'const' },
+ *   },
+ * });
+ *
+ * // Write exports to files
+ * fs.writeFileSync('tokens.json', JSON.stringify(result.exports.dtcg, null, 2));
+ * fs.writeFileSync('tokens.css', result.exports.tailwind);
+ * fs.writeFileSync('tokens.ts', result.exports.typescript);
+ *
+ * // Access tokens programmatically
+ * const primaryColor = result.registry.get('accent-500');
+ * ```
+ */
+export function buildDefaults(options: BuildDefaultsOptions = {}): BuildDefaultsResult {
+  // Generate the base system
+  const system = generateBaseSystem(options.config);
+
+  // Create registry with all tokens
+  const registry = new TokenRegistry(system.allTokens);
+
+  // Build exports
+  const exports: BuildDefaultsResult['exports'] = {};
+
+  if (options.exports?.dtcg) {
+    const dtcgOptions = typeof options.exports.dtcg === 'object' ? options.exports.dtcg : {};
+    exports.dtcg = toDTCG(system.allTokens, dtcgOptions);
+  }
+
+  if (options.exports?.tailwind) {
+    const tailwindOptions =
+      typeof options.exports.tailwind === 'object' ? options.exports.tailwind : {};
+    exports.tailwind = registryToTailwind(registry, tailwindOptions);
+  }
+
+  if (options.exports?.typescript) {
+    const tsOptions =
+      typeof options.exports.typescript === 'object' ? options.exports.typescript : {};
+    exports.typescript = registryToTypeScript(registry, tsOptions);
+  }
+
+  return {
+    system,
+    registry,
+    exports,
+  };
 }

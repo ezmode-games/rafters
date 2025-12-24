@@ -8,10 +8,42 @@
  * Default scales are provided by the orchestrator from defaults.ts.
  */
 
+import { generateOKLCHScale } from '@rafters/color-utils';
 import type { ColorValue, OKLCH, Token } from '@rafters/shared';
-import type { ColorScaleInput } from './defaults.js';
+import type { ColorScaleInput, SemanticColorBase } from './defaults.js';
 import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
 import { COLOR_SCALE_POSITIONS } from './types.js';
+
+/**
+ * Reference lightness for the 500 position (mid-tone).
+ * Used when generating scales from semantic color bases.
+ */
+const REFERENCE_LIGHTNESS = 0.55;
+
+/**
+ * Build a ColorScaleInput from a semantic color base.
+ * Computes full 11-position scale using OKLCH contrast-based math.
+ *
+ * @param name - Semantic role name (e.g., "accent", "destructive")
+ * @param base - Hue, chroma, and description for the color role
+ * @returns ColorScaleInput with computed 11-position scale
+ */
+export function buildColorScaleFromBase(name: string, base: SemanticColorBase): ColorScaleInput {
+  const baseColor: OKLCH = {
+    l: REFERENCE_LIGHTNESS,
+    c: base.chroma,
+    h: base.hue,
+    alpha: 1,
+  };
+
+  const scale = generateOKLCHScale(baseColor);
+
+  return {
+    name,
+    scale,
+    description: base.description,
+  };
+}
 
 /**
  * Convert OKLCH to CSS string

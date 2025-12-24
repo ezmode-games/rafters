@@ -57,6 +57,70 @@ export const DEFAULT_COLOR_SCALES: ColorScaleInput[] = [
 ];
 
 // =============================================================================
+// COLOR PALETTE BASES
+// =============================================================================
+
+/**
+ * Base hue and chroma for color palette generation.
+ * Full 11-position scales are computed mathematically via generateOKLCHScale().
+ *
+ * Rafters palette - color names from API cache (api.rafters.studio):
+ * - neutral: zinc (achromatic, h:0, c:0) - defined above
+ * - silver-true-glacier: teal/cyan (h:180, c:0.12) - cool, serene
+ * - silver-bold-fire-truck: fire-truck red (h:0, c:0.20) - warm, energetic
+ * - silver-true-honey: honey gold (h:60, c:0.12) - warm, inviting
+ * - silver-true-citrine: citrine green (h:90, c:0.12) - fresh, natural
+ * - silver-true-sky: sky blue (h:210, c:0.12) - calm, trustworthy
+ * - silver-true-violet: violet/purple (h:270, c:0.12) - creative, luxurious
+ */
+export interface ColorPaletteBase {
+  /** Hue in degrees (0-360) */
+  hue: number;
+  /** Chroma (0-0.4 typical range) */
+  chroma: number;
+  /** Description of the color */
+  description: string;
+}
+
+export const DEFAULT_COLOR_PALETTE_BASES: Record<string, ColorPaletteBase> = {
+  'silver-true-glacier': {
+    hue: 180,
+    chroma: 0.12,
+    description: 'Cool cyan/teal palette - serene, balanced, calming.',
+  },
+  'silver-bold-fire-truck': {
+    hue: 0,
+    chroma: 0.2,
+    description: 'Bold fire-truck red palette - warm, energetic, attention-grabbing.',
+  },
+  'silver-true-honey': {
+    hue: 60,
+    chroma: 0.12,
+    description: 'Warm honey gold palette - inviting, refined, subtle warmth.',
+  },
+  'silver-true-citrine': {
+    hue: 90,
+    chroma: 0.12,
+    description: 'Fresh citrine green palette - natural, growth, harmony.',
+  },
+  'silver-true-sky': {
+    hue: 210,
+    chroma: 0.12,
+    description: 'Calm sky blue palette - trustworthy, serene, reliable.',
+  },
+  'silver-true-violet': {
+    hue: 270,
+    chroma: 0.12,
+    description: 'Creative violet palette - luxurious, imaginative, refined.',
+  },
+};
+
+/** @deprecated Use DEFAULT_COLOR_PALETTE_BASES instead */
+export const DEFAULT_SEMANTIC_COLOR_BASES = DEFAULT_COLOR_PALETTE_BASES;
+/** @deprecated Use ColorPaletteBase instead */
+export type SemanticColorBase = ColorPaletteBase;
+
+// =============================================================================
 // BREAKPOINT DEFAULTS
 // =============================================================================
 
@@ -101,16 +165,34 @@ export const DEFAULT_BREAKPOINTS: Record<string, BreakpointDef> = {
 };
 
 export interface ContainerBreakpointDef {
-  minWidth: number;
+  /** Width in rem (Tailwind v4 uses rem for container queries) */
+  width: number;
   meaning: string;
 }
 
+/**
+ * Container query breakpoints matching Tailwind v4 defaults.
+ *
+ * Tailwind v4 uses `--container-*` theme variables with rem values.
+ * These create utilities like `@xs:`, `@sm:`, `@md:`, etc.
+ *
+ * @see https://tailwindcss.com/docs/responsive-design#container-queries
+ */
 export const DEFAULT_CONTAINER_BREAKPOINTS: Record<string, ContainerBreakpointDef> = {
-  'cq-xs': { minWidth: 320, meaning: 'Extra small container - minimal space' },
-  'cq-sm': { minWidth: 384, meaning: 'Small container - card-sized' },
-  'cq-md': { minWidth: 448, meaning: 'Medium container - panel-sized' },
-  'cq-lg': { minWidth: 512, meaning: 'Large container - sidebar-sized' },
-  'cq-xl': { minWidth: 576, meaning: 'Extra large container - main content area' },
+  // Match Tailwind v4 defaults
+  '3xs': { width: 16, meaning: 'Smallest container (256px) - icons, badges' },
+  '2xs': { width: 18, meaning: 'Extra extra small (288px) - compact cards' },
+  xs: { width: 20, meaning: 'Extra small (320px) - mobile-width cards' },
+  sm: { width: 24, meaning: 'Small (384px) - standard cards' },
+  md: { width: 28, meaning: 'Medium (448px) - wide cards, panels' },
+  lg: { width: 32, meaning: 'Large (512px) - sidebars, dialog content' },
+  xl: { width: 36, meaning: 'Extra large (576px) - main content panels' },
+  '2xl': { width: 42, meaning: '2XL (672px) - wide content areas' },
+  '3xl': { width: 48, meaning: '3XL (768px) - tablet-width containers' },
+  '4xl': { width: 56, meaning: '4XL (896px) - wide panels' },
+  '5xl': { width: 64, meaning: '5XL (1024px) - desktop content' },
+  '6xl': { width: 72, meaning: '6XL (1152px) - wide desktop content' },
+  '7xl': { width: 80, meaning: '7XL (1280px) - maximum content width' },
 };
 
 // =============================================================================

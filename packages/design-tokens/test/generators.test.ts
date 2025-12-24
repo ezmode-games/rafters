@@ -223,15 +223,15 @@ describe('Token Structure Validation', () => {
     it('includes base spacing token', () => {
       const baseToken = result.tokens.find((t) => t.name === 'spacing-base');
       expect(baseToken).toBeDefined();
-      expect(baseToken?.value).toBe('4px');
+      expect(baseToken?.value).toBe('0.25rem'); // 4px = 0.25rem
     });
 
     it('calculates correct spacing values', () => {
       const spacing4 = result.tokens.find((t) => t.name === 'spacing-4');
-      expect(spacing4?.value).toBe('16px'); // 4 * 4 = 16
+      expect(spacing4?.value).toBe('1rem'); // 16px = 1rem
 
       const spacing8 = result.tokens.find((t) => t.name === 'spacing-8');
-      expect(spacing8?.value).toBe('32px'); // 4 * 8 = 32
+      expect(spacing8?.value).toBe('2rem'); // 32px = 2rem
     });
 
     it('all tokens have valid structure', () => {
@@ -329,7 +329,7 @@ describe('Token Structure Validation', () => {
     it('includes base radius token', () => {
       const baseToken = result.tokens.find((t) => t.name === 'radius-base');
       expect(baseToken).toBeDefined();
-      expect(baseToken?.value).toBe('6px');
+      expect(baseToken?.value).toBe('0.375rem'); // 6px = 0.375rem
     });
 
     it('radius-none is 0', () => {
@@ -487,7 +487,7 @@ describe('Token Structure Validation', () => {
     it('includes focus ring width token', () => {
       const widthToken = result.tokens.find((t) => t.name === 'focus-ring-width');
       expect(widthToken).toBeDefined();
-      expect(widthToken?.value).toBe('2px');
+      expect(widthToken?.value).toBe('0.125rem'); // 2px = 0.125rem
     });
 
     it('includes focus ring color token', () => {
@@ -527,7 +527,7 @@ describe('Token Structure Validation', () => {
     });
 
     it('generates container query breakpoints', () => {
-      const cqTokens = result.tokens.filter((t) => t.name.startsWith('breakpoint-cq-'));
+      const cqTokens = result.tokens.filter((t) => t.name.startsWith('container-'));
       expect(cqTokens.length).toBeGreaterThan(0);
     });
 
@@ -598,7 +598,7 @@ describe('Orchestration', () => {
 
       // Spacing should be doubled
       const spacing4 = result.allTokens.find((t) => t.name === 'spacing-4');
-      expect(spacing4?.value).toBe('32px'); // 8 * 4 = 32
+      expect(spacing4?.value).toBe('2rem'); // 32px = 2rem
     });
   });
 
@@ -647,7 +647,7 @@ describe('Orchestration', () => {
       const map = toTokenMap(result);
 
       const spacing4 = map.get('spacing-4');
-      expect(spacing4?.value).toBe('16px');
+      expect(spacing4?.value).toBe('1rem'); // 16px = 1rem
     });
   });
 
@@ -715,8 +715,8 @@ describe('Mathematical Relationships', () => {
       const spacing4_base4 = base4Result.allTokens.find((t) => t.name === 'spacing-4');
       const spacing4_base8 = base8Result.allTokens.find((t) => t.name === 'spacing-4');
 
-      expect(spacing4_base4?.value).toBe('16px'); // 4 * 4
-      expect(spacing4_base8?.value).toBe('32px'); // 8 * 4
+      expect(spacing4_base4?.value).toBe('1rem'); // 16px = 1rem
+      expect(spacing4_base8?.value).toBe('2rem'); // 32px = 2rem
     });
   });
 
