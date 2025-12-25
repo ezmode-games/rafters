@@ -6,3 +6,149 @@ export type CleanupFunction = () => void;
 export type OutsideClickHandler = (event: MouseEvent | TouchEvent | PointerEvent) => void;
 
 export type EscapeKeyHandler = (event: KeyboardEvent) => void;
+
+/**
+ * Orientation for navigation primitives
+ */
+export type Orientation = 'horizontal' | 'vertical' | 'both';
+
+/**
+ * Text direction for RTL support
+ */
+export type Direction = 'ltr' | 'rtl';
+
+/**
+ * Keyboard event key names for type-safe handlers
+ */
+export type KeyboardKey =
+  | 'Enter'
+  | 'Space'
+  | 'Escape'
+  | 'Tab'
+  | 'ArrowUp'
+  | 'ArrowDown'
+  | 'ArrowLeft'
+  | 'ArrowRight'
+  | 'Home'
+  | 'End'
+  | 'PageUp'
+  | 'PageDown'
+  | 'Backspace'
+  | 'Delete';
+
+/**
+ * Modifier keys for keyboard handlers
+ */
+export interface KeyboardModifiers {
+  shift?: boolean;
+  ctrl?: boolean;
+  alt?: boolean;
+  meta?: boolean;
+}
+
+/**
+ * Keyboard handler callback
+ */
+export type KeyboardHandlerCallback = (event: KeyboardEvent) => void;
+
+/**
+ * Live region politeness for screen reader announcements
+ */
+export type LiveRegionPoliteness = 'polite' | 'assertive' | 'off';
+
+/**
+ * Live region role for screen reader announcements
+ */
+export type LiveRegionRole = 'status' | 'alert' | 'log';
+
+/**
+ * Side positioning for floating elements
+ */
+export type Side = 'top' | 'right' | 'bottom' | 'left';
+
+/**
+ * Alignment for floating elements
+ */
+export type Align = 'start' | 'center' | 'end';
+
+/**
+ * Position result from collision detection
+ */
+export interface Position {
+  x: number;
+  y: number;
+  side: Side;
+  align: Align;
+}
+
+/**
+ * Focus outside handler
+ */
+export type FocusOutsideHandler = (event: FocusEvent) => void;
+
+/**
+ * Pointer down outside handler
+ */
+export type PointerDownOutsideHandler = (event: PointerEvent | TouchEvent) => void;
+
+/**
+ * Navigation callback for roving focus
+ */
+export type NavigationCallback = (element: HTMLElement, index: number) => void;
+
+/**
+ * ARIA attribute types for type-safe attribute setting
+ */
+export interface AriaAttributes {
+  // Widget attributes
+  'aria-autocomplete'?: 'none' | 'inline' | 'list' | 'both';
+  'aria-checked'?: boolean | 'mixed';
+  'aria-disabled'?: boolean;
+  'aria-expanded'?: boolean;
+  'aria-haspopup'?: boolean | 'menu' | 'listbox' | 'tree' | 'grid' | 'dialog';
+  'aria-hidden'?: boolean;
+  'aria-invalid'?: boolean | 'grammar' | 'spelling';
+  'aria-label'?: string;
+  'aria-level'?: number;
+  'aria-modal'?: boolean;
+  'aria-multiline'?: boolean;
+  'aria-multiselectable'?: boolean;
+  'aria-orientation'?: 'horizontal' | 'vertical';
+  'aria-placeholder'?: string;
+  'aria-pressed'?: boolean | 'mixed';
+  'aria-readonly'?: boolean;
+  'aria-required'?: boolean;
+  'aria-selected'?: boolean;
+  'aria-sort'?: 'none' | 'ascending' | 'descending' | 'other';
+  'aria-valuemax'?: number;
+  'aria-valuemin'?: number;
+  'aria-valuenow'?: number;
+  'aria-valuetext'?: string;
+
+  // Live region attributes
+  'aria-atomic'?: boolean;
+  'aria-busy'?: boolean;
+  'aria-live'?: 'off' | 'polite' | 'assertive';
+  'aria-relevant'?: 'additions' | 'removals' | 'text' | 'all' | 'additions text';
+
+  // Relationship attributes
+  'aria-activedescendant'?: string;
+  'aria-controls'?: string;
+  'aria-describedby'?: string;
+  'aria-details'?: string;
+  'aria-errormessage'?: string;
+  'aria-flowto'?: string;
+  'aria-labelledby'?: string;
+  'aria-owns'?: string;
+  'aria-posinset'?: number;
+  'aria-setsize'?: number;
+  'aria-colcount'?: number;
+  'aria-colindex'?: number;
+  'aria-colspan'?: number;
+  'aria-rowcount'?: number;
+  'aria-rowindex'?: number;
+  'aria-rowspan'?: number;
+
+  // Role attribute
+  role?: string;
+}
