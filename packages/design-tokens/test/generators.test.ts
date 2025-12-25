@@ -759,6 +759,39 @@ describe('Token Dependencies', () => {
     const focusRing = tokenMap.get('focus-ring');
     expect(focusRing?.dependsOn).toContain('ring');
   });
+
+  // Semantic color dependencies
+  it('destructive depends on silver-bold-fire-truck color family', () => {
+    const destructive = tokenMap.get('destructive');
+    expect(destructive?.dependsOn).toBeDefined();
+    expect(destructive?.dependsOn).toContain('silver-bold-fire-truck-600');
+  });
+
+  it('success depends on silver-true-citrine color family', () => {
+    const success = tokenMap.get('success');
+    expect(success?.dependsOn).toBeDefined();
+    expect(success?.dependsOn).toContain('silver-true-citrine-600');
+  });
+
+  it('warning depends on silver-true-honey color family', () => {
+    const warning = tokenMap.get('warning');
+    expect(warning?.dependsOn).toBeDefined();
+    expect(warning?.dependsOn).toContain('silver-true-honey-500');
+  });
+
+  it('info depends on silver-true-sky color family', () => {
+    const info = tokenMap.get('info');
+    expect(info?.dependsOn).toBeDefined();
+    expect(info?.dependsOn).toContain('silver-true-sky-600');
+  });
+
+  it('semantic tokens include both light and dark mode dependencies', () => {
+    const destructive = tokenMap.get('destructive');
+    expect(destructive?.dependsOn).toBeDefined();
+    // Light mode: silver-bold-fire-truck-600, Dark mode: silver-bold-fire-truck-500
+    expect(destructive?.dependsOn).toContain('silver-bold-fire-truck-600');
+    expect(destructive?.dependsOn).toContain('silver-bold-fire-truck-500');
+  });
 });
 
 describe('Accessibility Metadata', () => {

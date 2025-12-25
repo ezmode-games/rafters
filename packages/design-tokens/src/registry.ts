@@ -280,7 +280,9 @@ export class TokenRegistry {
   }
 
   /**
-   * Regenerate all dependent tokens when a dependency changes
+   * Regenerate all dependent tokens when a dependency changes.
+   * Respects userOverride - tokens with human overrides are NOT regenerated,
+   * but their computedValue IS updated so agents can see the difference.
    */
   private async regenerateDependents(changedTokenName: string): Promise<void> {
     // Get all tokens that depend on the changed token
@@ -309,7 +311,15 @@ export class TokenRegistry {
   }
 
   /**
-   * Regenerate a single token using its generation rule
+   * Regenerate a single token using its generation rule.
+   *
+   * If the token has a userOverride:
+   * - Updates computedValue (what the rule produces)
+   * - Does NOT change value (respects human decision)
+   * - Agent can see: "computed would be X, but human set Y because Z"
+   *
+   * If no override:
+   * - Updates value directly
    */
   private async regenerateToken(tokenName: string): Promise<void> {
     // Get the generation rule for this token
@@ -318,15 +328,31 @@ export class TokenRegistry {
       return; // No rule to execute
     }
 
+    const existingToken = this.tokens.get(tokenName);
+    if (!existingToken) {
+      return;
+    }
+
     try {
       // Parse and execute the rule
       const parsedRule = this.ruleParser.parse(rule);
-      const newValue = this.ruleExecutor.execute(parsedRule, tokenName);
+      const newComputedValue = this.ruleExecutor.execute(parsedRule, tokenName);
 
-      // Update token value (but don't trigger cascading - we're already in cascade)
-      const existingToken = this.tokens.get(tokenName);
-      if (existingToken) {
-        this.tokens.set(tokenName, { ...existingToken, value: newValue });
+      if (existingToken.userOverride) {
+        // Token has human override - update computedValue but preserve value
+        // Agent intelligence: can see what system would produce vs what human chose
+        this.tokens.set(tokenName, {
+          ...existingToken,
+          computedValue: newComputedValue,
+          // value stays as-is (the human's choice)
+        });
+      } else {
+        // No override - update the actual value
+        this.tokens.set(tokenName, {
+          ...existingToken,
+          value: newComputedValue,
+          computedValue: newComputedValue,
+        });
       }
     } catch (error) {
       throw new Error(`Failed to regenerate token ${tokenName}: ${error}`);
