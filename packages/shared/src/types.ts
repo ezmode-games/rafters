@@ -438,7 +438,6 @@ export const TokenSchema = z.object({
 
   // Designer intent - captures WHY values deviate from computed defaults
   // Git blame shows WHAT changed and WHEN; these fields explain the reasoning
-  overrideReason: z.string().optional(), // "Cards need visual anchoring in data-dense layouts"
   appliesWhen: z.array(z.string()).optional(), // ["data-heavy interfaces", "dashboard contexts"]
   usagePatterns: z
     .object({
@@ -446,6 +445,34 @@ export const TokenSchema = z.object({
       never: z.array(z.string()), // ["Multiple primary buttons competing", "On busy backgrounds"]
     })
     .optional(),
+
+  // Human override tracking - CRITICAL for agent intelligence
+  // When a human manually sets a value, this captures the full context
+  // so agents know WHY it was changed and can respect intentional decisions
+  userOverride: z
+    .object({
+      // The value before the human changed it (computed from generation rule)
+      previousValue: z.union([z.string(), ColorValueSchema, ColorReferenceSchema]).optional(),
+      // WHY was this overridden? This is the key intelligence for agents
+      reason: z.string(), // "Brand team requested pink for Q1 campaign"
+      // Who made this change?
+      overriddenBy: z.string().optional(), // "jane@design.co" or "design-review-2024-01-15"
+      // When was it overridden?
+      overriddenAt: z.string(), // ISO timestamp
+      // Was this approved in a review process?
+      approvedBy: z.string().optional(), // "design-review-2024-01-15"
+      // Is this a temporary override that should revert?
+      revertAfter: z.string().optional(), // ISO date - cascade can auto-revert after this
+      // What triggered the need for override?
+      context: z.string().optional(), // "Q1 marketing campaign", "accessibility audit finding"
+      // Tags for querying overrides
+      tags: z.array(z.string()).optional(), // ["temporary", "brand", "accessibility"]
+    })
+    .optional(),
+
+  // Computed value from generation rule (before any override)
+  // Stored so agents can see what the system WOULD produce vs what human chose
+  computedValue: z.union([z.string(), ColorValueSchema, ColorReferenceSchema]).optional(),
 
   // Dependency tracking for automatic regeneration
   dependsOn: z.array(z.string()).optional(), // Parent token(s) - empty = root token
