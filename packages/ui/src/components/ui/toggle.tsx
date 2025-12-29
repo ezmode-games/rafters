@@ -18,7 +18,8 @@ export interface ToggleProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const variantClasses: Record<string, string> = {
   default: 'bg-transparent data-[state=on]:bg-accent data-[state=on]:text-accent-foreground',
-  outline: 'border border-input bg-transparent data-[state=on]:bg-accent data-[state=on]:text-accent-foreground',
+  outline:
+    'border border-input bg-transparent data-[state=on]:bg-accent data-[state=on]:text-accent-foreground',
 };
 
 const sizeClasses: Record<string, string> = {
@@ -37,7 +38,7 @@ export function Toggle({
   asChild = false,
   onClick,
   ...props
-}: ToggleProps): JSX.Element {
+}: ToggleProps) {
   // State management (controlled vs uncontrolled)
   const [uncontrolledPressed, setUncontrolledPressed] = React.useState(defaultPressed);
   const isControlled = controlledPressed !== undefined;
@@ -46,11 +47,11 @@ export function Toggle({
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       const newPressed = !pressed;
-      
+
       if (!isControlled) {
         setUncontrolledPressed(newPressed);
       }
-      
+
       onPressedChange?.(newPressed);
       onClick?.(event);
     },
@@ -58,7 +59,7 @@ export function Toggle({
   );
 
   // Base styles following the component styling reference
-  const baseClasses = 
+  const baseClasses =
     'inline-flex items-center justify-center ' +
     'rounded-md ' +
     'text-sm font-medium ' +

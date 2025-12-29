@@ -19,7 +19,7 @@ describe('Toggle - Accessibility', () => {
   it('has correct aria-pressed attribute', () => {
     const { rerender } = render(<Toggle>Test</Toggle>);
     expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'false');
-    
+
     rerender(<Toggle pressed>Test</Toggle>);
     expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'true');
   });
