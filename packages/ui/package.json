@@ -6,7 +6,8 @@
     "./primitives/*": "./src/primitives/*.ts",
     "./components/*": "./src/components/*.tsx",
     "./dialog": "./src/components/ui/dialog.tsx",
-    "./dialog.vue": "./src/components/ui/dialog.vue.ts"
+    "./dialog.vue": "./src/components/ui/dialog.vue.ts",
+    "./skeleton": "./src/components/ui/skeleton.tsx"
   },
   "scripts": {
     "test": "vitest",
