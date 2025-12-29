@@ -1,59 +1,18 @@
 /**
- * Intelligence Integration Primitives
- * Demonstrates how primitives can query Rafters design tokens and intelligence
- * This is a conceptual prototype showing future integration possibilities
+ * Design Intelligence Primitives
+ * Pure behavioral functions for design reasoning - no styling concerns
+ *
+ * These primitives help components make informed decisions about:
+ * - Cognitive load budgeting
+ * - Accessibility validation
+ * - Motion preferences
  */
 
 /**
- * CONCEPTUAL: Query token registry for spacing value
- * In production, this would import from @rafters/design-tokens
- */
-export function querySpacingToken(path: string): string {
-  // Example: querySpacingToken('dialog.padding') -> '1.5rem'
-  // This would hit the Token Registry intelligence
-  const mockTokens: Record<string, string> = {
-    'dialog.padding': '1.5rem',
-    'dialog.gap': '1rem',
-    'dialog.border-radius': '0.5rem',
-    'overlay.opacity': '0.8',
-  };
-
-  return mockTokens[path] || '0';
-}
-
-/**
- * CONCEPTUAL: Query color registry with WCAG validation
- */
-export function queryColorToken(
-  path: string,
-  options?: {
-    validateContrast?: boolean;
-    background?: string;
-    level?: 'AA' | 'AAA';
-  },
-): string {
-  // Example: queryColorToken('dialog.background', { validateContrast: true, background: '#fff', level: 'AAA' })
-  // This would hit the Color Intelligence and validate via WCAG matrices
-  const mockColors: Record<string, string> = {
-    'dialog.background': '#ffffff',
-    'dialog.foreground': '#09090b',
-    'overlay.background': '#000000',
-  };
-
-  const color = mockColors[path] || '#000000';
-
-  if (options?.validateContrast && options?.background) {
-    // In production: query ColorValue intelligence for pre-computed contrast ratios
-    console.log(
-      `[Intelligence] Validating ${color} against ${options.background} for ${options.level} compliance`,
-    );
-  }
-
-  return color;
-}
-
-/**
- * CONCEPTUAL: Calculate cognitive load for dialog configuration
+ * Calculate cognitive load for dialog configuration
+ * Returns load score, budget, and recommendations for improvement
+ *
+ * Based on Rafters cognitive load budget: 15 points max per interaction
  */
 export function calculateDialogCognitiveLoad(config: {
   hasTitle: boolean;
@@ -67,7 +26,6 @@ export function calculateDialogCognitiveLoad(config: {
   withinBudget: boolean;
   recommendations: string[];
 } {
-  // Rafters cognitive load budget: 15 points max
   let load = 0;
   const recommendations: string[] = [];
 
@@ -95,7 +53,7 @@ export function calculateDialogCognitiveLoad(config: {
     load += 2;
   }
 
-  const budget = 15; // Rafters standard
+  const budget = 15;
   const withinBudget = load <= budget;
 
   if (!withinBudget) {
@@ -107,22 +65,8 @@ export function calculateDialogCognitiveLoad(config: {
 }
 
 /**
- * CONCEPTUAL: Get optimal z-index from stacking context intelligence
- */
-export function getOptimalZIndex(layer: 'overlay' | 'dialog' | 'tooltip' | 'dropdown'): number {
-  // In production: query Rafters z-index registry
-  const zIndexMap: Record<string, number> = {
-    overlay: 50,
-    dialog: 50,
-    tooltip: 60,
-    dropdown: 55,
-  };
-
-  return zIndexMap[layer] || 1;
-}
-
-/**
- * CONCEPTUAL: Validate ARIA setup against accessibility rules
+ * Validate dialog accessibility against WCAG requirements
+ * Returns validation result with errors and warnings
  */
 export function validateDialogAccessibility(config: {
   hasTitle: boolean;
@@ -160,13 +104,13 @@ export function validateDialogAccessibility(config: {
 }
 
 /**
- * CONCEPTUAL: Get animation timing based on motion preferences
+ * Get animation timing based on motion preferences
+ * Respects prefers-reduced-motion for accessibility
  */
 export function getAnimationTiming(preference: 'reduced' | 'normal'): {
   duration: number;
   easing: string;
 } {
-  // Respect prefers-reduced-motion
   if (preference === 'reduced') {
     return {
       duration: 0,
@@ -174,106 +118,61 @@ export function getAnimationTiming(preference: 'reduced' | 'normal'): {
     };
   }
 
-  // Query Rafters animation token registry
   return {
-    duration: 200, // ms
-    easing: 'cubic-bezier(0.16, 1, 0.3, 1)', // Rafters standard easing
+    duration: 200,
+    easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
   };
 }
 
 /**
- * EXAMPLE: Enhanced Dialog ARIA props with intelligence
+ * Detect user's motion preference from media query
+ * SSR-safe: returns 'normal' on server
  */
-export interface IntelligentDialogOptions {
-  open: boolean;
-  labelId?: string;
-  descriptionId?: string;
-  modal?: boolean;
-  // Intelligence options
-  validateAccessibility?: boolean;
-  enforceLoadBudget?: boolean;
-  useTokens?: boolean;
-}
-
-export function getIntelligentDialogProps(options: IntelligentDialogOptions) {
-  const baseProps = {
-    role: 'dialog',
-    'aria-modal': options.modal !== false ? 'true' : undefined,
-    'aria-labelledby': options.labelId,
-    'aria-describedby': options.descriptionId,
-    'data-state': options.open ? 'open' : 'closed',
-  };
-
-  // Validation
-  if (options.validateAccessibility) {
-    const validation = validateDialogAccessibility({
-      hasTitle: !!options.labelId,
-      hasDescription: !!options.descriptionId,
-      hasFocusableElements: true, // Would need to check actual content
-      modal: options.modal !== false,
-    });
-
-    if (!validation.valid) {
-      console.error('[Rafters Intelligence] Accessibility errors:', validation.errors);
-    }
-
-    if (validation.warnings.length > 0) {
-      console.warn('[Rafters Intelligence] Accessibility warnings:', validation.warnings);
-    }
+export function detectMotionPreference(): 'reduced' | 'normal' {
+  if (typeof window === 'undefined') {
+    return 'normal';
   }
 
-  // Token-based styling (conceptual)
-  if (options.useTokens) {
-    const zIndex = getOptimalZIndex('dialog');
-    console.log(`[Rafters Intelligence] Using z-index: ${zIndex} from stacking context registry`);
-  }
-
-  return baseProps;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'reduced' : 'normal';
 }
 
 /**
- * EXAMPLE: Component usage with intelligence
+ * Calculate cognitive load for a generic component configuration
+ * Extensible for different component types
  */
-/*
-export function IntelligentDialog() {
-  const cognitiveLoad = calculateDialogCognitiveLoad({
-    hasTitle: true,
-    hasDescription: true,
-    hasForm: true,
-    formFieldCount: 3,
-    hasMultipleActions: true,
-  });
+export function calculateComponentCognitiveLoad(config: {
+  componentType: 'dialog' | 'form' | 'menu' | 'tooltip';
+  elementCount: number;
+  hasAnimation: boolean;
+  interactionComplexity: 'low' | 'medium' | 'high';
+}): {
+  load: number;
+  budget: number;
+  withinBudget: boolean;
+} {
+  const baseCosts: Record<string, number> = {
+    dialog: 2,
+    form: 3,
+    menu: 2,
+    tooltip: 1,
+  };
 
-  if (!cognitiveLoad.withinBudget) {
-    console.warn('[Rafters Intelligence]', cognitiveLoad.recommendations);
-  }
+  const complexityCosts: Record<string, number> = {
+    low: 0,
+    medium: 2,
+    high: 4,
+  };
 
-  const ariaProps = getIntelligentDialogProps({
-    open: true,
-    labelId: 'title',
-    descriptionId: 'desc',
-    modal: true,
-    validateAccessibility: true,
-    enforceLoadBudget: true,
-    useTokens: true,
-  });
+  let load = baseCosts[config.componentType] || 1;
+  load += config.elementCount * 0.5;
+  load += config.hasAnimation ? 1 : 0;
+  load += complexityCosts[config.interactionComplexity] || 0;
 
-  return (
-    <div
-      {...ariaProps}
-      style={{
-        padding: querySpacingToken('dialog.padding'),
-        backgroundColor: queryColorToken('dialog.background', {
-          validateContrast: true,
-          background: '#fff',
-          level: 'AAA',
-        }),
-        borderRadius: querySpacingToken('dialog.border-radius'),
-        zIndex: getOptimalZIndex('dialog'),
-      }}
-    >
-      Dialog content
-    </div>
-  );
+  const budget = 15;
+
+  return {
+    load: Math.round(load * 10) / 10,
+    budget,
+    withinBudget: load <= budget,
+  };
 }
-*/
