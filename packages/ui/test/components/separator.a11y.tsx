@@ -1,6 +1,7 @@
 import { render } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
-import { Separator } from './separator';
+import { Separator } from '../../src/components/ui/separator';
 
 describe('Separator - Accessibility', () => {
   it('has no accessibility violations when decorative', async () => {
