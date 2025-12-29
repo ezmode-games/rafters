@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
-import { Badge } from './badge';
+import { describe, expect, it } from 'vitest';
+import { Badge } from '../../src/components/ui/badge';
 
 describe('Badge', () => {
   it('renders children', () => {
@@ -28,7 +29,11 @@ describe('Badge', () => {
   });
 
   it('passes through HTML attributes', () => {
-    render(<Badge data-testid="badge" aria-label="status">Test</Badge>);
+    render(
+      <Badge data-testid="badge" aria-label="status">
+        Test
+      </Badge>,
+    );
     expect(screen.getByTestId('badge')).toHaveAttribute('aria-label', 'status');
   });
 

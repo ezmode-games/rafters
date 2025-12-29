@@ -1,6 +1,7 @@
 import { render } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
-import { Badge } from './badge';
+import { Badge } from '../../src/components/ui/badge';
 
 describe('Badge - Accessibility', () => {
   it('has no accessibility violations', async () => {
@@ -10,7 +11,15 @@ describe('Badge - Accessibility', () => {
   });
 
   it('has no violations with all variants', async () => {
-    const variants = ['default', 'secondary', 'destructive', 'success', 'warning', 'info', 'outline'] as const;
+    const variants = [
+      'default',
+      'secondary',
+      'destructive',
+      'success',
+      'warning',
+      'info',
+      'outline',
+    ] as const;
     for (const variant of variants) {
       const { container } = render(<Badge variant={variant}>Test</Badge>);
       const results = await axe(container);
@@ -22,7 +31,7 @@ describe('Badge - Accessibility', () => {
     const { container } = render(
       <Badge aria-label="status indicator" role="status">
         Active
-      </Badge>
+      </Badge>,
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();
@@ -37,7 +46,7 @@ describe('Badge - Accessibility', () => {
         <li>
           Item 2 <Badge variant="warning">Pending</Badge>
         </li>
-      </ul>
+      </ul>,
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();
