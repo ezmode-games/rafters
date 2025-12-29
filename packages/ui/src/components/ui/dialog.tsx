@@ -14,7 +14,6 @@ import {
 } from '../../primitives/dialog-aria';
 import { onEscapeKeyDown } from '../../primitives/escape-keydown';
 import { createFocusTrap, preventBodyScroll } from '../../primitives/focus-trap';
-import { generateId } from '../../primitives/id-generator';
 import { onPointerDownOutside } from '../../primitives/outside-click';
 import { getPortalContainer } from '../../primitives/portal';
 
@@ -72,10 +71,11 @@ export function Dialog({
     [isControlled, onOpenChange],
   );
 
-  // Generate stable IDs for ARIA relationships
-  const [contentId] = React.useState(() => generateId('dialog-content'));
-  const [titleId] = React.useState(() => generateId('dialog-title'));
-  const [descriptionId] = React.useState(() => generateId('dialog-description'));
+  // Generate stable IDs for ARIA relationships using React 19 useId
+  const id = React.useId();
+  const contentId = `dialog-content-${id}`;
+  const titleId = `dialog-title-${id}`;
+  const descriptionId = `dialog-description-${id}`;
 
   const contextValue = React.useMemo(
     () => ({

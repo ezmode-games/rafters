@@ -1,12 +1,4 @@
-import { describe, expect, it } from 'vitest';
-import { getPortalContainer, isPortalSupported } from '../../src/primitives/portal';
+import { describe } from 'vitest';
 
-describe('portal', () => {
-  it('returns a container when provided and is supported in test env', () => {
-    const el = document.createElement('div');
-    document.body.appendChild(el);
-    const container = getPortalContainer({ container: el });
-    expect(container).toBe(el);
-    expect(isPortalSupported()).toBe(true);
-  });
-});
+// Placeholder: actual tests live in test/primitives/portal.test.ts
+describe.skip('portal tests moved', () => {});

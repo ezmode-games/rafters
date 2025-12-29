@@ -228,7 +228,7 @@ export function setAriaAttributes(
     return () => {};
   }
 
-  const { validate = true, warn = process.env.NODE_ENV !== 'production' } = options;
+  const { validate = true, warn = true } = options;
 
   const originalAttributes: OriginalAttributes = new Map();
 
@@ -281,7 +281,7 @@ export function updateAriaAttribute<K extends keyof AriaAttributes>(
 ): void {
   if (typeof window === 'undefined') return;
 
-  const { validate = true, warn = process.env.NODE_ENV !== 'production' } = options;
+  const { validate = true, warn = true } = options;
 
   if (value === undefined) {
     element.removeAttribute(attribute);

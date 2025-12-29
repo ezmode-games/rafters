@@ -42,11 +42,34 @@ cleanup();
 
 Class helper
 
-This package also provides a small, opinionated class builder, `classy`, which
-combines deterministic `cn`-like merging with optional token resolution.
+This package provides `classy`, a lean class builder with:
+
+- Deterministic `cn`-like merging
+- Automatic deduplication
+- Blocks Tailwind arbitrary bracket syntax by default (enforces design tokens)
+- Optional token resolution via `tokenMap`
+
+```ts
+import classy from './classy';
+
+// Basic usage
+classy('flex items-center', isActive && 'bg-primary');
+
+// With conditionals
+classy('btn', { 'btn-disabled': disabled, 'btn-loading': loading });
+
+// Blocks arbitrary values by default
+classy('w-[100px]'); // warns and skips
+```
+
+API
 
 - `classy(...inputs)` — default instance (no tokenMap, arbitrary classes blocked)
-- `classy.create({ tokenMap, allowArbitrary, warn })` — create instance with token resolver
-- `classy.token(key)` — helper to mark token references for resolution
+- `createClassy({ tokenMap, allowArbitrary, warn })` — create custom instance
+- `token(key)` — mark token references for resolution
 
-Use `classy` to build classes consistently across React, Vue, and Web Components.
+Why no tailwind-merge?
+
+`classy` intentionally does NOT resolve Tailwind utility conflicts. If you have `p-4 p-8`, both stay - making overrides explicit and debuggable in the DOM.
+
+The design system should be the source of truth. If you're frequently fighting it with utility conflicts, that's a signal to fix the design system, not paper over it with merge logic.

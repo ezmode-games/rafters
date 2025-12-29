@@ -65,6 +65,12 @@ pnpm -C packages/ui run typecheck
 
 If you need a new utility or token, add it to the Rafters token registry rather than using bracketed arbitrary Tailwind values.
 
+## Why no tailwind-merge?
+
+The `classy` utility intentionally does NOT resolve Tailwind utility conflicts. If you pass `p-4 p-8`, both classes stay in the output - making overrides explicit and debuggable in the DOM.
+
+The design system should be the source of truth. If you're frequently fighting it with utility conflicts, that's a signal to fix the design system, not paper over it with merge logic.
+
 ## Exports
 
 The package exposes primitives and components via the `exports` field in `package.json`. Consumers can import directly from paths like:
