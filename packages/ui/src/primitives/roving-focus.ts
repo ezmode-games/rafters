@@ -72,8 +72,12 @@ function getFocusableItems(container: HTMLElement): HTMLElement[] {
   );
 
   return items.filter((item) => {
-    // Skip disabled items
-    if (item.hasAttribute('disabled') || item.getAttribute('aria-disabled') === 'true') {
+    // Skip disabled items (check all common disabled patterns)
+    if (
+      item.hasAttribute('disabled') ||
+      item.hasAttribute('data-disabled') ||
+      item.getAttribute('aria-disabled') === 'true'
+    ) {
       return false;
     }
     // Skip hidden items

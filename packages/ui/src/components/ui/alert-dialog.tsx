@@ -1,0 +1,484 @@
+/**
+ * AlertDialog component - drop-in replacement for shadcn/ui AlertDialog
+ * Built with framework-agnostic primitives
+ * Matches shadcn/Radix API exactly
+ *
+ * Key differences from Dialog:
+ * - Uses role="alertdialog" for destructive/important confirmations
+ * - Has Action and Cancel buttons instead of generic Close
+ * - Focus defaults to cancel button (safer choice)
+ */
+
+import * as React from 'react';
+import { createPortal } from 'react-dom';
+import classy from '../../primitives/classy';
+import { onEscapeKeyDown } from '../../primitives/escape-keydown';
+import { createFocusTrap, preventBodyScroll } from '../../primitives/focus-trap';
+import { getPortalContainer } from '../../primitives/portal';
+
+// Context for sharing alert dialog state
+interface AlertDialogContextValue {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  contentId: string;
+  titleId: string;
+  descriptionId: string;
+  cancelRef: React.RefObject<HTMLButtonElement | null>;
+}
+
+const AlertDialogContext = React.createContext<AlertDialogContextValue | null>(null);
+
+function useAlertDialogContext() {
+  const context = React.useContext(AlertDialogContext);
+  if (!context) {
+    throw new Error('AlertDialog components must be used within AlertDialog');
+  }
+  return context;
+}
+
+// ==================== AlertDialog (Root) ====================
+
+export interface AlertDialogProps {
+  children: React.ReactNode;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function AlertDialog({
+  children,
+  open: controlledOpen,
+  defaultOpen = false,
+  onOpenChange,
+}: AlertDialogProps) {
+  // Uncontrolled state
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
+
+  // Reference to cancel button for initial focus
+  const cancelRef = React.useRef<HTMLButtonElement | null>(null);
+
+  // Determine if controlled
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : uncontrolledOpen;
+
+  const handleOpenChange = React.useCallback(
+    (newOpen: boolean) => {
+      if (!isControlled) {
+        setUncontrolledOpen(newOpen);
+      }
+      onOpenChange?.(newOpen);
+    },
+    [isControlled, onOpenChange],
+  );
+
+  // Generate stable IDs for ARIA relationships
+  const id = React.useId();
+  const contentId = `alertdialog-content-${id}`;
+  const titleId = `alertdialog-title-${id}`;
+  const descriptionId = `alertdialog-description-${id}`;
+
+  const contextValue = React.useMemo(
+    () => ({
+      open,
+      onOpenChange: handleOpenChange,
+      contentId,
+      titleId,
+      descriptionId,
+      cancelRef,
+    }),
+    [open, handleOpenChange, contentId, titleId, descriptionId],
+  );
+
+  return <AlertDialogContext.Provider value={contextValue}>{children}</AlertDialogContext.Provider>;
+}
+
+// ==================== AlertDialogTrigger ====================
+
+export interface AlertDialogTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  asChild?: boolean;
+}
+
+export function AlertDialogTrigger({ asChild, onClick, ...props }: AlertDialogTriggerProps) {
+  const { open, onOpenChange, contentId } = useAlertDialogContext();
+
+  const ariaProps = {
+    'aria-expanded': open,
+    'aria-controls': contentId,
+    'aria-haspopup': 'dialog' as const,
+    'data-state': open ? 'open' : 'closed',
+  };
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onClick?.(event);
+    onOpenChange(!open);
+  };
+
+  if (asChild && React.isValidElement(props.children)) {
+    return React.cloneElement(props.children, {
+      ...ariaProps,
+      onClick: handleClick,
+    } as Partial<unknown>);
+  }
+
+  return <button type="button" onClick={handleClick} {...ariaProps} {...props} />;
+}
+
+// ==================== AlertDialogPortal ====================
+
+export interface AlertDialogPortalProps {
+  children: React.ReactNode;
+  container?: HTMLElement | null;
+  forceMount?: boolean;
+}
+
+export function AlertDialogPortal({ children, container, forceMount }: AlertDialogPortalProps) {
+  const { open } = useAlertDialogContext();
+  const [mounted, setMounted] = React.useState(false);
+
+  // Wait for client-side hydration
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const portalContainer = getPortalContainer(
+    container !== undefined ? { container, enabled: true } : { enabled: true },
+  );
+
+  const shouldRender = forceMount || open;
+
+  if (!shouldRender || !mounted || !portalContainer) {
+    return null;
+  }
+
+  return createPortal(children, portalContainer);
+}
+
+// ==================== AlertDialogOverlay ====================
+
+export interface AlertDialogOverlayProps extends React.HTMLAttributes<HTMLDivElement> {
+  asChild?: boolean;
+  forceMount?: boolean;
+}
+
+export function AlertDialogOverlay({
+  asChild,
+  forceMount,
+  className,
+  ...props
+}: AlertDialogOverlayProps) {
+  const { open } = useAlertDialogContext();
+
+  const ariaProps = {
+    'data-state': open ? 'open' : 'closed',
+    'aria-hidden': 'true' as const,
+  };
+
+  const shouldRender = forceMount || open;
+
+  if (!shouldRender) {
+    return null;
+  }
+
+  const overlayProps = {
+    ...ariaProps,
+    className: classy('fixed inset-0 z-50 bg-black/80', className),
+    ...props,
+  };
+
+  if (asChild && React.isValidElement(props.children)) {
+    return React.cloneElement(props.children, overlayProps as Partial<unknown>);
+  }
+
+  return <div {...overlayProps} />;
+}
+
+// ==================== AlertDialogContent ====================
+
+export interface AlertDialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  asChild?: boolean;
+  forceMount?: boolean;
+  onOpenAutoFocus?: (event: Event) => void;
+  onCloseAutoFocus?: (event: Event) => void;
+  onEscapeKeyDown?: (event: KeyboardEvent) => void;
+}
+
+export function AlertDialogContent({
+  asChild,
+  forceMount,
+  onOpenAutoFocus: _onOpenAutoFocus,
+  onCloseAutoFocus: _onCloseAutoFocus,
+  onEscapeKeyDown: onEscapeKeyDownProp,
+  className,
+  ...props
+}: AlertDialogContentProps) {
+  const { open, onOpenChange, contentId, titleId, descriptionId, cancelRef } =
+    useAlertDialogContext();
+  const contentRef = React.useRef<HTMLDivElement>(null);
+
+  // Focus trap - with custom initial focus on cancel button
+  React.useEffect(() => {
+    if (!open || !contentRef.current) return;
+
+    // Store previously focused element
+    const previouslyFocused = document.activeElement as HTMLElement;
+
+    // Focus the cancel button if it exists, otherwise first focusable
+    const focusInitial = () => {
+      if (cancelRef.current) {
+        cancelRef.current.focus();
+      } else {
+        const focusable = contentRef.current?.querySelectorAll(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        );
+        if (focusable && focusable.length > 0) {
+          (focusable[0] as HTMLElement).focus();
+        }
+      }
+    };
+
+    // Delay focus slightly to ensure content is rendered
+    const timer = setTimeout(focusInitial, 0);
+
+    // Create focus trap
+    const cleanup = createFocusTrap(contentRef.current);
+
+    return () => {
+      clearTimeout(timer);
+      cleanup();
+      // Restore focus to previously focused element
+      previouslyFocused?.focus();
+    };
+  }, [open, cancelRef]);
+
+  // Body scroll lock
+  React.useEffect(() => {
+    if (!open) return;
+
+    const cleanup = preventBodyScroll();
+    return cleanup;
+  }, [open]);
+
+  // Escape key handler
+  React.useEffect(() => {
+    if (!open) return;
+
+    const cleanup = onEscapeKeyDown((event) => {
+      onEscapeKeyDownProp?.(event);
+      if (!event.defaultPrevented) {
+        onOpenChange(false);
+      }
+    });
+
+    return cleanup;
+  }, [open, onOpenChange, onEscapeKeyDownProp]);
+
+  // Outside click handler - alert dialogs should NOT close on outside click
+  // This is intentionally different from Dialog
+  // The user must explicitly choose an action (Cancel or Action)
+
+  const ariaProps = {
+    role: 'alertdialog' as const,
+    'aria-modal': 'true' as const,
+    'aria-labelledby': titleId,
+    'aria-describedby': descriptionId,
+    'data-state': open ? 'open' : 'closed',
+  };
+
+  const shouldRender = forceMount || open;
+
+  if (!shouldRender) {
+    return null;
+  }
+
+  // Render using a centered container
+  const containerClass = classy('fixed inset-0 z-50 flex items-center justify-center p-4');
+
+  const innerClass = classy(className);
+
+  const innerProps = {
+    ref: contentRef,
+    id: contentId,
+    ...ariaProps,
+    className: innerClass,
+    ...props,
+  } as React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> };
+
+  // If asChild, clone the child with inner props
+  if (asChild && React.isValidElement(props.children)) {
+    const child = React.cloneElement(props.children, innerProps as Partial<unknown>);
+    return <div className={containerClass}>{child}</div>;
+  }
+
+  return (
+    <div className={containerClass}>
+      <div {...innerProps} />
+    </div>
+  );
+}
+
+// ==================== AlertDialogHeader ====================
+
+export interface AlertDialogHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export function AlertDialogHeader({ className, ...props }: AlertDialogHeaderProps) {
+  return (
+    <div
+      className={classy('flex flex-col space-y-2 text-center sm:text-left', className)}
+      {...props}
+    />
+  );
+}
+
+// ==================== AlertDialogFooter ====================
+
+export interface AlertDialogFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export function AlertDialogFooter({ className, ...props }: AlertDialogFooterProps) {
+  return (
+    <div
+      className={classy('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)}
+      {...props}
+    />
+  );
+}
+
+// ==================== AlertDialogTitle ====================
+
+export interface AlertDialogTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
+  asChild?: boolean;
+}
+
+export function AlertDialogTitle({ asChild, className, ...props }: AlertDialogTitleProps) {
+  const { titleId } = useAlertDialogContext();
+
+  const titleProps = {
+    id: titleId,
+    className: classy('text-lg font-semibold', className),
+    ...props,
+  };
+
+  if (asChild && React.isValidElement(props.children)) {
+    return React.cloneElement(props.children, titleProps as Partial<unknown>);
+  }
+
+  return <h2 {...titleProps} />;
+}
+
+// ==================== AlertDialogDescription ====================
+
+export interface AlertDialogDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
+  asChild?: boolean;
+}
+
+export function AlertDialogDescription({
+  asChild,
+  className,
+  ...props
+}: AlertDialogDescriptionProps) {
+  const { descriptionId } = useAlertDialogContext();
+
+  const descriptionProps = {
+    id: descriptionId,
+    className: classy('text-sm text-muted-foreground', className),
+    ...props,
+  };
+
+  if (asChild && React.isValidElement(props.children)) {
+    return React.cloneElement(props.children, descriptionProps as Partial<unknown>);
+  }
+
+  return <p {...descriptionProps} />;
+}
+
+// ==================== AlertDialogAction ====================
+
+export interface AlertDialogActionProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  asChild?: boolean;
+}
+
+export function AlertDialogAction({
+  asChild,
+  onClick,
+  className,
+  ...props
+}: AlertDialogActionProps) {
+  const { onOpenChange } = useAlertDialogContext();
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onClick?.(event);
+    onOpenChange(false);
+  };
+
+  const buttonClass = classy(
+    'inline-flex h-10 items-center justify-center rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground ring-offset-background transition-colors hover:bg-destructive/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+    className,
+  );
+
+  if (asChild && React.isValidElement(props.children)) {
+    return React.cloneElement(props.children, {
+      onClick: handleClick,
+      className: buttonClass,
+    } as Partial<unknown>);
+  }
+
+  return <button type="button" onClick={handleClick} className={buttonClass} {...props} />;
+}
+
+// ==================== AlertDialogCancel ====================
+
+export interface AlertDialogCancelProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  asChild?: boolean;
+}
+
+export function AlertDialogCancel({
+  asChild,
+  onClick,
+  className,
+  ...props
+}: AlertDialogCancelProps) {
+  const { onOpenChange, cancelRef } = useAlertDialogContext();
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onClick?.(event);
+    onOpenChange(false);
+  };
+
+  const buttonClass = classy(
+    'mt-2 inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:mt-0',
+    className,
+  );
+
+  if (asChild && React.isValidElement(props.children)) {
+    return React.cloneElement(props.children, {
+      ref: cancelRef,
+      onClick: handleClick,
+      className: buttonClass,
+    } as Partial<unknown>);
+  }
+
+  return (
+    <button
+      ref={cancelRef}
+      type="button"
+      onClick={handleClick}
+      className={buttonClass}
+      {...props}
+    />
+  );
+}
+
+// ==================== Namespaced Export (shadcn style) ====================
+
+AlertDialog.Trigger = AlertDialogTrigger;
+AlertDialog.Portal = AlertDialogPortal;
+AlertDialog.Overlay = AlertDialogOverlay;
+AlertDialog.Content = AlertDialogContent;
+AlertDialog.Header = AlertDialogHeader;
+AlertDialog.Footer = AlertDialogFooter;
+AlertDialog.Title = AlertDialogTitle;
+AlertDialog.Description = AlertDialogDescription;
+AlertDialog.Action = AlertDialogAction;
+AlertDialog.Cancel = AlertDialogCancel;
+
+// Re-export root as AlertDialogRoot alias for shadcn compatibility
+export { AlertDialog as AlertDialogRoot };
