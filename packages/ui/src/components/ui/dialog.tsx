@@ -16,6 +16,7 @@ import { onEscapeKeyDown } from '../../primitives/escape-keydown';
 import { createFocusTrap, preventBodyScroll } from '../../primitives/focus-trap';
 import { onPointerDownOutside } from '../../primitives/outside-click';
 import { getPortalContainer } from '../../primitives/portal';
+import { mergeProps } from '../../primitives/slot';
 
 // Context for sharing dialog state
 interface DialogContextValue {
@@ -98,7 +99,7 @@ export interface DialogTriggerProps extends React.ButtonHTMLAttributes<HTMLButto
   asChild?: boolean;
 }
 
-export function DialogTrigger({ asChild, onClick, ...props }: DialogTriggerProps) {
+export function DialogTrigger({ asChild, onClick, children, ...props }: DialogTriggerProps) {
   const { open, onOpenChange, contentId } = useDialogContext();
 
   const ariaProps = getTriggerAriaProps({ open, controlsId: contentId });
@@ -108,14 +109,17 @@ export function DialogTrigger({ asChild, onClick, ...props }: DialogTriggerProps
     onOpenChange(!open);
   };
 
-  if (asChild && React.isValidElement(props.children)) {
-    return React.cloneElement(props.children, {
-      ...ariaProps,
-      onClick: handleClick,
-    } as Partial<unknown>);
+  if (asChild && React.isValidElement(children)) {
+    const childProps = children.props as Record<string, unknown>;
+    const mergedProps = mergeProps({ ...ariaProps, onClick: handleClick }, childProps);
+    return React.cloneElement(children, mergedProps as React.Attributes);
   }
 
-  return <button type="button" onClick={handleClick} {...ariaProps} {...props} />;
+  return (
+    <button type="button" onClick={handleClick} {...ariaProps} {...props}>
+      {children}
+    </button>
+  );
 }
 
 // ==================== Dialog.Portal ====================
@@ -168,7 +172,7 @@ export function DialogOverlay({ asChild, forceMount, className, ...props }: Dial
 
   const overlayProps = {
     ...ariaProps,
-    className: classy('fixed inset-0 z-50 bg-black/80', className),
+    className: classy('fixed inset-0 z-depth-overlay bg-black/80', className),
     ...props,
   };
 
@@ -200,6 +204,7 @@ export function DialogContent({
   onPointerDownOutside: onPointerDownOutsideProp,
   onInteractOutside,
   className,
+  children,
   ...props
 }: DialogContentProps) {
   const { open, onOpenChange, contentId, titleId, descriptionId, modal } = useDialogContext();
@@ -263,13 +268,13 @@ export function DialogContent({
   if (!shouldRender) {
     return null;
   }
-  // Render using a centered container (avoid Tailwind arbitrary bracket classes)
-  const containerClass = classy(
-    'fixed inset-0 z-50 flex items-center justify-center p-4',
-    modal ? '' : '',
-  );
+  // Render using a centered container
+  const containerClass = classy('fixed inset-0 z-depth-modal flex items-center justify-center p-4');
 
-  const innerClass = classy(className);
+  const innerClass = classy(
+    'w-full max-w-lg rounded-lg border border-card-border bg-card p-6 text-card-foreground shadow-lg',
+    className,
+  );
 
   const innerProps = {
     ref: contentRef,
@@ -280,15 +285,41 @@ export function DialogContent({
   } as React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> };
 
   // If asChild, clone the child with inner props
-  if (asChild && React.isValidElement(props.children)) {
-    const child = React.cloneElement(props.children, innerProps as Partial<unknown>);
+  if (asChild && React.isValidElement(children)) {
+    const child = React.cloneElement(children, innerProps as Partial<unknown>);
     return <div className={containerClass}>{child}</div>;
   }
 
   return (
     <div className={containerClass}>
-      <div {...innerProps} />
+      <div {...innerProps}>{children}</div>
     </div>
+  );
+}
+
+// ==================== Dialog.Header ====================
+
+export interface DialogHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export function DialogHeader({ className, ...props }: DialogHeaderProps) {
+  return (
+    <div
+      className={classy('flex flex-col space-y-1.5 text-center sm:text-left', className)}
+      {...props}
+    />
+  );
+}
+
+// ==================== Dialog.Footer ====================
+
+export interface DialogFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export function DialogFooter({ className, ...props }: DialogFooterProps) {
+  return (
+    <div
+      className={classy('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)}
+      {...props}
+    />
   );
 }
 
@@ -298,11 +329,12 @@ export interface DialogTitleProps extends React.HTMLAttributes<HTMLHeadingElemen
   asChild?: boolean;
 }
 
-export function DialogTitle({ asChild, ...props }: DialogTitleProps) {
+export function DialogTitle({ asChild, className, ...props }: DialogTitleProps) {
   const { titleId } = useDialogContext();
 
   const titleProps = {
     id: titleId,
+    className: classy('text-lg font-semibold leading-none tracking-tight', className),
     ...props,
   };
 
@@ -319,11 +351,12 @@ export interface DialogDescriptionProps extends React.HTMLAttributes<HTMLParagra
   asChild?: boolean;
 }
 
-export function DialogDescription({ asChild, ...props }: DialogDescriptionProps) {
+export function DialogDescription({ asChild, className, ...props }: DialogDescriptionProps) {
   const { descriptionId } = useDialogContext();
 
   const descriptionProps = {
     id: descriptionId,
+    className: classy('text-sm text-muted-foreground', className),
     ...props,
   };
 
@@ -340,7 +373,7 @@ export interface DialogCloseProps extends React.ButtonHTMLAttributes<HTMLButtonE
   asChild?: boolean;
 }
 
-export function DialogClose({ asChild, onClick, ...props }: DialogCloseProps) {
+export function DialogClose({ asChild, onClick, children, ...props }: DialogCloseProps) {
   const { onOpenChange } = useDialogContext();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -348,13 +381,17 @@ export function DialogClose({ asChild, onClick, ...props }: DialogCloseProps) {
     onOpenChange(false);
   };
 
-  if (asChild && React.isValidElement(props.children)) {
-    return React.cloneElement(props.children, {
-      onClick: handleClick,
-    } as Partial<unknown>);
+  if (asChild && React.isValidElement(children)) {
+    const childProps = children.props as Record<string, unknown>;
+    const mergedProps = mergeProps({ onClick: handleClick }, childProps);
+    return React.cloneElement(children, mergedProps as React.Attributes);
   }
 
-  return <button type="button" onClick={handleClick} {...props} />;
+  return (
+    <button type="button" onClick={handleClick} {...props}>
+      {children}
+    </button>
+  );
 }
 
 // ==================== Namespaced Export (shadcn style) ====================
@@ -363,6 +400,8 @@ Dialog.Trigger = DialogTrigger;
 Dialog.Portal = DialogPortal;
 Dialog.Overlay = DialogOverlay;
 Dialog.Content = DialogContent;
+Dialog.Header = DialogHeader;
+Dialog.Footer = DialogFooter;
 Dialog.Title = DialogTitle;
 Dialog.Description = DialogDescription;
 Dialog.Close = DialogClose;
