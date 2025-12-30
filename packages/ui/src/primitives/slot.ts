@@ -15,6 +15,7 @@
  * ```
  */
 
+import classy from './classy';
 import type { CleanupFunction } from './types';
 
 export interface SlotMergeOptions {
@@ -328,7 +329,7 @@ export function mergeClassNames(parentClass: string, childClass: string): string
  */
 export interface SlotProps {
   className?: string;
-  style?: Record<string, string>;
+  style?: Record<string, unknown> | undefined;
   [key: string]: unknown;
 }
 
@@ -348,11 +349,11 @@ export function mergeProps(
     const parentValue = parentProps[key];
     const childValue = childProps[key];
 
-    // Handle className specially
-    if (key === 'className' && typeof parentValue === 'string' && typeof childValue === 'string') {
+    // Handle className specially - use classy for deduplication and proper merging
+    if (key === 'className') {
       merged.className = classMerger
-        ? classMerger(parentValue, childValue)
-        : `${parentValue} ${childValue}`;
+        ? classMerger(String(parentValue ?? ''), String(childValue ?? ''))
+        : classy(parentValue as string, childValue as string);
       continue;
     }
 
