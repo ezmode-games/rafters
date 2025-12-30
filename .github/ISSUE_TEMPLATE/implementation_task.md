@@ -114,6 +114,22 @@ const result = example.method(parameters);
 
 **This issue is complete when:** [Specific, measurable completion condition]
 
+## Completion Workflow
+
+**IMPORTANT: Each issue must have its own dedicated PR.**
+
+1. Create a feature branch from `main` named `{issue-number}-{short-description}`
+2. Implement the feature with all tests passing
+3. Create a PR that closes THIS issue only (use `Closes #{issue-number}` in PR body)
+4. Do NOT bundle multiple issues into a single PR
+5. PR title format: `feat(scope): brief description (#{issue-number})`
+
+This ensures:
+- Clean git history with atomic commits
+- Easy rollback if issues arise
+- Clear traceability between issues and code changes
+- Simpler code review process
+
 ## Context & References
 
 - Related issues: #123, #456
