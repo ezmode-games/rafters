@@ -328,7 +328,7 @@ export function mergeClassNames(parentClass: string, childClass: string): string
  */
 export interface SlotProps {
   className?: string;
-  style?: Record<string, string>;
+  style?: Record<string, unknown> | undefined;
   [key: string]: unknown;
 }
 

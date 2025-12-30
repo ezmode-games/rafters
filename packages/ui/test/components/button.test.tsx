@@ -23,25 +23,41 @@ describe('Button', () => {
     const btn = screen.getByRole('button');
     // class presence rather than exact string to avoid brittle ordering
     expect(btn.className).toContain('bg-secondary');
-    expect(btn.className).toContain('px-6');
+    expect(btn.className).toContain('px-8'); // lg size uses px-8
   });
 
-  it('supports semantic variants and outline', () => {
+  it('supports all shadcn variants', () => {
     render(
       <div>
-        <Button variant="info">Info</Button>
-        <Button variant="success">Success</Button>
-        <Button variant="warning">Warn</Button>
-        <Button variant="alert">Alert</Button>
+        <Button variant="default">Default</Button>
+        <Button variant="secondary">Secondary</Button>
+        <Button variant="destructive">Destructive</Button>
         <Button variant="outline">Outline</Button>
+        <Button variant="ghost">Ghost</Button>
       </div>,
     );
 
-    expect(screen.getByText('Info').className).toContain('bg-info');
-    expect(screen.getByText('Success').className).toContain('bg-success');
-    expect(screen.getByText('Warn').className).toContain('bg-warning');
-    expect(screen.getByText('Alert').className).toContain('bg-alert');
+    expect(screen.getByText('Default').className).toContain('bg-primary');
+    expect(screen.getByText('Secondary').className).toContain('bg-secondary');
+    expect(screen.getByText('Destructive').className).toContain('bg-destructive');
     expect(screen.getByText('Outline').className).toContain('border');
+    expect(screen.getByText('Ghost').className).toContain('hover:bg-accent');
+  });
+
+  it('supports all size variants', () => {
+    render(
+      <div>
+        <Button size="default">Default</Button>
+        <Button size="sm">Small</Button>
+        <Button size="lg">Large</Button>
+        <Button size="icon">Icon</Button>
+      </div>,
+    );
+
+    expect(screen.getByText('Default').className).toContain('h-10');
+    expect(screen.getByText('Small').className).toContain('h-9');
+    expect(screen.getByText('Large').className).toContain('h-11');
+    expect(screen.getByText('Icon').className).toContain('w-10');
   });
 
   it('forwards onClick and respects disabled', async () => {
