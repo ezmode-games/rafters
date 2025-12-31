@@ -1,0 +1,132 @@
+---
+/**
+ * Standardized documentation page layout with cognitive load awareness
+ *
+ * @cognitive-load 4/10 - Structured reading experience with clear information hierarchy
+ * @attention-economics Guides focus through progressive disclosure and visual hierarchy
+ * @trust-building Clear expectations with consistent layout patterns
+ * @accessibility Full keyboard navigation and screen reader support
+ * @semantic-meaning Content structure mirrors user mental models
+ */
+
+export interface Props {
+  title: string;
+  description?: string;
+  cognitiveLoad?: number;
+  trustLevel?: 'low' | 'medium' | 'high' | 'critical';
+  attentionNote?: string;
+  category?: string;
+  lastUpdated?: Date;
+}
+
+const {
+  title,
+  description,
+  cognitiveLoad,
+  trustLevel = 'low',
+  attentionNote,
+  category,
+  lastUpdated,
+} = Astro.props;
+
+// Trust building: Show complexity level to set expectations
+const _getCognitiveLoadLabel = (load: number) => {
+  if (load <= 3) return 'Low complexity';
+  if (load <= 6) return 'Moderate complexity';
+  return 'High complexity';
+};
+
+const _getCognitiveLoadColor = (load: number) => {
+  if (load <= 3) return 'bg-success/10 text-success-foreground border-success/20';
+  if (load <= 6) return 'bg-warning/10 text-warning-foreground border-warning/20';
+  return 'bg-destructive/10 text-destructive-foreground border-destructive/20';
+};
+---
+
+<div class="max-w-4xl mx-auto">
+  <!-- Page Header - Clear hierarchy and expectations -->
+  <header class="space-y-6 pb-8 border-b border-border">
+    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+      <div class="space-y-2">
+        <div class="flex items-center gap-3">
+          {category && (
+            <span class="text-xs bg-muted/60 text-muted-foreground border border-border px-2 py-1 rounded-md font-medium">
+              {category}
+            </span>
+          )}
+          <h1 class="text-3xl font-mono font-semibold text-foreground tracking-tight">
+            {title}
+          </h1>
+        </div>
+        
+        {description && (
+          <p class="text-lg text-muted-foreground leading-relaxed max-w-3xl">
+            {description}
+          </p>
+        )}
+      </div>
+
+      <!-- Cognitive Load Indicator - Trust Building -->
+      {cognitiveLoad !== undefined && (
+        <div class="flex-shrink-0">
+          <div class={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border ${getCognitiveLoadColor(cognitiveLoad)}`}>
+            <span class="text-sm font-medium">
+              Complexity: {cognitiveLoad}/10
+            </span>
+            <span class="text-xs opacity-75">
+              {getCognitiveLoadLabel(cognitiveLoad)}
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+
+    <!-- Attention Economics: Important notes get visual priority -->
+    {attentionNote && (
+      <div class="bg-warning/10 border border-warning/20 rounded-lg p-4">
+        <p class="text-sm text-warning-foreground">
+          <strong class="font-medium">Attention:</strong> {attentionNote}
+        </p>
+      </div>
+    )}
+
+    <!-- Trust building: Show when content was last updated -->
+    {lastUpdated && (
+      <div class="text-xs text-muted-foreground">
+        Last updated: {lastUpdated.toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        })}
+      </div>
+    )}
+  </header>
+
+  <!-- Main Content Area - Optimal reading experience -->
+  <main class="pt-8 space-y-8">
+    <!-- Progressive disclosure: Content sections with breathing room -->
+    <div class="prose prose-neutral max-w-none 
+                prose-headings:text-foreground prose-headings:font-semibold
+                prose-p:text-foreground prose-p:leading-relaxed
+                prose-strong:text-foreground prose-strong:font-medium
+                prose-code:text-foreground prose-code:bg-muted/50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
+                prose-pre:bg-muted/30 prose-pre:border prose-pre:border-border
+                prose-a:text-primary hover:prose-a:text-primary/80 prose-a:no-underline hover:prose-a:underline
+                prose-blockquote:border-l-border prose-blockquote:text-muted-foreground
+                prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground">
+      <slot />
+    </div>
+  </main>
+
+  <!-- Navigation Footer - Supporting navigation -->
+  <footer class="pt-12 mt-16 border-t border-border">
+    <div class="flex justify-between items-center text-sm text-muted-foreground">
+      <div>
+        <slot name="previous-page" />
+      </div>
+      <div>
+        <slot name="next-page" />
+      </div>
+    </div>
+  </footer>
+</div>

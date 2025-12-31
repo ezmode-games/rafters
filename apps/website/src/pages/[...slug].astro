@@ -1,0 +1,99 @@
+---
+import { type CollectionEntry, getCollection } from 'astro:content';
+import { z } from 'zod';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DocsLayout from '../layouts/DocsLayout.astro';
+import MarketingLayout from '../layouts/MarketingLayout.astro';
+
+export async function getStaticPaths() {
+  // Get all collections
+  const pages = await getCollection('pages');
+  const docs = await getCollection('docs');
+
+  const paths: Array<{
+    params: { slug: string | undefined };
+    props: {
+      doc: CollectionEntry<'pages'> | CollectionEntry<'docs'>;
+      collection: 'pages' | 'docs';
+    };
+  }> = [];
+
+  // Add pages collection (huh, docs, etc.) - excluding index which has its own route
+  for (const page of pages) {
+    if (page.slug !== 'index') {
+      paths.push({
+        params: {
+          slug: page.slug,
+        },
+        props: {
+          doc: page,
+          collection: 'pages',
+        },
+      });
+    }
+  }
+
+  // Add docs collection - slug already includes the path (foundation/getting-started, components/button, etc.)
+  for (const doc of docs) {
+    paths.push({
+      params: { slug: `docs/${doc.slug}` },
+      props: { doc, collection: 'docs' },
+    });
+  }
+
+  return paths;
+}
+
+const PropsSchema = z.object({
+  doc: z.any(), // CollectionEntry types are complex, runtime validation for shape
+  collection: z.enum(['pages', 'docs']),
+});
+
+type Props = z.infer<typeof PropsSchema> & {
+  doc: CollectionEntry<'pages'> | CollectionEntry<'docs'>;
+};
+
+const validatedProps = PropsSchema.parse(Astro.props);
+const { doc, collection } = validatedProps as Props;
+const { Content } = await doc.render();
+
+// Determine layout based on frontmatter or collection
+let LayoutComponent: typeof BaseLayout | typeof DocsLayout | typeof MarketingLayout;
+let layoutProps: {
+  title?: string;
+  description?: string;
+  headerTitle?: string;
+  headerTitleClasses?: string;
+} = {
+  title: doc.data.title,
+  description: doc.data.description,
+};
+
+if (collection === 'pages') {
+  const pageDoc = doc as CollectionEntry<'pages'>;
+  // Use pageLayout from frontmatter
+  switch (pageDoc.data.pageLayout) {
+    case 'marketing':
+      LayoutComponent = MarketingLayout;
+      layoutProps = {
+        ...layoutProps,
+        headerTitle: pageDoc.data.headerTitle,
+        headerTitleClasses: pageDoc.data.headerTitleClasses,
+      };
+      break;
+    case 'docs':
+      LayoutComponent = DocsLayout;
+      break;
+    default:
+      LayoutComponent = BaseLayout;
+      break;
+  }
+} else {
+  // Docs collection uses docs layout
+  LayoutComponent = DocsLayout;
+}
+---
+
+<LayoutComponent {...layoutProps}>
+  <Content />
+</LayoutComponent>

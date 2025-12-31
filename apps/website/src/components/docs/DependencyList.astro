@@ -1,0 +1,56 @@
+---
+interface Props {
+  dependencies: string[];
+  registryDependencies?: string[];
+}
+
+const { dependencies, registryDependencies = [] } = Astro.props;
+
+const hasExternal = dependencies.filter((d) => !d.startsWith('@rafters')).length > 0;
+const hasRegistry = registryDependencies.length > 0;
+const externalDeps = dependencies.filter((d) => !d.startsWith('@rafters'));
+---
+
+{(hasExternal || hasRegistry) && (
+  <div class="flex flex-wrap gap-8 my-6 p-5 bg-gray-50 rounded-md border border-gray-200">
+    {hasRegistry && (
+      <div class="flex-1 min-w-[200px]">
+        <h4 class="font-mono text-xs font-semibold uppercase tracking-wider text-gray-500 m-0 mb-3">
+          Registry Dependencies
+        </h4>
+        <div class="flex flex-wrap gap-2">
+          {registryDependencies.map((dep) => (
+            <a
+              href={`/docs/components/${dep}`}
+              class="inline-flex items-center gap-1.5 px-2.5 py-1.5 font-mono text-sm rounded bg-blue-50 text-blue-700 border border-blue-200 no-underline hover:bg-blue-100 hover:border-blue-300 transition-colors"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="opacity-70">
+                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                <polyline points="13 2 13 9 20 9"></polyline>
+              </svg>
+              <span>{dep}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {hasExternal && (
+      <div class="flex-1 min-w-[200px]">
+        <h4 class="font-mono text-xs font-semibold uppercase tracking-wider text-gray-500 m-0 mb-3">
+          External Packages
+        </h4>
+        <div class="flex flex-wrap gap-2">
+          {externalDeps.map((dep) => (
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 font-mono text-sm rounded bg-gray-100 text-gray-600 border border-gray-200">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="opacity-70">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              </svg>
+              <span>{dep}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+)}

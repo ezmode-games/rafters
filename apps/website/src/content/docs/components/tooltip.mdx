@@ -1,0 +1,127 @@
+---
+title: "Tooltip"
+description: "Contextual help overlay with hover activation"
+order: 9
+---
+
+import ComponentDoc from '../../../components/docs/ComponentDoc.astro';
+import CodeBlock from '../../../components/docs/CodeBlock.astro';
+import PropsTable from '../../../components/docs/PropsTable.astro';
+
+<ComponentDoc
+  name="tooltip"
+  description="A contextual popup that displays helpful information on hover or focus. Built with framework-agnostic primitives for positioning and collision detection."
+  examples={[
+    {
+      title: "Basic Tooltip",
+      description: "Wrap any element with a tooltip.",
+      code: `import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider
+} from '@/components/ui/tooltip';
+
+<TooltipProvider>
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <Button variant="outline">Hover me</Button>
+    </TooltipTrigger>
+    <TooltipContent>
+      <p>This is a tooltip</p>
+    </TooltipContent>
+  </Tooltip>
+</TooltipProvider>`
+    },
+    {
+      title: "Positioning",
+      description: "Control tooltip placement with the side prop.",
+      code: `<Tooltip>
+  <TooltipTrigger>Top</TooltipTrigger>
+  <TooltipContent side="top">Top tooltip</TooltipContent>
+</Tooltip>
+
+<Tooltip>
+  <TooltipTrigger>Bottom</TooltipTrigger>
+  <TooltipContent side="bottom">Bottom tooltip</TooltipContent>
+</Tooltip>
+
+<Tooltip>
+  <TooltipTrigger>Left</TooltipTrigger>
+  <TooltipContent side="left">Left tooltip</TooltipContent>
+</Tooltip>
+
+<Tooltip>
+  <TooltipTrigger>Right</TooltipTrigger>
+  <TooltipContent side="right">Right tooltip</TooltipContent>
+</Tooltip>`
+    },
+    {
+      title: "Custom Delay",
+      description: "Adjust the delay before showing the tooltip.",
+      code: `<TooltipProvider delayDuration={0}>
+  <Tooltip>
+    <TooltipTrigger>Instant</TooltipTrigger>
+    <TooltipContent>Shows immediately</TooltipContent>
+  </Tooltip>
+</TooltipProvider>`
+    },
+    {
+      title: "Icon Button Tooltip",
+      description: "Add tooltips to icon-only buttons for accessibility.",
+      code: `<Tooltip>
+  <TooltipTrigger asChild>
+    <Button size="icon" variant="ghost">
+      <SettingsIcon />
+      <span className="sr-only">Settings</span>
+    </Button>
+  </TooltipTrigger>
+  <TooltipContent>Settings</TooltipContent>
+</Tooltip>`
+    }
+  ]}
+  props={[
+    { name: "open", type: "boolean", description: "Controlled open state" },
+    { name: "defaultOpen", type: "boolean", default: "false", description: "Initial open state" },
+    { name: "onOpenChange", type: "(open: boolean) => void", description: "Callback when open state changes" }
+  ]}
+/>
+
+## Component Parts
+
+<PropsTable
+  title="TooltipProvider Props"
+  props={[
+    { name: "delayDuration", type: "number", default: "700", description: "Delay in ms before showing" },
+    { name: "skipDelayDuration", type: "number", default: "300", description: "Time window for skip delay" },
+    { name: "disableHoverableContent", type: "boolean", default: "false", description: "Disable hovering over content" }
+  ]}
+/>
+
+<PropsTable
+  title="TooltipContent Props"
+  props={[
+    { name: "side", type: "'top' | 'bottom' | 'left' | 'right'", default: "'top'", description: "Preferred side" },
+    { name: "align", type: "'start' | 'center' | 'end'", default: "'center'", description: "Alignment on the side" },
+    { name: "sideOffset", type: "number", default: "4", description: "Distance from trigger" }
+  ]}
+/>
+
+## Primitives Used
+
+<CodeBlock
+  code={`// Collision-aware positioning
+import { computePosition } from '@/lib/primitives/collision-detector';
+
+// Portal rendering
+import { getPortalContainer } from '@/lib/primitives/portal';`}
+  language="typescript"
+  filename="primitives"
+/>
+
+## Accessibility
+
+- Keyboard accessible via focus
+- Screen reader announcements
+- Escape key to dismiss
+- Respects prefers-reduced-motion
