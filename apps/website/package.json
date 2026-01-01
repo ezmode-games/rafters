@@ -8,17 +8,20 @@
     "preview": "astro build && wrangler dev",
     "astro": "astro",
     "deploy": "astro build && wrangler deploy",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "test:unit": "vitest run"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",
+    "@astrojs/mdx": "^4.3.13",
     "@astrojs/react": "^4.4.2",
+    "@rafters/design-tokens": "workspace:*",
     "@tailwindcss/vite": "^4.1.18",
-    "@types/react": "^19.2.7",
-    "@types/react-dom": "^19.2.3",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "astro": "^5.16.5",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {

@@ -1,0 +1,154 @@
+---
+title: "Select"
+description: "Custom dropdown select with keyboard navigation and typeahead"
+order: 7
+---
+
+import ComponentDoc from '../../../components/docs/ComponentDoc.astro';
+import CodeBlock from '../../../components/docs/CodeBlock.astro';
+import PropsTable from '../../../components/docs/PropsTable.astro';
+
+<ComponentDoc
+  name="select"
+  description="A custom select component with full keyboard navigation, typeahead search, and proper ARIA attributes. Built with framework-agnostic primitives."
+  examples={[
+    {
+      title: "Basic Select",
+      description: "A simple dropdown with options.",
+      code: `import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem
+} from '@/components/ui/select';
+
+export function Example() {
+  return (
+    <Select>
+      <SelectTrigger className="w-[180px]">
+        <SelectValue placeholder="Select a fruit" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="apple">Apple</SelectItem>
+        <SelectItem value="banana">Banana</SelectItem>
+        <SelectItem value="orange">Orange</SelectItem>
+      </SelectContent>
+    </Select>
+  );
+}`
+    },
+    {
+      title: "Controlled Select",
+      description: "Control the value externally with state.",
+      code: `const [value, setValue] = useState('');
+
+<Select value={value} onValueChange={setValue}>
+  <SelectTrigger>
+    <SelectValue placeholder="Choose..." />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="light">Light</SelectItem>
+    <SelectItem value="dark">Dark</SelectItem>
+    <SelectItem value="system">System</SelectItem>
+  </SelectContent>
+</Select>`
+    },
+    {
+      title: "Grouped Options",
+      description: "Organize options into logical groups.",
+      code: `<Select>
+  <SelectTrigger>
+    <SelectValue placeholder="Select a timezone" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectGroup>
+      <SelectLabel>North America</SelectLabel>
+      <SelectItem value="est">Eastern Time</SelectItem>
+      <SelectItem value="pst">Pacific Time</SelectItem>
+    </SelectGroup>
+    <SelectSeparator />
+    <SelectGroup>
+      <SelectLabel>Europe</SelectLabel>
+      <SelectItem value="gmt">GMT</SelectItem>
+      <SelectItem value="cet">Central European</SelectItem>
+    </SelectGroup>
+  </SelectContent>
+</Select>`
+    },
+    {
+      title: "With Form",
+      description: "Use with HTML forms via the name prop.",
+      code: `<form onSubmit={handleSubmit}>
+  <Select name="priority" defaultValue="medium">
+    <SelectTrigger>
+      <SelectValue />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="low">Low</SelectItem>
+      <SelectItem value="medium">Medium</SelectItem>
+      <SelectItem value="high">High</SelectItem>
+    </SelectContent>
+  </Select>
+</form>`
+    }
+  ]}
+  props={[
+    { name: "value", type: "string", description: "Controlled selected value" },
+    { name: "defaultValue", type: "string", default: "''", description: "Initial value for uncontrolled usage" },
+    { name: "onValueChange", type: "(value: string) => void", description: "Callback when selection changes" },
+    { name: "open", type: "boolean", description: "Controlled open state" },
+    { name: "onOpenChange", type: "(open: boolean) => void", description: "Callback when open state changes" },
+    { name: "disabled", type: "boolean", default: "false", description: "Disables the select" },
+    { name: "name", type: "string", description: "Form field name for native form submission" }
+  ]}
+/>
+
+## Component Parts
+
+<PropsTable
+  title="SelectItem Props"
+  props={[
+    { name: "value", type: "string", required: true, description: "Value submitted when selected" },
+    { name: "disabled", type: "boolean", default: "false", description: "Disables this option" },
+    { name: "textValue", type: "string", description: "Text for typeahead (defaults to children text)" }
+  ]}
+/>
+
+## Primitives Used
+
+<CodeBlock
+  code={`// Collision detection for positioning
+import { computePosition } from '@/lib/primitives/collision-detector';
+
+// Keyboard navigation
+import { onEscapeKeyDown } from '@/lib/primitives/escape-keydown';
+import { createRovingFocus } from '@/lib/primitives/roving-focus';
+
+// Typeahead search
+import { createTypeahead } from '@/lib/primitives/typeahead';
+
+// Click outside detection
+import { onPointerDownOutside } from '@/lib/primitives/outside-click';`}
+  language="typescript"
+  filename="primitives"
+/>
+
+## Keyboard Navigation
+
+| Key | Action |
+|-----|--------|
+| `Space` / `Enter` | Open select / select option |
+| `ArrowDown` | Open select / move to next option |
+| `ArrowUp` | Move to previous option |
+| `Home` | Move to first option |
+| `End` | Move to last option |
+| `Escape` | Close select |
+| `A-Z` | Typeahead to matching option |
+
+## Accessibility
+
+- Full ARIA combobox pattern implementation
+- Screen reader announcements for options
+- Typeahead search for quick navigation
+- Proper focus management

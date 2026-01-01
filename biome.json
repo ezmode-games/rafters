@@ -71,5 +71,31 @@
     "formatter": {
       "trailingCommas": "none"
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.astro"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedVariables": "off",
+            "noUnusedImports": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/globals.css"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noInvalidDirectionInLinearGradient": "off"
+          },
+          "complexity": {
+            "noImportantStyles": "off"
+          }
+        }
+      }
+    }
+  ]
 }

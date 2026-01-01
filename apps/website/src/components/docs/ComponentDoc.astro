@@ -1,0 +1,104 @@
+---
+/**
+ * ComponentDoc - Template for component documentation pages
+ * Loads component data from registry and displays it with a clean layout
+ */
+
+import { loadComponent } from '../../lib/registry/componentService';
+import CodeBlock from './CodeBlock.astro';
+import DependencyList from './DependencyList.astro';
+import InstallCommand from './InstallCommand.astro';
+import PropsTable from './PropsTable.astro';
+
+interface Props {
+  name: string;
+  description?: string;
+  examples?: Array<{
+    title: string;
+    description?: string;
+    code: string;
+  }>;
+  props?: Array<{
+    name: string;
+    type: string;
+    default?: string;
+    description?: string;
+    required?: boolean;
+  }>;
+}
+
+const { name, description, examples = [], props = [] } = Astro.props;
+
+// Load component data from registry
+const component = loadComponent(name);
+const dependencies = component?.dependencies ?? [];
+const registryDependencies = component?.registryDependencies ?? [];
+---
+
+<div class="component-doc">
+  <!-- Header -->
+  <header class="mb-8 pb-6 border-b border-gray-200">
+    <div class="flex items-center gap-3 mb-2">
+      <h1 class="font-mono text-3xl font-medium text-gray-900 m-0">
+        {name}
+      </h1>
+      <span class="font-mono text-xs font-medium uppercase tracking-wider px-2 py-1 bg-gray-100 text-gray-500 rounded">
+        Component
+      </span>
+    </div>
+    {description && (
+      <p class="text-lg text-gray-600 leading-relaxed m-0 mt-3">
+        {description}
+      </p>
+    )}
+  </header>
+
+  <!-- Installation -->
+  <section class="mb-10">
+    <InstallCommand name={name} />
+  </section>
+
+  <!-- Dependencies -->
+  {(dependencies.length > 0 || registryDependencies.length > 0) && (
+    <section class="mb-10">
+      <DependencyList
+        dependencies={dependencies}
+        registryDependencies={registryDependencies}
+      />
+    </section>
+  )}
+
+  <!-- Usage Examples -->
+  {examples.length > 0 && (
+    <section class="mb-10">
+      <h2 class="font-mono text-sm font-semibold uppercase tracking-wider text-gray-500 mb-6">
+        Usage
+      </h2>
+      {examples.map((example) => (
+        <div class="mb-8">
+          <h3 class="text-xl font-medium text-gray-900 mb-2">
+            {example.title}
+          </h3>
+          {example.description && (
+            <p class="text-gray-600 mb-4">
+              {example.description}
+            </p>
+          )}
+          <CodeBlock code={example.code} filename={`${name}.tsx`} />
+        </div>
+      ))}
+    </section>
+  )}
+
+  <!-- Props -->
+  {props.length > 0 && (
+    <section class="mb-10">
+      <PropsTable props={props} />
+    </section>
+  )}
+
+  <!-- Additional Content (slot for MDX content) -->
+  <div class="component-content">
+    <slot />
+  </div>
+</div>

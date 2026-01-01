@@ -1,16 +1,25 @@
 ---
+import { getCollection } from 'astro:content';
+import MarketingLayout from '../layouts/MarketingLayout.astro';
 
+// Get the index page from the pages collection
+const pages = await getCollection('pages');
+const indexPage = pages.find((page) => page.slug === 'index');
+
+if (!indexPage) {
+  throw new Error('Index page not found in pages collection');
+}
+
+const { Content } = await indexPage.render();
+
+const layoutProps = {
+  title: indexPage.data.title,
+  description: indexPage.data.description,
+  headerTitle: indexPage.data.headerTitle,
+  headerTitleClasses: indexPage.data.headerTitleClasses,
+};
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<MarketingLayout {...layoutProps}>
+  <Content />
+</MarketingLayout>

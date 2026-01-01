@@ -1,0 +1,85 @@
+---
+title: "Button"
+description: "Interactive button component with variant support and loading states"
+order: 1
+---
+
+import ComponentDoc from '../../../components/docs/ComponentDoc.astro';
+import CodeBlock from '../../../components/docs/CodeBlock.astro';
+import PropsTable from '../../../components/docs/PropsTable.astro';
+
+<ComponentDoc
+  name="button"
+  description="A versatile button component with multiple variants, sizes, and support for the asChild pattern. Built with semantic design tokens and accessible by default."
+  examples={[
+    {
+      title: "Basic Usage",
+      description: "Import and use the Button component with default styling.",
+      code: `import { Button } from '@/components/ui/button';
+
+export function Example() {
+  return <Button>Click me</Button>;
+}`
+    },
+    {
+      title: "Variants",
+      description: "Choose from multiple visual variants to match your UI needs.",
+      code: `<Button variant="default">Default</Button>
+<Button variant="secondary">Secondary</Button>
+<Button variant="destructive">Destructive</Button>
+<Button variant="outline">Outline</Button>
+<Button variant="ghost">Ghost</Button>`
+    },
+    {
+      title: "Sizes",
+      description: "Adjust button size based on context and hierarchy.",
+      code: `<Button size="sm">Small</Button>
+<Button size="default">Default</Button>
+<Button size="lg">Large</Button>
+<Button size="icon"><IconPlus /></Button>`
+    },
+    {
+      title: "Loading State",
+      description: "Show a loading indicator while an action is in progress.",
+      code: `<Button loading>Saving...</Button>`
+    },
+    {
+      title: "As Child Pattern",
+      description: "Render as a different element while keeping button styling.",
+      code: `<Button asChild>
+  <a href="/docs">Read the docs</a>
+</Button>`
+    }
+  ]}
+  props={[
+    { name: "variant", type: "'default' | 'secondary' | 'destructive' | 'outline' | 'ghost'", default: "'default'", description: "Visual style variant" },
+    { name: "size", type: "'default' | 'sm' | 'lg' | 'icon'", default: "'default'", description: "Size of the button" },
+    { name: "loading", type: "boolean", default: "false", description: "Shows loading state and disables interaction" },
+    { name: "disabled", type: "boolean", default: "false", description: "Disables the button" },
+    { name: "asChild", type: "boolean", default: "false", description: "Merge props onto child element instead of rendering a button" },
+    { name: "className", type: "string", description: "Additional CSS classes" }
+  ]}
+/>
+
+## Styling
+
+The Button uses semantic design tokens for consistent theming:
+
+<CodeBlock
+  code={`// Variant tokens
+bg-primary text-primary-foreground    // default
+bg-secondary text-secondary-foreground // secondary
+bg-destructive text-destructive-foreground // destructive
+border border-input bg-background     // outline
+bg-transparent                        // ghost`}
+  language="css"
+  filename="tokens"
+/>
+
+## Accessibility
+
+- Uses native `<button>` element by default
+- `aria-disabled` and `aria-busy` for loading/disabled states
+- Keyboard activation with Enter and Space
+- Focus visible ring for keyboard navigation
+- When using `asChild` with non-button elements, adds `role="button"` and keyboard handlers

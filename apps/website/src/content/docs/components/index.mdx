@@ -1,0 +1,59 @@
+---
+title: "Components"
+description: "shadcn-compatible components built with vanilla primitives"
+order: 1
+---
+
+import { getRegistryIndex, listPrimitiveNames } from '../../../lib/registry/componentService';
+
+export const registry = getRegistryIndex();
+export const primitives = listPrimitiveNames();
+export const docPages = ['badge', 'button', 'dialog', 'input', 'label', 'select', 'slider', 'tabs', 'tooltip'];
+
+# Component Library
+
+Rafters provides shadcn-compatible React components built on framework-agnostic vanilla primitives. Every component works as a drop-in replacement for shadcn/ui while using our own accessible primitives instead of Radix.
+
+## Installation
+
+Add components to your project using the CLI:
+
+```bash
+npx rafters add button
+npx rafters add dialog
+npx rafters add select
+```
+
+## Components ({registry.components.length})
+
+<div class="grid gap-2 my-6">
+  {registry.components.map(name => (
+    docPages.includes(name)
+      ? <a href={`/docs/components/${name}`} class="font-mono text-sm px-3 py-2 bg-blue-50 text-blue-700 rounded border border-blue-200 hover:bg-blue-100 no-underline">{name}</a>
+      : <span class="font-mono text-sm px-3 py-2 bg-gray-50 text-gray-600 rounded border border-gray-200">{name}</span>
+  ))}
+</div>
+
+## Primitives ({primitives.length})
+
+<div class="grid gap-2 my-6">
+  {primitives.map(name => (
+    <span class="font-mono text-sm px-3 py-2 bg-gray-50 text-gray-600 rounded border border-gray-200">{name}</span>
+  ))}
+</div>
+
+## Registry API
+
+```bash
+# Get all components
+GET /registry/index.json
+
+# Get a specific component
+GET /registry/components/button.json
+
+# Get primitives
+GET /registry/primitives/focus-trap.json
+
+# Initialize a new project
+GET /registry/init.json
+```
