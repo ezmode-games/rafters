@@ -34,7 +34,7 @@ const {
 } = Astro.props;
 
 // Apply semantic color tokens based on variant and trust level
-const _getCardClasses = (variant: string, _trustLevel: string) => {
+const getCardClasses = (variant: string, _trustLevel: string) => {
   const baseClasses = 'border rounded-lg p-6 transition-colors hover:shadow-sm';
 
   switch (variant) {
