@@ -1,0 +1,199 @@
+/**
+ * Project detection utilities
+ *
+ * Detects framework, Tailwind version, and shadcn configuration
+ */
+
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+
+export type Framework = 'next' | 'vite' | 'remix' | 'astro' | 'unknown';
+
+export interface ShadcnConfig {
+  tailwind?: {
+    css?: string;
+  };
+}
+
+export interface ShadcnColors {
+  background?: string;
+  foreground?: string;
+  card?: string;
+  cardForeground?: string;
+  popover?: string;
+  popoverForeground?: string;
+  primary?: string;
+  primaryForeground?: string;
+  secondary?: string;
+  secondaryForeground?: string;
+  muted?: string;
+  mutedForeground?: string;
+  accent?: string;
+  accentForeground?: string;
+  destructive?: string;
+  destructiveForeground?: string;
+  border?: string;
+  input?: string;
+  ring?: string;
+}
+
+export interface ProjectDetection {
+  framework: Framework;
+  shadcn: ShadcnConfig | null;
+  tailwindVersion: string | null;
+}
+
+interface PackageJson {
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+}
+
+/**
+ * Detect the framework used in the project by checking package.json dependencies
+ */
+export async function detectFramework(cwd: string): Promise<Framework> {
+  try {
+    const content = await readFile(join(cwd, 'package.json'), 'utf-8');
+    const pkg = JSON.parse(content) as PackageJson;
+    const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+
+    // Check for frameworks in order of specificity
+    if (deps['next']) {
+      return 'next';
+    }
+
+    // Remix packages all start with @remix-run/
+    const hasRemix = Object.keys(deps).some((dep) => dep.startsWith('@remix-run/'));
+    if (hasRemix) {
+      return 'remix';
+    }
+
+    if (deps['astro']) {
+      return 'astro';
+    }
+
+    if (deps['vite']) {
+      return 'vite';
+    }
+
+    return 'unknown';
+  } catch {
+    return 'unknown';
+  }
+}
+
+/**
+ * Detect the Tailwind CSS version installed in the project
+ * Returns the version string or null if not installed
+ */
+export async function detectTailwindVersion(cwd: string): Promise<string | null> {
+  try {
+    const content = await readFile(join(cwd, 'package.json'), 'utf-8');
+    const pkg = JSON.parse(content) as PackageJson;
+    const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+
+    const tailwindVersion = deps['tailwindcss'];
+    if (!tailwindVersion) {
+      return null;
+    }
+
+    // Extract version number, handling ranges like ^4.0.0, ~4.0.0, >=4.0.0
+    // Remove leading ^, ~, >=, >, =, etc.
+    const versionMatch = tailwindVersion.match(/\d+\.\d+\.\d+/);
+    return versionMatch ? versionMatch[0] : tailwindVersion;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Check if the detected Tailwind version is v3 (not supported)
+ */
+export function isTailwindV3(version: string | null): boolean {
+  if (!version) {
+    return false;
+  }
+  return version.startsWith('3.');
+}
+
+/**
+ * Detect shadcn configuration by looking for components.json
+ */
+export async function detectShadcn(cwd: string): Promise<ShadcnConfig | null> {
+  try {
+    const content = await readFile(join(cwd, 'components.json'), 'utf-8');
+    return JSON.parse(content) as ShadcnConfig;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Parse CSS variables from a CSS file into light/dark color objects
+ */
+export function parseCssVariables(css: string): { light: ShadcnColors; dark: ShadcnColors } {
+  const light: ShadcnColors = {};
+  const dark: ShadcnColors = {};
+
+  const rootMatch = css.match(/:root\s*\{([^}]+)\}/);
+  if (rootMatch?.[1]) {
+    parseVariablesIntoColors(rootMatch[1], light);
+  }
+
+  const darkMatch = css.match(/\.dark\s*\{([^}]+)\}/);
+  if (darkMatch?.[1]) {
+    parseVariablesIntoColors(darkMatch[1], dark);
+  }
+
+  return { light, dark };
+}
+
+function parseVariablesIntoColors(block: string, colors: ShadcnColors): void {
+  const varMap: Record<string, keyof ShadcnColors> = {
+    '--background': 'background',
+    '--foreground': 'foreground',
+    '--card': 'card',
+    '--card-foreground': 'cardForeground',
+    '--popover': 'popover',
+    '--popover-foreground': 'popoverForeground',
+    '--primary': 'primary',
+    '--primary-foreground': 'primaryForeground',
+    '--secondary': 'secondary',
+    '--secondary-foreground': 'secondaryForeground',
+    '--muted': 'muted',
+    '--muted-foreground': 'mutedForeground',
+    '--accent': 'accent',
+    '--accent-foreground': 'accentForeground',
+    '--destructive': 'destructive',
+    '--destructive-foreground': 'destructiveForeground',
+    '--border': 'border',
+    '--input': 'input',
+    '--ring': 'ring',
+  };
+
+  for (const [cssVar, colorKey] of Object.entries(varMap)) {
+    const regex = new RegExp(`${cssVar}:\\s*([^;]+);`);
+    const match = block.match(regex);
+    if (match?.[1]) {
+      colors[colorKey] = match[1].trim();
+    }
+  }
+}
+
+/**
+ * Detect all project configuration at once
+ * Returns framework, shadcn config, and Tailwind version
+ */
+export async function detectProject(cwd: string): Promise<ProjectDetection> {
+  const [framework, shadcn, tailwindVersion] = await Promise.all([
+    detectFramework(cwd),
+    detectShadcn(cwd),
+    detectTailwindVersion(cwd),
+  ]);
+
+  return {
+    framework,
+    shadcn,
+    tailwindVersion,
+  };
+}

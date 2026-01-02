@@ -6,7 +6,9 @@
 
 ## Goal
 
-Build `@rafters/cli` - a CLI that initializes projects, generates output files, and runs an MCP server for AI agent access to the design token system.
+Build `@rafters/cli` - a CLI that initializes projects, adds components, runs an MCP server for AI agent access, and launches Studio for visual token editing.
+
+**Usage:** `pnpx rafters <command>` - ephemeral, not installed as a dependency.
 
 ---
 
@@ -14,12 +16,16 @@ Build `@rafters/cli` - a CLI that initializes projects, generates output files, 
 
 ### `rafters init`
 
-Creates `.rafters/` folder with default configuration and tokens.
+Detects framework and shadcn, creates `.rafters/` folder with configuration and default tokens, generates output files.
 
 ```bash
 rafters init          # Initialize in current directory
-rafters init --force  # Overwrite existing
+rafters init --force  # Regenerate from config (overwrites output files)
 ```
+
+**Detection:**
+- Framework: Next.js, Vite, Remix, Astro, etc.
+- shadcn: Checks for shadcn installation and existing color variables
 
 **Output:**
 ```
@@ -43,18 +49,24 @@ rafters init --force  # Overwrite existing
     tokens.ts
 ```
 
-### `rafters generate`
-
-Regenerates output files from token sources.
-
-```bash
-rafters generate  # Regenerate all output files
-```
+**Behavior:**
+- First run: Generates default tokens, writes config and output
+- With `--force`: Reads existing config, regenerates all output files
+- Without `--force` on existing project: Warns and exits (or prompts)
 
 Uses existing exporters from `@rafters/design-tokens`:
 - `registryToTailwind()` -> theme.css
 - `registryToDTCG()` -> tokens.json
 - `registryToTypeScript()` -> tokens.ts
+
+### `rafters add <component>`
+
+Adds a rafters component to the project (drop-in shadcn replacement).
+
+```bash
+rafters add button
+rafters add card dialog
+```
 
 ### `rafters mcp`
 
@@ -63,6 +75,16 @@ Starts MCP server for AI agent access (stdio transport, no network).
 ```bash
 rafters mcp
 ```
+
+### `rafters studio`
+
+Opens Studio UI for visual token editing.
+
+```bash
+rafters studio
+```
+
+Studio is a static React app using the File System Access API to read/write `.rafters/` directly from the browser. No server needed - CLI just opens the bundled HTML file.
 
 ---
 
@@ -78,7 +100,7 @@ All tools prefixed with `rafters_` for namespacing:
 | `rafters_search_tokens` | Search by name or semantic meaning | `{ query: string, limit?: number }` |
 | `rafters_get_config` | Get design system configuration | none |
 
-**Key principle:** Token metadata includes "why" (semanticMeaning, usagePatterns) so agents don't have to guess.
+**Key principle:** Token metadata includes "why" (semanticMeaning, usagePatterns) so AI agents have the intelligence layer, not just values.
 
 ---
 
@@ -90,17 +112,30 @@ packages/cli/
     index.ts              # Entry point, commander setup
     commands/
       init.ts             # rafters init
-      generate.ts         # rafters generate
+      add.ts              # rafters add
       mcp.ts              # rafters mcp
+      studio.ts           # rafters studio (opens bundled app)
     mcp/
       server.ts           # MCP server implementation
       tools.ts            # Tool handlers
     utils/
       paths.ts            # .rafters/ path helpers
+      detect.ts           # Framework + shadcn detection (reusable for --upgrade)
   bin/
     rafters.js            # Executable shebang
   package.json
   tsconfig.json
+
+packages/studio/
+  src/
+    App.tsx               # React app root
+    components/           # UI components
+    hooks/
+      useFileSystem.ts    # File System Access API wrapper
+    utils/
+      tokens.ts           # Token read/write via FS API
+  index.html              # Static entry point
+  vite.config.ts          # Build config (build only, no dev server for production)
 ```
 
 ---
@@ -149,26 +184,27 @@ import { registryToTailwind, registryToDTCG, registryToTypeScript } from '@rafte
 
 ## What's NOT in Scope
 
-- **Studio UI** - Separate project, many issues, not part of CLI
 - **Web server / HTTP API** - CLI is local-only
 - **Cloud sync** - Local filesystem only
-- **Component scaffolding** - Just tokens, not components
-- **Framework-specific init** - Creates vanilla .rafters/, no Next/Vite detection
+- **Token migration from shadcn** - Basic init uses defaults; migration is future work
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] `npx rafters init` creates valid .rafters/ structure
-- [ ] `npx rafters generate` produces theme.css, tokens.json, tokens.ts
-- [ ] `rafters mcp` starts stdio MCP server
+- [ ] `pnpx rafters init` detects framework and shadcn
+- [ ] `pnpx rafters init` creates valid .rafters/ structure with default tokens
+- [ ] `pnpx rafters init --force` regenerates output from existing config
+- [ ] `pnpx rafters add <component>` adds component files
+- [ ] `pnpx rafters mcp` starts stdio MCP server
+- [ ] `pnpx rafters studio` launches Studio UI
 - [ ] All 5 MCP tools respond correctly
 - [ ] Works with Claude Desktop config:
   ```json
   {
     "mcpServers": {
       "rafters": {
-        "command": "npx",
+        "command": "pnpx",
         "args": ["rafters", "mcp"],
         "cwd": "/path/to/project"
       }
@@ -177,19 +213,21 @@ import { registryToTailwind, registryToDTCG, registryToTypeScript } from '@rafte
   ```
 - [ ] TypeScript strict mode, no `any` types
 - [ ] Biome clean
-- [ ] Unit tests for each command
-- [ ] Integration test for MCP tools
+- [ ] BDD tests with playwright-bdd
+- [ ] Zod mock data with zocker
+- [ ] Filesystem fixtures for detection scenarios
 
 ---
 
 ## Implementation Order
 
 1. **Scaffold package** - package.json, tsconfig, bin setup
-2. **`init` command** - uses generateBaseSystem, NodePersistenceAdapter
-3. **`generate` command** - uses registry, exporters
+2. **`init` command** - framework detection, shadcn detection, generateBaseSystem, NodePersistenceAdapter
+3. **`add` command** - component scaffolding
 4. **`mcp` command** - MCP server with 5 tools
-5. **Tests** - unit + integration
-6. **Docs** - README, Claude Desktop config example
+5. **`studio` command** - Studio launcher
+6. **Tests** - unit + integration
+7. **Docs** - README, Claude Desktop config example
 
 ---
 
@@ -197,4 +235,5 @@ import { registryToTailwind, registryToDTCG, registryToTypeScript } from '@rafte
 
 - Consolidates deleted CLI_ARCHITECTURE.md and MCP_ARCHITECTURE.md
 - Replaces closed issue #366 which had inconsistent specs
-- Studio is intentionally excluded (separate epic)
+- Components are drop-in replacements for shadcn
+- Tailwind v4 only (OKLCH native, no v3 support)
