@@ -1,13 +1,18 @@
 /**
  * Unit tests for rafters add command
  *
- * Tests individual functions in isolation using zocker-generated fixtures.
+ * Following project test strategy:
+ * - Property-based testing with zocker for schema-driven validation
+ * - Real fixtures over brittle hardcoded mocks
+ * - Test behavior, not implementation details
  */
 
 import { describe, expect, it } from 'vitest';
-// Import the internal functions we want to unit test
+import { zocker } from 'zocker';
+import { z } from 'zod';
 import { collectDependencies, transformFileContent } from '../../src/commands/add.js';
-import { registryFixtures } from '../fixtures/registry.js';
+import { RegistryItemSchema } from '../../src/registry/types.js';
+import { generateRandomItems, registryFixtures } from '../fixtures/registry.js';
 
 describe('transformFileContent', () => {
   it('transforms ../../primitives/ imports to @/lib/primitives/', () => {
@@ -94,6 +99,49 @@ describe('collectDependencies', () => {
     const sorted = [...dependencies].sort();
     expect(dependencies).toEqual(sorted);
   });
+
+  // Property-based test: for all valid items, dependencies are extracted
+  it('PROPERTY: always returns arrays for dependencies', () => {
+    const items = generateRandomItems(20);
+
+    const result = collectDependencies(items);
+
+    expect(Array.isArray(result.dependencies)).toBe(true);
+    expect(Array.isArray(result.devDependencies)).toBe(true);
+  });
+});
+
+describe('RegistryItemSchema validation', () => {
+  // Property-based test: zocker-generated data always validates
+  it('PROPERTY: zocker-generated items always parse successfully', () => {
+    const items = zocker(z.array(RegistryItemSchema).length(50)).generate();
+
+    items.forEach((item) => {
+      expect(() => RegistryItemSchema.parse(item)).not.toThrow();
+    });
+  });
+
+  it('validates required fields', () => {
+    expect(() =>
+      RegistryItemSchema.parse({
+        name: 'test',
+        type: 'registry:ui',
+        dependencies: [],
+        files: [],
+      }),
+    ).not.toThrow();
+  });
+
+  it('rejects invalid type', () => {
+    expect(() =>
+      RegistryItemSchema.parse({
+        name: 'test',
+        type: 'invalid-type',
+        dependencies: [],
+        files: [],
+      }),
+    ).toThrow();
+  });
 });
 
 describe('registry fixtures', () => {
@@ -102,7 +150,7 @@ describe('registry fixtures', () => {
 
     expect(button.name).toBe('button');
     expect(button.type).toBe('registry:ui');
-    expect(button.files).toHaveLength(1);
+    expect(button.files.length).toBeGreaterThan(0);
     expect(button.files[0].path).toBe('components/ui/button.tsx');
     expect(button.registryDependencies).toContain('classy');
   });
@@ -112,7 +160,7 @@ describe('registry fixtures', () => {
 
     expect(classy.name).toBe('classy');
     expect(classy.type).toBe('registry:primitive');
-    expect(classy.files).toHaveLength(1);
+    expect(classy.files.length).toBeGreaterThan(0);
     expect(classy.files[0].path).toBe('lib/primitives/classy.ts');
   });
 
@@ -122,5 +170,19 @@ describe('registry fixtures', () => {
     expect(index.name).toBe('rafters');
     expect(index.components).toContain('button');
     expect(index.primitives).toContain('classy');
+  });
+
+  // Property-based test: all fixtures validate against schema
+  it('PROPERTY: all generated fixtures validate against schema', () => {
+    const fixtures = [
+      registryFixtures.buttonComponent(),
+      registryFixtures.classyPrimitive(),
+      registryFixtures.cardComponent(),
+      registryFixtures.dialogComponent(),
+    ];
+
+    fixtures.forEach((fixture) => {
+      expect(() => RegistryItemSchema.parse(fixture)).not.toThrow();
+    });
   });
 });

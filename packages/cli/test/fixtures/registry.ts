@@ -1,5 +1,8 @@
 /**
  * Registry fixtures generated from Zod schemas using zocker
+ *
+ * Following project test strategy: property-based testing with zocker
+ * for schema-driven validation. Real fixtures over brittle hardcoded mocks.
  */
 
 import { zocker } from 'zocker';
@@ -9,64 +12,64 @@ import {
   RegistryItemSchema,
 } from '../../src/registry/types.js';
 
-// Create base generators with seed for reproducibility
+/**
+ * Create fixture factory with override support
+ * Pattern from test/utils/index.ts
+ */
+export function createFixtureFactory<T>(generator: () => T, baseSeed = 42) {
+  let counter = baseSeed;
+
+  return {
+    generate(overrides?: Partial<T>): T {
+      const base = generator();
+      counter++;
+      return overrides ? { ...base, ...overrides } : base;
+    },
+    generateMany(count: number): T[] {
+      return Array.from({ length: count }, () => this.generate());
+    },
+    reset(newSeed = 42) {
+      counter = newSeed;
+    },
+  };
+}
+
+// Base generators from Zod schemas
 const registryFileGenerator = zocker(RegistryFileSchema).setSeed(42);
 const registryItemGenerator = zocker(RegistryItemSchema).setSeed(42);
 const registryIndexGenerator = zocker(RegistryIndexSchema).setSeed(42);
 
 /**
- * Generate a registry file fixture
+ * Factory for generating registry files from schema
  */
-export function createRegistryFile(
-  overrides: Partial<ReturnType<typeof registryFileGenerator.generate>> = {},
-) {
-  return {
-    ...registryFileGenerator.generate(),
-    ...overrides,
-  };
-}
+export const registryFileFactory = createFixtureFactory(() => registryFileGenerator.generate());
 
 /**
- * Generate a registry item fixture
+ * Factory for generating registry items from schema
  */
-export function createRegistryItem(
-  overrides: Partial<ReturnType<typeof registryItemGenerator.generate>> = {},
-) {
-  const generated = registryItemGenerator.generate();
-  return {
-    ...generated,
-    // Ensure files array is present if not overridden
-    files: generated.files || [],
-    dependencies: generated.dependencies || [],
-    ...overrides,
-  };
-}
+export const registryItemFactory = createFixtureFactory(() => registryItemGenerator.generate());
 
 /**
- * Generate a registry index fixture
+ * Factory for generating registry index from schema
  */
-export function createRegistryIndex(
-  overrides: Partial<ReturnType<typeof registryIndexGenerator.generate>> = {},
-) {
-  return {
-    ...registryIndexGenerator.generate(),
-    ...overrides,
-  };
-}
+export const registryIndexFactory = createFixtureFactory(() => registryIndexGenerator.generate());
 
-// Pre-defined component fixtures for common test cases
+/**
+ * Pre-configured fixtures for common test scenarios
+ * These use the factories with specific overrides for readable tests
+ */
 export const registryFixtures = {
   /**
    * Button component with classy primitive dependency
    */
   buttonComponent: () =>
-    createRegistryItem({
+    registryItemFactory.generate({
       name: 'button',
       type: 'registry:ui',
       dependencies: ['react'],
       registryDependencies: ['classy'],
       files: [
-        createRegistryFile({
+        registryFileFactory.generate({
           path: 'components/ui/button.tsx',
           content: `import classy from '../../primitives/classy';
 export const Button = () => <button>Click me</button>;`,
@@ -79,12 +82,13 @@ export const Button = () => <button>Click me</button>;`,
    * Classy primitive (class name utility)
    */
   classyPrimitive: () =>
-    createRegistryItem({
+    registryItemFactory.generate({
       name: 'classy',
       type: 'registry:primitive',
       dependencies: [],
+      registryDependencies: undefined,
       files: [
-        createRegistryFile({
+        registryFileFactory.generate({
           path: 'lib/primitives/classy.ts',
           content: `export default function classy(...classes: string[]) { return classes.filter(Boolean).join(' '); }`,
           type: 'registry:primitive',
@@ -96,12 +100,13 @@ export const Button = () => <button>Click me</button>;`,
    * Card component (no dependencies)
    */
   cardComponent: () =>
-    createRegistryItem({
+    registryItemFactory.generate({
       name: 'card',
       type: 'registry:ui',
       dependencies: ['react'],
+      registryDependencies: undefined,
       files: [
-        createRegistryFile({
+        registryFileFactory.generate({
           path: 'components/ui/card.tsx',
           content: `export const Card = () => <div>Card</div>;`,
           type: 'registry:ui',
@@ -113,13 +118,13 @@ export const Button = () => <button>Click me</button>;`,
    * Dialog component with external npm dependency
    */
   dialogComponent: () =>
-    createRegistryItem({
+    registryItemFactory.generate({
       name: 'dialog',
       type: 'registry:ui',
       dependencies: ['react', '@radix-ui/react-dialog'],
       registryDependencies: ['classy'],
       files: [
-        createRegistryFile({
+        registryFileFactory.generate({
           path: 'components/ui/dialog.tsx',
           content: `import * as DialogPrimitive from '@radix-ui/react-dialog';
 export const Dialog = DialogPrimitive.Root;`,
@@ -132,10 +137,17 @@ export const Dialog = DialogPrimitive.Root;`,
    * Registry index for testing
    */
   registryIndex: () =>
-    createRegistryIndex({
+    registryIndexFactory.generate({
       name: 'rafters',
       homepage: 'https://rafters.studio',
       components: ['button', 'card', 'dialog'],
       primitives: ['classy'],
     }),
 };
+
+/**
+ * Generate random valid registry items for property-based testing
+ */
+export function generateRandomItems(count: number) {
+  return registryItemFactory.generateMany(count);
+}
