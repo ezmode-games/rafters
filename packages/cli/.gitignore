@@ -1,0 +1,6 @@
+# BDD generated test files
+.features-gen/
+
+# Playwright
+playwright-report/
+test-results/

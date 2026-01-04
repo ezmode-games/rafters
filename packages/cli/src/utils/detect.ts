@@ -58,7 +58,7 @@ export async function detectFramework(cwd: string): Promise<Framework> {
     const deps = { ...pkg.dependencies, ...pkg.devDependencies };
 
     // Check for frameworks in order of specificity
-    if (deps['next']) {
+    if (deps.next) {
       return 'next';
     }
 
@@ -68,11 +68,11 @@ export async function detectFramework(cwd: string): Promise<Framework> {
       return 'remix';
     }
 
-    if (deps['astro']) {
+    if (deps.astro) {
       return 'astro';
     }
 
-    if (deps['vite']) {
+    if (deps.vite) {
       return 'vite';
     }
 
@@ -92,7 +92,7 @@ export async function detectTailwindVersion(cwd: string): Promise<string | null>
     const pkg = JSON.parse(content) as PackageJson;
     const deps = { ...pkg.dependencies, ...pkg.devDependencies };
 
-    const tailwindVersion = deps['tailwindcss'];
+    const tailwindVersion = deps.tailwindcss;
     if (!tailwindVersion) {
       return null;
     }
