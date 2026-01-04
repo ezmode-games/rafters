@@ -173,6 +173,109 @@ describe('tokensToTailwind', () => {
     expect(css).toContain('--color-background: var(--background);');
     expect(css).toContain('--color-primary: var(--primary);');
   });
+
+  it('should include .dark class for manual toggle support', () => {
+    const tokens: Token[] = [
+      { name: 'neutral-500', value: 'oklch(0.55 0 0)', category: 'color', namespace: 'color' },
+    ];
+
+    const css = tokensToTailwind(tokens);
+
+    expect(css).toContain('.dark {');
+    expect(css).toMatch(/\.dark \{[^}]*--background: var\(--rafters-dark-background\);/);
+  });
+
+  it('should generate @keyframes from motion-keyframe-* tokens', () => {
+    const tokens: Token[] = [
+      {
+        name: 'motion-keyframe-fade-in',
+        value: 'from { opacity: 0; } to { opacity: 1; }',
+        category: 'motion',
+        namespace: 'motion',
+        keyframeName: 'fade-in',
+      },
+      {
+        name: 'motion-keyframe-slide-up',
+        value:
+          'from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; }',
+        category: 'motion',
+        namespace: 'motion',
+        keyframeName: 'slide-up',
+      },
+    ];
+
+    const css = tokensToTailwind(tokens);
+
+    expect(css).toContain('@keyframes fade-in {');
+    expect(css).toContain('from { opacity: 0; } to { opacity: 1; }');
+    expect(css).toContain('@keyframes slide-up {');
+  });
+
+  it('should generate --animate-* tokens from motion-animation-* tokens', () => {
+    const tokens: Token[] = [
+      {
+        name: 'motion-animation-fade-in',
+        value: 'fade-in var(--motion-duration-normal) var(--motion-easing-ease-out)',
+        category: 'motion',
+        namespace: 'motion',
+        animationName: 'fade-in',
+      },
+      {
+        name: 'motion-animation-spin',
+        value: 'spin var(--motion-duration-slow) var(--motion-easing-linear) infinite',
+        category: 'motion',
+        namespace: 'motion',
+        animationName: 'spin',
+      },
+    ];
+
+    const css = tokensToTailwind(tokens);
+
+    expect(css).toContain(
+      '--animate-fade-in: fade-in var(--motion-duration-normal) var(--motion-easing-ease-out);',
+    );
+    expect(css).toContain(
+      '--animate-spin: spin var(--motion-duration-slow) var(--motion-easing-linear) infinite;',
+    );
+  });
+
+  it('should place --animate-* tokens inside @theme block', () => {
+    const tokens: Token[] = [
+      {
+        name: 'motion-animation-fade-in',
+        value: 'fade-in var(--motion-duration-normal) var(--motion-easing-ease-out)',
+        category: 'motion',
+        namespace: 'motion',
+        animationName: 'fade-in',
+      },
+    ];
+
+    const css = tokensToTailwind(tokens);
+
+    // --animate-* should be inside @theme block
+    const themeMatch = css.match(/@theme \{([\s\S]*?)\}/);
+    expect(themeMatch).not.toBeNull();
+    expect(themeMatch![1]).toContain('--animate-fade-in:');
+  });
+
+  it('should place @keyframes outside @theme block', () => {
+    const tokens: Token[] = [
+      {
+        name: 'motion-keyframe-fade-in',
+        value: 'from { opacity: 0; } to { opacity: 1; }',
+        category: 'motion',
+        namespace: 'motion',
+        keyframeName: 'fade-in',
+      },
+    ];
+
+    const css = tokensToTailwind(tokens);
+
+    // @keyframes should appear after @theme block ends
+    const themeEnd = css.indexOf('}', css.indexOf('@theme {'));
+    const keyframesStart = css.indexOf('@keyframes fade-in');
+    expect(keyframesStart).toBeGreaterThan(themeEnd);
+  });
 });
 
 describe('registryToTailwind', () => {

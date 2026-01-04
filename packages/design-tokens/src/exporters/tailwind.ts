@@ -217,6 +217,7 @@ function generateRootBlock(): string {
     lines.push(`  --${name}: var(--rafters-dark-${name});`);
   }
   lines.push('}');
+  lines.push('');
 
   return lines.join('\n');
 }

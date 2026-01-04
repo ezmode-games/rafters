@@ -508,7 +508,7 @@ export const TokenSchema = z.object({
     .optional(),
   delayMs: z.number().optional(), // Delay before animation starts
 
-  // Keyframe tokens (CSS @keyframes definitions)
+  // Keyframe tokens (CSS @keyframes content / animation step definitions)
   keyframeName: z.string().optional(), // Name of the keyframe (e.g., "fade-in")
 
   // Animation tokens (combine keyframe + duration + easing)

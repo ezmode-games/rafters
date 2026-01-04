@@ -475,6 +475,55 @@ describe('Token Structure Validation', () => {
         validateTokenStructure(token);
       }
     });
+
+    it('generates keyframe tokens', () => {
+      const keyframeTokens = result.tokens.filter((t) => t.name.startsWith('motion-keyframe-'));
+      expect(keyframeTokens.length).toBe(19);
+
+      // Check specific keyframes exist
+      const fadeIn = result.tokens.find((t) => t.name === 'motion-keyframe-fade-in');
+      expect(fadeIn).toBeDefined();
+      expect(fadeIn?.keyframeName).toBe('fade-in');
+      expect(fadeIn?.value).toContain('opacity');
+
+      const slideInFromBottom = result.tokens.find(
+        (t) => t.name === 'motion-keyframe-slide-in-from-bottom',
+      );
+      expect(slideInFromBottom).toBeDefined();
+      expect(slideInFromBottom?.value).toContain('translateY');
+    });
+
+    it('generates animation tokens', () => {
+      const animationTokens = result.tokens.filter((t) => t.name.startsWith('motion-animation-'));
+      expect(animationTokens.length).toBe(19);
+
+      // Check specific animations exist
+      const fadeIn = result.tokens.find((t) => t.name === 'motion-animation-fade-in');
+      expect(fadeIn).toBeDefined();
+      expect(fadeIn?.animationName).toBe('fade-in');
+      expect(fadeIn?.keyframeName).toBe('fade-in');
+      expect(fadeIn?.animationDuration).toBeDefined();
+      expect(fadeIn?.animationEasing).toBeDefined();
+    });
+
+    it('animation tokens reference duration and easing tokens via var()', () => {
+      const fadeIn = result.tokens.find((t) => t.name === 'motion-animation-fade-in');
+      expect(fadeIn?.value).toContain('var(--motion-duration-');
+      expect(fadeIn?.value).toContain('var(--motion-easing-');
+    });
+
+    it('animation tokens with fixed durations use literal values', () => {
+      const spin = result.tokens.find((t) => t.name === 'motion-animation-spin');
+      expect(spin?.value).toContain('1s');
+      expect(spin?.animationIterations).toBe('infinite');
+    });
+
+    it('animation tokens have correct dependsOn arrays', () => {
+      const fadeIn = result.tokens.find((t) => t.name === 'motion-animation-fade-in');
+      expect(fadeIn?.dependsOn).toContain('motion-keyframe-fade-in');
+      expect(fadeIn?.dependsOn).toContain('motion-duration-fast');
+      expect(fadeIn?.dependsOn).toContain('motion-easing-ease-out');
+    });
   });
 
   describe('generateFocusTokens', () => {
