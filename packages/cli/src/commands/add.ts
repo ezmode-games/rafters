@@ -40,7 +40,7 @@ function fileExists(cwd: string, relativePath: string): boolean {
 /**
  * Transform component file content to update imports for the target project
  */
-function transformFileContent(content: string): string {
+export function transformFileContent(content: string): string {
   let transformed = content;
 
   // Transform imports from ../../primitives/ to lib/primitives/
@@ -112,7 +112,7 @@ async function installItem(
 /**
  * Collect npm dependencies from registry items
  */
-function collectDependencies(items: RegistryItem[]): {
+export function collectDependencies(items: RegistryItem[]): {
   dependencies: string[];
   devDependencies: string[];
 } {
