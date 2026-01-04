@@ -4,6 +4,7 @@
  * Provides shared steps for fixture creation, CLI execution, and assertions
  */
 
+import type { ChildProcess } from 'node:child_process';
 import { existsSync, readdirSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -14,6 +15,14 @@ import { cleanupFixture, createFixture } from '../fixtures/projects.js';
 const { Given, When, Then, After } = createBdd();
 
 // Test context shared across steps
+// Note: Module-level context is intentional for playwright-bdd step state sharing.
+// Parallel execution is disabled in playwright.config.ts to ensure test isolation.
+interface ServerHandle {
+  process: ChildProcess;
+  waitForReady: () => Promise<void>;
+  stop: () => void;
+}
+
 interface TestContext {
   fixturePath: string;
   commandResult: {
@@ -21,7 +30,7 @@ interface TestContext {
     stdout: string;
     stderr: string;
   } | null;
-  serverProcess: unknown | null;
+  serverProcess: ServerHandle | null;
 }
 
 const context: TestContext = {
@@ -32,12 +41,17 @@ const context: TestContext = {
 
 // Cleanup after each scenario
 After(async () => {
+  // Stop any running server process
+  if (context.serverProcess) {
+    context.serverProcess.stop();
+    context.serverProcess = null;
+  }
+
   if (context.fixturePath) {
     await cleanupFixture(context.fixturePath);
     context.fixturePath = '';
   }
   context.commandResult = null;
-  context.serverProcess = null;
 });
 
 // Background steps
@@ -97,13 +111,13 @@ Given('a Next.js project with .rafters already initialized', async () => {
   await execRafters(context.fixturePath, ['init']);
 });
 
-Given('component {string} is already installed', async (_ctx, component: string) => {
+Given('component {string} is already installed', async ({}, component: string) => {
   const { execRafters } = await import('./helpers.js');
   await execRafters(context.fixturePath, ['add', component]);
 });
 
 // Command execution steps
-When('I run {string}', async (_ctx, command: string) => {
+When('I run {string}', async ({}, command: string) => {
   const { execRafters } = await import('./helpers.js');
   // Parse "rafters init --force" into ["init", "--force"]
   const parts = command.split(' ');
@@ -113,7 +127,7 @@ When('I run {string}', async (_ctx, command: string) => {
   context.commandResult = await execRafters(context.fixturePath, parts);
 });
 
-When('I start {string}', async (_ctx, command: string) => {
+When('I start {string}', async ({}, command: string) => {
   const { startRafters } = await import('./helpers.js');
   const parts = command.split(' ');
   if (parts[0] === 'rafters') {
@@ -133,7 +147,7 @@ Then('the command should fail', async () => {
   expect(context.commandResult?.exitCode).not.toBe(0);
 });
 
-Then('the error should contain {string}', async (_ctx, text: string) => {
+Then('the error should contain {string}', async ({}, text: string) => {
   expect(context.commandResult?.stderr).toContain(text);
 });
 
@@ -142,7 +156,7 @@ Then('the output should contain available components', async () => {
 });
 
 // File assertion steps
-Then('file {string} should exist', async (_ctx, filePath: string) => {
+Then('file {string} should exist', async ({}, filePath: string) => {
   const fullPath = join(context.fixturePath, filePath);
   expect(existsSync(fullPath)).toBe(true);
 });
@@ -175,7 +189,7 @@ Then('the file should contain valid TypeScript', async () => {
 });
 
 // Framework detection assertions
-Then('the detected framework should be {string}', async (_ctx, framework: string) => {
+Then('the detected framework should be {string}', async ({}, framework: string) => {
   const configPath = join(context.fixturePath, '.rafters', 'config.rafters.json');
   const config = JSON.parse(await readFile(configPath, 'utf-8'));
   expect(config.framework).toBe(framework);

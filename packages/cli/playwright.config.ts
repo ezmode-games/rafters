@@ -12,7 +12,8 @@ export default defineConfig({
   use: {
     trace: 'on-first-retry',
   },
-  // CLI tests don't need browser, run in parallel
-  fullyParallel: true,
-  workers: 4,
+  // CLI integration tests use module-level context for step state sharing
+  // Run sequentially to avoid test isolation issues
+  fullyParallel: false,
+  workers: 1,
 });

@@ -255,7 +255,7 @@ describe('tokensToTailwind', () => {
     // --animate-* should be inside @theme block
     const themeMatch = css.match(/@theme \{([\s\S]*?)\}/);
     expect(themeMatch).not.toBeNull();
-    expect(themeMatch![1]).toContain('--animate-fade-in:');
+    expect(themeMatch?.[1]).toContain('--animate-fade-in:');
   });
 
   it('should place @keyframes outside @theme block', () => {

@@ -1,5 +1,8 @@
 /**
  * Studio-specific step definitions
+ *
+ * Note: Module-level state is intentional for playwright-bdd step state sharing.
+ * Parallel execution is disabled in playwright.config.ts to ensure test isolation.
  */
 
 import { expect } from '@playwright/test';
@@ -10,12 +13,13 @@ const { Given, When, Then } = createBdd();
 
 let serverPort = 3456;
 let lastResponse: { status: number; body: string; contentType: string } | null = null;
+let _lastError: Error | null = null;
 
 Then('the server should start on default port', async () => {
   expect(context.serverProcess).not.toBeNull();
 });
 
-Then('the server should start on port {int}', async (_ctx, port: number) => {
+Then('the server should start on port {int}', async ({}, port: number) => {
   serverPort = port;
   expect(context.serverProcess).not.toBeNull();
 });
@@ -30,6 +34,7 @@ Given('the studio server is running', async () => {
 });
 
 When('I request the root path', async () => {
+  _lastError = null;
   try {
     const response = await fetch(`http://localhost:${serverPort}/`);
     lastResponse = {
@@ -37,12 +42,14 @@ When('I request the root path', async () => {
       body: await response.text(),
       contentType: response.headers.get('content-type') ?? '',
     };
-  } catch {
+  } catch (error) {
+    _lastError = error instanceof Error ? error : new Error(String(error));
     lastResponse = { status: 0, body: '', contentType: '' };
   }
 });
 
-When('I request {string}', async (_ctx, path: string) => {
+When('I request {string}', async ({}, path: string) => {
+  _lastError = null;
   try {
     const response = await fetch(`http://localhost:${serverPort}${path}`);
     lastResponse = {
@@ -50,12 +57,14 @@ When('I request {string}', async (_ctx, path: string) => {
       body: await response.text(),
       contentType: response.headers.get('content-type') ?? '',
     };
-  } catch {
+  } catch (error) {
+    _lastError = error instanceof Error ? error : new Error(String(error));
     lastResponse = { status: 0, body: '', contentType: '' };
   }
 });
 
-When('I POST to {string} with updated values', async (_ctx, path: string) => {
+When('I POST to {string} with updated values', async ({}, path: string) => {
+  _lastError = null;
   try {
     const response = await fetch(`http://localhost:${serverPort}${path}`, {
       method: 'POST',
@@ -67,7 +76,8 @@ When('I POST to {string} with updated values', async (_ctx, path: string) => {
       body: await response.text(),
       contentType: response.headers.get('content-type') ?? '',
     };
-  } catch {
+  } catch (error) {
+    _lastError = error instanceof Error ? error : new Error(String(error));
     lastResponse = { status: 0, body: '', contentType: '' };
   }
 });

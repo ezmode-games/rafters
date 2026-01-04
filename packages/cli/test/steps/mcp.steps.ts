@@ -1,5 +1,8 @@
 /**
  * MCP-specific step definitions
+ *
+ * Note: Module-level state is intentional for playwright-bdd step state sharing.
+ * Parallel execution is disabled in playwright.config.ts to ensure test isolation.
  */
 
 import { expect } from '@playwright/test';
@@ -21,7 +24,7 @@ When('the MCP server is running', async () => {
   // Server already started in previous step
 });
 
-Then('it should expose the {string} tool', async (_ctx, _toolName: string) => {
+Then('it should expose the {string} tool', async ({}, _toolName: string) => {
   // MCP tools are exposed via the server protocol
   // This would require MCP client implementation for full testing
   expect(true).toBe(true); // Placeholder for MCP client integration
@@ -29,12 +32,12 @@ Then('it should expose the {string} tool', async (_ctx, _toolName: string) => {
 
 When(
   'I call MCP tool {string} with namespace {string}',
-  async (_ctx, _tool: string, _namespace: string) => {
+  async ({}, _tool: string, _namespace: string) => {
     // Would call MCP client with tool and parameters
   },
 );
 
-When('I call MCP tool {string} with token path and value', async (_ctx, _tool: string) => {
+When('I call MCP tool {string} with token path and value', async ({}, _tool: string) => {
   // Would call MCP client with update parameters
 });
 
