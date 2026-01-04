@@ -16,20 +16,14 @@ import {
  * Create fixture factory with override support
  * Pattern from test/utils/index.ts
  */
-export function createFixtureFactory<T>(generator: () => T, baseSeed = 42) {
-  let counter = baseSeed;
-
+export function createFixtureFactory<T>(generator: () => T, _baseSeed = 42) {
   return {
     generate(overrides?: Partial<T>): T {
       const base = generator();
-      counter++;
       return overrides ? { ...base, ...overrides } : base;
     },
     generateMany(count: number): T[] {
       return Array.from({ length: count }, () => this.generate());
-    },
-    reset(newSeed = 42) {
-      counter = newSeed;
     },
   };
 }

@@ -116,9 +116,9 @@ describe('RegistryItemSchema validation', () => {
   it('PROPERTY: zocker-generated items always parse successfully', () => {
     const items = zocker(z.array(RegistryItemSchema).length(50)).generate();
 
-    items.forEach((item) => {
+    for (const item of items) {
       expect(() => RegistryItemSchema.parse(item)).not.toThrow();
-    });
+    }
   });
 
   it('validates required fields', () => {
@@ -181,8 +181,8 @@ describe('registry fixtures', () => {
       registryFixtures.dialogComponent(),
     ];
 
-    fixtures.forEach((fixture) => {
+    for (const fixture of fixtures) {
       expect(() => RegistryItemSchema.parse(fixture)).not.toThrow();
-    });
+    }
   });
 });
