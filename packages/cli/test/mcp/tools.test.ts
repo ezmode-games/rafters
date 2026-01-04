@@ -1,4 +1,5 @@
 import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { RaftersToolHandler, TOOL_DEFINITIONS } from '../../src/mcp/tools.js';
@@ -34,7 +35,7 @@ describe('TOOL_DEFINITIONS', () => {
 });
 
 describe('RaftersToolHandler', () => {
-  const testDir = '/tmp/rafters-test-mcp-tools';
+  const testDir = join(tmpdir(), 'rafters-test-mcp-tools');
   let handler: RaftersToolHandler;
 
   beforeEach(async () => {

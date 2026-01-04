@@ -1,4 +1,5 @@
 import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
@@ -11,7 +12,7 @@ import {
 } from '../../src/utils/detect.js';
 
 describe('detectFramework', () => {
-  const testDir = '/tmp/rafters-test-detect-framework';
+  const testDir = join(tmpdir(), 'rafters-test-detect-framework');
 
   beforeEach(async () => {
     await mkdir(testDir, { recursive: true });
@@ -101,7 +102,7 @@ describe('detectFramework', () => {
 });
 
 describe('detectTailwindVersion', () => {
-  const testDir = '/tmp/rafters-test-detect-tailwind';
+  const testDir = join(tmpdir(), 'rafters-test-detect-tailwind');
 
   beforeEach(async () => {
     await mkdir(testDir, { recursive: true });
@@ -183,7 +184,7 @@ describe('isTailwindV3', () => {
 });
 
 describe('detectShadcn', () => {
-  const testDir = '/tmp/rafters-test-detect-shadcn';
+  const testDir = join(tmpdir(), 'rafters-test-detect-shadcn');
 
   beforeEach(async () => {
     await mkdir(testDir, { recursive: true });
@@ -309,7 +310,7 @@ describe('parseCssVariables', () => {
 });
 
 describe('detectProject', () => {
-  const testDir = '/tmp/rafters-test-detect-project';
+  const testDir = join(tmpdir(), 'rafters-test-detect-project');
 
   beforeEach(async () => {
     await mkdir(testDir, { recursive: true });
