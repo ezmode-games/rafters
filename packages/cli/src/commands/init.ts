@@ -7,7 +7,7 @@
 
 import { existsSync } from 'node:fs';
 import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 import {
   buildDefaults,
   NodePersistenceAdapter,
@@ -34,6 +34,67 @@ async function backupCss(cssPath: string): Promise<string> {
   const backupPath = cssPath.replace(/\.css$/, '.backup.css');
   await copyFile(cssPath, backupPath);
   return backupPath;
+}
+
+type Framework = 'next' | 'vite' | 'remix' | 'astro' | 'unknown';
+
+const CSS_LOCATIONS: Record<Framework, string[]> = {
+  astro: ['src/styles/global.css', 'src/styles/globals.css', 'src/global.css'],
+  next: ['src/app/globals.css', 'app/globals.css', 'styles/globals.css'],
+  vite: ['src/index.css', 'src/main.css', 'src/styles.css', 'src/app.css'],
+  remix: ['app/styles/global.css', 'app/globals.css', 'app/root.css'],
+  unknown: ['src/styles/global.css', 'src/index.css', 'styles/globals.css'],
+};
+
+async function findMainCssFile(cwd: string, framework: Framework): Promise<string | null> {
+  const locations = CSS_LOCATIONS[framework] || CSS_LOCATIONS.unknown;
+
+  for (const location of locations) {
+    const fullPath = join(cwd, location);
+    if (existsSync(fullPath)) {
+      return location;
+    }
+  }
+
+  return null;
+}
+
+async function updateMainCss(cwd: string, cssPath: string, themePath: string): Promise<void> {
+  const fullCssPath = join(cwd, cssPath);
+  const cssContent = await readFile(fullCssPath, 'utf-8');
+
+  // Calculate relative path from CSS file to theme.css
+  const cssDir = join(cwd, cssPath, '..');
+  const themeFullPath = join(cwd, themePath);
+  const relativeThemePath = relative(cssDir, themeFullPath);
+
+  // Check if already imported
+  if (cssContent.includes('.rafters/output/theme.css')) {
+    console.log({ event: 'init:css_already_imported', cssPath });
+    return;
+  }
+
+  // Backup the original
+  await backupCss(fullCssPath);
+
+  // The theme.css already includes @import "tailwindcss", so we just need to import it
+  // Replace the tailwindcss import with our theme import
+  let newContent: string;
+  if (cssContent.includes('@import "tailwindcss"')) {
+    newContent = cssContent.replace('@import "tailwindcss";', `@import "${relativeThemePath}";`);
+  } else if (cssContent.includes("@import 'tailwindcss'")) {
+    newContent = cssContent.replace("@import 'tailwindcss';", `@import "${relativeThemePath}";`);
+  } else {
+    // No tailwind import found, prepend the theme import
+    newContent = `@import "${relativeThemePath}";\n\n${cssContent}`;
+  }
+
+  await writeFile(fullCssPath, newContent);
+  console.log({
+    event: 'init:css_updated',
+    cssPath,
+    themePath: relativeThemePath,
+  });
 }
 
 async function regenerateFromExisting(
@@ -231,6 +292,20 @@ export async function init(options: InitOptions): Promise<void> {
   await writeFile(join(paths.output, 'theme.css'), tailwindCss);
   await writeFile(join(paths.output, 'tokens.ts'), typescriptSrc);
   await writeFile(join(paths.output, 'tokens.json'), JSON.stringify(dtcgJson, null, 2));
+
+  // Find and update the main CSS file (if not using shadcn which has its own CSS path)
+  if (!shadcn) {
+    const mainCssPath = await findMainCssFile(cwd, framework as Framework);
+    if (mainCssPath) {
+      await updateMainCss(cwd, mainCssPath, '.rafters/output/theme.css');
+    } else {
+      console.log({
+        event: 'init:css_not_found',
+        message: 'No main CSS file found. Add @import ".rafters/output/theme.css" manually.',
+        searchedLocations: CSS_LOCATIONS[framework as Framework] || CSS_LOCATIONS.unknown,
+      });
+    }
+  }
 
   console.log({
     event: 'init:complete',
