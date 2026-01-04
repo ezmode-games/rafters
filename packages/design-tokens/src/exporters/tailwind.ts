@@ -198,16 +198,26 @@ function generateRootBlock(): string {
     lines.push(`  --${name}: var(--rafters-${name});`);
   }
 
+  lines.push('}');
   lines.push('');
 
-  // Dark mode override via prefers-color-scheme
-  lines.push('  @media (prefers-color-scheme: dark) {');
+  // Dark mode via prefers-color-scheme media query
+  lines.push('@media (prefers-color-scheme: dark) {');
+  lines.push('  :root {');
   for (const name of Object.keys(semanticMappings)) {
     lines.push(`    --${name}: var(--rafters-dark-${name});`);
   }
   lines.push('  }');
-
   lines.push('}');
+  lines.push('');
+
+  // Dark mode via .dark class (for manual toggle support)
+  lines.push('.dark {');
+  for (const name of Object.keys(semanticMappings)) {
+    lines.push(`  --${name}: var(--rafters-dark-${name});`);
+  }
+  lines.push('}');
+
   return lines.join('\n');
 }
 
@@ -325,9 +335,60 @@ function generateThemeBlock(groups: GroupedTokens): string {
       const value = tokenValueToCSS(token);
       lines.push(`  --${token.name}: ${value};`);
     }
+    lines.push('');
+  }
+
+  // Animation utility tokens (from motion-animation-* tokens)
+  const animationTokens = generateAnimationTokens(groups.motion);
+  if (animationTokens) {
+    lines.push(animationTokens);
   }
 
   lines.push('}');
+  return lines.join('\n');
+}
+
+/**
+ * Generate @keyframes from motion-keyframe-* tokens
+ */
+function generateKeyframes(motionTokens: Token[]): string {
+  const keyframeTokens = motionTokens.filter((t) => t.name.startsWith('motion-keyframe-'));
+
+  if (keyframeTokens.length === 0) {
+    return '';
+  }
+
+  const lines: string[] = [];
+
+  for (const token of keyframeTokens) {
+    const keyframeName = token.keyframeName || token.name.replace('motion-keyframe-', '');
+    lines.push(`@keyframes ${keyframeName} {`);
+    lines.push(`  ${token.value}`);
+    lines.push('}');
+    lines.push('');
+  }
+
+  return lines.join('\n').trim();
+}
+
+/**
+ * Generate animation utility tokens for @theme block from motion-animation-* tokens
+ * These create --animate-* tokens that can be used with Tailwind's animate-* utilities
+ */
+function generateAnimationTokens(motionTokens: Token[]): string {
+  const animationTokens = motionTokens.filter((t) => t.name.startsWith('motion-animation-'));
+
+  if (animationTokens.length === 0) {
+    return '';
+  }
+
+  const lines: string[] = [];
+
+  for (const token of animationTokens) {
+    const animName = token.animationName || token.name.replace('motion-animation-', '');
+    lines.push(`  --animate-${animName}: ${token.value};`);
+  }
+
   return lines.join('\n');
 }
 
@@ -374,6 +435,13 @@ export function tokensToTailwind(tokens: Token[], options: TailwindExportOptions
   // :root block with --rafters-* namespace and dark mode
   const rootBlock = generateRootBlock();
   sections.push(rootBlock);
+  sections.push('');
+
+  // Keyframes for animations (from motion-keyframe-* tokens)
+  const keyframes = generateKeyframes(groups.motion);
+  if (keyframes) {
+    sections.push(keyframes);
+  }
 
   return sections.join('\n');
 }

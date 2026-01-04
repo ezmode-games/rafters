@@ -183,7 +183,372 @@ export function generateMotionTokens(
     });
   }
 
-  // Composite animation tokens for common patterns
+  // Keyframe definitions - these define the actual animation steps
+  const keyframes: Array<{
+    name: string;
+    css: string;
+    meaning: string;
+    contexts: string[];
+  }> = [
+    {
+      name: 'fade-in',
+      css: 'from { opacity: 0; } to { opacity: 1; }',
+      meaning: 'Fade from transparent to opaque',
+      contexts: ['enter', 'appear', 'show'],
+    },
+    {
+      name: 'fade-out',
+      css: 'from { opacity: 1; } to { opacity: 0; }',
+      meaning: 'Fade from opaque to transparent',
+      contexts: ['exit', 'disappear', 'hide'],
+    },
+    {
+      name: 'slide-in-from-top',
+      css: 'from { transform: translateY(-100%); } to { transform: translateY(0); }',
+      meaning: 'Slide in from above',
+      contexts: ['dropdown', 'notification', 'toast'],
+    },
+    {
+      name: 'slide-in-from-bottom',
+      css: 'from { transform: translateY(100%); } to { transform: translateY(0); }',
+      meaning: 'Slide in from below',
+      contexts: ['sheet', 'drawer', 'mobile-menu'],
+    },
+    {
+      name: 'slide-in-from-left',
+      css: 'from { transform: translateX(-100%); } to { transform: translateX(0); }',
+      meaning: 'Slide in from left',
+      contexts: ['sidebar', 'panel', 'drawer'],
+    },
+    {
+      name: 'slide-in-from-right',
+      css: 'from { transform: translateX(100%); } to { transform: translateX(0); }',
+      meaning: 'Slide in from right',
+      contexts: ['sidebar', 'panel', 'drawer'],
+    },
+    {
+      name: 'slide-out-to-top',
+      css: 'from { transform: translateY(0); } to { transform: translateY(-100%); }',
+      meaning: 'Slide out upward',
+      contexts: ['dropdown-exit', 'notification-dismiss'],
+    },
+    {
+      name: 'slide-out-to-bottom',
+      css: 'from { transform: translateY(0); } to { transform: translateY(100%); }',
+      meaning: 'Slide out downward',
+      contexts: ['sheet-exit', 'drawer-close'],
+    },
+    {
+      name: 'slide-out-to-left',
+      css: 'from { transform: translateX(0); } to { transform: translateX(-100%); }',
+      meaning: 'Slide out to left',
+      contexts: ['sidebar-close', 'panel-exit'],
+    },
+    {
+      name: 'slide-out-to-right',
+      css: 'from { transform: translateX(0); } to { transform: translateX(100%); }',
+      meaning: 'Slide out to right',
+      contexts: ['sidebar-close', 'panel-exit'],
+    },
+    {
+      name: 'scale-in',
+      css: 'from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; }',
+      meaning: 'Scale up while fading in',
+      contexts: ['modal', 'popover', 'dialog'],
+    },
+    {
+      name: 'scale-out',
+      css: 'from { transform: scale(1); opacity: 1; } to { transform: scale(0.95); opacity: 0; }',
+      meaning: 'Scale down while fading out',
+      contexts: ['modal-exit', 'popover-close'],
+    },
+    {
+      name: 'spin',
+      css: 'from { transform: rotate(0deg); } to { transform: rotate(360deg); }',
+      meaning: 'Continuous rotation',
+      contexts: ['loading', 'spinner', 'refresh'],
+    },
+    {
+      name: 'ping',
+      css: '75%, 100% { transform: scale(2); opacity: 0; }',
+      meaning: 'Expanding pulse that fades out',
+      contexts: ['notification-badge', 'attention', 'pulse'],
+    },
+    {
+      name: 'pulse',
+      css: '0%, 100% { opacity: 1; } 50% { opacity: 0.5; }',
+      meaning: 'Gentle opacity pulse',
+      contexts: ['skeleton', 'loading-placeholder'],
+    },
+    {
+      name: 'bounce',
+      css: '0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); } 50% { transform: translateY(0); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }',
+      meaning: 'Bouncing motion',
+      contexts: ['attention', 'scroll-indicator'],
+    },
+    {
+      name: 'accordion-down',
+      css: 'from { height: 0; } to { height: var(--radix-accordion-content-height); }',
+      meaning: 'Expand accordion content',
+      contexts: ['accordion', 'collapsible', 'expand'],
+    },
+    {
+      name: 'accordion-up',
+      css: 'from { height: var(--radix-accordion-content-height); } to { height: 0; }',
+      meaning: 'Collapse accordion content',
+      contexts: ['accordion', 'collapsible', 'collapse'],
+    },
+    {
+      name: 'caret-blink',
+      css: '0%, 70%, 100% { opacity: 1; } 20%, 50% { opacity: 0; }',
+      meaning: 'Text cursor blinking',
+      contexts: ['input-caret', 'text-cursor'],
+    },
+  ];
+
+  // Generate keyframe tokens
+  for (const kf of keyframes) {
+    tokens.push({
+      name: `motion-keyframe-${kf.name}`,
+      value: kf.css,
+      category: 'motion',
+      namespace: 'motion',
+      semanticMeaning: kf.meaning,
+      usageContext: kf.contexts,
+      keyframeName: kf.name,
+      description: `Keyframe ${kf.name}: ${kf.meaning}`,
+      generatedAt: timestamp,
+      containerQueryAware: false,
+      reducedMotionAware: true,
+    });
+  }
+
+  // Animation definitions - combine keyframe + duration + easing
+  const animations: Array<{
+    name: string;
+    keyframe: string;
+    duration: string;
+    easing: string;
+    iterations?: string;
+    meaning: string;
+    contexts: string[];
+  }> = [
+    {
+      name: 'fade-in',
+      keyframe: 'fade-in',
+      duration: 'fast',
+      easing: 'ease-out',
+      meaning: 'Fade in animation',
+      contexts: ['enter', 'appear'],
+    },
+    {
+      name: 'fade-out',
+      keyframe: 'fade-out',
+      duration: 'fast',
+      easing: 'ease-in',
+      meaning: 'Fade out animation',
+      contexts: ['exit', 'disappear'],
+    },
+    {
+      name: 'slide-in-from-top',
+      keyframe: 'slide-in-from-top',
+      duration: 'normal',
+      easing: 'ease-out',
+      meaning: 'Slide in from top',
+      contexts: ['dropdown', 'notification'],
+    },
+    {
+      name: 'slide-in-from-bottom',
+      keyframe: 'slide-in-from-bottom',
+      duration: 'normal',
+      easing: 'ease-out',
+      meaning: 'Slide in from bottom',
+      contexts: ['sheet', 'drawer'],
+    },
+    {
+      name: 'slide-in-from-left',
+      keyframe: 'slide-in-from-left',
+      duration: 'normal',
+      easing: 'ease-out',
+      meaning: 'Slide in from left',
+      contexts: ['sidebar', 'panel'],
+    },
+    {
+      name: 'slide-in-from-right',
+      keyframe: 'slide-in-from-right',
+      duration: 'normal',
+      easing: 'ease-out',
+      meaning: 'Slide in from right',
+      contexts: ['sidebar', 'panel'],
+    },
+    {
+      name: 'slide-out-to-top',
+      keyframe: 'slide-out-to-top',
+      duration: 'fast',
+      easing: 'ease-in',
+      meaning: 'Slide out to top',
+      contexts: ['dropdown-exit'],
+    },
+    {
+      name: 'slide-out-to-bottom',
+      keyframe: 'slide-out-to-bottom',
+      duration: 'fast',
+      easing: 'ease-in',
+      meaning: 'Slide out to bottom',
+      contexts: ['sheet-exit'],
+    },
+    {
+      name: 'slide-out-to-left',
+      keyframe: 'slide-out-to-left',
+      duration: 'fast',
+      easing: 'ease-in',
+      meaning: 'Slide out to left',
+      contexts: ['sidebar-close'],
+    },
+    {
+      name: 'slide-out-to-right',
+      keyframe: 'slide-out-to-right',
+      duration: 'fast',
+      easing: 'ease-in',
+      meaning: 'Slide out to right',
+      contexts: ['sidebar-close'],
+    },
+    {
+      name: 'scale-in',
+      keyframe: 'scale-in',
+      duration: 'normal',
+      easing: 'spring',
+      meaning: 'Scale in with spring',
+      contexts: ['modal', 'popover'],
+    },
+    {
+      name: 'scale-out',
+      keyframe: 'scale-out',
+      duration: 'fast',
+      easing: 'ease-in',
+      meaning: 'Scale out',
+      contexts: ['modal-exit'],
+    },
+    {
+      name: 'spin',
+      keyframe: 'spin',
+      duration: '1s',
+      easing: 'linear',
+      iterations: 'infinite',
+      meaning: 'Continuous spin',
+      contexts: ['loading', 'spinner'],
+    },
+    {
+      name: 'ping',
+      keyframe: 'ping',
+      duration: '1s',
+      easing: 'ease-out',
+      iterations: 'infinite',
+      meaning: 'Pinging pulse',
+      contexts: ['notification'],
+    },
+    {
+      name: 'pulse',
+      keyframe: 'pulse',
+      duration: '2s',
+      easing: 'ease-in-out',
+      iterations: 'infinite',
+      meaning: 'Gentle pulse',
+      contexts: ['skeleton', 'loading'],
+    },
+    {
+      name: 'bounce',
+      keyframe: 'bounce',
+      duration: '1s',
+      easing: 'ease-in-out',
+      iterations: 'infinite',
+      meaning: 'Bouncing',
+      contexts: ['attention'],
+    },
+    {
+      name: 'accordion-down',
+      keyframe: 'accordion-down',
+      duration: 'normal',
+      easing: 'ease-out',
+      meaning: 'Accordion expand',
+      contexts: ['accordion', 'collapsible'],
+    },
+    {
+      name: 'accordion-up',
+      keyframe: 'accordion-up',
+      duration: 'normal',
+      easing: 'ease-out',
+      meaning: 'Accordion collapse',
+      contexts: ['accordion', 'collapsible'],
+    },
+    {
+      name: 'caret-blink',
+      keyframe: 'caret-blink',
+      duration: '1.25s',
+      easing: 'ease-out',
+      iterations: 'infinite',
+      meaning: 'Caret blinking',
+      contexts: ['input'],
+    },
+  ];
+
+  // Generate animation tokens
+  for (const anim of animations) {
+    // Get duration - either from tokens or as literal value
+    let durationValue: string;
+    let durationRef: string;
+    if (anim.duration.endsWith('s') || anim.duration.endsWith('ms')) {
+      durationValue = anim.duration;
+      durationRef = anim.duration;
+    } else {
+      const durationDef = durationDefs[anim.duration];
+      if (!durationDef) continue;
+      const durationMs =
+        durationDef.step === 'instant'
+          ? 0
+          : Math.round(progression.compute(baseTransitionDuration, durationDef.step));
+      durationValue = `${durationMs}ms`;
+      durationRef = `var(--motion-duration-${anim.duration})`;
+    }
+
+    // Get easing
+    const easingDef = easingDefs[anim.easing];
+    if (!easingDef) continue;
+    const easingRef = `var(--motion-easing-${anim.easing})`;
+
+    // Build animation value
+    const iterations = anim.iterations || '';
+    const animValue = iterations
+      ? `${anim.keyframe} ${durationRef} ${easingRef} ${iterations}`
+      : `${anim.keyframe} ${durationRef} ${easingRef}`;
+
+    tokens.push({
+      name: `motion-animation-${anim.name}`,
+      value: animValue,
+      category: 'motion',
+      namespace: 'motion',
+      semanticMeaning: anim.meaning,
+      usageContext: anim.contexts,
+      animationName: anim.name,
+      keyframeName: anim.keyframe,
+      animationDuration: durationValue,
+      animationEasing: easingDef.css,
+      animationIterations: anim.iterations || '1',
+      dependsOn: [
+        `motion-keyframe-${anim.keyframe}`,
+        ...(anim.duration.endsWith('s') || anim.duration.endsWith('ms')
+          ? []
+          : [`motion-duration-${anim.duration}`]),
+        `motion-easing-${anim.easing}`,
+      ],
+      description: `Animation ${anim.name}: ${anim.meaning}`,
+      generatedAt: timestamp,
+      containerQueryAware: false,
+      reducedMotionAware: true,
+    });
+  }
+
+  // Composite presets (for backwards compatibility)
   const composites = [
     {
       name: 'motion-fade-in',
