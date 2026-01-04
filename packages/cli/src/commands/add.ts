@@ -5,11 +5,16 @@
  * Fetches component definitions from the registry and writes to project.
  */
 
-import { access } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { access, mkdir, writeFile } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import { RegistryClient } from '../registry/client.js';
+import type { RegistryItem } from '../registry/types.js';
 import { getRaftersPaths } from '../utils/paths.js';
 
 export interface AddOptions {
   overwrite?: boolean;
+  registryUrl?: string;
 }
 
 /**
@@ -22,6 +27,157 @@ async function isInitialized(cwd: string): Promise<boolean> {
     return true;
   } catch {
     return false;
+  }
+}
+
+/**
+ * Check if a file already exists at the target path
+ */
+function fileExists(cwd: string, relativePath: string): boolean {
+  return existsSync(join(cwd, relativePath));
+}
+
+/**
+ * Transform component file content to update imports for the target project
+ */
+export function transformFileContent(content: string): string {
+  let transformed = content;
+
+  // Transform imports from ../../primitives/ to lib/primitives/
+  transformed = transformed.replace(
+    /from\s+['"]\.\.\/\.\.\/primitives\/([^'"]+)['"]/g,
+    "from '@/lib/primitives/$1'",
+  );
+
+  // Transform imports from ../primitives/ to lib/primitives/
+  transformed = transformed.replace(
+    /from\s+['"]\.\.\/primitives\/([^'"]+)['"]/g,
+    "from '@/lib/primitives/$1'",
+  );
+
+  // Transform relative component imports to absolute
+  transformed = transformed.replace(/from\s+['"]\.\/([^'"]+)['"]/g, "from '@/components/ui/$1'");
+
+  // Transform parent lib imports to absolute lib path
+  transformed = transformed.replace(/from\s+['"]\.\.\/lib\/([^'"]+)['"]/g, "from '@/lib/$1'");
+
+  // Transform parent hooks imports to absolute hooks path
+  transformed = transformed.replace(/from\s+['"]\.\.\/hooks\/([^'"]+)['"]/g, "from '@/hooks/$1'");
+
+  // Transform other parent imports as UI components (excluding lib/ and hooks/ already handled)
+  transformed = transformed.replace(
+    /from\s+['"]\.\.\/(?!lib\/|hooks\/)([^'"]+)['"]/g,
+    "from '@/components/ui/$1'",
+  );
+
+  return transformed;
+}
+
+/**
+ * Install a single registry item to the project
+ */
+async function installItem(
+  cwd: string,
+  item: RegistryItem,
+  options: AddOptions,
+): Promise<{ installed: boolean; skipped: boolean; files: string[] }> {
+  const installedFiles: string[] = [];
+  let skipped = false;
+
+  for (const file of item.files) {
+    const targetPath = join(cwd, file.path);
+
+    // Check if file exists and handle overwrite
+    if (fileExists(cwd, file.path)) {
+      if (!options.overwrite) {
+        console.log({
+          event: 'add:skip',
+          component: item.name,
+          file: file.path,
+          reason: 'exists',
+        });
+        skipped = true;
+        continue;
+      }
+    }
+
+    // Ensure directory exists
+    await mkdir(dirname(targetPath), { recursive: true });
+
+    // Transform and write the file
+    const transformedContent = transformFileContent(file.content);
+    await writeFile(targetPath, transformedContent, 'utf-8');
+
+    installedFiles.push(file.path);
+  }
+
+  return {
+    installed: installedFiles.length > 0,
+    skipped,
+    files: installedFiles,
+  };
+}
+
+/**
+ * Collect npm dependencies from registry items
+ */
+export function collectDependencies(items: RegistryItem[]): {
+  dependencies: string[];
+  devDependencies: string[];
+} {
+  const deps = new Set<string>();
+  const devDeps = new Set<string>();
+
+  for (const item of items) {
+    for (const dep of item.dependencies) {
+      // Skip React (assumed to be installed)
+      if (dep === 'react' || dep.startsWith('react/')) {
+        continue;
+      }
+      deps.add(dep);
+    }
+
+    if (item.devDependencies) {
+      for (const dep of item.devDependencies) {
+        devDeps.add(dep);
+      }
+    }
+  }
+
+  return {
+    dependencies: [...deps].sort(),
+    devDependencies: [...devDeps].sort(),
+  };
+}
+
+/**
+ * Fetch a component from the registry
+ */
+export async function fetchComponent(name: string, registryUrl?: string): Promise<RegistryItem> {
+  const client = new RegistryClient(registryUrl);
+  return client.fetchComponent(name);
+}
+
+/**
+ * Install a component to a target directory
+ */
+export async function installComponent(
+  component: RegistryItem,
+  targetDir: string,
+  options: AddOptions = {},
+): Promise<void> {
+  const result = await installItem(targetDir, component, options);
+
+  if (result.installed) {
+    console.log({
+      event: 'add:installed',
+      component: component.name,
+      files: result.files,
+    });
+  }
+
+  if (result.skipped && !options.overwrite) {
+    throw new Error(`Component "${component.name}" already exists. Use --overwrite to replace.`);
   }
 }
 
@@ -53,22 +209,85 @@ export async function add(components: string[], options: AddOptions): Promise<vo
     overwrite: options.overwrite ?? false,
   });
 
-  // TODO: Fetch component definitions from registry
-  // TODO: Check for existing components and handle overwrite option
-  // TODO: Write component files to project
+  const client = new RegistryClient(options.registryUrl);
 
-  for (const component of components) {
+  // Resolve all components and their dependencies
+  const allItems: RegistryItem[] = [];
+  const seen = new Set<string>();
+
+  for (const componentName of components) {
+    try {
+      const items = await client.resolveDependencies(componentName, seen);
+      allItems.push(...items);
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error(`Error: ${err.message}`);
+      } else {
+        console.error(`Error: Failed to fetch component "${componentName}"`);
+      }
+      process.exitCode = 1;
+      return;
+    }
+  }
+
+  // Install all resolved items
+  const installed: string[] = [];
+  const skipped: string[] = [];
+
+  for (const item of allItems) {
+    try {
+      const result = await installItem(cwd, item, options);
+
+      if (result.installed) {
+        installed.push(item.name);
+        console.log({
+          event: 'add:installed',
+          component: item.name,
+          type: item.type,
+          files: result.files,
+        });
+      }
+
+      if (result.skipped && !result.installed) {
+        skipped.push(item.name);
+      }
+    } catch (err) {
+      // Warn but continue on peer component failures
+      if (err instanceof Error) {
+        console.warn({
+          event: 'add:warning',
+          component: item.name,
+          message: err.message,
+        });
+      }
+    }
+  }
+
+  // Collect and report dependencies
+  const { dependencies, devDependencies } = collectDependencies(allItems);
+
+  if (dependencies.length > 0 || devDependencies.length > 0) {
     console.log({
-      event: 'add:component',
-      component,
-      status: 'pending',
-      message: `Would add component: ${component}`,
+      event: 'add:dependencies',
+      dependencies,
+      devDependencies,
+      message: 'Run `pnpm add` to install these dependencies',
     });
   }
 
+  // Summary
   console.log({
     event: 'add:complete',
-    componentCount: components.length,
-    message: 'Component fetching not yet implemented',
+    installed: installed.length,
+    skipped: skipped.length,
+    components: installed,
   });
+
+  if (skipped.length > 0 && installed.length === 0) {
+    console.log({
+      event: 'add:hint',
+      message: 'Some components were skipped. Use --overwrite to replace existing files.',
+      skipped,
+    });
+  }
 }

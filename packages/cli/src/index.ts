@@ -29,6 +29,7 @@ program
   .description('Add rafters components to the project')
   .argument('<components...>', 'Component names to add')
   .option('--overwrite', 'Overwrite existing component files')
+  .option('--registry-url <url>', 'Custom registry URL')
   .action(add);
 
 program.command('mcp').description('Start MCP server for AI agent access (stdio)').action(mcp);
