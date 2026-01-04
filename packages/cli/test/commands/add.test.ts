@@ -39,6 +39,26 @@ describe('transformFileContent', () => {
     expect(result).toBe(`import { Card } from '@/components/ui/card';`);
   });
 
+  it('transforms ../lib/ imports to @/lib/', () => {
+    const input = `import { cn } from '../lib/utils';`;
+    const result = transformFileContent(input);
+    expect(result).toBe(`import { cn } from '@/lib/utils';`);
+  });
+
+  it('transforms ../hooks/ imports to @/hooks/', () => {
+    const input = `import { useMediaQuery } from '../hooks/use-media-query';`;
+    const result = transformFileContent(input);
+    expect(result).toBe(`import { useMediaQuery } from '@/hooks/use-media-query';`);
+  });
+
+  it('does not incorrectly transform ../lib/ as component import', () => {
+    const input = `import { cn } from '../lib/utils';`;
+    const result = transformFileContent(input);
+    // Should NOT be @/components/ui/lib/utils
+    expect(result).not.toContain('@/components/ui/lib');
+    expect(result).toBe(`import { cn } from '@/lib/utils';`);
+  });
+
   it('handles multiple imports in one file', () => {
     const input = `import classy from '../../primitives/classy';
 import { Button } from './button';

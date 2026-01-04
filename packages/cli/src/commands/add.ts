@@ -58,8 +58,17 @@ export function transformFileContent(content: string): string {
   // Transform relative component imports to absolute
   transformed = transformed.replace(/from\s+['"]\.\/([^'"]+)['"]/g, "from '@/components/ui/$1'");
 
-  // Transform parent component imports to absolute
-  transformed = transformed.replace(/from\s+['"]\.\.\/([^'"]+)['"]/g, "from '@/components/ui/$1'");
+  // Transform parent lib imports to absolute lib path
+  transformed = transformed.replace(/from\s+['"]\.\.\/lib\/([^'"]+)['"]/g, "from '@/lib/$1'");
+
+  // Transform parent hooks imports to absolute hooks path
+  transformed = transformed.replace(/from\s+['"]\.\.\/hooks\/([^'"]+)['"]/g, "from '@/hooks/$1'");
+
+  // Transform other parent imports as UI components (excluding lib/ and hooks/ already handled)
+  transformed = transformed.replace(
+    /from\s+['"]\.\.\/(?!lib\/|hooks\/)([^'"]+)['"]/g,
+    "from '@/components/ui/$1'",
+  );
 
   return transformed;
 }
@@ -167,7 +176,7 @@ export async function installComponent(
     });
   }
 
-  if (result.skipped && !result.installed) {
+  if (result.skipped && !options.overwrite) {
     throw new Error(`Component "${component.name}" already exists. Use --overwrite to replace.`);
   }
 }
