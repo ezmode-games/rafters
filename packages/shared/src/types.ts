@@ -508,6 +508,15 @@ export const TokenSchema = z.object({
     .optional(),
   delayMs: z.number().optional(), // Delay before animation starts
 
+  // Keyframe tokens (CSS @keyframes content / animation step definitions)
+  keyframeName: z.string().optional(), // Name of the keyframe (e.g., "fade-in")
+
+  // Animation tokens (combine keyframe + duration + easing)
+  animationName: z.string().optional(), // Name of the animation (e.g., "fade-in")
+  animationDuration: z.string().optional(), // Duration (e.g., "150ms", "1s")
+  animationEasing: z.string().optional(), // Easing function CSS value
+  animationIterations: z.string().optional(), // Iteration count (e.g., "1", "infinite")
+
   // Focus tokens (WCAG 2.2 compliance, derive from ring unless overridden)
   focusRingWidth: z.string().optional(), // e.g., "2px", "3px"
   focusRingColor: z.string().optional(), // Reference to ring token or override
