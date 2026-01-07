@@ -87,7 +87,7 @@ describe('AlertTitle', () => {
   });
 
   it('forwards ref correctly', () => {
-    const ref = createRef<HTMLParagraphElement>();
+    const ref = createRef<HTMLHeadingElement>();
     render(<AlertTitle ref={ref}>Title</AlertTitle>);
     expect(ref.current).toBeInstanceOf(HTMLHeadingElement);
   });
@@ -113,7 +113,7 @@ describe('AlertDescription', () => {
   });
 
   it('forwards ref correctly', () => {
-    const ref = createRef<HTMLParagraphElement>();
+    const ref = createRef<HTMLDivElement>();
     render(<AlertDescription ref={ref}>Description</AlertDescription>);
     expect(ref.current).toBeInstanceOf(HTMLDivElement);
   });
