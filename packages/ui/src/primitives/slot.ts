@@ -15,6 +15,7 @@
  * ```
  */
 
+import type * as React from 'react';
 import classy from './classy';
 import type { CleanupFunction } from './types';
 
@@ -329,7 +330,7 @@ export function mergeClassNames(parentClass: string, childClass: string): string
  */
 export interface SlotProps {
   className?: string;
-  style?: Record<string, unknown> | undefined;
+  style?: React.CSSProperties | undefined;
   [key: string]: unknown;
 }
 
