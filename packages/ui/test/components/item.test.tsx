@@ -81,7 +81,6 @@ describe('Item', () => {
   });
 
   it('does not call onClick when disabled', async () => {
-    const _user = userEvent.setup();
     const handleClick = vi.fn();
 
     render(
@@ -125,7 +124,6 @@ describe('Item', () => {
   });
 
   it('does not handle keyboard when disabled', async () => {
-    const _user = userEvent.setup();
     const handleClick = vi.fn();
 
     render(
