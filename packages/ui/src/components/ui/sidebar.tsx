@@ -715,8 +715,8 @@ export function SidebarMenuSkeleton({
   className,
   ...props
 }: SidebarMenuSkeletonProps) {
-  // Generate random width for skeleton
-  const width = React.useMemo(() => `${Math.floor(Math.random() * 40) + 50}%`, []);
+  // Generate random width for skeleton (stable across re-renders)
+  const [width] = React.useState(() => `${Math.floor(Math.random() * 40) + 50}%`);
 
   return (
     <div
