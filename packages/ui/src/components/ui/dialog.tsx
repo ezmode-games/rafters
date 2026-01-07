@@ -1,7 +1,34 @@
 /**
- * Dialog component - drop-in replacement for shadcn/ui Dialog
- * Built with framework-agnostic primitives
- * Matches shadcn/Radix API exactly
+ * Modal dialog component with focus management and escape patterns
+ *
+ * @cognitive-load 6/10 - Interrupts user flow, requires decision making
+ * @attention-economics Attention capture: modal=full attention, drawer=partial attention, popover=contextual attention
+ * @trust-building Clear close mechanisms, confirmation for destructive actions, non-blocking for informational content
+ * @accessibility Focus trapping, escape key handling, backdrop dismissal, screen reader announcements
+ * @semantic-meaning Usage patterns: modal=blocking workflow, drawer=supplementary, alert=urgent information
+ *
+ * @usage-patterns
+ * DO: Low trust - Quick confirmations, save draft (size=sm, minimal friction)
+ * DO: Medium trust - Publish content, moderate consequences (clear context)
+ * DO: High trust - Payments, significant impact (detailed explanation)
+ * DO: Critical trust - Account deletion, permanent loss (progressive confirmation)
+ * NEVER: Routine actions, non-essential interruptions
+ *
+ * @example
+ * ```tsx
+ * <Dialog>
+ *   <Dialog.Trigger asChild>
+ *     <Button>Open Dialog</Button>
+ *   </Dialog.Trigger>
+ *   <Dialog.Portal>
+ *     <Dialog.Overlay />
+ *     <Dialog.Content>
+ *       <Dialog.Title>Dialog Title</Dialog.Title>
+ *       <Dialog.Description>Dialog description here.</Dialog.Description>
+ *     </Dialog.Content>
+ *   </Dialog.Portal>
+ * </Dialog>
+ * ```
  */
 
 import * as React from 'react';
