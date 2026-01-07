@@ -1,7 +1,30 @@
 /**
- * Popover component - positioned floating content
- * Built with framework-agnostic primitives
- * Matches shadcn/Radix API
+ * Popover component for contextual floating content
+ *
+ * @cognitive-load 4/10 - Contextual content requiring focus but not blocking workflow
+ * @attention-economics Partial attention: appears on trigger, dismisses on outside click or escape
+ * @trust-building Predictable positioning, easy dismissal, non-blocking interaction
+ * @accessibility Focus management, escape key dismissal, outside click closes, screen reader announcements
+ * @semantic-meaning Contextual enhancement: additional info, controls, or options related to trigger
+ *
+ * @usage-patterns
+ * DO: Use for contextual actions or information related to trigger element
+ * DO: Position intelligently to avoid viewport edges
+ * DO: Allow dismissal via escape key and outside click
+ * DO: Keep content focused and relevant to trigger
+ * NEVER: Critical information, primary navigation, complex multi-step forms
+ *
+ * @example
+ * ```tsx
+ * <Popover>
+ *   <Popover.Trigger asChild>
+ *     <Button variant="outline">Open</Button>
+ *   </Popover.Trigger>
+ *   <Popover.Content>
+ *     Popover content here
+ *   </Popover.Content>
+ * </Popover>
+ * ```
  */
 
 import * as React from 'react';

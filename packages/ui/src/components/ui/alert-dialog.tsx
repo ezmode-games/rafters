@@ -1,12 +1,33 @@
 /**
- * AlertDialog component - drop-in replacement for shadcn/ui AlertDialog
- * Built with framework-agnostic primitives
- * Matches shadcn/Radix API exactly
+ * Alert dialog component for destructive or important confirmation actions
  *
- * Key differences from Dialog:
- * - Uses role="alertdialog" for destructive/important confirmations
- * - Has Action and Cancel buttons instead of generic Close
- * - Focus defaults to cancel button (safer choice)
+ * @cognitive-load 7/10 - Requires immediate decision, interrupts workflow with high stakes
+ * @attention-economics Full attention capture: blocks all other interactions until resolved
+ * @trust-building Focus defaults to Cancel (safer choice), clear action consequences, escape allows safe exit
+ * @accessibility role="alertdialog" for screen readers, focus trap, keyboard dismissal via Escape
+ * @semantic-meaning Confirmation patterns: Action=proceed with consequence, Cancel=safe exit without changes
+ *
+ * @usage-patterns
+ * DO: Use for destructive actions (delete, remove, discard)
+ * DO: Use for irreversible operations requiring explicit confirmation
+ * DO: Make consequences clear in description text
+ * DO: Default focus to Cancel for safety
+ * NEVER: Routine confirmations, non-destructive actions, information-only dialogs
+ *
+ * @example
+ * ```tsx
+ * <AlertDialog>
+ *   <AlertDialog.Trigger asChild>
+ *     <Button variant="destructive">Delete</Button>
+ *   </AlertDialog.Trigger>
+ *   <AlertDialog.Content>
+ *     <AlertDialog.Title>Are you sure?</AlertDialog.Title>
+ *     <AlertDialog.Description>This action cannot be undone.</AlertDialog.Description>
+ *     <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+ *     <AlertDialog.Action>Delete</AlertDialog.Action>
+ *   </AlertDialog.Content>
+ * </AlertDialog>
+ * ```
  */
 
 import * as React from 'react';

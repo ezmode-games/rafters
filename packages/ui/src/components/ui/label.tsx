@@ -1,3 +1,31 @@
+/**
+ * Form label component with semantic variants and accessibility associations
+ *
+ * @cognitive-load 2/10 - Provides clarity and reduces interpretation effort
+ * @attention-economics Information hierarchy: field=required label, hint=helpful guidance, error=attention needed
+ * @trust-building Clear requirement indication, helpful hints, non-punitive error messaging
+ * @accessibility Form association, screen reader optimization, color-independent error indication
+ * @semantic-meaning Variant meanings: field=input association, hint=guidance, error=validation feedback, success=confirmation
+ *
+ * @usage-patterns
+ * DO: Always associate with input using htmlFor/id
+ * DO: Use importance levels to guide user attention
+ * DO: Provide visual and semantic marking for required fields
+ * DO: Adapt styling based on form vs descriptive context
+ * NEVER: Orphaned labels, unclear or ambiguous text, missing required indicators
+ *
+ * @example
+ * ```tsx
+ * // Form label with input association
+ * <Label htmlFor="email">Email Address</Label>
+ * <Input id="email" type="email" />
+ *
+ * // Required field indication
+ * <Label htmlFor="name">
+ *   Name <span className="text-destructive">*</span>
+ * </Label>
+ * ```
+ */
 import * as React from 'react';
 import classy from '../../primitives/classy';
 
