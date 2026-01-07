@@ -137,16 +137,7 @@ const articleTypography = [
 
 export const Container = React.forwardRef<HTMLElement, ContainerProps>(
   (
-    {
-      as: Element = 'div',
-      size,
-      padding,
-      query = true,
-      queryName,
-      className,
-      style,
-      ...props
-    },
+    { as: Element = 'div', size, padding, query = true, queryName, className, style, ...props },
     ref,
   ) => {
     const isArticle = Element === 'article';

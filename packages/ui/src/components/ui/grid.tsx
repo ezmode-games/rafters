@@ -168,11 +168,7 @@ function GridRoot({
 
   return (
     <GridContext.Provider value={contextValue}>
-      <div
-        role={role === 'grid' ? 'grid' : undefined}
-        className={classes}
-        {...props}
-      >
+      <div role={role === 'grid' ? 'grid' : undefined} className={classes} {...props}>
         {children}
       </div>
     </GridContext.Provider>
@@ -212,14 +208,7 @@ const rowSpanClasses: Record<number, string> = {
   3: 'row-span-3',
 };
 
-function GridItem({
-  priority,
-  colSpan,
-  rowSpan,
-  className,
-  children,
-  ...props
-}: GridItemProps) {
+function GridItem({ priority, colSpan, rowSpan, className, children, ...props }: GridItemProps) {
   // Context available for future priority-based styling
   useGridContext();
 
