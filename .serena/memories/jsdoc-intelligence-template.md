@@ -31,7 +31,7 @@ This template is extracted from `remotes/origin/feature/registry-jsdoc-metadata`
  *
  * ## Design Guides
  * @design-guides
- * - [Guide Name]: https://rafters.realhandy.tech/docs/llm/[guide-slug]
+ * - [Guide Name]: https://rafters.studio/docs/llm/[guide-slug]
  *
  * ## Dependencies
  * @dependencies [list of package dependencies]
@@ -94,9 +94,9 @@ This template is extracted from `remotes/origin/feature/registry-jsdoc-metadata`
  * NEVER: Multiple primary buttons competing for attention
  *
  * @design-guides
- * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
- * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
- * - Component Patterns: https://rafters.realhandy.tech/docs/llm/component-patterns
+ * - Attention Economics: https://rafters.studio/docs/llm/attention-economics
+ * - Trust Building: https://rafters.studio/docs/llm/trust-building
+ * - Component Patterns: https://rafters.studio/docs/llm/component-patterns
  *
  * @dependencies @radix-ui/react-slot
  *
@@ -140,9 +140,9 @@ This template is extracted from `remotes/origin/feature/registry-jsdoc-metadata`
  * NEVER: Routine actions, non-essential interruptions
  *
  * @design-guides
- * - Trust Building: https://rafters.realhandy.tech/docs/llm/trust-building
- * - Cognitive Load: https://rafters.realhandy.tech/docs/llm/cognitive-load
- * - Progressive Enhancement: https://rafters.realhandy.tech/docs/llm/progressive-enhancement
+ * - Trust Building: https://rafters.studio/docs/llm/trust-building
+ * - Cognitive Load: https://rafters.studio/docs/llm/cognitive-load
+ * - Progressive Enhancement: https://rafters.studio/docs/llm/progressive-enhancement
  *
  * @dependencies @radix-ui/react-dialog, @rafters/design-tokens/motion
  *
@@ -188,9 +188,9 @@ This template is extracted from `remotes/origin/feature/registry-jsdoc-metadata`
  * NEVER: Use decorative containers without semantic purpose
  *
  * @design-guides
- * - Content Grouping: https://rafters.realhandy.tech/docs/llm/content-grouping
- * - Attention Economics: https://rafters.realhandy.tech/docs/llm/attention-economics
- * - Spatial Relationships: https://rafters.realhandy.tech/docs/llm/spatial-relationships
+ * - Content Grouping: https://rafters.studio/docs/llm/content-grouping
+ * - Attention Economics: https://rafters.studio/docs/llm/attention-economics
+ * - Spatial Relationships: https://rafters.studio/docs/llm/spatial-relationships
  *
  * @dependencies @rafters/design-tokens/motion
  *

@@ -35,9 +35,9 @@ import { zocker } from 'zocker';
 
 // Generate 100 random valid tokens, test property holds for ALL
 const tokens = zocker(z.array(TokenSchema).length(100)).generate();
-tokens.forEach(token => {
+for (const token of tokens) {
   expect(TokenSchema.parse(token)).toBeDefined();
-});
+}
 ```
 
 ## Accessibility Tests (MANDATORY for UI)
@@ -55,7 +55,7 @@ it('has no accessibility violations', async () => {
 ## Key Commands
 ```bash
 pnpm test                              # All tests
-pnpm --filter=@rafters/[pkg] test      # Specific package
+pnpm --filter=@rafters/shared test     # Specific package
 pnpm test:a11y                         # Accessibility only
 pnpm test:coverage                     # Coverage report
 ```
