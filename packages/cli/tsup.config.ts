@@ -6,6 +6,7 @@ export default defineConfig({
   target: 'node22',
   bundle: true,
   noExternal: ['@rafters/design-tokens', '@rafters/shared'],
+  external: ['commander', '@modelcontextprotocol/sdk'],
   outDir: 'dist',
   clean: true,
 });
