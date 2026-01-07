@@ -74,8 +74,10 @@ export function DatePicker<T extends DatePickerMode = 'single'>({
   formatRange = defaultFormatRange,
   className,
   ...props
-}: DatePickerProps<T>) {
+}: DatePickerProps<T>): React.JSX.Element {
   const [open, setOpen] = React.useState(false);
+  // Capture date once at mount for defaultMonth fallback (React purity)
+  const [defaultDate] = React.useState(() => new Date());
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const contentRef = React.useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = React.useState(false);
@@ -92,7 +94,7 @@ export function DatePicker<T extends DatePickerMode = 'single'>({
   React.useEffect(() => {
     if (!open || !triggerRef.current || !contentRef.current) return;
 
-    const updatePosition = () => {
+    const updatePosition = (): void => {
       const anchor = triggerRef.current;
       const floating = contentRef.current;
 
@@ -123,7 +125,7 @@ export function DatePicker<T extends DatePickerMode = 'single'>({
   React.useEffect(() => {
     if (!open) return;
 
-    return onEscapeKeyDown(() => {
+    return onEscapeKeyDown((): void => {
       setOpen(false);
       triggerRef.current?.focus();
     });
@@ -133,7 +135,7 @@ export function DatePicker<T extends DatePickerMode = 'single'>({
   React.useEffect(() => {
     if (!open || !contentRef.current) return;
 
-    return onPointerDownOutside(contentRef.current, (event) => {
+    return onPointerDownOutside(contentRef.current, (event): void => {
       const target = event.target as Node;
       if (triggerRef.current?.contains(target)) return;
 
@@ -143,7 +145,7 @@ export function DatePicker<T extends DatePickerMode = 'single'>({
 
   // Handle date selection
   const handleSelect = React.useCallback(
-    (selected: Date | DateRange | undefined) => {
+    (selected: Date | DateRange | undefined): void => {
       if (mode === 'single') {
         (onValueChange as (date: Date | undefined) => void)?.(selected as Date | undefined);
         setOpen(false);
@@ -160,7 +162,7 @@ export function DatePicker<T extends DatePickerMode = 'single'>({
   );
 
   // Format display value
-  const displayValue = React.useMemo(() => {
+  const displayValue = React.useMemo((): string => {
     if (mode === 'single') {
       const date = value as Date | undefined;
       return date ? formatDate(date) : placeholder;
@@ -181,7 +183,7 @@ export function DatePicker<T extends DatePickerMode = 'single'>({
         ref={triggerRef}
         type="button"
         disabled={disabled}
-        onClick={() => setOpen(!open)}
+        onClick={(): void => setOpen(!open)}
         aria-expanded={open}
         aria-controls={contentId}
         aria-haspopup="dialog"
@@ -248,8 +250,8 @@ export function DatePicker<T extends DatePickerMode = 'single'>({
               onSelect={handleSelect as NonNullable<CalendarProps['onSelect']>}
               defaultMonth={
                 mode === 'single'
-                  ? (value as Date) || new Date()
-                  : (value as DateRange)?.from || new Date()
+                  ? (value as Date) || defaultDate
+                  : (value as DateRange)?.from || defaultDate
               }
               {...calendarProps}
             />
