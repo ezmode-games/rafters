@@ -55,7 +55,7 @@ interface CommandContextValue {
 
 const CommandContext = React.createContext<CommandContextValue | null>(null);
 
-function useCommandContext() {
+function useCommandContext(): CommandContextValue {
   const context = React.useContext(CommandContext);
   if (!context) {
     throw new Error('Command components must be used within Command');
@@ -68,19 +68,15 @@ function useCommandContext() {
 export interface CommandProps extends React.HTMLAttributes<HTMLDivElement> {
   value?: string;
   onValueChange?: (value: string) => void;
-  filter?: (value: string, search: string) => boolean;
-  loop?: boolean;
 }
 
 export function Command({
   value: controlledValue,
   onValueChange,
-  filter,
-  loop = false,
   className,
   children,
   ...props
-}: CommandProps) {
+}: CommandProps): React.JSX.Element {
   // Search input value
   const [uncontrolledValue, setUncontrolledValue] = React.useState('');
   const isControlled = controlledValue !== undefined;
@@ -193,7 +189,7 @@ export function CommandDialog({
   className,
   children,
   ...props
-}: CommandDialogProps) {
+}: CommandDialogProps): React.JSX.Element | null {
   // Handle escape to close
   React.useEffect(() => {
     if (!open) return;
@@ -217,7 +213,7 @@ export function CommandDialog({
         type="button"
         className="fixed inset-0 z-50 bg-black/80 cursor-default"
         onClick={() => onOpenChange?.(false)}
-        aria-label="Close dialog"
+        aria-label="Close command palette"
       />
       {/* Dialog */}
       <div
@@ -240,7 +236,11 @@ export function CommandDialog({
 export interface CommandInputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> {}
 
-export function CommandInput({ className, onKeyDown, ...props }: CommandInputProps) {
+export function CommandInput({
+  className,
+  onKeyDown,
+  ...props
+}: CommandInputProps): React.JSX.Element {
   const {
     value,
     onValueChange,
@@ -338,7 +338,11 @@ export function CommandInput({ className, onKeyDown, ...props }: CommandInputPro
 
 export interface CommandListProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function CommandList({ className, children, ...props }: CommandListProps) {
+export function CommandList({
+  className,
+  children,
+  ...props
+}: CommandListProps): React.JSX.Element {
   const { listId } = useCommandContext();
 
   return (
@@ -358,7 +362,11 @@ export function CommandList({ className, children, ...props }: CommandListProps)
 
 export interface CommandEmptyProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function CommandEmpty({ className, children, ...props }: CommandEmptyProps) {
+export function CommandEmpty({
+  className,
+  children,
+  ...props
+}: CommandEmptyProps): React.JSX.Element | null {
   const { items, value } = useCommandContext();
 
   // Calculate visible items (those that match the search)
@@ -384,7 +392,12 @@ export interface CommandGroupProps extends React.HTMLAttributes<HTMLDivElement> 
   heading?: string;
 }
 
-export function CommandGroup({ heading, className, children, ...props }: CommandGroupProps) {
+export function CommandGroup({
+  heading,
+  className,
+  children,
+  ...props
+}: CommandGroupProps): React.JSX.Element {
   const headingId = React.useId();
 
   return (
@@ -425,7 +438,7 @@ export function CommandItem({
   className,
   children,
   ...props
-}: CommandItemProps) {
+}: CommandItemProps): React.JSX.Element | null {
   const {
     value: searchValue,
     activeIndex,
@@ -507,7 +520,10 @@ export function CommandItem({
 
 export interface CommandSeparatorProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function CommandSeparator({ className, ...props }: CommandSeparatorProps) {
+export function CommandSeparator({
+  className,
+  ...props
+}: CommandSeparatorProps): React.JSX.Element {
   return (
     <div
       data-command-separator=""
@@ -521,7 +537,7 @@ export function CommandSeparator({ className, ...props }: CommandSeparatorProps)
 
 export interface CommandShortcutProps extends React.HTMLAttributes<HTMLSpanElement> {}
 
-export function CommandShortcut({ className, ...props }: CommandShortcutProps) {
+export function CommandShortcut({ className, ...props }: CommandShortcutProps): React.JSX.Element {
   return (
     <span
       data-command-shortcut=""
