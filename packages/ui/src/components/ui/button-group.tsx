@@ -9,7 +9,7 @@
  *
  * @usage-patterns
  * DO: Group related actions (Save/Cancel, Undo/Redo, pagination controls)
- * DO: Use size prop on group to ensure consistent button sizing
+ * DO: Use size prop on group (Button must use useButtonGroupContext for inheritance)
  * DO: Keep groups small (2-5 buttons) for scannability
  * DO: Add aria-label to describe the group's purpose
  * NEVER: Mix unrelated actions in the same group
@@ -34,6 +34,26 @@
  */
 import * as React from 'react';
 import classy from '../../primitives/classy';
+
+// ==================== Constants ====================
+
+// Connected button styling via CSS child selectors
+const HORIZONTAL_CONNECTED_CLASSES = [
+  '[&>*:first-child]:rounded-r-none',
+  '[&>*:last-child]:rounded-l-none',
+  '[&>*:not(:first-child):not(:last-child)]:rounded-none',
+  '[&>*:not(:first-child)]:-ml-px',
+].join(' ');
+
+const VERTICAL_CONNECTED_CLASSES = [
+  '[&>*:first-child]:rounded-b-none',
+  '[&>*:last-child]:rounded-t-none',
+  '[&>*:not(:first-child):not(:last-child)]:rounded-none',
+  '[&>*:not(:first-child)]:-mt-px',
+].join(' ');
+
+// Focus stacking
+const FOCUS_STACKING_CLASS = '[&>*:focus-visible]:z-10';
 
 // ==================== Context ====================
 
@@ -82,30 +102,11 @@ export const ButtonGroup = React.forwardRef<HTMLDivElement, ButtonGroupProps>(
       className,
     );
 
-    // Connected button styling via CSS child selectors
-    // These use bracket syntax which classy blocks by default, so we concatenate them
-    const horizontalConnectedClasses = [
-      '[&>*:first-child]:rounded-r-none',
-      '[&>*:last-child]:rounded-l-none',
-      '[&>*:not(:first-child):not(:last-child)]:rounded-none',
-      '[&>*:not(:first-child)]:-ml-px',
-    ].join(' ');
-
-    const verticalConnectedClasses = [
-      '[&>*:first-child]:rounded-b-none',
-      '[&>*:last-child]:rounded-t-none',
-      '[&>*:not(:first-child):not(:last-child)]:rounded-none',
-      '[&>*:not(:first-child)]:-mt-px',
-    ].join(' ');
-
-    // Focus stacking class (also uses bracket syntax)
-    const focusStackingClass = '[&>*:focus-visible]:z-10';
-
-    // Combine all classes
+    // Combine all classes (using module-level constants for connected styling)
     const groupClasses = [
       baseClasses,
-      orientation === 'horizontal' ? horizontalConnectedClasses : verticalConnectedClasses,
-      focusStackingClass,
+      orientation === 'horizontal' ? HORIZONTAL_CONNECTED_CLASSES : VERTICAL_CONNECTED_CLASSES,
+      FOCUS_STACKING_CLASS,
     ].join(' ');
 
     return (

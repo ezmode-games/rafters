@@ -101,16 +101,16 @@ describe('ButtonGroup', () => {
     });
   });
 
-  describe('Size inheritance', () => {
-    it('defaults to default size', () => {
+  describe('Size context', () => {
+    it('provides default size in context', () => {
       render(
         <ButtonGroup>
           <Button>Test</Button>
         </ButtonGroup>,
       );
 
-      // The context is provided but Button needs to consume it
-      // For now we verify the context is available
+      // ButtonGroup provides size via context (useButtonGroupContext)
+      // Button component must consume context for inheritance to work
       expect(screen.getByRole('group')).toBeInTheDocument();
     });
 
