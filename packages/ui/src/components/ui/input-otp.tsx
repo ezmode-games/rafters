@@ -51,7 +51,7 @@ interface InputOTPContextValue {
 
 const InputOTPContext = React.createContext<InputOTPContextValue | null>(null);
 
-function useInputOTPContext() {
+function useInputOTPContext(): InputOTPContextValue {
   const context = React.useContext(InputOTPContext);
   if (!context) {
     throw new Error('InputOTP components must be used within InputOTP');
@@ -84,7 +84,7 @@ export function InputOTP({
   className,
   children,
   ...props
-}: InputOTPProps) {
+}: InputOTPProps): React.JSX.Element {
   // Controlled/uncontrolled value
   const [uncontrolledValue, setUncontrolledValue] = React.useState(defaultValue);
   const isControlled = controlledValue !== undefined;
@@ -98,7 +98,7 @@ export function InputOTP({
 
   // Handle value changes
   const handleChange = React.useCallback(
-    (newValue: string) => {
+    (newValue: string): void => {
       // Filter to pattern
       const filtered = newValue
         .split('')
@@ -123,12 +123,12 @@ export function InputOTP({
   );
 
   // Handle input change
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     handleChange(e.target.value);
   };
 
   // Handle keydown for navigation
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     if (disabled) return;
 
     if (e.key === 'Backspace') {
@@ -145,14 +145,14 @@ export function InputOTP({
   };
 
   // Handle paste
-  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>): void => {
     e.preventDefault();
     const pasted = e.clipboardData.getData('text');
     handleChange(pasted);
   };
 
   // Focus input when clicking anywhere in the component
-  const handleContainerClick = () => {
+  const handleContainerClick = (): void => {
     if (!disabled) {
       inputRef.current?.focus();
     }
@@ -213,7 +213,11 @@ export function InputOTP({
 
 export interface InputOTPGroupProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function InputOTPGroup({ className, children, ...props }: InputOTPGroupProps) {
+export function InputOTPGroup({
+  className,
+  children,
+  ...props
+}: InputOTPGroupProps): React.JSX.Element {
   return (
     <div data-input-otp-group="" className={classy('flex items-center', className)} {...props}>
       {children}
@@ -227,7 +231,7 @@ export interface InputOTPSlotProps extends React.HTMLAttributes<HTMLDivElement> 
   index: number;
 }
 
-export function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
+export function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps): React.JSX.Element {
   const { value, maxLength, activeIndex, inputRef, disabled } = useInputOTPContext();
 
   const char = value[index] ?? '';
@@ -236,7 +240,7 @@ export function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) 
   const hasFakeCaret = isActive && !isFilled;
 
   // Click on slot focuses input and sets active index
-  const handleClick = () => {
+  const handleClick = (): void => {
     if (!disabled) {
       inputRef.current?.focus();
     }
@@ -274,7 +278,10 @@ export function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) 
 
 export interface InputOTPSeparatorProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function InputOTPSeparator({ className, ...props }: InputOTPSeparatorProps) {
+export function InputOTPSeparator({
+  className,
+  ...props
+}: InputOTPSeparatorProps): React.JSX.Element {
   // Decorative separator - hidden from assistive technology
   return (
     <div
