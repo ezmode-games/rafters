@@ -460,7 +460,7 @@ export function ComboboxContent({
       window.removeEventListener('scroll', updatePosition, { capture: true });
       window.removeEventListener('resize', updatePosition);
     };
-  }, [open, side, align, sideOffset, alignOffset, inputRef, contentRef.current]);
+  }, [open, side, align, sideOffset, alignOffset, inputRef, contentRef]);
 
   // Escape key handler
   React.useEffect(() => {
@@ -485,7 +485,7 @@ export function ComboboxContent({
 
       onOpenChange(false);
     });
-  }, [open, onOpenChange, inputRef, contentRef.current]);
+  }, [open, onOpenChange, inputRef, contentRef]);
 
   if (!open || !mounted) return null;
 
@@ -506,7 +506,7 @@ export function ComboboxContent({
       ref={contentRef}
       id={listboxId}
       role="listbox"
-      data-state={open ? 'open' : 'closed'}
+      data-state="open"
       data-side={position.side}
       data-align={position.align}
       className={classy(
