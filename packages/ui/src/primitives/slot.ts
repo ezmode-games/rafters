@@ -326,7 +326,6 @@ export function mergeClassNames(parentClass: string, childClass: string): string
 
 /**
  * Props object for framework-agnostic prop merging
- * Use SlotPropsInput when passing React element props to mergeProps
  */
 export interface SlotProps {
   className?: string;
