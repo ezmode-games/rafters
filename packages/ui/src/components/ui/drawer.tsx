@@ -71,7 +71,7 @@ type DrawerSide = 'top' | 'right' | 'bottom' | 'left';
 
 const DrawerContext = React.createContext<DrawerContextValue | null>(null);
 
-function useDrawerContext() {
+function useDrawerContext(): DrawerContextValue {
   const context = React.useContext(DrawerContext);
   if (!context) {
     throw new Error('Drawer components must be used within Drawer.Root');
@@ -98,7 +98,7 @@ export function Drawer({
   onOpenChange,
   modal = true,
   side = 'bottom',
-}: DrawerProps) {
+}: DrawerProps): React.JSX.Element {
   // Uncontrolled state
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
 
@@ -144,7 +144,12 @@ export interface DrawerTriggerProps extends React.ButtonHTMLAttributes<HTMLButto
   asChild?: boolean;
 }
 
-export function DrawerTrigger({ asChild, onClick, children, ...props }: DrawerTriggerProps) {
+export function DrawerTrigger({
+  asChild,
+  onClick,
+  children,
+  ...props
+}: DrawerTriggerProps): React.JSX.Element {
   const { open, onOpenChange, contentId } = useDrawerContext();
 
   const ariaProps = getTriggerAriaProps({ open, controlsId: contentId });
@@ -175,7 +180,11 @@ export interface DrawerPortalProps {
   forceMount?: boolean;
 }
 
-export function DrawerPortal({ children, container, forceMount }: DrawerPortalProps) {
+export function DrawerPortal({
+  children,
+  container,
+  forceMount,
+}: DrawerPortalProps): React.ReactNode {
   const { open } = useDrawerContext();
   const [mounted, setMounted] = React.useState(false);
 
@@ -204,7 +213,12 @@ export interface DrawerOverlayProps extends React.HTMLAttributes<HTMLDivElement>
   forceMount?: boolean;
 }
 
-export function DrawerOverlay({ asChild, forceMount, className, ...props }: DrawerOverlayProps) {
+export function DrawerOverlay({
+  asChild,
+  forceMount,
+  className,
+  ...props
+}: DrawerOverlayProps): React.JSX.Element | null {
   const { open } = useDrawerContext();
 
   const ariaProps = getOverlayAriaProps({ open });
@@ -279,7 +293,7 @@ export function DrawerContent({
   className,
   children,
   ...props
-}: DrawerContentProps) {
+}: DrawerContentProps): React.JSX.Element | null {
   const { open, onOpenChange, contentId, titleId, descriptionId, modal, side } = useDrawerContext();
   const contentRef = React.useRef<HTMLDivElement>(null);
 
@@ -520,7 +534,7 @@ export function DrawerContent({
 
 export interface DrawerHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function DrawerHeader({ className, ...props }: DrawerHeaderProps) {
+export function DrawerHeader({ className, ...props }: DrawerHeaderProps): React.JSX.Element {
   return (
     <div
       className={classy('flex flex-col gap-1.5 text-center sm:text-left', className)}
@@ -533,7 +547,7 @@ export function DrawerHeader({ className, ...props }: DrawerHeaderProps) {
 
 export interface DrawerFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function DrawerFooter({ className, ...props }: DrawerFooterProps) {
+export function DrawerFooter({ className, ...props }: DrawerFooterProps): React.JSX.Element {
   return <div className={classy('mt-auto flex flex-col gap-2 pt-4', className)} {...props} />;
 }
 
@@ -543,7 +557,7 @@ export interface DrawerTitleProps extends React.HTMLAttributes<HTMLHeadingElemen
   asChild?: boolean;
 }
 
-export function DrawerTitle({ asChild, className, ...props }: DrawerTitleProps) {
+export function DrawerTitle({ asChild, className, ...props }: DrawerTitleProps): React.JSX.Element {
   const { titleId } = useDrawerContext();
 
   const titleProps = {
@@ -565,7 +579,11 @@ export interface DrawerDescriptionProps extends React.HTMLAttributes<HTMLParagra
   asChild?: boolean;
 }
 
-export function DrawerDescription({ asChild, className, ...props }: DrawerDescriptionProps) {
+export function DrawerDescription({
+  asChild,
+  className,
+  ...props
+}: DrawerDescriptionProps): React.JSX.Element {
   const { descriptionId } = useDrawerContext();
 
   const descriptionProps = {
@@ -587,7 +605,12 @@ export interface DrawerCloseProps extends React.ButtonHTMLAttributes<HTMLButtonE
   asChild?: boolean;
 }
 
-export function DrawerClose({ asChild, onClick, children, ...props }: DrawerCloseProps) {
+export function DrawerClose({
+  asChild,
+  onClick,
+  children,
+  ...props
+}: DrawerCloseProps): React.JSX.Element {
   const { onOpenChange } = useDrawerContext();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
