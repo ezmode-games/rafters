@@ -779,8 +779,6 @@ describe('ContextMenu - Submenus', () => {
   });
 
   it('should open submenu on hover', async () => {
-    const _user = userEvent.setup();
-
     render(
       <ContextMenu defaultOpen>
         <ContextMenuTrigger>Right-click</ContextMenuTrigger>
