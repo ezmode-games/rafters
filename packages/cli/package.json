@@ -4,30 +4,32 @@
   "description": "CLI for Rafters design system - scaffold tokens and add components",
   "type": "module",
   "bin": {
-    "rafters": "./bin/rafters.js"
+    "rafters": "./dist/index.js"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./dist/index.js"
   },
   "files": [
-    "bin",
-    "src"
+    "dist"
   ],
   "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
     "test": "pnpm run test:bdd && pnpm run test:unit",
     "test:bdd": "bddgen && playwright test",
     "test:unit": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf .turbo"
+    "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.25.1",
-    "@rafters/design-tokens": "workspace:*",
-    "@rafters/shared": "workspace:*",
     "commander": "^13.0.0"
   },
   "devDependencies": {
+    "@rafters/design-tokens": "workspace:*",
+    "@rafters/shared": "workspace:*",
+    "tsup": "^8.0.0",
     "@playwright/test": "catalog:",
     "@types/node": "catalog:",
     "playwright-bdd": "catalog:",

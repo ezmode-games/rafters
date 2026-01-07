@@ -1,3 +1,6 @@
+# Build output
+dist/
+
 # BDD generated test files
 .features-gen/
 
