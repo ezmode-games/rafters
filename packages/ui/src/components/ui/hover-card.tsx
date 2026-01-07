@@ -79,7 +79,7 @@ interface HoverCardContextValue {
 
 const HoverCardContext = React.createContext<HoverCardContextValue | null>(null);
 
-function useHoverCardContext() {
+function useHoverCardContext(): HoverCardContextValue {
   const context = React.useContext(HoverCardContext);
   if (!context) {
     throw new Error('HoverCard components must be used within HoverCard');
@@ -127,7 +127,7 @@ export function HoverCard({
   openDelay = 700,
   closeDelay = 300,
   children,
-}: HoverCardProps) {
+}: HoverCardProps): React.JSX.Element {
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
 
   const isControlled = controlledOpen !== undefined;
@@ -198,7 +198,11 @@ export interface HoverCardTriggerProps extends React.HTMLAttributes<HTMLElement>
   asChild?: boolean;
 }
 
-export function HoverCardTrigger({ asChild, children, ...props }: HoverCardTriggerProps) {
+export function HoverCardTrigger({
+  asChild,
+  children,
+  ...props
+}: HoverCardTriggerProps): React.JSX.Element {
   const {
     open,
     onOpenChange,
@@ -345,7 +349,11 @@ export interface HoverCardPortalProps {
   forceMount?: boolean;
 }
 
-export function HoverCardPortal({ children, container, forceMount }: HoverCardPortalProps) {
+export function HoverCardPortal({
+  children,
+  container,
+  forceMount,
+}: HoverCardPortalProps): React.ReactNode {
   const { open } = useHoverCardContext();
   const [mounted, setMounted] = React.useState(false);
 
@@ -420,7 +428,7 @@ export function HoverCardContent({
   children,
   onEscapeKeyDown: onEscapeKeyDownProp,
   ...props
-}: HoverCardContentProps) {
+}: HoverCardContentProps): React.JSX.Element | null {
   const {
     open,
     onOpenChange,
