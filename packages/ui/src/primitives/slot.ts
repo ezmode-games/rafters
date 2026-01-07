@@ -326,10 +326,12 @@ export function mergeClassNames(parentClass: string, childClass: string): string
 
 /**
  * Props object for framework-agnostic prop merging
+ * Use SlotPropsInput when passing React element props to mergeProps
  */
 export interface SlotProps {
   className?: string;
-  style?: Record<string, unknown> | undefined;
+  // biome-ignore lint/suspicious/noExplicitAny: Accept any style type for framework compatibility
+  style?: Record<string, any> | undefined;
   [key: string]: unknown;
 }
 
