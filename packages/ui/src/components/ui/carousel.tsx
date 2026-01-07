@@ -244,7 +244,7 @@ export function CarouselContent({ className, children, ...props }: CarouselConte
 export interface CarouselItemProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function CarouselItem({ className, children, ...props }: CarouselItemProps) {
-  const { registerItem, unregisterItem, orientation } = useCarouselContext();
+  const { registerItem, unregisterItem } = useCarouselContext();
 
   React.useEffect(() => {
     registerItem();
@@ -257,11 +257,7 @@ export function CarouselItem({ className, children, ...props }: CarouselItemProp
       role="group"
       aria-roledescription="slide"
       data-carousel-item=""
-      className={classy(
-        'min-w-0 shrink-0 grow-0',
-        orientation === 'horizontal' ? 'basis-full' : 'basis-full',
-        className,
-      )}
+      className={classy('min-w-0 shrink-0 grow-0', 'basis-full', className)}
       {...props}
     >
       {children}
@@ -380,7 +376,7 @@ export function CarouselIndicators({ className, ...props }: CarouselIndicatorsPr
     >
       {Array.from({ length: totalItems }).map((_, index) => (
         <button
-          key={index}
+          key={`slide-${index}`}
           type="button"
           role="tab"
           aria-selected={index === currentIndex}
