@@ -60,17 +60,9 @@ export interface FieldProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
-// Simple counter for generating unique IDs
-let fieldIdCounter = 0;
-
 function useFieldId(providedId?: string): string {
-  const generatedId = React.useMemo(() => {
-    if (providedId) return providedId;
-    fieldIdCounter += 1;
-    return `field-${fieldIdCounter}`;
-  }, [providedId]);
-
-  return generatedId;
+  const reactId = React.useId();
+  return providedId ?? `field-${reactId}`;
 }
 
 export const Field = React.forwardRef<HTMLDivElement, FieldProps>(
