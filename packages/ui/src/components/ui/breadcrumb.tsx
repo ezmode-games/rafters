@@ -62,9 +62,7 @@ import * as React from 'react';
 import classy from '../../primitives/classy';
 import { mergeProps } from '../../primitives/slot';
 
-export interface BreadcrumbProps extends React.ComponentPropsWithoutRef<'nav'> {
-  separator?: React.ReactNode;
-}
+export interface BreadcrumbProps extends React.ComponentPropsWithoutRef<'nav'> {}
 
 export const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
   ({ className, ...props }, ref) => (
