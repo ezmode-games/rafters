@@ -63,7 +63,7 @@ interface AvatarContextValue {
 
 const AvatarContext = React.createContext<AvatarContextValue | null>(null);
 
-function useAvatarContext() {
+function useAvatarContext(): AvatarContextValue {
   const context = React.useContext(AvatarContext);
   if (!context) {
     throw new Error('Avatar components must be used within an Avatar');
@@ -117,7 +117,7 @@ export const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(
     const { imageLoadingStatus, onImageLoadingStatusChange } = useAvatarContext();
 
     const handleStatusChange = React.useCallback(
-      (status: ImageLoadingStatus) => {
+      (status: ImageLoadingStatus): void => {
         onImageLoadingStatusChange(status);
         onLoadingStatusChange?.(status);
       },
@@ -133,7 +133,7 @@ export const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(
     }, [src, handleStatusChange]);
 
     const handleLoad = React.useCallback(
-      (event: React.SyntheticEvent<HTMLImageElement>) => {
+      (event: React.SyntheticEvent<HTMLImageElement>): void => {
         handleStatusChange('loaded');
         onLoad?.(event);
       },
@@ -141,7 +141,7 @@ export const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(
     );
 
     const handleError = React.useCallback(
-      (event: React.SyntheticEvent<HTMLImageElement>) => {
+      (event: React.SyntheticEvent<HTMLImageElement>): void => {
         handleStatusChange('error');
         onError?.(event);
       },
