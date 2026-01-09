@@ -7,7 +7,7 @@
 
 import { execa } from 'execa';
 import ora from 'ora';
-import { type PackageManager, getPackageManager } from './get-package-manager.js';
+import { getPackageManager, type PackageManager } from './get-package-manager.js';
 
 export interface UpdateDependenciesOptions {
   cwd: string;
@@ -69,16 +69,15 @@ async function installWithPackageManager(
       await execa('npm', ['install', ...(dev ? ['-D'] : []), ...dependencies], { cwd });
       break;
 
-    case 'deno':
+    case 'deno': {
       // Deno requires npm: prefix
       const denoDeps = dependencies.map((dep) => `npm:${dep}`);
       await execa('deno', ['add', ...(dev ? ['-D'] : []), ...denoDeps], { cwd });
       break;
+    }
 
-    case 'pnpm':
-    case 'yarn':
-    case 'bun':
     default:
+      // pnpm, yarn, bun all use 'add' command
       await execa(packageManager, ['add', ...(dev ? ['-D'] : []), ...dependencies], { cwd });
       break;
   }
