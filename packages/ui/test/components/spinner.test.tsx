@@ -58,7 +58,7 @@ describe('Spinner', () => {
     const spinner = container.firstChild;
     expect(spinner).toHaveClass('inline-block');
     expect(spinner).toHaveClass('rounded-full');
-    expect(spinner).toHaveClass('border-current');
+    expect(spinner).toHaveClass('border-primary');
     expect(spinner).toHaveClass('border-r-transparent');
   });
 

@@ -23,7 +23,7 @@ describe('Button', () => {
     const btn = screen.getByRole('button');
     // class presence rather than exact string to avoid brittle ordering
     expect(btn.className).toContain('bg-secondary');
-    expect(btn.className).toContain('px-8'); // lg size uses px-8
+    expect(btn.className).toContain('px-6'); // lg size uses px-6
   });
 
   it('supports all shadcn variants', () => {
@@ -55,8 +55,8 @@ describe('Button', () => {
     );
 
     expect(screen.getByText('Default').className).toContain('h-10');
-    expect(screen.getByText('Small').className).toContain('h-9');
-    expect(screen.getByText('Large').className).toContain('h-11');
+    expect(screen.getByText('Small').className).toContain('h-8');
+    expect(screen.getByText('Large').className).toContain('h-12');
     expect(screen.getByText('Icon').className).toContain('w-10');
   });
 

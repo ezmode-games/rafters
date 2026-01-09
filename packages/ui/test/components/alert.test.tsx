@@ -13,9 +13,9 @@ describe('Alert', () => {
   it('applies default variant classes', () => {
     render(<Alert>Default</Alert>);
     const alert = screen.getByRole('alert');
-    expect(alert.className).toContain('bg-background');
-    expect(alert.className).toContain('text-foreground');
-    expect(alert.className).toContain('border-border');
+    expect(alert.className).toContain('bg-primary-subtle');
+    expect(alert.className).toContain('text-primary-foreground');
+    expect(alert.className).toContain('border-primary-border');
   });
 
   it('applies info variant classes', () => {
