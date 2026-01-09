@@ -177,11 +177,7 @@ export function createClassy(options?: ClassyOptions) {
   /**
    * Process a single class string, checking for arbitrary values
    */
-  function processClass(
-    cls: string,
-    seen: Set<string>,
-    out: string[],
-  ): void {
+  function processClass(cls: string, seen: Set<string>, out: string[]): void {
     if (!allowArbitrary && hasArbitraryValue(cls)) {
       warn(`classy: arbitrary value '${cls}' skipped`);
       return;
@@ -197,11 +193,7 @@ export function createClassy(options?: ClassyOptions) {
   /**
    * Process a space-separated class string
    */
-  function processClassString(
-    str: string,
-    seen: Set<string>,
-    out: string[],
-  ): void {
+  function processClassString(str: string, seen: Set<string>, out: string[]): void {
     for (const part of str.split(/\s+/)) {
       if (part) {
         processClass(part, seen, out);

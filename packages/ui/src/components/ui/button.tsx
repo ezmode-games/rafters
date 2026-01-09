@@ -31,7 +31,18 @@ import { mergeProps } from '../../primitives/slot';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
-  variant?: 'default' | 'primary' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'muted' | 'accent' | 'outline' | 'ghost';
+  variant?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'destructive'
+    | 'success'
+    | 'warning'
+    | 'info'
+    | 'muted'
+    | 'accent'
+    | 'outline'
+    | 'ghost';
   size?: 'default' | 'sm' | 'lg' | 'icon';
   loading?: boolean;
 }
@@ -112,7 +123,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ' +
       'transition-colors';
 
-    const disabledCls = disabled || loading ? 'opacity-50 pointer-events-none cursor-not-allowed' : '';
+    const disabledCls =
+      disabled || loading ? 'opacity-50 pointer-events-none cursor-not-allowed' : '';
 
     const cls = classy(
       base,

@@ -34,7 +34,15 @@ export interface CheckboxProps
   /** Callback when checked state changes */
   onCheckedChange?: (checked: boolean) => void;
   /** Visual variant per docs/COMPONENT_STYLING_REFERENCE.md */
-  variant?: 'default' | 'primary' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'accent';
+  variant?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'destructive'
+    | 'success'
+    | 'warning'
+    | 'info'
+    | 'accent';
   /** Size variant */
   size?: 'sm' | 'default' | 'lg';
 }
@@ -154,7 +162,7 @@ export const Checkbox = React.forwardRef<HTMLButtonElement, CheckboxProps>(
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ' +
       'disabled:pointer-events-none disabled:opacity-50';
 
-    const cls = classy(baseClasses, s!.box, v!.border, v!.checked, v!.ring, className);
+    const cls = classy(baseClasses, s?.box, v?.border, v?.checked, v?.ring, className);
 
     return (
       // biome-ignore lint/a11y/useSemanticElements: Custom checkbox with visual styling not possible with native input
@@ -172,7 +180,7 @@ export const Checkbox = React.forwardRef<HTMLButtonElement, CheckboxProps>(
       >
         {checked && (
           <svg
-            className={s!.icon}
+            className={s?.icon}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

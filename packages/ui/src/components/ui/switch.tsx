@@ -34,7 +34,15 @@ export interface SwitchProps
   /** Callback when checked state changes */
   onCheckedChange?: (checked: boolean) => void;
   /** Visual variant per docs/COMPONENT_STYLING_REFERENCE.md */
-  variant?: 'default' | 'primary' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'accent';
+  variant?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'destructive'
+    | 'success'
+    | 'warning'
+    | 'info'
+    | 'accent';
   /** Size variant */
   size?: 'sm' | 'default' | 'lg';
 }
@@ -118,22 +126,22 @@ export const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
     // Track (background) styles per docs/COMPONENT_STYLING_REFERENCE.md
     const trackClasses = classy(
       'peer inline-flex shrink-0 cursor-pointer items-center',
-      s!.track,
+      s?.track,
       'rounded-full border-2 border-transparent',
       'transition-colors',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-      v!.ring,
+      v?.ring,
       'disabled:cursor-not-allowed disabled:opacity-50',
-      checked ? v!.checked : 'bg-input',
+      checked ? v?.checked : 'bg-input',
       className,
     );
 
     // Thumb (movable indicator) styles
     const thumbClasses = classy(
       'pointer-events-none block rounded-full bg-background shadow-lg ring-0',
-      s!.thumb,
+      s?.thumb,
       'transition-transform',
-      checked ? s!.translate : 'translate-x-0',
+      checked ? s?.translate : 'translate-x-0',
     );
 
     return (

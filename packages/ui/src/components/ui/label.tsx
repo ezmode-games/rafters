@@ -30,7 +30,16 @@ import * as React from 'react';
 import classy from '../../primitives/classy';
 
 export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
-  variant?: 'default' | 'primary' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'muted' | 'accent';
+  variant?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'destructive'
+    | 'success'
+    | 'warning'
+    | 'info'
+    | 'muted'
+    | 'accent';
 }
 
 export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(

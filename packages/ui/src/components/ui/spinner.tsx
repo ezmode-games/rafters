@@ -30,7 +30,16 @@ export interface SpinnerProps extends React.HTMLAttributes<HTMLOutputElement> {
   /** Size variant */
   size?: 'sm' | 'default' | 'lg';
   /** Visual variant per docs/COMPONENT_STYLING_REFERENCE.md */
-  variant?: 'default' | 'primary' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'accent' | 'muted';
+  variant?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'destructive'
+    | 'success'
+    | 'warning'
+    | 'info'
+    | 'accent'
+    | 'muted';
 }
 
 // Variant classes for spinner color
@@ -52,7 +61,12 @@ const sizeClasses: Record<string, string> = {
   lg: 'h-8 w-8 border-3',
 };
 
-export function Spinner({ className, size = 'default', variant = 'default', ...props }: SpinnerProps) {
+export function Spinner({
+  className,
+  size = 'default',
+  variant = 'default',
+  ...props
+}: SpinnerProps) {
   const baseClasses = 'inline-block rounded-full animate-spin motion-reduce:animate-none';
 
   const classes = classy(

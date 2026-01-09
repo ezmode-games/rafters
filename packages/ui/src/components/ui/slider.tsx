@@ -45,19 +45,51 @@ export interface SliderProps
   /** Orientation of the slider */
   orientation?: 'horizontal' | 'vertical';
   /** Visual variant per docs/COMPONENT_STYLING_REFERENCE.md */
-  variant?: 'default' | 'primary' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'accent';
+  variant?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'destructive'
+    | 'success'
+    | 'warning'
+    | 'info'
+    | 'accent';
   /** Size variant */
   size?: 'sm' | 'default' | 'lg';
 }
 
 // Variant classes for the range indicator and thumb
 const variantClasses: Record<string, { range: string; thumb: string; ring: string }> = {
-  default: { range: 'bg-primary', thumb: 'border-primary', ring: 'focus-visible:ring-primary-ring' },
-  primary: { range: 'bg-primary', thumb: 'border-primary', ring: 'focus-visible:ring-primary-ring' },
-  secondary: { range: 'bg-secondary', thumb: 'border-secondary', ring: 'focus-visible:ring-secondary-ring' },
-  destructive: { range: 'bg-destructive', thumb: 'border-destructive', ring: 'focus-visible:ring-destructive-ring' },
-  success: { range: 'bg-success', thumb: 'border-success', ring: 'focus-visible:ring-success-ring' },
-  warning: { range: 'bg-warning', thumb: 'border-warning', ring: 'focus-visible:ring-warning-ring' },
+  default: {
+    range: 'bg-primary',
+    thumb: 'border-primary',
+    ring: 'focus-visible:ring-primary-ring',
+  },
+  primary: {
+    range: 'bg-primary',
+    thumb: 'border-primary',
+    ring: 'focus-visible:ring-primary-ring',
+  },
+  secondary: {
+    range: 'bg-secondary',
+    thumb: 'border-secondary',
+    ring: 'focus-visible:ring-secondary-ring',
+  },
+  destructive: {
+    range: 'bg-destructive',
+    thumb: 'border-destructive',
+    ring: 'focus-visible:ring-destructive-ring',
+  },
+  success: {
+    range: 'bg-success',
+    thumb: 'border-success',
+    ring: 'focus-visible:ring-success-ring',
+  },
+  warning: {
+    range: 'bg-warning',
+    thumb: 'border-warning',
+    ring: 'focus-visible:ring-warning-ring',
+  },
   info: { range: 'bg-info', thumb: 'border-info', ring: 'focus-visible:ring-info-ring' },
   accent: { range: 'bg-accent', thumb: 'border-accent', ring: 'focus-visible:ring-accent-ring' },
 };
@@ -306,7 +338,7 @@ export const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
     );
 
     const trackClasses = classy('relative grow overflow-hidden rounded-full bg-muted', {
-      [s!.track]: isHorizontal,
+      [s?.track]: isHorizontal,
       'w-full': isHorizontal,
       'h-full w-2': !isHorizontal,
     });
@@ -333,7 +365,7 @@ export const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
         <div ref={trackRef} className={trackClasses} onPointerDown={handleTrackClick}>
           {/* Range indicator */}
           <div
-            className={classy('absolute', v!.range)}
+            className={classy('absolute', v?.range)}
             style={{
               ...rangeStyle,
               ...(isHorizontal ? { top: 0, bottom: 0 } : { left: 0, right: 0 }),
@@ -368,11 +400,11 @@ export const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
               aria-orientation={orientation}
               className={classy(
                 'absolute block rounded-full border-2 bg-background',
-                s!.thumb,
-                v!.thumb,
+                s?.thumb,
+                v?.thumb,
                 'ring-offset-background transition-colors',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-                v!.ring,
+                v?.ring,
                 {
                   'cursor-grab': !disabled,
                   'cursor-not-allowed': disabled,

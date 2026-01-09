@@ -28,7 +28,17 @@ import classy from '../../primitives/classy';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   /** Visual variant per docs/COMPONENT_STYLING_REFERENCE.md */
-  variant?: 'default' | 'primary' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'muted' | 'accent' | 'outline';
+  variant?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'destructive'
+    | 'success'
+    | 'warning'
+    | 'info'
+    | 'muted'
+    | 'accent'
+    | 'outline';
   /** Size variant */
   size?: 'sm' | 'default' | 'lg';
 }
@@ -54,7 +64,8 @@ const sizeClasses: Record<string, string> = {
 };
 
 export function Badge({ className, variant = 'default', size = 'default', ...props }: BadgeProps) {
-  const baseClasses = 'inline-flex items-center justify-center rounded-full font-semibold transition-colors';
+  const baseClasses =
+    'inline-flex items-center justify-center rounded-full font-semibold transition-colors';
 
   const classes = classy(
     baseClasses,

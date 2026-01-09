@@ -28,7 +28,16 @@ import classy from '../../primitives/classy';
 
 export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Visual variant per docs/COMPONENT_STYLING_REFERENCE.md - uses subtle backgrounds */
-  variant?: 'default' | 'primary' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'muted' | 'accent';
+  variant?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'destructive'
+    | 'success'
+    | 'warning'
+    | 'info'
+    | 'muted'
+    | 'accent';
 }
 
 // Variant classes using subtle backgrounds for skeleton states

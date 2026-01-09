@@ -603,9 +603,10 @@ export function SelectContent({
     ...props,
   };
 
-  const content = asChild && React.isValidElement(children) 
-    ? React.cloneElement(children, contentProps as Partial<unknown>)
-    : (
+  const content =
+    asChild && React.isValidElement(children) ? (
+      React.cloneElement(children, contentProps as Partial<unknown>)
+    ) : (
       <div {...contentProps}>
         <div className="p-1">{children}</div>
       </div>
@@ -869,10 +870,7 @@ export function SelectScrollUpButton({
   asChild,
   ...props
 }: SelectScrollUpButtonProps) {
-  const buttonClassName = classy(
-    'flex cursor-default items-center justify-center py-1',
-    className,
-  );
+  const buttonClassName = classy('flex cursor-default items-center justify-center py-1', className);
 
   if (asChild && React.isValidElement(children)) {
     return React.cloneElement(children, {
@@ -921,10 +919,7 @@ export function SelectScrollDownButton({
   asChild,
   ...props
 }: SelectScrollDownButtonProps) {
-  const buttonClassName = classy(
-    'flex cursor-default items-center justify-center py-1',
-    className,
-  );
+  const buttonClassName = classy('flex cursor-default items-center justify-center py-1', className);
 
   if (asChild && React.isValidElement(children)) {
     return React.cloneElement(children, {

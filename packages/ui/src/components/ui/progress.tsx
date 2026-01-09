@@ -43,7 +43,15 @@ export interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Callback to generate accessible value text. */
   getValueLabel?: (value: number, max: number) => string;
   /** Visual variant per docs/COMPONENT_STYLING_REFERENCE.md */
-  variant?: 'default' | 'primary' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'accent';
+  variant?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'destructive'
+    | 'success'
+    | 'warning'
+    | 'info'
+    | 'accent';
   /** Size variant */
   size?: 'sm' | 'default' | 'lg';
 }
@@ -71,7 +79,10 @@ function defaultValueLabel(value: number, max: number): string {
 }
 
 export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
-  ({ className, value, max = 100, getValueLabel, variant = 'default', size = 'default', ...props }, ref) => {
+  (
+    { className, value, max = 100, getValueLabel, variant = 'default', size = 'default', ...props },
+    ref,
+  ) => {
     const isIndeterminate = value === undefined;
     const clampedValue = isIndeterminate ? 0 : Math.min(Math.max(value, 0), max);
     const percentage = (clampedValue / max) * 100;

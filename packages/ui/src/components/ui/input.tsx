@@ -35,7 +35,16 @@ import * as React from 'react';
 import classy from '../../primitives/classy';
 
 export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
-  variant?: 'default' | 'primary' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'muted' | 'accent';
+  variant?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'destructive'
+    | 'success'
+    | 'warning'
+    | 'info'
+    | 'muted'
+    | 'accent';
   inputSize?: 'sm' | 'default' | 'lg';
 }
 
@@ -59,7 +68,10 @@ const sizeClasses: Record<string, string> = {
 };
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type = 'text', variant = 'default', inputSize = 'default', disabled, ...props }, ref) => {
+  (
+    { className, type = 'text', variant = 'default', inputSize = 'default', disabled, ...props },
+    ref,
+  ) => {
     const baseClasses =
       'flex w-full rounded-md border bg-background py-2 ' +
       'ring-offset-background ' +

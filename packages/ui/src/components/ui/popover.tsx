@@ -45,12 +45,7 @@ export interface PopoverProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-export function Popover({
-  children,
-  open,
-  defaultOpen = false,
-  onOpenChange,
-}: PopoverProps) {
+export function Popover({ children, open, defaultOpen = false, onOpenChange }: PopoverProps) {
   return (
     <Float.Root open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
       {children}

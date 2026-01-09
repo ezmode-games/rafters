@@ -50,7 +50,16 @@ import * as React from 'react';
 import classy from '../../primitives/classy';
 
 export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'primary' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'muted' | 'accent';
+  variant?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'destructive'
+    | 'success'
+    | 'warning'
+    | 'info'
+    | 'muted'
+    | 'accent';
 }
 
 // Variant classes per docs/COMPONENT_STYLING_REFERENCE.md - using -subtle for alert backgrounds
