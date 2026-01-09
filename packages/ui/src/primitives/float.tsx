@@ -22,7 +22,7 @@
 import * as React from 'react';
 import { createPortal } from 'react-dom';
 
-import { computePosition, type CollisionOptions } from './collision-detector';
+import { type CollisionOptions, computePosition } from './collision-detector';
 import { onEscapeKeyDown } from './escape-keydown';
 import { onPointerDownOutside } from './outside-click';
 import { getPortalContainer } from './portal';
@@ -71,7 +71,10 @@ export interface FloatContentProps extends Omit<React.HTMLAttributes<HTMLDivElem
   /** Whether to flip on collision */
   avoidCollisions?: boolean | undefined;
   /** Padding from viewport edges (px) */
-  collisionPadding?: number | { top?: number; right?: number; bottom?: number; left?: number } | undefined;
+  collisionPadding?:
+    | number
+    | { top?: number; right?: number; bottom?: number; left?: number }
+    | undefined;
   /** Custom container for portal */
   container?: HTMLElement | null | undefined;
   /** Disable portal rendering */
@@ -109,7 +112,12 @@ function useFloatContext() {
 
 // ==================== Float.Root ====================
 
-function FloatRoot({ children, open: controlledOpen, defaultOpen = false, onOpenChange }: FloatRootProps) {
+function FloatRoot({
+  children,
+  open: controlledOpen,
+  defaultOpen = false,
+  onOpenChange,
+}: FloatRootProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
   const anchorRef = React.useRef<HTMLElement | null>(null);
 
@@ -186,36 +194,33 @@ interface PositionState {
   align: Align;
 }
 
-const FloatContent = React.forwardRef<HTMLDivElement, FloatContentProps>(
-  function FloatContent(
-    {
-      children,
-      asChild,
-      forceMount,
-      side = 'bottom',
-      align = 'center',
-      sideOffset = 4,
-      alignOffset = 0,
-      avoidCollisions = true,
-      collisionPadding = 10,
-      container,
-      disablePortal = false,
-      onEscapeKeyDown: onEscapeKeyDownProp,
-      onPointerDownOutside: onPointerDownOutsideProp,
-      onFocusOutside,
-      disableOutsideClick = false,
-      disableEscapeKey = false,
-      className,
-      style,
-      ...props
-    },
-    forwardedRef,
-  ) {
-    const { open, onOpenChange, anchorRef, contentId, triggerId } = useFloatContext();
-    const internalRef = React.useRef<HTMLDivElement>(null);
-    const contentRef = forwardedRef
-      ? (forwardedRef as React.RefObject<HTMLDivElement>)
-      : internalRef;
+const FloatContent = React.forwardRef<HTMLDivElement, FloatContentProps>(function FloatContent(
+  {
+    children,
+    asChild,
+    forceMount,
+    side = 'bottom',
+    align = 'center',
+    sideOffset = 4,
+    alignOffset = 0,
+    avoidCollisions = true,
+    collisionPadding = 10,
+    container,
+    disablePortal = false,
+    onEscapeKeyDown: onEscapeKeyDownProp,
+    onPointerDownOutside: onPointerDownOutsideProp,
+    onFocusOutside,
+    disableOutsideClick = false,
+    disableEscapeKey = false,
+    className,
+    style,
+    ...props
+  },
+  forwardedRef,
+) {
+  const { open, onOpenChange, anchorRef, contentId, triggerId } = useFloatContext();
+  const internalRef = React.useRef<HTMLDivElement>(null);
+  const contentRef = forwardedRef ? (forwardedRef as React.RefObject<HTMLDivElement>) : internalRef;
   const [position, setPosition] = React.useState<PositionState>({
     x: 0,
     y: 0,
@@ -264,7 +269,17 @@ const FloatContent = React.forwardRef<HTMLDivElement, FloatContentProps>(
       window.removeEventListener('scroll', updatePosition, { capture: true });
       window.removeEventListener('resize', updatePosition);
     };
-  }, [open, side, align, sideOffset, alignOffset, avoidCollisions, collisionPadding, anchorRef]);
+  }, [
+    open,
+    side,
+    align,
+    sideOffset,
+    alignOffset,
+    avoidCollisions,
+    collisionPadding,
+    anchorRef,
+    contentRef,
+  ]);
 
   // Escape key handler
   React.useEffect(() => {
@@ -299,7 +314,7 @@ const FloatContent = React.forwardRef<HTMLDivElement, FloatContentProps>(
     });
 
     return cleanup;
-  }, [open, onOpenChange, onPointerDownOutsideProp, disableOutsideClick, anchorRef]);
+  }, [open, onOpenChange, onPointerDownOutsideProp, disableOutsideClick, anchorRef, contentRef]);
 
   // Determine if should render
   const shouldRender = forceMount || open;
@@ -330,11 +345,12 @@ const FloatContent = React.forwardRef<HTMLDivElement, FloatContentProps>(
     ...props,
   };
 
-  const content = asChild && React.isValidElement(children) ? (
-    React.cloneElement(children, contentProps as Partial<unknown>)
-  ) : (
-    <div {...contentProps}>{children}</div>
-  );
+  const content =
+    asChild && React.isValidElement(children) ? (
+      React.cloneElement(children, contentProps as Partial<unknown>)
+    ) : (
+      <div {...contentProps}>{children}</div>
+    );
 
   // Portal to container or body
   if (!disablePortal) {
@@ -349,8 +365,7 @@ const FloatContent = React.forwardRef<HTMLDivElement, FloatContentProps>(
   }
 
   return content;
-  },
-);
+});
 
 FloatContent.displayName = 'Float.Content';
 
@@ -368,18 +383,14 @@ function FloatArrow({ width = 10, height = 5, className, style, ...props }: Floa
   };
 
   return (
-    <div
-      className={className}
-      style={arrowStyle}
-      aria-hidden="true"
-      {...props}
-    >
+    <div className={className} style={arrowStyle} aria-hidden="true" {...props}>
       <svg
         width={width}
         height={height}
         viewBox={`0 0 ${width} ${height}`}
         fill="currentColor"
         style={{ display: 'block' }}
+        aria-hidden="true"
       >
         <polygon points={`0,${height} ${width / 2},0 ${width},${height}`} />
       </svg>
