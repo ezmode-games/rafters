@@ -27,25 +27,52 @@ import type * as React from 'react';
 import classy from '../../primitives/classy';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  /** Visual variant */
-  variant?: 'default' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'outline';
+  /** Visual variant per docs/COMPONENT_STYLING_REFERENCE.md */
+  variant?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'destructive'
+    | 'success'
+    | 'warning'
+    | 'info'
+    | 'muted'
+    | 'accent'
+    | 'outline';
+  /** Size variant */
+  size?: 'sm' | 'default' | 'lg';
 }
 
+// Variant classes per docs/COMPONENT_STYLING_REFERENCE.md
 const variantClasses: Record<string, string> = {
   default: 'bg-primary text-primary-foreground',
+  primary: 'bg-primary text-primary-foreground',
   secondary: 'bg-secondary text-secondary-foreground',
   destructive: 'bg-destructive text-destructive-foreground',
   success: 'bg-success text-success-foreground',
   warning: 'bg-warning text-warning-foreground',
   info: 'bg-info text-info-foreground',
+  muted: 'bg-muted text-muted-foreground',
+  accent: 'bg-accent text-accent-foreground',
   outline: 'bg-transparent border border-input text-foreground',
 };
 
-export function Badge({ className, variant = 'default', ...props }: BadgeProps) {
-  const baseClasses =
-    'inline-flex items-center justify-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors';
+const sizeClasses: Record<string, string> = {
+  sm: 'px-2 py-0.5 text-xs',
+  default: 'px-2.5 py-0.5 text-xs',
+  lg: 'px-3 py-1 text-sm',
+};
 
-  const classes = classy(baseClasses, variantClasses[variant] ?? variantClasses.default, className);
+export function Badge({ className, variant = 'default', size = 'default', ...props }: BadgeProps) {
+  const baseClasses =
+    'inline-flex items-center justify-center rounded-full font-semibold transition-colors';
+
+  const classes = classy(
+    baseClasses,
+    variantClasses[variant] ?? variantClasses.default,
+    sizeClasses[size] ?? sizeClasses.default,
+    className,
+  );
 
   return <span className={classes} {...props} />;
 }

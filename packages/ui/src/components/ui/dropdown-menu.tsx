@@ -426,7 +426,7 @@ export const DropdownMenuContent = React.forwardRef<HTMLDivElement, DropdownMenu
 
     const contentStyle: React.CSSProperties = {
       ...style,
-      position: 'absolute',
+      position: 'fixed',
       left: 0,
       top: 0,
       transform: `translate(${Math.round(position.x)}px, ${Math.round(position.y)}px)`,
@@ -453,19 +453,28 @@ export const DropdownMenuContent = React.forwardRef<HTMLDivElement, DropdownMenu
       ...props,
     };
 
+    let content: React.ReactNode;
+
     if (asChild && React.isValidElement(props.children)) {
-      return (
+      content = (
         <DropdownMenuContentContext.Provider value={contentContextValue}>
           {React.cloneElement(props.children, contentProps as Partial<unknown>)}
         </DropdownMenuContentContext.Provider>
       );
+    } else {
+      content = (
+        <DropdownMenuContentContext.Provider value={contentContextValue}>
+          <div {...contentProps} />
+        </DropdownMenuContentContext.Provider>
+      );
     }
 
-    return (
-      <DropdownMenuContentContext.Provider value={contentContextValue}>
-        <div {...contentProps} />
-      </DropdownMenuContentContext.Provider>
-    );
+    // Portal to body for proper positioning
+    const portalContainer = getPortalContainer({ enabled: true });
+    if (portalContainer) {
+      return createPortal(content, portalContainer);
+    }
+    return content;
   },
 );
 

@@ -171,6 +171,25 @@ function groupTokens(tokens: Token[]): GroupedTokens {
 }
 
 /**
+ * Generate @theme inline block for semantic color bridges
+ * These reference :root variables and must use @theme inline for dynamic resolution
+ * @see https://tailwindcss.com/docs/theme#using-custom-values
+ */
+function generateThemeInlineBlock(): string {
+  const semanticMappings = getSemanticMappings();
+  const lines: string[] = [];
+  lines.push('@theme inline {');
+
+  // Semantic color bridges (reference :root variables)
+  for (const name of Object.keys(semanticMappings)) {
+    lines.push(`  --color-${name}: var(--${name});`);
+  }
+
+  lines.push('}');
+  return lines.join('\n');
+}
+
+/**
  * Generate :root block with --rafters-* namespace and dark mode via media query
  * Reads from DEFAULT_SEMANTIC_COLOR_MAPPINGS via getSemanticMappings()
  */
@@ -224,10 +243,9 @@ function generateRootBlock(): string {
 
 /**
  * Generate @theme block with raw color scales and utility tokens
- * Reads from DEFAULT_SEMANTIC_COLOR_MAPPINGS via getSemanticMappings()
+ * Note: Semantic color bridges are NOT included here - they go in @theme inline
  */
 function generateThemeBlock(groups: GroupedTokens): string {
-  const semanticMappings = getSemanticMappings();
   const lines: string[] = [];
   lines.push('@theme {');
 
@@ -239,12 +257,6 @@ function generateThemeBlock(groups: GroupedTokens): string {
     }
     lines.push('');
   }
-
-  // Semantic color bridges (reference :root variables)
-  for (const name of Object.keys(semanticMappings)) {
-    lines.push(`  --color-${name}: var(--${name});`);
-  }
-  lines.push('');
 
   // Spacing tokens
   if (groups.spacing.length > 0) {
@@ -431,6 +443,11 @@ export function tokensToTailwind(tokens: Token[], options: TailwindExportOptions
   // @theme block with raw color scales and utility tokens
   const themeBlock = generateThemeBlock(groups);
   sections.push(themeBlock);
+  sections.push('');
+
+  // @theme inline block for semantic color bridges (reference :root variables)
+  const themeInlineBlock = generateThemeInlineBlock();
+  sections.push(themeInlineBlock);
   sections.push('');
 
   // :root block with --rafters-* namespace and dark mode

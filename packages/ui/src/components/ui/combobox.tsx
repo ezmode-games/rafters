@@ -494,7 +494,7 @@ export function ComboboxContent({
 
   const contentStyle: React.CSSProperties = {
     ...style,
-    position: 'absolute',
+    position: 'fixed',
     left: 0,
     top: 0,
     transform: `translate(${Math.round(position.x)}px, ${Math.round(position.y)}px)`,

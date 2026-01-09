@@ -202,6 +202,49 @@ importers:
         specifier: ^4.54.0
         version: 4.54.0(@cloudflare/workers-types@4.20251213.0)
 
+  apps/demo:
+    dependencies:
+      '@astrojs/cloudflare':
+        specifier: ^12.6.12
+        version: 12.6.12(@types/node@24.10.0)(astro@5.16.5(@types/node@24.10.0)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.52.5)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
+      '@astrojs/react':
+        specifier: ^4.4.2
+        version: 4.4.2(@types/node@24.10.0)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(jiti@2.6.1)(lightningcss@1.30.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
+      '@rafters/design-tokens':
+        specifier: workspace:*
+        version: link:../../packages/design-tokens
+      '@rafters/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@tailwindcss/vite':
+        specifier: ^4.1.18
+        version: 4.1.18(vite@7.1.12(@types/node@24.10.0)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.2
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.2.2(@types/react@19.2.2)
+      astro:
+        specifier: ^5.16.5
+        version: 5.16.5(@types/node@24.10.0)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.52.5)(terser@5.44.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.0
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.0(react@19.2.0)
+      tailwindcss:
+        specifier: ^4.1.18
+        version: 4.1.18
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.10.0
+      wrangler:
+        specifier: ^4.54.0
+        version: 4.54.0(@cloudflare/workers-types@4.20251213.0)
+
   apps/website:
     dependencies:
       '@astrojs/cloudflare':

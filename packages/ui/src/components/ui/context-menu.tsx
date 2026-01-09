@@ -413,19 +413,27 @@ export const ContextMenuContent = React.forwardRef<HTMLDivElement, ContextMenuCo
       ...props,
     };
 
+    let content: React.ReactNode;
+
     if (asChild && React.isValidElement(props.children)) {
-      return (
+      content = (
         <ContextMenuContentContext.Provider value={contentContextValue}>
           {React.cloneElement(props.children, contentProps as Partial<unknown>)}
         </ContextMenuContentContext.Provider>
       );
+    } else {
+      content = (
+        <ContextMenuContentContext.Provider value={contentContextValue}>
+          <div {...contentProps} />
+        </ContextMenuContentContext.Provider>
+      );
     }
 
-    return (
-      <ContextMenuContentContext.Provider value={contentContextValue}>
-        <div {...contentProps} />
-      </ContextMenuContentContext.Provider>
-    );
+    const portalContainer = getPortalContainer({ enabled: true });
+    if (portalContainer) {
+      return createPortal(content, portalContainer);
+    }
+    return content;
   },
 );
 

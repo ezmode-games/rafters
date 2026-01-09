@@ -785,3 +785,153 @@ describe('AlertDialog - Escape Key Prevention', () => {
     expect(screen.getByText('Cannot Escape')).toBeInTheDocument();
   });
 });
+
+describe('AlertDialog - shadcn Drop-in Replacement (no explicit Portal/Overlay)', () => {
+  beforeEach(() => {
+    document.body.textContent = '';
+  });
+
+  it('should work without explicit AlertDialogPortal and AlertDialogOverlay', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <AlertDialog>
+        <AlertDialogTrigger>Open</AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>,
+    );
+
+    // Initially closed
+    expect(screen.queryByText('Are you sure?')).not.toBeInTheDocument();
+
+    // Click trigger to open
+    await user.click(screen.getByText('Open'));
+
+    // Should open with Portal and Overlay automatically
+    await waitFor(() => {
+      expect(screen.getByText('Are you sure?')).toBeInTheDocument();
+      expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+    });
+
+    // Overlay should be present (check for the backdrop)
+    const overlays = document.querySelectorAll('[data-state="open"][aria-hidden="true"]');
+    expect(overlays.length).toBeGreaterThan(0);
+
+    // Click cancel to close
+    await user.click(screen.getByText('Cancel'));
+
+    await waitFor(() => {
+      expect(screen.queryByText('Are you sure?')).not.toBeInTheDocument();
+    });
+  });
+
+  it('should NOT have a close X button (unlike Dialog)', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <AlertDialog>
+        <AlertDialogTrigger>Open</AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Action</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction>Confirm</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>,
+    );
+
+    await user.click(screen.getByText('Open'));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+    });
+
+    // There should NOT be a close button with aria-label="Close"
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+  });
+
+  it('should have correct default styles on content', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <AlertDialog>
+        <AlertDialogTrigger>Open</AlertDialogTrigger>
+        <AlertDialogContent data-testid="content">
+          <AlertDialogTitle>Styled Content</AlertDialogTitle>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+        </AlertDialogContent>
+      </AlertDialog>,
+    );
+
+    await user.click(screen.getByText('Open'));
+
+    await waitFor(() => {
+      const content = screen.getByTestId('content');
+      expect(content).toHaveClass('relative', 'grid', 'w-full', 'max-w-lg');
+    });
+  });
+
+  it('should work with defaultOpen and auto Portal/Overlay', async () => {
+    render(
+      <AlertDialog defaultOpen>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Default Open Test</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Default Open Test')).toBeInTheDocument();
+      expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+    });
+  });
+
+  it('should close on escape key in shadcn style', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <AlertDialog>
+        <AlertDialogTrigger>Open</AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Escape Test</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>,
+    );
+
+    await user.click(screen.getByText('Open'));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+    });
+
+    // Press escape to close
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => {
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    });
+  });
+});

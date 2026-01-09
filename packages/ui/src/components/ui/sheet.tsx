@@ -16,6 +16,19 @@
  *
  * @example
  * ```tsx
+ * // Minimal usage - Portal, Overlay, and Close button are included automatically
+ * <Sheet>
+ *   <SheetTrigger>Open</SheetTrigger>
+ *   <SheetContent side="right">
+ *     <SheetHeader>
+ *       <SheetTitle>Title</SheetTitle>
+ *       <SheetDescription>Description</SheetDescription>
+ *     </SheetHeader>
+ *     Content here
+ *   </SheetContent>
+ * </Sheet>
+ *
+ * // Or with namespace syntax
  * <Sheet>
  *   <Sheet.Trigger asChild>
  *     <Button variant="outline">Open</Button>
@@ -27,6 +40,9 @@
  *     Sheet content here
  *   </Sheet.Content>
  * </Sheet>
+ *
+ * // Hide close button if needed
+ * <SheetContent showCloseButton={false}>...</SheetContent>
  * ```
  */
 
@@ -61,6 +77,13 @@ function useSheetContext() {
     throw new Error('Sheet components must be used within Sheet.Root');
   }
   return context;
+}
+
+// Context to track if we're inside a portal (to avoid double-wrapping)
+const SheetPortalContext = React.createContext<boolean>(false);
+
+function useIsInsidePortal() {
+  return React.useContext(SheetPortalContext);
 }
 
 // ==================== Sheet.Root ====================
@@ -171,7 +194,10 @@ export function SheetPortal({ children, container, forceMount }: SheetPortalProp
     return null;
   }
 
-  return createPortal(children, portalContainer);
+  return createPortal(
+    <SheetPortalContext.Provider value={true}>{children}</SheetPortalContext.Provider>,
+    portalContainer,
+  );
 }
 
 // ==================== Sheet.Overlay ====================
@@ -221,6 +247,10 @@ export interface SheetContentProps extends React.HTMLAttributes<HTMLDivElement> 
   onEscapeKeyDown?: (event: KeyboardEvent) => void;
   onPointerDownOutside?: (event: PointerEvent | TouchEvent) => void;
   onInteractOutside?: (event: Event) => void;
+  /** Whether to show the close button in top-right corner. Defaults to true. */
+  showCloseButton?: boolean;
+  /** Container element for the portal. Defaults to document.body. */
+  container?: HTMLElement | null;
 }
 
 const sideVariants = {
@@ -241,11 +271,17 @@ export function SheetContent({
   onEscapeKeyDown: onEscapeKeyDownProp,
   onPointerDownOutside: onPointerDownOutsideProp,
   onInteractOutside,
+  showCloseButton,
+  container,
   className,
   children,
   ...props
 }: SheetContentProps) {
   const { open, onOpenChange, contentId, titleId, descriptionId, modal } = useSheetContext();
+  const isInsidePortal = useIsInsidePortal();
+
+  // Default showCloseButton to true (shadcn-style: always show close button)
+  const shouldShowCloseButton = showCloseButton ?? true;
   const contentRef = React.useRef<HTMLDivElement>(null);
 
   // Focus trap
@@ -315,6 +351,29 @@ export function SheetContent({
     className,
   );
 
+  // Close button component (X icon)
+  const closeButton = shouldShowCloseButton ? (
+    <SheetClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+      <svg
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-4 w-4"
+      >
+        <path d="M18 6 6 18" />
+        <path d="m6 6 12 12" />
+      </svg>
+      <span className="sr-only">Close</span>
+    </SheetClose>
+  ) : null;
+
   const contentProps = {
     ref: contentRef,
     id: contentId,
@@ -323,33 +382,40 @@ export function SheetContent({
     ...props,
   } as React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> };
 
-  if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children, contentProps as Partial<unknown>);
+  // The core content to render
+  const renderContent = () => {
+    if (asChild && React.isValidElement(children)) {
+      return React.cloneElement(children, contentProps as Partial<unknown>);
+    }
+
+    return (
+      <div {...contentProps}>
+        {children}
+        {closeButton}
+      </div>
+    );
+  };
+
+  // If already inside a portal (user used SheetPortal explicitly), just render content
+  if (isInsidePortal) {
+    return renderContent();
   }
 
+  // Otherwise, wrap with Portal and Overlay automatically (shadcn-style)
+  // Build portal props, only including defined values
+  const portalProps: SheetPortalProps = { children: null as unknown as React.ReactNode };
+  if (container !== undefined) portalProps.container = container;
+  if (forceMount !== undefined) portalProps.forceMount = forceMount;
+
+  // Build overlay props, only including defined values
+  const overlayProps: SheetOverlayProps = {};
+  if (forceMount !== undefined) overlayProps.forceMount = forceMount;
+
   return (
-    <div {...contentProps}>
-      {children}
-      <SheetClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
-        <svg
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="h-4 w-4"
-        >
-          <path d="M18 6 6 18" />
-          <path d="m6 6 12 12" />
-        </svg>
-        <span className="sr-only">Close</span>
-      </SheetClose>
-    </div>
+    <SheetPortal {...portalProps}>
+      <SheetOverlay {...overlayProps} />
+      {renderContent()}
+    </SheetPortal>
   );
 }
 

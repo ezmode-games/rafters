@@ -50,15 +50,29 @@ import * as React from 'react';
 import classy from '../../primitives/classy';
 
 export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'info' | 'success' | 'warning' | 'destructive';
+  variant?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'destructive'
+    | 'success'
+    | 'warning'
+    | 'info'
+    | 'muted'
+    | 'accent';
 }
 
+// Variant classes per docs/COMPONENT_STYLING_REFERENCE.md - using -subtle for alert backgrounds
 const variantClasses: Record<string, string> = {
-  default: 'bg-background text-foreground border-border',
-  info: 'bg-info-subtle text-info-foreground border-info-border',
+  default: 'bg-primary-subtle text-primary-foreground border-primary-border',
+  primary: 'bg-primary-subtle text-primary-foreground border-primary-border',
+  secondary: 'bg-secondary-subtle text-secondary-foreground border-secondary-border',
+  destructive: 'bg-destructive-subtle text-destructive-foreground border-destructive-border',
   success: 'bg-success-subtle text-success-foreground border-success-border',
   warning: 'bg-warning-subtle text-warning-foreground border-warning-border',
-  destructive: 'bg-destructive-subtle text-destructive-foreground border-destructive-border',
+  info: 'bg-info-subtle text-info-foreground border-info-border',
+  muted: 'bg-muted text-muted-foreground border-border',
+  accent: 'bg-accent-subtle text-accent-foreground border-accent-border',
 };
 
 export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(

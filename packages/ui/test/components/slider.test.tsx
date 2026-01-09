@@ -251,7 +251,7 @@ describe('Slider', () => {
     it('has focus-visible ring on thumb', () => {
       render(<Slider aria-label="Volume" />);
       const slider = screen.getByRole('slider');
-      expect(slider).toHaveClass('focus-visible:ring-2', 'focus-visible:ring-ring');
+      expect(slider).toHaveClass('focus-visible:ring-2', 'focus-visible:ring-primary-ring');
     });
   });
 

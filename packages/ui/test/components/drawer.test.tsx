@@ -514,7 +514,7 @@ describe('Drawer - Focus Management', () => {
     render(
       <Drawer defaultOpen>
         <DrawerPortal>
-          <DrawerContent>
+          <DrawerContent showCloseButton={false} draggable={false}>
             <DrawerTitle>Focus Trap</DrawerTitle>
             <button type="button">First</button>
             <button type="button">Second</button>
@@ -872,19 +872,142 @@ describe('Drawer - Drag handle position based on side', () => {
   it('should position drag handle at bottom for top drawer', async () => {
     render(
       <Drawer defaultOpen side="top">
-        <DrawerPortal>
-          <DrawerContent data-testid="drawer-content">
-            <DrawerTitle>Top Drawer</DrawerTitle>
-          </DrawerContent>
-        </DrawerPortal>
+        <DrawerContent data-testid="drawer-content" showCloseButton={false}>
+          <DrawerTitle>Top Drawer</DrawerTitle>
+        </DrawerContent>
       </Drawer>,
     );
 
     await waitFor(() => {
       const content = screen.getByTestId('drawer-content');
       const handle = content.querySelector('[data-drawer-handle]');
-      // Handle should be the last child for top drawer
+      // Handle should be the last child for top drawer (when close button is hidden)
       expect(content.lastElementChild).toBe(handle);
     });
+  });
+});
+
+describe('Drawer - Simplified API (auto Portal/Overlay)', () => {
+  beforeEach(() => {
+    cleanup();
+  });
+
+  it('should auto-wrap with Portal and Overlay when not inside explicit portal', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <Drawer>
+        <DrawerTrigger>Open</DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Simple Title</DrawerTitle>
+            <DrawerDescription>Simple Description</DrawerDescription>
+          </DrawerHeader>
+          Content here
+          <DrawerFooter>
+            <DrawerClose>Cancel</DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>,
+    );
+
+    // Initially closed
+    expect(screen.queryByText('Simple Title')).not.toBeInTheDocument();
+
+    // Click trigger
+    await user.click(screen.getByText('Open'));
+
+    // Should open with content and overlay rendered
+    await waitFor(() => {
+      expect(screen.getByText('Simple Title')).toBeInTheDocument();
+      expect(screen.getByText('Simple Description')).toBeInTheDocument();
+      expect(screen.getByText('Content here')).toBeInTheDocument();
+    });
+
+    // Overlay should be rendered (data-state="open" on overlay element)
+    const overlay = document.querySelector('[data-state="open"][aria-hidden="true"]');
+    expect(overlay).toBeInTheDocument();
+  });
+
+  it('should render close button by default', async () => {
+    render(
+      <Drawer defaultOpen>
+        <DrawerContent>
+          <DrawerTitle>Title</DrawerTitle>
+        </DrawerContent>
+      </Drawer>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Title')).toBeInTheDocument();
+    });
+
+    // Close button should be rendered with X icon
+    const closeButton = screen.getByRole('button', { name: /close/i });
+    expect(closeButton).toBeInTheDocument();
+  });
+
+  it('should hide close button when showCloseButton is false', async () => {
+    render(
+      <Drawer defaultOpen>
+        <DrawerContent showCloseButton={false}>
+          <DrawerTitle>Title</DrawerTitle>
+        </DrawerContent>
+      </Drawer>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Title')).toBeInTheDocument();
+    });
+
+    // Close button should NOT be rendered
+    const closeButton = screen.queryByRole('button', { name: /close/i });
+    expect(closeButton).not.toBeInTheDocument();
+  });
+
+  it('should close via close button click', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <Drawer defaultOpen>
+        <DrawerContent>
+          <DrawerTitle>Title</DrawerTitle>
+        </DrawerContent>
+      </Drawer>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Title')).toBeInTheDocument();
+    });
+
+    // Click close button
+    const closeButton = screen.getByRole('button', { name: /close/i });
+    await user.click(closeButton);
+
+    // Should close
+    await waitFor(() => {
+      expect(screen.queryByText('Title')).not.toBeInTheDocument();
+    });
+  });
+
+  it('should work with explicit DrawerPortal (no double wrapping)', async () => {
+    render(
+      <Drawer defaultOpen>
+        <DrawerPortal>
+          <DrawerOverlay data-testid="explicit-overlay" />
+          <DrawerContent data-testid="drawer-content">
+            <DrawerTitle>Explicit Portal</DrawerTitle>
+          </DrawerContent>
+        </DrawerPortal>
+      </Drawer>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Explicit Portal')).toBeInTheDocument();
+    });
+
+    // Only one overlay should exist (no double-wrapping)
+    const overlays = document.querySelectorAll('[data-testid="explicit-overlay"]');
+    expect(overlays).toHaveLength(1);
   });
 });

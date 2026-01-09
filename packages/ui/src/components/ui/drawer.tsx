@@ -19,26 +19,42 @@
  *
  * @example
  * ```tsx
+ * // Minimal usage - Portal, Overlay, and Close button are included automatically
+ * <Drawer>
+ *   <DrawerTrigger>Open</DrawerTrigger>
+ *   <DrawerContent>
+ *     <DrawerHeader>
+ *       <DrawerTitle>Title</DrawerTitle>
+ *       <DrawerDescription>Description</DrawerDescription>
+ *     </DrawerHeader>
+ *     Content here
+ *     <DrawerFooter>
+ *       <DrawerClose>Cancel</DrawerClose>
+ *     </DrawerFooter>
+ *   </DrawerContent>
+ * </Drawer>
+ *
+ * // Or with namespace syntax
  * <Drawer>
  *   <Drawer.Trigger asChild>
  *     <Button>Open Drawer</Button>
  *   </Drawer.Trigger>
- *   <Drawer.Portal>
- *     <Drawer.Overlay />
- *     <Drawer.Content>
- *       <Drawer.Header>
- *         <Drawer.Title>Actions</Drawer.Title>
- *         <Drawer.Description>Select an action</Drawer.Description>
- *       </Drawer.Header>
- *       <div>Drawer content here</div>
- *       <Drawer.Footer>
- *         <Drawer.Close asChild>
- *           <Button variant="outline">Cancel</Button>
- *         </Drawer.Close>
- *       </Drawer.Footer>
- *     </Drawer.Content>
- *   </Drawer.Portal>
+ *   <Drawer.Content>
+ *     <Drawer.Header>
+ *       <Drawer.Title>Actions</Drawer.Title>
+ *       <Drawer.Description>Select an action</Drawer.Description>
+ *     </Drawer.Header>
+ *     <div>Drawer content here</div>
+ *     <Drawer.Footer>
+ *       <Drawer.Close asChild>
+ *         <Button variant="outline">Cancel</Button>
+ *       </Drawer.Close>
+ *     </Drawer.Footer>
+ *   </Drawer.Content>
  * </Drawer>
+ *
+ * // Hide close button if needed
+ * <DrawerContent showCloseButton={false}>...</DrawerContent>
  * ```
  */
 
@@ -77,6 +93,13 @@ function useDrawerContext(): DrawerContextValue {
     throw new Error('Drawer components must be used within Drawer.Root');
   }
   return context;
+}
+
+// Context to track if we're inside a portal (to avoid double-wrapping)
+const DrawerPortalContext = React.createContext<boolean>(false);
+
+function useIsInsidePortal() {
+  return React.useContext(DrawerPortalContext);
 }
 
 // ==================== Drawer.Root ====================
@@ -203,7 +226,10 @@ export function DrawerPortal({
     return null;
   }
 
-  return createPortal(children, portalContainer);
+  return createPortal(
+    <DrawerPortalContext.Provider value={true}>{children}</DrawerPortalContext.Provider>,
+    portalContainer,
+  );
 }
 
 // ==================== Drawer.Overlay ====================
@@ -261,6 +287,10 @@ export interface DrawerContentProps extends React.HTMLAttributes<HTMLDivElement>
   dismissThreshold?: number;
   /** Enable drag-to-dismiss gesture. Defaults to true. */
   draggable?: boolean;
+  /** Whether to show the close button in top-right corner. Defaults to true. */
+  showCloseButton?: boolean;
+  /** Container element for the portal. Defaults to document.body. */
+  container?: HTMLElement | null;
 }
 
 const sideVariants = {
@@ -290,11 +320,17 @@ export function DrawerContent({
   onInteractOutside,
   dismissThreshold = 100,
   draggable = true,
+  showCloseButton,
+  container,
   className,
   children,
   ...props
 }: DrawerContentProps): React.JSX.Element | null {
   const { open, onOpenChange, contentId, titleId, descriptionId, modal, side } = useDrawerContext();
+  const isInsidePortal = useIsInsidePortal();
+
+  // Default showCloseButton to true (shadcn-style: always show close button)
+  const shouldShowCloseButton = showCloseButton ?? true;
   const contentRef = React.useRef<HTMLDivElement>(null);
 
   // Drag state for touch gestures
@@ -517,16 +553,65 @@ export function DrawerContent({
     );
   };
 
-  if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children, contentProps as Partial<unknown>);
+  // Close button component (X icon)
+  const closeButton = shouldShowCloseButton ? (
+    <DrawerClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+      <svg
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-4 w-4"
+      >
+        <path d="M18 6 6 18" />
+        <path d="m6 6 12 12" />
+      </svg>
+      <span className="sr-only">Close</span>
+    </DrawerClose>
+  ) : null;
+
+  // The core content to render
+  const renderContent = () => {
+    if (asChild && React.isValidElement(children)) {
+      return React.cloneElement(children, contentProps as Partial<unknown>);
+    }
+
+    return (
+      <div {...contentProps}>
+        {(side === 'bottom' || side === 'right') && renderHandle()}
+        <div className="flex-1 overflow-auto p-6">{children}</div>
+        {(side === 'top' || side === 'left') && renderHandle()}
+        {closeButton}
+      </div>
+    );
+  };
+
+  // If already inside a portal (user used DrawerPortal explicitly), just render content
+  if (isInsidePortal) {
+    return renderContent();
   }
 
+  // Otherwise, wrap with Portal and Overlay automatically (shadcn-style)
+  // Build portal props, only including defined values
+  const portalProps: DrawerPortalProps = { children: null as unknown as React.ReactNode };
+  if (container !== undefined) portalProps.container = container;
+  if (forceMount !== undefined) portalProps.forceMount = forceMount;
+
+  // Build overlay props, only including defined values
+  const overlayProps: DrawerOverlayProps = {};
+  if (forceMount !== undefined) overlayProps.forceMount = forceMount;
+
   return (
-    <div {...contentProps}>
-      {(side === 'bottom' || side === 'right') && renderHandle()}
-      <div className="flex-1 overflow-auto p-6">{children}</div>
-      {(side === 'top' || side === 'left') && renderHandle()}
-    </div>
+    <DrawerPortal {...portalProps}>
+      <DrawerOverlay {...overlayProps} />
+      {renderContent()}
+    </DrawerPortal>
   );
 }
 

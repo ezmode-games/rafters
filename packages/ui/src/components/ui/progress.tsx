@@ -42,14 +42,47 @@ export interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
   max?: number;
   /** Callback to generate accessible value text. */
   getValueLabel?: (value: number, max: number) => string;
+  /** Visual variant per docs/COMPONENT_STYLING_REFERENCE.md */
+  variant?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'destructive'
+    | 'success'
+    | 'warning'
+    | 'info'
+    | 'accent';
+  /** Size variant */
+  size?: 'sm' | 'default' | 'lg';
 }
+
+// Variant classes for the indicator
+const variantClasses: Record<string, string> = {
+  default: 'bg-primary',
+  primary: 'bg-primary',
+  secondary: 'bg-secondary',
+  destructive: 'bg-destructive',
+  success: 'bg-success',
+  warning: 'bg-warning',
+  info: 'bg-info',
+  accent: 'bg-accent',
+};
+
+const sizeClasses: Record<string, string> = {
+  sm: 'h-1',
+  default: 'h-2',
+  lg: 'h-3',
+};
 
 function defaultValueLabel(value: number, max: number): string {
   return `${Math.round((value / max) * 100)}%`;
 }
 
 export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
-  ({ className, value, max = 100, getValueLabel, ...props }, ref) => {
+  (
+    { className, value, max = 100, getValueLabel, variant = 'default', size = 'default', ...props },
+    ref,
+  ) => {
     const isIndeterminate = value === undefined;
     const clampedValue = isIndeterminate ? 0 : Math.min(Math.max(value, 0), max);
     const percentage = (clampedValue / max) * 100;
@@ -60,13 +93,18 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
         ? getValueLabel(clampedValue, max)
         : defaultValueLabel(clampedValue, max);
 
+    const s = sizeClasses[size] ?? sizeClasses.default;
+    const v = variantClasses[variant] ?? variantClasses.default;
+
     const containerClasses = classy(
-      'relative h-2 w-full overflow-hidden rounded-full bg-muted',
+      'relative w-full overflow-hidden rounded-full bg-muted',
+      s,
       className,
     );
 
     const indicatorClasses = classy(
-      'h-full bg-primary transition-all duration-normal motion-reduce:transition-none',
+      'h-full transition-all duration-normal motion-reduce:transition-none',
+      v,
       isIndeterminate && 'animate-progress-indeterminate motion-reduce:animate-none',
     );
 

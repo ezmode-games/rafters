@@ -579,11 +579,19 @@ export function HoverCardContent({
     ...props,
   };
 
+  let content: React.ReactElement;
+
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children, contentProps as Partial<unknown>);
+    content = React.cloneElement(children, contentProps as Partial<unknown>);
+  } else {
+    content = <div {...contentProps}>{children}</div>;
   }
 
-  return <div {...contentProps}>{children}</div>;
+  const portalContainer = getPortalContainer({ enabled: true });
+  if (portalContainer) {
+    return createPortal(content, portalContainer);
+  }
+  return content;
 }
 
 // ==================== Namespaced Export (shadcn style) ====================
