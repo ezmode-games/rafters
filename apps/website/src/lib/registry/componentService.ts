@@ -268,8 +268,7 @@ function extractPrimitiveDependencies(content: string, isPrimitive = false): str
       pkg.includes('../../primitives/') ||
       isSiblingImport;
 
-    if (isPrimitiveImport
-    ) {
+    if (isPrimitiveImport) {
       const primitiveName = basename(pkg, '.ts');
       if (!primitives.includes(primitiveName) && primitiveName !== 'types') {
         primitives.push(primitiveName);
