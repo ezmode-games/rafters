@@ -16,15 +16,35 @@
  *
  * @example
  * ```tsx
+ * // Minimal usage - Portal and Overlay are included automatically, no close X button
+ * <AlertDialog>
+ *   <AlertDialogTrigger>Delete</AlertDialogTrigger>
+ *   <AlertDialogContent>
+ *     <AlertDialogHeader>
+ *       <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+ *       <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+ *     </AlertDialogHeader>
+ *     <AlertDialogFooter>
+ *       <AlertDialogCancel>Cancel</AlertDialogCancel>
+ *       <AlertDialogAction>Delete</AlertDialogAction>
+ *     </AlertDialogFooter>
+ *   </AlertDialogContent>
+ * </AlertDialog>
+ *
+ * // Or with namespace syntax
  * <AlertDialog>
  *   <AlertDialog.Trigger asChild>
  *     <Button variant="destructive">Delete</Button>
  *   </AlertDialog.Trigger>
  *   <AlertDialog.Content>
- *     <AlertDialog.Title>Are you sure?</AlertDialog.Title>
- *     <AlertDialog.Description>This action cannot be undone.</AlertDialog.Description>
- *     <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
- *     <AlertDialog.Action>Delete</AlertDialog.Action>
+ *     <AlertDialog.Header>
+ *       <AlertDialog.Title>Are you sure?</AlertDialog.Title>
+ *       <AlertDialog.Description>This action cannot be undone.</AlertDialog.Description>
+ *     </AlertDialog.Header>
+ *     <AlertDialog.Footer>
+ *       <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+ *       <AlertDialog.Action>Delete</AlertDialog.Action>
+ *     </AlertDialog.Footer>
  *   </AlertDialog.Content>
  * </AlertDialog>
  * ```
@@ -55,6 +75,13 @@ function useAlertDialogContext() {
     throw new Error('AlertDialog components must be used within AlertDialog');
   }
   return context;
+}
+
+// Context to track if we're inside a portal (to avoid double-wrapping)
+const AlertDialogPortalContext = React.createContext<boolean>(false);
+
+function useIsInsidePortal() {
+  return React.useContext(AlertDialogPortalContext);
 }
 
 // ==================== AlertDialog (Root) ====================
@@ -171,7 +198,10 @@ export function AlertDialogPortal({ children, container, forceMount }: AlertDial
     return null;
   }
 
-  return createPortal(children, portalContainer);
+  return createPortal(
+    <AlertDialogPortalContext.Provider value={true}>{children}</AlertDialogPortalContext.Provider>,
+    portalContainer,
+  );
 }
 
 // ==================== AlertDialogOverlay ====================
@@ -221,6 +251,8 @@ export interface AlertDialogContentProps extends React.HTMLAttributes<HTMLDivEle
   onOpenAutoFocus?: (event: Event) => void;
   onCloseAutoFocus?: (event: Event) => void;
   onEscapeKeyDown?: (event: KeyboardEvent) => void;
+  /** Container element for the portal. Defaults to document.body. */
+  container?: HTMLElement | null;
 }
 
 export function AlertDialogContent({
@@ -229,11 +261,14 @@ export function AlertDialogContent({
   onOpenAutoFocus: _onOpenAutoFocus,
   onCloseAutoFocus: _onCloseAutoFocus,
   onEscapeKeyDown: onEscapeKeyDownProp,
+  container,
   className,
+  children,
   ...props
 }: AlertDialogContentProps) {
   const { open, onOpenChange, contentId, titleId, descriptionId, cancelRef } =
     useAlertDialogContext();
+  const isInsidePortal = useIsInsidePortal();
   const contentRef = React.useRef<HTMLDivElement>(null);
 
   // Focus trap - with custom initial focus on cancel button
@@ -314,7 +349,11 @@ export function AlertDialogContent({
   // Render using a centered container
   const containerClass = classy('fixed inset-0 z-50 flex items-center justify-center p-4');
 
-  const innerClass = classy(className);
+  // Default styles matching shadcn AlertDialogContent
+  const innerClass = classy(
+    'relative grid w-full max-w-lg gap-4 border bg-background p-6 shadow-lg sm:rounded-lg',
+    className,
+  );
 
   const innerProps = {
     ref: contentRef,
@@ -324,16 +363,41 @@ export function AlertDialogContent({
     ...props,
   } as React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> };
 
-  // If asChild, clone the child with inner props
-  if (asChild && React.isValidElement(props.children)) {
-    const child = React.cloneElement(props.children, innerProps as Partial<unknown>);
-    return <div className={containerClass}>{child}</div>;
+  // The core content to render (NO close button for AlertDialog)
+  const renderContent = () => {
+    // If asChild, clone the child with inner props
+    if (asChild && React.isValidElement(children)) {
+      const child = React.cloneElement(children, innerProps as Partial<unknown>);
+      return <div className={containerClass}>{child}</div>;
+    }
+
+    return (
+      <div className={containerClass}>
+        <div {...innerProps}>{children}</div>
+      </div>
+    );
+  };
+
+  // If already inside a portal (user used AlertDialogPortal explicitly), just render content
+  if (isInsidePortal) {
+    return renderContent();
   }
 
+  // Otherwise, wrap with Portal and Overlay automatically (shadcn-style)
+  // Build portal props, only including defined values
+  const portalProps: AlertDialogPortalProps = { children: null as unknown as React.ReactNode };
+  if (container !== undefined) portalProps.container = container;
+  if (forceMount !== undefined) portalProps.forceMount = forceMount;
+
+  // Build overlay props, only including defined values
+  const overlayProps: AlertDialogOverlayProps = {};
+  if (forceMount !== undefined) overlayProps.forceMount = forceMount;
+
   return (
-    <div className={containerClass}>
-      <div {...innerProps} />
-    </div>
+    <AlertDialogPortal {...portalProps}>
+      <AlertDialogOverlay {...overlayProps} />
+      {renderContent()}
+    </AlertDialogPortal>
   );
 }
 

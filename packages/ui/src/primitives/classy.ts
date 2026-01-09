@@ -1,9 +1,20 @@
 /**
- * Classy — single smart class builder (cn + token-aware resolver)
+ * Classy — Tailwind-aware class builder with token resolution
  *
- * - Token refs are created with `token(key)` and resolved via a provided tokenMap.
- * - By default bracket/arbitrary Tailwind classes are disallowed and will be skipped with a warning.
+ * Features:
+ * - Full Tailwind syntax understanding (modifiers vs values)
+ * - Token refs for design system integration
+ * - Arbitrary value detection and blocking
+ * - Class deduplication and normalization
+ *
+ * Tailwind class structure: [modifier:]...[modifier:]utility[-value]
+ * - Modifiers can contain brackets: data-[state=open]:, aria-[checked]:, min-[320px]:
+ * - Utility values with brackets are arbitrary: w-[100px], bg-[#fff], text-[14px]
  */
+
+// ============================================================================
+// Types
+// ============================================================================
 
 export type ClassObject = Record<string, unknown>;
 export type ClassInput =
@@ -19,15 +30,37 @@ export type ClassInput =
 export type TokenMap = (key: string) => string | null;
 
 export interface ClassyOptions {
+  /** Resolve token references to class strings */
   tokenMap?: TokenMap;
-  allowArbitrary?: boolean; // allow bracketed arbitrary values like w-[10px]
+  /** Allow arbitrary values like w-[10px] (default: false) */
+  allowArbitrary?: boolean;
+  /** Custom warning handler */
   warn?: (msg: string) => void;
+  /** Custom class normalization */
   normalize?: (cls: string) => string;
 }
 
 export interface TokenRef {
   __classy_token: string;
 }
+
+/** Result of parsing a Tailwind class */
+export interface ParsedClass {
+  /** Original class string */
+  original: string;
+  /** Modifier chain (e.g., ['hover', 'dark', 'data-[state=open]']) */
+  modifiers: string[];
+  /** The utility part (e.g., 'bg-blue-500', 'w-[100px]') */
+  utility: string;
+  /** Whether the utility contains an arbitrary value */
+  isArbitrary: boolean;
+  /** Whether this is a valid Tailwind class structure */
+  isValid: boolean;
+}
+
+// ============================================================================
+// Token Reference
+// ============================================================================
 
 export function token(key: string): TokenRef {
   return { __classy_token: key };
@@ -37,118 +70,209 @@ function isTokenRef(v: unknown): v is TokenRef {
   return !!v && typeof v === 'object' && typeof (v as TokenRef).__classy_token === 'string';
 }
 
+// ============================================================================
+// Tailwind Class Parser
+// ============================================================================
+
+/**
+ * Parse a Tailwind class into its components.
+ * Handles bracket content correctly (brackets in modifiers vs arbitrary values).
+ *
+ * Examples:
+ * - "hover:bg-blue-500" → modifiers: ['hover'], utility: 'bg-blue-500', isArbitrary: false
+ * - "data-[state=open]:flex" → modifiers: ['data-[state=open]'], utility: 'flex', isArbitrary: false
+ * - "w-[100px]" → modifiers: [], utility: 'w-[100px]', isArbitrary: true
+ * - "hover:w-[100px]" → modifiers: ['hover'], utility: 'w-[100px]', isArbitrary: true
+ * - "supports-[display:grid]:grid" → modifiers: ['supports-[display:grid]'], utility: 'grid', isArbitrary: false
+ */
+export function parseTailwindClass(className: string): ParsedClass {
+  const original = className;
+  const modifiers: string[] = [];
+
+  // Find colon positions that are NOT inside brackets
+  // These separate modifiers from each other and from the utility
+  let depth = 0;
+  let lastSplit = 0;
+  const segments: string[] = [];
+
+  for (let i = 0; i < className.length; i++) {
+    const char = className[i];
+    if (char === '[') {
+      depth++;
+    } else if (char === ']') {
+      depth--;
+    } else if (char === ':' && depth === 0) {
+      segments.push(className.slice(lastSplit, i));
+      lastSplit = i + 1;
+    }
+  }
+  // Add the final segment (utility)
+  segments.push(className.slice(lastSplit));
+
+  // All segments except the last are modifiers
+  for (let i = 0; i < segments.length - 1; i++) {
+    const seg = segments[i];
+    if (seg) modifiers.push(seg);
+  }
+
+  // The last segment is the utility
+  const utility = segments[segments.length - 1] || '';
+
+  // Check if utility contains brackets (arbitrary value)
+  const isArbitrary = /\[.*\]/.test(utility);
+
+  // Basic validity check
+  const isValid = utility.length > 0;
+
+  return {
+    original,
+    modifiers,
+    utility,
+    isArbitrary,
+    isValid,
+  };
+}
+
+/**
+ * Check if a class contains an arbitrary value in the utility portion.
+ * Brackets in modifiers (data-[state=open]:) are NOT arbitrary.
+ * Brackets in the utility (w-[100px]) ARE arbitrary.
+ */
+export function hasArbitraryValue(className: string): boolean {
+  return parseTailwindClass(className).isArbitrary;
+}
+
+// ============================================================================
+// Utility Functions
+// ============================================================================
+
 function defaultWarn(msg: string) {
-  // keep it quiet in tests unless console.warn is stubbed
-  if (typeof console !== 'undefined' && console && console.warn) console.warn(msg);
+  if (typeof console !== 'undefined' && console?.warn) {
+    console.warn(msg);
+  }
 }
 
-function isBracketClass(s: string) {
-  return /\[.*\]/.test(s);
-}
-
-function flatten(inputs: ClassInput[], out: unknown[] = []) {
+function flatten(inputs: ClassInput[], out: unknown[] = []): unknown[] {
   for (const i of inputs) {
     if (i == null || i === false) continue;
-    if (Array.isArray(i)) flatten(i, out as ClassInput[]);
-    else out.push(i);
+    if (Array.isArray(i)) {
+      flatten(i, out);
+    } else {
+      out.push(i);
+    }
   }
   return out;
 }
 
+// ============================================================================
+// Class Builder
+// ============================================================================
+
 export function createClassy(options?: ClassyOptions) {
   const tokenMap = options?.tokenMap;
-  const allowArbitrary = !!options?.allowArbitrary;
+  const allowArbitrary = options?.allowArbitrary ?? false;
   const warn = options?.warn ?? defaultWarn;
   const normalize = options?.normalize ?? ((s: string) => s);
 
-  function build(...inputs: ClassInput[]) {
-    const flat = flatten(inputs as ClassInput[]);
+  /**
+   * Process a single class string, checking for arbitrary values
+   */
+  function processClass(
+    cls: string,
+    seen: Set<string>,
+    out: string[],
+  ): void {
+    if (!allowArbitrary && hasArbitraryValue(cls)) {
+      warn(`classy: arbitrary value '${cls}' skipped`);
+      return;
+    }
+
+    const norm = normalize(cls);
+    if (!seen.has(norm)) {
+      seen.add(norm);
+      out.push(norm);
+    }
+  }
+
+  /**
+   * Process a space-separated class string
+   */
+  function processClassString(
+    str: string,
+    seen: Set<string>,
+    out: string[],
+  ): void {
+    for (const part of str.split(/\s+/)) {
+      if (part) {
+        processClass(part, seen, out);
+      }
+    }
+  }
+
+  /**
+   * Build a class string from various inputs
+   */
+  function build(...inputs: ClassInput[]): string {
+    const flat = flatten(inputs);
     const seen = new Set<string>();
     const out: string[] = [];
 
     for (const item of flat) {
       if (item == null || item === false) continue;
 
-      // Token ref
+      // Token reference
       if (isTokenRef(item)) {
         const key = item.__classy_token;
         if (tokenMap) {
           const resolved = tokenMap(key);
           if (resolved) {
-            // resolved may contain multiple space-separated classes
-            for (const part of String(resolved).split(/\s+/).filter(Boolean)) {
-              if (!allowArbitrary && isBracketClass(part)) {
-                warn(`classy: arbitrary class '${part}' skipped`);
-                continue;
-              }
-              const norm = normalize(part);
-              if (!seen.has(norm)) {
-                seen.add(norm);
-                out.push(norm);
-              }
-            }
+            processClassString(resolved, seen, out);
           } else {
             warn(`classy: unknown token '${key}'`);
           }
         } else {
           warn(`classy: token '${key}' used but no tokenMap provided`);
         }
-
         continue;
       }
 
-      // Object form
+      // Object form { 'class-name': boolean }
       if (typeof item === 'object') {
         for (const k of Object.keys(item as ClassObject)) {
-          const v = (item as ClassObject)[k];
-          if (v) {
-            // k may be a tokenRef string marker? we treat as literal class
-            if (typeof k === 'string') {
-              for (const part of k.split(/\s+/).filter(Boolean)) {
-                if (!allowArbitrary && isBracketClass(part)) {
-                  warn(`classy: arbitrary class '${part}' skipped`);
-                  continue;
-                }
-                const norm = normalize(part);
-                if (!seen.has(norm)) {
-                  seen.add(norm);
-                  out.push(norm);
-                }
-              }
-            }
+          if ((item as ClassObject)[k]) {
+            processClassString(k, seen, out);
           }
         }
-
         continue;
       }
 
       // Primitive (string/number/boolean)
-      const s = String(item);
-      for (const part of s.split(/\s+/).filter(Boolean)) {
-        if (!allowArbitrary && isBracketClass(part)) {
-          warn(`classy: arbitrary class '${part}' skipped`);
-          continue;
-        }
-        const norm = normalize(part);
-        if (!seen.has(norm)) {
-          seen.add(norm);
-          out.push(norm);
-        }
-      }
+      processClassString(String(item), seen, out);
     }
 
-    return out.join(' ').trim();
+    return out.join(' ');
   }
 
+  // Attach utilities to the build function
   const instance = Object.assign(build, {
+    /** Create a token reference */
     token,
+    /** Create a new classy instance with different options */
     create: createClassy,
+    /** Parse a Tailwind class into components */
+    parse: parseTailwindClass,
+    /** Check if a class has arbitrary values */
+    hasArbitrary: hasArbitraryValue,
   });
 
-  return instance as typeof build & { token: typeof token; create: typeof createClassy };
+  return instance;
 }
 
-// default singleton
+// ============================================================================
+// Default Export
+// ============================================================================
+
+/** Default classy instance (arbitrary values blocked) */
 export const classy = createClassy();
 
 export default classy;

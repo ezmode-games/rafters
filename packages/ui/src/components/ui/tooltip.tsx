@@ -435,7 +435,7 @@ export function TooltipContent({
   }
 
   const contentClassName = classy(
-    'z-50 overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md',
+    'z-50 overflow-hidden rounded-md bg-foreground px-3 py-1.5 text-sm text-background shadow-md',
     'animate-in fade-in-0 zoom-in-95',
     className,
   );
@@ -461,11 +461,20 @@ export function TooltipContent({
     ...props,
   };
 
+  let content: React.ReactNode;
+
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children, contentProps as Partial<unknown>);
+    content = React.cloneElement(children, contentProps as Partial<unknown>);
+  } else {
+    content = <div {...contentProps}>{children}</div>;
   }
 
-  return <div {...contentProps}>{children}</div>;
+  // Portal to body
+  const portalContainer = getPortalContainer({ enabled: true });
+  if (portalContainer) {
+    return createPortal(content, portalContainer);
+  }
+  return content;
 }
 
 // ==================== Namespaced Export (shadcn style) ====================

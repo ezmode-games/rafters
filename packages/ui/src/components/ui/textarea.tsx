@@ -23,18 +23,45 @@
 import * as React from 'react';
 import classy from '../../primitives/classy';
 
-export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
+export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  variant?: 'default' | 'primary' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'muted' | 'accent';
+  size?: 'sm' | 'default' | 'lg';
+}
+
+// Variant classes per docs/COMPONENT_STYLING_REFERENCE.md
+const variantClasses: Record<string, string> = {
+  default: 'border-primary focus-visible:ring-2 focus-visible:ring-primary-ring',
+  primary: 'border-primary focus-visible:ring-2 focus-visible:ring-primary-ring',
+  secondary: 'border-secondary focus-visible:ring-2 focus-visible:ring-secondary-ring',
+  destructive: 'border-destructive focus-visible:ring-2 focus-visible:ring-destructive-ring',
+  success: 'border-success focus-visible:ring-2 focus-visible:ring-success-ring',
+  warning: 'border-warning focus-visible:ring-2 focus-visible:ring-warning-ring',
+  info: 'border-info focus-visible:ring-2 focus-visible:ring-info-ring',
+  muted: 'border-muted focus-visible:ring-2 focus-visible:ring-ring',
+  accent: 'border-accent focus-visible:ring-2 focus-visible:ring-accent-ring',
+};
+
+const sizeClasses: Record<string, string> = {
+  sm: 'min-h-16 px-2 py-1 text-xs',
+  default: 'min-h-20 px-3 py-2 text-sm',
+  lg: 'min-h-28 px-4 py-3 text-base',
+};
 
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, disabled, ...props }, ref) => {
+  ({ className, disabled, variant = 'default', size = 'default', ...props }, ref) => {
     const baseClasses =
-      'flex min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ' +
+      'flex w-full rounded-md border bg-background ' +
       'ring-offset-background ' +
       'placeholder:text-muted-foreground ' +
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ' +
+      'focus-visible:outline-none focus-visible:ring-offset-2 ' +
       'disabled:cursor-not-allowed disabled:opacity-50';
 
-    const cls = classy(baseClasses, className);
+    const cls = classy(
+      baseClasses,
+      variantClasses[variant] ?? variantClasses.default,
+      sizeClasses[size] ?? sizeClasses.default,
+      className,
+    );
 
     return (
       <textarea
@@ -42,6 +69,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         ref={ref}
         disabled={disabled}
         aria-disabled={disabled ? 'true' : undefined}
+        aria-invalid={variant === 'destructive' ? 'true' : undefined}
         {...props}
       />
     );

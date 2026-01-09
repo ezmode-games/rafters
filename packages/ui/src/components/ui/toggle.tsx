@@ -25,8 +25,8 @@ import * as React from 'react';
 import classy from '../../primitives/classy';
 
 export interface ToggleProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Visual variant */
-  variant?: 'default' | 'outline';
+  /** Visual variant per docs/COMPONENT_STYLING_REFERENCE.md */
+  variant?: 'default' | 'primary' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'accent' | 'outline' | 'ghost';
   /** Size variant */
   size?: 'default' | 'sm' | 'lg';
   /** Controlled pressed state */
@@ -39,10 +39,18 @@ export interface ToggleProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   asChild?: boolean;
 }
 
+// Variant classes for pressed state per docs/COMPONENT_STYLING_REFERENCE.md
 const variantClasses: Record<string, string> = {
-  default: 'bg-transparent data-[state=on]:bg-accent data-[state=on]:text-accent-foreground',
-  outline:
-    'border border-input bg-transparent data-[state=on]:bg-accent data-[state=on]:text-accent-foreground',
+  default: 'bg-transparent data-[state=on]:bg-primary data-[state=on]:text-primary-foreground hover:bg-muted',
+  primary: 'bg-transparent data-[state=on]:bg-primary data-[state=on]:text-primary-foreground hover:bg-muted',
+  secondary: 'bg-transparent data-[state=on]:bg-secondary data-[state=on]:text-secondary-foreground hover:bg-muted',
+  destructive: 'bg-transparent data-[state=on]:bg-destructive data-[state=on]:text-destructive-foreground hover:bg-muted',
+  success: 'bg-transparent data-[state=on]:bg-success data-[state=on]:text-success-foreground hover:bg-muted',
+  warning: 'bg-transparent data-[state=on]:bg-warning data-[state=on]:text-warning-foreground hover:bg-muted',
+  info: 'bg-transparent data-[state=on]:bg-info data-[state=on]:text-info-foreground hover:bg-muted',
+  accent: 'bg-transparent data-[state=on]:bg-accent data-[state=on]:text-accent-foreground hover:bg-muted',
+  outline: 'border border-input bg-transparent data-[state=on]:bg-accent data-[state=on]:text-accent-foreground hover:bg-muted',
+  ghost: 'bg-transparent data-[state=on]:bg-accent data-[state=on]:text-accent-foreground hover:bg-accent hover:text-accent-foreground',
 };
 
 const sizeClasses: Record<string, string> = {
@@ -81,15 +89,14 @@ export function Toggle({
     [pressed, isControlled, onPressedChange, onClick],
   );
 
-  // Base styles following the component styling reference
+  // Base styles per docs/COMPONENT_STYLING_REFERENCE.md
   const baseClasses =
     'inline-flex items-center justify-center ' +
     'rounded-md ' +
     'text-sm font-medium ' +
     'transition-colors ' +
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ' +
-    'disabled:pointer-events-none disabled:opacity-50 ' +
-    'hover:bg-muted hover:text-muted-foreground';
+    'disabled:pointer-events-none disabled:opacity-50';
 
   const cls = classy(
     baseClasses,

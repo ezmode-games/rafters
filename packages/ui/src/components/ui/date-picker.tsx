@@ -238,7 +238,7 @@ export function DatePicker<T extends DatePickerMode = 'single'>({
               'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
             )}
             style={{
-              position: 'absolute',
+              position: 'fixed',
               left: 0,
               top: 0,
               transform: `translate(${Math.round(position.x)}px, ${Math.round(position.y)}px)`,

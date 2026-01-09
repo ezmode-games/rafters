@@ -16,18 +16,32 @@
  *
  * @example
  * ```tsx
+ * // Minimal usage - Portal, Overlay, and Close button are included automatically
+ * <Dialog>
+ *   <DialogTrigger>Open</DialogTrigger>
+ *   <DialogContent>
+ *     <DialogHeader>
+ *       <DialogTitle>Title</DialogTitle>
+ *     </DialogHeader>
+ *     Content here
+ *   </DialogContent>
+ * </Dialog>
+ *
+ * // Or with namespace syntax
  * <Dialog>
  *   <Dialog.Trigger asChild>
  *     <Button>Open Dialog</Button>
  *   </Dialog.Trigger>
- *   <Dialog.Portal>
- *     <Dialog.Overlay />
- *     <Dialog.Content>
+ *   <Dialog.Content>
+ *     <Dialog.Header>
  *       <Dialog.Title>Dialog Title</Dialog.Title>
  *       <Dialog.Description>Dialog description here.</Dialog.Description>
- *     </Dialog.Content>
- *   </Dialog.Portal>
+ *     </Dialog.Header>
+ *   </Dialog.Content>
  * </Dialog>
+ *
+ * // Hide close button if needed
+ * <DialogContent showCloseButton={false}>...</DialogContent>
  * ```
  */
 
@@ -63,6 +77,13 @@ function useDialogContext() {
     throw new Error('Dialog components must be used within Dialog.Root');
   }
   return context;
+}
+
+// Context to track if we're inside a portal (to avoid double-wrapping)
+const DialogPortalContext = React.createContext<boolean>(false);
+
+function useIsInsidePortal() {
+  return React.useContext(DialogPortalContext);
 }
 
 // ==================== Dialog.Root ====================
@@ -176,7 +197,10 @@ export function DialogPortal({ children, container, forceMount }: DialogPortalPr
     return null;
   }
 
-  return createPortal(children, portalContainer);
+  return createPortal(
+    <DialogPortalContext.Provider value={true}>{children}</DialogPortalContext.Provider>,
+    portalContainer,
+  );
 }
 
 // ==================== Dialog.Overlay ====================
@@ -220,6 +244,12 @@ export interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement>
   onEscapeKeyDown?: (event: KeyboardEvent) => void;
   onPointerDownOutside?: (event: PointerEvent | TouchEvent) => void;
   onInteractOutside?: (event: Event) => void;
+  /** Whether to show the close button in top-right corner.
+   * Defaults to true for shadcn-style usage (without explicit DialogPortal),
+   * defaults to false when used with explicit DialogPortal for backward compatibility. */
+  showCloseButton?: boolean;
+  /** Container element for the portal. Defaults to document.body. */
+  container?: HTMLElement | null;
 }
 
 export function DialogContent({
@@ -230,11 +260,19 @@ export function DialogContent({
   onEscapeKeyDown: onEscapeKeyDownProp,
   onPointerDownOutside: onPointerDownOutsideProp,
   onInteractOutside,
+  showCloseButton,
+  container,
   className,
   children,
   ...props
 }: DialogContentProps) {
   const { open, onOpenChange, contentId, titleId, descriptionId, modal } = useDialogContext();
+  const isInsidePortal = useIsInsidePortal();
+
+  // Default showCloseButton based on usage pattern:
+  // - When using shadcn-style (no explicit DialogPortal), default to true
+  // - When using explicit DialogPortal wrapper, default to false for backward compatibility
+  const shouldShowCloseButton = showCloseButton ?? !isInsidePortal;
   const contentRef = React.useRef<HTMLDivElement>(null);
 
   // Focus trap
@@ -295,11 +333,39 @@ export function DialogContent({
   if (!shouldRender) {
     return null;
   }
+
+  // Close button component (X icon)
+  const closeButton = shouldShowCloseButton ? (
+    <button
+      type="button"
+      onClick={() => onOpenChange(false)}
+      className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+      aria-label="Close"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-4 w-4"
+      >
+        <path d="M18 6 6 18" />
+        <path d="m6 6 12 12" />
+      </svg>
+      <span className="sr-only">Close</span>
+    </button>
+  ) : null;
+
   // Render using a centered container
   const containerClass = classy('fixed inset-0 z-depth-modal flex items-center justify-center p-4');
 
   const innerClass = classy(
-    'w-full max-w-lg rounded-lg border border-card-border bg-card p-6 text-card-foreground shadow-lg',
+    'relative w-full max-w-lg rounded-lg border border-card-border bg-card p-6 text-card-foreground shadow-lg',
     className,
   );
 
@@ -311,16 +377,49 @@ export function DialogContent({
     ...props,
   } as React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> };
 
-  // If asChild, clone the child with inner props
-  if (asChild && React.isValidElement(children)) {
-    const child = React.cloneElement(children, innerProps as Partial<unknown>);
-    return <div className={containerClass}>{child}</div>;
+  // The core content to render
+  const renderContent = () => {
+    // If asChild, clone the child with inner props
+    if (asChild && React.isValidElement(children)) {
+      const child = React.cloneElement(children, innerProps as Partial<unknown>);
+      return (
+        <div className={containerClass}>
+          {child}
+          {closeButton}
+        </div>
+      );
+    }
+
+    return (
+      <div className={containerClass}>
+        <div {...innerProps}>
+          {children}
+          {closeButton}
+        </div>
+      </div>
+    );
+  };
+
+  // If already inside a portal (user used DialogPortal explicitly), just render content
+  if (isInsidePortal) {
+    return renderContent();
   }
 
+  // Otherwise, wrap with Portal and Overlay automatically (shadcn-style)
+  // Build portal props, only including defined values
+  const portalProps: DialogPortalProps = { children: null as unknown as React.ReactNode };
+  if (container !== undefined) portalProps.container = container;
+  if (forceMount !== undefined) portalProps.forceMount = forceMount;
+
+  // Build overlay props, only including defined values
+  const overlayProps: DialogOverlayProps = {};
+  if (forceMount !== undefined) overlayProps.forceMount = forceMount;
+
   return (
-    <div className={containerClass}>
-      <div {...innerProps}>{children}</div>
-    </div>
+    <DialogPortal {...portalProps}>
+      <DialogOverlay {...overlayProps} />
+      {renderContent()}
+    </DialogPortal>
   );
 }
 
