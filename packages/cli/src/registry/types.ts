@@ -8,24 +8,13 @@
 import { z } from 'zod';
 
 /**
- * File types in the registry
- */
-export const RegistryFileTypeSchema = z.enum([
-  'registry:component',
-  'registry:ui',
-  'registry:lib',
-  'registry:primitive',
-]);
-
-export type RegistryFileType = z.infer<typeof RegistryFileTypeSchema>;
-
-/**
  * A single file in a registry item
+ * Framework inferred from extension: .tsx=React, .vue=Vue, .svelte=Svelte
  */
 export const RegistryFileSchema = z.object({
   path: z.string(),
   content: z.string(),
-  type: RegistryFileTypeSchema,
+  dependencies: z.array(z.string()), // e.g., ["lodash@4.17.21"] - versioned
 });
 
 export type RegistryFile = z.infer<typeof RegistryFileSchema>;
@@ -44,9 +33,7 @@ export const RegistryItemSchema = z.object({
   name: z.string(),
   type: RegistryItemTypeSchema,
   description: z.string().optional(),
-  dependencies: z.array(z.string()),
-  devDependencies: z.array(z.string()).optional(),
-  registryDependencies: z.array(z.string()).optional(),
+  primitives: z.array(z.string()),
   files: z.array(RegistryFileSchema),
 });
 

@@ -164,13 +164,11 @@ export class RegistryClient {
 
     const deps: RegistryItem[] = [];
 
-    // Resolve registry dependencies first (peer components/primitives)
-    if (item.registryDependencies) {
-      for (const dep of item.registryDependencies) {
-        if (!resolved.has(dep)) {
-          const depItems = await this.resolveDependencies(dep, resolved);
-          deps.push(...depItems);
-        }
+    // Resolve primitive dependencies first
+    for (const dep of item.primitives) {
+      if (!resolved.has(dep)) {
+        const depItems = await this.resolveDependencies(dep, resolved);
+        deps.push(...depItems);
       }
     }
 

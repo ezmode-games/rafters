@@ -132,13 +132,13 @@ describe('rafters add - integration', () => {
         // Should have at least button and its dependencies
         expect(items.length).toBeGreaterThanOrEqual(1);
 
-        // If button has registryDependencies, they should come before button
+        // If button has primitives, they should come before button
         const buttonIndex = items.findIndex((item) => item.name === 'button');
         expect(buttonIndex).toBeGreaterThan(-1);
 
         // Any dependencies should be listed before button
         for (let i = 0; i < buttonIndex; i++) {
-          expect(items[buttonIndex].registryDependencies ?? []).toContain(items[i].name);
+          expect(items[buttonIndex].primitives).toContain(items[i].name);
         }
       },
     );
