@@ -45,7 +45,8 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
     | 'info'
     | 'muted'
     | 'accent';
-  inputSize?: 'sm' | 'default' | 'lg';
+  /** Size variant (not the HTML size attribute) */
+  size?: 'sm' | 'default' | 'lg';
 }
 
 // Variant classes per docs/COMPONENT_STYLING_REFERENCE.md
@@ -69,7 +70,7 @@ const sizeClasses: Record<string, string> = {
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
-    { className, type = 'text', variant = 'default', inputSize = 'default', disabled, ...props },
+    { className, type = 'text', variant = 'default', size = 'default', disabled, ...props },
     ref,
   ) => {
     const baseClasses =
@@ -83,7 +84,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const cls = classy(
       baseClasses,
       variantClasses[variant] ?? variantClasses.default,
-      sizeClasses[inputSize] ?? sizeClasses.default,
+      sizeClasses[size] ?? sizeClasses.default,
       className,
     );
 

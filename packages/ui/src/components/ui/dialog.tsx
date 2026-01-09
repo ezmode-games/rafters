@@ -408,7 +408,7 @@ export function DialogContent({
 
   // Otherwise, wrap with Portal and Overlay automatically (shadcn-style)
   // Build portal props, only including defined values
-  const portalProps: DialogPortalProps = { children: null as unknown as React.ReactNode };
+  const portalProps: Omit<DialogPortalProps, 'children'> = {};
   if (container !== undefined) portalProps.container = container;
   if (forceMount !== undefined) portalProps.forceMount = forceMount;
 

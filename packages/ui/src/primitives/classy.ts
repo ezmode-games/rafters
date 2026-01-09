@@ -106,6 +106,18 @@ export function parseTailwindClass(className: string): ParsedClass {
       lastSplit = i + 1;
     }
   }
+
+  // Validate balanced brackets - if depth != 0, brackets are malformed
+  if (depth !== 0) {
+    return {
+      original,
+      modifiers: [],
+      utility: className,
+      isArbitrary: false,
+      isValid: false,
+    };
+  }
+
   // Add the final segment (utility)
   segments.push(className.slice(lastSplit));
 
