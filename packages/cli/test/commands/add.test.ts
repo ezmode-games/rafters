@@ -93,14 +93,18 @@ describe('collectDependencies', () => {
     const items = [registryFixtures.dialogComponent()];
     const { dependencies } = collectDependencies(items);
 
-    expect(dependencies).toContain('@radix-ui/react-dialog');
+    // Dependencies are now versioned (e.g., package@version)
+    expect(dependencies).toContain('@radix-ui/react-dialog@2.1.0');
   });
 
-  it('excludes react from dependencies', () => {
-    const items = [registryFixtures.buttonComponent()];
-    const { dependencies } = collectDependencies(items);
+  it('includes versioned framework dependencies', () => {
+    // Add react dep to fixture for this test
+    const button = registryFixtures.buttonComponent();
+    button.files[0].dependencies = ['react@19.2.0'];
+    const { dependencies } = collectDependencies([button]);
 
-    expect(dependencies).not.toContain('react');
+    // Framework deps now included with versions
+    expect(dependencies).toContain('react@19.2.0');
   });
 
   it('deduplicates dependencies across items', () => {
@@ -146,7 +150,7 @@ describe('RegistryItemSchema validation', () => {
       RegistryItemSchema.parse({
         name: 'test',
         type: 'registry:ui',
-        dependencies: [],
+        primitives: [],
         files: [],
       }),
     ).not.toThrow();
@@ -157,7 +161,7 @@ describe('RegistryItemSchema validation', () => {
       RegistryItemSchema.parse({
         name: 'test',
         type: 'invalid-type',
-        dependencies: [],
+        primitives: [],
         files: [],
       }),
     ).toThrow();
@@ -172,7 +176,7 @@ describe('registry fixtures', () => {
     expect(button.type).toBe('registry:ui');
     expect(button.files.length).toBeGreaterThan(0);
     expect(button.files[0].path).toBe('components/ui/button.tsx');
-    expect(button.registryDependencies).toContain('classy');
+    expect(button.primitives).toContain('classy');
   });
 
   it('generates valid classy primitive fixture', () => {

@@ -23,16 +23,19 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
+    "@antfu/ni": "^28.1.0",
     "@modelcontextprotocol/sdk": "^1.25.1",
-    "commander": "^13.0.0"
+    "commander": "^13.0.0",
+    "execa": "^9.6.1",
+    "ora": "^9.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "catalog:",
     "@rafters/design-tokens": "workspace:*",
     "@rafters/shared": "workspace:*",
-    "tsup": "^8.0.0",
-    "@playwright/test": "catalog:",
     "@types/node": "catalog:",
     "playwright-bdd": "catalog:",
+    "tsup": "^8.0.0",
     "tsx": "^4.21.0",
     "typescript": "catalog:",
     "vitest": "catalog:",

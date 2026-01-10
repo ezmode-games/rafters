@@ -60,14 +60,13 @@ export const registryFixtures = {
     registryItemFactory.generate({
       name: 'button',
       type: 'registry:ui',
-      dependencies: ['react'],
-      registryDependencies: ['classy'],
+      primitives: ['classy'],
       files: [
         registryFileFactory.generate({
           path: 'components/ui/button.tsx',
           content: `import classy from '../../primitives/classy';
 export const Button = () => <button>Click me</button>;`,
-          type: 'registry:ui',
+          dependencies: [],
         }),
       ],
     }),
@@ -79,13 +78,12 @@ export const Button = () => <button>Click me</button>;`,
     registryItemFactory.generate({
       name: 'classy',
       type: 'registry:primitive',
-      dependencies: [],
-      registryDependencies: undefined,
+      primitives: [],
       files: [
         registryFileFactory.generate({
           path: 'lib/primitives/classy.ts',
           content: `export default function classy(...classes: string[]) { return classes.filter(Boolean).join(' '); }`,
-          type: 'registry:primitive',
+          dependencies: [],
         }),
       ],
     }),
@@ -97,13 +95,12 @@ export const Button = () => <button>Click me</button>;`,
     registryItemFactory.generate({
       name: 'card',
       type: 'registry:ui',
-      dependencies: ['react'],
-      registryDependencies: undefined,
+      primitives: [],
       files: [
         registryFileFactory.generate({
           path: 'components/ui/card.tsx',
           content: `export const Card = () => <div>Card</div>;`,
-          type: 'registry:ui',
+          dependencies: [],
         }),
       ],
     }),
@@ -115,14 +112,13 @@ export const Button = () => <button>Click me</button>;`,
     registryItemFactory.generate({
       name: 'dialog',
       type: 'registry:ui',
-      dependencies: ['react', '@radix-ui/react-dialog'],
-      registryDependencies: ['classy'],
+      primitives: ['classy'],
       files: [
         registryFileFactory.generate({
           path: 'components/ui/dialog.tsx',
           content: `import * as DialogPrimitive from '@radix-ui/react-dialog';
 export const Dialog = DialogPrimitive.Root;`,
-          type: 'registry:ui',
+          dependencies: ['@radix-ui/react-dialog@2.1.0'],
         }),
       ],
     }),

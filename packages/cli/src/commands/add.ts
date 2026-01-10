@@ -11,6 +11,7 @@ import { dirname, join } from 'node:path';
 import { RegistryClient } from '../registry/client.js';
 import type { RegistryItem } from '../registry/types.js';
 import { getRaftersPaths } from '../utils/paths.js';
+import { updateDependencies } from '../utils/update-dependencies.js';
 
 export interface AddOptions {
   overwrite?: boolean;
@@ -120,6 +121,7 @@ async function installItem(
 
 /**
  * Collect npm dependencies from registry items
+ * Dependencies are now per-file in the new schema with versions (e.g., react@19.2.0)
  */
 export function collectDependencies(items: RegistryItem[]): {
   dependencies: string[];
@@ -129,17 +131,10 @@ export function collectDependencies(items: RegistryItem[]): {
   const devDeps = new Set<string>();
 
   for (const item of items) {
-    for (const dep of item.dependencies) {
-      // Skip React (assumed to be installed)
-      if (dep === 'react' || dep.startsWith('react/')) {
-        continue;
-      }
-      deps.add(dep);
-    }
-
-    if (item.devDependencies) {
-      for (const dep of item.devDependencies) {
-        devDeps.add(dep);
+    // Dependencies are now on each file with versions
+    for (const file of item.files) {
+      for (const dep of file.dependencies) {
+        deps.add(dep);
       }
     }
   }
@@ -263,7 +258,7 @@ export async function add(components: string[], options: AddOptions): Promise<vo
     }
   }
 
-  // Collect and report dependencies
+  // Collect and install dependencies
   const { dependencies, devDependencies } = collectDependencies(allItems);
 
   if (dependencies.length > 0 || devDependencies.length > 0) {
@@ -271,8 +266,18 @@ export async function add(components: string[], options: AddOptions): Promise<vo
       event: 'add:dependencies',
       dependencies,
       devDependencies,
-      message: 'Run `pnpm add` to install these dependencies',
     });
+
+    try {
+      await updateDependencies(dependencies, devDependencies, { cwd });
+    } catch (err) {
+      console.error({
+        event: 'add:error',
+        message: 'Failed to install dependencies',
+        error: err instanceof Error ? err.message : String(err),
+      });
+      // Don't fail the whole command - files are already written
+    }
   }
 
   // Summary

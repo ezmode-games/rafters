@@ -31,8 +31,8 @@ const { name, description, examples = [], props = [] } = Astro.props;
 
 // Load component data from registry
 const component = loadComponent(name);
-const dependencies = component?.dependencies ?? [];
-const registryDependencies = component?.registryDependencies ?? [];
+const dependencies = component?.files[0]?.dependencies ?? [];
+const primitives = component?.primitives ?? [];
 ---
 
 <div class="component-doc">
@@ -59,11 +59,11 @@ const registryDependencies = component?.registryDependencies ?? [];
   </section>
 
   <!-- Dependencies -->
-  {(dependencies.length > 0 || registryDependencies.length > 0) && (
+  {(dependencies.length > 0 || primitives.length > 0) && (
     <section class="mb-10">
       <DependencyList
         dependencies={dependencies}
-        registryDependencies={registryDependencies}
+        primitives={primitives}
       />
     </section>
   )}

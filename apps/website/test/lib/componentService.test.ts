@@ -69,7 +69,6 @@ describe('componentService', () => {
       expect(component?.files).toBeDefined();
       expect(component?.files.length).toBeGreaterThan(0);
       expect(component?.files[0].path).toBe('components/ui/button.tsx');
-      expect(component?.files[0].type).toBe('registry:ui');
     });
 
     it('returns component with source content', () => {
@@ -78,17 +77,17 @@ describe('componentService', () => {
       expect(component?.files[0].content.length).toBeGreaterThan(0);
     });
 
-    it('extracts dependencies', () => {
+    it('extracts dependencies at file level', () => {
       const component = loadComponent('button');
-      expect(component?.dependencies).toBeDefined();
-      expect(Array.isArray(component?.dependencies)).toBe(true);
+      expect(component?.files[0].dependencies).toBeDefined();
+      expect(Array.isArray(component?.files[0].dependencies)).toBe(true);
     });
 
-    it('extracts registry dependencies for components with primitives', () => {
+    it('extracts primitive dependencies', () => {
       // Dialog uses slot primitive
       const component = loadComponent('dialog');
-      expect(component?.registryDependencies).toBeDefined();
-      expect(component?.registryDependencies).toContain('slot');
+      expect(component?.primitives).toBeDefined();
+      expect(component?.primitives).toContain('slot');
     });
 
     it('returns null for non-existent component', () => {
@@ -114,7 +113,6 @@ describe('componentService', () => {
       expect(primitive?.files).toBeDefined();
       expect(primitive?.files.length).toBeGreaterThan(0);
       expect(primitive?.files[0].path).toBe('lib/primitives/slot.ts');
-      expect(primitive?.files[0].type).toBe('registry:primitive');
     });
 
     it('returns null for non-existent primitive', () => {
@@ -136,7 +134,8 @@ describe('componentService', () => {
         expect(component.name).toBeDefined();
         expect(component.type).toBe('registry:ui');
         expect(component.files).toBeDefined();
-        expect(component.dependencies).toBeDefined();
+        expect(component.primitives).toBeDefined();
+        expect(component.files[0].dependencies).toBeDefined();
       }
     });
   });
@@ -154,7 +153,8 @@ describe('componentService', () => {
         expect(primitive.name).toBeDefined();
         expect(primitive.type).toBe('registry:primitive');
         expect(primitive.files).toBeDefined();
-        expect(primitive.dependencies).toBeDefined();
+        expect(primitive.primitives).toBeDefined();
+        expect(primitive.files[0].dependencies).toBeDefined();
       }
     });
   });

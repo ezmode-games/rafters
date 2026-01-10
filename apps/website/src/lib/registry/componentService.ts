@@ -9,16 +9,14 @@ import { basename, join } from 'node:path';
 export interface RegistryFile {
   path: string;
   content: string;
-  type: 'registry:component' | 'registry:ui' | 'registry:lib' | 'registry:primitive';
+  dependencies: string[]; // e.g., ["lodash@4.17.21"] - versioned
 }
 
 export interface RegistryItem {
   name: string;
   type: 'registry:ui' | 'registry:primitive';
   description?: string;
-  dependencies: string[];
-  devDependencies?: string[];
-  registryDependencies?: string[];
+  primitives: string[];
   files: RegistryFile[];
 }
 
@@ -59,8 +57,39 @@ export function listComponentNames(): string[] {
 export function listPrimitiveNames(): string[] {
   const primitivesDir = getPrimitivesPath();
   return readdirSync(primitivesDir)
-    .filter((f) => f.endsWith('.ts') && f !== 'types.ts')
-    .map((f) => basename(f, '.ts'));
+    .filter((f) => (f.endsWith('.ts') || f.endsWith('.tsx')) && f !== 'types.ts')
+    .map((f) => basename(f, f.endsWith('.tsx') ? '.tsx' : '.ts'));
+}
+
+/**
+ * Minimum framework versions required by Rafters components
+ * These are the peer dependency requirements
+ */
+const FRAMEWORK_VERSIONS: Record<string, string> = {
+  react: '19.2.0',
+  'react-dom': '19.2.0',
+  vue: '3.4.0',
+  svelte: '4.0.0',
+  'solid-js': '1.8.0',
+  preact: '10.0.0',
+};
+
+/**
+ * Dependencies to exclude (internal/build-time only)
+ */
+const EXCLUDED_DEPS = new Set(['react/jsx-runtime', '@types/react', '@types/react-dom']);
+
+/**
+ * Add versions to dependencies
+ * Framework deps get minimum versions, others passed through (for now)
+ */
+function versionDeps(deps: string[]): string[] {
+  return deps
+    .filter((dep) => !EXCLUDED_DEPS.has(dep))
+    .map((dep) => {
+      const version = FRAMEWORK_VERSIONS[dep];
+      return version ? `${dep}@${version}` : dep;
+    });
 }
 
 /**
@@ -82,13 +111,12 @@ export function loadComponent(name: string): RegistryItem | null {
     return {
       name,
       type: 'registry:ui',
-      dependencies: deps.external,
-      registryDependencies: [...deps.internal, ...primitiveDeps],
+      primitives: [...deps.internal, ...primitiveDeps],
       files: [
         {
           path: `components/ui/${name}.tsx`,
           content,
-          type: 'registry:ui',
+          dependencies: versionDeps(deps.external),
         },
       ],
     };
@@ -102,7 +130,18 @@ export function loadComponent(name: string): RegistryItem | null {
  */
 export function loadPrimitive(name: string): RegistryItem | null {
   const primitivesDir = getPrimitivesPath();
-  const filePath = join(primitivesDir, `${name}.ts`);
+
+  // Try .ts first, then .tsx (for primitives like float that use JSX)
+  let filePath = join(primitivesDir, `${name}.ts`);
+  let fileExt = '.ts';
+
+  try {
+    readFileSync(filePath, 'utf-8');
+  } catch {
+    // Try .tsx
+    filePath = join(primitivesDir, `${name}.tsx`);
+    fileExt = '.tsx';
+  }
 
   try {
     const content = readFileSync(filePath, 'utf-8');
@@ -111,18 +150,18 @@ export function loadPrimitive(name: string): RegistryItem | null {
     const deps = extractDependencies(content);
 
     // Extract primitive dependencies (other primitives this one imports)
-    const primitiveDeps = extractPrimitiveDependencies(content);
+    // Pass isPrimitive=true so ./foo imports are treated as sibling primitives
+    const primitiveDeps = extractPrimitiveDependencies(content, true);
 
     return {
       name,
       type: 'registry:primitive',
-      dependencies: deps.external,
-      registryDependencies: primitiveDeps,
+      primitives: primitiveDeps,
       files: [
         {
-          path: `lib/primitives/${name}.ts`,
+          path: `lib/primitives/${name}${fileExt}`,
           content,
-          type: 'registry:primitive',
+          dependencies: versionDeps(deps.external),
         },
       ],
     };
@@ -207,8 +246,10 @@ function extractDependencies(content: string): {
 
 /**
  * Extract primitive dependencies from source
+ * @param content - Source code content
+ * @param isPrimitive - If true, ./foo imports are treated as sibling primitives
  */
-function extractPrimitiveDependencies(content: string): string[] {
+function extractPrimitiveDependencies(content: string, isPrimitive = false): string[] {
   const primitives: string[] = [];
 
   // Match imports from primitives directory
@@ -219,11 +260,15 @@ function extractPrimitiveDependencies(content: string): string[] {
     const pkg = match[1];
 
     // Check if it's a primitive import
-    if (
+    // For primitives, ./foo (sibling import) is another primitive
+    const isSiblingImport = isPrimitive && pkg.startsWith('./') && !pkg.slice(2).includes('/');
+    const isPrimitiveImport =
       pkg.includes('/primitives/') ||
       pkg.includes('../primitives/') ||
-      pkg.includes('../../primitives/')
-    ) {
+      pkg.includes('../../primitives/') ||
+      isSiblingImport;
+
+    if (isPrimitiveImport) {
       const primitiveName = basename(pkg, '.ts');
       if (!primitives.includes(primitiveName) && primitiveName !== 'types') {
         primitives.push(primitiveName);

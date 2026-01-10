@@ -1,25 +1,25 @@
 ---
 interface Props {
   dependencies: string[];
-  registryDependencies?: string[];
+  primitives?: string[];
 }
 
-const { dependencies, registryDependencies = [] } = Astro.props;
+const { dependencies, primitives = [] } = Astro.props;
 
 const hasExternal = dependencies.filter((d) => !d.startsWith('@rafters')).length > 0;
-const hasRegistry = registryDependencies.length > 0;
+const hasPrimitives = primitives.length > 0;
 const externalDeps = dependencies.filter((d) => !d.startsWith('@rafters'));
 ---
 
-{(hasExternal || hasRegistry) && (
+{(hasExternal || hasPrimitives) && (
   <div class="flex flex-wrap gap-8 my-6 p-5 bg-gray-50 rounded-md border border-gray-200">
-    {hasRegistry && (
+    {hasPrimitives && (
       <div class="flex-1 min-w-[200px]">
         <h4 class="font-mono text-xs font-semibold uppercase tracking-wider text-gray-500 m-0 mb-3">
-          Registry Dependencies
+          Primitives
         </h4>
         <div class="flex flex-wrap gap-2">
-          {registryDependencies.map((dep) => (
+          {primitives.map((dep) => (
             <a
               href={`/docs/components/${dep}`}
               class="inline-flex items-center gap-1.5 px-2.5 py-1.5 font-mono text-sm rounded bg-blue-50 text-blue-700 border border-blue-200 no-underline hover:bg-blue-100 hover:border-blue-300 transition-colors"
