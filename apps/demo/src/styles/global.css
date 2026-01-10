@@ -1,0 +1,4 @@
+@import "../../.rafters/output/theme.css";
+
+/* Scan UI package for Tailwind classes */
+@source "../../../../packages/ui/src";

@@ -1,0 +1,98 @@
+@import 'tailwindcss';
+
+/* Tailwind v4 theme configuration */
+@theme {
+  /* Base color scales - Midnight Mirage (Rafters design tokens) */
+  --color-midnight-mirage-50: oklch(0.98 0.01 286);
+  --color-midnight-mirage-100: oklch(0.95 0.01 286);
+  --color-midnight-mirage-200: oklch(0.9 0.01 286);
+  --color-midnight-mirage-300: oklch(0.8 0.01 286);
+  --color-midnight-mirage-400: oklch(0.7 0.01 286);
+  --color-midnight-mirage-500: oklch(0.55 0.01 286);
+  --color-midnight-mirage-600: oklch(0.4 0.01 286);
+  --color-midnight-mirage-700: oklch(0.25 0.01 286);
+  --color-midnight-mirage-800: oklch(0.15 0.01 286);
+  --color-midnight-mirage-900: oklch(0.08 0.01 286);
+  --color-midnight-mirage-950: oklch(0.04 0.01 286);
+
+  /* Semantic intent colors */
+  --color-default-primary-300: oklch(0.8 0.01 286);
+  --color-default-primary-600: oklch(0.4 0.01 286);
+  --color-destructive-color-300: oklch(0.8 0.15 25);
+  --color-destructive-color-600: oklch(0.55 0.2 25);
+  --color-success-color-300: oklch(0.8 0.15 145);
+  --color-success-color-600: oklch(0.55 0.2 145);
+  --color-warning-color-300: oklch(0.85 0.12 85);
+  --color-warning-color-600: oklch(0.65 0.15 85);
+  --color-info-color-300: oklch(0.8 0.1 230);
+  --color-info-color-600: oklch(0.55 0.15 230);
+
+  /* Semantic color tokens mapped to Tailwind utilities */
+  --color-background: var(--color-midnight-mirage-50);
+  --color-foreground: var(--color-midnight-mirage-900);
+  --color-card: var(--color-midnight-mirage-50);
+  --color-card-foreground: var(--color-midnight-mirage-900);
+  --color-popover: var(--color-midnight-mirage-50);
+  --color-popover-foreground: var(--color-midnight-mirage-900);
+  --color-primary: var(--color-default-primary-600);
+  --color-primary-foreground: var(--color-midnight-mirage-50);
+  --color-secondary: var(--color-midnight-mirage-100);
+  --color-secondary-foreground: var(--color-midnight-mirage-900);
+  --color-muted: var(--color-midnight-mirage-100);
+  --color-muted-foreground: var(--color-midnight-mirage-500);
+  --color-accent: var(--color-midnight-mirage-100);
+  --color-accent-foreground: var(--color-midnight-mirage-900);
+  --color-destructive: var(--color-destructive-color-600);
+  --color-destructive-foreground: var(--color-midnight-mirage-50);
+  --color-success: var(--color-success-color-600);
+  --color-success-foreground: var(--color-midnight-mirage-50);
+  --color-warning: var(--color-warning-color-600);
+  --color-warning-foreground: var(--color-midnight-mirage-900);
+  --color-info: var(--color-info-color-600);
+  --color-info-foreground: var(--color-midnight-mirage-50);
+  --color-border: var(--color-midnight-mirage-200);
+  --color-input: var(--color-midnight-mirage-200);
+  --color-ring: var(--color-midnight-mirage-400);
+
+  /* Typography */
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+
+  /* Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+
+  /* Spacing (optional overrides) */
+  --spacing: 0.25rem;
+}
+
+/* Dark mode overrides */
+.dark {
+  --color-background: var(--color-midnight-mirage-900);
+  --color-foreground: var(--color-midnight-mirage-50);
+  --color-card: var(--color-midnight-mirage-800);
+  --color-card-foreground: var(--color-midnight-mirage-50);
+  --color-popover: var(--color-midnight-mirage-800);
+  --color-popover-foreground: var(--color-midnight-mirage-50);
+  --color-primary: var(--color-default-primary-300);
+  --color-primary-foreground: var(--color-midnight-mirage-900);
+  --color-secondary: var(--color-midnight-mirage-700);
+  --color-secondary-foreground: var(--color-midnight-mirage-50);
+  --color-muted: var(--color-midnight-mirage-700);
+  --color-muted-foreground: var(--color-midnight-mirage-400);
+  --color-accent: var(--color-midnight-mirage-700);
+  --color-accent-foreground: var(--color-midnight-mirage-50);
+  --color-destructive: var(--color-destructive-color-600);
+  --color-destructive-foreground: var(--color-midnight-mirage-50);
+  --color-success: var(--color-success-color-300);
+  --color-success-foreground: var(--color-midnight-mirage-900);
+  --color-warning: var(--color-warning-color-300);
+  --color-warning-foreground: var(--color-midnight-mirage-900);
+  --color-info: var(--color-info-color-300);
+  --color-info-foreground: var(--color-midnight-mirage-900);
+  --color-border: var(--color-midnight-mirage-700);
+  --color-input: var(--color-midnight-mirage-700);
+  --color-ring: var(--color-midnight-mirage-500);
+}
