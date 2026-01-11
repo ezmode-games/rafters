@@ -24,6 +24,7 @@ import { generateBreakpointTokens } from './breakpoint.js';
 import { buildColorScaleFromBase, generateColorTokens } from './color.js';
 // Import defaults
 import {
+  type ColorPaletteBase,
   type ColorScaleInput,
   DEFAULT_BREAKPOINTS,
   DEFAULT_COLOR_SCALES,
@@ -88,7 +89,7 @@ interface GeneratorDef {
  * 2. Semantic color bases (computed via math) - custom or default
  */
 function buildAllColorScales(
-  customBases?: Record<string, { hue: number; chroma: number; description: string }>,
+  customBases?: Record<string, ColorPaletteBase>,
 ): ColorScaleInput[] {
   const bases = customBases ?? DEFAULT_SEMANTIC_COLOR_BASES;
   const semanticScales = Object.entries(bases).map(([name, base]) =>
@@ -99,7 +100,7 @@ function buildAllColorScales(
 }
 
 function createGeneratorDefs(
-  colorPaletteBases?: Record<string, { hue: number; chroma: number; description: string }>,
+  colorPaletteBases?: Record<string, ColorPaletteBase>,
 ): GeneratorDef[] {
   return [
     // Foundation tokens (no dependencies)

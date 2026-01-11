@@ -649,6 +649,42 @@ describe('Orchestration', () => {
       const spacing4 = result.allTokens.find((t) => t.name === 'spacing-4');
       expect(spacing4?.value).toBe('2rem'); // 32px = 2rem
     });
+
+    it('uses custom colorPaletteBases when provided', () => {
+      const customBases = {
+        'custom-red': { hue: 0, chroma: 0.25, description: 'Custom red' },
+        'custom-blue': { hue: 240, chroma: 0.15, description: 'Custom blue' },
+      };
+
+      const result = generateBaseSystem({ colorPaletteBases: customBases });
+
+      // Should generate color tokens for custom families
+      const customRed500 = result.allTokens.find((t) => t.name === 'custom-red-500');
+      const customBlue500 = result.allTokens.find((t) => t.name === 'custom-blue-500');
+
+      expect(customRed500).toBeDefined();
+      expect(customBlue500).toBeDefined();
+      expect(customRed500?.value).toMatch(/oklch\(/);
+      expect(customBlue500?.value).toMatch(/oklch\(/);
+
+      // Should NOT have default color families when custom bases provided
+      const silverGlacier500 = result.allTokens.find(
+        (t) => t.name === 'silver-true-glacier-500',
+      );
+      expect(silverGlacier500).toBeUndefined();
+    });
+
+    it('still includes neutral scale when custom colorPaletteBases provided', () => {
+      const customBases = {
+        primary: { hue: 180, chroma: 0.12, description: 'Primary' },
+      };
+
+      const result = generateBaseSystem({ colorPaletteBases: customBases });
+
+      // Neutral is from DEFAULT_COLOR_SCALES, not DEFAULT_SEMANTIC_COLOR_BASES
+      const neutral500 = result.allTokens.find((t) => t.name === 'neutral-500');
+      expect(neutral500).toBeDefined();
+    });
   });
 
   describe('generateNamespaces', () => {
