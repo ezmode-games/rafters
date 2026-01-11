@@ -12,6 +12,10 @@
  */
 
 import type { Token } from '@rafters/shared';
+import type { ColorPaletteBase } from './defaults.js';
+
+// Re-export for convenience
+export type { ColorPaletteBase } from './defaults.js';
 
 /**
  * Configuration for the base design system
@@ -45,6 +49,11 @@ export interface BaseSystemConfig {
 
   /** Base transition duration override (ms). System default: baseSpacingUnit * 37.5 = 150ms */
   baseTransitionDurationOverride?: number;
+
+  // === COLOR OVERRIDES ===
+
+  /** Custom color palette bases. If provided, replaces DEFAULT_COLOR_PALETTE_BASES */
+  colorPaletteBases?: Record<string, ColorPaletteBase>;
 }
 
 /**

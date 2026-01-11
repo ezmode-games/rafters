@@ -9,7 +9,7 @@ import { existsSync } from 'node:fs';
 import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import {
-  buildDefaults,
+  buildColorSystem,
   NodePersistenceAdapter,
   registryToTailwind,
   registryToTypeScript,
@@ -207,7 +207,7 @@ export async function init(options: InitOptions): Promise<void> {
   }
 
   // Generate default token system - registry is the source of truth
-  const result = buildDefaults({
+  const result = buildColorSystem({
     exports: {
       tailwind: { includeImport: !shadcn },
       typescript: { includeJSDoc: true },

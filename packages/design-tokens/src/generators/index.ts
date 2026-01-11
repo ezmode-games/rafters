@@ -85,22 +85,27 @@ interface GeneratorDef {
 /**
  * Build the complete color scales array from:
  * 1. Pre-defined color scales (neutral)
- * 2. Semantic color bases (computed via math)
+ * 2. Semantic color bases (computed via math) - custom or default
  */
-function buildAllColorScales(): ColorScaleInput[] {
-  const semanticScales = Object.entries(DEFAULT_SEMANTIC_COLOR_BASES).map(([name, base]) =>
+function buildAllColorScales(
+  customBases?: Record<string, { hue: number; chroma: number; description: string }>,
+): ColorScaleInput[] {
+  const bases = customBases ?? DEFAULT_SEMANTIC_COLOR_BASES;
+  const semanticScales = Object.entries(bases).map(([name, base]) =>
     buildColorScaleFromBase(name, base),
   );
 
   return [...DEFAULT_COLOR_SCALES, ...semanticScales];
 }
 
-function createGeneratorDefs(): GeneratorDef[] {
+function createGeneratorDefs(
+  colorPaletteBases?: Record<string, { hue: number; chroma: number; description: string }>,
+): GeneratorDef[] {
   return [
     // Foundation tokens (no dependencies)
     {
       name: 'color',
-      generate: (config) => generateColorTokens(config, buildAllColorScales()),
+      generate: (config) => generateColorTokens(config, buildAllColorScales(colorPaletteBases)),
     },
     {
       name: 'spacing',
@@ -220,7 +225,7 @@ export function generateBaseSystem(config: Partial<BaseSystemConfig> = {}): Gene
   const byNamespace = new Map<string, Token[]>();
   const allTokens: Token[] = [];
 
-  const generators = createGeneratorDefs();
+  const generators = createGeneratorDefs(mergedConfig.colorPaletteBases);
   for (const { generate } of generators) {
     const result = generate(resolvedConfig);
     byNamespace.set(result.namespace, result.tokens);
@@ -267,7 +272,7 @@ export function generateNamespaces(
   const byNamespace = new Map<string, Token[]>();
   const allTokens: Token[] = [];
 
-  const generators = createGeneratorDefs();
+  const generators = createGeneratorDefs(mergedConfig.colorPaletteBases);
   const requestedGenerators = generators.filter((g) => namespaces.includes(g.name));
 
   for (const { generate } of requestedGenerators) {
@@ -370,10 +375,10 @@ export function getGeneratorInfo(): Array<{ name: string; description: string }>
 // =============================================================================
 
 /**
- * Options for building and exporting the default token system
+ * Options for building and exporting the token system
  */
-export interface BuildDefaultsOptions {
-  /** Configuration overrides for the base system */
+export interface BuildColorSystemOptions {
+  /** Configuration overrides for the base system (including colorPaletteBases) */
   config?: Partial<BaseSystemConfig>;
 
   /** Export format options */
@@ -387,10 +392,13 @@ export interface BuildDefaultsOptions {
   };
 }
 
+/** @deprecated Use BuildColorSystemOptions instead */
+export type BuildDefaultsOptions = BuildColorSystemOptions;
+
 /**
- * Result of building the default token system
+ * Result of building the token system
  */
-export interface BuildDefaultsResult {
+export interface BuildColorSystemResult {
   /** The generated token system */
   system: GenerateAllResult;
 
@@ -405,37 +413,44 @@ export interface BuildDefaultsResult {
   };
 }
 
+/** @deprecated Use BuildColorSystemResult instead */
+export type BuildDefaultsResult = BuildColorSystemResult;
+
 /**
- * Build the complete Rafters default token system with exports.
+ * Build a complete Rafters token system with exports.
  *
- * This is the primary entry point for generating a complete design token system
- * with the Rafters palette (zinc neutral + semantic colors) and exporting to
- * various formats.
+ * This is the primary entry point for generating a complete design token system.
+ * Pass custom colorPaletteBases to generate a system with different colors.
  *
  * @param options - Configuration and export options
  * @returns Generated system, registry, and exports
  *
  * @example
  * ```typescript
- * // Generate with all exports
- * const result = buildDefaults({
+ * // Generate with defaults (CLI init)
+ * const result = buildColorSystem();
+ *
+ * // Generate with custom colors (Studio color picker)
+ * import { generateRaftersHarmony } from '@rafters/color-utils';
+ * const harmony = generateRaftersHarmony(userPickedColor);
+ * const colorPaletteBases = Object.fromEntries(
+ *   Object.entries(harmony).map(([name, oklch]) =>
+ *     [name, { hue: oklch.h, chroma: oklch.c, description: name }]
+ *   )
+ * );
+ * const result = buildColorSystem({ config: { colorPaletteBases } });
+ *
+ * // Generate with exports
+ * const result = buildColorSystem({
  *   exports: {
  *     dtcg: true,
  *     tailwind: { includeComments: true },
  *     typescript: { format: 'const' },
  *   },
  * });
- *
- * // Write exports to files
- * fs.writeFileSync('tokens.json', JSON.stringify(result.exports.dtcg, null, 2));
- * fs.writeFileSync('tokens.css', result.exports.tailwind);
- * fs.writeFileSync('tokens.ts', result.exports.typescript);
- *
- * // Access tokens programmatically
- * const primaryColor = result.registry.get('accent-500');
  * ```
  */
-export function buildDefaults(options: BuildDefaultsOptions = {}): BuildDefaultsResult {
+export function buildColorSystem(options: BuildColorSystemOptions = {}): BuildColorSystemResult {
   // Generate the base system
   const system = generateBaseSystem(options.config);
 
@@ -443,7 +458,7 @@ export function buildDefaults(options: BuildDefaultsOptions = {}): BuildDefaults
   const registry = new TokenRegistry(system.allTokens);
 
   // Build exports
-  const exports: BuildDefaultsResult['exports'] = {};
+  const exports: BuildColorSystemResult['exports'] = {};
 
   if (options.exports?.dtcg) {
     const dtcgOptions = typeof options.exports.dtcg === 'object' ? options.exports.dtcg : {};
@@ -468,3 +483,6 @@ export function buildDefaults(options: BuildDefaultsOptions = {}): BuildDefaults
     exports,
   };
 }
+
+/** @deprecated Use buildColorSystem instead */
+export const buildDefaults = buildColorSystem;

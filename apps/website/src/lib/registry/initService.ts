@@ -3,7 +3,7 @@
  * Generates the init payload for `rafters init`
  */
 
-import { buildDefaults } from '@rafters/design-tokens';
+import { buildColorSystem } from '@rafters/design-tokens';
 
 export interface InitPayload {
   version: string;
@@ -18,7 +18,7 @@ export interface InitPayload {
  */
 export function generateInitPayload(): InitPayload {
   // Generate the complete token system with Tailwind export
-  const result = buildDefaults({
+  const result = buildColorSystem({
     exports: {
       tailwind: { includeImport: true },
     },
