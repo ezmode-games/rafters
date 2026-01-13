@@ -7,6 +7,8 @@ Rafters is a **Design Intelligence Protocol for AI Agents**. It converts subject
 
 1. **Token Registry** - What design values exist and why (OKLCH scales, musical progressions, perceptual weights)
 2. **Component Registry** - What UI patterns exist and when to use them (cognitive load, semantic meaning)
+   - 55 components (52 shadcn-compatible), 17 primitives, 72 total registry items
+   - Schema uses `primitives` (not `registryDependencies`) with per-file versioned dependencies
 3. **Designer Decisions Archive** - Why choices were made (embedded in tokens)
 
 ## Tech Stack

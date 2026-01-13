@@ -68,6 +68,7 @@ Tokens contain full intelligence with embedded decisions:
 ```
 
 ### React Components
-- Use primitives from `packages/ui/src/primitives`
+- Use primitives from `packages/ui/src/primitives` (17 primitives including float, classy, slot, modal, etc.)
 - Vanilla TypeScript base, framework-agnostic
 - SSR-safe implementations
+- **shadcn drop-in compatibility**: Overlay components (Dialog, Sheet, Drawer, Select, Tooltip, etc.) include Portal/Overlay internally so users can copy shadcn examples verbatim
