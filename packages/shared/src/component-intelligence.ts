@@ -157,15 +157,15 @@ function parseUsagePatternsInline(value: string, intelligence: JSDocIntelligence
     intelligence.usagePatterns = { dos: [], nevers: [] };
   }
 
-  // Match DO: patterns
-  const doMatches = value.matchAll(/DO:\s*([^DN]+?)(?=(?:DO:|NEVER:|$))/gi);
+  // Match DO: patterns - use negative lookahead to match any chars except keywords
+  const doMatches = value.matchAll(/DO:\s*((?:(?!DO:|NEVER:).)+?)(?=(?:DO:|NEVER:|$))/gi);
   for (const match of doMatches) {
     const text = match[1]?.trim();
     if (text) intelligence.usagePatterns.dos.push(text);
   }
 
-  // Match NEVER: patterns
-  const neverMatches = value.matchAll(/NEVER:\s*([^DN]+?)(?=(?:DO:|NEVER:|$))/gi);
+  // Match NEVER: patterns - use negative lookahead to match any chars except keywords
+  const neverMatches = value.matchAll(/NEVER:\s*((?:(?!DO:|NEVER:).)+?)(?=(?:DO:|NEVER:|$))/gi);
   for (const match of neverMatches) {
     const text = match[1]?.trim();
     if (text) intelligence.usagePatterns.nevers.push(text);
