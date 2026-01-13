@@ -738,3 +738,212 @@ describe('Popover - forceMount', () => {
     });
   });
 });
+
+describe('Popover - Auto-Portal (shadcn drop-in)', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('should auto-portal content without explicit PopoverPortal wrapper', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <Popover>
+        <PopoverTrigger>Open</PopoverTrigger>
+        <PopoverContent>Auto-Portaled Content</PopoverContent>
+      </Popover>,
+    );
+
+    // Initially closed
+    expect(screen.queryByText('Auto-Portaled Content')).not.toBeInTheDocument();
+
+    // Click trigger
+    await user.click(screen.getByText('Open'));
+
+    // Should open and render in portal (body)
+    await waitFor(() => {
+      expect(screen.getByText('Auto-Portaled Content')).toBeInTheDocument();
+    });
+
+    // Verify it's portaled to body (not nested in the original DOM)
+    const content = screen.getByRole('dialog');
+    expect(content.closest('body > *')).toBeTruthy();
+  });
+
+  it('should work with defaultOpen without explicit Portal', async () => {
+    render(
+      <Popover defaultOpen>
+        <PopoverTrigger>Open</PopoverTrigger>
+        <PopoverContent>Default Open Content</PopoverContent>
+      </Popover>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Default Open Content')).toBeInTheDocument();
+    });
+  });
+
+  it('should close on escape without explicit Portal', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <Popover defaultOpen>
+        <PopoverTrigger>Open</PopoverTrigger>
+        <PopoverContent>Escape Test</PopoverContent>
+      </Popover>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Escape Test')).toBeInTheDocument();
+    });
+
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => {
+      expect(screen.queryByText('Escape Test')).not.toBeInTheDocument();
+    });
+  });
+
+  it('should close on outside click without explicit Portal', async () => {
+    render(
+      <div>
+        <Popover defaultOpen>
+          <PopoverTrigger>Open</PopoverTrigger>
+          <PopoverContent>Outside Click Test</PopoverContent>
+        </Popover>
+        <button type="button" data-testid="outside">
+          Outside
+        </button>
+      </div>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Outside Click Test')).toBeInTheDocument();
+    });
+
+    fireEvent.pointerDown(screen.getByTestId('outside'));
+
+    await waitFor(() => {
+      expect(screen.queryByText('Outside Click Test')).not.toBeInTheDocument();
+    });
+  });
+
+  it('should support container prop without explicit Portal', async () => {
+    const customContainer = document.createElement('div');
+    customContainer.id = 'custom-portal-container';
+    document.body.appendChild(customContainer);
+
+    render(
+      <Popover defaultOpen>
+        <PopoverTrigger>Open</PopoverTrigger>
+        <PopoverContent container={customContainer}>Custom Container Content</PopoverContent>
+      </Popover>,
+    );
+
+    await waitFor(() => {
+      const content = screen.getByText('Custom Container Content');
+      expect(content).toBeInTheDocument();
+      expect(content.closest('#custom-portal-container')).toBeTruthy();
+    });
+
+    document.body.removeChild(customContainer);
+  });
+
+  it('should not double-wrap when used with explicit PopoverPortal', async () => {
+    render(
+      <Popover defaultOpen>
+        <PopoverTrigger>Open</PopoverTrigger>
+        <PopoverPortal>
+          <PopoverContent data-testid="content">Explicit Portal Content</PopoverContent>
+        </PopoverPortal>
+      </Popover>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Explicit Portal Content')).toBeInTheDocument();
+    });
+
+    // Should only have one dialog element (not double-portaled)
+    const dialogs = screen.getAllByRole('dialog');
+    expect(dialogs).toHaveLength(1);
+  });
+
+  it('should support PopoverClose without explicit Portal', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <Popover defaultOpen>
+        <PopoverTrigger>Open</PopoverTrigger>
+        <PopoverContent>
+          <p>Content</p>
+          <PopoverClose>Close Button</PopoverClose>
+        </PopoverContent>
+      </Popover>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Content')).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByText('Close Button'));
+
+    await waitFor(() => {
+      expect(screen.queryByText('Content')).not.toBeInTheDocument();
+    });
+  });
+
+  it('should focus first element without explicit Portal', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <Popover>
+        <PopoverTrigger>Open</PopoverTrigger>
+        <PopoverContent>
+          <button type="button">First</button>
+          <button type="button">Second</button>
+        </PopoverContent>
+      </Popover>,
+    );
+
+    await user.click(screen.getByText('Open'));
+
+    await waitFor(() => {
+      expect(screen.getByText('First')).toHaveFocus();
+    });
+  });
+
+  it('should have correct ARIA attributes without explicit Portal', async () => {
+    render(
+      <Popover defaultOpen>
+        <PopoverTrigger>Open</PopoverTrigger>
+        <PopoverContent>ARIA Test</PopoverContent>
+      </Popover>,
+    );
+
+    await waitFor(() => {
+      const trigger = screen.getByText('Open');
+      expect(trigger).toHaveAttribute('aria-expanded', 'true');
+      expect(trigger).toHaveAttribute('data-state', 'open');
+
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toHaveAttribute('data-state', 'open');
+    });
+  });
+
+  it('should support positioning props without explicit Portal', async () => {
+    render(
+      <Popover defaultOpen>
+        <PopoverTrigger>Open</PopoverTrigger>
+        <PopoverContent side="top" align="start" sideOffset={8}>
+          Positioned Content
+        </PopoverContent>
+      </Popover>,
+    );
+
+    await waitFor(() => {
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toHaveAttribute('data-side');
+      expect(dialog).toHaveAttribute('data-align');
+    });
+  });
+});
