@@ -2,6 +2,7 @@
  * Popover component for contextual floating content
  *
  * Built on the Float primitive for consistent positioning across all overlay components.
+ * Portal is automatically included - no need to wrap content in Popover.Portal.
  *
  * @cognitive-load 4/10 - Contextual content requiring focus but not blocking workflow
  * @attention-economics Partial attention: appears on trigger, dismisses on outside click or escape
@@ -18,6 +19,7 @@
  *
  * @example
  * ```tsx
+ * // Minimal usage - Portal is included automatically
  * <Popover>
  *   <Popover.Trigger asChild>
  *     <Button variant="outline">Open</Button>
@@ -25,6 +27,16 @@
  *   <Popover.Content>
  *     Popover content here
  *   </Popover.Content>
+ * </Popover>
+ *
+ * // Or with explicit Portal (for custom container)
+ * <Popover>
+ *   <Popover.Trigger asChild>
+ *     <Button>Open</Button>
+ *   </Popover.Trigger>
+ *   <Popover.Portal container={customContainer}>
+ *     <Popover.Content>Content</Popover.Content>
+ *   </Popover.Portal>
  * </Popover>
  * ```
  */
@@ -35,6 +47,13 @@ import classy from '../../primitives/classy';
 import { Float, useFloatContext } from '../../primitives/float';
 import { getPortalContainer } from '../../primitives/portal';
 import type { Align, Side } from '../../primitives/types';
+
+// Context to track if we're inside a portal (to avoid double-wrapping)
+const PopoverPortalContext = React.createContext<boolean>(false);
+
+function useIsInsidePortal() {
+  return React.useContext(PopoverPortalContext);
+}
 
 // ==================== Popover (Root) ====================
 
@@ -138,7 +157,10 @@ export function PopoverPortal({ children, container, forceMount }: PopoverPortal
     return null;
   }
 
-  return createPortal(children, portalContainer);
+  return createPortal(
+    <PopoverPortalContext.Provider value={true}>{children}</PopoverPortalContext.Provider>,
+    portalContainer,
+  );
 }
 
 // ==================== PopoverContent ====================
@@ -155,6 +177,8 @@ export interface PopoverContentProps extends React.HTMLAttributes<HTMLDivElement
   onEscapeKeyDown?: (event: KeyboardEvent) => void;
   onPointerDownOutside?: (event: PointerEvent | TouchEvent) => void;
   onInteractOutside?: (event: Event) => void;
+  /** Container element for the portal. Defaults to document.body. */
+  container?: HTMLElement | null;
 }
 
 export function PopoverContent({
@@ -169,12 +193,14 @@ export function PopoverContent({
   onEscapeKeyDown,
   onPointerDownOutside,
   onInteractOutside,
+  container,
   className,
   children,
   ...props
 }: PopoverContentProps) {
   const contentRef = React.useRef<HTMLDivElement>(null);
   const { open } = useFloatContext();
+  const isInsidePortal = useIsInsidePortal();
 
   // Focus first element on open
   React.useEffect(() => {
@@ -199,7 +225,7 @@ export function PopoverContent({
     [onPointerDownOutside, onInteractOutside],
   );
 
-  return (
+  const content = (
     <Float.Content
       ref={contentRef}
       forceMount={forceMount}
@@ -224,6 +250,18 @@ export function PopoverContent({
       {children}
     </Float.Content>
   );
+
+  // If already inside a portal (user used PopoverPortal explicitly), just render content
+  if (isInsidePortal) {
+    return content;
+  }
+
+  // Otherwise, wrap with Portal automatically (shadcn-style)
+  const portalProps: Omit<PopoverPortalProps, 'children'> = {};
+  if (container !== undefined) portalProps.container = container;
+  if (forceMount !== undefined) portalProps.forceMount = forceMount;
+
+  return <PopoverPortal {...portalProps}>{content}</PopoverPortal>;
 }
 
 // ==================== PopoverClose ====================
