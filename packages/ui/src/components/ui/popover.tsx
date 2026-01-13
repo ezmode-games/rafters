@@ -225,6 +225,8 @@ export function PopoverContent({
     [onPointerDownOutside, onInteractOutside],
   );
 
+  // When inside explicit PopoverPortal, disable Float.Content's internal portal
+  // When auto-portaling, let Float.Content handle the portal with the container prop
   const content = (
     <Float.Content
       ref={contentRef}
@@ -235,6 +237,8 @@ export function PopoverContent({
       alignOffset={alignOffset}
       onEscapeKeyDown={onEscapeKeyDown}
       onPointerDownOutside={handlePointerDownOutside}
+      disablePortal={isInsidePortal}
+      container={!isInsidePortal ? container : undefined}
       role="dialog"
       className={classy(
         'z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none',
@@ -251,17 +255,7 @@ export function PopoverContent({
     </Float.Content>
   );
 
-  // If already inside a portal (user used PopoverPortal explicitly), just render content
-  if (isInsidePortal) {
-    return content;
-  }
-
-  // Otherwise, wrap with Portal automatically (shadcn-style)
-  const portalProps: Omit<PopoverPortalProps, 'children'> = {};
-  if (container !== undefined) portalProps.container = container;
-  if (forceMount !== undefined) portalProps.forceMount = forceMount;
-
-  return <PopoverPortal {...portalProps}>{content}</PopoverPortal>;
+  return content;
 }
 
 // ==================== PopoverClose ====================
