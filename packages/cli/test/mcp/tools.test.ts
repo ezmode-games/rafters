@@ -6,17 +6,24 @@ import { RaftersToolHandler, TOOL_DEFINITIONS } from '../../src/mcp/tools.js';
 import { fixtures, serializeNamespaceFile } from '../fixtures/tokens.js';
 
 describe('TOOL_DEFINITIONS', () => {
-  it('should define 5 tools', () => {
-    expect(TOOL_DEFINITIONS).toHaveLength(5);
+  it('should define 9 tools', () => {
+    expect(TOOL_DEFINITIONS).toHaveLength(9);
   });
 
   it('should have correct tool names', () => {
     const names = TOOL_DEFINITIONS.map((t) => t.name);
+    // Token tools
     expect(names).toContain('rafters_list_namespaces');
     expect(names).toContain('rafters_get_tokens');
     expect(names).toContain('rafters_get_token');
     expect(names).toContain('rafters_search_tokens');
     expect(names).toContain('rafters_get_config');
+    // Component intelligence tools
+    expect(names).toContain('rafters_list_components');
+    expect(names).toContain('rafters_get_component');
+    expect(names).toContain('rafters_search_components');
+    // Design decision tools
+    expect(names).toContain('rafters_get_design_decisions');
   });
 
   it('should have descriptions for all tools', () => {
