@@ -83,9 +83,6 @@ export function useSidebar() {
 
 const SIDEBAR_COOKIE_NAME = 'sidebar:state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
-const SIDEBAR_WIDTH = '16rem';
-const SIDEBAR_WIDTH_MOBILE = '18rem';
-const SIDEBAR_WIDTH_ICON = '3rem';
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
 
 export interface SidebarProviderProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -179,13 +176,7 @@ export function SidebarProvider({
     <SidebarContext.Provider value={contextValue}>
       <div
         data-sidebar="provider"
-        style={
-          {
-            '--sidebar-width': SIDEBAR_WIDTH,
-            '--sidebar-width-icon': SIDEBAR_WIDTH_ICON,
-            ...style,
-          } as React.CSSProperties
-        }
+        style={style}
         className={classy(
           'group/sidebar-wrapper flex min-h-svh w-full has-data-[variant=inset]:bg-sidebar',
           className,
@@ -223,7 +214,7 @@ export function Sidebar({
         data-variant={variant}
         data-side={side}
         className={classy(
-          'flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground',
+          'flex h-full w-64 flex-col bg-sidebar text-sidebar-foreground',
           className,
         )}
         {...props}
@@ -255,14 +246,13 @@ export function Sidebar({
           data-side={side}
           data-state={openMobile ? 'open' : 'closed'}
           className={classy(
-            'fixed inset-y-0 z-depth-modal flex h-svh flex-col bg-sidebar text-sidebar-foreground',
-            'w-[--sidebar-width] transition-transform duration-200 ease-in-out',
+            'fixed inset-y-0 z-depth-modal flex h-svh w-72 flex-col bg-sidebar text-sidebar-foreground',
+            'transition-transform duration-200 ease-in-out',
             side === 'left'
               ? 'left-0 data-[state=closed]:-translate-x-full'
               : 'right-0 data-[state=closed]:translate-x-full',
             className,
           )}
-          style={{ ['--sidebar-width' as string]: SIDEBAR_WIDTH_MOBILE }}
           {...props}
         >
           <div className="flex h-full w-full flex-col">{children}</div>
@@ -284,23 +274,23 @@ export function Sidebar({
       {/* Gap element for smooth transition */}
       <div
         className={classy(
-          'relative h-svh w-[--sidebar-width] bg-transparent transition-[width] duration-200 ease-linear',
+          'relative h-svh w-64 bg-transparent transition-all duration-200 ease-linear',
           'group-data-[collapsible=offcanvas]:w-0',
-          'group-data-[collapsible=icon]:w-[--sidebar-width-icon]',
+          'group-data-[collapsible=icon]:w-12',
         )}
       />
 
       {/* Actual sidebar content */}
       <div
         className={classy(
-          'fixed inset-y-0 z-depth-navigation flex h-svh w-[--sidebar-width] flex-col transition-[left,right,width] duration-200 ease-linear',
+          'fixed inset-y-0 z-depth-navigation flex h-svh w-64 flex-col transition-all duration-200 ease-linear',
           side === 'left'
-            ? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]'
-            : 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]',
-          'group-data-[collapsible=icon]:w-[--sidebar-width-icon]',
+            ? 'left-0 group-data-[collapsible=offcanvas]:-left-64'
+            : 'right-0 group-data-[collapsible=offcanvas]:-right-64',
+          'group-data-[collapsible=icon]:w-12',
           // Variants
           variant === 'floating' || variant === 'inset'
-            ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+theme(spacing.4)+2px)]'
+            ? 'p-2 group-data-[collapsible=icon]:w-16'
             : 'border-r group-data-[side=right]:border-l group-data-[side=right]:border-r-0',
           className,
         )}
@@ -499,7 +489,7 @@ export function SidebarGroupLabel({
     'data-sidebar': 'group-label',
     className: classy(
       'flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none',
-      'ring-sidebar-ring transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2',
+      'ring-sidebar-ring transition-all duration-200 ease-linear focus-visible:ring-2',
       'group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0',
       className,
     ),
@@ -612,7 +602,7 @@ export function SidebarMenuButton({
     'data-active': isActive,
     className: classy(
       'peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none',
-      'ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+      'ring-sidebar-ring transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
       'focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50',
       'group-has-data-[sidebar=menu-action]/menu-item:pr-8',
       'aria-disabled:pointer-events-none aria-disabled:opacity-50',
