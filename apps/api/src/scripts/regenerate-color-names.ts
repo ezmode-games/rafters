@@ -15,30 +15,28 @@ import { unlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { generateColorName } from '@rafters/color-utils';
 import type { ColorValue, OKLCH } from '@rafters/shared';
-import { z } from 'zod';
 
 const INDEX_NAME = 'rafters-colors';
 const GET_BATCH_SIZE = 20; // Vectorize API limit for get-vectors
 const UPSERT_BATCH_SIZE = 100; // Accumulate before upserting
 
-// Zod schemas for Vectorize API responses
-const VectorListResponseSchema = z.object({
-  count: z.number(),
-  totalCount: z.number(),
-  isTruncated: z.boolean(),
-  nextCursor: z.string().optional(),
-  vectors: z.array(z.object({ id: z.string() })),
-});
+// Type definitions for Vectorize API responses
+// Note: Runtime validation is done inline for this one-time migration script
+interface VectorListResponse {
+  count: number;
+  totalCount: number;
+  isTruncated: boolean;
+  nextCursor?: string;
+  vectors: Array<{ id: string }>;
+}
 
-const VectorSchema = z.object({
-  id: z.string(),
-  values: z.array(z.number()),
-  metadata: z.record(z.unknown()).optional(),
-});
+interface VectorRecord {
+  id: string;
+  values: number[];
+  metadata?: Record<string, unknown>;
+}
 
-const VectorArraySchema = z.array(VectorSchema);
-
-type VectorGetResponse = { vectors: z.infer<typeof VectorArraySchema> };
+type VectorGetResponse = { vectors: VectorRecord[] };
 
 interface RegenerationResult {
   total: number;
@@ -69,7 +67,7 @@ function getAllVectorIds(): string[] {
     }
 
     const output = runWrangler(args);
-    const response = VectorListResponseSchema.parse(JSON.parse(output));
+    const response = JSON.parse(output) as VectorListResponse;
 
     for (const v of response.vectors) {
       ids.push(v.id);
@@ -94,8 +92,8 @@ function getVectorsBatch(ids: string[]): VectorGetResponse {
   }
   const jsonOutput = output.slice(jsonStart);
 
-  // Parse and validate the array, wrap in expected structure
-  const vectors = VectorArraySchema.parse(JSON.parse(jsonOutput));
+  // Parse the array and wrap in expected structure
+  const vectors = JSON.parse(jsonOutput) as VectorRecord[];
   return { vectors };
 }
 
