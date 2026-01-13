@@ -5,6 +5,20 @@
 
 import { readdirSync, readFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
+import { parse, type Spec } from 'comment-parser';
+
+// Intelligence metadata extracted from JSDoc comments
+export interface ComponentIntelligence {
+  cognitiveLoad?: number; // 0-10 scale
+  attentionEconomics?: string;
+  accessibility?: string;
+  trustBuilding?: string;
+  semanticMeaning?: string;
+  usagePatterns?: {
+    dos: string[];
+    nevers: string[];
+  };
+}
 
 export interface RegistryFile {
   path: string;
@@ -18,6 +32,7 @@ export interface RegistryItem {
   description?: string;
   primitives: string[];
   files: RegistryFile[];
+  intelligence?: ComponentIntelligence;
 }
 
 export interface RegistryIndex {
@@ -93,6 +108,79 @@ function versionDeps(deps: string[]): string[] {
 }
 
 /**
+ * Parse JSDoc comments from source to extract intelligence metadata
+ */
+export function parseJSDocFromSource(source: string): ComponentIntelligence | undefined {
+  const blocks = parse(source);
+  if (blocks.length === 0) return undefined;
+
+  const intelligence: ComponentIntelligence = {};
+  let hasAnyField = false;
+
+  // Process all JSDoc blocks
+  for (const block of blocks) {
+    for (const tag of block.tags) {
+      const tagName = tag.tag.toLowerCase();
+      const value = getTagValue(tag);
+
+      switch (tagName) {
+        case 'cognitiveload':
+          {
+            const num = Number.parseInt(value, 10);
+            if (!Number.isNaN(num) && num >= 0 && num <= 10) {
+              intelligence.cognitiveLoad = num;
+              hasAnyField = true;
+            }
+          }
+          break;
+        case 'attentioneconomics':
+          intelligence.attentionEconomics = value;
+          hasAnyField = true;
+          break;
+        case 'accessibility':
+          intelligence.accessibility = value;
+          hasAnyField = true;
+          break;
+        case 'trustbuilding':
+          intelligence.trustBuilding = value;
+          hasAnyField = true;
+          break;
+        case 'semanticmeaning':
+          intelligence.semanticMeaning = value;
+          hasAnyField = true;
+          break;
+        case 'do':
+          if (!intelligence.usagePatterns) {
+            intelligence.usagePatterns = { dos: [], nevers: [] };
+          }
+          intelligence.usagePatterns.dos.push(value);
+          hasAnyField = true;
+          break;
+        case 'never':
+          if (!intelligence.usagePatterns) {
+            intelligence.usagePatterns = { dos: [], nevers: [] };
+          }
+          intelligence.usagePatterns.nevers.push(value);
+          hasAnyField = true;
+          break;
+      }
+    }
+  }
+
+  return hasAnyField ? intelligence : undefined;
+}
+
+/**
+ * Extract the full value from a JSDoc tag (name + description)
+ */
+function getTagValue(tag: Spec): string {
+  const parts: string[] = [];
+  if (tag.name) parts.push(tag.name);
+  if (tag.description) parts.push(tag.description);
+  return parts.join(' ').trim();
+}
+
+/**
  * Load a single component by name
  */
 export function loadComponent(name: string): RegistryItem | null {
@@ -108,7 +196,10 @@ export function loadComponent(name: string): RegistryItem | null {
     // Extract primitive dependencies
     const primitiveDeps = extractPrimitiveDependencies(content);
 
-    return {
+    // Parse JSDoc for intelligence metadata
+    const intelligence = parseJSDocFromSource(content);
+
+    const result: RegistryItem = {
       name,
       type: 'registry:ui',
       primitives: [...deps.internal, ...primitiveDeps],
@@ -120,6 +211,12 @@ export function loadComponent(name: string): RegistryItem | null {
         },
       ],
     };
+
+    if (intelligence) {
+      result.intelligence = intelligence;
+    }
+
+    return result;
   } catch {
     return null;
   }
@@ -153,7 +250,10 @@ export function loadPrimitive(name: string): RegistryItem | null {
     // Pass isPrimitive=true so ./foo imports are treated as sibling primitives
     const primitiveDeps = extractPrimitiveDependencies(content, true);
 
-    return {
+    // Parse JSDoc for intelligence metadata
+    const intelligence = parseJSDocFromSource(content);
+
+    const result: RegistryItem = {
       name,
       type: 'registry:primitive',
       primitives: primitiveDeps,
@@ -165,6 +265,12 @@ export function loadPrimitive(name: string): RegistryItem | null {
         },
       ],
     };
+
+    if (intelligence) {
+      result.intelligence = intelligence;
+    }
+
+    return result;
   } catch {
     return null;
   }

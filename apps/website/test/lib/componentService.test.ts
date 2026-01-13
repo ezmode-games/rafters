@@ -7,6 +7,7 @@ import {
   loadAllPrimitives,
   loadComponent,
   loadPrimitive,
+  parseJSDocFromSource,
 } from '../../src/lib/registry/componentService';
 
 describe('componentService', () => {
@@ -178,6 +179,156 @@ describe('componentService', () => {
       const index = getRegistryIndex();
       const names = listPrimitiveNames();
       expect(index.primitives).toEqual(names);
+    });
+  });
+
+  describe('parseJSDocFromSource', () => {
+    it('returns undefined for source without JSDoc', () => {
+      const source = `
+        export function myFunction() {
+          return true;
+        }
+      `;
+      expect(parseJSDocFromSource(source)).toBeUndefined();
+    });
+
+    it('returns undefined for JSDoc without intelligence tags', () => {
+      const source = `
+        /**
+         * A simple function
+         * @param x The input
+         * @returns The output
+         */
+        export function myFunction(x: number) {
+          return x * 2;
+        }
+      `;
+      expect(parseJSDocFromSource(source)).toBeUndefined();
+    });
+
+    it('parses cognitiveLoad tag', () => {
+      const source = `
+        /**
+         * A component
+         * @cognitiveLoad 5
+         */
+        export function MyComponent() {}
+      `;
+      const intel = parseJSDocFromSource(source);
+      expect(intel).toBeDefined();
+      expect(intel?.cognitiveLoad).toBe(5);
+    });
+
+    it('validates cognitiveLoad is between 0-10', () => {
+      const source = `
+        /**
+         * @cognitiveLoad 15
+         */
+        export function MyComponent() {}
+      `;
+      const intel = parseJSDocFromSource(source);
+      expect(intel).toBeUndefined();
+    });
+
+    it('parses attentionEconomics tag', () => {
+      const source = `
+        /**
+         * @attentionEconomics Primary action button, demands immediate attention
+         */
+        export function Button() {}
+      `;
+      const intel = parseJSDocFromSource(source);
+      expect(intel?.attentionEconomics).toBe('Primary action button, demands immediate attention');
+    });
+
+    it('parses accessibility tag', () => {
+      const source = `
+        /**
+         * @accessibility Requires aria-label for screen readers
+         */
+        export function IconButton() {}
+      `;
+      const intel = parseJSDocFromSource(source);
+      expect(intel?.accessibility).toBe('Requires aria-label for screen readers');
+    });
+
+    it('parses trustBuilding tag', () => {
+      const source = `
+        /**
+         * @trustBuilding Consistent placement reinforces user expectations
+         */
+        export function Navigation() {}
+      `;
+      const intel = parseJSDocFromSource(source);
+      expect(intel?.trustBuilding).toBe('Consistent placement reinforces user expectations');
+    });
+
+    it('parses semanticMeaning tag', () => {
+      const source = `
+        /**
+         * @semanticMeaning Represents destructive or irreversible action
+         */
+        export function DeleteButton() {}
+      `;
+      const intel = parseJSDocFromSource(source);
+      expect(intel?.semanticMeaning).toBe('Represents destructive or irreversible action');
+    });
+
+    it('parses do tags into usagePatterns.dos', () => {
+      const source = `
+        /**
+         * @do Use for primary calls to action
+         * @do Place in consistent locations
+         */
+        export function Button() {}
+      `;
+      const intel = parseJSDocFromSource(source);
+      expect(intel?.usagePatterns).toBeDefined();
+      expect(intel?.usagePatterns?.dos).toHaveLength(2);
+      expect(intel?.usagePatterns?.dos).toContain('Use for primary calls to action');
+      expect(intel?.usagePatterns?.dos).toContain('Place in consistent locations');
+    });
+
+    it('parses never tags into usagePatterns.nevers', () => {
+      const source = `
+        /**
+         * @never Use for destructive actions without confirmation
+         * @never Place outside of visible viewport
+         */
+        export function Button() {}
+      `;
+      const intel = parseJSDocFromSource(source);
+      expect(intel?.usagePatterns).toBeDefined();
+      expect(intel?.usagePatterns?.nevers).toHaveLength(2);
+      expect(intel?.usagePatterns?.nevers).toContain(
+        'Use for destructive actions without confirmation',
+      );
+      expect(intel?.usagePatterns?.nevers).toContain('Place outside of visible viewport');
+    });
+
+    it('parses multiple intelligence tags from single JSDoc block', () => {
+      const source = `
+        /**
+         * Primary button component
+         * @cognitiveLoad 3
+         * @attentionEconomics High visibility, primary action
+         * @accessibility Use descriptive text, avoid icon-only
+         * @trustBuilding Consistent styling across app
+         * @semanticMeaning Primary action confirmation
+         * @do Use sparingly for main actions
+         * @never Use multiple primary buttons in one view
+         */
+        export function Button() {}
+      `;
+      const intel = parseJSDocFromSource(source);
+      expect(intel).toBeDefined();
+      expect(intel?.cognitiveLoad).toBe(3);
+      expect(intel?.attentionEconomics).toBe('High visibility, primary action');
+      expect(intel?.accessibility).toBe('Use descriptive text, avoid icon-only');
+      expect(intel?.trustBuilding).toBe('Consistent styling across app');
+      expect(intel?.semanticMeaning).toBe('Primary action confirmation');
+      expect(intel?.usagePatterns?.dos).toContain('Use sparingly for main actions');
+      expect(intel?.usagePatterns?.nevers).toContain('Use multiple primary buttons in one view');
     });
   });
 });
