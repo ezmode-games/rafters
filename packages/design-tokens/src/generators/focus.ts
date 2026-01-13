@@ -167,12 +167,15 @@ export function generateFocusTokens(
     },
   });
 
-  // High contrast mode overrides
+  // High contrast mode overrides - derive from base focus ring width
+  // Width is scaled up for better visibility in high contrast
+  const highContrastWidth = focusRingWidth * 1.5; // 1.5x base width for high contrast visibility
+  const highContrastOffset = focusRingWidth; // Offset matches base width
   tokens.push({
     name: 'focus-high-contrast',
     value: JSON.stringify({
-      width: pxToRem(3),
-      offset: pxToRem(2),
+      width: pxToRem(highContrastWidth),
+      offset: pxToRem(highContrastOffset),
       style: 'solid',
       color: 'Highlight',
     }),
@@ -180,8 +183,8 @@ export function generateFocusTokens(
     namespace: 'focus',
     semanticMeaning: 'Focus ring for Windows High Contrast Mode',
     usageContext: ['high-contrast-mode', 'forced-colors'],
-    focusRingWidth: pxToRem(3),
-    focusRingOffset: pxToRem(2),
+    focusRingWidth: pxToRem(highContrastWidth),
+    focusRingOffset: pxToRem(highContrastOffset),
     focusRingStyle: 'solid',
     highContrastMode: 'Highlight',
     description: 'High contrast focus ring using system Highlight color.',

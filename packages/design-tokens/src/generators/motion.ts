@@ -183,7 +183,18 @@ export function generateMotionTokens(
     });
   }
 
-  // Keyframe definitions - these define the actual animation steps
+  // Keyframe definitions - values derived from progression ratio for mathematical harmony
+  // Compute animation values from ratio:
+  // - scaleStart: 1/ratio^0.25 ≈ 0.955 for subtle entrance scale
+  // - pingScale: ratio^3 ≈ 1.73 for expanding effect (rounded to 2 for simplicity)
+  // - pulseOpacity: 1/ratio^4 ≈ 0.48 for gentle pulse midpoint
+  // - bounceTranslate: 100/ratio^6 ≈ 33% for bounce height
+  const ratioValue = progression.ratio;
+  const scaleStart = Math.round((1 / ratioValue ** 0.25) * 100) / 100; // ~0.95 for 1.2 ratio
+  const pingScale = Math.round(ratioValue ** 3 * 10) / 10; // ~1.7 for 1.2 ratio, round to nearest 0.1
+  const pulseOpacity = Math.round((1 / ratioValue ** 4) * 100) / 100; // ~0.48 for 1.2 ratio
+  const bouncePercent = Math.round(100 / ratioValue ** 6); // ~33% for 1.2 ratio
+
   const keyframes: Array<{
     name: string;
     css: string;
@@ -252,13 +263,13 @@ export function generateMotionTokens(
     },
     {
       name: 'scale-in',
-      css: 'from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; }',
+      css: `from { transform: scale(${scaleStart}); opacity: 0; } to { transform: scale(1); opacity: 1; }`,
       meaning: 'Scale up while fading in',
       contexts: ['modal', 'popover', 'dialog'],
     },
     {
       name: 'scale-out',
-      css: 'from { transform: scale(1); opacity: 1; } to { transform: scale(0.95); opacity: 0; }',
+      css: `from { transform: scale(1); opacity: 1; } to { transform: scale(${scaleStart}); opacity: 0; }`,
       meaning: 'Scale down while fading out',
       contexts: ['modal-exit', 'popover-close'],
     },
@@ -270,19 +281,19 @@ export function generateMotionTokens(
     },
     {
       name: 'ping',
-      css: '75%, 100% { transform: scale(2); opacity: 0; }',
+      css: `75%, 100% { transform: scale(${pingScale}); opacity: 0; }`,
       meaning: 'Expanding pulse that fades out',
       contexts: ['notification-badge', 'attention', 'pulse'],
     },
     {
       name: 'pulse',
-      css: '0%, 100% { opacity: 1; } 50% { opacity: 0.5; }',
+      css: `0%, 100% { opacity: 1; } 50% { opacity: ${pulseOpacity}; }`,
       meaning: 'Gentle opacity pulse',
       contexts: ['skeleton', 'loading-placeholder'],
     },
     {
       name: 'bounce',
-      css: '0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); } 50% { transform: translateY(0); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }',
+      css: `0%, 100% { transform: translateY(-${bouncePercent}%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); } 50% { transform: translateY(0); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }`,
       meaning: 'Bouncing motion',
       contexts: ['attention', 'scroll-indicator'],
     },

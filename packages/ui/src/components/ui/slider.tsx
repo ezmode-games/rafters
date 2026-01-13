@@ -324,8 +324,8 @@ export const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
     const isHorizontal = orientation === 'horizontal';
 
     // Get variant and size classes with explicit defaults
-    const v = variantClasses[variant] || variantClasses.default;
-    const s = sliderSizeClasses[size] || sliderSizeClasses.default;
+    const v = variantClasses[variant] ?? variantClasses.default;
+    const s = sliderSizeClasses[size] ?? { track: 'h-2', thumb: 'h-5 w-5' };
 
     const containerClasses = classy(
       'relative flex touch-none select-none items-center',
@@ -337,11 +337,14 @@ export const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
       className,
     );
 
-    const trackClasses = classy('relative grow overflow-hidden rounded-full bg-muted', {
-      [s!.track]: isHorizontal,
-      'w-full': isHorizontal,
-      'h-full w-2': !isHorizontal,
-    });
+    const trackClasses = classy(
+      'relative grow overflow-hidden rounded-full bg-muted',
+      isHorizontal && s.track,
+      {
+        'w-full': isHorizontal,
+        'h-full w-2': !isHorizontal,
+      },
+    );
 
     const rangeStyle: React.CSSProperties = isHorizontal
       ? {

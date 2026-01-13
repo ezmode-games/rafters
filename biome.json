@@ -19,7 +19,9 @@
       "!test-results",
       "!**/.cache",
       "!**/*.vue",
-      "!**/worker-configuration.d.ts"
+      "!**/worker-configuration.d.ts",
+      "!apps/demo/src/styles/global.css",
+      "!**/.rafters"
     ]
   },
   "assist": { "actions": { "source": { "organizeImports": "on" } } },

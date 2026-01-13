@@ -668,9 +668,7 @@ describe('Orchestration', () => {
       expect(customBlue500?.value).toMatch(/oklch\(/);
 
       // Should NOT have default color families when custom bases provided
-      const silverGlacier500 = result.allTokens.find(
-        (t) => t.name === 'silver-true-glacier-500',
-      );
+      const silverGlacier500 = result.allTokens.find((t) => t.name === 'silver-true-glacier-500');
       expect(silverGlacier500).toBeUndefined();
     });
 

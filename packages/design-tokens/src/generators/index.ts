@@ -88,9 +88,7 @@ interface GeneratorDef {
  * 1. Pre-defined color scales (neutral)
  * 2. Semantic color bases (computed via math) - custom or default
  */
-function buildAllColorScales(
-  customBases?: Record<string, ColorPaletteBase>,
-): ColorScaleInput[] {
+function buildAllColorScales(customBases?: Record<string, ColorPaletteBase>): ColorScaleInput[] {
   const bases = customBases ?? DEFAULT_SEMANTIC_COLOR_BASES;
   const semanticScales = Object.entries(bases).map(([name, base]) =>
     buildColorScaleFromBase(name, base),
@@ -99,9 +97,7 @@ function buildAllColorScales(
   return [...DEFAULT_COLOR_SCALES, ...semanticScales];
 }
 
-function createGeneratorDefs(
-  colorPaletteBases?: Record<string, ColorPaletteBase>,
-): GeneratorDef[] {
+function createGeneratorDefs(colorPaletteBases?: Record<string, ColorPaletteBase>): GeneratorDef[] {
   return [
     // Foundation tokens (no dependencies)
     {

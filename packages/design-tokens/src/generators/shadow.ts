@@ -122,40 +122,41 @@ export function generateShadowTokens(
   }
 
   // Add colored shadow variant tokens
-  const coloredShadows = [
-    {
-      name: 'shadow-primary',
-      desc: 'Primary colored shadow for emphasis',
-      color: 'var(--primary)',
-      opacity: 0.2,
-    },
-    {
-      name: 'shadow-destructive',
-      desc: 'Destructive colored shadow for warnings',
-      color: 'var(--destructive)',
-      opacity: 0.2,
-    },
-  ];
+  // Opacity derived from base shadow definition scaled by ratio for emphasis
+  const baseDef = shadowDefs.DEFAULT;
+  if (baseDef) {
+    const coloredOpacity = baseDef.opacity * ratioValue; // Scale by progression ratio for emphasis
+    const coloredShadows = [
+      {
+        name: 'shadow-primary',
+        desc: 'Primary colored shadow for emphasis',
+        color: 'var(--primary)',
+      },
+      {
+        name: 'shadow-destructive',
+        desc: 'Destructive colored shadow for warnings',
+        color: 'var(--destructive)',
+      },
+    ];
 
-  for (const { name, desc, color, opacity } of coloredShadows) {
-    const baseDef = shadowDefs.DEFAULT;
-    if (!baseDef) continue;
-    const yOffsetPx = Math.round(baseDef.yOffset * baseSpacingUnit * 100) / 100;
-    const blurPx = Math.round(baseDef.blur * baseSpacingUnit * 100) / 100;
-    const spreadPx = Math.round(baseDef.spread * baseSpacingUnit * 100) / 100;
+    for (const { name, desc, color } of coloredShadows) {
+      const yOffsetPx = Math.round(baseDef.yOffset * baseSpacingUnit * 100) / 100;
+      const blurPx = Math.round(baseDef.blur * baseSpacingUnit * 100) / 100;
+      const spreadPx = Math.round(baseDef.spread * baseSpacingUnit * 100) / 100;
 
-    tokens.push({
-      name,
-      value: `0 ${pxToRem(yOffsetPx)} ${pxToRem(blurPx)} ${pxToRem(spreadPx)} color-mix(in oklch, ${color} ${opacity * 100}%, transparent)`,
-      category: 'shadow',
-      namespace: 'shadow',
-      semanticMeaning: desc,
-      usageContext: ['branded-elements', 'emphasis'],
-      dependsOn: ['shadow', color.replace('var(--', '').replace(')', '')],
-      description: `${desc}. Uses color-mix for proper OKLCH blending.`,
-      generatedAt: timestamp,
-      containerQueryAware: false,
-    });
+      tokens.push({
+        name,
+        value: `0 ${pxToRem(yOffsetPx)} ${pxToRem(blurPx)} ${pxToRem(spreadPx)} color-mix(in oklch, ${color} ${coloredOpacity * 100}%, transparent)`,
+        category: 'shadow',
+        namespace: 'shadow',
+        semanticMeaning: desc,
+        usageContext: ['branded-elements', 'emphasis'],
+        dependsOn: ['shadow', color.replace('var(--', '').replace(')', '')],
+        description: `${desc}. Uses color-mix for proper OKLCH blending.`,
+        generatedAt: timestamp,
+        containerQueryAware: false,
+      });
+    }
   }
 
   // Progression metadata

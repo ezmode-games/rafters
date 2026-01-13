@@ -141,7 +141,7 @@ export const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
       className={classy(
         'h-10 px-2 text-left align-middle font-medium text-muted-foreground',
         '[&:has([role=checkbox])]:pr-0',
-        '[&>[role=checkbox]]:translate-y-[2px]',
+        '[&>[role=checkbox]]:translate-y-0.5',
         className,
       )}
       {...props}
@@ -163,7 +163,7 @@ export const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
       className={classy(
         'p-2 align-middle',
         '[&:has([role=checkbox])]:pr-0',
-        '[&>[role=checkbox]]:translate-y-[2px]',
+        '[&>[role=checkbox]]:translate-y-0.5',
         className,
       )}
       {...props}

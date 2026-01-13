@@ -15,5 +15,6 @@ test-results
 *.turbo/
 *.astro/
 .rafters/
+!apps/demo/.rafters/
 .playwright-mcp/
 *.tsbuildinfo

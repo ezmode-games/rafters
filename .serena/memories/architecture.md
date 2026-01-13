@@ -42,6 +42,8 @@ npx rafters studio     # Launch customization UI
 npx rafters mcp        # Start MCP server for AI agents
 ```
 
+**Auto-dependency installation**: CLI detects package manager from lockfiles (@antfu/ni) and auto-installs npm dependencies when adding components.
+
 ### Website (apps/website)
 - **Astro** for static site generation
 - **MDX** for documentation
@@ -76,8 +78,9 @@ Token engine with dependency graph:
 
 ### @rafters/ui
 React components with cognitive metadata:
-- **Primitives** (vanilla TS, SSR-safe): slot, modal, keyboard, escape-handler, aria, sr-manager, focus
-- **Components**: Badge, Button, Card, Dialog, Input, Label, Select, Slider, Toast, etc.
+- **Primitives** (17 total, vanilla TS, SSR-safe): slot, modal, keyboard, escape-handler, aria, sr-manager, focus, float, classy, etc.
+- **Components**: 55 total (52 shadcn-compatible) - Badge, Button, Card, Dialog, Input, Label, Select, Slider, Toast, etc.
+- **shadcn drop-in compatibility**: All overlay components (Dialog, Sheet, Drawer, Select, Tooltip, etc.) include Portal/Overlay internally - users can copy shadcn examples verbatim
 - Each component includes cognitive load ratings and accessibility requirements
 
 ## Token Format (Rafters Native JSON)
