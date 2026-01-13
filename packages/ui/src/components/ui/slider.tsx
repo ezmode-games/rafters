@@ -338,7 +338,7 @@ export const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
     );
 
     const trackClasses = classy('relative grow overflow-hidden rounded-full bg-muted', {
-      [s!.track]: isHorizontal,
+      [s?.track ?? '']: isHorizontal,
       'w-full': isHorizontal,
       'h-full w-2': !isHorizontal,
     });
