@@ -9,7 +9,7 @@
  * import { generateColorName } from '@rafters/color-utils';
  *
  * const name = generateColorName({ l: 0.65, c: 0.12, h: 230, alpha: 1 });
- * // Returns: "dove-true-cobalt"
+ * // Returns: "luminous-true-cobalt"
  * ```
  */
 
