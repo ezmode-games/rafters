@@ -76,7 +76,7 @@ export const ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(
       <div
         ref={ref}
         className={classy(
-          'h-full w-full rounded-[inherit]',
+          'h-full w-full rounded-sm @md:rounded-md @lg:rounded-lg',
           scrollbarBase,
           orientationStyles[orientation],
           className,
