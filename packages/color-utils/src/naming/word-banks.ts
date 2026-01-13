@@ -2,7 +2,7 @@
  * Word Banks for Deterministic Color Naming
  *
  * Three independent word banks map to OKLCH dimensions:
- * - Luminosity (L): materials/textures describing light levels
+ * - Luminosity (L): brightness-based words describing light levels
  * - Intensity (C): emotions/feelings describing saturation
  * - Material (H): objects/places/nature describing hue
  *
@@ -13,18 +13,21 @@
 /**
  * Luminosity words by lightness bucket (0-1 in 10 steps)
  * Index 0 = darkest (0.0-0.1), Index 9 = lightest (0.9-1.0)
+ *
+ * Uses brightness-based words that describe luminance without implying
+ * grayscale materials, allowing natural composition with chromatic hues.
  */
 export const LUMINOSITY_WORDS: readonly string[] = [
-  'obsidian', // 0.0-0.1: darkest
-  'coal', // 0.1-0.2
-  'slate', // 0.2-0.3
-  'pewter', // 0.3-0.4
-  'stone', // 0.4-0.5
-  'silver', // 0.5-0.6
-  'dove', // 0.6-0.7
-  'bone', // 0.7-0.8
-  'ivory', // 0.8-0.9
-  'snow', // 0.9-1.0: lightest
+  'shadow', // 0.0-0.1: darkest
+  'dark', // 0.1-0.2
+  'deep', // 0.2-0.3
+  'dim', // 0.3-0.4
+  'mid', // 0.4-0.5
+  'balanced', // 0.5-0.6
+  'luminous', // 0.6-0.7
+  'pale', // 0.7-0.8
+  'faint', // 0.8-0.9
+  'brilliant', // 0.9-1.0: lightest
 ] as const;
 
 /**

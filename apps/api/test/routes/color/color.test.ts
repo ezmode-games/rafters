@@ -153,32 +153,32 @@ describe('Color Routes', () => {
       });
 
       it('generates deterministic three-word color names', async () => {
-        // Test violet (hue 260) - bone (L=0.7), honest (C=0.15, medium density), violet (H=260, no expanded hub)
+        // Test violet (hue 260) - pale (L=0.7), honest (C=0.15, medium density), violet (H=260, no expanded hub)
         const violetRes = await SELF.fetch('http://localhost/color/0.700-0.150-260?adhoc=true');
         const violetJson = await violetRes.json();
-        expect(violetJson.color.name).toBe('bone-honest-violet');
+        expect(violetJson.color.name).toBe('pale-honest-violet');
 
         // Test red (hue 10) - uses expanded hub with semantic sub-selection
         const redRes = await SELF.fetch('http://localhost/color/0.500-0.200-10?adhoc=true');
         const redJson = await redRes.json();
-        expect(redJson.color.name).toBe('silver-bold-warning-red');
+        expect(redJson.color.name).toBe('balanced-bold-warning-red');
 
-        // Test low chroma - silver (L=0.5), whisper (C=0.02, achromatic), arctic (H=180, no expanded hub)
+        // Test low chroma - balanced (L=0.5), whisper (C=0.02, achromatic), arctic (H=180, no expanded hub)
         const lowChromaRes = await SELF.fetch('http://localhost/color/0.500-0.020-180?adhoc=true');
         const lowChromaJson = await lowChromaRes.json();
-        expect(lowChromaJson.color.name).toBe('silver-whisper-arctic');
+        expect(lowChromaJson.color.name).toBe('balanced-whisper-arctic');
       });
 
       it('varies luminosity word by lightness', async () => {
-        // Test light (lightness 0.85) - ivory (L=0.85), honest (C=0.15), violet (H=260)
+        // Test light (lightness 0.85) - faint (L=0.85), honest (C=0.15), violet (H=260)
         const lightRes = await SELF.fetch('http://localhost/color/0.850-0.150-260?adhoc=true');
         const lightJson = await lightRes.json();
-        expect(lightJson.color.name).toBe('ivory-honest-violet');
+        expect(lightJson.color.name).toBe('faint-honest-violet');
 
-        // Test dark (lightness 0.20) - slate (L=0.2), honest (C=0.15), violet (H=260)
+        // Test dark (lightness 0.20) - deep (L=0.2), honest (C=0.15), violet (H=260)
         const darkRes = await SELF.fetch('http://localhost/color/0.200-0.150-260?adhoc=true');
         const darkJson = await darkRes.json();
-        expect(darkJson.color.name).toBe('slate-honest-violet');
+        expect(darkJson.color.name).toBe('deep-honest-violet');
       });
     });
   });

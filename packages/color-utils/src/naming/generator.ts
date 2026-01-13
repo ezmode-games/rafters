@@ -5,7 +5,7 @@
  * Uses temperature and perceptual weight to select appropriate word variants.
  *
  * Format: {luminosity}-{intensity}-{material}
- * Examples: "slate-bold-cobalt", "ivory-soft-sage", "obsidian-whisper"
+ * Examples: "deep-bold-cobalt", "faint-soft-sage", "shadow-whisper"
  *
  * Two-tier system:
  * 1. Expanded hubs: Rich semantic word banks for Red, Green, Blue (more coming)
@@ -28,14 +28,14 @@ const ACHROMATIC_THRESHOLD = 0.02;
  * Generate a deterministic color name from OKLCH values
  *
  * The name is composed of up to three hyphenated words:
- * - Luminosity: describes the lightness (obsidian, slate, ivory, snow, etc.)
+ * - Luminosity: describes the lightness (shadow, deep, balanced, pale, brilliant, etc.)
  * - Intensity: describes the chroma/saturation (whisper, bold, fierce, etc.)
  * - Material: describes the hue (ember, sapphire, sage, etc.)
  *
  * Achromatic colors (chroma < 0.02) omit the material word.
  *
  * @param oklch - The color in OKLCH format
- * @returns A hyphenated color name like "dove-clear-sapphire"
+ * @returns A hyphenated color name like "luminous-clear-sapphire"
  */
 export function generateColorName(oklch: OKLCH): string {
   // Get computed properties for semantic word selection

@@ -187,7 +187,7 @@ describe('generateColorName', () => {
     const name = generateColorName(oklch);
 
     // Format: luminosity-intensity-material (each component may contain hyphens)
-    // Examples: "dove-true-bay-blue", "slate-bold-cobalt", "ivory-soft-sage"
+    // Examples: "luminous-true-lagoon", "deep-bold-cobalt", "faint-soft-sage"
     expect(name).toMatch(/^[a-z]+(-[a-z]+)+$/);
   });
 });
