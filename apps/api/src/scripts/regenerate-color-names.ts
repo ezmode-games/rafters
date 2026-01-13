@@ -15,26 +15,30 @@ import { unlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { generateColorName } from '@rafters/color-utils';
 import type { ColorValue, OKLCH } from '@rafters/shared';
+import { z } from 'zod';
 
 const INDEX_NAME = 'rafters-colors';
 const GET_BATCH_SIZE = 20; // Vectorize API limit for get-vectors
 const UPSERT_BATCH_SIZE = 100; // Accumulate before upserting
 
-interface VectorListResponse {
-  count: number;
-  totalCount: number;
-  isTruncated: boolean;
-  nextCursor?: string;
-  vectors: Array<{ id: string }>;
-}
+// Zod schemas for Vectorize API responses
+const VectorListResponseSchema = z.object({
+  count: z.number(),
+  totalCount: z.number(),
+  isTruncated: z.boolean(),
+  nextCursor: z.string().optional(),
+  vectors: z.array(z.object({ id: z.string() })),
+});
 
-interface VectorGetResponse {
-  vectors: Array<{
-    id: string;
-    values: number[];
-    metadata?: Record<string, unknown>;
-  }>;
-}
+const VectorSchema = z.object({
+  id: z.string(),
+  values: z.array(z.number()),
+  metadata: z.record(z.unknown()).optional(),
+});
+
+const VectorArraySchema = z.array(VectorSchema);
+
+type VectorGetResponse = { vectors: z.infer<typeof VectorArraySchema> };
 
 interface RegenerationResult {
   total: number;
@@ -51,7 +55,7 @@ function runWrangler(args: string[]): string {
   return result;
 }
 
-async function getAllVectorIds(): Promise<string[]> {
+function getAllVectorIds(): string[] {
   const ids: string[] = [];
   let cursor: string | undefined;
 
@@ -65,7 +69,7 @@ async function getAllVectorIds(): Promise<string[]> {
     }
 
     const output = runWrangler(args);
-    const response: VectorListResponse = JSON.parse(output);
+    const response = VectorListResponseSchema.parse(JSON.parse(output));
 
     for (const v of response.vectors) {
       ids.push(v.id);
@@ -90,14 +94,19 @@ function getVectorsBatch(ids: string[]): VectorGetResponse {
   }
   const jsonOutput = output.slice(jsonStart);
 
-  // Parse the array and wrap in expected structure
-  const vectors = JSON.parse(jsonOutput);
+  // Parse and validate the array, wrap in expected structure
+  const vectors = VectorArraySchema.parse(JSON.parse(jsonOutput));
   return { vectors };
 }
 
 function regenerateName(color: ColorValue): string {
-  // Get base color from scale[5] (the 500 step) or first available
-  const baseColor: OKLCH = color.scale[5] ?? color.scale[0] ?? { l: 0.5, c: 0, h: 0, alpha: 1 };
+  // Get base color from scale[5] (the 500 step) or closest available
+  if (!Array.isArray(color.scale) || color.scale.length === 0) {
+    throw new Error('Cannot regenerate color name: color.scale is missing or empty');
+  }
+
+  const baseIndex = Math.min(5, color.scale.length - 1);
+  const baseColor: OKLCH = color.scale[baseIndex];
   return generateColorName(baseColor);
 }
 
@@ -113,13 +122,27 @@ function processVectors(
 
   for (const vector of vectors) {
     try {
-      if (!vector.metadata?.color_json) {
+      const colorJsonRaw = vector.metadata?.color_json;
+      if (colorJsonRaw === undefined || colorJsonRaw === null) {
         errors.push({ id: vector.id, error: 'No color_json in metadata' });
         continue;
       }
+      if (typeof colorJsonRaw !== 'string') {
+        errors.push({ id: vector.id, error: 'color_json is not a string' });
+        continue;
+      }
 
-      const colorJson = vector.metadata.color_json as string;
-      const color: ColorValue = JSON.parse(colorJson);
+      let color: ColorValue;
+      try {
+        color = JSON.parse(colorJsonRaw) as ColorValue;
+      } catch (parseError) {
+        errors.push({
+          id: vector.id,
+          error: `Invalid JSON in color_json: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
+        });
+        continue;
+      }
+
       const oldName = color.name;
       const newName = regenerateName(color);
 
@@ -163,8 +186,11 @@ function upsertVectors(
 ): void {
   if (vectors.length === 0) return;
 
-  // Write NDJSON file
-  const tempFile = join(process.cwd(), '.vectorize-upsert-temp.ndjson');
+  // Write NDJSON file with unique name to prevent conflicts
+  const tempFile = join(
+    process.cwd(),
+    `.vectorize-upsert-temp-${process.pid}-${Date.now()}.ndjson`,
+  );
   const ndjson = vectors.map((v) => JSON.stringify(v)).join('\n');
   writeFileSync(tempFile, ndjson);
 
@@ -175,7 +201,7 @@ function upsertVectors(
   }
 }
 
-async function main(): Promise<void> {
+function main(): void {
   const dryRun = process.argv.includes('--dry-run');
 
   console.log('='.repeat(60));
@@ -194,7 +220,7 @@ async function main(): Promise<void> {
   };
 
   // Get all vector IDs
-  const allIds = await getAllVectorIds();
+  const allIds = getAllVectorIds();
   result.total = allIds.length;
   console.log(`\nTotal vectors: ${allIds.length}`);
   console.log('');
@@ -260,7 +286,9 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch((err) => {
+try {
+  main();
+} catch (err) {
   console.error('Fatal error:', err);
   process.exit(1);
-});
+}
