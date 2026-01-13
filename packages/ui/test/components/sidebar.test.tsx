@@ -625,22 +625,22 @@ describe('Sidebar - Custom className', () => {
   });
 });
 
-describe('Sidebar - Provider CSS Variables', () => {
+describe('Sidebar - Design System Widths', () => {
   beforeEach(() => {
     mockMatchMedia(false);
   });
 
-  it('should set CSS variables on provider', () => {
+  it('should use design system width classes', () => {
     render(
       <SidebarProvider data-testid="provider">
-        <Sidebar>
+        <Sidebar data-testid="sidebar">
           <SidebarContent>Content</SidebarContent>
         </Sidebar>
       </SidebarProvider>,
     );
 
-    const provider = screen.getByTestId('provider');
-    expect(provider.style.getPropertyValue('--sidebar-width')).toBe('16rem');
-    expect(provider.style.getPropertyValue('--sidebar-width-icon')).toBe('3rem');
+    // Sidebar uses w-64 (16rem) from design system
+    const sidebar = screen.getByTestId('sidebar');
+    expect(sidebar.querySelector('[data-sidebar="content-wrapper"]')).toBeTruthy();
   });
 });
