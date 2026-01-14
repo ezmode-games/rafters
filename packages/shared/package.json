@@ -19,6 +19,7 @@
     "clean": "rm -rf .turbo coverage"
   },
   "dependencies": {
+    "comment-parser": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {

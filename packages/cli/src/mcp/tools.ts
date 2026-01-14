@@ -1,26 +1,363 @@
 /**
- * MCP Tools for Rafters Design Token System
+ * MCP Tools for Rafters Design System
  *
- * Provides 5 tools for AI agents to interact with design tokens:
- * - rafters_list_namespaces: List available token namespaces
- * - rafters_get_tokens: Get tokens, filtered by namespace
- * - rafters_get_token: Get single token with full metadata
- * - rafters_search_tokens: Search by name or semantic meaning
- * - rafters_get_config: Get design system configuration
+ * AI-first design intelligence for composing UI - 3 focused tools:
+ *
+ * 1. rafters_vocabulary - Compact system overview (colors, spacing, type, components)
+ * 2. rafters_pattern - Deep guidance for design patterns (destructive-action, form-validation, etc.)
+ * 3. rafters_component - Full component intelligence on demand
+ *
+ * Design philosophy: Progressive disclosure. Start with vocabulary to orient,
+ * then drill into patterns or components as needed.
  */
 
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
+import { basename, join } from 'node:path';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { NodePersistenceAdapter, TokenRegistry } from '@rafters/design-tokens';
-import type { Token } from '@rafters/shared';
-import { getRaftersPaths } from '../utils/paths.js';
+import { NodePersistenceAdapter } from '@rafters/design-tokens';
+import {
+  type ColorValue,
+  type ComponentMetadata,
+  extractDependencies,
+  extractPrimitiveDependencies,
+  extractSizes,
+  extractVariants,
+  parseDescription,
+  parseJSDocIntelligence,
+  toDisplayName,
+} from '@rafters/shared';
 
-// Tool definitions for MCP server
+// ==================== Design Patterns ====================
+// Composable patterns for common UI scenarios
+
+interface DesignPattern {
+  name: string;
+  intent: string;
+  components: string[];
+  tokens: {
+    colors: string[];
+    spacing: string[];
+    typography?: string[];
+  };
+  cognitiveLoad: number;
+  accessibility: string;
+  trustPattern?: string;
+  guidance: {
+    do: string[];
+    never: string[];
+  };
+  example?: string;
+}
+
+const DESIGN_PATTERNS: Record<string, DesignPattern> = {
+  'destructive-action': {
+    name: 'Destructive Action',
+    intent: 'Permanent or hard-to-reverse operations requiring user confirmation',
+    components: ['alert-dialog', 'button'],
+    tokens: {
+      colors: ['destructive', 'destructive-foreground'],
+      spacing: ['4', '6'],
+    },
+    cognitiveLoad: 7,
+    accessibility:
+      'Requires clear focus management, escape to cancel, explicit confirmation button',
+    trustPattern:
+      'Two-step confirmation. Never auto-focus the destructive button. Cancel should be prominent.',
+    guidance: {
+      do: [
+        'Use AlertDialog for irreversible actions',
+        'Describe what will be deleted/changed',
+        'Provide clear cancel path',
+        'Use destructive variant only for the confirm button',
+      ],
+      never: [
+        'Auto-focus destructive button',
+        'Use for reversible actions',
+        'Hide the cancel option',
+        'Use vague language like "Continue"',
+      ],
+    },
+    example: `<AlertDialog>
+  <AlertDialogTrigger asChild>
+    <Button variant="destructive">Delete Account</Button>
+  </AlertDialogTrigger>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+      <AlertDialogDescription>
+        This permanently deletes all your data. This cannot be undone.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancel</AlertDialogCancel>
+      <AlertDialogAction variant="destructive">Delete Account</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>`,
+  },
+  'form-validation': {
+    name: 'Form Validation',
+    intent: 'Inline validation feedback that helps without blocking',
+    components: ['field', 'input', 'label', 'button'],
+    tokens: {
+      colors: ['destructive', 'muted', 'muted-foreground'],
+      spacing: ['2', '4'],
+      typography: ['sm', 'base'],
+    },
+    cognitiveLoad: 4,
+    accessibility:
+      'Error messages must be associated with inputs via aria-describedby. Use aria-invalid on errored inputs.',
+    guidance: {
+      do: [
+        'Show validation on blur or submit, not while typing',
+        'Associate error text with input via aria-describedby',
+        'Use Field component for consistent error handling',
+        'Provide actionable error messages',
+      ],
+      never: [
+        'Validate while user is still typing',
+        'Use red color alone to indicate errors',
+        'Block form submission without explanation',
+        'Use generic error messages',
+      ],
+    },
+    example: `<Field error={errors.email}>
+  <Label htmlFor="email">Email</Label>
+  <Input
+    id="email"
+    type="email"
+    aria-invalid={!!errors.email}
+    aria-describedby={errors.email ? "email-error" : undefined}
+  />
+</Field>`,
+  },
+  'empty-state': {
+    name: 'Empty State',
+    intent: 'Guide users when no content exists, provide clear next action',
+    components: ['empty', 'button', 'typography'],
+    tokens: {
+      colors: ['muted', 'muted-foreground', 'primary'],
+      spacing: ['6', '8', '12'],
+      typography: ['lg', 'base'],
+    },
+    cognitiveLoad: 2,
+    accessibility: 'Empty states should be announced to screen readers with appropriate context',
+    guidance: {
+      do: [
+        'Provide a clear call-to-action',
+        'Explain why the state is empty',
+        'Use muted tones for illustrations',
+        'Keep the message concise',
+      ],
+      never: [
+        'Leave users without guidance',
+        'Use alarming language',
+        'Hide the empty state',
+        'Show multiple competing CTAs',
+      ],
+    },
+    example: `<Empty>
+  <Empty.Icon icon={InboxIcon} />
+  <Empty.Title>No messages yet</Empty.Title>
+  <Empty.Description>
+    Start a conversation to see messages here.
+  </Empty.Description>
+  <Empty.Action asChild>
+    <Button>Compose Message</Button>
+  </Empty.Action>
+</Empty>`,
+  },
+  'loading-state': {
+    name: 'Loading State',
+    intent: 'Indicate progress without causing anxiety or impatience',
+    components: ['spinner', 'skeleton', 'progress'],
+    tokens: {
+      colors: ['muted', 'primary'],
+      spacing: ['4', '8'],
+    },
+    cognitiveLoad: 1,
+    accessibility:
+      'Use aria-busy on containers, aria-live for status updates. Spinner needs aria-label.',
+    guidance: {
+      do: [
+        'Use Skeleton for known content structure',
+        'Use Spinner for unknown duration operations',
+        'Use Progress when duration is known',
+        'Match skeleton shapes to expected content',
+      ],
+      never: [
+        'Block interaction without feedback',
+        'Use spinning animations that cause vestibular issues',
+        'Show loading for < 200ms operations',
+        'Use multiple spinners in view',
+      ],
+    },
+  },
+  'navigation-hierarchy': {
+    name: 'Navigation Hierarchy',
+    intent: 'Help users understand where they are and where they can go',
+    components: ['breadcrumb', 'tabs', 'navigation-menu', 'sidebar'],
+    tokens: {
+      colors: ['muted-foreground', 'foreground', 'primary'],
+      spacing: ['2', '4', '6'],
+      typography: ['sm', 'base'],
+    },
+    cognitiveLoad: 3,
+    accessibility:
+      'Use nav landmark, aria-current for active items, keyboard navigation between items',
+    guidance: {
+      do: [
+        'Use Breadcrumb for deep hierarchies',
+        'Use Tabs for peer-level navigation',
+        'Highlight current location clearly',
+        'Keep navigation consistent across pages',
+      ],
+      never: [
+        'Mix navigation paradigms',
+        'Hide primary navigation',
+        'Use more than 3 levels in breadcrumbs',
+        'Auto-collapse navigation on desktop',
+      ],
+    },
+  },
+  'data-table': {
+    name: 'Data Table',
+    intent: 'Present structured data with sorting, filtering, and actions',
+    components: ['table', 'button', 'dropdown-menu', 'checkbox', 'pagination'],
+    tokens: {
+      colors: ['muted', 'border', 'foreground'],
+      spacing: ['2', '4', '6'],
+      typography: ['sm', 'base'],
+    },
+    cognitiveLoad: 6,
+    accessibility: 'Use proper table semantics, scope headers, caption for context',
+    guidance: {
+      do: [
+        'Use semantic table elements',
+        'Provide column headers with scope',
+        'Support keyboard navigation',
+        'Paginate large datasets',
+      ],
+      never: [
+        'Use divs for tabular data',
+        'Hide important columns on mobile',
+        'Auto-load infinite data without user action',
+        'Use tables for layout',
+      ],
+    },
+  },
+  'modal-dialog': {
+    name: 'Modal Dialog',
+    intent: 'Focus user attention on a single task or decision',
+    components: ['dialog', 'button'],
+    tokens: {
+      colors: ['background', 'foreground', 'border'],
+      spacing: ['4', '6', '8'],
+    },
+    cognitiveLoad: 5,
+    accessibility:
+      'Trap focus inside dialog, return focus on close, ESC to dismiss, aria-modal=true',
+    trustPattern: 'Users should always be able to dismiss without consequence',
+    guidance: {
+      do: [
+        'Focus first interactive element on open',
+        'Provide clear close mechanism',
+        'Keep content focused on one task',
+        'Return focus to trigger on close',
+      ],
+      never: [
+        'Stack multiple dialogs',
+        'Use for non-blocking information',
+        'Prevent dismissal without explicit save',
+        'Auto-open dialogs on page load',
+      ],
+    },
+  },
+  'tooltip-guidance': {
+    name: 'Tooltip Guidance',
+    intent: 'Provide contextual help without cluttering the interface',
+    components: ['tooltip', 'button'],
+    tokens: {
+      colors: ['popover', 'popover-foreground'],
+      spacing: ['2'],
+      typography: ['sm'],
+    },
+    cognitiveLoad: 1,
+    accessibility: 'Tooltip content must be accessible to keyboard users via focus',
+    guidance: {
+      do: [
+        'Keep tooltip text concise (1-2 sentences)',
+        'Trigger on hover AND focus',
+        'Use for supplementary information only',
+        'Position to avoid obscuring content',
+      ],
+      never: [
+        'Put essential information in tooltips only',
+        'Use for error messages',
+        'Require click to open',
+        'Include interactive elements inside',
+      ],
+    },
+  },
+  'card-layout': {
+    name: 'Card Layout',
+    intent: 'Group related content in scannable, contained units',
+    components: ['card', 'button', 'badge', 'avatar'],
+    tokens: {
+      colors: ['card', 'card-foreground', 'border'],
+      spacing: ['4', '6'],
+    },
+    cognitiveLoad: 2,
+    accessibility: 'If card is clickable, entire card should be the click target with clear focus',
+    guidance: {
+      do: [
+        'Use consistent card sizes in grids',
+        'Prioritize content hierarchy within cards',
+        'Provide clear visual boundaries',
+        'Use CardHeader/CardContent for structure',
+      ],
+      never: [
+        'Nest cards within cards',
+        'Overload cards with actions',
+        'Mix card sizes arbitrarily',
+        'Use cards for single pieces of content',
+      ],
+    },
+  },
+  'dropdown-actions': {
+    name: 'Dropdown Actions',
+    intent: 'Provide secondary actions without cluttering the primary interface',
+    components: ['dropdown-menu', 'button'],
+    tokens: {
+      colors: ['popover', 'popover-foreground', 'accent'],
+      spacing: ['2', '4'],
+      typography: ['sm'],
+    },
+    cognitiveLoad: 4,
+    accessibility: 'Arrow key navigation between items, type-ahead, ESC to close',
+    guidance: {
+      do: [
+        'Group related actions with separators',
+        'Use icons consistently (all or none)',
+        'Show keyboard shortcuts',
+        'Place destructive actions at bottom with separator',
+      ],
+      never: [
+        'Nest dropdowns more than 1 level',
+        'Put primary actions in dropdowns',
+        'Use dropdowns with fewer than 3 items',
+        'Auto-close on any click',
+      ],
+    },
+  },
+};
+
+// Tool definitions for MCP server - 3 focused design tools
 export const TOOL_DEFINITIONS = [
   {
-    name: 'rafters_list_namespaces',
+    name: 'rafters_vocabulary',
     description:
-      'List all available token namespaces in the design system. Returns an array of namespace names like color, spacing, typography, etc.',
+      'Get compact design system vocabulary: color palette names, spacing scale, type scale, and component list with cognitive loads. Use this first to understand what you can compose with.',
     inputSchema: {
       type: 'object' as const,
       properties: {},
@@ -28,68 +365,39 @@ export const TOOL_DEFINITIONS = [
     },
   },
   {
-    name: 'rafters_get_tokens',
+    name: 'rafters_pattern',
     description:
-      'Get design tokens, optionally filtered by namespace. Returns tokens with full metadata including semantic meaning, usage patterns, and accessibility information.',
+      'Get deep guidance for a specific design pattern. Returns components to use, tokens to apply, accessibility requirements, trust patterns, and do/never guidance. Patterns: destructive-action, form-validation, empty-state, loading-state, navigation-hierarchy, data-table, modal-dialog, tooltip-guidance, card-layout, dropdown-actions',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        namespace: {
+        pattern: {
           type: 'string',
           description:
-            'Optional namespace to filter tokens (e.g., "color", "spacing", "typography")',
+            'Pattern name: destructive-action, form-validation, empty-state, loading-state, navigation-hierarchy, data-table, modal-dialog, tooltip-guidance, card-layout, dropdown-actions',
         },
       },
-      required: [],
+      required: ['pattern'],
     },
   },
   {
-    name: 'rafters_get_token',
+    name: 'rafters_component',
     description:
-      'Get a single token by name with full metadata including semantic meaning, usage patterns, accessibility information, and why this token exists.',
+      'Get full intelligence for a specific component: cognitive load, attention economics, accessibility, trust patterns, do/never guidance, variants, sizes. Use when you need deep details about a specific component.',
     inputSchema: {
       type: 'object' as const,
       properties: {
         name: {
           type: 'string',
-          description: 'The exact token name to retrieve',
+          description: 'Component name (e.g., "button", "dialog", "alert-dialog", "popover")',
         },
       },
       required: ['name'],
     },
   },
-  {
-    name: 'rafters_search_tokens',
-    description:
-      'Search tokens by name or semantic meaning. Useful for finding tokens that match a concept like "primary action", "error state", or "heading text".',
-    inputSchema: {
-      type: 'object' as const,
-      properties: {
-        query: {
-          type: 'string',
-          description: 'Search query - matches token names and semantic meanings',
-        },
-        limit: {
-          type: 'number',
-          description: 'Maximum number of results to return (default: 10)',
-        },
-      },
-      required: ['query'],
-    },
-  },
-  {
-    name: 'rafters_get_config',
-    description:
-      'Get the design system configuration including framework detection, output paths, and generation settings.',
-    inputSchema: {
-      type: 'object' as const,
-      properties: {},
-      required: [],
-    },
-  },
 ] as const;
 
-// Tool handler class
+// Tool handler class - 3 focused design tools
 export class RaftersToolHandler {
   private readonly adapter: NodePersistenceAdapter;
   private readonly projectRoot: string;
@@ -104,16 +412,12 @@ export class RaftersToolHandler {
    */
   async handleToolCall(name: string, args: Record<string, unknown>): Promise<CallToolResult> {
     switch (name) {
-      case 'rafters_list_namespaces':
-        return this.listNamespaces();
-      case 'rafters_get_tokens':
-        return this.getTokens(args.namespace as string | undefined);
-      case 'rafters_get_token':
-        return this.getToken(args.name as string);
-      case 'rafters_search_tokens':
-        return this.searchTokens(args.query as string, args.limit as number | undefined);
-      case 'rafters_get_config':
-        return this.getConfig();
+      case 'rafters_vocabulary':
+        return this.getVocabulary();
+      case 'rafters_pattern':
+        return this.getPattern(args.pattern as string);
+      case 'rafters_component':
+        return this.getComponent(args.name as string);
       default:
         return {
           content: [{ type: 'text', text: `Unknown tool: ${name}` }],
@@ -122,106 +426,358 @@ export class RaftersToolHandler {
     }
   }
 
-  /**
-   * List all available token namespaces
-   */
-  private async listNamespaces(): Promise<CallToolResult> {
-    try {
-      const namespaces = await this.adapter.listNamespaces();
+  // ==================== Tool 1: Vocabulary ====================
 
+  /**
+   * Get compact design system vocabulary
+   * Returns: color palettes, spacing scale, type scale, component list with loads
+   */
+  private async getVocabulary(): Promise<CallToolResult> {
+    try {
+      const [colors, spacing, typography, components] = await Promise.all([
+        this.getColorVocabulary(),
+        this.getSpacingVocabulary(),
+        this.getTypographyVocabulary(),
+        this.getComponentVocabulary(),
+      ]);
+
+      const vocabulary = {
+        colors,
+        spacing,
+        typography,
+        components,
+        patterns: Object.keys(DESIGN_PATTERNS),
+        usage:
+          'Use rafters_pattern for deep guidance on specific patterns, rafters_component for component details',
+      };
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(vocabulary, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      return this.handleError('getVocabulary', error);
+    }
+  }
+
+  /**
+   * Extract compact color vocabulary
+   */
+  private async getColorVocabulary(): Promise<{
+    semantic: string[];
+    palettes: Array<{ name: string; positions: string[] }>;
+  }> {
+    try {
+      const tokens = await this.adapter.loadNamespace('color');
+      const semantic: string[] = [];
+      const palettes = new Map<string, Set<string>>();
+
+      for (const token of tokens) {
+        // Semantic colors (simple references)
+        if (typeof token.value === 'object' && 'family' in (token.value as object)) {
+          semantic.push(token.name);
+        }
+        // Color families (full ColorValue objects with scales)
+        else if (typeof token.value === 'object' && 'scale' in (token.value as object)) {
+          const colorValue = token.value as ColorValue;
+          palettes.set(
+            colorValue.name,
+            new Set(['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950']),
+          );
+        }
+      }
+
+      return {
+        semantic,
+        palettes: [...palettes.entries()].map(([name, positions]) => ({
+          name,
+          positions: [...positions],
+        })),
+      };
+    } catch {
+      return { semantic: [], palettes: [] };
+    }
+  }
+
+  /**
+   * Extract compact spacing vocabulary
+   */
+  private async getSpacingVocabulary(): Promise<{ scale: Record<string, string> }> {
+    try {
+      const tokens = await this.adapter.loadNamespace('spacing');
+      const scale: Record<string, string> = {};
+
+      for (const token of tokens) {
+        if (typeof token.value === 'string') {
+          scale[token.name] = token.value;
+        }
+      }
+
+      return { scale };
+    } catch {
+      return { scale: {} };
+    }
+  }
+
+  /**
+   * Extract compact typography vocabulary
+   */
+  private async getTypographyVocabulary(): Promise<{
+    sizes: Record<string, string>;
+    weights: string[];
+  }> {
+    try {
+      const tokens = await this.adapter.loadNamespace('typography');
+      const sizes: Record<string, string> = {};
+      const weights = new Set<string>();
+
+      for (const token of tokens) {
+        if (typeof token.value === 'string') {
+          if (token.name.includes('weight')) {
+            weights.add(token.name.replace('-weight', ''));
+          } else {
+            sizes[token.name] = token.value;
+          }
+        }
+      }
+
+      return { sizes, weights: [...weights] };
+    } catch {
+      return { sizes: {}, weights: [] };
+    }
+  }
+
+  /**
+   * Extract compact component vocabulary
+   */
+  private async getComponentVocabulary(): Promise<
+    Array<{ name: string; category: string; load?: number }>
+  > {
+    try {
+      const componentsPath = this.getComponentsPath();
+      const files = await readdir(componentsPath);
+      const componentFiles = files.filter((f) => f.endsWith('.tsx'));
+
+      const components: Array<{ name: string; category: string; load?: number }> = [];
+
+      for (const file of componentFiles) {
+        const name = basename(file, '.tsx');
+        const metadata = await this.loadComponentMetadata(name);
+
+        if (metadata) {
+          const item: { name: string; category: string; load?: number } = {
+            name: metadata.name,
+            category: metadata.category,
+          };
+          if (metadata.intelligence?.cognitiveLoad !== undefined) {
+            item.load = metadata.intelligence.cognitiveLoad;
+          }
+          components.push(item);
+        }
+      }
+
+      // Sort by category, then by name
+      components.sort((a, b) => {
+        if (a.category !== b.category) return a.category.localeCompare(b.category);
+        return a.name.localeCompare(b.name);
+      });
+
+      return components;
+    } catch {
+      return [];
+    }
+  }
+
+  // ==================== Tool 2: Pattern ====================
+
+  /**
+   * Get deep guidance for a specific design pattern
+   */
+  private async getPattern(patternName: string): Promise<CallToolResult> {
+    const pattern = DESIGN_PATTERNS[patternName];
+
+    if (!pattern) {
       return {
         content: [
           {
             type: 'text',
             text: JSON.stringify(
               {
-                namespaces,
-                count: namespaces.length,
-                description:
-                  'Available token namespaces in the design system. Use rafters_get_tokens with a namespace to get tokens from a specific category.',
+                error: `Pattern "${patternName}" not found`,
+                available: Object.keys(DESIGN_PATTERNS),
+                suggestion: 'Use one of the available patterns listed above',
               },
               null,
               2,
             ),
           },
         ],
+        isError: true,
       };
-    } catch (error) {
-      return this.handleError('listNamespaces', error);
+    }
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(pattern, null, 2),
+        },
+      ],
+    };
+  }
+
+  // ==================== Tool 3: Component ====================
+
+  /**
+   * Get path to UI components directory
+   */
+  private getComponentsPath(): string {
+    const monorepoPath = join(this.projectRoot, 'packages/ui/src/components/ui');
+    return monorepoPath;
+  }
+
+  /**
+   * Load component metadata from source file
+   */
+  private async loadComponentMetadata(name: string): Promise<ComponentMetadata | null> {
+    const componentsPath = this.getComponentsPath();
+    const filePath = join(componentsPath, `${name}.tsx`);
+
+    try {
+      const source = await readFile(filePath, 'utf-8');
+      const intelligence = parseJSDocIntelligence(source);
+      const description = parseDescription(source);
+
+      const metadata: ComponentMetadata = {
+        name,
+        displayName: toDisplayName(name),
+        category: this.inferCategory(name),
+        variants: extractVariants(source),
+        sizes: extractSizes(source),
+        dependencies: extractDependencies(source),
+        primitives: extractPrimitiveDependencies(source),
+        filePath: `packages/ui/src/components/ui/${name}.tsx`,
+      };
+
+      if (description) {
+        metadata.description = description;
+      }
+      if (intelligence) {
+        metadata.intelligence = intelligence;
+      }
+
+      return metadata;
+    } catch {
+      return null;
     }
   }
 
   /**
-   * Get tokens, optionally filtered by namespace
+   * Infer component category from name
    */
-  private async getTokens(namespace?: string): Promise<CallToolResult> {
-    try {
-      const namespaces = namespace ? [namespace] : await this.adapter.listNamespaces();
+  private inferCategory(name: string): ComponentMetadata['category'] {
+    const categoryMap: Record<string, ComponentMetadata['category']> = {
+      // Layout
+      card: 'layout',
+      separator: 'layout',
+      'aspect-ratio': 'layout',
+      'scroll-area': 'layout',
+      resizable: 'layout',
+      container: 'layout',
+      grid: 'layout',
+      // Form
+      button: 'form',
+      'button-group': 'form',
+      input: 'form',
+      'input-group': 'form',
+      'input-otp': 'form',
+      textarea: 'form',
+      select: 'form',
+      checkbox: 'form',
+      'radio-group': 'form',
+      switch: 'form',
+      slider: 'form',
+      toggle: 'form',
+      'toggle-group': 'form',
+      field: 'form',
+      label: 'form',
+      combobox: 'form',
+      'date-picker': 'form',
+      // Feedback
+      alert: 'feedback',
+      badge: 'feedback',
+      progress: 'feedback',
+      skeleton: 'feedback',
+      spinner: 'feedback',
+      empty: 'feedback',
+      // Navigation
+      breadcrumb: 'navigation',
+      tabs: 'navigation',
+      pagination: 'navigation',
+      'navigation-menu': 'navigation',
+      menubar: 'navigation',
+      sidebar: 'navigation',
+      // Overlay
+      dialog: 'overlay',
+      drawer: 'overlay',
+      popover: 'overlay',
+      tooltip: 'overlay',
+      'hover-card': 'overlay',
+      sheet: 'overlay',
+      'alert-dialog': 'overlay',
+      'dropdown-menu': 'overlay',
+      'context-menu': 'overlay',
+      command: 'overlay',
+      // Data Display
+      table: 'data-display',
+      avatar: 'data-display',
+      accordion: 'data-display',
+      calendar: 'data-display',
+      carousel: 'data-display',
+      collapsible: 'data-display',
+      item: 'data-display',
+      typography: 'data-display',
+      kbd: 'data-display',
+    };
 
-      const allTokens: Token[] = [];
-
-      for (const ns of namespaces) {
-        try {
-          const tokens = await this.adapter.loadNamespace(ns);
-          allTokens.push(...tokens);
-        } catch {
-          // Namespace may not exist, skip silently
-        }
-      }
-
-      // Create a registry to organize tokens
-      const registry = new TokenRegistry(allTokens);
-      const tokenList = registry.list(namespace ? { namespace } : undefined);
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(
-              {
-                tokens: tokenList.map((token) => this.formatTokenForAgent(token)),
-                count: tokenList.length,
-                namespace: namespace ?? 'all',
-              },
-              null,
-              2,
-            ),
-          },
-        ],
-      };
-    } catch (error) {
-      return this.handleError('getTokens', error);
-    }
+    return categoryMap[name] ?? 'utility';
   }
 
   /**
-   * Get a single token by name
+   * Get full component intelligence
    */
-  private async getToken(name: string): Promise<CallToolResult> {
+  private async getComponent(name: string): Promise<CallToolResult> {
     try {
-      const namespaces = await this.adapter.listNamespaces();
-      let foundToken: Token | undefined;
+      const metadata = await this.loadComponentMetadata(name);
 
-      for (const ns of namespaces) {
+      if (!metadata) {
+        // Try to provide helpful suggestions
+        const componentsPath = this.getComponentsPath();
+        let available: string[] = [];
         try {
-          const tokens = await this.adapter.loadNamespace(ns);
-          foundToken = tokens.find((t) => t.name === name);
-          if (foundToken) break;
+          const files = await readdir(componentsPath);
+          available = files
+            .filter((f) => f.endsWith('.tsx'))
+            .map((f) => basename(f, '.tsx'))
+            .filter((n) => n.includes(name) || name.includes(n))
+            .slice(0, 5);
         } catch {
-          // Namespace may not exist, skip silently
+          // Ignore
         }
-      }
 
-      if (!foundToken) {
         return {
           content: [
             {
               type: 'text',
               text: JSON.stringify(
                 {
-                  error: `Token "${name}" not found`,
-                  suggestion:
-                    'Use rafters_list_namespaces to see available namespaces, then rafters_get_tokens to list tokens.',
+                  error: `Component "${name}" not found`,
+                  similar: available.length > 0 ? available : undefined,
+                  suggestion: 'Use rafters_vocabulary to see all available components',
                 },
                 null,
                 2,
@@ -232,234 +788,57 @@ export class RaftersToolHandler {
         };
       }
 
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(this.formatTokenForAgent(foundToken), null, 2),
-          },
-        ],
+      // Format for AI agent consumption - full intelligence
+      const formatted: Record<string, unknown> = {
+        name: metadata.name,
+        displayName: metadata.displayName,
+        category: metadata.category,
       };
-    } catch (error) {
-      return this.handleError('getToken', error);
-    }
-  }
 
-  /**
-   * Search tokens by name or semantic meaning
-   */
-  private async searchTokens(query: string, limit: number = 10): Promise<CallToolResult> {
-    try {
-      const namespaces = await this.adapter.listNamespaces();
-      const allTokens: Token[] = [];
+      if (metadata.description) {
+        formatted.description = metadata.description;
+      }
 
-      for (const ns of namespaces) {
-        try {
-          const tokens = await this.adapter.loadNamespace(ns);
-          allTokens.push(...tokens);
-        } catch {
-          // Namespace may not exist, skip silently
+      if (metadata.intelligence) {
+        const intel = metadata.intelligence;
+        formatted.cognitiveLoad = intel.cognitiveLoad;
+        formatted.attentionEconomics = intel.attentionEconomics;
+        formatted.accessibility = intel.accessibility;
+        formatted.trustBuilding = intel.trustBuilding;
+        formatted.semanticMeaning = intel.semanticMeaning;
+        if (intel.usagePatterns) {
+          formatted.do = intel.usagePatterns.dos;
+          formatted.never = intel.usagePatterns.nevers;
         }
       }
 
-      const queryLower = query.toLowerCase();
+      if (metadata.variants.length > 1 || metadata.variants[0] !== 'default') {
+        formatted.variants = metadata.variants;
+      }
 
-      // Search by name, semantic meaning, and description
-      const matches = allTokens.filter((token) => {
-        const nameMatch = token.name.toLowerCase().includes(queryLower);
-        const semanticMatch = token.semanticMeaning?.toLowerCase().includes(queryLower);
-        const descriptionMatch = token.description?.toLowerCase().includes(queryLower);
-        const categoryMatch = token.category.toLowerCase().includes(queryLower);
-        const usageMatch = token.usageContext?.some((ctx) =>
-          ctx.toLowerCase().includes(queryLower),
-        );
+      if (metadata.sizes.length > 1 || metadata.sizes[0] !== 'default') {
+        formatted.sizes = metadata.sizes;
+      }
 
-        return nameMatch || semanticMatch || descriptionMatch || categoryMatch || usageMatch;
-      });
+      if (metadata.primitives.length > 0) {
+        formatted.primitives = metadata.primitives;
+      }
 
-      // Score and sort matches
-      const scored = matches.map((token) => {
-        let score = 0;
-        const nameLower = token.name.toLowerCase();
-
-        // Exact name match gets highest score
-        if (nameLower === queryLower) score += 100;
-        // Name starts with query
-        else if (nameLower.startsWith(queryLower)) score += 50;
-        // Name contains query
-        else if (nameLower.includes(queryLower)) score += 25;
-
-        // Semantic meaning match
-        if (token.semanticMeaning?.toLowerCase().includes(queryLower)) {
-          score += 30;
-        }
-
-        // Description match
-        if (token.description?.toLowerCase().includes(queryLower)) {
-          score += 10;
-        }
-
-        return { token, score };
-      });
-
-      scored.sort((a, b) => b.score - a.score);
-
-      const results = scored.slice(0, limit).map(({ token }) => token);
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(
-              {
-                query,
-                results: results.map((token) => this.formatTokenForAgent(token)),
-                count: results.length,
-                totalMatches: matches.length,
-              },
-              null,
-              2,
-            ),
-          },
-        ],
-      };
-    } catch (error) {
-      return this.handleError('searchTokens', error);
-    }
-  }
-
-  /**
-   * Get design system configuration
-   */
-  private async getConfig(): Promise<CallToolResult> {
-    try {
-      const paths = getRaftersPaths(this.projectRoot);
-
-      let config: Record<string, unknown> = {};
-      try {
-        const configContent = await readFile(paths.config, 'utf-8');
-        config = JSON.parse(configContent);
-      } catch {
-        // Config may not exist
-        config = {
-          error: 'Configuration file not found',
-          suggestion: 'Run "rafters init" to initialize the design system in this project.',
-        };
+      if (metadata.dependencies.length > 0) {
+        formatted.dependencies = metadata.dependencies;
       }
 
       return {
         content: [
           {
             type: 'text',
-            text: JSON.stringify(
-              {
-                projectRoot: this.projectRoot,
-                paths: {
-                  raftersDir: paths.root,
-                  config: paths.config,
-                  tokens: paths.tokens,
-                  output: paths.output,
-                },
-                config,
-              },
-              null,
-              2,
-            ),
+            text: JSON.stringify(formatted, null, 2),
           },
         ],
       };
     } catch (error) {
-      return this.handleError('getConfig', error);
+      return this.handleError('getComponent', error);
     }
-  }
-
-  /**
-   * Format a token with intelligence for AI agent consumption
-   */
-  private formatTokenForAgent(token: Token): Record<string, unknown> {
-    // Build a comprehensive view of the token for AI agents
-    const formatted: Record<string, unknown> = {
-      name: token.name,
-      value: token.value,
-      category: token.category,
-      namespace: token.namespace,
-    };
-
-    // Add semantic intelligence - the "why" for AI agents
-    if (token.semanticMeaning) {
-      formatted.semanticMeaning = token.semanticMeaning;
-    }
-
-    if (token.usageContext && token.usageContext.length > 0) {
-      formatted.usageContext = token.usageContext;
-    }
-
-    if (token.usagePatterns) {
-      formatted.usagePatterns = token.usagePatterns;
-    }
-
-    if (token.appliesWhen && token.appliesWhen.length > 0) {
-      formatted.appliesWhen = token.appliesWhen;
-    }
-
-    // Add accessibility information
-    if (token.accessibilityLevel) {
-      formatted.accessibilityLevel = token.accessibilityLevel;
-    }
-
-    // Add trust and consequence information for UI decisions
-    if (token.trustLevel) {
-      formatted.trustLevel = token.trustLevel;
-    }
-
-    if (token.consequence) {
-      formatted.consequence = token.consequence;
-    }
-
-    // Add cognitive load for design decisions
-    if (token.cognitiveLoad) {
-      formatted.cognitiveLoad = token.cognitiveLoad;
-    }
-
-    // Add dependency information
-    if (token.dependsOn && token.dependsOn.length > 0) {
-      formatted.dependsOn = token.dependsOn;
-    }
-
-    if (token.generationRule) {
-      formatted.generationRule = token.generationRule;
-    }
-
-    // Add component associations
-    if (token.applicableComponents && token.applicableComponents.length > 0) {
-      formatted.applicableComponents = token.applicableComponents;
-    }
-
-    // Add user override information if present
-    if (token.userOverride) {
-      formatted.userOverride = {
-        reason: token.userOverride.reason,
-        overriddenAt: token.userOverride.overriddenAt,
-        previousValue: token.userOverride.previousValue,
-        context: token.userOverride.context,
-      };
-    }
-
-    // Add computed vs actual value comparison if different
-    if (
-      token.computedValue &&
-      JSON.stringify(token.computedValue) !== JSON.stringify(token.value)
-    ) {
-      formatted.computedValue = token.computedValue;
-      formatted.hasDeviation = true;
-    }
-
-    // Add description if present
-    if (token.description) {
-      formatted.description = token.description;
-    }
-
-    return formatted;
   }
 
   /**

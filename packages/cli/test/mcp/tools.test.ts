@@ -6,17 +6,15 @@ import { RaftersToolHandler, TOOL_DEFINITIONS } from '../../src/mcp/tools.js';
 import { fixtures, serializeNamespaceFile } from '../fixtures/tokens.js';
 
 describe('TOOL_DEFINITIONS', () => {
-  it('should define 5 tools', () => {
-    expect(TOOL_DEFINITIONS).toHaveLength(5);
+  it('should define 3 design-focused tools', () => {
+    expect(TOOL_DEFINITIONS).toHaveLength(3);
   });
 
   it('should have correct tool names', () => {
     const names = TOOL_DEFINITIONS.map((t) => t.name);
-    expect(names).toContain('rafters_list_namespaces');
-    expect(names).toContain('rafters_get_tokens');
-    expect(names).toContain('rafters_get_token');
-    expect(names).toContain('rafters_search_tokens');
-    expect(names).toContain('rafters_get_config');
+    expect(names).toContain('rafters_vocabulary');
+    expect(names).toContain('rafters_pattern');
+    expect(names).toContain('rafters_component');
   });
 
   it('should have descriptions for all tools', () => {
@@ -47,174 +45,127 @@ describe('RaftersToolHandler', () => {
     await rm(testDir, { recursive: true, force: true });
   });
 
-  describe('rafters_list_namespaces', () => {
-    it('should return empty array when no namespaces exist', async () => {
-      const result = await handler.handleToolCall('rafters_list_namespaces', {});
+  describe('rafters_vocabulary', () => {
+    it('should return vocabulary structure with empty tokens', async () => {
+      const result = await handler.handleToolCall('rafters_vocabulary', {});
 
       expect(result.isError).toBeFalsy();
       expect(result.content).toHaveLength(1);
 
       const data = JSON.parse(result.content[0].text as string);
-      expect(data.namespaces).toEqual([]);
-      expect(data.count).toBe(0);
+      expect(data.colors).toBeDefined();
+      expect(data.spacing).toBeDefined();
+      expect(data.typography).toBeDefined();
+      expect(data.components).toBeDefined();
+      expect(data.patterns).toBeDefined();
+      expect(Array.isArray(data.patterns)).toBe(true);
     });
 
-    it('should return list of namespaces when tokens exist', async () => {
-      // Create some namespace files using fixtures
+    it('should return color vocabulary when tokens exist', async () => {
       await writeFile(
         join(testDir, '.rafters', 'tokens', 'color.rafters.json'),
         serializeNamespaceFile('color', [fixtures.primaryToken()]),
       );
+
+      const result = await handler.handleToolCall('rafters_vocabulary', {});
+
+      expect(result.isError).toBeFalsy();
+
+      const data = JSON.parse(result.content[0].text as string);
+      expect(data.colors.semantic).toContain('primary');
+    });
+
+    it('should return spacing vocabulary when tokens exist', async () => {
       await writeFile(
         join(testDir, '.rafters', 'tokens', 'spacing.rafters.json'),
         serializeNamespaceFile('spacing', [fixtures.spacing1Token()]),
       );
 
-      const result = await handler.handleToolCall('rafters_list_namespaces', {});
+      const result = await handler.handleToolCall('rafters_vocabulary', {});
 
       expect(result.isError).toBeFalsy();
 
       const data = JSON.parse(result.content[0].text as string);
-      expect(data.namespaces).toContain('color');
-      expect(data.namespaces).toContain('spacing');
-      expect(data.count).toBe(2);
+      expect(data.spacing.scale).toBeDefined();
+      expect(data.spacing.scale['spacing-1']).toBe('0.25rem');
+    });
+
+    it('should include available patterns', async () => {
+      const result = await handler.handleToolCall('rafters_vocabulary', {});
+
+      const data = JSON.parse(result.content[0].text as string);
+      expect(data.patterns).toContain('destructive-action');
+      expect(data.patterns).toContain('form-validation');
+      expect(data.patterns).toContain('empty-state');
     });
   });
 
-  describe('rafters_get_tokens', () => {
-    beforeEach(async () => {
-      await writeFile(
-        join(testDir, '.rafters', 'tokens', 'color.rafters.json'),
-        serializeNamespaceFile('color', [fixtures.primaryToken(), fixtures.secondaryToken()]),
-      );
-      await writeFile(
-        join(testDir, '.rafters', 'tokens', 'spacing.rafters.json'),
-        serializeNamespaceFile('spacing', [fixtures.spacing1Token()]),
-      );
-    });
-
-    it('should return all tokens when no namespace filter', async () => {
-      const result = await handler.handleToolCall('rafters_get_tokens', {});
-
-      expect(result.isError).toBeFalsy();
-
-      const data = JSON.parse(result.content[0].text as string);
-      expect(data.count).toBe(3);
-      expect(data.namespace).toBe('all');
-    });
-
-    it('should return filtered tokens when namespace provided', async () => {
-      const result = await handler.handleToolCall('rafters_get_tokens', { namespace: 'color' });
-
-      expect(result.isError).toBeFalsy();
-
-      const data = JSON.parse(result.content[0].text as string);
-      expect(data.count).toBe(2);
-      expect(data.namespace).toBe('color');
-      expect(data.tokens.every((t: { namespace: string }) => t.namespace === 'color')).toBe(true);
-    });
-  });
-
-  describe('rafters_get_token', () => {
-    const primaryToken = fixtures.primaryToken();
-
-    beforeEach(async () => {
-      await writeFile(
-        join(testDir, '.rafters', 'tokens', 'color.rafters.json'),
-        serializeNamespaceFile('color', [primaryToken]),
-      );
-    });
-
-    it('should return token with full metadata', async () => {
-      const result = await handler.handleToolCall('rafters_get_token', { name: 'primary' });
-
-      expect(result.isError).toBeFalsy();
-
-      const data = JSON.parse(result.content[0].text as string);
-      expect(data.name).toBe('primary');
-      expect(data.value).toEqual(primaryToken.value); // ColorReference object
-      expect(data.semanticMeaning).toBe(primaryToken.semanticMeaning);
-      expect(data.usageContext).toEqual(primaryToken.usageContext);
-    });
-
-    it('should return error for non-existent token', async () => {
-      const result = await handler.handleToolCall('rafters_get_token', { name: 'nonexistent' });
-
-      expect(result.isError).toBe(true);
-
-      const data = JSON.parse(result.content[0].text as string);
-      expect(data.error).toContain('not found');
-    });
-  });
-
-  describe('rafters_search_tokens', () => {
-    beforeEach(async () => {
-      await writeFile(
-        join(testDir, '.rafters', 'tokens', 'color.rafters.json'),
-        serializeNamespaceFile('color', [
-          fixtures.primaryToken(),
-          fixtures.primaryHoverToken(),
-          fixtures.destructiveToken(),
-        ]),
-      );
-    });
-
-    it('should search by name', async () => {
-      const result = await handler.handleToolCall('rafters_search_tokens', { query: 'primary' });
-
-      expect(result.isError).toBeFalsy();
-
-      const data = JSON.parse(result.content[0].text as string);
-      expect(data.count).toBe(2);
-      expect(data.results.some((t: { name: string }) => t.name === 'primary')).toBe(true);
-      expect(data.results.some((t: { name: string }) => t.name === 'primary-hover')).toBe(true);
-    });
-
-    it('should search by semantic meaning', async () => {
-      const result = await handler.handleToolCall('rafters_search_tokens', { query: 'error' });
-
-      expect(result.isError).toBeFalsy();
-
-      const data = JSON.parse(result.content[0].text as string);
-      expect(data.count).toBe(1);
-      expect(data.results[0].name).toBe('destructive');
-    });
-
-    it('should respect limit parameter', async () => {
-      const result = await handler.handleToolCall('rafters_search_tokens', {
-        query: 'a',
-        limit: 1,
+  describe('rafters_pattern', () => {
+    it('should return pattern details for valid pattern', async () => {
+      const result = await handler.handleToolCall('rafters_pattern', {
+        pattern: 'destructive-action',
       });
 
       expect(result.isError).toBeFalsy();
 
       const data = JSON.parse(result.content[0].text as string);
-      expect(data.count).toBe(1);
+      expect(data.name).toBe('Destructive Action');
+      expect(data.intent).toBeDefined();
+      expect(data.components).toContain('alert-dialog');
+      expect(data.components).toContain('button');
+      expect(data.tokens.colors).toContain('destructive');
+      expect(data.accessibility).toBeDefined();
+      expect(data.trustPattern).toBeDefined();
+      expect(data.guidance.do).toBeDefined();
+      expect(data.guidance.never).toBeDefined();
+    });
+
+    it('should return pattern with example code', async () => {
+      const result = await handler.handleToolCall('rafters_pattern', {
+        pattern: 'destructive-action',
+      });
+
+      const data = JSON.parse(result.content[0].text as string);
+      expect(data.example).toContain('AlertDialog');
+    });
+
+    it('should return error for unknown pattern', async () => {
+      const result = await handler.handleToolCall('rafters_pattern', {
+        pattern: 'nonexistent-pattern',
+      });
+
+      expect(result.isError).toBe(true);
+
+      const data = JSON.parse(result.content[0].text as string);
+      expect(data.error).toContain('not found');
+      expect(data.available).toContain('destructive-action');
+    });
+
+    it('should return form-validation pattern', async () => {
+      const result = await handler.handleToolCall('rafters_pattern', {
+        pattern: 'form-validation',
+      });
+
+      expect(result.isError).toBeFalsy();
+
+      const data = JSON.parse(result.content[0].text as string);
+      expect(data.name).toBe('Form Validation');
+      expect(data.components).toContain('field');
+      expect(data.components).toContain('input');
     });
   });
 
-  describe('rafters_get_config', () => {
-    it('should return paths even without config file', async () => {
-      const result = await handler.handleToolCall('rafters_get_config', {});
+  describe('rafters_component', () => {
+    it('should return error for non-existent component', async () => {
+      const result = await handler.handleToolCall('rafters_component', {
+        name: 'nonexistent',
+      });
 
-      expect(result.isError).toBeFalsy();
-
-      const data = JSON.parse(result.content[0].text as string);
-      expect(data.projectRoot).toBe(testDir);
-      expect(data.paths).toBeDefined();
-      expect(data.paths.raftersDir).toContain('.rafters');
-    });
-
-    it('should return config when file exists', async () => {
-      const config = { framework: 'next', shadcn: true };
-      await writeFile(join(testDir, '.rafters', 'config.rafters.json'), JSON.stringify(config));
-
-      const result = await handler.handleToolCall('rafters_get_config', {});
-
-      expect(result.isError).toBeFalsy();
+      expect(result.isError).toBe(true);
 
       const data = JSON.parse(result.content[0].text as string);
-      expect(data.config).toEqual(config);
+      expect(data.error).toContain('not found');
+      expect(data.suggestion).toContain('rafters_vocabulary');
     });
   });
 

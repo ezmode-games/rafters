@@ -4,6 +4,7 @@ packages:
 
 catalog:
   '@axe-core/playwright': ^4.10.0
+  comment-parser: ^1.4.1
   '@biomejs/biome': ^2.3.2
   '@changesets/cli': ^2.29.5
   '@cloudflare/vitest-pool-workers': ^0.9.3
