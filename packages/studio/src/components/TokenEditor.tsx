@@ -2,8 +2,10 @@ import { useState } from 'react';
 import type { Token } from '../api/token-loader';
 import { useToken } from '../hooks/useTokens';
 import type { TokenNamespace } from '../types';
-import { getTokenCssValue, getTokenDisplayValue } from '../utils/token-display';
+import type { OKLCH } from '../utils/color-conversion';
+import { getTokenDisplayValue } from '../utils/token-display';
 import { Preview } from './Preview';
+import { SpectrumPicker } from './SpectrumPicker';
 import { TokenGrid } from './TokenGrid';
 
 interface TokenEditorProps {
@@ -16,7 +18,14 @@ interface TokenEditorProps {
 export function TokenEditor({ namespace, tokenId, tokens, onTokenSelect }: TokenEditorProps) {
   const token = useToken(tokens, tokenId);
   const [hoveredToken, setHoveredToken] = useState<string | null>(null);
+  const [pendingColor, setPendingColor] = useState<OKLCH | null>(null);
   const colorTokens = tokens.color || [];
+
+  // Handle color change from picker (will be saved in #568)
+  const handleColorChange = (oklch: OKLCH) => {
+    setPendingColor(oklch);
+    // TODO: #568 will add save with reason functionality
+  };
 
   // Show preview for color namespace
   if (namespace === 'color') {
@@ -35,8 +44,15 @@ export function TokenEditor({ namespace, tokenId, tokens, onTokenSelect }: Token
             />
           </div>
 
-          {/* Selected Token Details */}
-          {token && <TokenDetails token={token} namespace={namespace} />}
+          {/* Selected Token Details with Color Picker */}
+          {token && (
+            <TokenDetails
+              token={token}
+              namespace={namespace}
+              onColorChange={handleColorChange}
+              pendingColor={pendingColor}
+            />
+          )}
         </div>
 
         {/* Right: Live Preview */}
@@ -81,8 +97,17 @@ export function TokenEditor({ namespace, tokenId, tokens, onTokenSelect }: Token
   );
 }
 
-function TokenDetails({ token, namespace }: { token: Token; namespace: TokenNamespace }) {
-  const cssValue = getTokenCssValue(token);
+function TokenDetails({
+  token,
+  namespace,
+  onColorChange,
+  pendingColor,
+}: {
+  token: Token;
+  namespace: TokenNamespace;
+  onColorChange?: (oklch: OKLCH) => void;
+  pendingColor?: OKLCH | null;
+}) {
   const displayValue = getTokenDisplayValue(token);
 
   return (
@@ -104,14 +129,15 @@ function TokenDetails({ token, namespace }: { token: Token; namespace: TokenName
         )}
       </div>
 
-      {/* Color preview */}
-      {namespace === 'color' && (
+      {/* Color picker */}
+      {namespace === 'color' && onColorChange && (
         <div className="mt-6">
-          <div className="aspect-video rounded-lg" style={{ backgroundColor: cssValue }} />
-          <p className="mt-2 text-center font-mono text-sm text-neutral-600">{displayValue}</p>
-          <p className="mt-4 text-center text-sm text-neutral-500">
-            Color picker will be implemented in issue #567
-          </p>
+          <SpectrumPicker token={token} onColorChange={onColorChange} />
+          {pendingColor && (
+            <p className="mt-3 text-center text-xs text-amber-600">
+              Color selected. Save functionality coming in #568.
+            </p>
+          )}
         </div>
       )}
 

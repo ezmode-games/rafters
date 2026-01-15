@@ -15,6 +15,7 @@
     "@rafters/design-tokens": "workspace:*",
     "@rafters/shared": "workspace:*",
     "@rafters/ui": "workspace:*",
+    "colorjs.io": "^0.5.2",
     "react": "catalog:",
     "react-colorful": "^5.6.1",
     "react-dom": "catalog:"

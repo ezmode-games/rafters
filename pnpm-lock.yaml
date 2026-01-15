@@ -460,6 +460,9 @@ importers:
       '@rafters/ui':
         specifier: workspace:*
         version: link:../ui
+      colorjs.io:
+        specifier: ^0.5.2
+        version: 0.5.2
       react:
         specifier: 'catalog:'
         version: 19.2.0
