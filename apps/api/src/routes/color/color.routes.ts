@@ -38,9 +38,10 @@ const SearchResultSchema = z.object({
 // Schema for get response (includes generation status)
 const ColorResponseSchema = z.object({
   color: ColorValueSchema.nullable(),
-  status: z.enum(['found', 'generating', 'queued', 'error']),
+  status: z.enum(['found', 'approximate', 'generating', 'queued', 'error']),
   requestId: z.string().optional(),
   error: z.string().optional(),
+  similarityScore: z.number().min(0).max(1).optional(),
 });
 
 /**

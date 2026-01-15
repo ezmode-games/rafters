@@ -30,13 +30,7 @@
     "binding": "AI",
     "remote": true
   },
-  "services": [
-    {
-      "binding": "CORE_API",
-      "service": "realhandy-api",
-      "remote": true
-    }
-  ],
+  // TODO: Add service binding to ezmode-api for uncertainty tracking (issue #563)
   "queues": {
     "producers": [
       {

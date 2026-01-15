@@ -50,6 +50,10 @@ export const getColor: AppRouteHandler<GetColorRoute> = async (c) => {
     );
   }
 
+  // Similarity threshold for nearest-neighbor fallback
+  // Color name embeddings typically score 0.6-0.7 for similar colors
+  const SIMILARITY_THRESHOLD = 0.6;
+
   // Standard path: Try cache lookup first
   try {
     const results = await c.env.VECTORIZE.getByIds([vectorId]);
@@ -65,7 +69,32 @@ export const getColor: AppRouteHandler<GetColorRoute> = async (c) => {
       );
     }
   } catch {
-    // Cache miss or error - fall through to generation
+    // Cache miss or error - fall through to nearest-neighbor
+  }
+
+  // Nearest-neighbor fallback: Find semantically similar cached color
+  try {
+    const mathOnlyColor = buildColorValue(oklch);
+    const queryEmbedding = await generateQueryEmbedding(mathOnlyColor.name, c.env.AI);
+    const similar = await c.env.VECTORIZE.query(queryEmbedding, {
+      topK: 1,
+      returnMetadata: 'all',
+    });
+
+    if (similar.matches[0]?.score && similar.matches[0].score > SIMILARITY_THRESHOLD) {
+      const rawMetadata = similar.matches[0].metadata as unknown as VectorMetadata;
+      const parsed = parseVectorMetadata(rawMetadata);
+      return c.json(
+        {
+          color: parsed.color,
+          status: 'approximate' as const,
+          similarityScore: similar.matches[0].score,
+        },
+        HttpStatusCodes.OK,
+      );
+    }
+  } catch {
+    // Nearest-neighbor failed - fall through to generation
   }
 
   // If not sync, return math-only immediately
