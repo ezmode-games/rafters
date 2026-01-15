@@ -37,7 +37,12 @@ export function App() {
               </button>
             </div>
           )}
-          <TokenEditor namespace={selectedNamespace} tokenId={selectedToken} tokens={tokens} />
+          <TokenEditor
+            namespace={selectedNamespace}
+            tokenId={selectedToken}
+            tokens={tokens}
+            onTokenSelect={setSelectedToken}
+          />
         </main>
       </div>
     </div>
