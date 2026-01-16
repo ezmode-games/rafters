@@ -6,7 +6,8 @@
  */
 
 import type { Plugin, ViteDevServer } from 'vite';
-import { loadProjectTokens, saveTokenUpdate } from './token-loader';
+import { loadProjectTokens, saveTokenUpdate, updateSingleToken } from './token-loader';
+import { writeQueue } from './write-queue';
 
 export function studioApiPlugin(): Plugin {
   return {
@@ -123,6 +124,74 @@ export function studioApiPlugin(): Plugin {
           res.statusCode = 500;
           res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify({ error: `Failed to save namespace ${namespace}` }));
+        }
+      });
+
+      // PATCH /api/token/:namespace/:name - Update a single token with reason
+      server.middlewares.use('/api/token/', async (req, res, next) => {
+        if (req.method !== 'PATCH') {
+          next();
+          return;
+        }
+
+        // Extract namespace/name from URL: /api/token/color/primary-500
+        const urlParts = req.url?.replace('/', '').split('?')[0].split('/');
+        if (!urlParts || urlParts.length < 2) {
+          next();
+          return;
+        }
+
+        const namespace = urlParts[0];
+        const tokenName = urlParts.slice(1).join('/'); // Handle names with slashes
+
+        try {
+          if (!projectPath) {
+            res.statusCode = 400;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ error: 'No project path configured' }));
+            return;
+          }
+
+          // Read body
+          let body = '';
+          for await (const chunk of req) {
+            body += chunk;
+          }
+
+          const { value, reason } = JSON.parse(body);
+
+          // Validate required fields
+          if (value === undefined) {
+            res.statusCode = 400;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ error: 'Missing required field: value' }));
+            return;
+          }
+
+          if (!reason || typeof reason !== 'string' || reason.trim() === '') {
+            res.statusCode = 400;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ error: 'Missing required field: reason' }));
+            return;
+          }
+
+          // Use write queue to serialize updates
+          const updatedToken = await writeQueue.enqueue(namespace, () =>
+            updateSingleToken(projectPath, namespace, {
+              name: tokenName,
+              value,
+              reason: reason.trim(),
+            }),
+          );
+
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ success: true, token: updatedToken }));
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Unknown error';
+          console.error(`[studio] Failed to update token ${namespace}/${tokenName}:`, error);
+          res.statusCode = 500;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ error: message }));
         }
       });
     },

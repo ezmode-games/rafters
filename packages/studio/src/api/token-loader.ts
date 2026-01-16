@@ -9,6 +9,11 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
+export interface UserOverride {
+  reason: string;
+  timestamp: string;
+}
+
 export interface Token {
   name: string;
   value: unknown;
@@ -17,6 +22,7 @@ export interface Token {
   description?: string;
   semanticMeaning?: string;
   usageContext?: string[];
+  userOverride?: UserOverride;
   [key: string]: unknown;
 }
 
@@ -91,4 +97,61 @@ export async function saveTokenUpdate(
   };
 
   await writeFile(filePath, JSON.stringify(data, null, 2));
+}
+
+export interface TokenUpdateRequest {
+  name: string;
+  value: unknown;
+  reason: string;
+}
+
+/**
+ * Update a single token with a reason
+ *
+ * This function:
+ * 1. Loads the current namespace file
+ * 2. Updates the specific token with new value and userOverride
+ * 3. Saves the file back
+ */
+export async function updateSingleToken(
+  projectPath: string,
+  namespace: string,
+  update: TokenUpdateRequest,
+): Promise<Token> {
+  const { writeFile, mkdir } = await import('node:fs/promises');
+  const tokensDir = join(projectPath, '.rafters', 'tokens');
+  const filePath = join(tokensDir, `${namespace}.rafters.json`);
+
+  // Load current data
+  let data: NamespaceFile;
+  try {
+    const content = await readFile(filePath, 'utf-8');
+    data = JSON.parse(content) as NamespaceFile;
+  } catch {
+    throw new Error(`Namespace ${namespace} not found`);
+  }
+
+  // Find and update the token
+  const tokenIndex = data.tokens.findIndex((t) => t.name === update.name);
+  if (tokenIndex === -1) {
+    throw new Error(`Token ${update.name} not found in ${namespace}`);
+  }
+
+  const updatedToken: Token = {
+    ...data.tokens[tokenIndex],
+    value: update.value,
+    userOverride: {
+      reason: update.reason,
+      timestamp: new Date().toISOString(),
+    },
+  };
+
+  data.tokens[tokenIndex] = updatedToken;
+  data.generatedAt = new Date().toISOString();
+
+  // Save
+  await mkdir(tokensDir, { recursive: true });
+  await writeFile(filePath, JSON.stringify(data, null, 2));
+
+  return updatedToken;
 }

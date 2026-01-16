@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import type { Token } from '../api/token-loader';
+import { useTokenSave } from '../hooks/useTokenSave';
 import { useToken } from '../hooks/useTokens';
 import type { TokenNamespace } from '../types';
 import type { OKLCH } from '../utils/color-conversion';
+import { oklchToCSS, roundOKLCH } from '../utils/color-conversion';
 import { getTokenDisplayValue } from '../utils/token-display';
 import { Preview } from './Preview';
 import { SpectrumPicker } from './SpectrumPicker';
@@ -13,18 +15,30 @@ interface TokenEditorProps {
   tokenId: string | null;
   tokens: Record<string, Token[]>;
   onTokenSelect: (tokenId: string | null) => void;
+  onTokenSaved?: () => void;
 }
 
-export function TokenEditor({ namespace, tokenId, tokens, onTokenSelect }: TokenEditorProps) {
+export function TokenEditor({
+  namespace,
+  tokenId,
+  tokens,
+  onTokenSelect,
+  onTokenSaved,
+}: TokenEditorProps) {
   const token = useToken(tokens, tokenId);
   const [hoveredToken, setHoveredToken] = useState<string | null>(null);
   const [pendingColor, setPendingColor] = useState<OKLCH | null>(null);
   const colorTokens = tokens.color || [];
 
-  // Handle color change from picker (will be saved in #568)
+  // Handle color change from picker
   const handleColorChange = (oklch: OKLCH) => {
     setPendingColor(oklch);
-    // TODO: #568 will add save with reason functionality
+  };
+
+  // Clear pending color after successful save
+  const handleSaved = () => {
+    setPendingColor(null);
+    onTokenSaved?.();
   };
 
   // Show preview for color namespace
@@ -51,6 +65,7 @@ export function TokenEditor({ namespace, tokenId, tokens, onTokenSelect }: Token
               namespace={namespace}
               onColorChange={handleColorChange}
               pendingColor={pendingColor}
+              onSaved={handleSaved}
             />
           )}
         </div>
@@ -102,13 +117,41 @@ function TokenDetails({
   namespace,
   onColorChange,
   pendingColor,
+  onSaved,
 }: {
   token: Token;
   namespace: TokenNamespace;
   onColorChange?: (oklch: OKLCH) => void;
   pendingColor?: OKLCH | null;
+  onSaved?: () => void;
 }) {
   const displayValue = getTokenDisplayValue(token);
+  const [reason, setReason] = useState('');
+  const { saveToken, state } = useTokenSave();
+
+  // Has pending changes (color selected)
+  const hasPendingChanges = namespace === 'color' && pendingColor !== null;
+
+  // Handle save
+  const handleSave = async () => {
+    if (!hasPendingChanges || !pendingColor) return;
+
+    // Convert OKLCH to storable format
+    const rounded = roundOKLCH(pendingColor);
+    const colorValue = {
+      oklch: rounded,
+      css: oklchToCSS(rounded),
+    };
+
+    const result = await saveToken(namespace, token.name, colorValue, reason);
+    if (result) {
+      setReason('');
+      onSaved?.();
+    }
+  };
+
+  // Check if save is allowed
+  const canSave = hasPendingChanges && reason.trim().length > 0 && !state.saving;
 
   return (
     <div className="rounded-lg border border-neutral-200 bg-white p-6">
@@ -127,17 +170,25 @@ function TokenDetails({
             {token.semanticMeaning}
           </span>
         )}
+        {token.userOverride && (
+          <span className="rounded bg-amber-50 px-2 py-0.5 text-xs text-amber-700">
+            User Override
+          </span>
+        )}
       </div>
+
+      {/* Previous override reason */}
+      {token.userOverride && (
+        <div className="mt-4 rounded-md bg-amber-50 p-3">
+          <p className="text-xs font-medium text-amber-800">Previous change reason:</p>
+          <p className="mt-1 text-sm text-amber-700">{token.userOverride.reason}</p>
+        </div>
+      )}
 
       {/* Color picker */}
       {namespace === 'color' && onColorChange && (
         <div className="mt-6">
           <SpectrumPicker token={token} onColorChange={onColorChange} />
-          {pendingColor && (
-            <p className="mt-3 text-center text-xs text-amber-600">
-              Color selected. Save functionality coming in #568.
-            </p>
-          )}
         </div>
       )}
 
@@ -170,22 +221,52 @@ function TokenDetails({
         </div>
       )}
 
-      {/* Reason input placeholder */}
-      <div className="mt-8 border-t border-neutral-200 pt-6">
-        <label htmlFor="change-reason" className="block text-sm font-medium text-neutral-700">
-          Why are you making this change?
-        </label>
-        <textarea
-          id="change-reason"
-          className="mt-2 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm placeholder:text-neutral-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-          rows={3}
-          placeholder="Describe the design intent..."
-          disabled
-        />
-        <p className="mt-2 text-xs text-neutral-500">
-          Save with reason will be implemented in issue #568
-        </p>
-      </div>
+      {/* Save with reason - only show when there are pending changes */}
+      {hasPendingChanges && (
+        <div className="mt-8 border-t border-neutral-200 pt-6">
+          <label htmlFor="change-reason" className="block text-sm font-medium text-neutral-700">
+            Why are you making this change?
+          </label>
+          <textarea
+            id="change-reason"
+            className="mt-2 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm placeholder:text-neutral-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            rows={3}
+            placeholder="Describe the design intent (required for AI context)..."
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            disabled={state.saving}
+          />
+          <p className="mt-2 text-xs text-neutral-500">
+            AI agents use this to understand your design decisions.
+          </p>
+
+          {/* Error message */}
+          {state.error && (
+            <div className="mt-3 rounded-md bg-red-50 p-3 text-sm text-red-700">{state.error}</div>
+          )}
+
+          {/* Success message */}
+          {state.success && (
+            <div className="mt-3 rounded-md bg-green-50 p-3 text-sm text-green-700">
+              Token saved successfully!
+            </div>
+          )}
+
+          {/* Save button */}
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={!canSave}
+            className={`mt-4 w-full rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+              canSave
+                ? 'bg-blue-500 text-white hover:bg-blue-600'
+                : 'cursor-not-allowed bg-neutral-200 text-neutral-500'
+            }`}
+          >
+            {state.saving ? 'Saving...' : 'Save Change'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

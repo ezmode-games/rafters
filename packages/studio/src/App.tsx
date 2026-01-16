@@ -42,6 +42,7 @@ export function App() {
             tokenId={selectedToken}
             tokens={tokens}
             onTokenSelect={setSelectedToken}
+            onTokenSaved={refetch}
           />
         </main>
       </div>
