@@ -6,7 +6,9 @@ import type { TokenNamespace } from '../types';
 import type { OKLCH } from '../utils/color-conversion';
 import { oklchToCSS, roundOKLCH } from '../utils/color-conversion';
 import { getTokenDisplayValue } from '../utils/token-display';
+import { MotionEditor } from './MotionEditor';
 import { Preview } from './Preview';
+import { SpacingEditor } from './SpacingEditor';
 import { SpectrumPicker } from './SpectrumPicker';
 import { TokenGrid } from './TokenGrid';
 
@@ -127,31 +129,53 @@ function TokenDetails({
 }) {
   const displayValue = getTokenDisplayValue(token);
   const [reason, setReason] = useState('');
+  const [pendingValue, setPendingValue] = useState<string | null>(null);
   const { saveToken, state } = useTokenSave();
 
-  // Has pending changes (color selected)
-  const hasPendingChanges = namespace === 'color' && pendingColor !== null;
+  // Has pending changes (color or non-color)
+  const hasPendingChanges =
+    (namespace === 'color' && pendingColor !== null) ||
+    (namespace !== 'color' && pendingValue !== null);
+
+  // Handle non-color value change
+  const handleValueChange = (value: string) => {
+    setPendingValue(value);
+  };
 
   // Handle save
   const handleSave = async () => {
-    if (!hasPendingChanges || !pendingColor) return;
+    if (!hasPendingChanges) return;
 
-    // Convert OKLCH to storable format
-    const rounded = roundOKLCH(pendingColor);
-    const colorValue = {
-      oklch: rounded,
-      css: oklchToCSS(rounded),
-    };
+    let valueToSave: unknown;
 
-    const result = await saveToken(namespace, token.name, colorValue, reason);
+    if (namespace === 'color' && pendingColor) {
+      // Convert OKLCH to storable format
+      const rounded = roundOKLCH(pendingColor);
+      valueToSave = {
+        oklch: rounded,
+        css: oklchToCSS(rounded),
+      };
+    } else if (pendingValue !== null) {
+      valueToSave = pendingValue;
+    } else {
+      return;
+    }
+
+    const result = await saveToken(namespace, token.name, valueToSave, reason);
     if (result) {
       setReason('');
+      setPendingValue(null);
       onSaved?.();
     }
   };
 
   // Check if save is allowed
   const canSave = hasPendingChanges && reason.trim().length > 0 && !state.saving;
+
+  // Determine which editor to show for non-color tokens
+  const isSpacingToken = namespace === 'spacing' || token.name.includes('spacing');
+  const isMotionToken =
+    namespace === 'motion' || token.name.includes('duration') || token.name.includes('easing');
 
   return (
     <div className="rounded-lg border border-neutral-200 bg-white p-6">
@@ -192,15 +216,21 @@ function TokenDetails({
         </div>
       )}
 
-      {/* Non-color value */}
+      {/* Non-color editors */}
       {namespace !== 'color' && (
         <div className="mt-6">
-          <div className="rounded-md bg-neutral-50 p-4">
-            <p className="font-mono text-sm text-neutral-700">{displayValue}</p>
-          </div>
-          <p className="mt-4 text-sm text-neutral-500">
-            Editor for {namespace} tokens will be implemented in issue #569
-          </p>
+          {isSpacingToken && <SpacingEditor token={token} onValueChange={handleValueChange} />}
+          {isMotionToken && <MotionEditor token={token} onValueChange={handleValueChange} />}
+          {!isSpacingToken && !isMotionToken && (
+            <div>
+              <div className="rounded-md bg-neutral-50 p-4">
+                <p className="font-mono text-sm text-neutral-700">{displayValue}</p>
+              </div>
+              <p className="mt-4 text-sm text-neutral-500">
+                Visual editor for {namespace} tokens coming soon.
+              </p>
+            </div>
+          )}
         </div>
       )}
 
