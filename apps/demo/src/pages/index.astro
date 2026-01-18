@@ -76,7 +76,7 @@ const totalComponents = components.length;
           <Muted class="ml-2">components</Muted>
         </div>
         <div>
-          <span class="text-3xl font-semibold text-primary">3</span>
+          <span class="text-3xl font-semibold text-primary">4</span>
           <Muted class="ml-2">MCP tools</Muted>
         </div>
       </div>
@@ -300,7 +300,7 @@ const totalComponents = components.length;
       <H2 class="mb-2">MCP Tools</H2>
       <Muted class="mb-8">How AI agents query design intelligence</Muted>
 
-      <Grid preset="linear" columns={3} gap="6">
+      <Grid preset="linear" columns={2} gap="6">
         <Card>
           <CardHeader>
             <CardTitle as="h3">Vocabulary</CardTitle>
@@ -339,6 +339,20 @@ const totalComponents = components.length;
           <CardContent>
             <P class="text-sm text-muted-foreground">
               Complete intelligence parsed from JSDoc: cognitive load, accessibility, usage patterns.
+            </P>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle as="h3">Token</CardTitle>
+            <CardDescription>
+              "What's the story behind this value?"
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <P class="text-sm text-muted-foreground">
+              Dependency graph, derivation rules, and human override context. See what the system computes vs what a designer chose and why.
             </P>
           </CardContent>
         </Card>

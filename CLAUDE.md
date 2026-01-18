@@ -13,10 +13,11 @@ AI agents don't have taste. They guess at colors, spacing, hierarchy. Rafters en
 - **Where** (Tokens) - `packages/design-tokens` with dependency graph and human override tracking
 - **Why** (Decisions) - Do/never patterns, cognitive load scores, trust patterns, accessibility requirements
 
-**Three MCP tools** (the primary interface - docs are secondary):
+**Four MCP tools** (the primary interface - docs are secondary):
 1. `rafters_vocabulary` - What's available (colors, spacing, components)
 2. `rafters_pattern` - How to implement scenarios (destructive-action, form-validation, etc.)
 3. `rafters_component` - Full intelligence for a specific component
+4. `rafters_token` - Token dependency graph, derivation rules, and human override context
 
 The AI learns **what** to do, **because of how** it works, **and why** it matters. The decisions are already made by the designer.
 

@@ -352,7 +352,7 @@ const DESIGN_PATTERNS: Record<string, DesignPattern> = {
   },
 };
 
-// Tool definitions for MCP server - 3 focused design tools
+// Tool definitions for MCP server - 4 focused design tools
 export const TOOL_DEFINITIONS = [
   {
     name: 'rafters_vocabulary',
@@ -395,9 +395,25 @@ export const TOOL_DEFINITIONS = [
       required: ['name'],
     },
   },
+  {
+    name: 'rafters_token',
+    description:
+      'Get full intelligence for a design token: current value, derivation rule, dependencies, dependents (cascade impact), and human override context. Shows what the system computes vs what a designer chose and why. Use when you need to understand token relationships or respect designer decisions.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        name: {
+          type: 'string',
+          description:
+            'Token name (e.g., "spacing-6", "primary-500", "spacing-base"). Use rafters_vocabulary to see available tokens.',
+        },
+      },
+      required: ['name'],
+    },
+  },
 ] as const;
 
-// Tool handler class - 3 focused design tools
+// Tool handler class - 4 focused design tools
 export class RaftersToolHandler {
   private readonly adapter: NodePersistenceAdapter;
   private readonly projectRoot: string;
@@ -418,6 +434,8 @@ export class RaftersToolHandler {
         return this.getPattern(args.pattern as string);
       case 'rafters_component':
         return this.getComponent(args.name as string);
+      case 'rafters_token':
+        return this.getToken(args.name as string);
       default:
         return {
           content: [{ type: 'text', text: `Unknown tool: ${name}` }],
@@ -838,6 +856,140 @@ export class RaftersToolHandler {
       };
     } catch (error) {
       return this.handleError('getComponent', error);
+    }
+  }
+
+  // ==================== Tool 4: Token ====================
+
+  /**
+   * Get full token intelligence including dependency graph and override context
+   */
+  private async getToken(tokenName: string): Promise<CallToolResult> {
+    try {
+      // Try to load the token from any namespace
+      const namespaces = ['color', 'spacing', 'typography'];
+      let foundToken = null;
+      let foundNamespace = '';
+
+      for (const ns of namespaces) {
+        try {
+          const tokens = await this.adapter.loadNamespace(ns);
+          const token = tokens.find((t) => t.name === tokenName);
+          if (token) {
+            foundToken = token;
+            foundNamespace = ns;
+            break;
+          }
+        } catch {
+          continue;
+        }
+      }
+
+      if (!foundToken) {
+        // Try to provide helpful suggestions
+        const allTokenNames: string[] = [];
+        for (const ns of namespaces) {
+          try {
+            const tokens = await this.adapter.loadNamespace(ns);
+            allTokenNames.push(...tokens.map((t) => t.name));
+          } catch {
+            continue;
+          }
+        }
+
+        const similar = allTokenNames
+          .filter((n) => n.includes(tokenName) || tokenName.includes(n.split('-')[0] || ''))
+          .slice(0, 5);
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(
+                {
+                  error: `Token "${tokenName}" not found`,
+                  similar: similar.length > 0 ? similar : undefined,
+                  suggestion: 'Use rafters_vocabulary to see all available tokens',
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+          isError: true,
+        };
+      }
+
+      // Build comprehensive token intelligence
+      const intelligence: Record<string, unknown> = {
+        name: foundToken.name,
+        namespace: foundNamespace,
+        value: foundToken.value,
+      };
+
+      // Derivation information
+      if (foundToken.generationRule) {
+        intelligence.derivation = {
+          rule: foundToken.generationRule,
+          mathRelationship: foundToken.mathRelationship,
+          progressionSystem: foundToken.progressionSystem,
+          scalePosition: foundToken.scalePosition,
+        };
+      }
+
+      // Dependencies
+      if (foundToken.dependsOn && foundToken.dependsOn.length > 0) {
+        intelligence.dependsOn = foundToken.dependsOn;
+      }
+
+      // Computed vs actual value (for override detection)
+      if (foundToken.computedValue !== undefined) {
+        intelligence.computedValue = foundToken.computedValue;
+      }
+
+      // Human override context - the key intelligence
+      if (foundToken.userOverride) {
+        intelligence.override = {
+          previousValue: foundToken.userOverride.previousValue,
+          reason: foundToken.userOverride.reason,
+          overriddenBy: foundToken.userOverride.overriddenBy,
+          overriddenAt: foundToken.userOverride.overriddenAt,
+          context: foundToken.userOverride.context,
+          tags: foundToken.userOverride.tags,
+          revertAfter: foundToken.userOverride.revertAfter,
+        };
+        intelligence.isOverridden = true;
+      } else {
+        intelligence.isOverridden = false;
+      }
+
+      // Semantic meaning and usage
+      if (foundToken.semanticMeaning) {
+        intelligence.semanticMeaning = foundToken.semanticMeaning;
+      }
+      if (foundToken.usageContext) {
+        intelligence.usageContext = foundToken.usageContext;
+      }
+      if (foundToken.usagePatterns) {
+        intelligence.do = foundToken.usagePatterns.do;
+        intelligence.never = foundToken.usagePatterns.never;
+      }
+
+      // Responsive awareness
+      if (foundToken.containerQueryAware !== undefined) {
+        intelligence.containerQueryAware = foundToken.containerQueryAware;
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(intelligence, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      return this.handleError('getToken', error);
     }
   }
 
