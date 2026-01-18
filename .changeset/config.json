@@ -13,6 +13,9 @@
     "@rafters/shared",
     "@rafters/color-utils",
     "@rafters/math-utils",
-    "@rafters/studio"
+    "@rafters/studio",
+    "demo",
+    "website",
+    "rafters-api"
   ]
 }
