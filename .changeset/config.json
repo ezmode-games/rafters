@@ -12,6 +12,7 @@
     "@rafters/ui",
     "@rafters/shared",
     "@rafters/color-utils",
-    "@rafters/math-utils"
+    "@rafters/math-utils",
+    "@rafters/studio"
   ]
 }
