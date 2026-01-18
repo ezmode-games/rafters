@@ -1,5 +1,6 @@
 {
   "name": "@rafters/math-utils",
+  "private": true,
   "version": "0.0.1",
   "description": "Mathematical utilities for design token generation",
   "type": "module",

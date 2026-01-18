@@ -1,5 +1,6 @@
 {
   "name": "@rafters/design-tokens",
+  "private": true,
   "version": "0.0.1",
   "description": "Revolutionary dependency-aware design token system with W3C DTCG compliance",
   "type": "module",

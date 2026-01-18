@@ -1,5 +1,6 @@
 {
   "name": "@rafters/color-utils",
+  "private": true,
   "version": "0.0.1",
   "description": "OKLCH color manipulation utilities for Rafters design system",
   "type": "module",
