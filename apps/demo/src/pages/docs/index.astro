@@ -1,7 +1,7 @@
 ---
 /**
  * Docs Index - Overview of all documentation sections
- * 
+ *
  * Uses Rafters components:
  * - Container: main landmark with size constraint
  * - Grid: linear preset for equal-priority cards
@@ -13,7 +13,7 @@
 
 import { getCollection } from 'astro:content';
 import { Badge } from '@rafters/ui/components/ui/badge';
-import { Card, CardHeader, CardTitle, CardDescription } from '@rafters/ui/components/ui/card';
+import { Card, CardDescription, CardHeader, CardTitle } from '@rafters/ui/components/ui/card';
 import { Container } from '@rafters/ui/components/ui/container';
 import { Grid } from '@rafters/ui/components/ui/grid';
 import { Separator } from '@rafters/ui/components/ui/separator';
@@ -24,11 +24,31 @@ const allDocs = await getCollection('docs', ({ data }) => !data.draft);
 
 // Group by section
 const sections = {
-  concepts: { label: 'Concepts', description: 'Understanding the Design Intelligence Protocol', docs: [] as typeof allDocs },
-  tokens: { label: 'Tokens', description: 'The dependency-aware token system', docs: [] as typeof allDocs },
-  components: { label: 'Components', description: 'UI building blocks with embedded intelligence', docs: [] as typeof allDocs },
-  patterns: { label: 'Patterns', description: 'Solving common design scenarios', docs: [] as typeof allDocs },
-  guides: { label: 'Guides', description: 'Step-by-step implementation', docs: [] as typeof allDocs },
+  concepts: {
+    label: 'Concepts',
+    description: 'Understanding the Design Intelligence Protocol',
+    docs: [] as typeof allDocs,
+  },
+  tokens: {
+    label: 'Tokens',
+    description: 'The dependency-aware token system',
+    docs: [] as typeof allDocs,
+  },
+  components: {
+    label: 'Components',
+    description: 'UI building blocks with embedded intelligence',
+    docs: [] as typeof allDocs,
+  },
+  patterns: {
+    label: 'Patterns',
+    description: 'Solving common design scenarios',
+    docs: [] as typeof allDocs,
+  },
+  guides: {
+    label: 'Guides',
+    description: 'Step-by-step implementation',
+    docs: [] as typeof allDocs,
+  },
 };
 
 // Badge variants per section
@@ -56,7 +76,7 @@ const sectionOrder = ['concepts', 'tokens', 'components', 'patterns', 'guides'] 
 
 // Count total docs
 const totalDocs = allDocs.length;
-const sectionsWithDocs = sectionOrder.filter(key => sections[key].docs.length > 0);
+const sectionsWithDocs = sectionOrder.filter((key) => sections[key].docs.length > 0);
 ---
 
 <BaseLayout title="Documentation" description="Rafters Design Intelligence Protocol documentation">

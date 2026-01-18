@@ -9,7 +9,7 @@ import DocLayout from '../../layouts/DocLayout.astro';
 
 export async function getStaticPaths() {
   const docs = await getCollection('docs', ({ data }) => !data.draft);
-  
+
   return docs.map((entry) => ({
     params: { slug: entry.slug },
     props: { entry },

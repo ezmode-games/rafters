@@ -880,9 +880,7 @@ export class RaftersToolHandler {
             foundNamespace = ns;
             break;
           }
-        } catch {
-          continue;
-        }
+        } catch {}
       }
 
       if (!foundToken) {
@@ -892,9 +890,7 @@ export class RaftersToolHandler {
           try {
             const tokens = await this.adapter.loadNamespace(ns);
             allTokenNames.push(...tokens.map((t) => t.name));
-          } catch {
-            continue;
-          }
+          } catch {}
         }
 
         const similar = allTokenNames
