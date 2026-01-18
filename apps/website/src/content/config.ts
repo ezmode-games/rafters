@@ -1,22 +1,6 @@
 import { defineCollection, z } from 'astro:content';
 
-// Unified docs collection for all documentation
-const docsCollection = defineCollection({
-  type: 'content',
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    // Component-specific fields (optional for foundation docs)
-    cognitiveLoad: z.number().min(0).max(10).optional(),
-    trustLevel: z.enum(['low', 'medium', 'high', 'critical']).optional(),
-    attentionEconomics: z.string().optional(),
-    // Common fields
-    order: z.number().optional(),
-    draft: z.boolean().optional(),
-  }),
-});
-
-// Universal page collection for landing, huh, and any other pages
+// Universal page collection for landing and other pages
 const pageCollection = defineCollection({
   type: 'content',
   schema: z.object({
@@ -53,7 +37,6 @@ const decisionsCollection = defineCollection({
 });
 
 export const collections = {
-  docs: docsCollection,
   pages: pageCollection,
   decisions: decisionsCollection,
 };
