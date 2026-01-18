@@ -4,13 +4,11 @@ packages:
 
 catalog:
   '@axe-core/playwright': ^4.10.0
-  comment-parser: ^1.4.1
   '@biomejs/biome': ^2.3.2
-  '@changesets/cli': ^2.29.5
+  '@changesets/cli': ^2.29.8
   '@cloudflare/vitest-pool-workers': ^0.9.3
   '@playwright/experimental-ct-react': ^1.56.0
   '@playwright/test': ^1.56.0
-  playwright-bdd: ^8.4.2
   '@testing-library/jest-dom': ^6.6.3
   '@testing-library/react': ^16.1.0
   '@testing-library/user-event': ^14.5.2
@@ -20,11 +18,13 @@ catalog:
   '@vitejs/plugin-react': ^4.3.4
   '@vitest/coverage-v8': ^3.2.0
   '@vitest/ui': ^3.2.0
+  comment-parser: ^1.4.1
   happy-dom: ^20.0.10
   hono: ^4.10.4
   lefthook: ^1.10.0
   lit: ^3.3.1
   msw: ^2.11.6
+  playwright-bdd: ^8.4.2
   react: ^19.2.0
   react-dom: ^19.2.0
   stoker: ^2.0.1
