@@ -85,6 +85,39 @@ export const fixtures = {
       value: '0.25rem',
     }),
 
+  // Spacing token with derivation rule
+  spacingWithRuleToken: () =>
+    fixtures.spacingToken({
+      name: 'spacing-6',
+      value: '1.5rem',
+      generationRule: 'calc({spacing-base} * 6)',
+      mathRelationship: '4 * 6',
+      progressionSystem: 'minor-third' as const,
+      scalePosition: 6,
+      dependsOn: ['spacing-base'],
+      semanticMeaning: 'Medium spacing for section separation',
+      usageContext: ['section-padding', 'card-padding'],
+    }),
+
+  // Token with human override
+  overriddenToken: () =>
+    fixtures.spacingToken({
+      name: 'spacing-custom',
+      value: '2rem',
+      computedValue: '1.75rem',
+      generationRule: 'calc({spacing-base} * 7)',
+      dependsOn: ['spacing-base'],
+      semanticMeaning: 'Custom spacing for hero sections',
+      userOverride: {
+        previousValue: '1.75rem',
+        reason: 'Design review requested larger spacing for hero',
+        overriddenBy: 'designer@example.com',
+        overriddenAt: '2024-01-15T10:30:00Z',
+        context: 'Hero section redesign Q1 2024',
+        tags: ['hero', 'redesign'],
+      },
+    }),
+
   // Generate a full ColorValue (for color family tokens)
   colorFamilyToken: (name: string, colorName: string) => {
     const colorValue = colorValueGenerator
