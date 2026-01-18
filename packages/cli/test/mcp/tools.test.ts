@@ -6,8 +6,8 @@ import { RaftersToolHandler, TOOL_DEFINITIONS } from '../../src/mcp/tools.js';
 import { fixtures, serializeNamespaceFile } from '../fixtures/tokens.js';
 
 describe('TOOL_DEFINITIONS', () => {
-  it('should define 3 design-focused tools', () => {
-    expect(TOOL_DEFINITIONS).toHaveLength(3);
+  it('should define 4 design-focused tools', () => {
+    expect(TOOL_DEFINITIONS).toHaveLength(4);
   });
 
   it('should have correct tool names', () => {
@@ -15,6 +15,7 @@ describe('TOOL_DEFINITIONS', () => {
     expect(names).toContain('rafters_vocabulary');
     expect(names).toContain('rafters_pattern');
     expect(names).toContain('rafters_component');
+    expect(names).toContain('rafters_token');
   });
 
   it('should have descriptions for all tools', () => {
@@ -166,6 +167,124 @@ describe('RaftersToolHandler', () => {
       const data = JSON.parse(result.content[0].text as string);
       expect(data.error).toContain('not found');
       expect(data.suggestion).toContain('rafters_vocabulary');
+    });
+  });
+
+  describe('rafters_token', () => {
+    it('should return error for non-existent token', async () => {
+      const result = await handler.handleToolCall('rafters_token', {
+        name: 'nonexistent-token',
+      });
+
+      expect(result.isError).toBe(true);
+
+      const data = JSON.parse(result.content[0].text as string);
+      expect(data.error).toContain('not found');
+      expect(data.suggestion).toContain('rafters_vocabulary');
+    });
+
+    it('should return token details for existing spacing token', async () => {
+      await writeFile(
+        join(testDir, '.rafters', 'tokens', 'spacing.rafters.json'),
+        serializeNamespaceFile('spacing', [fixtures.spacing1Token()]),
+      );
+
+      const result = await handler.handleToolCall('rafters_token', {
+        name: 'spacing-1',
+      });
+
+      expect(result.isError).toBeFalsy();
+
+      const data = JSON.parse(result.content[0].text as string);
+      expect(data.name).toBe('spacing-1');
+      expect(data.namespace).toBe('spacing');
+      expect(data.value).toBe('0.25rem');
+      expect(data.isOverridden).toBe(false);
+    });
+
+    it('should return derivation information for tokens with rules', async () => {
+      await writeFile(
+        join(testDir, '.rafters', 'tokens', 'spacing.rafters.json'),
+        serializeNamespaceFile('spacing', [fixtures.spacingWithRuleToken()]),
+      );
+
+      const result = await handler.handleToolCall('rafters_token', {
+        name: 'spacing-6',
+      });
+
+      expect(result.isError).toBeFalsy();
+
+      const data = JSON.parse(result.content[0].text as string);
+      expect(data.name).toBe('spacing-6');
+      expect(data.derivation).toBeDefined();
+      expect(data.derivation.rule).toBe('calc({spacing-base} * 6)');
+      expect(data.derivation.progressionSystem).toBe('minor-third');
+      expect(data.dependsOn).toContain('spacing-base');
+      expect(data.semanticMeaning).toBeDefined();
+      expect(data.usageContext).toBeDefined();
+    });
+
+    it('should return override context for human-overridden tokens', async () => {
+      await writeFile(
+        join(testDir, '.rafters', 'tokens', 'spacing.rafters.json'),
+        serializeNamespaceFile('spacing', [fixtures.overriddenToken()]),
+      );
+
+      const result = await handler.handleToolCall('rafters_token', {
+        name: 'spacing-custom',
+      });
+
+      expect(result.isError).toBeFalsy();
+
+      const data = JSON.parse(result.content[0].text as string);
+      expect(data.name).toBe('spacing-custom');
+      expect(data.value).toBe('2rem');
+      expect(data.computedValue).toBe('1.75rem');
+      expect(data.isOverridden).toBe(true);
+      expect(data.override).toBeDefined();
+      expect(data.override.previousValue).toBe('1.75rem');
+      expect(data.override.reason).toContain('Design review');
+      expect(data.override.overriddenBy).toBe('designer@example.com');
+      expect(data.override.tags).toContain('hero');
+    });
+
+    it('should suggest similar tokens when token not found', async () => {
+      await writeFile(
+        join(testDir, '.rafters', 'tokens', 'spacing.rafters.json'),
+        serializeNamespaceFile('spacing', [
+          fixtures.spacing1Token(),
+          fixtures.spacingWithRuleToken(),
+        ]),
+      );
+
+      const result = await handler.handleToolCall('rafters_token', {
+        name: 'spacing-99',
+      });
+
+      expect(result.isError).toBe(true);
+
+      const data = JSON.parse(result.content[0].text as string);
+      expect(data.error).toContain('not found');
+      expect(data.similar).toBeDefined();
+      expect(data.similar.length).toBeGreaterThan(0);
+    });
+
+    it('should return color token details', async () => {
+      await writeFile(
+        join(testDir, '.rafters', 'tokens', 'color.rafters.json'),
+        serializeNamespaceFile('color', [fixtures.primaryToken()]),
+      );
+
+      const result = await handler.handleToolCall('rafters_token', {
+        name: 'primary',
+      });
+
+      expect(result.isError).toBeFalsy();
+
+      const data = JSON.parse(result.content[0].text as string);
+      expect(data.name).toBe('primary');
+      expect(data.namespace).toBe('color');
+      expect(data.semanticMeaning).toContain('Primary');
     });
   });
 

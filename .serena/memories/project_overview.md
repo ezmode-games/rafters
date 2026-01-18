@@ -1,7 +1,19 @@
 # Rafters Project Overview
 
+**READ `what_rafters_is` MEMORY FIRST.** That explains what Rafters actually is and why it exists. This file is just technical reference.
+
 ## Purpose
-Rafters is a **Design Intelligence Protocol for AI Agents**. It converts subjective design decisions into objective, queryable data structures that AI agents can use to build interfaces without guessing at colors, spacing, hierarchy, and balance.
+Rafters is a **Design Intelligence Protocol for AI Agents**.
+
+## Design Philosophy
+See `docs/DESIGN_PHILOSOPHY.md` for the complete philosophy document that balances:
+- **Craft (Jobs/Ive/Rams)** - Deep simplicity, every detail intentional, design as soul
+- **Experimentation (Joshua Davis)** - Structured chaos, room for delight within constraints
+- **Usability (Jakob Nielsen)** - Empirical validation via 10 heuristics
+
+The system exists to encode design judgment - built from decades of work at Frog, IDEO, physical devices, brand systems - into a format machines can learn from. AI agents don't have taste; Rafters provides data that simulates taste.
+
+Key tension: Craft without experimentation is sterile. Experimentation without usability is chaos. Usability without craft looks like ass. All three, together. It converts subjective design decisions into objective, queryable data structures that AI agents can use to build interfaces without guessing at colors, spacing, hierarchy, and balance.
 
 **Core concept:** AI agents don't have taste. They need data. Rafters provides data that simulates taste through three interconnected registries:
 
