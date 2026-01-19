@@ -7,7 +7,7 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-export type Framework = 'next' | 'vite' | 'remix' | 'astro' | 'unknown';
+export type Framework = 'next' | 'vite' | 'remix' | 'react-router' | 'astro' | 'unknown';
 
 export interface ShadcnConfig {
   tailwind?: {
@@ -60,6 +60,11 @@ export async function detectFramework(cwd: string): Promise<Framework> {
     // Check for frameworks in order of specificity
     if (deps.next) {
       return 'next';
+    }
+
+    // React Router v7 uses react-router package (check before Remix)
+    if (deps['react-router']) {
+      return 'react-router';
     }
 
     // Remix packages all start with @remix-run/

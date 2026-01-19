@@ -22,6 +22,7 @@ program
   .command('init')
   .description('Initialize .rafters/ with default tokens and config')
   .option('-f, --force', 'Regenerate output files from existing config')
+  .option('--agent', 'Output JSON for machine consumption')
   .action(init);
 
 program
@@ -30,6 +31,7 @@ program
   .argument('<components...>', 'Component names to add')
   .option('--overwrite', 'Overwrite existing component files')
   .option('--registry-url <url>', 'Custom registry URL')
+  .option('--agent', 'Output JSON for machine consumption')
   .action(add);
 
 program.command('mcp').description('Start MCP server for AI agent access (stdio)').action(mcp);

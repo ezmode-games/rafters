@@ -17,43 +17,43 @@ import { generateRandomItems, registryFixtures } from '../fixtures/registry.js';
 describe('transformFileContent', () => {
   it('transforms ../../primitives/ imports to @/lib/primitives/', () => {
     const input = `import classy from '../../primitives/classy';`;
-    const result = transformFileContent(input);
+    const result = transformFileContent(input, null);
     expect(result).toBe(`import classy from '@/lib/primitives/classy';`);
   });
 
   it('transforms ../primitives/ imports to @/lib/primitives/', () => {
     const input = `import { cn } from '../primitives/cn';`;
-    const result = transformFileContent(input);
+    const result = transformFileContent(input, null);
     expect(result).toBe(`import { cn } from '@/lib/primitives/cn';`);
   });
 
   it('transforms ./ component imports to @/components/ui/', () => {
     const input = `import { Button } from './button';`;
-    const result = transformFileContent(input);
+    const result = transformFileContent(input, null);
     expect(result).toBe(`import { Button } from '@/components/ui/button';`);
   });
 
   it('transforms ../ component imports to @/components/ui/', () => {
     const input = `import { Card } from '../card';`;
-    const result = transformFileContent(input);
+    const result = transformFileContent(input, null);
     expect(result).toBe(`import { Card } from '@/components/ui/card';`);
   });
 
   it('transforms ../lib/ imports to @/lib/', () => {
     const input = `import { cn } from '../lib/utils';`;
-    const result = transformFileContent(input);
+    const result = transformFileContent(input, null);
     expect(result).toBe(`import { cn } from '@/lib/utils';`);
   });
 
   it('transforms ../hooks/ imports to @/hooks/', () => {
     const input = `import { useMediaQuery } from '../hooks/use-media-query';`;
-    const result = transformFileContent(input);
+    const result = transformFileContent(input, null);
     expect(result).toBe(`import { useMediaQuery } from '@/hooks/use-media-query';`);
   });
 
   it('does not incorrectly transform ../lib/ as component import', () => {
     const input = `import { cn } from '../lib/utils';`;
-    const result = transformFileContent(input);
+    const result = transformFileContent(input, null);
     // Should NOT be @/components/ui/lib/utils
     expect(result).not.toContain('@/components/ui/lib');
     expect(result).toBe(`import { cn } from '@/lib/utils';`);
@@ -64,7 +64,7 @@ describe('transformFileContent', () => {
 import { Button } from './button';
 import { Card } from '../card';`;
 
-    const result = transformFileContent(input);
+    const result = transformFileContent(input, null);
 
     expect(result).toContain(`from '@/lib/primitives/classy'`);
     expect(result).toContain(`from '@/components/ui/button'`);
@@ -75,7 +75,7 @@ import { Card } from '../card';`;
     const input = `import React from 'react';
 import * as Dialog from '@radix-ui/react-dialog';`;
 
-    const result = transformFileContent(input);
+    const result = transformFileContent(input, null);
 
     expect(result).toContain(`from 'react'`);
     expect(result).toContain(`from '@radix-ui/react-dialog'`);
@@ -83,7 +83,7 @@ import * as Dialog from '@radix-ui/react-dialog';`;
 
   it('handles double quotes', () => {
     const input = `import classy from "../../primitives/classy";`;
-    const result = transformFileContent(input);
+    const result = transformFileContent(input, null);
     expect(result).toBe(`import classy from '@/lib/primitives/classy';`);
   });
 });
