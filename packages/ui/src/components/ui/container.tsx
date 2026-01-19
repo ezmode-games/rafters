@@ -15,6 +15,7 @@
  * DO: Spacing happens inside (padding), not outside (no margins)
  * NEVER: Nest containers unnecessarily
  * NEVER: Use margins for spacing - let parent Grid handle gaps
+ * NEVER: Use @container without w-full in flex/grid contexts (causes width collapse in Tailwind v4)
  *
  * @example
  * ```tsx
@@ -143,8 +144,9 @@ export const Container = React.forwardRef<HTMLElement, ContainerProps>(
     const isArticle = Element === 'article';
 
     const classes = classy(
-      // Container queries
-      query && '@container',
+      // Container queries - w-full prevents width collapse when container-type: inline-size
+      // is applied to flex/grid children (Tailwind v4 behavior)
+      query && '@container w-full',
 
       // Size constraint
       size && sizeClasses[size],
