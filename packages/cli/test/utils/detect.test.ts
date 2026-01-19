@@ -46,6 +46,18 @@ describe('detectFramework', () => {
     expect(framework).toBe('vite');
   });
 
+  it('should detect React Router v7', async () => {
+    await writeFile(
+      join(testDir, 'package.json'),
+      JSON.stringify({
+        dependencies: { 'react-router': '^7.0.0', react: '^19.0.0' },
+      }),
+    );
+
+    const framework = await detectFramework(testDir);
+    expect(framework).toBe('react-router');
+  });
+
   it('should detect Remix', async () => {
     await writeFile(
       join(testDir, 'package.json'),

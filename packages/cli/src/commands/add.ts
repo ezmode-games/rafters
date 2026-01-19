@@ -6,16 +6,19 @@
  */
 
 import { existsSync } from 'node:fs';
-import { access, mkdir, writeFile } from 'node:fs/promises';
+import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { RegistryClient } from '../registry/client.js';
 import type { RegistryItem } from '../registry/types.js';
 import { getRaftersPaths } from '../utils/paths.js';
+import { error, log, setAgentMode } from '../utils/ui.js';
 import { updateDependencies } from '../utils/update-dependencies.js';
+import type { RaftersConfig } from './init.js';
 
 export interface AddOptions {
   overwrite?: boolean;
   registryUrl?: string;
+  agent?: boolean;
 }
 
 /**
@@ -32,6 +35,44 @@ async function isInitialized(cwd: string): Promise<boolean> {
 }
 
 /**
+ * Load rafters config from .rafters/config.rafters.json
+ */
+async function loadConfig(cwd: string): Promise<RaftersConfig | null> {
+  const paths = getRaftersPaths(cwd);
+  try {
+    const content = await readFile(paths.config, 'utf-8');
+    return JSON.parse(content) as RaftersConfig;
+  } catch (err) {
+    // Log warning if file exists but failed to parse
+    if (existsSync(paths.config)) {
+      const message = err instanceof Error ? err.message : String(err);
+      log({ event: 'add:warning', message: `Failed to load config: ${message}` });
+    }
+    return null;
+  }
+}
+
+/**
+ * Transform registry path to project path based on config
+ * e.g., "components/ui/button.tsx" -> "app/components/ui/button.tsx"
+ */
+function transformPath(registryPath: string, config: RaftersConfig | null): string {
+  if (!config) return registryPath;
+
+  // Transform component paths
+  if (registryPath.startsWith('components/ui/')) {
+    return registryPath.replace('components/ui/', `${config.componentsPath}/`);
+  }
+
+  // Transform primitive paths
+  if (registryPath.startsWith('lib/primitives/')) {
+    return registryPath.replace('lib/primitives/', `${config.primitivesPath}/`);
+  }
+
+  return registryPath;
+}
+
+/**
  * Check if a file already exists at the target path
  */
 function fileExists(cwd: string, relativePath: string): boolean {
@@ -41,34 +82,51 @@ function fileExists(cwd: string, relativePath: string): boolean {
 /**
  * Transform component file content to update imports for the target project
  */
-export function transformFileContent(content: string): string {
+export function transformFileContent(content: string, config: RaftersConfig | null): string {
   let transformed = content;
 
-  // Transform imports from ../../primitives/ to lib/primitives/
+  // Get paths from config or use defaults
+  const componentsPath = config?.componentsPath ?? 'components/ui';
+  const primitivesPath = config?.primitivesPath ?? 'lib/primitives';
+
+  // Transform imports from ../../primitives/ to configured primitives path
   transformed = transformed.replace(
     /from\s+['"]\.\.\/\.\.\/primitives\/([^'"]+)['"]/g,
-    "from '@/lib/primitives/$1'",
+    `from '@/${primitivesPath}/$1'`,
   );
 
-  // Transform imports from ../primitives/ to lib/primitives/
+  // Transform imports from ../primitives/ to configured primitives path
   transformed = transformed.replace(
     /from\s+['"]\.\.\/primitives\/([^'"]+)['"]/g,
-    "from '@/lib/primitives/$1'",
+    `from '@/${primitivesPath}/$1'`,
   );
 
-  // Transform relative component imports to absolute
-  transformed = transformed.replace(/from\s+['"]\.\/([^'"]+)['"]/g, "from '@/components/ui/$1'");
+  // Transform relative component imports to configured components path
+  transformed = transformed.replace(
+    /from\s+['"]\.\/([^'"]+)['"]/g,
+    `from '@/${componentsPath}/$1'`,
+  );
 
-  // Transform parent lib imports to absolute lib path
-  transformed = transformed.replace(/from\s+['"]\.\.\/lib\/([^'"]+)['"]/g, "from '@/lib/$1'");
+  // Transform parent lib imports - derive lib path as parent directory of primitivesPath
+  const libPath = dirname(primitivesPath);
+  transformed = transformed.replace(
+    /from\s+['"]\.\.\/lib\/([^'"]+)['"]/g,
+    `from '@/${libPath}/$1'`,
+  );
 
-  // Transform parent hooks imports to absolute hooks path
-  transformed = transformed.replace(/from\s+['"]\.\.\/hooks\/([^'"]+)['"]/g, "from '@/hooks/$1'");
+  // Transform parent hooks imports - derive hooks path from components path structure
+  // e.g., 'components/ui' -> 'hooks', 'app/components/ui' -> 'app/hooks'
+  const componentsMatch = componentsPath.match(/^(.*)components\/ui$/);
+  const hooksPath = componentsMatch ? `${componentsMatch[1]}hooks`.replace(/^\//, '') : 'hooks';
+  transformed = transformed.replace(
+    /from\s+['"]\.\.\/hooks\/([^'"]+)['"]/g,
+    `from '@/${hooksPath}/$1'`,
+  );
 
   // Transform other parent imports as UI components (excluding lib/ and hooks/ already handled)
   transformed = transformed.replace(
     /from\s+['"]\.\.\/(?!lib\/|hooks\/)([^'"]+)['"]/g,
-    "from '@/components/ui/$1'",
+    `from '@/${componentsPath}/$1'`,
   );
 
   return transformed;
@@ -81,20 +139,23 @@ async function installItem(
   cwd: string,
   item: RegistryItem,
   options: AddOptions,
+  config: RaftersConfig | null,
 ): Promise<{ installed: boolean; skipped: boolean; files: string[] }> {
   const installedFiles: string[] = [];
   let skipped = false;
 
   for (const file of item.files) {
-    const targetPath = join(cwd, file.path);
+    // Transform the path based on project config
+    const projectPath = transformPath(file.path, config);
+    const targetPath = join(cwd, projectPath);
 
     // Check if file exists and handle overwrite
-    if (fileExists(cwd, file.path)) {
+    if (fileExists(cwd, projectPath)) {
       if (!options.overwrite) {
-        console.log({
+        log({
           event: 'add:skip',
           component: item.name,
-          file: file.path,
+          file: projectPath,
           reason: 'exists',
         });
         skipped = true;
@@ -106,10 +167,10 @@ async function installItem(
     await mkdir(dirname(targetPath), { recursive: true });
 
     // Transform and write the file
-    const transformedContent = transformFileContent(file.content);
+    const transformedContent = transformFileContent(file.content, config);
     await writeFile(targetPath, transformedContent, 'utf-8');
 
-    installedFiles.push(file.path);
+    installedFiles.push(projectPath);
   }
 
   return {
@@ -161,10 +222,11 @@ export async function installComponent(
   targetDir: string,
   options: AddOptions = {},
 ): Promise<void> {
-  const result = await installItem(targetDir, component, options);
+  const config = await loadConfig(targetDir);
+  const result = await installItem(targetDir, component, options, config);
 
   if (result.installed) {
-    console.log({
+    log({
       event: 'add:installed',
       component: component.name,
       files: result.files,
@@ -180,24 +242,29 @@ export async function installComponent(
  * Add one or more components to the project
  */
 export async function add(components: string[], options: AddOptions): Promise<void> {
+  setAgentMode(options.agent ?? false);
+
   const cwd = process.cwd();
 
   // Validate that .rafters/ exists
   const initialized = await isInitialized(cwd);
   if (!initialized) {
-    console.error('Error: Project not initialized. Run `rafters init` first.');
+    error('Project not initialized. Run `rafters init` first.');
     process.exitCode = 1;
     return;
   }
+
+  // Load project config for path mappings
+  const config = await loadConfig(cwd);
 
   // Validate that at least one component is specified
   if (components.length === 0) {
-    console.error('Error: No components specified. Usage: rafters add <component...>');
+    error('No components specified. Usage: rafters add <component...>');
     process.exitCode = 1;
     return;
   }
 
-  console.log({
+  log({
     event: 'add:start',
     cwd,
     components,
@@ -216,9 +283,9 @@ export async function add(components: string[], options: AddOptions): Promise<vo
       allItems.push(...items);
     } catch (err) {
       if (err instanceof Error) {
-        console.error(`Error: ${err.message}`);
+        error(err.message);
       } else {
-        console.error(`Error: Failed to fetch component "${componentName}"`);
+        error(`Failed to fetch component "${componentName}"`);
       }
       process.exitCode = 1;
       return;
@@ -231,11 +298,11 @@ export async function add(components: string[], options: AddOptions): Promise<vo
 
   for (const item of allItems) {
     try {
-      const result = await installItem(cwd, item, options);
+      const result = await installItem(cwd, item, options, config);
 
       if (result.installed) {
         installed.push(item.name);
-        console.log({
+        log({
           event: 'add:installed',
           component: item.name,
           type: item.type,
@@ -249,7 +316,7 @@ export async function add(components: string[], options: AddOptions): Promise<vo
     } catch (err) {
       // Warn but continue on peer component failures
       if (err instanceof Error) {
-        console.warn({
+        log({
           event: 'add:warning',
           component: item.name,
           message: err.message,
@@ -262,7 +329,7 @@ export async function add(components: string[], options: AddOptions): Promise<vo
   const { dependencies, devDependencies } = collectDependencies(allItems);
 
   if (dependencies.length > 0 || devDependencies.length > 0) {
-    console.log({
+    log({
       event: 'add:dependencies',
       dependencies,
       devDependencies,
@@ -271,7 +338,7 @@ export async function add(components: string[], options: AddOptions): Promise<vo
     try {
       await updateDependencies(dependencies, devDependencies, { cwd });
     } catch (err) {
-      console.error({
+      log({
         event: 'add:error',
         message: 'Failed to install dependencies',
         error: err instanceof Error ? err.message : String(err),
@@ -281,7 +348,7 @@ export async function add(components: string[], options: AddOptions): Promise<vo
   }
 
   // Summary
-  console.log({
+  log({
     event: 'add:complete',
     installed: installed.length,
     skipped: skipped.length,
@@ -289,7 +356,7 @@ export async function add(components: string[], options: AddOptions): Promise<vo
   });
 
   if (skipped.length > 0 && installed.length === 0) {
-    console.log({
+    log({
       event: 'add:hint',
       message: 'Some components were skipped. Use --overwrite to replace existing files.',
       skipped,

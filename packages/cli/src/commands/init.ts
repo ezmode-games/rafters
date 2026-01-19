@@ -25,9 +25,11 @@ import {
   type ShadcnConfig,
 } from '../utils/detect.js';
 import { getRaftersPaths } from '../utils/paths.js';
+import { log, setAgentMode } from '../utils/ui.js';
 
 interface InitOptions {
   force?: boolean;
+  agent?: boolean;
 }
 
 async function backupCss(cssPath: string): Promise<string> {
@@ -36,15 +38,43 @@ async function backupCss(cssPath: string): Promise<string> {
   return backupPath;
 }
 
-type Framework = 'next' | 'vite' | 'remix' | 'astro' | 'unknown';
+type Framework = 'next' | 'vite' | 'remix' | 'react-router' | 'astro' | 'unknown';
 
 const CSS_LOCATIONS: Record<Framework, string[]> = {
   astro: ['src/styles/global.css', 'src/styles/globals.css', 'src/global.css'],
   next: ['src/app/globals.css', 'app/globals.css', 'styles/globals.css'],
   vite: ['src/index.css', 'src/main.css', 'src/styles.css', 'src/app.css'],
   remix: ['app/styles/global.css', 'app/globals.css', 'app/root.css'],
+  'react-router': ['app/app.css', 'app/root.css', 'app/styles.css', 'app/globals.css'],
   unknown: ['src/styles/global.css', 'src/index.css', 'styles/globals.css'],
 };
+
+// Default component paths per framework
+const COMPONENT_PATHS: Record<Framework, { components: string; primitives: string }> = {
+  astro: { components: 'src/components/ui', primitives: 'src/lib/primitives' },
+  next: { components: 'components/ui', primitives: 'lib/primitives' },
+  vite: { components: 'src/components/ui', primitives: 'src/lib/primitives' },
+  remix: { components: 'app/components/ui', primitives: 'app/lib/primitives' },
+  'react-router': { components: 'app/components/ui', primitives: 'app/lib/primitives' },
+  unknown: { components: 'components/ui', primitives: 'lib/primitives' },
+};
+
+/**
+ * Configuration persisted in `.rafters/rafters.config.json`.
+ * Used by the CLI to resolve framework-specific defaults and perform
+ * path transformations when generating or updating files.
+ * All paths are relative to the project root.
+ */
+export interface RaftersConfig {
+  /** Detected or selected application framework */
+  framework: Framework;
+  /** Root directory for UI components, e.g. `components/ui` or `app/components/ui` */
+  componentsPath: string;
+  /** Root directory for primitive components, e.g. `lib/primitives` */
+  primitivesPath: string;
+  /** Entry CSS file for design tokens, or null if not detected */
+  cssPath: string | null;
+}
 
 async function findMainCssFile(cwd: string, framework: Framework): Promise<string | null> {
   const locations = CSS_LOCATIONS[framework] || CSS_LOCATIONS.unknown;
@@ -70,7 +100,7 @@ async function updateMainCss(cwd: string, cssPath: string, themePath: string): P
 
   // Check if already imported
   if (cssContent.includes('.rafters/output/theme.css')) {
-    console.log({ event: 'init:css_already_imported', cssPath });
+    log({ event: 'init:css_already_imported', cssPath });
     return;
   }
 
@@ -90,7 +120,7 @@ async function updateMainCss(cwd: string, cssPath: string, themePath: string): P
   }
 
   await writeFile(fullCssPath, newContent);
-  console.log({
+  log({
     event: 'init:css_updated',
     cssPath,
     themePath: relativeThemePath,
@@ -102,7 +132,7 @@ async function regenerateFromExisting(
   paths: ReturnType<typeof getRaftersPaths>,
   shadcn: ShadcnConfig | null,
 ): Promise<void> {
-  console.log({ event: 'init:regenerate', cwd });
+  log({ event: 'init:regenerate', cwd });
 
   // Load all tokens from .rafters/tokens/
   const adapter = new NodePersistenceAdapter(cwd);
@@ -118,7 +148,7 @@ async function regenerateFromExisting(
     allTokens.push(...tokens);
   }
 
-  console.log({
+  log({
     event: 'init:loaded',
     tokenCount: allTokens.length,
     namespaces,
@@ -139,7 +169,7 @@ async function regenerateFromExisting(
   await writeFile(join(paths.output, 'tokens.ts'), typescriptSrc);
   await writeFile(join(paths.output, 'tokens.json'), JSON.stringify(dtcgJson, null, 2));
 
-  console.log({
+  log({
     event: 'init:complete',
     outputs: ['theme.css', 'tokens.ts', 'tokens.json'],
     path: paths.output,
@@ -147,15 +177,17 @@ async function regenerateFromExisting(
 }
 
 export async function init(options: InitOptions): Promise<void> {
+  setAgentMode(options.agent ?? false);
+
   const cwd = process.cwd();
   const paths = getRaftersPaths(cwd);
 
-  console.log({ event: 'init:start', cwd });
+  log({ event: 'init:start', cwd });
 
   // Detect project configuration
   const { framework, shadcn, tailwindVersion } = await detectProject(cwd);
 
-  console.log({
+  log({
     event: 'init:detected',
     framework,
     tailwindVersion,
@@ -192,7 +224,7 @@ export async function init(options: InitOptions): Promise<void> {
       existingColors = parseCssVariables(cssContent);
       const backupPath = await backupCss(cssPath);
 
-      console.log({
+      log({
         event: 'init:shadcn_detected',
         cssPath: shadcn.tailwind.css,
         backupPath,
@@ -202,7 +234,7 @@ export async function init(options: InitOptions): Promise<void> {
         },
       });
     } catch (err) {
-      console.log({ event: 'init:shadcn_css_error', error: String(err) });
+      log({ event: 'init:shadcn_css_error', error: String(err) });
     }
   }
 
@@ -248,13 +280,13 @@ export async function init(options: InitOptions): Promise<void> {
       }
     }
 
-    console.log({
+    log({
       event: 'init:colors_imported',
       count: Object.keys(existingColors.light).length,
     });
   }
 
-  console.log({
+  log({
     event: 'init:generated',
     tokenCount: registry.size(),
   });
@@ -278,7 +310,7 @@ export async function init(options: InitOptions): Promise<void> {
     await adapter.saveNamespace(namespace, tokens);
   }
 
-  console.log({
+  log({
     event: 'init:registry_saved',
     path: paths.tokens,
     namespaceCount: tokensByNamespace.size,
@@ -294,22 +326,35 @@ export async function init(options: InitOptions): Promise<void> {
   await writeFile(join(paths.output, 'tokens.json'), JSON.stringify(dtcgJson, null, 2));
 
   // Find and update the main CSS file (if not using shadcn which has its own CSS path)
+  let detectedCssPath: string | null = null;
   if (!shadcn) {
-    const mainCssPath = await findMainCssFile(cwd, framework as Framework);
-    if (mainCssPath) {
-      await updateMainCss(cwd, mainCssPath, '.rafters/output/theme.css');
+    detectedCssPath = await findMainCssFile(cwd, framework as Framework);
+    if (detectedCssPath) {
+      await updateMainCss(cwd, detectedCssPath, '.rafters/output/theme.css');
     } else {
-      console.log({
+      log({
         event: 'init:css_not_found',
         message: 'No main CSS file found. Add @import ".rafters/output/theme.css" manually.',
         searchedLocations: CSS_LOCATIONS[framework as Framework] || CSS_LOCATIONS.unknown,
       });
     }
+  } else if (shadcn?.tailwind?.css) {
+    detectedCssPath = shadcn.tailwind.css;
   }
 
-  console.log({
+  // Create config file with detected settings
+  const frameworkPaths = COMPONENT_PATHS[framework as Framework] || COMPONENT_PATHS.unknown;
+  const config: RaftersConfig = {
+    framework: framework as Framework,
+    componentsPath: frameworkPaths.components,
+    primitivesPath: frameworkPaths.primitives,
+    cssPath: detectedCssPath,
+  };
+  await writeFile(paths.config, JSON.stringify(config, null, 2));
+
+  log({
     event: 'init:complete',
-    outputs: ['theme.css', 'tokens.ts', 'tokens.json'],
+    outputs: ['theme.css', 'tokens.ts', 'tokens.json', 'config.rafters.json'],
     path: paths.output,
   });
 }
