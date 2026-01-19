@@ -95,12 +95,18 @@ const FRAMEWORK_VERSIONS: Record<string, string> = {
 const EXCLUDED_DEPS = new Set(['react/jsx-runtime', '@types/react', '@types/react-dom']);
 
 /**
+ * Prefixes to exclude (internal packages)
+ */
+const EXCLUDED_PREFIXES = ['@rafters/'];
+
+/**
  * Add versions to dependencies
  * Framework deps get minimum versions, others passed through (for now)
  */
 function versionDeps(deps: string[]): string[] {
   return deps
     .filter((dep) => !EXCLUDED_DEPS.has(dep))
+    .filter((dep) => !EXCLUDED_PREFIXES.some((prefix) => dep.startsWith(prefix)))
     .map((dep) => {
       const version = FRAMEWORK_VERSIONS[dep];
       return version ? `${dep}@${version}` : dep;
