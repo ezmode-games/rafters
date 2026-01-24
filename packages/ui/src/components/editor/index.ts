@@ -12,11 +12,17 @@ export {
 } from './BlockCanvas';
 // R-101: BlockWrapper - Wrapper for each block with selection, drag, actions
 export { BlockWrapper, type BlockWrapperProps } from './BlockWrapper';
+// R-102: BlockSidebar - Block palette sidebar with categories and search
+export {
+  type BlockDefinition,
+  BlockSidebar,
+  type BlockSidebarProps,
+  type BlockRegistry,
+} from './BlockSidebar';
 // R-105: CommandPaletteUI - Slash command menu
 export { CommandPaletteUI, type CommandPaletteUIProps } from './CommandPaletteUI';
 // R-104: EditorToolbar - Undo/redo and formatting controls
 export { EditorToolbar, type EditorToolbarProps } from './EditorToolbar';
 // R-103: PropertyEditor - Schema-driven property editor
 export { PropertyEditor, type PropertyEditorProps } from './PropertyEditor';
-// R-102: BlockSidebar
 // R-106: InlineToolbar
