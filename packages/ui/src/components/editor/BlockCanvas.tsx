@@ -395,17 +395,33 @@ export function BlockCanvas({
   // Drop Zone
   // ========================================================================
 
+  // Track last known drag position since useDropZone doesn't pass the event
+  const lastDragPositionRef = useRef<{ clientY: number } | null>(null);
+
+  // Listen for dragover events at the document level to track mouse position
+  useEffect(() => {
+    const handleDragOver = (event: DragEvent) => {
+      lastDragPositionRef.current = { clientY: event.clientY };
+    };
+
+    document.addEventListener('dragover', handleDragOver);
+    return () => {
+      document.removeEventListener('dragover', handleDragOver);
+    };
+  }, []);
+
   const dropZone = useDropZone({
     onDragEnter: () => {},
     onDragLeave: () => {
       setDropTargetIndex(null);
     },
-    onDragOver: (data, event) => {
+    onDragOver: (data) => {
       // Calculate drop index based on mouse position
       const container = containerRef.current;
-      if (!container || !data || !event) return;
+      const lastPos = lastDragPositionRef.current;
+      if (!container || !data || !lastPos) return;
 
-      const pointerY = event.clientY;
+      const pointerY = lastPos.clientY;
       const blockElements = container.querySelectorAll('[data-block-id]');
 
       let targetIndex = blocks.length;
