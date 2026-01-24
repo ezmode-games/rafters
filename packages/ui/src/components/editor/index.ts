@@ -23,6 +23,7 @@ export { BlockWrapper, type BlockWrapperProps } from './BlockWrapper';
 export { CommandPaletteUI, type CommandPaletteUIProps } from './CommandPaletteUI';
 // R-104: EditorToolbar - Undo/redo and formatting controls
 export { EditorToolbar, type EditorToolbarProps } from './EditorToolbar';
+// R-106: InlineToolbar - Floating toolbar for text formatting
+export { InlineToolbar, type InlineToolbarProps } from './InlineToolbar';
 // R-103: PropertyEditor - Schema-driven property editor
 export { PropertyEditor, type PropertyEditorProps } from './PropertyEditor';
-// R-106: InlineToolbar
