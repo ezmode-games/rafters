@@ -239,26 +239,24 @@ function ToolbarButton({ onClick, disabled, label, shortcut, children }: Toolbar
   const tooltipContent = shortcut ? `${label} (${shortcut})` : label;
 
   return (
-    <Tooltip.Provider delayDuration={300}>
-      <Tooltip>
-        <Tooltip.Trigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClick}
-            disabled={disabled}
-            aria-label={label}
-            aria-disabled={disabled ? 'true' : undefined}
-            className="h-8 w-8"
-          >
-            {children}
-          </Button>
-        </Tooltip.Trigger>
-        <Tooltip.Content side="bottom" sideOffset={4}>
-          {tooltipContent}
-        </Tooltip.Content>
-      </Tooltip>
-    </Tooltip.Provider>
+    <Tooltip>
+      <Tooltip.Trigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClick}
+          disabled={disabled}
+          aria-label={label}
+          aria-disabled={disabled ? 'true' : undefined}
+          className="h-8 w-8"
+        >
+          {children}
+        </Button>
+      </Tooltip.Trigger>
+      <Tooltip.Content side="bottom" sideOffset={4}>
+        {tooltipContent}
+      </Tooltip.Content>
+    </Tooltip>
   );
 }
 
@@ -267,7 +265,8 @@ function ToolbarButton({ onClick, disabled, label, shortcut, children }: Toolbar
 // ============================================================================
 
 function ToolbarSeparator() {
-  return <div className="mx-1 h-6 w-px bg-border" role="separator" aria-orientation="vertical" />;
+  // Using <hr> for semantic separator - the separator role is implicit
+  return <hr className="mx-1 h-6 w-px border-0 bg-border" aria-orientation="vertical" />;
 }
 
 // ============================================================================
@@ -314,76 +313,85 @@ export function EditorToolbar({
   );
 
   return (
-    <div
-      className={containerClasses}
-      role="toolbar"
-      aria-label="Editor toolbar"
-      data-testid="editor-toolbar"
-    >
-      {/* History Controls */}
-      <div className="flex items-center gap-0.5" role="group" aria-label="History controls">
-        <ToolbarButton onClick={handleUndo} disabled={!canUndo} label="Undo" shortcut={`${mod}+Z`}>
-          <UndoIcon className={iconClasses} />
-        </ToolbarButton>
+    <Tooltip.Provider delayDuration={300}>
+      <div
+        className={containerClasses}
+        role="toolbar"
+        aria-label="Editor toolbar"
+        data-testid="editor-toolbar"
+      >
+        {/* History Controls */}
+        {/* biome-ignore lint/a11y/useSemanticElements: fieldset inappropriate for toolbar visual design */}
+        <div className="flex items-center gap-0.5" role="group" aria-label="History controls">
+          <ToolbarButton
+            onClick={handleUndo}
+            disabled={!canUndo}
+            label="Undo"
+            shortcut={`${mod}+Z`}
+          >
+            <UndoIcon className={iconClasses} />
+          </ToolbarButton>
 
-        <ToolbarButton
-          onClick={handleRedo}
-          disabled={!canRedo}
-          label="Redo"
-          shortcut={`${mod}+Shift+Z`}
-        >
-          <RedoIcon className={iconClasses} />
-        </ToolbarButton>
-      </div>
-
-      {/* Separator between history and formatting */}
-      {hasFormattingButtons && <ToolbarSeparator />}
-
-      {/* Formatting Controls */}
-      {hasFormattingButtons && (
-        <div className="flex items-center gap-0.5" role="group" aria-label="Formatting controls">
-          {onBold && (
-            <ToolbarButton onClick={onBold} label="Bold" shortcut={`${mod}+B`}>
-              <BoldIcon className={iconClasses} />
-            </ToolbarButton>
-          )}
-
-          {onItalic && (
-            <ToolbarButton onClick={onItalic} label="Italic" shortcut={`${mod}+I`}>
-              <ItalicIcon className={iconClasses} />
-            </ToolbarButton>
-          )}
-
-          {onUnderline && (
-            <ToolbarButton onClick={onUnderline} label="Underline" shortcut={`${mod}+U`}>
-              <UnderlineIcon className={iconClasses} />
-            </ToolbarButton>
-          )}
-
-          {onStrikethrough && (
-            <ToolbarButton
-              onClick={onStrikethrough}
-              label="Strikethrough"
-              shortcut={`${mod}+Shift+S`}
-            >
-              <StrikethroughIcon className={iconClasses} />
-            </ToolbarButton>
-          )}
-
-          {onLink && (
-            <ToolbarButton onClick={onLink} label="Insert link" shortcut={`${mod}+K`}>
-              <LinkIcon className={iconClasses} />
-            </ToolbarButton>
-          )}
-
-          {onCode && (
-            <ToolbarButton onClick={onCode} label="Code" shortcut={`${mod}+E`}>
-              <CodeIcon className={iconClasses} />
-            </ToolbarButton>
-          )}
+          <ToolbarButton
+            onClick={handleRedo}
+            disabled={!canRedo}
+            label="Redo"
+            shortcut={`${mod}+Shift+Z`}
+          >
+            <RedoIcon className={iconClasses} />
+          </ToolbarButton>
         </div>
-      )}
-    </div>
+
+        {/* Separator between history and formatting */}
+        {hasFormattingButtons && <ToolbarSeparator />}
+
+        {/* Formatting Controls */}
+        {hasFormattingButtons && (
+          // biome-ignore lint/a11y/useSemanticElements: fieldset inappropriate for toolbar visual design
+          <div className="flex items-center gap-0.5" role="group" aria-label="Formatting controls">
+            {onBold && (
+              <ToolbarButton onClick={onBold} label="Bold" shortcut={`${mod}+B`}>
+                <BoldIcon className={iconClasses} />
+              </ToolbarButton>
+            )}
+
+            {onItalic && (
+              <ToolbarButton onClick={onItalic} label="Italic" shortcut={`${mod}+I`}>
+                <ItalicIcon className={iconClasses} />
+              </ToolbarButton>
+            )}
+
+            {onUnderline && (
+              <ToolbarButton onClick={onUnderline} label="Underline" shortcut={`${mod}+U`}>
+                <UnderlineIcon className={iconClasses} />
+              </ToolbarButton>
+            )}
+
+            {onStrikethrough && (
+              <ToolbarButton
+                onClick={onStrikethrough}
+                label="Strikethrough"
+                shortcut={`${mod}+Shift+S`}
+              >
+                <StrikethroughIcon className={iconClasses} />
+              </ToolbarButton>
+            )}
+
+            {onLink && (
+              <ToolbarButton onClick={onLink} label="Insert link" shortcut={`${mod}+K`}>
+                <LinkIcon className={iconClasses} />
+              </ToolbarButton>
+            )}
+
+            {onCode && (
+              <ToolbarButton onClick={onCode} label="Code" shortcut={`${mod}+E`}>
+                <CodeIcon className={iconClasses} />
+              </ToolbarButton>
+            )}
+          </div>
+        )}
+      </div>
+    </Tooltip.Provider>
   );
 }
 

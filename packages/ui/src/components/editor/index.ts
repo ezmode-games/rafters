@@ -3,11 +3,10 @@
  * @module components/editor
  */
 
-// R-103: PropertyEditor - Schema-driven property editor
-export { PropertyEditor, type PropertyEditorProps } from './PropertyEditor';
-
 // R-104: EditorToolbar - Undo/redo and formatting controls
 export { EditorToolbar, type EditorToolbarProps } from './EditorToolbar';
+// R-103: PropertyEditor - Schema-driven property editor
+export { PropertyEditor, type PropertyEditorProps } from './PropertyEditor';
 
 // Components will be exported here as they are implemented
 // R-100: BlockCanvas

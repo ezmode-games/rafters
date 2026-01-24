@@ -45,6 +45,7 @@ function TestDraggable({
 
   return (
     <div data-testid="container">
+      {/* biome-ignore lint/a11y/noNoninteractiveTabindex: tabIndex needed for keyboard drag testing */}
       <div ref={ref} data-testid="draggable" tabIndex={0}>
         Draggable Item
       </div>
@@ -505,8 +506,9 @@ describe('useDraggable and useDropZone together', () => {
         data: { id: 'item-1' },
       });
 
+      const onDrop = vi.fn();
       const dropZone = useDropZone({
-        onDrop: (data) => console.log('Dropped:', data),
+        onDrop,
       });
 
       return (

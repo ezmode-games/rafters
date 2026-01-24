@@ -15,8 +15,7 @@ function TestEditor({
   multiSelect?: boolean;
 }) {
   const { ref, state, select, selectRange, selectAll, clear } = useBlockSelection({
-    getBlocks: () =>
-      Array.from(document.querySelectorAll('[data-block-id]')) as HTMLElement[],
+    getBlocks: () => Array.from(document.querySelectorAll('[data-block-id]')) as HTMLElement[],
     onSelectionChange,
     multiSelect,
   });

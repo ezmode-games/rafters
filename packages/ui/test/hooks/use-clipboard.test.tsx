@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { StrictMode, useEffect, useState } from 'react';
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useClipboard } from '../../src/hooks/use-clipboard';
 import type { ClipboardData } from '../../src/primitives/clipboard';
 
@@ -36,7 +36,7 @@ function TestClipboard({
   onCopy?: (data: ClipboardData) => void;
   onCut?: (data: ClipboardData) => void;
 }) {
-  const { ref, write, read } = useClipboard({
+  const { containerRef, copy, cut, paste } = useClipboard({
     customMimeType,
     onPaste,
     onCopy,
@@ -45,47 +45,55 @@ function TestClipboard({
 
   const [lastRead, setLastRead] = useState<string>('');
 
-  const handleWrite = async () => {
-    await write({ text: 'Hello World', html: '<b>Hello World</b>' });
+  const handleCopy = async () => {
+    await copy({ text: 'Hello World', html: '<b>Hello World</b>' });
   };
 
-  const handleWriteCustom = async () => {
-    await write({
+  const handleCopyCustom = async () => {
+    await copy({
       text: 'Custom data',
       custom: { type: 'block', id: 'block-1' },
     });
   };
 
-  const handleRead = async () => {
-    const data = await read();
+  const handleCut = async () => {
+    await cut({ text: 'Cut content' });
+  };
+
+  const handlePaste = async () => {
+    const data = await paste();
     setLastRead(JSON.stringify(data));
   };
 
   return (
-    <div ref={ref} data-testid="container" tabIndex={0}>
+    // biome-ignore lint/a11y/noNoninteractiveTabindex: tabIndex needed for clipboard event testing
+    <div ref={containerRef} data-testid="container" tabIndex={0}>
       <div data-testid="content">Editable content</div>
       <div data-testid="last-read">{lastRead}</div>
-      <button type="button" data-testid="write" onClick={handleWrite}>
-        Write
+      <button type="button" data-testid="copy" onClick={handleCopy}>
+        Copy
       </button>
-      <button type="button" data-testid="write-custom" onClick={handleWriteCustom}>
-        Write Custom
+      <button type="button" data-testid="copy-custom" onClick={handleCopyCustom}>
+        Copy Custom
       </button>
-      <button type="button" data-testid="read" onClick={handleRead}>
-        Read
+      <button type="button" data-testid="cut" onClick={handleCut}>
+        Cut
+      </button>
+      <button type="button" data-testid="paste" onClick={handlePaste}>
+        Paste
       </button>
     </div>
   );
 }
 
 describe('useClipboard', () => {
-  describe('ref callback', () => {
-    it('returns a ref callback', () => {
+  describe('containerRef callback', () => {
+    it('returns a containerRef callback', () => {
       let capturedRef: React.RefCallback<HTMLElement> | null = null;
 
       function CaptureRef() {
-        const { ref } = useClipboard();
-        capturedRef = ref;
+        const { containerRef } = useClipboard();
+        capturedRef = containerRef;
         return null;
       }
 
@@ -94,7 +102,7 @@ describe('useClipboard', () => {
       expect(typeof capturedRef).toBe('function');
     });
 
-    it('creates controller when ref is attached', () => {
+    it('creates controller when containerRef is attached', () => {
       render(<TestClipboard />);
 
       // Verify container is rendered and accessible
@@ -102,7 +110,7 @@ describe('useClipboard', () => {
       expect(container).toBeInTheDocument();
     });
 
-    it('cleans up when ref is detached', async () => {
+    it('cleans up when containerRef is detached', async () => {
       const onPaste = vi.fn();
 
       function ToggleClipboard() {
@@ -132,112 +140,160 @@ describe('useClipboard', () => {
     });
   });
 
-  describe('write() method', () => {
+  describe('copy() method', () => {
     it('calls the primitive write function', async () => {
-      // We test write via a completion callback pattern since the primitive
+      // We test copy via a completion callback pattern since the primitive
       // handles the clipboard API internally. The hook's job is to forward
       // the call correctly to the controller.
-      let writeResult: { called: boolean } = { called: false };
+      const copyResult: { called: boolean } = { called: false };
 
-      function WriteTracker() {
-        const { ref, write } = useClipboard();
+      function CopyTracker() {
+        const { containerRef, copy } = useClipboard();
 
         const handleClick = async () => {
-          await write({ text: 'Hello World' });
-          writeResult.called = true;
+          await copy({ text: 'Hello World' });
+          copyResult.called = true;
         };
 
         return (
-          <div ref={ref} data-testid="container">
-            <button type="button" data-testid="write" onClick={handleClick}>
-              Write
+          <div ref={containerRef} data-testid="container">
+            <button type="button" data-testid="copy" onClick={handleClick}>
+              Copy
             </button>
           </div>
         );
       }
 
       const user = userEvent.setup();
-      render(<WriteTracker />);
+      render(<CopyTracker />);
 
-      await user.click(screen.getByTestId('write'));
+      await user.click(screen.getByTestId('copy'));
 
-      // The write function should complete without error
+      // The copy function should complete without error
       await waitFor(() => {
-        expect(writeResult.called).toBe(true);
+        expect(copyResult.called).toBe(true);
       });
     });
 
     it('is a no-op before container is attached', async () => {
-      let writeFunc: ((data: ClipboardData) => Promise<void>) | null = null;
+      let copyFunc: ((data: ClipboardData) => Promise<void>) | null = null;
 
       function NoContainer() {
-        const { write } = useClipboard();
-        writeFunc = write;
-        // Intentionally not attaching ref
+        const { copy } = useClipboard();
+        copyFunc = copy;
+        // Intentionally not attaching containerRef
         return <div data-testid="no-container">No container</div>;
       }
 
       render(<NoContainer />);
 
       // Should not throw when called without container
-      await expect(writeFunc?.({ text: 'test' })).resolves.toBeUndefined();
+      await expect(copyFunc?.({ text: 'test' })).resolves.toBeUndefined();
     });
   });
 
-  describe('read() method', () => {
-    it('calls the primitive read function', async () => {
-      // We test read via a completion callback pattern since the primitive
-      // handles the clipboard API internally. The hook's job is to forward
-      // the call correctly to the controller.
-      let readResult: { called: boolean; data: ClipboardData | null } = {
-        called: false,
-        data: null,
-      };
+  describe('cut() method', () => {
+    it('calls the primitive write function with cut semantics', async () => {
+      const cutResult: { called: boolean } = { called: false };
 
-      function ReadTracker() {
-        const { ref, read } = useClipboard();
+      function CutTracker() {
+        const { containerRef, cut } = useClipboard();
 
         const handleClick = async () => {
-          const data = await read();
-          readResult.called = true;
-          readResult.data = data;
+          await cut({ text: 'Cut content' });
+          cutResult.called = true;
         };
 
         return (
-          <div ref={ref} data-testid="container">
-            <button type="button" data-testid="read" onClick={handleClick}>
-              Read
+          <div ref={containerRef} data-testid="container">
+            <button type="button" data-testid="cut" onClick={handleClick}>
+              Cut
             </button>
           </div>
         );
       }
 
       const user = userEvent.setup();
-      render(<ReadTracker />);
+      render(<CutTracker />);
 
-      await user.click(screen.getByTestId('read'));
+      await user.click(screen.getByTestId('cut'));
 
-      // The read function should complete and return a result
+      // The cut function should complete without error
       await waitFor(() => {
-        expect(readResult.called).toBe(true);
+        expect(cutResult.called).toBe(true);
+      });
+    });
+
+    it('is a no-op before container is attached', async () => {
+      let cutFunc: ((data: ClipboardData) => Promise<void>) | null = null;
+
+      function NoContainer() {
+        const { cut } = useClipboard();
+        cutFunc = cut;
+        return <div data-testid="no-container">No container</div>;
+      }
+
+      render(<NoContainer />);
+
+      // Should not throw when called without container
+      await expect(cutFunc?.({ text: 'test' })).resolves.toBeUndefined();
+    });
+  });
+
+  describe('paste() method', () => {
+    it('calls the primitive read function', async () => {
+      // We test paste via a completion callback pattern since the primitive
+      // handles the clipboard API internally. The hook's job is to forward
+      // the call correctly to the controller.
+      const pasteResult: { called: boolean; data: ClipboardData | null } = {
+        called: false,
+        data: null,
+      };
+
+      function PasteTracker() {
+        const { containerRef, paste } = useClipboard();
+
+        const handleClick = async () => {
+          const data = await paste();
+          pasteResult.called = true;
+          pasteResult.data = data;
+        };
+
+        return (
+          <div ref={containerRef} data-testid="container">
+            <button type="button" data-testid="paste" onClick={handleClick}>
+              Paste
+            </button>
+          </div>
+        );
+      }
+
+      const user = userEvent.setup();
+      render(<PasteTracker />);
+
+      await user.click(screen.getByTestId('paste'));
+
+      // The paste function should complete and return a result
+      await waitFor(() => {
+        expect(pasteResult.called).toBe(true);
         // Result should be an object (could be empty due to permissions)
-        expect(readResult.data).toBeDefined();
-        expect(typeof readResult.data).toBe('object');
+        expect(pasteResult.data).toBeDefined();
+        expect(typeof pasteResult.data).toBe('object');
       });
     });
 
     it('returns empty object before container is attached', async () => {
-      let readFunc: (() => Promise<ClipboardData>) | null = null;
+      let pasteFunc: (() => Promise<ClipboardData>) | null = null;
 
       function NoContainer() {
-        const { read } = useClipboard();
-        readFunc = read;
+        const { paste } = useClipboard();
+        pasteFunc = paste;
         return <div>No container</div>;
       }
 
       render(<NoContainer />);
 
-      const result = await readFunc?.();
+      const result = await pasteFunc?.();
       expect(result).toEqual({});
     });
   });
@@ -318,13 +374,14 @@ describe('useClipboard', () => {
 
       function UpdateableClipboard() {
         const [useSecond, setUseSecond] = useState(false);
-        const { ref } = useClipboard({
+        const { containerRef } = useClipboard({
           onPaste: useSecond ? onPaste2 : onPaste1,
         });
 
         return (
           <div>
-            <div ref={ref} data-testid="container" tabIndex={0}>
+            {/* biome-ignore lint/a11y/noNoninteractiveTabindex: tabIndex needed for clipboard event testing */}
+            <div ref={containerRef} data-testid="container" tabIndex={0}>
               Content
             </div>
             <button type="button" data-testid="switch" onClick={() => setUseSecond(true)}>
@@ -409,12 +466,12 @@ describe('useClipboard', () => {
       const onPaste = vi.fn();
 
       function TrackingClipboard() {
-        const { ref } = useClipboard({
+        const { containerRef } = useClipboard({
           onPaste,
         });
 
         return (
-          <div ref={ref} data-testid="container">
+          <div ref={containerRef} data-testid="container">
             Content
           </div>
         );
@@ -437,21 +494,21 @@ describe('useClipboard', () => {
       // The actual SSR check happens in the primitive, but we verify
       // the hook doesn't break when controller returns no-op functions
 
-      let writeFunc: ((data: ClipboardData) => Promise<void>) | null = null;
-      let readFunc: (() => Promise<ClipboardData>) | null = null;
+      let copyFunc: ((data: ClipboardData) => Promise<void>) | null = null;
+      let pasteFunc: (() => Promise<ClipboardData>) | null = null;
 
       function SSRComponent() {
-        const { ref, write, read } = useClipboard();
-        writeFunc = write;
-        readFunc = read;
-        return <div ref={ref}>SSR Content</div>;
+        const { containerRef, copy, paste } = useClipboard();
+        copyFunc = copy;
+        pasteFunc = paste;
+        return <div ref={containerRef}>SSR Content</div>;
       }
 
       render(<SSRComponent />);
 
       // Both methods should complete without error
-      await expect(writeFunc?.({ text: 'test' })).resolves.toBeUndefined();
-      const result = await readFunc?.();
+      await expect(copyFunc?.({ text: 'test' })).resolves.toBeUndefined();
+      const result = await pasteFunc?.();
       expect(result).toBeDefined();
     });
   });
@@ -459,22 +516,23 @@ describe('useClipboard', () => {
   describe('stable function references', () => {
     it('maintains stable references across renders', async () => {
       const references: {
-        write: (data: ClipboardData) => Promise<void>;
-        read: () => Promise<ClipboardData>;
+        copy: (data: ClipboardData) => Promise<void>;
+        cut: (data: ClipboardData) => Promise<void>;
+        paste: () => Promise<ClipboardData>;
       }[] = [];
 
       function CaptureReferences() {
-        const { ref, write, read } = useClipboard();
+        const { containerRef, copy, cut, paste } = useClipboard();
 
         // Capture references on each effect run
         useEffect(() => {
-          references.push({ write, read });
+          references.push({ copy, cut, paste });
         });
 
         const [, setCounter] = useState(0);
 
         return (
-          <div ref={ref}>
+          <div ref={containerRef}>
             <button type="button" data-testid="rerender" onClick={() => setCounter((c) => c + 1)}>
               Rerender
             </button>
@@ -495,9 +553,10 @@ describe('useClipboard', () => {
       const lastRef = references[references.length - 1];
       const prevRef = references[references.length - 2];
 
-      // write and read should be stable (useCallback with empty deps)
-      expect(prevRef?.write).toBe(lastRef?.write);
-      expect(prevRef?.read).toBe(lastRef?.read);
+      // copy, cut, and paste should be stable (useCallback with empty deps)
+      expect(prevRef?.copy).toBe(lastRef?.copy);
+      expect(prevRef?.cut).toBe(lastRef?.cut);
+      expect(prevRef?.paste).toBe(lastRef?.paste);
     });
   });
 

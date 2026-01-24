@@ -1,9 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  createInputHandler,
-  type InputData,
-  type InputHandlerOptions,
-} from '../../src/primitives/input-events';
+import { createInputHandler, type InputData } from '../../src/primitives/input-events';
 
 describe('createInputHandler', () => {
   let container: HTMLDivElement;

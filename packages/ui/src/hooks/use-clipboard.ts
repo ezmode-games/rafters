@@ -7,7 +7,7 @@
  * @example
  * ```tsx
  * function Editor() {
- *   const { ref, write, read } = useClipboard({
+ *   const { containerRef, copy, cut, paste } = useClipboard({
  *     customMimeType: 'application/x-rafters-blocks',
  *     onPaste: (data) => console.log('Pasted:', data),
  *     onCopy: (data) => console.log('Copied:', data),
@@ -15,9 +15,10 @@
  *   });
  *
  *   return (
- *     <div ref={ref}>
- *       <button onClick={() => write({ text: 'Hello' })}>Copy Text</button>
- *       <button onClick={async () => console.log(await read())}>Read</button>
+ *     <div ref={containerRef}>
+ *       <button onClick={() => copy({ text: 'Hello' })}>Copy Text</button>
+ *       <button onClick={() => cut({ text: 'Hello' })}>Cut Text</button>
+ *       <button onClick={async () => console.log(await paste())}>Paste</button>
  *     </div>
  *   );
  * }
@@ -66,19 +67,25 @@ export interface UseClipboardReturn {
    * When element is set, creates the clipboard controller
    * When element is detached (null), cleans up
    */
-  ref: React.RefCallback<HTMLElement>;
+  containerRef: React.RefCallback<HTMLElement>;
 
   /**
-   * Write data to the clipboard
+   * Copy data to the clipboard
    * Uses the modern Clipboard API with fallback for basic text
    */
-  write: (data: ClipboardData) => Promise<void>;
+  copy: (data: ClipboardData) => Promise<void>;
 
   /**
-   * Read data from the clipboard
+   * Cut data to the clipboard (copy with cut semantics)
+   * The caller is responsible for removing the source content
+   */
+  cut: (data: ClipboardData) => Promise<void>;
+
+  /**
+   * Read/paste data from the clipboard
    * Returns empty ClipboardData if clipboard is empty or permission denied
    */
-  read: () => Promise<ClipboardData>;
+  paste: () => Promise<ClipboardData>;
 }
 
 /**
@@ -92,15 +99,15 @@ export interface UseClipboardReturn {
  * - Stable function references: uses useCallback for all methods
  *
  * @param options - Configuration options for clipboard behavior
- * @returns Clipboard ref and control functions with stable references
+ * @returns Clipboard containerRef and control functions with stable references
  *
  * @example
  * ```tsx
  * // Basic usage
- * const { ref, write, read } = useClipboard();
+ * const { containerRef, copy, paste } = useClipboard();
  *
  * // With custom MIME type and callbacks
- * const { ref, write, read } = useClipboard({
+ * const { containerRef, copy, cut, paste } = useClipboard({
  *   customMimeType: 'application/x-my-app',
  *   onPaste: (data) => {
  *     if (data.custom) {
@@ -182,7 +189,7 @@ export function useClipboard(options: UseClipboardOptions = {}): UseClipboardRet
    * Creates controller when element is attached
    * Cleans up when element is detached
    */
-  const ref = useCallback(
+  const containerRef = useCallback(
     (element: HTMLElement | null) => {
       elementRef.current = element;
 
@@ -201,18 +208,28 @@ export function useClipboard(options: UseClipboardOptions = {}): UseClipboardRet
   );
 
   /**
-   * Write data to the clipboard
+   * Copy data to the clipboard
    */
-  const write = useCallback(async (data: ClipboardData): Promise<void> => {
+  const copy = useCallback(async (data: ClipboardData): Promise<void> => {
     if (controllerRef.current) {
       await controllerRef.current.write(data);
     }
   }, []);
 
   /**
-   * Read data from the clipboard
+   * Cut data to the clipboard
+   * Functionally same as copy - caller handles removing source content
    */
-  const read = useCallback(async (): Promise<ClipboardData> => {
+  const cut = useCallback(async (data: ClipboardData): Promise<void> => {
+    if (controllerRef.current) {
+      await controllerRef.current.write(data);
+    }
+  }, []);
+
+  /**
+   * Paste/read data from the clipboard
+   */
+  const paste = useCallback(async (): Promise<ClipboardData> => {
     if (controllerRef.current) {
       return controllerRef.current.read();
     }
@@ -220,9 +237,10 @@ export function useClipboard(options: UseClipboardOptions = {}): UseClipboardRet
   }, []);
 
   return {
-    ref,
-    write,
-    read,
+    containerRef,
+    copy,
+    cut,
+    paste,
   };
 }
 

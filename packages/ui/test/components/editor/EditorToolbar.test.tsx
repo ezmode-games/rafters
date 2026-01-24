@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { EditorToolbar } from '../../../src/components/editor/EditorToolbar';
-import type { UseHistoryReturn, HistoryState } from '../../../src/hooks/use-history';
+import type { HistoryState, UseHistoryReturn } from '../../../src/hooks/use-history';
 
 /**
  * Create a mock history object for testing

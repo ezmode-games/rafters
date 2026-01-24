@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { useCommandPalette } from '../../src/hooks/use-command-palette';
 import type { Command } from '../../src/primitives/types';
@@ -574,7 +574,7 @@ describe('useCommandPalette', () => {
       const container = createMockContainer();
       const commands = createTestCommands();
 
-      const { result, rerender } = renderHook(() => useCommandPalette({ commands }));
+      const { result } = renderHook(() => useCommandPalette({ commands }));
 
       // Simulate StrictMode double-mount
       act(() => {
