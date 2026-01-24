@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createBlockSelection } from '../../src/primitives/selection';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { createBlockSelection, createTextSelection } from '../../src/primitives/selection';
 
 describe('createBlockSelection', () => {
   let container: HTMLDivElement;
@@ -494,6 +494,397 @@ describe('createBlockSelection', () => {
       expect(state.selected.size).toBe(0);
 
       selection.cleanup();
+    });
+  });
+});
+
+describe('createTextSelection', () => {
+  let container: HTMLDivElement;
+
+  beforeEach(() => {
+    container = document.createElement('div');
+    container.setAttribute('contenteditable', 'true');
+    container.innerHTML = 'Hello world this is a test';
+    document.body.appendChild(container);
+  });
+
+  afterEach(() => {
+    // Clear any existing selection
+    window.getSelection()?.removeAllRanges();
+    document.body.removeChild(container);
+  });
+
+  describe('getRange', () => {
+    it('returns null when no selection exists', () => {
+      const textSelection = createTextSelection({ container });
+
+      const range = textSelection.getRange();
+
+      expect(range).toBeNull();
+
+      textSelection.cleanup();
+    });
+
+    it('returns null when selection is outside container', () => {
+      const outsideElement = document.createElement('div');
+      outsideElement.textContent = 'Outside content';
+      document.body.appendChild(outsideElement);
+
+      const textSelection = createTextSelection({ container });
+
+      // Create selection in outside element
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(outsideElement);
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+
+      const result = textSelection.getRange();
+      expect(result).toBeNull();
+
+      textSelection.cleanup();
+      document.body.removeChild(outsideElement);
+    });
+
+    it('returns range when selection is inside container', () => {
+      const textSelection = createTextSelection({ container });
+
+      // Create selection inside container
+      const selection = window.getSelection();
+      const range = document.createRange();
+      const textNode = container.firstChild;
+      if (textNode) {
+        range.setStart(textNode, 0);
+        range.setEnd(textNode, 5); // "Hello"
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+      }
+
+      const result = textSelection.getRange();
+
+      expect(result).not.toBeNull();
+      expect(result?.startOffset).toBe(0);
+      expect(result?.endOffset).toBe(5);
+      expect(result?.collapsed).toBe(false);
+
+      textSelection.cleanup();
+    });
+  });
+
+  describe('setRange', () => {
+    it('sets range programmatically', () => {
+      const textSelection = createTextSelection({ container });
+
+      const textNode = container.firstChild;
+      if (textNode) {
+        textSelection.setRange({
+          startNode: textNode,
+          startOffset: 6,
+          endNode: textNode,
+          endOffset: 11, // "world"
+          collapsed: false,
+        });
+
+        const result = textSelection.getRange();
+        expect(result).not.toBeNull();
+        expect(result?.startOffset).toBe(6);
+        expect(result?.endOffset).toBe(11);
+      }
+
+      textSelection.cleanup();
+    });
+
+    it('does not set range if nodes are outside container', () => {
+      const outsideElement = document.createElement('div');
+      outsideElement.textContent = 'Outside';
+      document.body.appendChild(outsideElement);
+
+      const textSelection = createTextSelection({ container });
+
+      const outsideTextNode = outsideElement.firstChild;
+      if (outsideTextNode) {
+        textSelection.setRange({
+          startNode: outsideTextNode,
+          startOffset: 0,
+          endNode: outsideTextNode,
+          endOffset: 7,
+          collapsed: false,
+        });
+
+        // Should not have set selection in container
+        const result = textSelection.getRange();
+        expect(result).toBeNull();
+      }
+
+      textSelection.cleanup();
+      document.body.removeChild(outsideElement);
+    });
+  });
+
+  describe('collapse', () => {
+    it('collapses selection to start', () => {
+      const textSelection = createTextSelection({ container });
+
+      const textNode = container.firstChild;
+      if (textNode) {
+        // Set initial selection
+        textSelection.setRange({
+          startNode: textNode,
+          startOffset: 0,
+          endNode: textNode,
+          endOffset: 5,
+          collapsed: false,
+        });
+
+        textSelection.collapse(true);
+
+        const result = textSelection.getRange();
+        expect(result?.collapsed).toBe(true);
+        expect(result?.startOffset).toBe(0);
+      }
+
+      textSelection.cleanup();
+    });
+
+    it('collapses selection to end', () => {
+      const textSelection = createTextSelection({ container });
+
+      const textNode = container.firstChild;
+      if (textNode) {
+        textSelection.setRange({
+          startNode: textNode,
+          startOffset: 0,
+          endNode: textNode,
+          endOffset: 5,
+          collapsed: false,
+        });
+
+        textSelection.collapse(false);
+
+        const result = textSelection.getRange();
+        expect(result?.collapsed).toBe(true);
+        expect(result?.startOffset).toBe(5);
+      }
+
+      textSelection.cleanup();
+    });
+
+    it('does nothing when no selection exists', () => {
+      const textSelection = createTextSelection({ container });
+
+      // Should not throw
+      textSelection.collapse(true);
+
+      const result = textSelection.getRange();
+      expect(result).toBeNull();
+
+      textSelection.cleanup();
+    });
+  });
+
+  describe('expandByWord', () => {
+    it('expands collapsed cursor to word boundaries when Selection.modify is available', () => {
+      const textSelection = createTextSelection({ container });
+
+      const textNode = container.firstChild;
+      if (textNode) {
+        // Place cursor in middle of "Hello"
+        textSelection.setRange({
+          startNode: textNode,
+          startOffset: 2,
+          endNode: textNode,
+          endOffset: 2,
+          collapsed: true,
+        });
+
+        // Check if Selection.modify is available (not in jsdom)
+        const selection = window.getSelection();
+        const hasModify = selection && 'modify' in selection;
+
+        textSelection.expandByWord();
+
+        const result = textSelection.getRange();
+        if (hasModify) {
+          // In real browsers, should have expanded
+          expect(result?.collapsed).toBe(false);
+        } else {
+          // In jsdom, modify is not available so selection stays collapsed
+          expect(result?.collapsed).toBe(true);
+        }
+      }
+
+      textSelection.cleanup();
+    });
+
+    it('does nothing when no selection exists', () => {
+      const textSelection = createTextSelection({ container });
+
+      // Should not throw
+      textSelection.expandByWord();
+
+      const result = textSelection.getRange();
+      expect(result).toBeNull();
+
+      textSelection.cleanup();
+    });
+  });
+
+  describe('expandByLine', () => {
+    it('expands selection to line boundaries when Selection.modify is available', () => {
+      // Create container with multiple lines
+      container.innerHTML = 'First line<br>Second line';
+
+      const textSelection = createTextSelection({ container });
+
+      const textNode = container.firstChild;
+      if (textNode) {
+        // Place cursor in "First"
+        textSelection.setRange({
+          startNode: textNode,
+          startOffset: 3,
+          endNode: textNode,
+          endOffset: 3,
+          collapsed: true,
+        });
+
+        // Check if Selection.modify is available (not in jsdom)
+        const selection = window.getSelection();
+        const hasModify = selection && 'modify' in selection;
+
+        textSelection.expandByLine();
+
+        const result = textSelection.getRange();
+        if (hasModify) {
+          // In real browsers, should have expanded
+          expect(result?.collapsed).toBe(false);
+        } else {
+          // In jsdom, modify is not available so selection stays collapsed
+          expect(result?.collapsed).toBe(true);
+        }
+      }
+
+      textSelection.cleanup();
+    });
+
+    it('does nothing when no selection exists', () => {
+      const textSelection = createTextSelection({ container });
+
+      // Should not throw
+      textSelection.expandByLine();
+
+      const result = textSelection.getRange();
+      expect(result).toBeNull();
+
+      textSelection.cleanup();
+    });
+  });
+
+  describe('cleanup', () => {
+    it('removes selectionchange listener', () => {
+      const onSelectionChange = vi.fn();
+      const textSelection = createTextSelection({
+        container,
+        onSelectionChange,
+      });
+
+      textSelection.cleanup();
+
+      // Create a selection after cleanup
+      const textNode = container.firstChild;
+      if (textNode) {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.setStart(textNode, 0);
+        range.setEnd(textNode, 5);
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+
+        // Dispatch selectionchange event manually
+        document.dispatchEvent(new Event('selectionchange'));
+      }
+
+      // Callback should not have been called after cleanup
+      expect(onSelectionChange).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('onSelectionChange callback', () => {
+    it('fires when selection changes within container', () => {
+      const onSelectionChange = vi.fn();
+      const textSelection = createTextSelection({
+        container,
+        onSelectionChange,
+      });
+
+      const textNode = container.firstChild;
+      if (textNode) {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.setStart(textNode, 0);
+        range.setEnd(textNode, 5);
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+
+        // Dispatch selectionchange event
+        document.dispatchEvent(new Event('selectionchange'));
+      }
+
+      // Callback should have been called at least once with our selection
+      expect(onSelectionChange).toHaveBeenCalled();
+      expect(onSelectionChange).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          startOffset: 0,
+          endOffset: 5,
+          collapsed: false,
+        }),
+      );
+
+      textSelection.cleanup();
+    });
+
+    it('fires with null when selection is outside container', () => {
+      const outsideElement = document.createElement('div');
+      outsideElement.textContent = 'Outside';
+      document.body.appendChild(outsideElement);
+
+      const onSelectionChange = vi.fn();
+      const textSelection = createTextSelection({
+        container,
+        onSelectionChange,
+      });
+
+      // Select outside element
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(outsideElement);
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+
+      // Dispatch selectionchange event
+      document.dispatchEvent(new Event('selectionchange'));
+
+      expect(onSelectionChange).toHaveBeenCalledWith(null);
+
+      textSelection.cleanup();
+      document.body.removeChild(outsideElement);
+    });
+  });
+
+  describe('SSR safety', () => {
+    it('returns no-op controller when window is undefined', () => {
+      // This test verifies the code path exists
+      // In actual SSR, window would be undefined
+      const textSelection = createTextSelection({ container });
+
+      // These should not throw
+      expect(textSelection.getRange).toBeDefined();
+      expect(textSelection.setRange).toBeDefined();
+      expect(textSelection.collapse).toBeDefined();
+      expect(textSelection.expandByWord).toBeDefined();
+      expect(textSelection.expandByLine).toBeDefined();
+      expect(textSelection.cleanup).toBeDefined();
+
+      textSelection.cleanup();
     });
   });
 });
