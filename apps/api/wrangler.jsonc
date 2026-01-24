@@ -30,7 +30,12 @@
     "binding": "AI",
     "remote": true
   },
-  // TODO: Add service binding to ezmode-api for uncertainty tracking (issue #563)
+  "services": [
+    {
+      "binding": "CORE_API",
+      "service": "ezmode-api"
+    }
+  ],
   "queues": {
     "producers": [
       {
