@@ -3,9 +3,11 @@
  * @module hooks
  */
 
-// Hooks will be exported here as they are implemented
+// R-301: useHistory - not yet implemented
+// R-302: useClipboard - not yet implemented
+// R-303: useDragDrop - not yet implemented
+// R-304: useCommandPalette - not yet implemented
+
 // R-300: useBlockSelection
-// R-301: useHistory
-// R-302: useClipboard
-// R-303: useDragDrop
-// R-304: useCommandPalette
+export { useBlockSelection } from './use-block-selection';
+export type { UseBlockSelectionOptions, UseBlockSelectionReturn } from './use-block-selection';
