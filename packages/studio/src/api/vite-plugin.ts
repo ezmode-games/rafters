@@ -6,7 +6,12 @@
  */
 
 import type { Plugin, ViteDevServer } from 'vite';
-import { loadProjectTokens, saveTokenUpdate, updateSingleToken } from './token-loader';
+import {
+  initializeStudioCss,
+  loadProjectTokens,
+  saveTokenUpdate,
+  updateSingleToken,
+} from './token-loader';
 import { writeQueue } from './write-queue';
 
 export function studioApiPlugin(): Plugin {
@@ -17,6 +22,11 @@ export function studioApiPlugin(): Plugin {
 
       if (!projectPath) {
         console.warn('[studio] RAFTERS_PROJECT_PATH not set, API routes will return empty data');
+      } else {
+        // Initialize split CSS files for HMR on server start
+        initializeStudioCss(projectPath).catch((err) => {
+          console.error('[studio] Failed to initialize CSS:', err);
+        });
       }
 
       // GET /api/tokens - List all tokens grouped by namespace

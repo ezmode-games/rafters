@@ -99,7 +99,7 @@ async function updateMainCss(cwd: string, cssPath: string, themePath: string): P
   const relativeThemePath = relative(cssDir, themeFullPath);
 
   // Check if already imported
-  if (cssContent.includes('.rafters/output/theme.css')) {
+  if (cssContent.includes('.rafters/output/rafters.css')) {
     log({ event: 'init:css_already_imported', cssPath });
     return;
   }
@@ -165,13 +165,13 @@ async function regenerateFromExisting(
   await mkdir(paths.output, { recursive: true });
 
   // Write output files
-  await writeFile(join(paths.output, 'theme.css'), tailwindCss);
-  await writeFile(join(paths.output, 'tokens.ts'), typescriptSrc);
-  await writeFile(join(paths.output, 'tokens.json'), JSON.stringify(dtcgJson, null, 2));
+  await writeFile(join(paths.output, 'rafters.css'), tailwindCss);
+  await writeFile(join(paths.output, 'rafters.ts'), typescriptSrc);
+  await writeFile(join(paths.output, 'rafters.json'), JSON.stringify(dtcgJson, null, 2));
 
   log({
     event: 'init:complete',
-    outputs: ['theme.css', 'tokens.ts', 'tokens.json'],
+    outputs: ['rafters.css', 'rafters.ts', 'rafters.json'],
     path: paths.output,
   });
 }
@@ -321,20 +321,20 @@ export async function init(options: InitOptions): Promise<void> {
   const typescriptSrc = registryToTypeScript(registry, { includeJSDoc: true });
   const dtcgJson = toDTCG(registry.list());
 
-  await writeFile(join(paths.output, 'theme.css'), tailwindCss);
-  await writeFile(join(paths.output, 'tokens.ts'), typescriptSrc);
-  await writeFile(join(paths.output, 'tokens.json'), JSON.stringify(dtcgJson, null, 2));
+  await writeFile(join(paths.output, 'rafters.css'), tailwindCss);
+  await writeFile(join(paths.output, 'rafters.ts'), typescriptSrc);
+  await writeFile(join(paths.output, 'rafters.json'), JSON.stringify(dtcgJson, null, 2));
 
   // Find and update the main CSS file (if not using shadcn which has its own CSS path)
   let detectedCssPath: string | null = null;
   if (!shadcn) {
     detectedCssPath = await findMainCssFile(cwd, framework as Framework);
     if (detectedCssPath) {
-      await updateMainCss(cwd, detectedCssPath, '.rafters/output/theme.css');
+      await updateMainCss(cwd, detectedCssPath, '.rafters/output/rafters.css');
     } else {
       log({
         event: 'init:css_not_found',
-        message: 'No main CSS file found. Add @import ".rafters/output/theme.css" manually.',
+        message: 'No main CSS file found. Add @import ".rafters/output/rafters.css" manually.',
         searchedLocations: CSS_LOCATIONS[framework as Framework] || CSS_LOCATIONS.unknown,
       });
     }
@@ -354,7 +354,7 @@ export async function init(options: InitOptions): Promise<void> {
 
   log({
     event: 'init:complete',
-    outputs: ['theme.css', 'tokens.ts', 'tokens.json', 'config.rafters.json'],
+    outputs: ['rafters.css', 'rafters.ts', 'rafters.json', 'config.rafters.json'],
     path: paths.output,
   });
 }

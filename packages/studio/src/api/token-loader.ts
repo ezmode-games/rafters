@@ -2,12 +2,20 @@
  * Token Loader for Studio
  *
  * Loads tokens from the target project's .rafters/tokens directory.
- * This is a standalone implementation that reads JSON files directly
- * to avoid build-time dependencies on workspace TypeScript packages.
+ * Uses @rafters/design-tokens directly (workspace import) for:
+ * - Token loading via NodePersistenceAdapter
+ * - CSS regeneration via registryToVars (instant HMR)
  */
 
-import { readdir, readFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import {
+  NodePersistenceAdapter,
+  registryToTailwindStatic,
+  registryToVars,
+  TokenRegistry,
+} from '@rafters/design-tokens';
+import type { Token as SharedToken } from '@rafters/shared';
 
 export interface UserOverride {
   reason: string;
@@ -106,6 +114,77 @@ export interface TokenUpdateRequest {
 }
 
 /**
+ * Regenerate CSS files for instant HMR
+ *
+ * Writes rafters.vars.css which contains pure CSS variables.
+ * Vite detects the change and hot-reloads immediately.
+ */
+async function regenerateCss(projectPath: string): Promise<void> {
+  const outputDir = join(projectPath, '.rafters', 'output');
+  const adapter = new NodePersistenceAdapter(projectPath);
+
+  // Load all tokens from persisted files
+  const namespaces = await adapter.listNamespaces();
+  const allTokens: SharedToken[] = [];
+
+  for (const ns of namespaces) {
+    const tokens = await adapter.loadNamespace(ns);
+    allTokens.push(...tokens);
+  }
+
+  if (allTokens.length === 0) {
+    return;
+  }
+
+  // Create registry and generate CSS
+  const registry = new TokenRegistry(allTokens);
+  const varsCSS = registryToVars(registry);
+
+  await mkdir(outputDir, { recursive: true });
+  await writeFile(join(outputDir, 'rafters.vars.css'), varsCSS);
+
+  console.log('[studio] Regenerated rafters.vars.css');
+}
+
+/**
+ * Initialize Studio CSS files
+ *
+ * Creates both:
+ * - rafters.tailwind.css (static, processed once by Tailwind)
+ * - rafters.vars.css (dynamic, instant HMR)
+ */
+export async function initializeStudioCss(projectPath: string): Promise<void> {
+  const outputDir = join(projectPath, '.rafters', 'output');
+  const adapter = new NodePersistenceAdapter(projectPath);
+
+  const namespaces = await adapter.listNamespaces();
+  const allTokens: SharedToken[] = [];
+
+  for (const ns of namespaces) {
+    const tokens = await adapter.loadNamespace(ns);
+    allTokens.push(...tokens);
+  }
+
+  if (allTokens.length === 0) {
+    console.warn('[studio] No tokens found, skipping CSS initialization');
+    return;
+  }
+
+  const registry = new TokenRegistry(allTokens);
+
+  const staticCSS = registryToTailwindStatic(registry);
+  const varsCSS = registryToVars(registry);
+
+  await mkdir(outputDir, { recursive: true });
+  await writeFile(join(outputDir, 'rafters.tailwind.css'), staticCSS);
+  await writeFile(join(outputDir, 'rafters.vars.css'), varsCSS);
+
+  console.log('[studio] Initialized CSS files:');
+  console.log('  - rafters.tailwind.css (static)');
+  console.log('  - rafters.vars.css (dynamic)');
+}
+
+/**
  * Update a single token with a reason
  *
  * This function:
@@ -152,6 +231,9 @@ export async function updateSingleToken(
   // Save
   await mkdir(tokensDir, { recursive: true });
   await writeFile(filePath, JSON.stringify(data, null, 2));
+
+  // Regenerate CSS for instant HMR
+  await regenerateCss(projectPath);
 
   return updatedToken;
 }

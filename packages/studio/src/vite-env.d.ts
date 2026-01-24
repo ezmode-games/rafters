@@ -1,5 +1,9 @@
 /// <reference types="vite/client" />
 
+// CSS imports from project output directory (alias @rafters-output)
+declare module '@rafters-output/rafters.tailwind.css';
+declare module '@rafters-output/rafters.vars.css';
+
 // Re-declare apca-w3 module to satisfy TypeScript when following workspace links
 declare module 'apca-w3' {
   export function APCAcontrast(txtY: number, bgY: number, places?: number): number;

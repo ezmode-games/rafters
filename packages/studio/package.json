@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "echo 'Studio is dev-only, no build needed'",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"
   },

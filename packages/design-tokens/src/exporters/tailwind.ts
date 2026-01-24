@@ -491,3 +491,333 @@ export function registryToTailwind(
   const tokens = registry.list();
   return tokensToTailwind(tokens, options);
 }
+
+/**
+ * Generate @theme block with var() references instead of actual values
+ * Used for Studio static CSS - Tailwind processes once and references CSS variables
+ */
+function generateThemeBlockWithVarRefs(groups: GroupedTokens): string {
+  const lines: string[] = [];
+  lines.push('@theme {');
+
+  // Color scales with --color- prefix referencing vars
+  if (groups.color.length > 0) {
+    for (const token of groups.color) {
+      lines.push(`  --color-${token.name}: var(--rafters-color-${token.name});`);
+    }
+    lines.push('');
+  }
+
+  // Spacing tokens
+  if (groups.spacing.length > 0) {
+    for (const token of groups.spacing) {
+      lines.push(`  --spacing-${token.name}: var(--rafters-spacing-${token.name});`);
+    }
+    lines.push('');
+  }
+
+  // Typography tokens
+  if (groups.typography.length > 0) {
+    for (const token of groups.typography) {
+      lines.push(`  --${token.name}: var(--rafters-${token.name});`);
+      if (token.lineHeight) {
+        lines.push(`  --${token.name}--line-height: var(--rafters-${token.name}--line-height);`);
+      }
+    }
+    lines.push('');
+  }
+
+  // Radius tokens
+  if (groups.radius.length > 0) {
+    for (const token of groups.radius) {
+      lines.push(`  --radius-${token.name}: var(--rafters-radius-${token.name});`);
+    }
+    lines.push('');
+  }
+
+  // Shadow tokens
+  if (groups.shadow.length > 0) {
+    for (const token of groups.shadow) {
+      lines.push(`  --shadow-${token.name}: var(--rafters-shadow-${token.name});`);
+    }
+    lines.push('');
+  }
+
+  // Depth (z-index) tokens
+  if (groups.depth.length > 0) {
+    for (const token of groups.depth) {
+      lines.push(`  --${token.name}: var(--rafters-${token.name});`);
+    }
+    lines.push('');
+  }
+
+  // Motion tokens
+  if (groups.motion.length > 0) {
+    for (const token of groups.motion) {
+      lines.push(`  --${token.name}: var(--rafters-${token.name});`);
+    }
+    lines.push('');
+  }
+
+  // Breakpoint tokens
+  if (groups.breakpoint.length > 0) {
+    for (const token of groups.breakpoint) {
+      lines.push(`  --${token.name}: var(--rafters-${token.name});`);
+    }
+    lines.push('');
+  }
+
+  // Elevation tokens
+  if (groups.elevation.length > 0) {
+    for (const token of groups.elevation) {
+      lines.push(`  --${token.name}: var(--rafters-${token.name});`);
+    }
+    lines.push('');
+  }
+
+  // Focus tokens
+  if (groups.focus.length > 0) {
+    for (const token of groups.focus) {
+      lines.push(`  --${token.name}: var(--rafters-${token.name});`);
+    }
+    lines.push('');
+  }
+
+  // Other tokens
+  if (groups.other.length > 0) {
+    for (const token of groups.other) {
+      lines.push(`  --${token.name}: var(--rafters-${token.name});`);
+    }
+    lines.push('');
+  }
+
+  // Animation utility tokens (from motion-animation-* tokens)
+  const animationTokens = groups.motion.filter((t) => t.name.startsWith('motion-animation-'));
+  if (animationTokens.length > 0) {
+    for (const token of animationTokens) {
+      const animName = token.animationName || token.name.replace('motion-animation-', '');
+      lines.push(`  --animate-${animName}: var(--rafters-animate-${animName});`);
+    }
+  }
+
+  lines.push('}');
+  return lines.join('\n');
+}
+
+/**
+ * Generate :root block with actual token values for Studio HMR
+ * Uses --rafters-* namespace so @theme block can reference via var()
+ */
+function generateVarsRootBlock(groups: GroupedTokens): string {
+  const lines: string[] = [];
+  lines.push(':root {');
+
+  // Color scales
+  if (groups.color.length > 0) {
+    for (const token of groups.color) {
+      const value = tokenValueToCSS(token);
+      lines.push(`  --rafters-color-${token.name}: ${value};`);
+    }
+    lines.push('');
+  }
+
+  // Spacing tokens
+  if (groups.spacing.length > 0) {
+    for (const token of groups.spacing) {
+      const value = tokenValueToCSS(token);
+      lines.push(`  --rafters-spacing-${token.name}: ${value};`);
+    }
+    lines.push('');
+  }
+
+  // Typography tokens
+  if (groups.typography.length > 0) {
+    for (const token of groups.typography) {
+      const value = tokenValueToCSS(token);
+      lines.push(`  --rafters-${token.name}: ${value};`);
+      if (token.lineHeight) {
+        lines.push(`  --rafters-${token.name}--line-height: ${token.lineHeight};`);
+      }
+    }
+    lines.push('');
+  }
+
+  // Radius tokens
+  if (groups.radius.length > 0) {
+    for (const token of groups.radius) {
+      const value = tokenValueToCSS(token);
+      lines.push(`  --rafters-radius-${token.name}: ${value};`);
+    }
+    lines.push('');
+  }
+
+  // Shadow tokens
+  if (groups.shadow.length > 0) {
+    for (const token of groups.shadow) {
+      const value = tokenValueToCSS(token);
+      lines.push(`  --rafters-shadow-${token.name}: ${value};`);
+    }
+    lines.push('');
+  }
+
+  // Depth (z-index) tokens
+  if (groups.depth.length > 0) {
+    for (const token of groups.depth) {
+      const value = tokenValueToCSS(token);
+      lines.push(`  --rafters-${token.name}: ${value};`);
+    }
+    lines.push('');
+  }
+
+  // Motion tokens
+  if (groups.motion.length > 0) {
+    for (const token of groups.motion) {
+      const value = tokenValueToCSS(token);
+      lines.push(`  --rafters-${token.name}: ${value};`);
+    }
+    lines.push('');
+  }
+
+  // Breakpoint tokens
+  if (groups.breakpoint.length > 0) {
+    for (const token of groups.breakpoint) {
+      const value = tokenValueToCSS(token);
+      lines.push(`  --rafters-${token.name}: ${value};`);
+    }
+    lines.push('');
+  }
+
+  // Elevation tokens
+  if (groups.elevation.length > 0) {
+    for (const token of groups.elevation) {
+      const value = tokenValueToCSS(token);
+      lines.push(`  --rafters-${token.name}: ${value};`);
+    }
+    lines.push('');
+  }
+
+  // Focus tokens
+  if (groups.focus.length > 0) {
+    for (const token of groups.focus) {
+      const value = tokenValueToCSS(token);
+      lines.push(`  --rafters-${token.name}: ${value};`);
+    }
+    lines.push('');
+  }
+
+  // Other tokens
+  if (groups.other.length > 0) {
+    for (const token of groups.other) {
+      const value = tokenValueToCSS(token);
+      lines.push(`  --rafters-${token.name}: ${value};`);
+    }
+    lines.push('');
+  }
+
+  // Animation tokens
+  const animationTokens = groups.motion.filter((t) => t.name.startsWith('motion-animation-'));
+  if (animationTokens.length > 0) {
+    for (const token of animationTokens) {
+      const animName = token.animationName || token.name.replace('motion-animation-', '');
+      lines.push(`  --rafters-animate-${animName}: ${token.value};`);
+    }
+    lines.push('');
+  }
+
+  lines.push('}');
+  return lines.join('\n');
+}
+
+/**
+ * Export registry tokens to static Tailwind CSS for Studio
+ *
+ * This produces the @theme block with var() references - processed once by Tailwind.
+ * Used with registryToVars() for instant HMR in Studio:
+ * - rafters.tailwind.css = this function (static, processed once)
+ * - rafters.vars.css = registryToVars() (dynamic, instant HMR)
+ *
+ * @param registry - TokenRegistry containing tokens
+ * @returns Static Tailwind CSS with var() references
+ *
+ * @example
+ * ```typescript
+ * // In Studio setup
+ * const staticCSS = registryToTailwindStatic(registry);
+ * await writeFile('.rafters/output/rafters.tailwind.css', staticCSS);
+ * ```
+ */
+export function registryToTailwindStatic(registry: TokenRegistry): string {
+  const tokens = registry.list();
+
+  if (tokens.length === 0) {
+    throw new Error('Registry is empty');
+  }
+
+  const groups = groupTokens(tokens);
+  const sections: string[] = [];
+
+  // Tailwind import
+  sections.push('@import "tailwindcss";');
+  sections.push('');
+
+  // @theme block with var() references (static - processed once by Tailwind)
+  const themeBlock = generateThemeBlockWithVarRefs(groups);
+  sections.push(themeBlock);
+  sections.push('');
+
+  // @theme inline block for semantic color bridges
+  const themeInlineBlock = generateThemeInlineBlock();
+  sections.push(themeInlineBlock);
+  sections.push('');
+
+  // Keyframes for animations (these don't change with token values)
+  const keyframes = generateKeyframes(groups.motion);
+  if (keyframes) {
+    sections.push(keyframes);
+  }
+
+  return sections.join('\n');
+}
+
+/**
+ * Export registry tokens to pure CSS variables for Studio HMR
+ *
+ * This produces only :root CSS variables - instant HMR without Tailwind reprocessing.
+ * Used with registryToTailwindStatic() for instant HMR in Studio:
+ * - rafters.tailwind.css = registryToTailwindStatic() (static, processed once)
+ * - rafters.vars.css = this function (dynamic, instant HMR)
+ *
+ * @param registry - TokenRegistry containing tokens
+ * @returns Pure CSS variables for HMR
+ *
+ * @example
+ * ```typescript
+ * // In Studio on token change
+ * registry.setChangeCallback(async () => {
+ *   const varsCSS = registryToVars(registry);
+ *   await writeFile('.rafters/output/rafters.vars.css', varsCSS);
+ *   // Vite HMR detects change, hot-reloads CSS instantly
+ * });
+ * ```
+ */
+export function registryToVars(registry: TokenRegistry): string {
+  const tokens = registry.list();
+
+  if (tokens.length === 0) {
+    throw new Error('Registry is empty');
+  }
+
+  const groups = groupTokens(tokens);
+  const sections: string[] = [];
+
+  // :root block with actual token values (--rafters-* namespace)
+  const varsBlock = generateVarsRootBlock(groups);
+  sections.push(varsBlock);
+  sections.push('');
+
+  // Include semantic variable blocks for light/dark mode switching
+  const rootBlock = generateRootBlock();
+  sections.push(rootBlock);
+
+  return sections.join('\n');
+}
