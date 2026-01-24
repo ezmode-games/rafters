@@ -266,7 +266,8 @@ interface LinkPopoverProps {
   onOpenChange: (open: boolean) => void;
   onSubmit: (url: string) => void;
   initialUrl: string | undefined;
-  triggerRef: React.RefObject<HTMLButtonElement | null>;
+  /** Ref to the button for focus restoration on close */
+  buttonRef: React.RefObject<HTMLButtonElement | null>;
 }
 
 function LinkPopover({
@@ -274,7 +275,7 @@ function LinkPopover({
   onOpenChange,
   onSubmit,
   initialUrl,
-  triggerRef,
+  buttonRef,
 }: LinkPopoverProps): React.JSX.Element {
   const [url, setUrl] = useState(initialUrl ?? '');
   const [error, setError] = useState<string | null>(null);
@@ -315,10 +316,10 @@ function LinkPopover({
       if (event.key === 'Escape') {
         event.preventDefault();
         onOpenChange(false);
-        triggerRef.current?.focus();
+        buttonRef.current?.focus();
       }
     },
-    [onOpenChange, triggerRef],
+    [onOpenChange, buttonRef],
   );
 
   const handlePaste = useCallback((event: React.ClipboardEvent<HTMLInputElement>) => {
@@ -332,61 +333,56 @@ function LinkPopover({
   }, []);
 
   return (
-    <Popover open={isOpen} onOpenChange={onOpenChange}>
-      <Popover.Anchor asChild>
-        <span ref={triggerRef as React.RefObject<HTMLSpanElement>} />
-      </Popover.Anchor>
-      <Popover.Content
-        side="bottom"
-        align="start"
-        sideOffset={8}
-        className="w-72 p-2"
-        data-testid="link-popover"
-      >
-        <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-          <label htmlFor="link-url" className="sr-only">
-            Link URL
-          </label>
-          <Input
-            ref={inputRef}
-            id="link-url"
-            type="text"
-            placeholder="Enter URL..."
-            value={url}
-            onChange={(e) => {
-              setUrl(e.target.value);
-              setError(null);
-            }}
-            onKeyDown={handleKeyDown}
-            onPaste={handlePaste}
-            variant={error ? 'destructive' : 'default'}
+    <Popover.Content
+      side="bottom"
+      align="start"
+      sideOffset={8}
+      className="w-72 p-2"
+      data-testid="link-popover"
+    >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+        <label htmlFor="link-url" className="sr-only">
+          Link URL
+        </label>
+        <Input
+          ref={inputRef}
+          id="link-url"
+          type="text"
+          placeholder="Enter URL..."
+          value={url}
+          onChange={(e) => {
+            setUrl(e.target.value);
+            setError(null);
+          }}
+          onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
+          variant={error ? 'destructive' : 'default'}
+          size="sm"
+          data-testid="link-url-input"
+          aria-invalid={error ? 'true' : undefined}
+          aria-describedby={error ? 'link-error' : undefined}
+        />
+        {error && (
+          <span id="link-error" className="text-xs text-destructive" role="alert">
+            {error}
+          </span>
+        )}
+        <div className="flex gap-1 justify-end">
+          <Button
+            type="button"
+            variant="ghost"
             size="sm"
-            data-testid="link-url-input"
-            aria-invalid={error ? 'true' : undefined}
-            aria-describedby={error ? 'link-error' : undefined}
-          />
-          {error && (
-            <span id="link-error" className="text-xs text-destructive" role="alert">
-              {error}
-            </span>
-          )}
-          <div className="flex gap-1 justify-end">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-              data-testid="link-cancel"
-            >
-              Cancel
-            </Button>
-            <Button type="submit" variant="primary" size="sm" data-testid="link-submit">
-              Apply
-            </Button>
-          </div>
-        </form>
-      </Popover.Content>
-    </Popover>
+            onClick={() => onOpenChange(false)}
+            data-testid="link-cancel"
+          >
+            Cancel
+          </Button>
+          <Button type="submit" variant="primary" size="sm" data-testid="link-submit">
+            Apply
+          </Button>
+        </div>
+      </form>
+    </Popover.Content>
   );
 }
 
@@ -441,13 +437,35 @@ export function InlineToolbar({
   const toolbarRef = useRef<HTMLDivElement>(null);
   const linkButtonRef = useRef<HTMLButtonElement>(null);
   const [linkPopoverOpen, setLinkPopoverOpen] = useState(false);
-  const [adjustedPosition, setAdjustedPosition] = useState(position);
+  const [adjustedPosition, setAdjustedPosition] = useState<{ x: number; y: number } | undefined>(
+    undefined,
+  );
 
   // Create a set for fast active format lookups
   const activeFormatsSet = useMemo(() => new Set(activeFormats), [activeFormats]);
 
   // Check if link format is active
   const isLinkActive = activeFormatsSet.has('link');
+
+  // ========================================================================
+  // Close popover when toolbar hides
+  // ========================================================================
+
+  useEffect(() => {
+    if (!isVisible) {
+      setLinkPopoverOpen(false);
+    }
+  }, [isVisible]);
+
+  // ========================================================================
+  // Reset adjusted position when position changes
+  // ========================================================================
+
+  useEffect(() => {
+    // Reset adjusted position whenever the source position changes
+    // This ensures we don't use stale adjusted values
+    setAdjustedPosition(undefined);
+  }, [position?.x, position?.y]);
 
   // ========================================================================
   // Position Adjustment
@@ -517,16 +535,6 @@ export function InlineToolbar({
     [onFormat],
   );
 
-  const handleLinkClick = useCallback(() => {
-    if (hasLink) {
-      // If already has link, show popover to edit
-      setLinkPopoverOpen(true);
-    } else {
-      // Show link input popover
-      setLinkPopoverOpen(true);
-    }
-  }, [hasLink]);
-
   const handleLinkSubmit = useCallback(
     (url: string) => {
       onLink(url);
@@ -585,26 +593,36 @@ export function InlineToolbar({
         {/* Separator */}
         <div className="w-px h-6 bg-border mx-1" aria-hidden="true" />
 
-        {/* Link button */}
-        <Tooltip>
-          <Tooltip.Trigger asChild>
-            <Button
-              ref={linkButtonRef}
-              variant={isLinkActive ? 'secondary' : 'ghost'}
-              size="icon"
-              onClick={handleLinkClick}
-              aria-pressed={isLinkActive}
-              data-testid="format-link"
-              className="h-8 w-8"
-            >
-              <LinkIcon />
-              <span className="sr-only">Link</span>
-            </Button>
-          </Tooltip.Trigger>
-          <Tooltip.Content side="bottom" sideOffset={4}>
-            Link ({modKey}+K)
-          </Tooltip.Content>
-        </Tooltip>
+        {/* Link button with popover - Popover.Trigger provides ARIA attributes */}
+        <Popover open={linkPopoverOpen} onOpenChange={setLinkPopoverOpen}>
+          <Tooltip>
+            <Tooltip.Trigger asChild>
+              <Popover.Trigger asChild>
+                <Button
+                  ref={linkButtonRef}
+                  variant={isLinkActive ? 'secondary' : 'ghost'}
+                  size="icon"
+                  aria-pressed={isLinkActive}
+                  data-testid="format-link"
+                  className="h-8 w-8"
+                >
+                  <LinkIcon />
+                  <span className="sr-only">Link</span>
+                </Button>
+              </Popover.Trigger>
+            </Tooltip.Trigger>
+            <Tooltip.Content side="bottom" sideOffset={4}>
+              Link ({modKey}+K)
+            </Tooltip.Content>
+          </Tooltip>
+          <LinkPopover
+            isOpen={linkPopoverOpen}
+            onOpenChange={setLinkPopoverOpen}
+            onSubmit={handleLinkSubmit}
+            initialUrl={linkUrl}
+            buttonRef={linkButtonRef}
+          />
+        </Popover>
 
         {/* Unlink button - only show when has link */}
         {hasLink && (
@@ -626,15 +644,6 @@ export function InlineToolbar({
             </Tooltip.Content>
           </Tooltip>
         )}
-
-        {/* Link popover */}
-        <LinkPopover
-          isOpen={linkPopoverOpen}
-          onOpenChange={setLinkPopoverOpen}
-          onSubmit={handleLinkSubmit}
-          initialUrl={linkUrl}
-          triggerRef={linkButtonRef}
-        />
       </div>
 
       {/* Screen reader announcement for toolbar visibility */}
