@@ -229,7 +229,7 @@ function useEditableHeading({
     const text = event.clipboardData.getData('text/plain');
     // Remove line breaks from pasted text
     const singleLine = text.replace(/[\r\n]+/g, ' ');
-    document.execCommand('insertText', false, singleLine);
+    insertTextAtSelection(singleLine);
   }, []);
 
   // Sync content when children change (controlled mode)
@@ -312,6 +312,64 @@ function escapeHtml(text: string): string {
 }
 
 /**
+ * Insert plain text at the current selection using Selection API.
+ * This is a modern replacement for the deprecated document.execCommand('insertText').
+ */
+function insertTextAtSelection(text: string): void {
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) {
+    return;
+  }
+
+  const range = selection.getRangeAt(0);
+  range.deleteContents();
+
+  const textNode = document.createTextNode(text);
+  range.insertNode(textNode);
+
+  // Move caret to immediately after the inserted text
+  range.setStartAfter(textNode);
+  range.collapse(true);
+
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
+
+/**
+ * Insert HTML at the current selection using Selection API.
+ * This is a modern replacement for the deprecated document.execCommand('insertHTML').
+ */
+function insertHtmlAtSelection(html: string): void {
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) {
+    return;
+  }
+
+  const range = selection.getRangeAt(0);
+  range.deleteContents();
+
+  // Create a temporary container to parse the HTML
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = html;
+
+  // Insert all child nodes from the temp container
+  const fragment = document.createDocumentFragment();
+  let lastNode: Node | null = null;
+  while (tempDiv.firstChild) {
+    lastNode = fragment.appendChild(tempDiv.firstChild);
+  }
+  range.insertNode(fragment);
+
+  // Move caret to after the last inserted node
+  if (lastNode) {
+    range.setStartAfter(lastNode);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+}
+
+/**
  * Parse HTML from contenteditable to InlineContent[]
  * Note: Uses innerHTML on a temporary element for parsing, content is sanitized via escapeHtml
  */
@@ -385,33 +443,46 @@ function htmlToInlineContent(html: string): InlineContent[] {
 }
 
 /**
- * Get active formats at current selection
+ * Get active formats at current selection using DOM traversal.
+ * This is a modern replacement for deprecated document.queryCommandState.
  */
 function getActiveFormats(): InlineMark[] {
   const formats: InlineMark[] = [];
   if (typeof document === 'undefined') return formats;
 
-  // Check each format using queryCommandState
-  if (document.queryCommandState('bold')) formats.push('bold');
-  if (document.queryCommandState('italic')) formats.push('italic');
-  if (document.queryCommandState('strikethrough')) formats.push('strikethrough');
-
-  // Check for code by looking at parent elements
   const selection = window.getSelection();
-  if (selection && selection.rangeCount > 0) {
-    let node: Node | null = selection.anchorNode;
-    while (node && node !== document.body) {
-      if (node.nodeType === Node.ELEMENT_NODE) {
-        const tagName = (node as HTMLElement).tagName.toLowerCase();
-        if (tagName === 'code' && !formats.includes('code')) {
-          formats.push('code');
-        }
-        if (tagName === 'a' && !formats.includes('link')) {
-          formats.push('link');
-        }
+  if (!selection || selection.rangeCount === 0) return formats;
+
+  // Walk up the DOM tree from selection anchor to find formatting tags
+  let node: Node | null = selection.anchorNode;
+  while (node && node !== document.body) {
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const tagName = (node as HTMLElement).tagName.toLowerCase();
+      // Check for bold (strong/b)
+      if ((tagName === 'strong' || tagName === 'b') && !formats.includes('bold')) {
+        formats.push('bold');
       }
-      node = node.parentNode;
+      // Check for italic (em/i)
+      if ((tagName === 'em' || tagName === 'i') && !formats.includes('italic')) {
+        formats.push('italic');
+      }
+      // Check for strikethrough (s/strike/del)
+      if (
+        (tagName === 's' || tagName === 'strike' || tagName === 'del') &&
+        !formats.includes('strikethrough')
+      ) {
+        formats.push('strikethrough');
+      }
+      // Check for code
+      if (tagName === 'code' && !formats.includes('code')) {
+        formats.push('code');
+      }
+      // Check for link
+      if (tagName === 'a' && !formats.includes('link')) {
+        formats.push('link');
+      }
     }
+    node = node.parentNode;
   }
 
   return formats;
@@ -584,10 +655,10 @@ function useEditableParagraph({
 
       // Remove block elements, keep only inline formatting
       const cleanHtml = sanitizeInlineHtml(tempDiv);
-      document.execCommand('insertHTML', false, cleanHtml);
+      insertHtmlAtSelection(cleanHtml);
     } else {
       const text = event.clipboardData.getData('text/plain');
-      document.execCommand('insertText', false, text);
+      insertTextAtSelection(text);
     }
   }, []);
 
@@ -767,10 +838,10 @@ function useEditableQuote({
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = html;
       const cleanHtml = sanitizeInlineHtml(tempDiv);
-      document.execCommand('insertHTML', false, cleanHtml);
+      insertHtmlAtSelection(cleanHtml);
     } else {
       const text = event.clipboardData.getData('text/plain');
-      document.execCommand('insertText', false, text);
+      insertTextAtSelection(text);
     }
   }, []);
 
