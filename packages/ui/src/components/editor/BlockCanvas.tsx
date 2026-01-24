@@ -118,7 +118,7 @@ interface DropIndicatorProps {
   isVisible: boolean;
 }
 
-function DropIndicator({ isVisible }: DropIndicatorProps) {
+function DropIndicator({ isVisible }: DropIndicatorProps): React.JSX.Element | null {
   if (!isVisible) return null;
 
   return (
@@ -158,9 +158,17 @@ export function BlockCanvas({
   // Create block ID to index map for efficient lookups
   const blockIndexMap = useMemo(() => {
     const map = new Map<string, number>();
-    blocks.forEach((block, index) => {
-      map.set(block.id, index);
-    });
+    for (let index = 0; index < blocks.length; index += 1) {
+      const block = blocks[index];
+      if (block) {
+        if (process.env.NODE_ENV !== 'production' && map.has(block.id)) {
+          throw new Error(
+            `Duplicate block id "${block.id}" detected at index ${index}. Block IDs must be unique.`,
+          );
+        }
+        map.set(block.id, index);
+      }
+    }
     return map;
   }, [blocks]);
 
@@ -392,14 +400,32 @@ export function BlockCanvas({
     onDragLeave: () => {
       setDropTargetIndex(null);
     },
-    onDragOver: (data) => {
+    onDragOver: (data, event) => {
       // Calculate drop index based on mouse position
       const container = containerRef.current;
-      if (!container || !data) return;
+      if (!container || !data || !event) return;
 
-      // For now, just show drop at end
-      // In a full implementation, we'd calculate based on mouse Y position
-      setDropTargetIndex(blocks.length);
+      const pointerY = event.clientY;
+      const blockElements = container.querySelectorAll('[data-block-id]');
+
+      let targetIndex = blocks.length;
+
+      for (let i = 0; i < blockElements.length; i += 1) {
+        const blockEl = blockElements.item(i);
+        if (!(blockEl instanceof HTMLElement)) {
+          continue;
+        }
+
+        const rect = blockEl.getBoundingClientRect();
+        const midpointY = rect.top + rect.height / 2;
+
+        if (pointerY < midpointY) {
+          targetIndex = i;
+          break;
+        }
+      }
+
+      setDropTargetIndex(targetIndex);
     },
     onDrop: (data) => {
       if (!data || dropTargetIndex === null) return;
