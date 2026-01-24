@@ -288,7 +288,11 @@ function BlockItem({ block, onInsert, matchIndices = [] }: BlockItemProps): Reac
       draggable="true"
     >
       <div className="flex-shrink-0 text-muted-foreground">
-        <DefaultBlockIcon className="w-5 h-5" />
+        {block.icon ? (
+          <img src={block.icon} alt="" className="w-5 h-5" aria-hidden="true" />
+        ) : (
+          <DefaultBlockIcon className="w-5 h-5" />
+        )}
       </div>
       <div className="flex-1 min-w-0">
         <div className="text-sm font-medium truncate">
@@ -360,38 +364,60 @@ export function BlockSidebar({
   }, [registry.blocks, recentlyUsed]);
 
   // Filter blocks based on search query
-  const { filteredBlocks, matchResults } = useMemo(() => {
+  const { filteredBlocks, matchResults, blockScores } = useMemo(() => {
     if (!searchQuery.trim()) {
-      return { filteredBlocks: registry.blocks, matchResults: new Map<string, FuzzyMatchResult>() };
+      return {
+        filteredBlocks: registry.blocks,
+        matchResults: new Map<string, FuzzyMatchResult>(),
+        blockScores: new Map<string, number>(),
+      };
     }
 
     const results = new Map<string, FuzzyMatchResult>();
+    const scores = new Map<string, number>();
     const filtered: BlockDefinition[] = [];
 
     for (const block of registry.blocks) {
-      // Search in label, description, and keywords
-      const searchText = [block.label, block.description ?? '', ...(block.keywords ?? [])].join(
-        ' ',
-      );
-      const result = fuzzyMatch(searchText, searchQuery);
+      // Search in label, description, and keywords separately to find best match
+      const labelResult = fuzzyMatch(block.label, searchQuery);
+      const descResult = block.description ? fuzzyMatch(block.description, searchQuery) : null;
+      const keywordResults = (block.keywords ?? []).map((kw) => fuzzyMatch(kw, searchQuery));
 
-      if (result.matches) {
-        // Re-run match on label only for highlighting
-        const labelResult = fuzzyMatch(block.label, searchQuery);
+      // Find the best score across all fields
+      let bestScore = labelResult.matches ? labelResult.score : 0;
+      if (descResult?.matches && descResult.score > bestScore) {
+        bestScore = descResult.score;
+      }
+      for (const kwResult of keywordResults) {
+        if (kwResult.matches && kwResult.score > bestScore) {
+          bestScore = kwResult.score;
+        }
+      }
+
+      // Check if any field matched
+      const hasMatch =
+        labelResult.matches || descResult?.matches || keywordResults.some((r) => r.matches);
+
+      if (hasMatch) {
+        // Store label result for highlighting (even if score is 0, indices may be useful)
         results.set(block.type, labelResult);
+        scores.set(block.type, bestScore);
         filtered.push(block);
       }
     }
 
-    // Sort by score
+    // Sort by best score
     filtered.sort((a, b) => {
-      const scoreA = results.get(a.type)?.score ?? 0;
-      const scoreB = results.get(b.type)?.score ?? 0;
+      const scoreA = scores.get(a.type) ?? 0;
+      const scoreB = scores.get(b.type) ?? 0;
       return scoreB - scoreA;
     });
 
-    return { filteredBlocks: filtered, matchResults: results };
+    return { filteredBlocks: filtered, matchResults: results, blockScores: scores };
   }, [searchQuery, registry.blocks]);
+
+  // Suppress unused variable warning - blockScores used for sorting
+  void blockScores;
 
   // Filtered blocks by category
   const filteredBlocksByCategory = useMemo(() => {
@@ -437,12 +463,18 @@ export function BlockSidebar({
     return indices;
   }, [matchResults]);
 
-  // Sidebar container classes
+  // Get uncategorized blocks (blocks whose category is not in registry.categories)
+  const uncategorizedBlocks = useMemo(() => {
+    const categoryIds = new Set(registry.categories.map((c) => c.id));
+    return filteredBlocks.filter((block) => !categoryIds.has(block.category));
+  }, [filteredBlocks, registry.categories]);
+
+  // Sidebar container classes - use CSS group-hover for smooth hover expansion
   const sidebarClasses = classy(
-    'flex flex-col h-full',
+    'group flex flex-col h-full',
     'bg-background border-r border-border',
     'transition-all duration-200',
-    collapsed ? 'w-12' : 'w-64',
+    collapsed ? 'w-12 hover:w-64' : 'w-64',
     className,
   );
 
@@ -457,18 +489,70 @@ export function BlockSidebar({
     );
   }
 
-  // Collapsed state
+  // Collapsed state - show expand button, content shown on hover via CSS
   if (collapsed) {
     return (
       <div className={sidebarClasses} data-testid="block-sidebar" data-collapsed="true">
-        <button
-          type="button"
-          className="p-3 hover:bg-muted transition-colors"
-          onClick={handleCollapseToggle}
-          aria-label="Expand sidebar"
-        >
-          <ChevronIcon direction="right" className="w-4 h-4 mx-auto" />
-        </button>
+        {/* Expand button - always visible in collapsed state */}
+        {onCollapse && (
+          <button
+            type="button"
+            className="p-3 hover:bg-muted transition-colors flex-shrink-0"
+            onClick={handleCollapseToggle}
+            aria-label="Expand sidebar"
+          >
+            <ChevronIcon direction="right" className="w-4 h-4 mx-auto" />
+          </button>
+        )}
+        {/* Content hidden when collapsed, shown on hover via CSS group-hover */}
+        <div className="hidden group-hover:flex flex-col flex-1 overflow-hidden border-t border-border">
+          <div className="p-2 border-b border-border">
+            <div className="relative">
+              <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search blocks..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onKeyDown={handleSearchKeyDown}
+                className="pl-8 h-8"
+                aria-label="Search blocks"
+              />
+            </div>
+          </div>
+          <div className="flex-1 overflow-y-auto p-2">
+            <Accordion
+              type="multiple"
+              value={expandedCategories}
+              onValueChange={(value) => setExpandedCategories(value as string[])}
+            >
+              {sortedCategories.map((category) => {
+                const blocks = filteredBlocksByCategory.get(category.id);
+                if (!blocks || blocks.length === 0) return null;
+
+                return (
+                  <CategorySection
+                    key={category.id}
+                    categoryId={category.id}
+                    categoryLabel={category.label}
+                    blocks={blocks}
+                    onInsert={handleInsert}
+                    blockMatchIndices={blockMatchIndices}
+                  />
+                );
+              })}
+              {uncategorizedBlocks.length > 0 && (
+                <CategorySection
+                  categoryId="uncategorized"
+                  categoryLabel="Other"
+                  blocks={uncategorizedBlocks}
+                  onInsert={handleInsert}
+                  blockMatchIndices={blockMatchIndices}
+                />
+              )}
+            </Accordion>
+          </div>
+        </div>
       </div>
     );
   }
@@ -558,6 +642,17 @@ export function BlockSidebar({
                 />
               );
             })}
+
+            {/* Uncategorized blocks (category not in registry.categories) */}
+            {uncategorizedBlocks.length > 0 && (
+              <CategorySection
+                categoryId="uncategorized"
+                categoryLabel="Other"
+                blocks={uncategorizedBlocks}
+                onInsert={handleInsert}
+                blockMatchIndices={blockMatchIndices}
+              />
+            )}
           </Accordion>
         )}
       </div>
