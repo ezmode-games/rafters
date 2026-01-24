@@ -45,6 +45,8 @@ type ContentPriority = 'primary' | 'secondary' | 'tertiary';
 interface GridContextValue {
   preset: GridPreset;
   pattern: BentoPattern | undefined;
+  editable: boolean | undefined;
+  showColumnDropZones: boolean | undefined;
 }
 
 const GridContext = React.createContext<GridContextValue | null>(null);
@@ -54,6 +56,13 @@ function useGridContext() {
 }
 
 // ==================== Grid ====================
+
+/** Grid configuration for onConfigChange callback */
+export interface GridConfig {
+  columns?: 1 | 2 | 3 | 4 | 5 | 6 | 'auto';
+  gap?: '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12';
+  preset?: GridPreset;
+}
 
 export interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
@@ -97,6 +106,27 @@ export interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
    * Accessible label - required when role="grid"
    */
   'aria-label'?: string;
+
+  // ============================================================================
+  // Editable Props (R-202)
+  // ============================================================================
+
+  /**
+   * Enable editing mode for block editor
+   * Shows column guides and enables drop zones
+   */
+  editable?: boolean | undefined;
+
+  /**
+   * Show drop zone indicators in each column
+   * Displays placeholder when cells are empty in edit mode
+   */
+  showColumnDropZones?: boolean | undefined;
+
+  /**
+   * Called when grid configuration changes in edit mode
+   */
+  onConfigChange?: ((config: GridConfig) => void) | undefined;
 }
 
 const gapClasses: Record<string, string> = {
@@ -143,6 +173,9 @@ function GridRoot({
   columns = 'auto',
   gap = '4',
   role = 'presentation',
+  editable,
+  showColumnDropZones,
+  onConfigChange,
   className,
   children,
   ...props
@@ -161,14 +194,24 @@ function GridRoot({
     // Responsive defaults for linear
     preset === 'linear' && columns === 'auto' && 'sm:grid-cols-2 lg:grid-cols-3',
 
+    // Editable mode styling (R-202)
+    editable && 'outline-2 outline-dashed outline-muted-foreground/30 outline-offset-2 rounded p-2',
+
     className,
   );
 
-  const contextValue: GridContextValue = { preset, pattern };
+  const contextValue: GridContextValue = { preset, pattern, editable, showColumnDropZones };
 
   return (
     <GridContext.Provider value={contextValue}>
-      <div role={role === 'grid' ? 'grid' : undefined} className={classes} {...props}>
+      <div
+        role={role === 'grid' ? 'grid' : undefined}
+        className={classes}
+        data-editable={editable || undefined}
+        data-preset={preset}
+        data-columns={typeof columns === 'number' ? columns : undefined}
+        {...props}
+      >
         {children}
       </div>
     </GridContext.Provider>
@@ -208,21 +251,43 @@ const rowSpanClasses: Record<number, string> = {
   3: 'row-span-3',
 };
 
+/**
+ * Drop zone placeholder for empty grid items in edit mode
+ */
+function GridItemDropZone() {
+  return (
+    <div className="flex min-h-16 items-center justify-center rounded border-2 border-dashed border-muted-foreground/20 bg-muted/20 p-2 text-muted-foreground">
+      <span className="text-xs">Drop here</span>
+    </div>
+  );
+}
+
 function GridItem({ priority, colSpan, rowSpan, className, children, ...props }: GridItemProps) {
-  // Context available for future priority-based styling
-  useGridContext();
+  const context = useGridContext();
+  const isEmpty = !children || (Array.isArray(children) && children.length === 0);
 
   const classes = classy(
     // Explicit spans override preset behavior
     colSpan && colSpanClasses[colSpan],
     rowSpan && rowSpanClasses[rowSpan],
 
+    // Editable mode styling (R-202)
+    context?.editable && 'outline outline-1 outline-dashed outline-muted-foreground/20 rounded',
+
     className,
   );
 
+  // Show drop zone in edit mode when item is empty
+  const content =
+    context?.editable && context?.showColumnDropZones && isEmpty ? (
+      <GridItemDropZone />
+    ) : (
+      children
+    );
+
   return (
-    <div className={classes || undefined} {...props}>
-      {children}
+    <div className={classes || undefined} data-priority={priority} {...props}>
+      {content}
     </div>
   );
 }

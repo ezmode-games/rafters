@@ -32,6 +32,9 @@ import classy from '../../primitives/classy';
 
 type ContainerElement = 'div' | 'main' | 'section' | 'article' | 'aside';
 
+/** Background preset options for containers */
+export type ContainerBackground = 'none' | 'muted' | 'accent' | 'card';
+
 export interface ContainerProps extends React.HTMLAttributes<HTMLElement> {
   /** Semantic element - determines behavior and accessibility role */
   as?: ContainerElement;
@@ -60,6 +63,33 @@ export interface ContainerProps extends React.HTMLAttributes<HTMLElement> {
    * Use with @container/name in child styles
    */
   queryName?: string;
+
+  // ============================================================================
+  // Editable Props (R-202)
+  // ============================================================================
+
+  /**
+   * Enable editing mode for block editor
+   * Shows dashed outline and enables drop zone
+   */
+  editable?: boolean | undefined;
+
+  /**
+   * Background color preset or custom class
+   * Presets: 'none', 'muted', 'accent', 'card'
+   */
+  background?: ContainerBackground | undefined;
+
+  /**
+   * Show drop zone indicator for child blocks
+   * Displays placeholder when container is empty in edit mode
+   */
+  showDropZone?: boolean | undefined;
+
+  /**
+   * Called when background changes in edit mode
+   */
+  onBackgroundChange?: ((background: ContainerBackground) => void) | undefined;
 }
 
 const sizeClasses: Record<string, string> = {
@@ -136,12 +166,46 @@ const articleTypography = [
   'max-w-prose',
 ].join(' ');
 
+/** Background class mapping */
+const backgroundClasses: Record<ContainerBackground, string> = {
+  none: '',
+  muted: 'bg-muted',
+  accent: 'bg-accent',
+  card: 'bg-card',
+};
+
+/**
+ * Drop zone placeholder for empty containers in edit mode
+ */
+function DropZonePlaceholder() {
+  return (
+    <div className="flex min-h-24 items-center justify-center rounded-md border-2 border-dashed border-muted-foreground/25 bg-muted/30 p-4 text-muted-foreground">
+      <span className="text-sm">Drop blocks here</span>
+    </div>
+  );
+}
+
 export const Container = React.forwardRef<HTMLElement, ContainerProps>(
   (
-    { as: Element = 'div', size, padding, query = true, queryName, className, style, ...props },
+    {
+      as: Element = 'div',
+      size,
+      padding,
+      query = true,
+      queryName,
+      editable,
+      background,
+      showDropZone,
+      onBackgroundChange,
+      className,
+      style,
+      children,
+      ...props
+    },
     ref,
   ) => {
     const isArticle = Element === 'article';
+    const isEmpty = !children || (Array.isArray(children) && children.length === 0);
 
     const classes = classy(
       // Container queries - w-full prevents width collapse when container-type: inline-size
@@ -157,8 +221,14 @@ export const Container = React.forwardRef<HTMLElement, ContainerProps>(
       // Padding
       padding && paddingClasses[padding],
 
+      // Background (R-202)
+      background && backgroundClasses[background],
+
       // Article gets typography
       isArticle && articleTypography,
+
+      // Editable mode styling (R-202)
+      editable && 'outline-2 outline-dashed outline-muted-foreground/30 outline-offset-2 rounded',
 
       // User classes
       className,
@@ -170,12 +240,26 @@ export const Container = React.forwardRef<HTMLElement, ContainerProps>(
       ...(queryName && { containerName: queryName }),
     };
 
-    return React.createElement(Element, {
-      ref,
-      className: classes || undefined,
-      style: Object.keys(containerStyle).length > 0 ? containerStyle : undefined,
-      ...props,
-    });
+    // Determine content to render
+    const content =
+      editable && showDropZone && isEmpty ? (
+        <DropZonePlaceholder />
+      ) : (
+        children
+      );
+
+    return React.createElement(
+      Element,
+      {
+        ref,
+        className: classes || undefined,
+        style: Object.keys(containerStyle).length > 0 ? containerStyle : undefined,
+        'data-editable': editable || undefined,
+        'data-background': background || undefined,
+        ...props,
+      },
+      content,
+    );
   },
 );
 

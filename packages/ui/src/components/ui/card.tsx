@@ -48,25 +48,99 @@
  * ```
  */
 import * as React from 'react';
+import { useCallback, useRef } from 'react';
 import classy from '../../primitives/classy';
+
+// ============================================================================
+// Card Context (R-202)
+// ============================================================================
+
+interface CardContextValue {
+  editable: boolean | undefined;
+  onTitleChange: ((title: string) => void) | undefined;
+  onDescriptionChange: ((description: string) => void) | undefined;
+}
+
+const CardContext = React.createContext<CardContextValue | null>(null);
+
+function useCardContext() {
+  return React.useContext(CardContext);
+}
+
+// ============================================================================
+// Card Props
+// ============================================================================
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   as?: 'div' | 'article' | 'section' | 'aside';
   interactive?: boolean;
+
+  // ============================================================================
+  // Editable Props (R-202)
+  // ============================================================================
+
+  /**
+   * Enable editing mode for block editor
+   * Makes CardTitle and CardDescription contenteditable
+   */
+  editable?: boolean | undefined;
+
+  /**
+   * Called when CardTitle text changes (if editable)
+   */
+  onTitleChange?: ((title: string) => void) | undefined;
+
+  /**
+   * Called when CardDescription text changes (if editable)
+   */
+  onDescriptionChange?: ((description: string) => void) | undefined;
 }
 
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ as: Component = 'div', interactive, className, ...props }, ref) => {
+  (
+    {
+      as: Component = 'div',
+      interactive,
+      editable,
+      onTitleChange,
+      onDescriptionChange,
+      className,
+      children,
+      ...props
+    },
+    ref,
+  ) => {
     const base = 'bg-card text-card-foreground border border-card-border rounded-lg shadow-sm';
 
     const interactiveStyles = interactive
       ? 'hover:bg-card-hover hover:shadow-md transition-shadow duration-normal motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
       : '';
 
-    const cls = classy(base, interactiveStyles, className);
+    // Editable mode styling (R-202)
+    const editableStyles = editable
+      ? 'outline-2 outline-dashed outline-muted-foreground/30 outline-offset-2'
+      : '';
+
+    const cls = classy(base, interactiveStyles, editableStyles, className);
+
+    const contextValue: CardContextValue = {
+      editable,
+      onTitleChange,
+      onDescriptionChange,
+    };
 
     return (
-      <Component ref={ref} className={cls} tabIndex={interactive ? 0 : undefined} {...props} />
+      <CardContext.Provider value={contextValue}>
+        <Component
+          ref={ref}
+          className={cls}
+          tabIndex={interactive ? 0 : undefined}
+          data-editable={editable || undefined}
+          {...props}
+        >
+          {children}
+        </Component>
+      </CardContext.Provider>
     );
   },
 );
@@ -86,23 +160,102 @@ CardHeader.displayName = 'CardHeader';
 
 export interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
   as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  /** Placeholder text shown when empty in edit mode */
+  placeholder?: string | undefined;
 }
 
 export const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
-  ({ as: Component = 'h3', className, ...props }, ref) => {
-    const cls = classy('text-2xl font-semibold leading-none tracking-tight', className);
-    return <Component ref={ref} className={cls} {...props} />;
+  ({ as: Component = 'h3', className, placeholder = 'Add title...', children, ...props }, ref) => {
+    const context = useCardContext();
+    const elementRef = useRef<HTMLHeadingElement>(null);
+
+    const handleInput = useCallback(() => {
+      if (!elementRef.current || !context?.onTitleChange) return;
+      const text = elementRef.current.textContent ?? '';
+      context.onTitleChange(text);
+    }, [context]);
+
+    // Combine refs
+    const combinedRef = (element: HTMLHeadingElement | null) => {
+      (elementRef as React.MutableRefObject<HTMLHeadingElement | null>).current = element;
+      if (typeof ref === 'function') {
+        ref(element);
+      } else if (ref) {
+        (ref as React.MutableRefObject<HTMLHeadingElement | null>).current = element;
+      }
+    };
+
+    const cls = classy(
+      'text-2xl font-semibold leading-none tracking-tight',
+      context?.editable && 'outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded',
+      className,
+    );
+
+    const editableProps = context?.editable
+      ? {
+          contentEditable: true,
+          suppressContentEditableWarning: true,
+          onInput: handleInput,
+          'data-placeholder': placeholder,
+        }
+      : {};
+
+    return (
+      <Component ref={combinedRef} className={cls} {...editableProps} {...props}>
+        {children}
+      </Component>
+    );
   },
 );
 
 CardTitle.displayName = 'CardTitle';
 
-export interface CardDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
+export interface CardDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
+  /** Placeholder text shown when empty in edit mode */
+  placeholder?: string | undefined;
+}
 
 export const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescriptionProps>(
-  ({ className, ...props }, ref) => {
-    const cls = classy('text-sm text-muted-foreground', className);
-    return <p ref={ref} className={cls} {...props} />;
+  ({ className, placeholder = 'Add description...', children, ...props }, ref) => {
+    const context = useCardContext();
+    const elementRef = useRef<HTMLParagraphElement>(null);
+
+    const handleInput = useCallback(() => {
+      if (!elementRef.current || !context?.onDescriptionChange) return;
+      const text = elementRef.current.textContent ?? '';
+      context.onDescriptionChange(text);
+    }, [context]);
+
+    // Combine refs
+    const combinedRef = (element: HTMLParagraphElement | null) => {
+      (elementRef as React.MutableRefObject<HTMLParagraphElement | null>).current = element;
+      if (typeof ref === 'function') {
+        ref(element);
+      } else if (ref) {
+        (ref as React.MutableRefObject<HTMLParagraphElement | null>).current = element;
+      }
+    };
+
+    const cls = classy(
+      'text-sm text-muted-foreground',
+      context?.editable && 'outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded',
+      className,
+    );
+
+    const editableProps = context?.editable
+      ? {
+          contentEditable: true,
+          suppressContentEditableWarning: true,
+          onInput: handleInput,
+          'data-placeholder': placeholder,
+        }
+      : {};
+
+    return (
+      <p ref={combinedRef} className={cls} {...editableProps} {...props}>
+        {children}
+      </p>
+    );
   },
 );
 
