@@ -8,6 +8,8 @@ import {
   H2,
   H3,
   H4,
+  htmlToInlineContent,
+  inlineContentToHtml,
   Large,
   Lead,
   Muted,
@@ -15,6 +17,7 @@ import {
   Small,
   typographyClasses,
 } from '../../src/components/ui/typography';
+import type { InlineContent } from '../../src/primitives/types';
 
 describe('H1', () => {
   it('renders as h1 by default', () => {
@@ -754,6 +757,330 @@ describe('Editable Heading (R-200a)', () => {
       render(<H4 data-testid="h4">Static H4</H4>);
       const heading = screen.getByTestId('h4');
       expect(heading).not.toHaveAttribute('contenteditable');
+    });
+  });
+});
+
+// ============================================================================
+// R-200b: Editable Paragraph Tests
+// ============================================================================
+
+describe('Editable Paragraph (R-200b)', () => {
+  describe('P editable mode', () => {
+    it('should enable contenteditable when editable is true', () => {
+      render(
+        <P editable data-testid="p">
+          Editable paragraph content
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+      expect(paragraph).toHaveAttribute('contenteditable', 'true');
+    });
+
+    it('should not enable contenteditable when editable is false', () => {
+      render(<P data-testid="p">Static paragraph content</P>);
+      const paragraph = screen.getByTestId('p');
+      expect(paragraph).not.toHaveAttribute('contenteditable');
+    });
+
+    it('should add data-editable attribute when editable', () => {
+      render(
+        <P editable data-testid="p">
+          Content
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+      expect(paragraph).toHaveAttribute('data-editable', 'true');
+    });
+
+    it('should add focus styling classes when editable', () => {
+      render(
+        <P editable data-testid="p">
+          Content
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+      expect(paragraph.className).toContain('focus:ring-2');
+    });
+
+    it('should call onChange with InlineContent[] on content change', () => {
+      const onChange = vi.fn();
+      render(
+        <P editable onChange={onChange} data-testid="p">
+          Initial content
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+
+      // Simulate typing by setting textContent and triggering input
+      paragraph.textContent = 'New content';
+      fireEvent.input(paragraph);
+
+      expect(onChange).toHaveBeenCalled();
+      const content = onChange.mock.calls[0][0] as InlineContent[];
+      expect(content).toHaveLength(1);
+      expect(content[0].text).toBe('New content');
+    });
+
+    it('should call onFocus when paragraph receives focus', () => {
+      const onFocus = vi.fn();
+      render(
+        <P editable onFocus={onFocus} data-testid="p">
+          Content
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+
+      fireEvent.focus(paragraph);
+
+      expect(onFocus).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call onBlur when paragraph loses focus', () => {
+      const onBlur = vi.fn();
+      render(
+        <P editable onBlur={onBlur} data-testid="p">
+          Content
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+
+      fireEvent.blur(paragraph);
+
+      expect(onBlur).toHaveBeenCalledTimes(1);
+    });
+
+    it('should set placeholder attributes when provided', () => {
+      render(
+        <P editable placeholder="Type something..." data-testid="p">
+          {null}
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+      expect(paragraph).toHaveAttribute('data-placeholder', 'Type something...');
+      expect(paragraph).toHaveAttribute('aria-placeholder', 'Type something...');
+    });
+
+    it('should call onEnter when Enter is pressed', () => {
+      const onEnter = vi.fn();
+      render(
+        <P editable onEnter={onEnter} data-testid="p">
+          Content
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+
+      fireEvent.keyDown(paragraph, { key: 'Enter' });
+
+      expect(onEnter).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not call onEnter when Shift+Enter is pressed', () => {
+      const onEnter = vi.fn();
+      render(
+        <P editable onEnter={onEnter} data-testid="p">
+          Content
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+
+      fireEvent.keyDown(paragraph, { key: 'Enter', shiftKey: true });
+
+      expect(onEnter).not.toHaveBeenCalled();
+    });
+
+    it('should forward ref correctly', () => {
+      const ref = createRef<HTMLParagraphElement>();
+      render(
+        <P editable ref={ref} data-testid="p">
+          Content
+        </P>,
+      );
+      expect(ref.current).toBeTruthy();
+      expect(ref.current?.tagName).toBe('P');
+    });
+
+    it('should merge custom className with editable styles', () => {
+      render(
+        <P editable className="custom-class" data-testid="p">
+          Content
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+      expect(paragraph.className).toContain('custom-class');
+      expect(paragraph.className).toContain('focus:ring-2');
+    });
+  });
+
+  describe('P backward compatibility', () => {
+    it('works without editable props', () => {
+      render(<P data-testid="p">Static paragraph</P>);
+      const paragraph = screen.getByTestId('p');
+      expect(paragraph).not.toHaveAttribute('contenteditable');
+      expect(paragraph).not.toHaveAttribute('data-editable');
+      expect(paragraph).toHaveTextContent('Static paragraph');
+    });
+
+    it('renders as p by default', () => {
+      render(<P data-testid="p">Content</P>);
+      const paragraph = screen.getByTestId('p');
+      expect(paragraph.tagName).toBe('P');
+    });
+
+    it('can render as a different element', () => {
+      render(
+        <P as="div" data-testid="p">
+          Content
+        </P>,
+      );
+      const element = screen.getByTestId('p');
+      expect(element.tagName).toBe('DIV');
+    });
+  });
+});
+
+// ============================================================================
+// R-200b: InlineContent Conversion Tests
+// ============================================================================
+
+describe('InlineContent Conversion (R-200b)', () => {
+  describe('inlineContentToHtml', () => {
+    it('should convert plain text', () => {
+      const content: InlineContent[] = [{ text: 'Hello world' }];
+      const html = inlineContentToHtml(content);
+      expect(html).toBe('Hello world');
+    });
+
+    it('should convert bold text', () => {
+      const content: InlineContent[] = [{ text: 'Bold text', marks: ['bold'] }];
+      const html = inlineContentToHtml(content);
+      expect(html).toBe('<strong>Bold text</strong>');
+    });
+
+    it('should convert italic text', () => {
+      const content: InlineContent[] = [{ text: 'Italic text', marks: ['italic'] }];
+      const html = inlineContentToHtml(content);
+      expect(html).toBe('<em>Italic text</em>');
+    });
+
+    it('should convert code text', () => {
+      const content: InlineContent[] = [{ text: 'code snippet', marks: ['code'] }];
+      const html = inlineContentToHtml(content);
+      expect(html).toBe('<code>code snippet</code>');
+    });
+
+    it('should convert strikethrough text', () => {
+      const content: InlineContent[] = [{ text: 'deleted', marks: ['strikethrough'] }];
+      const html = inlineContentToHtml(content);
+      expect(html).toBe('<s>deleted</s>');
+    });
+
+    it('should convert link text', () => {
+      const content: InlineContent[] = [
+        { text: 'Click here', marks: ['link'], href: 'https://example.com' },
+      ];
+      const html = inlineContentToHtml(content);
+      expect(html).toBe('<a href="https://example.com">Click here</a>');
+    });
+
+    it('should convert multiple marks', () => {
+      const content: InlineContent[] = [{ text: 'Bold and italic', marks: ['bold', 'italic'] }];
+      const html = inlineContentToHtml(content);
+      expect(html).toBe('<em><strong>Bold and italic</strong></em>');
+    });
+
+    it('should convert multiple segments', () => {
+      const content: InlineContent[] = [
+        { text: 'Normal ' },
+        { text: 'bold', marks: ['bold'] },
+        { text: ' text' },
+      ];
+      const html = inlineContentToHtml(content);
+      expect(html).toBe('Normal <strong>bold</strong> text');
+    });
+
+    it('should escape HTML special characters', () => {
+      const content: InlineContent[] = [{ text: '<script>alert("xss")</script>' }];
+      const html = inlineContentToHtml(content);
+      expect(html).toBe('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;');
+    });
+  });
+
+  describe('htmlToInlineContent', () => {
+    it('should convert plain text', () => {
+      const content = htmlToInlineContent('Hello world');
+      expect(content).toHaveLength(1);
+      expect(content[0].text).toBe('Hello world');
+      expect(content[0].marks).toBeUndefined();
+    });
+
+    it('should convert strong tag to bold mark', () => {
+      const content = htmlToInlineContent('<strong>Bold text</strong>');
+      expect(content).toHaveLength(1);
+      expect(content[0].text).toBe('Bold text');
+      expect(content[0].marks).toContain('bold');
+    });
+
+    it('should convert b tag to bold mark', () => {
+      const content = htmlToInlineContent('<b>Bold text</b>');
+      expect(content).toHaveLength(1);
+      expect(content[0].marks).toContain('bold');
+    });
+
+    it('should convert em tag to italic mark', () => {
+      const content = htmlToInlineContent('<em>Italic text</em>');
+      expect(content).toHaveLength(1);
+      expect(content[0].marks).toContain('italic');
+    });
+
+    it('should convert i tag to italic mark', () => {
+      const content = htmlToInlineContent('<i>Italic text</i>');
+      expect(content).toHaveLength(1);
+      expect(content[0].marks).toContain('italic');
+    });
+
+    it('should convert code tag to code mark', () => {
+      const content = htmlToInlineContent('<code>code</code>');
+      expect(content).toHaveLength(1);
+      expect(content[0].marks).toContain('code');
+    });
+
+    it('should convert s tag to strikethrough mark', () => {
+      const content = htmlToInlineContent('<s>deleted</s>');
+      expect(content).toHaveLength(1);
+      expect(content[0].marks).toContain('strikethrough');
+    });
+
+    it('should convert del tag to strikethrough mark', () => {
+      const content = htmlToInlineContent('<del>deleted</del>');
+      expect(content).toHaveLength(1);
+      expect(content[0].marks).toContain('strikethrough');
+    });
+
+    it('should convert a tag to link mark with href', () => {
+      const content = htmlToInlineContent('<a href="https://example.com">Link</a>');
+      expect(content).toHaveLength(1);
+      expect(content[0].text).toBe('Link');
+      expect(content[0].marks).toContain('link');
+      expect(content[0].href).toBe('https://example.com');
+    });
+
+    it('should convert nested marks', () => {
+      const content = htmlToInlineContent('<strong><em>Bold and italic</em></strong>');
+      expect(content).toHaveLength(1);
+      expect(content[0].marks).toContain('bold');
+      expect(content[0].marks).toContain('italic');
+    });
+
+    it('should convert mixed content', () => {
+      const content = htmlToInlineContent('Normal <strong>bold</strong> text');
+      expect(content).toHaveLength(3);
+      expect(content[0].text).toBe('Normal ');
+      expect(content[0].marks).toBeUndefined();
+      expect(content[1].text).toBe('bold');
+      expect(content[1].marks).toContain('bold');
+      expect(content[2].text).toBe(' text');
+      expect(content[2].marks).toBeUndefined();
     });
   });
 });
