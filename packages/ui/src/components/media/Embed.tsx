@@ -33,9 +33,9 @@ import { useEffect, useMemo, useState } from 'react';
 import classy from '../../primitives/classy';
 import {
   detectEmbedProvider,
+  type EmbedProvider,
   getAspectRatioValue,
   isAllowedEmbedDomain,
-  type EmbedProvider,
 } from './utils';
 
 export type AspectRatio = '16:9' | '4:3' | '1:1' | '9:16';
@@ -91,7 +91,7 @@ function EmbedFallback({ url, message }: { url: string; message: string }) {
 /**
  * Twitter embed using platform widget
  */
-function TwitterEmbed({ url, tweetId }: { url: string; tweetId: string }) {
+function TwitterEmbed({ tweetId }: { tweetId: string }) {
   const [isLoading, setIsLoading] = useState(true);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -131,15 +131,15 @@ function TwitterEmbed({ url, tweetId }: { url: string; tweetId: string }) {
     };
 
     loadTwitterWidget();
-  }, [tweetId, url]);
+  }, [tweetId]);
 
   return (
     <div className="flex justify-center">
       {isLoading && (
-        <div className="flex h-32 items-center justify-center" role="status">
+        <output className="flex h-32 items-center justify-center">
           <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           <span className="sr-only">Loading tweet...</span>
-        </div>
+        </output>
       )}
       <div ref={containerRef} className={isLoading ? 'hidden' : ''} />
     </div>
@@ -229,11 +229,12 @@ export const Embed = React.forwardRef<HTMLDivElement, EmbedProps>(
           {...props}
         >
           <form onSubmit={handleUrlSubmit} className="flex flex-col gap-3">
-            <label className="text-sm font-medium text-muted-foreground">
+            <label htmlFor="embed-url-input" className="text-sm font-medium text-muted-foreground">
               Enter embed URL (YouTube, Vimeo, Twitch, or Twitter)
             </label>
             <div className="flex gap-2">
               <input
+                id="embed-url-input"
                 type="url"
                 value={inputUrl}
                 onChange={(e) => setInputUrl(e.target.value)}
@@ -278,7 +279,7 @@ export const Embed = React.forwardRef<HTMLDivElement, EmbedProps>(
       return (
         <div ref={ref} className={classy('relative', className)} {...props}>
           {editable && <ProviderBadge provider={provider} />}
-          <TwitterEmbed url={url} tweetId={videoId} />
+          <TwitterEmbed tweetId={videoId} />
         </div>
       );
     }

@@ -17,10 +17,7 @@ describe('Embed', () => {
 
       const iframe = screen.getByTitle('youtube embed');
       expect(iframe).toBeInTheDocument();
-      expect(iframe).toHaveAttribute(
-        'src',
-        'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
-      );
+      expect(iframe).toHaveAttribute('src', 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
     });
 
     it('should render with custom title', () => {
@@ -34,10 +31,7 @@ describe('Embed', () => {
       render(<Embed url="https://youtu.be/dQw4w9WgXcQ" />);
 
       const iframe = screen.getByTitle('youtube embed');
-      expect(iframe).toHaveAttribute(
-        'src',
-        'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
-      );
+      expect(iframe).toHaveAttribute('src', 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
     });
   });
 

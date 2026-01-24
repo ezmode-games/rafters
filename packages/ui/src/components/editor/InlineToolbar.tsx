@@ -461,11 +461,12 @@ export function InlineToolbar({
   // Reset adjusted position when position changes
   // ========================================================================
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: position triggers reset even though value isn't used
   useEffect(() => {
     // Reset adjusted position whenever the source position changes
     // This ensures we don't use stale adjusted values
     setAdjustedPosition(undefined);
-  }, [position?.x, position?.y]);
+  }, [position]);
 
   // ========================================================================
   // Position Adjustment

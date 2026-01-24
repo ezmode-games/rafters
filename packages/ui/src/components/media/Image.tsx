@@ -64,10 +64,10 @@ export interface ImageProps extends Omit<React.HTMLAttributes<HTMLElement>, 'onC
  */
 function LoadingOverlay() {
   return (
-    <div className="absolute inset-0 flex items-center justify-center bg-muted/80" role="status">
+    <output className="absolute inset-0 flex items-center justify-center bg-muted/80">
       <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       <span className="sr-only">Loading image...</span>
-    </div>
+    </output>
   );
 }
 
