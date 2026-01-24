@@ -1084,3 +1084,195 @@ describe('InlineContent Conversion (R-200b)', () => {
     });
   });
 });
+
+// ============================================================================
+// R-200d: Editable Quote Tests
+// ============================================================================
+
+describe('Editable Quote (R-200d)', () => {
+  describe('Blockquote editable mode', () => {
+    it('should enable contenteditable when editable is true', () => {
+      render(
+        <Blockquote editable data-testid="quote">
+          Editable quote content
+        </Blockquote>,
+      );
+      const quote = screen.getByTestId('quote');
+      expect(quote).toHaveAttribute('contenteditable', 'true');
+    });
+
+    it('should not enable contenteditable when editable is false', () => {
+      render(<Blockquote data-testid="quote">Static quote</Blockquote>);
+      const quote = screen.getByTestId('quote');
+      expect(quote).not.toHaveAttribute('contenteditable');
+    });
+
+    it('should add data-editable attribute when editable', () => {
+      render(
+        <Blockquote editable data-testid="quote">
+          Content
+        </Blockquote>,
+      );
+      const quote = screen.getByTestId('quote');
+      expect(quote).toHaveAttribute('data-editable', 'true');
+    });
+
+    it('should add focus styling classes when editable', () => {
+      render(
+        <Blockquote editable data-testid="quote">
+          Content
+        </Blockquote>,
+      );
+      const quote = screen.getByTestId('quote');
+      expect(quote.className).toContain('focus:ring-2');
+    });
+
+    it('should call onChange with InlineContent[] on content change', () => {
+      const onChange = vi.fn();
+      render(
+        <Blockquote editable onChange={onChange} data-testid="quote">
+          Initial quote
+        </Blockquote>,
+      );
+      const quote = screen.getByTestId('quote');
+
+      quote.textContent = 'New quote content';
+      fireEvent.input(quote);
+
+      expect(onChange).toHaveBeenCalled();
+      const content = onChange.mock.calls[0][0] as InlineContent[];
+      expect(content).toHaveLength(1);
+      expect(content[0].text).toBe('New quote content');
+    });
+
+    it('should call onFocus when quote receives focus', () => {
+      const onFocus = vi.fn();
+      render(
+        <Blockquote editable onFocus={onFocus} data-testid="quote">
+          Content
+        </Blockquote>,
+      );
+      const quote = screen.getByTestId('quote');
+
+      fireEvent.focus(quote);
+
+      expect(onFocus).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call onBlur when quote loses focus', () => {
+      const onBlur = vi.fn();
+      render(
+        <Blockquote editable onBlur={onBlur} data-testid="quote">
+          Content
+        </Blockquote>,
+      );
+      const quote = screen.getByTestId('quote');
+
+      fireEvent.blur(quote);
+
+      expect(onBlur).toHaveBeenCalledTimes(1);
+    });
+
+    it('should set placeholder attributes when provided', () => {
+      render(
+        <Blockquote editable placeholder="Enter quote..." data-testid="quote">
+          {null}
+        </Blockquote>,
+      );
+      const quote = screen.getByTestId('quote');
+      expect(quote).toHaveAttribute('data-placeholder', 'Enter quote...');
+      expect(quote).toHaveAttribute('aria-placeholder', 'Enter quote...');
+    });
+
+    it('should call onEnter when Enter is pressed', () => {
+      const onEnter = vi.fn();
+      render(
+        <Blockquote editable onEnter={onEnter} data-testid="quote">
+          Content
+        </Blockquote>,
+      );
+      const quote = screen.getByTestId('quote');
+
+      fireEvent.keyDown(quote, { key: 'Enter' });
+
+      expect(onEnter).toHaveBeenCalledTimes(1);
+    });
+
+    it('should forward ref correctly', () => {
+      const ref = createRef<HTMLQuoteElement>();
+      render(
+        <Blockquote editable ref={ref} data-testid="quote">
+          Content
+        </Blockquote>,
+      );
+      expect(ref.current).toBeTruthy();
+      expect(ref.current?.tagName).toBe('BLOCKQUOTE');
+    });
+  });
+
+  describe('Blockquote citation', () => {
+    it('should render citation when provided', () => {
+      render(
+        <Blockquote citation="John Doe" data-testid="quote">
+          A great quote
+        </Blockquote>,
+      );
+      const citation = screen.getByText('John Doe');
+      expect(citation).toBeInTheDocument();
+      expect(citation.tagName).toBe('CITE');
+    });
+
+    it('should render editable citation when editable with onCitationChange', () => {
+      render(
+        <Blockquote editable citation="Author" onCitationChange={vi.fn()} data-testid="quote">
+          Content
+        </Blockquote>,
+      );
+      const citation = screen.getByText('Author');
+      expect(citation).toHaveAttribute('contenteditable', 'true');
+    });
+
+    it('should call onCitationChange when citation is edited', () => {
+      const onCitationChange = vi.fn();
+      render(
+        <Blockquote
+          editable
+          citation="Original Author"
+          onCitationChange={onCitationChange}
+          data-testid="quote"
+        >
+          Content
+        </Blockquote>,
+      );
+      const citation = screen.getByText('Original Author');
+
+      citation.textContent = 'New Author';
+      fireEvent.input(citation);
+
+      expect(onCitationChange).toHaveBeenCalledWith('New Author');
+    });
+  });
+
+  describe('Blockquote backward compatibility', () => {
+    it('works without editable props', () => {
+      render(<Blockquote data-testid="quote">Static quote</Blockquote>);
+      const quote = screen.getByTestId('quote');
+      expect(quote).not.toHaveAttribute('contenteditable');
+      expect(quote).not.toHaveAttribute('data-editable');
+      expect(quote).toHaveTextContent('Static quote');
+    });
+
+    it('renders as blockquote by default', () => {
+      render(<Blockquote data-testid="quote">Content</Blockquote>);
+      const quote = screen.getByTestId('quote');
+      expect(quote.tagName).toBe('BLOCKQUOTE');
+    });
+
+    it('applies blockquote styling', () => {
+      render(<Blockquote data-testid="quote">Content</Blockquote>);
+      const quote = screen.getByTestId('quote');
+      expect(quote.className).toContain('border-l-2');
+      expect(quote.className).toContain('italic');
+    });
+  });
+});

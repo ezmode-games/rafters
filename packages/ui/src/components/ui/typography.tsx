@@ -137,6 +137,23 @@ export interface SelectionInfo {
   linkUrl?: string | undefined;
 }
 
+/**
+ * Extended props for editable quote components (R-200d)
+ * Supports InlineContent[] for the quote body and optional citation editing.
+ */
+export interface EditableQuoteProps
+  extends Omit<TypographyProps, 'onChange' | 'onBlur' | 'onFocus' | 'onKeyDown'>,
+    EditableTypographyProps {
+  /** Quote content */
+  children?: React.ReactNode;
+  /** Citation text (e.g., author name, source) */
+  citation?: string | undefined;
+  /** Called when citation changes */
+  onCitationChange?: ((citation: string) => void) | undefined;
+  /** Called when text selection changes (for InlineToolbar integration) */
+  onSelectionChange?: ((selection: SelectionInfo | null) => void) | undefined;
+}
+
 // ============================================================================
 // Editable Heading Hook (R-200a)
 // ============================================================================
@@ -629,6 +646,151 @@ function sanitizeInlineHtml(element: HTMLElement): string {
   return Array.from(element.childNodes).map(processNode).join('');
 }
 
+// ============================================================================
+// Editable Quote Hook (R-200d)
+// ============================================================================
+
+/**
+ * Hook for contenteditable quote behavior with InlineContent and citation support
+ */
+function useEditableQuote({
+  editable,
+  onChange,
+  onFocus,
+  onBlur,
+  placeholder,
+  onKeyDown,
+  onEnter,
+  onBackspaceAtStart,
+  onSelectionChange,
+}: EditableQuoteProps) {
+  const elementRef = useRef<HTMLElement>(null);
+  const lastHtmlRef = useRef<string>('');
+
+  // Handle input events
+  const handleInput = useCallback(() => {
+    if (!elementRef.current || !onChange) return;
+
+    const html = elementRef.current.innerHTML;
+    if (html !== lastHtmlRef.current) {
+      lastHtmlRef.current = html;
+      const content = htmlToInlineContent(html);
+      onChange(content);
+    }
+  }, [onChange]);
+
+  // Handle selection changes
+  const handleSelectionChange = useCallback(() => {
+    if (!onSelectionChange || !elementRef.current) return;
+
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+      onSelectionChange(null);
+      return;
+    }
+
+    const range = selection.getRangeAt(0);
+    if (!elementRef.current.contains(range.commonAncestorContainer)) {
+      onSelectionChange(null);
+      return;
+    }
+
+    const rect = range.getBoundingClientRect();
+    const activeFormats = getActiveFormats();
+    const linkUrl = getLinkAtSelection();
+
+    onSelectionChange({
+      rect: {
+        x: rect.x,
+        y: rect.y,
+        width: rect.width,
+        height: rect.height,
+      },
+      text: selection.toString(),
+      activeFormats,
+      hasLink: activeFormats.includes('link'),
+      linkUrl,
+    });
+  }, [onSelectionChange]);
+
+  // Set up selection change listener
+  useEffect(() => {
+    if (!editable || !onSelectionChange) return undefined;
+
+    document.addEventListener('selectionchange', handleSelectionChange);
+    return () => {
+      document.removeEventListener('selectionchange', handleSelectionChange);
+    };
+  }, [editable, onSelectionChange, handleSelectionChange]);
+
+  // Handle key down events
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      onKeyDown?.(event);
+      if (event.defaultPrevented) return;
+
+      if (event.key === 'Enter' && !event.shiftKey) {
+        // Enter creates new paragraph within quote
+        event.preventDefault();
+        onEnter?.();
+      } else if (event.key === 'Backspace') {
+        const selection = window.getSelection();
+        const element = elementRef.current;
+        if (selection && element && selection.isCollapsed && selection.anchorOffset === 0) {
+          const range = selection.getRangeAt(0);
+          const preRange = document.createRange();
+          preRange.selectNodeContents(element);
+          preRange.setEnd(range.startContainer, range.startOffset);
+          if (preRange.toString() === '') {
+            onBackspaceAtStart?.();
+          }
+        }
+      }
+    },
+    [onKeyDown, onEnter, onBackspaceAtStart],
+  );
+
+  const handleFocus = useCallback(() => {
+    onFocus?.();
+  }, [onFocus]);
+
+  const handleBlur = useCallback(() => {
+    onBlur?.();
+    onSelectionChange?.(null);
+  }, [onBlur, onSelectionChange]);
+
+  // Handle paste - preserve inline formatting
+  const handlePaste = useCallback((event: React.ClipboardEvent) => {
+    event.preventDefault();
+    const html = event.clipboardData.getData('text/html');
+    if (html) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+      const cleanHtml = sanitizeInlineHtml(tempDiv);
+      document.execCommand('insertHTML', false, cleanHtml);
+    } else {
+      const text = event.clipboardData.getData('text/plain');
+      document.execCommand('insertText', false, text);
+    }
+  }, []);
+
+  const editableProps = editable
+    ? {
+        contentEditable: true,
+        suppressContentEditableWarning: true,
+        onInput: handleInput,
+        onKeyDown: handleKeyDown,
+        onFocus: handleFocus,
+        onBlur: handleBlur,
+        onPaste: handlePaste,
+        'data-placeholder': placeholder,
+        'aria-placeholder': placeholder,
+      }
+    : {};
+
+  return { editableProps, elementRef };
+}
+
 /**
  * H1 - Primary page heading
  * Use once per page for the main title
@@ -1096,16 +1258,110 @@ Code.displayName = 'Code';
 /**
  * Blockquote - Block quotation
  * For quotations or callouts with left border emphasis
+ *
+ * Supports editable mode (R-200d) with contenteditable and optional citation editing.
+ *
+ * @example
+ * ```tsx
+ * // Static quote
+ * <Blockquote>
+ *   "Design is not just what it looks like."
+ * </Blockquote>
+ *
+ * // Editable quote with citation
+ * <Blockquote
+ *   editable
+ *   citation="Steve Jobs"
+ *   onChange={(content) => setQuote(content)}
+ *   onCitationChange={(citation) => setCitation(citation)}
+ *   placeholder="Enter quote..."
+ * >
+ *   {children}
+ * </Blockquote>
+ * ```
  */
-export const Blockquote = React.forwardRef<HTMLQuoteElement, TypographyProps>(
-  ({ as, className, ...props }, ref) => {
+export const Blockquote = React.forwardRef<HTMLQuoteElement, EditableQuoteProps>(
+  (
+    {
+      as,
+      className,
+      editable,
+      onChange,
+      onFocus,
+      onBlur,
+      placeholder,
+      onKeyDown,
+      onEnter,
+      onBackspaceAtStart,
+      onSelectionChange,
+      citation,
+      onCitationChange,
+      children,
+      ...props
+    },
+    ref,
+  ) => {
+    const { editableProps, elementRef } = useEditableQuote({
+      editable,
+      onChange,
+      onFocus,
+      onBlur,
+      placeholder,
+      onKeyDown,
+      onEnter,
+      onBackspaceAtStart,
+      onSelectionChange,
+    });
+
+    const citationRef = useRef<HTMLElement>(null);
+
+    const handleCitationInput = useCallback(() => {
+      if (!citationRef.current || !onCitationChange) return;
+      const text = citationRef.current.textContent ?? '';
+      onCitationChange(text);
+    }, [onCitationChange]);
+
     const Component = as ?? 'blockquote';
+
+    // Combine refs
+    const combinedRef = (element: HTMLQuoteElement | null) => {
+      (elementRef as React.MutableRefObject<HTMLElement | null>).current = element;
+      if (typeof ref === 'function') {
+        ref(element);
+      } else if (ref) {
+        (ref as React.MutableRefObject<HTMLQuoteElement | null>).current = element;
+      }
+    };
+
     return (
       <Component
-        ref={ref as React.Ref<HTMLQuoteElement>}
-        className={classy(typographyClasses.blockquote, className)}
+        ref={combinedRef}
+        className={classy(
+          typographyClasses.blockquote,
+          editable && 'outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded',
+          className,
+        )}
+        data-editable={editable || undefined}
+        {...editableProps}
         {...props}
-      />
+      >
+        {children}
+        {(citation !== undefined || (editable && onCitationChange)) && (
+          <cite
+            ref={citationRef}
+            className={classy(
+              'mt-2 block text-sm text-muted-foreground not-italic',
+              editable && 'outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded',
+            )}
+            contentEditable={editable}
+            suppressContentEditableWarning={editable}
+            onInput={editable ? handleCitationInput : undefined}
+            data-placeholder={editable ? 'Add citation...' : undefined}
+          >
+            {citation}
+          </cite>
+        )}
+      </Component>
     );
   },
 );
