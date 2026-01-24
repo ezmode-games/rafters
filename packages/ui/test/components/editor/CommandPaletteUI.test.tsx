@@ -199,9 +199,7 @@ describe('CommandPaletteUI', () => {
     });
 
     it('should highlight matched text in labels', () => {
-      const commands: Command[] = [
-        { id: 'bold', label: 'Bold Text', action: vi.fn() },
-      ];
+      const commands: Command[] = [{ id: 'bold', label: 'Bold Text', action: vi.fn() }];
       const props = createDefaultProps({ commands, searchQuery: 'Bold' });
 
       render(<CommandPaletteUI {...props} />);

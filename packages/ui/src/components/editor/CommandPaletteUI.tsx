@@ -32,9 +32,9 @@
  * ```
  */
 import * as React from 'react';
-import { useEffect, useRef, useId, useCallback } from 'react';
-import type { Command } from '../../primitives/types';
+import { useCallback, useEffect, useId, useRef } from 'react';
 import classy from '../../primitives/classy';
+import type { Command } from '../../primitives/types';
 import { Input } from '../ui/input';
 
 // ============================================================================
@@ -191,14 +191,26 @@ function CommandItem({ command, isSelected, searchQuery, onSelect, id }: Command
     isSelected ? 'bg-accent text-accent-foreground' : 'hover:bg-muted',
   );
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleClick();
+      }
+    },
+    [handleClick],
+  );
+
   return (
     <div
       ref={itemRef}
       id={id}
       role="option"
       aria-selected={isSelected}
+      tabIndex={-1}
       className={itemClasses}
       onClick={handleClick}
+      onKeyDown={handleKeyDown}
       data-testid={`command-item-${command.id}`}
     >
       {/* Icon */}
@@ -326,6 +338,9 @@ export function CommandPaletteUI({
   return (
     <div
       ref={containerRef}
+      role="dialog"
+      aria-modal="false"
+      aria-label="Command palette"
       className={containerClasses}
       style={{
         left: constrainedPos.x,
@@ -367,6 +382,7 @@ export function CommandPaletteUI({
           </div>
         ) : (
           Array.from(groupedCommands.entries()).map(([category, categoryCommands]) => (
+            // biome-ignore lint/a11y/useSemanticElements: fieldset not appropriate for listbox group styling
             <div key={category} role="group" aria-label={category}>
               {/* Category Header */}
               <div className="px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
