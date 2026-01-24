@@ -558,6 +558,9 @@ importers:
       vitest-axe:
         specifier: 'catalog:'
         version: 1.0.0-pre.5(vitest@3.2.4)
+      zod:
+        specifier: 'catalog:'
+        version: 4.1.12
 
 packages:
 
