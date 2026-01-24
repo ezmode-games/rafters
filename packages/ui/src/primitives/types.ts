@@ -152,3 +152,76 @@ export interface AriaAttributes {
   // Role attribute
   role?: string;
 }
+
+// =============================================================================
+// Editor v1 Types
+// =============================================================================
+
+/**
+ * Inline formatting mark types for rich text editing
+ */
+export type InlineMark = 'bold' | 'italic' | 'code' | 'strikethrough' | 'link';
+
+/**
+ * Rich text content with inline formatting marks
+ */
+export interface InlineContent {
+  text: string;
+  marks?: InlineMark[];
+  /** Only present when marks includes 'link' */
+  href?: string;
+}
+
+/**
+ * Input event types for contenteditable handling
+ */
+export type InputType =
+  | 'insertText'
+  | 'insertParagraph'
+  | 'insertLineBreak'
+  | 'deleteContentBackward'
+  | 'deleteContentForward'
+  | 'deleteByCut'
+  | 'insertFromPaste'
+  | 'formatBold'
+  | 'formatItalic'
+  | 'formatUnderline'
+  | 'formatStrikeThrough'
+  | 'historyUndo'
+  | 'historyRedo';
+
+/**
+ * Selection range for text selection primitive
+ */
+export interface SelectionRange {
+  startNode: Node;
+  startOffset: number;
+  endNode: Node;
+  endOffset: number;
+  collapsed: boolean;
+}
+
+/**
+ * Command definition for command palette
+ */
+export interface Command {
+  id: string;
+  label: string;
+  description?: string;
+  icon?: string;
+  category?: string;
+  keywords?: string[];
+  shortcut?: string;
+  action: () => void;
+}
+
+/**
+ * Format definition for inline formatting
+ */
+export interface FormatDefinition {
+  name: InlineMark;
+  tag: string;
+  shortcut?: string;
+  attributes?: Record<string, string>;
+  class?: string;
+}
