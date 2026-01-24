@@ -3,9 +3,22 @@
  * @module hooks
  */
 
-// R-302: useClipboard - not yet implemented
-// R-303: useDragDrop - not yet implemented
-// R-304: useCommandPalette - not yet implemented
+// R-302: useClipboard
+export { useClipboard } from './use-clipboard';
+export type { UseClipboardOptions, UseClipboardReturn, ClipboardData } from './use-clipboard';
+
+// R-304: useCommandPalette
+export { useCommandPalette } from './use-command-palette';
+export type { UseCommandPaletteOptions, UseCommandPaletteReturn } from './use-command-palette';
+
+// R-303: useDragDrop
+export { useDraggable, useDropZone } from './use-drag-drop';
+export type {
+  UseDraggableOptions,
+  UseDraggableReturn,
+  UseDropZoneOptions,
+  UseDropZoneReturn,
+} from './use-drag-drop';
 
 // R-300: useBlockSelection
 export { useBlockSelection } from './use-block-selection';
