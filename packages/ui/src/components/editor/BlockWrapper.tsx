@@ -177,8 +177,10 @@ export function BlockWrapper({
   );
 
   // Action handlers with event stopping
+  // These accept Event (not React.MouseEvent) because DropdownMenu.Item's
+  // onSelect callback provides a native Event, not a React SyntheticEvent
   const handleDelete = useCallback(
-    (event: React.MouseEvent) => {
+    (event: Event) => {
       event.stopPropagation();
       onDelete();
     },
@@ -186,7 +188,7 @@ export function BlockWrapper({
   );
 
   const handleDuplicate = useCallback(
-    (event: React.MouseEvent) => {
+    (event: Event) => {
       event.stopPropagation();
       onDuplicate();
     },
@@ -194,7 +196,7 @@ export function BlockWrapper({
   );
 
   const handleMoveUp = useCallback(
-    (event: React.MouseEvent) => {
+    (event: Event) => {
       event.stopPropagation();
       if (!isFirst) {
         onMoveUp();
@@ -204,7 +206,7 @@ export function BlockWrapper({
   );
 
   const handleMoveDown = useCallback(
-    (event: React.MouseEvent) => {
+    (event: Event) => {
       event.stopPropagation();
       if (!isLast) {
         onMoveDown();
@@ -296,20 +298,18 @@ export function BlockWrapper({
           </button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content align="start" side="right">
-          <DropdownMenu.Item onSelect={handleDuplicate as unknown as () => void}>
-            Duplicate
-          </DropdownMenu.Item>
+          <DropdownMenu.Item onSelect={handleDuplicate}>Duplicate</DropdownMenu.Item>
           <DropdownMenu.Separator />
-          <DropdownMenu.Item onSelect={handleMoveUp as unknown as () => void} disabled={isFirst}>
+          <DropdownMenu.Item onSelect={handleMoveUp} disabled={isFirst}>
             Move up
           </DropdownMenu.Item>
-          <DropdownMenu.Item onSelect={handleMoveDown as unknown as () => void} disabled={isLast}>
+          <DropdownMenu.Item onSelect={handleMoveDown} disabled={isLast}>
             Move down
           </DropdownMenu.Item>
           <DropdownMenu.Separator />
           <DropdownMenu.Item
             className="text-destructive focus:text-destructive"
-            onSelect={handleDelete as unknown as () => void}
+            onSelect={handleDelete}
           >
             Delete
           </DropdownMenu.Item>
