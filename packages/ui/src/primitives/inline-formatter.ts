@@ -310,9 +310,7 @@ function unwrapFormatElement(element: HTMLElement): void {
   parent.removeChild(element);
 
   // Normalize to merge adjacent text nodes
-  if (parent.normalize) {
-    (parent as HTMLElement).normalize();
-  }
+  (parent as HTMLElement).normalize();
 }
 
 /**
@@ -460,11 +458,17 @@ export function createInlineFormatter(options: InlineFormatterOptions): InlineFo
     }
 
     // Get formats at first node
-    let commonFormats = getFormatsAtNode(textNodes[0], container, tagToFormat);
+    const firstNode = textNodes[0];
+    if (!firstNode) {
+      return [];
+    }
+    let commonFormats = getFormatsAtNode(firstNode, container, tagToFormat);
 
     // Intersect with formats at all other nodes
     for (let i = 1; i < textNodes.length; i++) {
-      const nodeFormats = getFormatsAtNode(textNodes[i], container, tagToFormat);
+      const node = textNodes[i];
+      if (!node) continue;
+      const nodeFormats = getFormatsAtNode(node, container, tagToFormat);
       const intersection = new Set<InlineMark>();
       for (const format of commonFormats) {
         if (nodeFormats.has(format)) {
@@ -575,7 +579,7 @@ export function createInlineFormatter(options: InlineFormatterOptions): InlineFo
     // Walk up from the common ancestor and remove empty format elements
     let current: Node | null = commonAncestor;
     while (current && current !== container) {
-      const parent = current.parentNode;
+      const parent: Node | null = current.parentNode;
       if (
         current.nodeType === Node.ELEMENT_NODE &&
         tagToFormat.has((current as HTMLElement).tagName.toLowerCase()) &&

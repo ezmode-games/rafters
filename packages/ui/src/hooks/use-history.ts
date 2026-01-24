@@ -28,7 +28,7 @@
  */
 
 import { useCallback, useRef, useState } from 'react';
-import { type History, type HistoryState, createHistory } from '../primitives/history';
+import { createHistory, type History, type HistoryState } from '../primitives/history';
 
 export interface UseHistoryOptions<T> {
   /**
@@ -130,8 +130,9 @@ export function useHistory<T>(options: UseHistoryOptions<T>): UseHistoryReturn<T
   }
 
   // State to trigger re-renders when history changes
-  const [historyState, setHistoryState] = useState<HistoryState<T>>(() =>
-    historyRef.current!.getState(),
+  const [historyState, setHistoryState] = useState<HistoryState<T>>(
+    // biome-ignore lint/style/noNonNullAssertion: historyRef.current is guaranteed to be set by the if-block above
+    () => historyRef.current!.getState(),
   );
 
   // Update React state from history controller
