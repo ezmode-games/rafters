@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { createRef } from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   Blockquote,
   Code,
@@ -507,5 +507,253 @@ describe('Typography composition', () => {
     expect(screen.getByTestId('code')).toHaveTextContent('useState');
     expect(screen.getByTestId('quote')).toHaveTextContent('Design is how it works.');
     expect(screen.getByTestId('muted')).toHaveTextContent('Last updated: Jan 2025');
+  });
+});
+
+// ============================================================================
+// R-200a: Editable Heading Tests
+// ============================================================================
+
+describe('Editable Heading (R-200a)', () => {
+  describe('H1 editable mode', () => {
+    it('should enable contenteditable when editable is true', () => {
+      render(
+        <H1 editable data-testid="h1">
+          Editable Title
+        </H1>,
+      );
+      const heading = screen.getByTestId('h1');
+      expect(heading).toHaveAttribute('contenteditable', 'true');
+    });
+
+    it('should not be contenteditable when editable is false', () => {
+      render(<H1 data-testid="h1">Static Title</H1>);
+      const heading = screen.getByTestId('h1');
+      expect(heading).not.toHaveAttribute('contenteditable');
+    });
+
+    it('should call onChange on content change', () => {
+      const onChange = vi.fn();
+      render(
+        <H1 editable onChange={onChange} data-testid="h1">
+          Title
+        </H1>,
+      );
+      const heading = screen.getByTestId('h1');
+
+      // Simulate typing
+      heading.textContent = 'New Title';
+      fireEvent.input(heading);
+
+      expect(onChange).toHaveBeenCalledWith('New Title');
+    });
+
+    it('should show placeholder via data attribute when empty', () => {
+      render(
+        <H1 editable placeholder="Enter title..." data-testid="h1">
+          {''}
+        </H1>,
+      );
+      const heading = screen.getByTestId('h1');
+      expect(heading).toHaveAttribute('data-placeholder', 'Enter title...');
+      expect(heading).toHaveAttribute('aria-placeholder', 'Enter title...');
+    });
+
+    it('should call onEnter when Enter key is pressed', () => {
+      const onEnter = vi.fn();
+      render(
+        <H1 editable onEnter={onEnter} data-testid="h1">
+          Title
+        </H1>,
+      );
+      const heading = screen.getByTestId('h1');
+
+      fireEvent.keyDown(heading, { key: 'Enter' });
+
+      expect(onEnter).toHaveBeenCalled();
+    });
+
+    it('should prevent default on Enter key', () => {
+      const onEnter = vi.fn();
+      render(
+        <H1 editable onEnter={onEnter} data-testid="h1">
+          Title
+        </H1>,
+      );
+      const heading = screen.getByTestId('h1');
+
+      const event = fireEvent.keyDown(heading, { key: 'Enter' });
+
+      // The event should be prevented
+      expect(event).toBe(false);
+    });
+
+    it('should call onFocus when focused', () => {
+      const onFocus = vi.fn();
+      render(
+        <H1 editable onFocus={onFocus} data-testid="h1">
+          Title
+        </H1>,
+      );
+      const heading = screen.getByTestId('h1');
+
+      fireEvent.focus(heading);
+
+      expect(onFocus).toHaveBeenCalled();
+    });
+
+    it('should call onBlur when blurred', () => {
+      const onBlur = vi.fn();
+      render(
+        <H1 editable onBlur={onBlur} data-testid="h1">
+          Title
+        </H1>,
+      );
+      const heading = screen.getByTestId('h1');
+
+      fireEvent.blur(heading);
+
+      expect(onBlur).toHaveBeenCalled();
+    });
+
+    it('should add editable styling classes when editable', () => {
+      render(
+        <H1 editable data-testid="h1">
+          Title
+        </H1>,
+      );
+      const heading = screen.getByTestId('h1');
+      expect(heading).toHaveClass('outline-none');
+    });
+
+    it('should set data-editable attribute when editable', () => {
+      render(
+        <H1 editable data-testid="h1">
+          Title
+        </H1>,
+      );
+      const heading = screen.getByTestId('h1');
+      expect(heading).toHaveAttribute('data-editable', 'true');
+    });
+
+    it('should forward ref correctly in editable mode', () => {
+      const ref = createRef<HTMLHeadingElement>();
+      render(
+        <H1 ref={ref} editable>
+          Title
+        </H1>,
+      );
+      expect(ref.current).toBeInstanceOf(HTMLHeadingElement);
+      expect(ref.current).toHaveAttribute('contenteditable', 'true');
+    });
+  });
+
+  describe('H2 editable mode', () => {
+    it('should enable contenteditable when editable is true', () => {
+      render(
+        <H2 editable data-testid="h2">
+          Editable Section
+        </H2>,
+      );
+      const heading = screen.getByTestId('h2');
+      expect(heading).toHaveAttribute('contenteditable', 'true');
+    });
+
+    it('should call onChange on content change', () => {
+      const onChange = vi.fn();
+      render(
+        <H2 editable onChange={onChange} data-testid="h2">
+          Section
+        </H2>,
+      );
+      const heading = screen.getByTestId('h2');
+
+      heading.textContent = 'New Section';
+      fireEvent.input(heading);
+
+      expect(onChange).toHaveBeenCalledWith('New Section');
+    });
+  });
+
+  describe('H3 editable mode', () => {
+    it('should enable contenteditable when editable is true', () => {
+      render(
+        <H3 editable data-testid="h3">
+          Editable Subsection
+        </H3>,
+      );
+      const heading = screen.getByTestId('h3');
+      expect(heading).toHaveAttribute('contenteditable', 'true');
+    });
+
+    it('should call onChange on content change', () => {
+      const onChange = vi.fn();
+      render(
+        <H3 editable onChange={onChange} data-testid="h3">
+          Subsection
+        </H3>,
+      );
+      const heading = screen.getByTestId('h3');
+
+      heading.textContent = 'New Subsection';
+      fireEvent.input(heading);
+
+      expect(onChange).toHaveBeenCalledWith('New Subsection');
+    });
+  });
+
+  describe('H4 editable mode', () => {
+    it('should enable contenteditable when editable is true', () => {
+      render(
+        <H4 editable data-testid="h4">
+          Editable Minor Heading
+        </H4>,
+      );
+      const heading = screen.getByTestId('h4');
+      expect(heading).toHaveAttribute('contenteditable', 'true');
+    });
+
+    it('should call onChange on content change', () => {
+      const onChange = vi.fn();
+      render(
+        <H4 editable onChange={onChange} data-testid="h4">
+          Minor Heading
+        </H4>,
+      );
+      const heading = screen.getByTestId('h4');
+
+      heading.textContent = 'New Minor Heading';
+      fireEvent.input(heading);
+
+      expect(onChange).toHaveBeenCalledWith('New Minor Heading');
+    });
+  });
+
+  describe('Backward compatibility', () => {
+    it('H1 works without editable props', () => {
+      render(<H1 data-testid="h1">Static H1</H1>);
+      const heading = screen.getByTestId('h1');
+      expect(heading).not.toHaveAttribute('contenteditable');
+      expect(heading).not.toHaveAttribute('data-editable');
+      expect(heading).toHaveTextContent('Static H1');
+    });
+
+    it('H2 works without editable props', () => {
+      render(<H2 data-testid="h2">Static H2</H2>);
+      const heading = screen.getByTestId('h2');
+      expect(heading).not.toHaveAttribute('contenteditable');
+    });
+
+    it('H3 works without editable props', () => {
+      render(<H3 data-testid="h3">Static H3</H3>);
+      const heading = screen.getByTestId('h3');
+      expect(heading).not.toHaveAttribute('contenteditable');
+    });
+
+    it('H4 works without editable props', () => {
+      render(<H4 data-testid="h4">Static H4</H4>);
+      const heading = screen.getByTestId('h4');
+      expect(heading).not.toHaveAttribute('contenteditable');
+    });
   });
 });
