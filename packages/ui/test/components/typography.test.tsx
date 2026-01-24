@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { createRef } from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   Blockquote,
   Code,
@@ -8,6 +8,8 @@ import {
   H2,
   H3,
   H4,
+  htmlToInlineContent,
+  inlineContentToHtml,
   Large,
   Lead,
   Muted,
@@ -15,6 +17,7 @@ import {
   Small,
   typographyClasses,
 } from '../../src/components/ui/typography';
+import type { InlineContent } from '../../src/primitives/types';
 
 describe('H1', () => {
   it('renders as h1 by default', () => {
@@ -507,5 +510,769 @@ describe('Typography composition', () => {
     expect(screen.getByTestId('code')).toHaveTextContent('useState');
     expect(screen.getByTestId('quote')).toHaveTextContent('Design is how it works.');
     expect(screen.getByTestId('muted')).toHaveTextContent('Last updated: Jan 2025');
+  });
+});
+
+// ============================================================================
+// R-200a: Editable Heading Tests
+// ============================================================================
+
+describe('Editable Heading (R-200a)', () => {
+  describe('H1 editable mode', () => {
+    it('should enable contenteditable when editable is true', () => {
+      render(
+        <H1 editable data-testid="h1">
+          Editable Title
+        </H1>,
+      );
+      const heading = screen.getByTestId('h1');
+      expect(heading).toHaveAttribute('contenteditable', 'true');
+    });
+
+    it('should not be contenteditable when editable is false', () => {
+      render(<H1 data-testid="h1">Static Title</H1>);
+      const heading = screen.getByTestId('h1');
+      expect(heading).not.toHaveAttribute('contenteditable');
+    });
+
+    it('should call onChange on content change', () => {
+      const onChange = vi.fn();
+      render(
+        <H1 editable onChange={onChange} data-testid="h1">
+          Title
+        </H1>,
+      );
+      const heading = screen.getByTestId('h1');
+
+      // Simulate typing
+      heading.textContent = 'New Title';
+      fireEvent.input(heading);
+
+      expect(onChange).toHaveBeenCalledWith('New Title');
+    });
+
+    it('should show placeholder via data attribute when empty', () => {
+      render(
+        <H1 editable placeholder="Enter title..." data-testid="h1">
+          {''}
+        </H1>,
+      );
+      const heading = screen.getByTestId('h1');
+      expect(heading).toHaveAttribute('data-placeholder', 'Enter title...');
+      expect(heading).toHaveAttribute('aria-placeholder', 'Enter title...');
+    });
+
+    it('should call onEnter when Enter key is pressed', () => {
+      const onEnter = vi.fn();
+      render(
+        <H1 editable onEnter={onEnter} data-testid="h1">
+          Title
+        </H1>,
+      );
+      const heading = screen.getByTestId('h1');
+
+      fireEvent.keyDown(heading, { key: 'Enter' });
+
+      expect(onEnter).toHaveBeenCalled();
+    });
+
+    it('should prevent default on Enter key', () => {
+      const onEnter = vi.fn();
+      render(
+        <H1 editable onEnter={onEnter} data-testid="h1">
+          Title
+        </H1>,
+      );
+      const heading = screen.getByTestId('h1');
+
+      const event = fireEvent.keyDown(heading, { key: 'Enter' });
+
+      // The event should be prevented
+      expect(event).toBe(false);
+    });
+
+    it('should call onFocus when focused', () => {
+      const onFocus = vi.fn();
+      render(
+        <H1 editable onFocus={onFocus} data-testid="h1">
+          Title
+        </H1>,
+      );
+      const heading = screen.getByTestId('h1');
+
+      fireEvent.focus(heading);
+
+      expect(onFocus).toHaveBeenCalled();
+    });
+
+    it('should call onBlur when blurred', () => {
+      const onBlur = vi.fn();
+      render(
+        <H1 editable onBlur={onBlur} data-testid="h1">
+          Title
+        </H1>,
+      );
+      const heading = screen.getByTestId('h1');
+
+      fireEvent.blur(heading);
+
+      expect(onBlur).toHaveBeenCalled();
+    });
+
+    it('should add editable styling classes when editable', () => {
+      render(
+        <H1 editable data-testid="h1">
+          Title
+        </H1>,
+      );
+      const heading = screen.getByTestId('h1');
+      expect(heading).toHaveClass('outline-none');
+    });
+
+    it('should set data-editable attribute when editable', () => {
+      render(
+        <H1 editable data-testid="h1">
+          Title
+        </H1>,
+      );
+      const heading = screen.getByTestId('h1');
+      expect(heading).toHaveAttribute('data-editable', 'true');
+    });
+
+    it('should forward ref correctly in editable mode', () => {
+      const ref = createRef<HTMLHeadingElement>();
+      render(
+        <H1 ref={ref} editable>
+          Title
+        </H1>,
+      );
+      expect(ref.current).toBeInstanceOf(HTMLHeadingElement);
+      expect(ref.current).toHaveAttribute('contenteditable', 'true');
+    });
+  });
+
+  describe('H2 editable mode', () => {
+    it('should enable contenteditable when editable is true', () => {
+      render(
+        <H2 editable data-testid="h2">
+          Editable Section
+        </H2>,
+      );
+      const heading = screen.getByTestId('h2');
+      expect(heading).toHaveAttribute('contenteditable', 'true');
+    });
+
+    it('should call onChange on content change', () => {
+      const onChange = vi.fn();
+      render(
+        <H2 editable onChange={onChange} data-testid="h2">
+          Section
+        </H2>,
+      );
+      const heading = screen.getByTestId('h2');
+
+      heading.textContent = 'New Section';
+      fireEvent.input(heading);
+
+      expect(onChange).toHaveBeenCalledWith('New Section');
+    });
+  });
+
+  describe('H3 editable mode', () => {
+    it('should enable contenteditable when editable is true', () => {
+      render(
+        <H3 editable data-testid="h3">
+          Editable Subsection
+        </H3>,
+      );
+      const heading = screen.getByTestId('h3');
+      expect(heading).toHaveAttribute('contenteditable', 'true');
+    });
+
+    it('should call onChange on content change', () => {
+      const onChange = vi.fn();
+      render(
+        <H3 editable onChange={onChange} data-testid="h3">
+          Subsection
+        </H3>,
+      );
+      const heading = screen.getByTestId('h3');
+
+      heading.textContent = 'New Subsection';
+      fireEvent.input(heading);
+
+      expect(onChange).toHaveBeenCalledWith('New Subsection');
+    });
+  });
+
+  describe('H4 editable mode', () => {
+    it('should enable contenteditable when editable is true', () => {
+      render(
+        <H4 editable data-testid="h4">
+          Editable Minor Heading
+        </H4>,
+      );
+      const heading = screen.getByTestId('h4');
+      expect(heading).toHaveAttribute('contenteditable', 'true');
+    });
+
+    it('should call onChange on content change', () => {
+      const onChange = vi.fn();
+      render(
+        <H4 editable onChange={onChange} data-testid="h4">
+          Minor Heading
+        </H4>,
+      );
+      const heading = screen.getByTestId('h4');
+
+      heading.textContent = 'New Minor Heading';
+      fireEvent.input(heading);
+
+      expect(onChange).toHaveBeenCalledWith('New Minor Heading');
+    });
+  });
+
+  describe('Backward compatibility', () => {
+    it('H1 works without editable props', () => {
+      render(<H1 data-testid="h1">Static H1</H1>);
+      const heading = screen.getByTestId('h1');
+      expect(heading).not.toHaveAttribute('contenteditable');
+      expect(heading).not.toHaveAttribute('data-editable');
+      expect(heading).toHaveTextContent('Static H1');
+    });
+
+    it('H2 works without editable props', () => {
+      render(<H2 data-testid="h2">Static H2</H2>);
+      const heading = screen.getByTestId('h2');
+      expect(heading).not.toHaveAttribute('contenteditable');
+    });
+
+    it('H3 works without editable props', () => {
+      render(<H3 data-testid="h3">Static H3</H3>);
+      const heading = screen.getByTestId('h3');
+      expect(heading).not.toHaveAttribute('contenteditable');
+    });
+
+    it('H4 works without editable props', () => {
+      render(<H4 data-testid="h4">Static H4</H4>);
+      const heading = screen.getByTestId('h4');
+      expect(heading).not.toHaveAttribute('contenteditable');
+    });
+  });
+});
+
+// ============================================================================
+// R-200b: Editable Paragraph Tests
+// ============================================================================
+
+describe('Editable Paragraph (R-200b)', () => {
+  describe('P editable mode', () => {
+    it('should enable contenteditable when editable is true', () => {
+      render(
+        <P editable data-testid="p">
+          Editable paragraph content
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+      expect(paragraph).toHaveAttribute('contenteditable', 'true');
+    });
+
+    it('should not enable contenteditable when editable is false', () => {
+      render(<P data-testid="p">Static paragraph content</P>);
+      const paragraph = screen.getByTestId('p');
+      expect(paragraph).not.toHaveAttribute('contenteditable');
+    });
+
+    it('should add data-editable attribute when editable', () => {
+      render(
+        <P editable data-testid="p">
+          Content
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+      expect(paragraph).toHaveAttribute('data-editable', 'true');
+    });
+
+    it('should add focus styling classes when editable', () => {
+      render(
+        <P editable data-testid="p">
+          Content
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+      expect(paragraph.className).toContain('focus:ring-2');
+    });
+
+    it('should call onChange with InlineContent[] on content change', () => {
+      const onChange = vi.fn();
+      render(
+        <P editable onChange={onChange} data-testid="p">
+          Initial content
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+
+      // Simulate typing by setting textContent and triggering input
+      paragraph.textContent = 'New content';
+      fireEvent.input(paragraph);
+
+      expect(onChange).toHaveBeenCalled();
+      const content = onChange.mock.calls[0][0] as InlineContent[];
+      expect(content).toHaveLength(1);
+      expect(content[0].text).toBe('New content');
+    });
+
+    it('should call onFocus when paragraph receives focus', () => {
+      const onFocus = vi.fn();
+      render(
+        <P editable onFocus={onFocus} data-testid="p">
+          Content
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+
+      fireEvent.focus(paragraph);
+
+      expect(onFocus).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call onBlur when paragraph loses focus', () => {
+      const onBlur = vi.fn();
+      render(
+        <P editable onBlur={onBlur} data-testid="p">
+          Content
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+
+      fireEvent.blur(paragraph);
+
+      expect(onBlur).toHaveBeenCalledTimes(1);
+    });
+
+    it('should set placeholder attributes when provided', () => {
+      render(
+        <P editable placeholder="Type something..." data-testid="p">
+          {null}
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+      expect(paragraph).toHaveAttribute('data-placeholder', 'Type something...');
+      expect(paragraph).toHaveAttribute('aria-placeholder', 'Type something...');
+    });
+
+    it('should call onEnter when Enter is pressed', () => {
+      const onEnter = vi.fn();
+      render(
+        <P editable onEnter={onEnter} data-testid="p">
+          Content
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+
+      fireEvent.keyDown(paragraph, { key: 'Enter' });
+
+      expect(onEnter).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not call onEnter when Shift+Enter is pressed', () => {
+      const onEnter = vi.fn();
+      render(
+        <P editable onEnter={onEnter} data-testid="p">
+          Content
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+
+      fireEvent.keyDown(paragraph, { key: 'Enter', shiftKey: true });
+
+      expect(onEnter).not.toHaveBeenCalled();
+    });
+
+    it('should forward ref correctly', () => {
+      const ref = createRef<HTMLParagraphElement>();
+      render(
+        <P editable ref={ref} data-testid="p">
+          Content
+        </P>,
+      );
+      expect(ref.current).toBeTruthy();
+      expect(ref.current?.tagName).toBe('P');
+    });
+
+    it('should merge custom className with editable styles', () => {
+      render(
+        <P editable className="custom-class" data-testid="p">
+          Content
+        </P>,
+      );
+      const paragraph = screen.getByTestId('p');
+      expect(paragraph.className).toContain('custom-class');
+      expect(paragraph.className).toContain('focus:ring-2');
+    });
+  });
+
+  describe('P backward compatibility', () => {
+    it('works without editable props', () => {
+      render(<P data-testid="p">Static paragraph</P>);
+      const paragraph = screen.getByTestId('p');
+      expect(paragraph).not.toHaveAttribute('contenteditable');
+      expect(paragraph).not.toHaveAttribute('data-editable');
+      expect(paragraph).toHaveTextContent('Static paragraph');
+    });
+
+    it('renders as p by default', () => {
+      render(<P data-testid="p">Content</P>);
+      const paragraph = screen.getByTestId('p');
+      expect(paragraph.tagName).toBe('P');
+    });
+
+    it('can render as a different element', () => {
+      render(
+        <P as="div" data-testid="p">
+          Content
+        </P>,
+      );
+      const element = screen.getByTestId('p');
+      expect(element.tagName).toBe('DIV');
+    });
+  });
+});
+
+// ============================================================================
+// R-200b: InlineContent Conversion Tests
+// ============================================================================
+
+describe('InlineContent Conversion (R-200b)', () => {
+  describe('inlineContentToHtml', () => {
+    it('should convert plain text', () => {
+      const content: InlineContent[] = [{ text: 'Hello world' }];
+      const html = inlineContentToHtml(content);
+      expect(html).toBe('Hello world');
+    });
+
+    it('should convert bold text', () => {
+      const content: InlineContent[] = [{ text: 'Bold text', marks: ['bold'] }];
+      const html = inlineContentToHtml(content);
+      expect(html).toBe('<strong>Bold text</strong>');
+    });
+
+    it('should convert italic text', () => {
+      const content: InlineContent[] = [{ text: 'Italic text', marks: ['italic'] }];
+      const html = inlineContentToHtml(content);
+      expect(html).toBe('<em>Italic text</em>');
+    });
+
+    it('should convert code text', () => {
+      const content: InlineContent[] = [{ text: 'code snippet', marks: ['code'] }];
+      const html = inlineContentToHtml(content);
+      expect(html).toBe('<code>code snippet</code>');
+    });
+
+    it('should convert strikethrough text', () => {
+      const content: InlineContent[] = [{ text: 'deleted', marks: ['strikethrough'] }];
+      const html = inlineContentToHtml(content);
+      expect(html).toBe('<s>deleted</s>');
+    });
+
+    it('should convert link text', () => {
+      const content: InlineContent[] = [
+        { text: 'Click here', marks: ['link'], href: 'https://example.com' },
+      ];
+      const html = inlineContentToHtml(content);
+      expect(html).toBe('<a href="https://example.com">Click here</a>');
+    });
+
+    it('should convert multiple marks', () => {
+      const content: InlineContent[] = [{ text: 'Bold and italic', marks: ['bold', 'italic'] }];
+      const html = inlineContentToHtml(content);
+      expect(html).toBe('<em><strong>Bold and italic</strong></em>');
+    });
+
+    it('should convert multiple segments', () => {
+      const content: InlineContent[] = [
+        { text: 'Normal ' },
+        { text: 'bold', marks: ['bold'] },
+        { text: ' text' },
+      ];
+      const html = inlineContentToHtml(content);
+      expect(html).toBe('Normal <strong>bold</strong> text');
+    });
+
+    it('should escape HTML special characters', () => {
+      const content: InlineContent[] = [{ text: '<script>alert("xss")</script>' }];
+      const html = inlineContentToHtml(content);
+      expect(html).toBe('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;');
+    });
+  });
+
+  describe('htmlToInlineContent', () => {
+    it('should convert plain text', () => {
+      const content = htmlToInlineContent('Hello world');
+      expect(content).toHaveLength(1);
+      expect(content[0].text).toBe('Hello world');
+      expect(content[0].marks).toBeUndefined();
+    });
+
+    it('should convert strong tag to bold mark', () => {
+      const content = htmlToInlineContent('<strong>Bold text</strong>');
+      expect(content).toHaveLength(1);
+      expect(content[0].text).toBe('Bold text');
+      expect(content[0].marks).toContain('bold');
+    });
+
+    it('should convert b tag to bold mark', () => {
+      const content = htmlToInlineContent('<b>Bold text</b>');
+      expect(content).toHaveLength(1);
+      expect(content[0].marks).toContain('bold');
+    });
+
+    it('should convert em tag to italic mark', () => {
+      const content = htmlToInlineContent('<em>Italic text</em>');
+      expect(content).toHaveLength(1);
+      expect(content[0].marks).toContain('italic');
+    });
+
+    it('should convert i tag to italic mark', () => {
+      const content = htmlToInlineContent('<i>Italic text</i>');
+      expect(content).toHaveLength(1);
+      expect(content[0].marks).toContain('italic');
+    });
+
+    it('should convert code tag to code mark', () => {
+      const content = htmlToInlineContent('<code>code</code>');
+      expect(content).toHaveLength(1);
+      expect(content[0].marks).toContain('code');
+    });
+
+    it('should convert s tag to strikethrough mark', () => {
+      const content = htmlToInlineContent('<s>deleted</s>');
+      expect(content).toHaveLength(1);
+      expect(content[0].marks).toContain('strikethrough');
+    });
+
+    it('should convert del tag to strikethrough mark', () => {
+      const content = htmlToInlineContent('<del>deleted</del>');
+      expect(content).toHaveLength(1);
+      expect(content[0].marks).toContain('strikethrough');
+    });
+
+    it('should convert a tag to link mark with href', () => {
+      const content = htmlToInlineContent('<a href="https://example.com">Link</a>');
+      expect(content).toHaveLength(1);
+      expect(content[0].text).toBe('Link');
+      expect(content[0].marks).toContain('link');
+      expect(content[0].href).toBe('https://example.com');
+    });
+
+    it('should convert nested marks', () => {
+      const content = htmlToInlineContent('<strong><em>Bold and italic</em></strong>');
+      expect(content).toHaveLength(1);
+      expect(content[0].marks).toContain('bold');
+      expect(content[0].marks).toContain('italic');
+    });
+
+    it('should convert mixed content', () => {
+      const content = htmlToInlineContent('Normal <strong>bold</strong> text');
+      expect(content).toHaveLength(3);
+      expect(content[0].text).toBe('Normal ');
+      expect(content[0].marks).toBeUndefined();
+      expect(content[1].text).toBe('bold');
+      expect(content[1].marks).toContain('bold');
+      expect(content[2].text).toBe(' text');
+      expect(content[2].marks).toBeUndefined();
+    });
+  });
+});
+
+// ============================================================================
+// R-200d: Editable Quote Tests
+// ============================================================================
+
+describe('Editable Quote (R-200d)', () => {
+  describe('Blockquote editable mode', () => {
+    it('should enable contenteditable when editable is true', () => {
+      render(
+        <Blockquote editable data-testid="quote">
+          Editable quote content
+        </Blockquote>,
+      );
+      const quote = screen.getByTestId('quote');
+      expect(quote).toHaveAttribute('contenteditable', 'true');
+    });
+
+    it('should not enable contenteditable when editable is false', () => {
+      render(<Blockquote data-testid="quote">Static quote</Blockquote>);
+      const quote = screen.getByTestId('quote');
+      expect(quote).not.toHaveAttribute('contenteditable');
+    });
+
+    it('should add data-editable attribute when editable', () => {
+      render(
+        <Blockquote editable data-testid="quote">
+          Content
+        </Blockquote>,
+      );
+      const quote = screen.getByTestId('quote');
+      expect(quote).toHaveAttribute('data-editable', 'true');
+    });
+
+    it('should add focus styling classes when editable', () => {
+      render(
+        <Blockquote editable data-testid="quote">
+          Content
+        </Blockquote>,
+      );
+      const quote = screen.getByTestId('quote');
+      expect(quote.className).toContain('focus:ring-2');
+    });
+
+    it('should call onChange with InlineContent[] on content change', () => {
+      const onChange = vi.fn();
+      render(
+        <Blockquote editable onChange={onChange} data-testid="quote">
+          Initial quote
+        </Blockquote>,
+      );
+      const quote = screen.getByTestId('quote');
+
+      quote.textContent = 'New quote content';
+      fireEvent.input(quote);
+
+      expect(onChange).toHaveBeenCalled();
+      const content = onChange.mock.calls[0][0] as InlineContent[];
+      expect(content).toHaveLength(1);
+      expect(content[0].text).toBe('New quote content');
+    });
+
+    it('should call onFocus when quote receives focus', () => {
+      const onFocus = vi.fn();
+      render(
+        <Blockquote editable onFocus={onFocus} data-testid="quote">
+          Content
+        </Blockquote>,
+      );
+      const quote = screen.getByTestId('quote');
+
+      fireEvent.focus(quote);
+
+      expect(onFocus).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call onBlur when quote loses focus', () => {
+      const onBlur = vi.fn();
+      render(
+        <Blockquote editable onBlur={onBlur} data-testid="quote">
+          Content
+        </Blockquote>,
+      );
+      const quote = screen.getByTestId('quote');
+
+      fireEvent.blur(quote);
+
+      expect(onBlur).toHaveBeenCalledTimes(1);
+    });
+
+    it('should set placeholder attributes when provided', () => {
+      render(
+        <Blockquote editable placeholder="Enter quote..." data-testid="quote">
+          {null}
+        </Blockquote>,
+      );
+      const quote = screen.getByTestId('quote');
+      expect(quote).toHaveAttribute('data-placeholder', 'Enter quote...');
+      expect(quote).toHaveAttribute('aria-placeholder', 'Enter quote...');
+    });
+
+    it('should call onEnter when Enter is pressed', () => {
+      const onEnter = vi.fn();
+      render(
+        <Blockquote editable onEnter={onEnter} data-testid="quote">
+          Content
+        </Blockquote>,
+      );
+      const quote = screen.getByTestId('quote');
+
+      fireEvent.keyDown(quote, { key: 'Enter' });
+
+      expect(onEnter).toHaveBeenCalledTimes(1);
+    });
+
+    it('should forward ref correctly', () => {
+      const ref = createRef<HTMLQuoteElement>();
+      render(
+        <Blockquote editable ref={ref} data-testid="quote">
+          Content
+        </Blockquote>,
+      );
+      expect(ref.current).toBeTruthy();
+      expect(ref.current?.tagName).toBe('BLOCKQUOTE');
+    });
+  });
+
+  describe('Blockquote citation', () => {
+    it('should render citation when provided', () => {
+      render(
+        <Blockquote citation="John Doe" data-testid="quote">
+          A great quote
+        </Blockquote>,
+      );
+      const citation = screen.getByText('John Doe');
+      expect(citation).toBeInTheDocument();
+      expect(citation.tagName).toBe('CITE');
+    });
+
+    it('should render editable citation when editable with onCitationChange', () => {
+      render(
+        <Blockquote editable citation="Author" onCitationChange={vi.fn()} data-testid="quote">
+          Content
+        </Blockquote>,
+      );
+      const citation = screen.getByText('Author');
+      expect(citation).toHaveAttribute('contenteditable', 'true');
+    });
+
+    it('should call onCitationChange when citation is edited', () => {
+      const onCitationChange = vi.fn();
+      render(
+        <Blockquote
+          editable
+          citation="Original Author"
+          onCitationChange={onCitationChange}
+          data-testid="quote"
+        >
+          Content
+        </Blockquote>,
+      );
+      const citation = screen.getByText('Original Author');
+
+      citation.textContent = 'New Author';
+      fireEvent.input(citation);
+
+      expect(onCitationChange).toHaveBeenCalledWith('New Author');
+    });
+  });
+
+  describe('Blockquote backward compatibility', () => {
+    it('works without editable props', () => {
+      render(<Blockquote data-testid="quote">Static quote</Blockquote>);
+      const quote = screen.getByTestId('quote');
+      expect(quote).not.toHaveAttribute('contenteditable');
+      expect(quote).not.toHaveAttribute('data-editable');
+      expect(quote).toHaveTextContent('Static quote');
+    });
+
+    it('renders as blockquote by default', () => {
+      render(<Blockquote data-testid="quote">Content</Blockquote>);
+      const quote = screen.getByTestId('quote');
+      expect(quote.tagName).toBe('BLOCKQUOTE');
+    });
+
+    it('applies blockquote styling', () => {
+      render(<Blockquote data-testid="quote">Content</Blockquote>);
+      const quote = screen.getByTestId('quote');
+      expect(quote.className).toContain('border-l-2');
+      expect(quote.className).toContain('italic');
+    });
   });
 });
