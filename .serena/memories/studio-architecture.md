@@ -37,12 +37,12 @@ React UI   Vite middleware (~80 lines)
     │    ├── TokenRegistry.setChangeCallback() → CSS regen
     │    ├── registry.set() → auto-cascade dependents
     │    ├── NodePersistenceAdapter → filesystem
-    │    └── registryToTailwind() → theme.css
+    │    └── registryToVars() → rafters.vars.css
     │         │
     └────►────┘
               │
               ▼
-    .rafters/tokens/*.rafters.json + .rafters/output/theme.css
+    .rafters/tokens/*.rafters.json + .rafters/output/rafters.vars.css
               │
               ▼
     Vite HMR (CSS hot reload) → React repaints
@@ -86,7 +86,7 @@ packages/
 └── studio/
     ├── vite.config.ts            # Vite + middleware plugin
     ├── src/
-    │   ├── main.tsx              # imports theme.css for HMR
+    │   ├── main.tsx              # imports rafters.vars.css for HMR
     │   ├── app.tsx
     │   └── components/
     │       ├── sidebar.tsx       # namespace list
@@ -101,8 +101,8 @@ packages/
 // In Vite middleware setup:
 registry.setChangeCallback(async (event) => {
   if (event.type === 'token-changed' || event.type === 'tokens-batch-changed') {
-    const css = registryToTailwind(registry);
-    await writeFile('.rafters/output/theme.css', css);
+    const css = registryToVars(registry);
+    await writeFile('.rafters/output/rafters.vars.css', css);
     // Vite HMR detects change, hot-reloads CSS
   }
 });
