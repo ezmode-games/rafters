@@ -22,7 +22,7 @@ pub async fn run(port: u16, dir: PathBuf) -> Result<()> {
 
     tracing::info!("Serving {} at http://{}", dir.display(), addr);
 
-    let app = Router::new().nest_service("/", ServeDir::new(&dir));
+    let app = Router::new().fallback_service(ServeDir::new(&dir));
 
     let listener = tokio::net::TcpListener::bind(addr).await?;
 

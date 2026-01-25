@@ -3,6 +3,7 @@
 use crate::react::ComponentStructure;
 
 /// Generate a Web Component class from the extracted component structure.
+/// Uses adoptedStyleSheets to inherit page-level Tailwind CSS.
 pub fn generate_web_component(tag_name: &str, structure: &ComponentStructure) -> String {
     let class_name = to_pascal_case(tag_name);
 
@@ -50,6 +51,9 @@ const sizeClasses = {{
 const baseClasses = '{base_classes}';
 const disabledClasses = '{disabled_classes}';
 
+// Cache for adopted stylesheets
+let cachedSheet = null;
+
 export class {class_name} extends HTMLElement {{
   static observedAttributes = [{attrs_array}];
 
@@ -72,25 +76,29 @@ export class {class_name} extends HTMLElement {{
   #adoptStyles() {{
     if (!this.shadowRoot) return;
 
-    try {{
-      const allRules = [];
-      for (const sheet of Array.from(document.styleSheets)) {{
-        try {{
-          for (const rule of Array.from(sheet.cssRules)) {{
-            allRules.push(rule.cssText);
-          }}
-        }} catch {{
-          // Skip cross-origin stylesheets
-        }}
-      }}
+    // Use cached sheet if available
+    if (cachedSheet) {{
+      this.shadowRoot.adoptedStyleSheets = [cachedSheet];
+      return;
+    }}
 
-      if (allRules.length > 0) {{
-        const adoptedSheet = new CSSStyleSheet();
-        adoptedSheet.replaceSync(allRules.join('\n'));
-        this.shadowRoot.adoptedStyleSheets = [adoptedSheet];
+    // Find and adopt page stylesheets
+    const sheets = [];
+    for (const sheet of document.styleSheets) {{
+      try {{
+        // Clone the stylesheet for adoption
+        const clone = new CSSStyleSheet();
+        const rules = Array.from(sheet.cssRules).map(r => r.cssText).join('\\n');
+        clone.replaceSync(rules);
+        sheets.push(clone);
+      }} catch (e) {{
+        // Cross-origin stylesheets can't be accessed, skip them
       }}
-    }} catch (e) {{
-      console.warn('Failed to adopt styles:', e);
+    }}
+
+    if (sheets.length > 0) {{
+      cachedSheet = sheets[0]; // Cache first sheet (main styles)
+      this.shadowRoot.adoptedStyleSheets = sheets;
     }}
   }}
 
@@ -208,8 +216,8 @@ mod tests {
         let structure = ComponentStructure {
             name: "Button".to_string(),
             variant_lookup: vec![
-                ("primary".to_string(), "bg-blue-500".to_string()),
-                ("secondary".to_string(), "bg-gray-500".to_string()),
+                ("primary".to_string(), "bg-primary text-primary-foreground".to_string()),
+                ("secondary".to_string(), "bg-secondary text-secondary-foreground".to_string()),
             ],
             size_lookup: vec![
                 ("sm".to_string(), "h-8 px-3".to_string()),
@@ -227,7 +235,7 @@ mod tests {
         assert!(output.contains("class MyButton extends HTMLElement"));
         assert!(output.contains("static observedAttributes"));
         assert!(output.contains("customElements.define('my-button'"));
-        assert!(output.contains("bg-blue-500"));
-        assert!(output.contains("inline-flex items-center"));
+        assert!(output.contains("bg-primary"));
+        assert!(output.contains("adoptedStyleSheets"));
     }
 }

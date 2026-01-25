@@ -124,10 +124,6 @@ const DOC_TEMPLATE: &str = r##"{% extends "base.html" %}
 
 {% block content %}
 <article class="doc">
-  <header>
-    <h1>{{ title }}</h1>
-  </header>
-
   <div class="content">
     {{ content | safe }}
   </div>

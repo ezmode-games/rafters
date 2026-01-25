@@ -47,9 +47,9 @@ enum Commands {
 
     /// Build static documentation site
     Build {
-        /// Output directory
-        #[arg(short, long, default_value = "dist")]
-        output: PathBuf,
+        /// Output directory (defaults to config or "dist")
+        #[arg(short, long)]
+        output: Option<PathBuf>,
 
         /// Skip minification
         #[arg(long)]
@@ -90,7 +90,8 @@ async fn main() -> Result<()> {
             commands::dev::run(port, !no_open).await?;
         }
         Commands::Build { output, no_minify } => {
-            commands::build::run(output, !no_minify).await?;
+            let minify = if no_minify { Some(false) } else { None };
+            commands::build::run(output, minify).await?;
         }
         Commands::Serve { port, dir } => {
             commands::serve::run(port, dir).await?;

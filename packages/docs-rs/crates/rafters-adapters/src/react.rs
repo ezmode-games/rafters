@@ -45,7 +45,7 @@ impl ReactAdapter {
     }
 
     /// Extract component structure from source code using regex patterns.
-    fn extract_structure(&self, source: &str) -> Result<ComponentStructure, TransformError> {
+    pub fn extract_structure(&self, source: &str) -> Result<ComponentStructure, TransformError> {
         // Extract variantClasses Record (required)
         let variant_lookup = extract_record(source, "variantClasses")?;
         if variant_lookup.is_empty() {
@@ -187,14 +187,14 @@ static DESTRUCTURE_RE: LazyLock<Regex> = LazyLock::new(|| {
 });
 
 /// Extract component name from source.
-fn extract_component_name(source: &str) -> Option<String> {
+pub fn extract_component_name(source: &str) -> Option<String> {
     COMPONENT_NAME_RE
         .captures(source)
         .map(|c| c.get(1).unwrap().as_str().to_string())
 }
 
 /// Extract a Record<string, string> from source.
-fn extract_record(source: &str, name: &str) -> Result<Vec<(String, String)>, TransformError> {
+pub fn extract_record(source: &str, name: &str) -> Result<Vec<(String, String)>, TransformError> {
     let mut entries = Vec::new();
 
     for cap in RECORD_RE.captures_iter(source) {
@@ -216,7 +216,7 @@ fn extract_record(source: &str, name: &str) -> Result<Vec<(String, String)>, Tra
 }
 
 /// Extract base classes from source.
-fn extract_base_classes(source: &str) -> Option<String> {
+pub fn extract_base_classes(source: &str) -> Option<String> {
     // Try concatenated format first
     if let Some(cap) = BASE_CLASSES_CONCAT_RE.captures(source) {
         let raw = cap.get(1).unwrap().as_str();
@@ -249,14 +249,14 @@ fn parse_concatenated_string(raw: &str) -> String {
 }
 
 /// Extract disabled classes from source.
-fn extract_disabled_classes(source: &str) -> Option<String> {
+pub fn extract_disabled_classes(source: &str) -> Option<String> {
     DISABLED_CLASSES_RE
         .captures(source)
         .map(|c| c.get(1).unwrap().as_str().to_string())
 }
 
 /// Extract observed attributes from props interface or destructuring.
-fn extract_attributes(source: &str) -> Vec<String> {
+pub fn extract_attributes(source: &str) -> Vec<String> {
     let mut attrs = Vec::new();
 
     // Common button attributes we always look for
