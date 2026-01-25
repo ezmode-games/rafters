@@ -517,6 +517,8 @@ export function BlockCanvas({
                   id={`block-${block.id}`}
                   role="option"
                   aria-selected={context.isSelected}
+                  aria-setsize={blocks.length}
+                  aria-posinset={index + 1}
                   data-block-id={block.id}
                   data-focused={context.isFocused}
                   onClick={(e) => handleBlockClick(block.id, e)}
