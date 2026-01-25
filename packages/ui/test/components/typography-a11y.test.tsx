@@ -2,14 +2,18 @@ import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 import {
+  Abbr,
   Blockquote,
   Code,
+  CodeBlock,
   H1,
   H2,
   H3,
   H4,
   Large,
   Lead,
+  List,
+  Mark,
   Muted,
   P,
   Small,
@@ -258,6 +262,230 @@ describe('Typography - With ARIA attributes', () => {
           Enable Feature
         </button>
       </div>,
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+});
+
+// ============================================================================
+// List - Accessibility (R-200c)
+// ============================================================================
+
+describe('List - Accessibility', () => {
+  it('has no violations for unordered list', async () => {
+    const { container } = render(
+      <List
+        items={[
+          { id: '1', content: 'First item' },
+          { id: '2', content: 'Second item' },
+          { id: '3', content: 'Third item' },
+        ]}
+      />,
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has no violations for ordered list', async () => {
+    const { container } = render(
+      <List
+        ordered
+        items={[
+          { id: '1', content: 'Step one' },
+          { id: '2', content: 'Step two' },
+          { id: '3', content: 'Step three' },
+        ]}
+      />,
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has no violations with nested items', async () => {
+    const { container } = render(
+      <List
+        items={[
+          { id: '1', content: 'Parent item' },
+          { id: '2', content: 'Nested item', indent: 1 },
+          { id: '3', content: 'Deeply nested', indent: 2 },
+        ]}
+      />,
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has no violations with InlineContent formatting', async () => {
+    const { container } = render(
+      <List
+        items={[
+          {
+            id: '1',
+            content: [{ text: 'Bold ', marks: ['bold'] }, { text: 'and normal text' }],
+          },
+          {
+            id: '2',
+            content: [{ text: 'Link text', marks: ['link'], href: 'https://example.com' }],
+          },
+        ]}
+      />,
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has no violations in article context', async () => {
+    const { container } = render(
+      <article>
+        <H2>Requirements</H2>
+        <List
+          items={[
+            { id: '1', content: 'Node.js 18+' },
+            { id: '2', content: 'pnpm 8+' },
+          ]}
+        />
+      </article>,
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+});
+
+// ============================================================================
+// CodeBlock - Accessibility (R-200e)
+// ============================================================================
+
+describe('CodeBlock - Accessibility', () => {
+  it('has no violations for basic code block', async () => {
+    const { container } = render(<CodeBlock>const x = 1;</CodeBlock>);
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has no violations with language attribute', async () => {
+    const { container } = render(
+      <CodeBlock language="typescript">{'const greeting: string = "Hello";'}</CodeBlock>,
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has no violations with line numbers', async () => {
+    const { container } = render(
+      <CodeBlock showLineNumbers>{'const a = 1;\nconst b = 2;\nconst c = a + b;'}</CodeBlock>,
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has no violations with multi-line code', async () => {
+    const code = `function greet(name) {
+  return \`Hello, \${name}!\`;
+}
+
+greet('World');`;
+    const { container } = render(<CodeBlock language="javascript">{code}</CodeBlock>);
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has no violations in article context', async () => {
+    const { container } = render(
+      <article>
+        <H2>Example Code</H2>
+        <P>Here is an example:</P>
+        <CodeBlock language="python">{'print("Hello, World!")'}</CodeBlock>
+      </article>,
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+});
+
+// ============================================================================
+// Mark - Accessibility
+// ============================================================================
+
+describe('Mark - Accessibility', () => {
+  it('has no violations for basic mark', async () => {
+    const { container } = render(<Mark>Highlighted text</Mark>);
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has no violations inside paragraph', async () => {
+    const { container } = render(
+      <P>
+        The <Mark>important</Mark> part of this sentence.
+      </P>,
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has no violations for search result highlighting', async () => {
+    const { container } = render(
+      <article>
+        <H2>Search Results</H2>
+        <P>
+          Found 3 matches for <Mark>keyword</Mark> in this document.
+        </P>
+        <P>
+          The <Mark>keyword</Mark> appears multiple times with <Mark>keyword</Mark> variations.
+        </P>
+      </article>,
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+});
+
+// ============================================================================
+// Abbr - Accessibility
+// ============================================================================
+
+describe('Abbr - Accessibility', () => {
+  it('has no violations for basic abbreviation', async () => {
+    const { container } = render(<Abbr title="Application Programming Interface">API</Abbr>);
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has no violations inside paragraph', async () => {
+    const { container } = render(
+      <P>
+        The <Abbr title="Application Programming Interface">API</Abbr> provides access to all
+        features.
+      </P>,
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has no violations with multiple abbreviations', async () => {
+    const { container } = render(
+      <P>
+        Use the <Abbr title="Command Line Interface">CLI</Abbr> to interact with the{' '}
+        <Abbr title="Application Programming Interface">API</Abbr> via{' '}
+        <Abbr title="HyperText Transfer Protocol">HTTP</Abbr>.
+      </P>,
+    );
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('has no violations in technical documentation', async () => {
+    const { container } = render(
+      <article>
+        <H2>Technical Overview</H2>
+        <P>
+          The <Abbr title="Single Page Application">SPA</Abbr> communicates with the backend via{' '}
+          <Abbr title="Representational State Transfer">REST</Abbr>{' '}
+          <Abbr title="Application Programming Interface">API</Abbr> calls using{' '}
+          <Abbr title="JavaScript Object Notation">JSON</Abbr> format.
+        </P>
+      </article>,
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();
