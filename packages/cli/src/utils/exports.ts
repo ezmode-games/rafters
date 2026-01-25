@@ -5,6 +5,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { getPackageManager } from './get-package-manager.js';
 
 export interface ExportConfig {
   tailwind: boolean;
@@ -67,6 +68,27 @@ export const FUTURE_EXPORTS: ExportChoice[] = [
 ];
 
 /**
+ * Find the Tailwind CLI binary path (cross-platform)
+ */
+function findTailwindBin(cwd: string): string | null {
+  const binDir = join(cwd, 'node_modules', '.bin');
+  const candidates = [join(binDir, 'tailwindcss')];
+
+  // Windows uses .cmd extension
+  if (process.platform === 'win32') {
+    candidates.unshift(join(binDir, 'tailwindcss.cmd'));
+  }
+
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) {
+      return candidate;
+    }
+  }
+
+  return null;
+}
+
+/**
  * Generate compiled CSS by running Tailwind CLI
  * Tailwind v4 uses @tailwindcss/cli package
  * Uses execFileSync for safety (no shell injection)
@@ -76,22 +98,33 @@ export async function generateCompiledCss(
   inputPath: string,
   outputPath: string,
 ): Promise<void> {
-  // Tailwind v4 CLI is in @tailwindcss/cli package
-  const nodeModulesBin = join(cwd, 'node_modules', '.bin', 'tailwindcss');
-  const hasTailwindCli = existsSync(nodeModulesBin);
-
   const args = ['-i', inputPath, '-o', outputPath, '--minify'];
 
-  if (hasTailwindCli) {
-    // Use local @tailwindcss/cli
-    execFileSync(nodeModulesBin, args, { cwd, stdio: 'pipe' });
-  } else {
-    // Try pnpm exec as fallback (workspace hoisting)
-    try {
-      execFileSync('pnpm', ['exec', 'tailwindcss', ...args], { cwd, stdio: 'pipe' });
-    } catch {
-      throw new Error('Tailwind CLI not found. Install it with: pnpm add -D @tailwindcss/cli');
-    }
+  // Try local node_modules/.bin first (cross-platform)
+  const localBin = findTailwindBin(cwd);
+  if (localBin) {
+    execFileSync(localBin, args, { cwd, stdio: 'pipe' });
+    return;
+  }
+
+  // Try global tailwindcss on PATH
+  try {
+    execFileSync('tailwindcss', args, { cwd, stdio: 'pipe' });
+    return;
+  } catch {
+    // Continue to package manager fallback
+  }
+
+  // Fallback to package manager exec
+  const pm = await getPackageManager(cwd, { withFallback: true });
+  const execCmd = pm === 'pnpm' ? ['pnpm', 'exec'] : pm === 'bun' ? ['bunx'] : ['npx'];
+
+  try {
+    execFileSync(execCmd[0], [...execCmd.slice(1), 'tailwindcss', ...args], { cwd, stdio: 'pipe' });
+  } catch {
+    throw new Error(
+      'Tailwind CLI not found. Install @tailwindcss/cli in your project or ensure tailwindcss is available on your PATH.',
+    );
   }
 }
 

@@ -95,11 +95,19 @@ export function log(event: Record<string, unknown>): void {
       console.log(`  Imported ${event.count} existing colors`);
       break;
 
+    case 'init:prompting_exports':
+      // Stop spinner before interactive prompt
+      context.spinner?.succeed('Configuration ready');
+      break;
+
     case 'init:exports_default':
+      context.spinner?.succeed('Configuration ready');
       console.log('  Using default exports (agent mode)');
+      context.spinner = ora('Generating outputs...').start();
       break;
 
     case 'init:exports_selected':
+      console.log('  Exports configured');
       context.spinner = ora('Generating outputs...').start();
       break;
 

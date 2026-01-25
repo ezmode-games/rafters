@@ -140,9 +140,22 @@ async function updateMainCss(cwd: string, cssPath: string, themePath: string): P
 }
 
 /**
+ * Check if running in an interactive terminal
+ */
+function isInteractive(): boolean {
+  return Boolean(process.stdin.isTTY && process.stdout.isTTY);
+}
+
+/**
  * Prompt user for export format selections
+ * Returns defaults if not in an interactive terminal
  */
 async function promptExportFormats(existingConfig?: ExportConfig): Promise<ExportConfig> {
+  // Non-interactive: use existing config or defaults
+  if (!isInteractive()) {
+    return existingConfig ?? DEFAULT_EXPORTS;
+  }
+
   // Build choices with existing config as defaults if available
   const choices = EXPORT_CHOICES.map((choice) => ({
     name: choice.name,
@@ -262,12 +275,18 @@ async function regenerateFromExisting(
   // Create registry
   const registry = new TokenRegistry(allTokens);
 
-  // Prompt for exports (or use existing config in agent mode)
+  // Prompt for exports (or use existing config in agent mode / non-interactive)
   let exports: ExportConfig;
   if (isAgentMode) {
     exports = existingConfig?.exports ?? DEFAULT_EXPORTS;
+    log({ event: 'init:exports_default', exports });
   } else {
+    // Stop spinner before prompting (if interactive)
+    if (isInteractive()) {
+      log({ event: 'init:prompting_exports' });
+    }
     exports = await promptExportFormats(existingConfig?.exports);
+    log({ event: 'init:exports_selected', exports });
   }
 
   // Ensure output directory exists
@@ -352,12 +371,16 @@ export async function init(options: InitOptions): Promise<void> {
     }
   }
 
-  // Prompt for export formats (use defaults in agent mode)
+  // Prompt for export formats (use defaults in agent mode or non-interactive)
   let exports: ExportConfig;
   if (isAgentMode) {
     exports = DEFAULT_EXPORTS;
     log({ event: 'init:exports_default', exports });
   } else {
+    // Stop spinner before prompting (if interactive)
+    if (isInteractive()) {
+      log({ event: 'init:prompting_exports' });
+    }
     exports = await promptExportFormats();
     log({ event: 'init:exports_selected', exports });
   }
