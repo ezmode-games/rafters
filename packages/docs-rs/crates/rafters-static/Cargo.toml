@@ -1,0 +1,26 @@
+[package]
+name = "rafters-static"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Static site generator for rafters documentation"
+
+[dependencies]
+minijinja = { workspace = true }
+lightningcss = { workspace = true }
+walkdir = { workspace = true }
+rayon = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+rafters-mdx = { workspace = true }
+rafters-adapters = { workspace = true }
+pulldown-cmark = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3"
+tokio-test = "0.4"

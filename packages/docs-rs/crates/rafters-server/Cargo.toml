@@ -1,0 +1,26 @@
+[package]
+name = "rafters-server"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Development server with hot reload for rafters docs"
+
+[dependencies]
+axum = { workspace = true }
+tower-http = { workspace = true }
+tokio = { workspace = true }
+notify = { workspace = true }
+tracing = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+rafters-mdx = { workspace = true }
+rafters-adapters = { workspace = true }
+pulldown-cmark = { workspace = true }
+open = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3"
+tokio-test = "0.4"
