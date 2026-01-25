@@ -257,9 +257,7 @@ export function BlockWrapper({
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: keyboard handled at BlockCanvas level
-    // biome-ignore lint/a11y/useSemanticElements: role="listitem" pairs with parent role="listbox"
     <div
-      role="listitem"
       data-block-wrapper={id}
       data-selected={isSelected}
       data-focused={isFocused}
