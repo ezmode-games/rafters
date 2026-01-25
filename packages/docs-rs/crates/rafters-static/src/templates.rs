@@ -71,7 +71,11 @@ impl TemplateEngine {
     }
 
     /// Render a page using the specified template.
-    pub fn render_page(&self, template: &str, context: &Context) -> Result<String, minijinja::Error> {
+    pub fn render_page(
+        &self,
+        template: &str,
+        context: &Context,
+    ) -> Result<String, minijinja::Error> {
         let tmpl = self.env.get_template(template)?;
 
         tmpl.render(context! {

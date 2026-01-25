@@ -16,7 +16,7 @@ use axum::{
 use tokio::sync::RwLock;
 use tower_http::services::ServeDir;
 
-use rafters_adapters::{ReactAdapter, FrameworkAdapter, TransformContext};
+use rafters_adapters::{FrameworkAdapter, ReactAdapter, TransformContext};
 use rafters_mdx::parse_mdx;
 
 use crate::watcher::{FileWatcher, WatchEvent};
@@ -102,8 +102,8 @@ impl DevServer {
             self.config.components_dir.clone(),
         ];
 
-        let (watcher, mut rx) = FileWatcher::new(&watch_paths)
-            .map_err(|e| ServerError::WatchError(e.to_string()))?;
+        let (watcher, mut rx) =
+            FileWatcher::new(&watch_paths).map_err(|e| ServerError::WatchError(e.to_string()))?;
 
         // Spawn file watch handler
         let state_clone = Arc::clone(&state);
@@ -280,10 +280,7 @@ async fn handle_ws(mut socket: WebSocket, state: Arc<RwLock<ServerState>>) {
 /// Handler for the HMR client script.
 async fn hmr_script_handler() -> impl IntoResponse {
     let script = hmr_client_script("ws://127.0.0.1:7777/__hmr");
-    (
-        [("content-type", "application/javascript")],
-        script,
-    )
+    ([("content-type", "application/javascript")], script)
 }
 
 /// Simple markdown to HTML renderer.

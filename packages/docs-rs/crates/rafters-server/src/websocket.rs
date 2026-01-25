@@ -69,7 +69,7 @@ impl Default for HmrHub {
 /// Generate the client-side HMR script.
 ///
 /// # Security Note
-/// 
+///
 /// This script dynamically executes Web Component code for hot module replacement.
 /// This is a DEVELOPMENT-ONLY feature where:
 /// - Code comes exclusively from the local dev server (localhost)

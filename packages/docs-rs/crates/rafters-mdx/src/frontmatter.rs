@@ -65,8 +65,8 @@ pub fn extract_frontmatter(source: &str) -> Result<(Option<Frontmatter>, &str), 
     let yaml_content = &after_open[..close_pos].trim();
     let remaining = &after_open[close_pos + 4..];
 
-    let frontmatter: Frontmatter =
-        serde_yaml::from_str(yaml_content).map_err(|e| FrontmatterError::InvalidYaml(e.to_string()))?;
+    let frontmatter: Frontmatter = serde_yaml::from_str(yaml_content)
+        .map_err(|e| FrontmatterError::InvalidYaml(e.to_string()))?;
 
     Ok((Some(frontmatter), remaining.trim_start()))
 }
@@ -100,7 +100,10 @@ order: 1
         let fm = fm.unwrap();
 
         assert_eq!(fm.title, "Button");
-        assert_eq!(fm.description, Some("A clickable button component".to_string()));
+        assert_eq!(
+            fm.description,
+            Some("A clickable button component".to_string())
+        );
         assert_eq!(fm.order, Some(1));
         assert!(content.starts_with("# Button Component"));
     }

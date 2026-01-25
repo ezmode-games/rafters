@@ -8,7 +8,7 @@ use std::time::Instant;
 use rayon::prelude::*;
 use walkdir::WalkDir;
 
-use rafters_adapters::{ReactAdapter, FrameworkAdapter, TransformContext, TransformedBlock};
+use rafters_adapters::{FrameworkAdapter, ReactAdapter, TransformContext, TransformedBlock};
 use rafters_mdx::{parse_mdx, CodeBlock, Frontmatter, ParsedDoc};
 
 use crate::assets::AssetPipeline;
@@ -217,8 +217,18 @@ impl StaticBuilder {
 
         // Sort by order from frontmatter
         pages.sort_by(|a, b| {
-            let order_a = a.doc.frontmatter.as_ref().and_then(|f| f.order).unwrap_or(999);
-            let order_b = b.doc.frontmatter.as_ref().and_then(|f| f.order).unwrap_or(999);
+            let order_a = a
+                .doc
+                .frontmatter
+                .as_ref()
+                .and_then(|f| f.order)
+                .unwrap_or(999);
+            let order_b = b
+                .doc
+                .frontmatter
+                .as_ref()
+                .and_then(|f| f.order)
+                .unwrap_or(999);
             order_a.cmp(&order_b)
         });
 
@@ -235,7 +245,10 @@ impl StaticBuilder {
         }
 
         // Convert path to output structure
-        let stem = relative.file_stem().and_then(|s| s.to_str()).unwrap_or("index");
+        let stem = relative
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .unwrap_or("index");
 
         if stem == "index" {
             // docs/index.mdx -> dist/index.html
@@ -244,7 +257,11 @@ impl StaticBuilder {
         } else {
             // docs/button.mdx -> dist/button/index.html
             let parent = relative.parent().unwrap_or(Path::new(""));
-            self.config.output_dir.join(parent).join(stem).join("index.html")
+            self.config
+                .output_dir
+                .join(parent)
+                .join(stem)
+                .join("index.html")
         }
     }
 
@@ -311,9 +328,7 @@ impl StaticBuilder {
 
     /// Convert output path to URL.
     fn path_to_url(&self, path: &Path) -> String {
-        let relative = path
-            .strip_prefix(&self.config.output_dir)
-            .unwrap_or(path);
+        let relative = path.strip_prefix(&self.config.output_dir).unwrap_or(path);
 
         let url = relative
             .parent()
@@ -383,7 +398,10 @@ impl StaticBuilder {
             nav: nav.to_vec(),
             toc,
             base_url: self.config.base_url.clone(),
-            web_components: web_components.iter().map(|w| w.web_component.clone()).collect(),
+            web_components: web_components
+                .iter()
+                .map(|w| w.web_component.clone())
+                .collect(),
         };
 
         // Render template
@@ -394,13 +412,11 @@ impl StaticBuilder {
 
         // Ensure output directory exists
         if let Some(parent) = page.output_path.parent() {
-            fs::create_dir_all(parent)
-                .map_err(|e| BuildError::WriteError(e.to_string()))?;
+            fs::create_dir_all(parent).map_err(|e| BuildError::WriteError(e.to_string()))?;
         }
 
         // Write output
-        fs::write(&page.output_path, html)
-            .map_err(|e| BuildError::WriteError(e.to_string()))?;
+        fs::write(&page.output_path, html).map_err(|e| BuildError::WriteError(e.to_string()))?;
 
         Ok((1, components_count))
     }
@@ -436,7 +452,10 @@ impl StaticBuilder {
         // This is a simplified approach - in production you'd want proper AST manipulation
         for wc in web_components {
             let marker = format!("<!-- live:{} -->", wc.tag_name);
-            let replacement = format!("<{} variant=\"primary\">Example</{}>", wc.tag_name, wc.tag_name);
+            let replacement = format!(
+                "<{} variant=\"primary\">Example</{}>",
+                wc.tag_name, wc.tag_name
+            );
             html_output = html_output.replace(&marker, &replacement);
         }
 
@@ -446,8 +465,7 @@ impl StaticBuilder {
     /// Generate static assets.
     fn generate_assets(&self) -> Result<(), BuildError> {
         let assets_dir = self.config.output_dir.join("assets");
-        fs::create_dir_all(&assets_dir)
-            .map_err(|e| BuildError::WriteError(e.to_string()))?;
+        fs::create_dir_all(&assets_dir).map_err(|e| BuildError::WriteError(e.to_string()))?;
 
         // Generate main CSS
         let css = AssetPipeline::generate_css();

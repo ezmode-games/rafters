@@ -79,10 +79,7 @@ async fn main() -> Result<()> {
         EnvFilter::new("info")
     };
 
-    fmt()
-        .with_env_filter(filter)
-        .with_target(false)
-        .init();
+    fmt().with_env_filter(filter).with_target(false).init();
 
     // Execute command
     match cli.command {

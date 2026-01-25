@@ -46,44 +46,37 @@ impl ReactAdapter {
 
     /// Extract component structure from source code using regex patterns.
     fn extract_structure(&self, source: &str) -> Result<ComponentStructure, TransformError> {
-        let mut structure = ComponentStructure::default();
-
-        // Extract component name from function/const declaration
-        structure.name = extract_component_name(source).unwrap_or_else(|| "Component".to_string());
-
-        // Extract variantClasses Record
-        structure.variant_lookup = extract_record(source, "variantClasses")?;
-        if structure.variant_lookup.is_empty() {
+        // Extract variantClasses Record (required)
+        let variant_lookup = extract_record(source, "variantClasses")?;
+        if variant_lookup.is_empty() {
             return Err(TransformError::MissingVariants);
         }
 
         // Extract sizeClasses Record (optional)
-        structure.size_lookup = extract_record(source, "sizeClasses").unwrap_or_default();
+        let size_lookup = extract_record(source, "sizeClasses").unwrap_or_default();
 
-        // Extract baseClasses
-        structure.base_classes = extract_base_classes(source).unwrap_or_default();
-
-        // Extract disabledClasses
-        structure.disabled_classes = extract_disabled_classes(source)
-            .unwrap_or_else(|| "opacity-50 pointer-events-none cursor-not-allowed".to_string());
-
-        // Extract observed attributes from props interface or destructuring
-        structure.observed_attributes = extract_attributes(source);
-
-        // Set defaults
-        structure.default_variant = structure
-            .variant_lookup
+        // Compute defaults from lookups
+        let default_variant = variant_lookup
             .first()
             .map(|(k, _)| k.clone())
             .unwrap_or_else(|| "default".to_string());
 
-        structure.default_size = structure
-            .size_lookup
+        let default_size = size_lookup
             .first()
             .map(|(k, _)| k.clone())
             .unwrap_or_else(|| "default".to_string());
 
-        Ok(structure)
+        Ok(ComponentStructure {
+            name: extract_component_name(source).unwrap_or_else(|| "Component".to_string()),
+            base_classes: extract_base_classes(source).unwrap_or_default(),
+            disabled_classes: extract_disabled_classes(source)
+                .unwrap_or_else(|| "opacity-50 pointer-events-none cursor-not-allowed".to_string()),
+            variant_lookup,
+            size_lookup,
+            default_variant,
+            default_size,
+            observed_attributes: extract_attributes(source),
+        })
     }
 }
 

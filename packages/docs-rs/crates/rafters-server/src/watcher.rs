@@ -1,6 +1,6 @@
 //! File watching for hot reload.
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::mpsc;
 use std::time::Duration;
 
@@ -47,14 +47,14 @@ impl FileWatcher {
                 let _ = sync_tx.send(event);
             }
         })
-        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+        .map_err(std::io::Error::other)?;
 
         // Watch all paths
         for path in paths {
             if path.exists() {
                 watcher
                     .watch(path, RecursiveMode::Recursive)
-                    .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+                    .map_err(std::io::Error::other)?;
             }
         }
 
@@ -86,21 +86,21 @@ impl FileWatcher {
 }
 
 /// Classify a notify event into a WatchEvent.
-fn classify_event(path: &PathBuf, kind: &notify::EventKind) -> Option<WatchEvent> {
+fn classify_event(path: &Path, kind: &notify::EventKind) -> Option<WatchEvent> {
     use notify::EventKind;
 
     let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
 
     match kind {
-        EventKind::Create(_) => Some(WatchEvent::Created(path.clone())),
-        EventKind::Remove(_) => Some(WatchEvent::Deleted(path.clone())),
+        EventKind::Create(_) => Some(WatchEvent::Created(path.to_path_buf())),
+        EventKind::Remove(_) => Some(WatchEvent::Deleted(path.to_path_buf())),
         EventKind::Modify(_) => {
             if ext == "mdx" || ext == "md" {
-                Some(WatchEvent::MdxModified(path.clone()))
+                Some(WatchEvent::MdxModified(path.to_path_buf()))
             } else if ext == "tsx" || ext == "jsx" || ext == "ts" || ext == "js" {
-                Some(WatchEvent::ComponentModified(path.clone()))
+                Some(WatchEvent::ComponentModified(path.to_path_buf()))
             } else {
-                Some(WatchEvent::Modified(path.clone()))
+                Some(WatchEvent::Modified(path.to_path_buf()))
             }
         }
         _ => None,
