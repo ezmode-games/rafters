@@ -150,11 +150,22 @@ export function log(event: Record<string, unknown>): void {
       context.spinner = ora('Installing...').start();
       break;
 
-    case 'add:dependencies':
-      if (context.spinner) {
-        context.spinner.text = 'Installing dependencies...';
+    case 'add:dependencies': {
+      context.spinner?.succeed('Files written');
+      const deps = event.dependencies as string[];
+      const devDeps = event.devDependencies as string[];
+      if (deps.length > 0 || devDeps.length > 0) {
+        console.log('  Dependencies to install:');
+        for (const dep of deps) {
+          console.log(`    ${dep}`);
+        }
+        for (const dep of devDeps) {
+          console.log(`    ${dep} (dev)`);
+        }
       }
+      context.spinner = ora('Installing dependencies...').start();
       break;
+    }
 
     case 'add:complete':
       context.spinner?.succeed(

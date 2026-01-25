@@ -16,6 +16,7 @@ import { updateDependencies } from '../utils/update-dependencies.js';
 import type { RaftersConfig } from './init.js';
 
 export interface AddOptions {
+  list?: boolean;
   overwrite?: boolean;
   registryUrl?: string;
   agent?: boolean;
@@ -244,6 +245,24 @@ export async function installComponent(
 export async function add(components: string[], options: AddOptions): Promise<void> {
   setAgentMode(options.agent ?? false);
 
+  const client = new RegistryClient(options.registryUrl);
+
+  // Handle --list option
+  if (options.list) {
+    const availableComponents = await client.listComponents();
+    if (options.agent) {
+      // Agent mode: output JSON
+      log({ event: 'add:list', components: availableComponents });
+    } else {
+      // Human mode: formatted output
+      console.log('Available components:\n');
+      for (const comp of availableComponents) {
+        console.log(`  ${comp.name}  ${comp.description ?? ''}`);
+      }
+    }
+    return;
+  }
+
   const cwd = process.cwd();
 
   // Validate that .rafters/ exists
@@ -270,8 +289,6 @@ export async function add(components: string[], options: AddOptions): Promise<vo
     components,
     overwrite: options.overwrite ?? false,
   });
-
-  const client = new RegistryClient(options.registryUrl);
 
   // Resolve all components and their dependencies
   const allItems: RegistryItem[] = [];
@@ -361,5 +378,8 @@ export async function add(components: string[], options: AddOptions): Promise<vo
       message: 'Some components were skipped. Use --overwrite to replace existing files.',
       skipped,
     });
+    // Fail if nothing was installed and components were skipped (already exist)
+    error('Component already exists. Use --overwrite to replace.');
+    process.exitCode = 1;
   }
 }

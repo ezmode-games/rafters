@@ -23,7 +23,7 @@ export async function studio(): Promise<void> {
     process.exit(1);
   }
 
-  // Find studio package - in dev it's at ../../../studio, in prod it's in node_modules
+  // Find studio package - in dev it's at ../../../studio (packages/studio), in prod it's in node_modules
   const devStudioPath = join(__dirname, '..', '..', '..', 'studio');
   const prodStudioPath = join(__dirname, '..', 'node_modules', '@rafters', 'studio');
 
