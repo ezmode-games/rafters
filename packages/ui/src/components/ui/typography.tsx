@@ -87,6 +87,16 @@ const typographyClasses = {
   muted: 'text-sm text-muted-foreground',
   code: 'rounded bg-muted px-1 py-0.5 font-mono text-sm text-foreground',
   blockquote: 'mt-6 border-l-2 border-border pl-6 italic text-foreground',
+  // List classes (R-200c)
+  ul: 'my-6 ml-6 list-disc [&>li]:mt-2 text-foreground',
+  ol: 'my-6 ml-6 list-decimal [&>li]:mt-2 text-foreground',
+  li: 'leading-7',
+  // CodeBlock classes (R-200e)
+  codeblock:
+    'relative rounded-lg bg-muted p-4 font-mono text-sm overflow-x-auto text-foreground [&_code]:bg-transparent [&_code]:p-0',
+  // Additional typography (Kbd is a separate component in kbd.tsx)
+  mark: 'bg-accent text-accent-foreground px-1 rounded',
+  abbr: 'cursor-help underline decoration-dotted underline-offset-4',
 } as const;
 
 export interface TypographyProps extends React.HTMLAttributes<HTMLElement> {
@@ -152,6 +162,66 @@ export interface EditableQuoteProps
   onCitationChange?: ((citation: string) => void) | undefined;
   /** Called when text selection changes (for InlineToolbar integration) */
   onSelectionChange?: ((selection: SelectionInfo | null) => void) | undefined;
+}
+
+/**
+ * List item content for editable lists
+ */
+export interface ListItem {
+  /** Unique identifier for the item */
+  id: string;
+  /** Item content as string or InlineContent[] */
+  content: string | InlineContent[];
+  /** Indentation level (0 = top level) */
+  indent?: number | undefined;
+}
+
+/**
+ * Extended props for editable list components (R-200c)
+ * Supports ordered and unordered lists with item-level editing.
+ */
+export interface EditableListProps extends Omit<TypographyProps, 'onChange'> {
+  /** List items */
+  items: ListItem[];
+  /** Whether the list is ordered (numbered) */
+  ordered?: boolean | undefined;
+  /** Enable editing mode */
+  editable?: boolean | undefined;
+  /** Called when items change */
+  onChange?: ((items: ListItem[]) => void) | undefined;
+  /** Called when a new item is added */
+  onItemAdd?: ((index: number) => void) | undefined;
+  /** Called when an item is removed */
+  onItemRemove?: ((index: number) => void) | undefined;
+  /** Called when an item is indented */
+  onIndent?: ((index: number) => void) | undefined;
+  /** Called when an item is outdented */
+  onOutdent?: ((index: number) => void) | undefined;
+  /** Placeholder for empty items */
+  placeholder?: string | undefined;
+}
+
+/**
+ * Extended props for editable code block components (R-200e)
+ * Supports multi-line code with optional syntax highlighting.
+ */
+export interface EditableCodeBlockProps extends Omit<TypographyProps, 'onChange'> {
+  /** Code content */
+  children: string;
+  /** Programming language for syntax highlighting */
+  language?: string | undefined;
+  /** Enable editing mode */
+  editable?: boolean | undefined;
+  /** Called when code changes */
+  onChange?: ((code: string) => void) | undefined;
+  /** Called when language changes */
+  onLanguageChange?: ((language: string) => void) | undefined;
+  /** Show line numbers */
+  showLineNumbers?: boolean | undefined;
+  /** Tab size in spaces */
+  tabSize?: number | undefined;
+  /** Placeholder when empty */
+  placeholder?: string | undefined;
 }
 
 // ============================================================================
@@ -1437,6 +1507,516 @@ export const Blockquote = React.forwardRef<HTMLQuoteElement, EditableQuoteProps>
   },
 );
 Blockquote.displayName = 'Blockquote';
+
+// ============================================================================
+// Editable List Hook (R-200c)
+// ============================================================================
+
+/**
+ * Hook for contenteditable list behavior with item-level editing
+ */
+function useEditableList({
+  items,
+  editable,
+  onChange,
+  onItemAdd,
+  onItemRemove,
+  onIndent,
+  onOutdent,
+  placeholder,
+}: EditableListProps) {
+  const listRef = useRef<HTMLElement>(null);
+  const itemRefs = useRef<Map<string, HTMLLIElement>>(new Map());
+
+  // Handle item content change
+  const handleItemInput = useCallback(
+    (index: number) => {
+      if (!onChange) return;
+
+      const item = items[index];
+      if (!item) return;
+
+      const element = itemRefs.current.get(item.id);
+      if (!element) return;
+
+      const html = element.innerHTML;
+      const content = htmlToInlineContent(html);
+      const newItems = [...items];
+      newItems[index] = { ...item, content };
+      onChange(newItems);
+    },
+    [items, onChange],
+  );
+
+  // Handle key events for list navigation
+  const handleItemKeyDown = useCallback(
+    (event: React.KeyboardEvent, index: number) => {
+      const item = items[index];
+      if (!item) return;
+
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        onItemAdd?.(index + 1);
+      } else if (event.key === 'Backspace') {
+        const element = itemRefs.current.get(item.id);
+        if (!element) return;
+
+        const selection = window.getSelection();
+        if (selection?.isCollapsed && selection.anchorOffset === 0) {
+          // Check if at the very start
+          const range = selection.getRangeAt(0);
+          const preRange = document.createRange();
+          preRange.selectNodeContents(element);
+          preRange.setEnd(range.startContainer, range.startOffset);
+          if (preRange.toString() === '') {
+            event.preventDefault();
+            // If item is empty, remove it
+            if (element.textContent === '') {
+              onItemRemove?.(index);
+            } else if (item.indent && item.indent > 0) {
+              // If indented, outdent first
+              onOutdent?.(index);
+            } else if (index > 0) {
+              // Merge with previous item
+              onItemRemove?.(index);
+            }
+          }
+        }
+      } else if (event.key === 'Tab') {
+        event.preventDefault();
+        if (event.shiftKey) {
+          onOutdent?.(index);
+        } else {
+          onIndent?.(index);
+        }
+      }
+    },
+    [items, onItemAdd, onItemRemove, onIndent, onOutdent],
+  );
+
+  // Handle paste - strip to plain text or inline formatting
+  const handleItemPaste = useCallback((event: React.ClipboardEvent) => {
+    event.preventDefault();
+    const html = event.clipboardData.getData('text/html');
+    if (html) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+      const cleanHtml = sanitizeInlineHtml(tempDiv);
+      insertHtmlAtSelection(cleanHtml);
+    } else {
+      const text = event.clipboardData.getData('text/plain');
+      insertTextAtSelection(text);
+    }
+  }, []);
+
+  // Register item ref
+  const registerItemRef = useCallback((id: string, element: HTMLLIElement | null) => {
+    if (element) {
+      itemRefs.current.set(id, element);
+    } else {
+      itemRefs.current.delete(id);
+    }
+  }, []);
+
+  // Build props for each list item
+  const getItemProps = useCallback(
+    (index: number) => {
+      const item = items[index];
+      if (!item || !editable) return {};
+
+      return {
+        contentEditable: true,
+        suppressContentEditableWarning: true,
+        onInput: () => handleItemInput(index),
+        onKeyDown: (e: React.KeyboardEvent) => handleItemKeyDown(e, index),
+        onPaste: handleItemPaste,
+        'data-placeholder': placeholder,
+        ref: (el: HTMLLIElement | null) => registerItemRef(item.id, el),
+      };
+    },
+    [
+      items,
+      editable,
+      handleItemInput,
+      handleItemKeyDown,
+      handleItemPaste,
+      placeholder,
+      registerItemRef,
+    ],
+  );
+
+  return { listRef, getItemProps };
+}
+
+/**
+ * List - Ordered or unordered list with editable support
+ *
+ * Supports editable mode (R-200c) with item-level editing, indentation, and list operations.
+ *
+ * @example
+ * ```tsx
+ * // Static list
+ * <List items={[{ id: '1', content: 'First item' }, { id: '2', content: 'Second item' }]} />
+ *
+ * // Editable list
+ * <List
+ *   items={items}
+ *   editable
+ *   onChange={(items) => setItems(items)}
+ *   onItemAdd={(index) => addItem(index)}
+ *   onItemRemove={(index) => removeItem(index)}
+ *   onIndent={(index) => indentItem(index)}
+ *   onOutdent={(index) => outdentItem(index)}
+ * />
+ * ```
+ */
+export const List = React.forwardRef<HTMLUListElement | HTMLOListElement, EditableListProps>(
+  (
+    {
+      items,
+      ordered = false,
+      editable,
+      onChange,
+      onItemAdd,
+      onItemRemove,
+      onIndent,
+      onOutdent,
+      placeholder,
+      className,
+      ...props
+    },
+    ref,
+  ) => {
+    const { listRef, getItemProps } = useEditableList({
+      items,
+      ordered,
+      editable,
+      onChange,
+      onItemAdd,
+      onItemRemove,
+      onIndent,
+      onOutdent,
+      placeholder,
+    });
+
+    const Component = ordered ? 'ol' : 'ul';
+    const listClass = ordered ? typographyClasses.ol : typographyClasses.ul;
+
+    // Combine refs
+    const combinedRef = (element: HTMLUListElement | HTMLOListElement | null) => {
+      (listRef as React.MutableRefObject<HTMLElement | null>).current = element;
+      if (typeof ref === 'function') {
+        ref(element as HTMLUListElement & HTMLOListElement);
+      } else if (ref) {
+        (ref as React.MutableRefObject<HTMLUListElement | HTMLOListElement | null>).current =
+          element;
+      }
+    };
+
+    // Indent classes using Tailwind spacing scale (semantic, not arbitrary)
+    const getIndentClass = (indent: number | undefined): string => {
+      if (!indent || indent <= 0) return '';
+      // Use standard Tailwind spacing: ml-6, ml-12, ml-18 (not available), ml-24
+      // Limit to 4 levels of nesting
+      const indentMap: Record<number, string> = {
+        1: 'ml-6',
+        2: 'ml-12',
+        3: 'ml-16',
+        4: 'ml-24',
+      };
+      return indentMap[Math.min(indent, 4)] ?? 'ml-24';
+    };
+
+    return (
+      <Component
+        ref={combinedRef}
+        className={classy(listClass, className)}
+        data-editable={editable || undefined}
+        {...props}
+      >
+        {items.map((item, index) => {
+          const itemProps = getItemProps(index);
+          const indentClass = getIndentClass(item.indent);
+
+          if (editable) {
+            // Content is sanitized via escapeHtml in inlineContentToHtml
+            const htmlContent =
+              typeof item.content === 'string'
+                ? escapeHtml(item.content)
+                : inlineContentToHtml(item.content);
+
+            return (
+              <li
+                key={item.id}
+                className={classy(
+                  typographyClasses.li,
+                  indentClass,
+                  'outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded',
+                )}
+                {...itemProps}
+                dangerouslySetInnerHTML={{ __html: htmlContent }}
+              />
+            );
+          }
+
+          // For static mode with InlineContent[], use dangerouslySetInnerHTML
+          // Content is sanitized via escapeHtml in inlineContentToHtml
+          if (typeof item.content !== 'string') {
+            return (
+              <li
+                key={item.id}
+                className={classy(typographyClasses.li, indentClass)}
+                dangerouslySetInnerHTML={{ __html: inlineContentToHtml(item.content) }}
+              />
+            );
+          }
+
+          return (
+            <li key={item.id} className={classy(typographyClasses.li, indentClass)}>
+              {item.content}
+            </li>
+          );
+        })}
+      </Component>
+    );
+  },
+);
+List.displayName = 'List';
+
+// ============================================================================
+// Editable CodeBlock Hook (R-200e)
+// ============================================================================
+
+/**
+ * Hook for contenteditable code block behavior
+ */
+function useEditableCodeBlock({
+  editable,
+  onChange,
+  tabSize = 2,
+  placeholder,
+}: Pick<EditableCodeBlockProps, 'editable' | 'onChange' | 'tabSize' | 'placeholder'>) {
+  const elementRef = useRef<HTMLPreElement>(null);
+  const lastContentRef = useRef<string>('');
+
+  // Handle input events
+  const handleInput = useCallback(() => {
+    if (!elementRef.current || !onChange) return;
+
+    const content = elementRef.current.textContent ?? '';
+    if (content !== lastContentRef.current) {
+      lastContentRef.current = content;
+      onChange(content);
+    }
+  }, [onChange]);
+
+  // Handle key events
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        event.preventDefault();
+        const spaces = ' '.repeat(tabSize);
+        insertTextAtSelection(spaces);
+      } else if (event.key === 'Enter') {
+        // Allow Enter for new lines in code blocks
+        event.preventDefault();
+        insertTextAtSelection('\n');
+      }
+    },
+    [tabSize],
+  );
+
+  // Handle paste - always plain text for code
+  const handlePaste = useCallback((event: React.ClipboardEvent) => {
+    event.preventDefault();
+    const text = event.clipboardData.getData('text/plain');
+    insertTextAtSelection(text);
+  }, []);
+
+  const editableProps = editable
+    ? {
+        contentEditable: true,
+        suppressContentEditableWarning: true,
+        onInput: handleInput,
+        onKeyDown: handleKeyDown,
+        onPaste: handlePaste,
+        'data-placeholder': placeholder,
+        'aria-placeholder': placeholder,
+        spellCheck: false,
+      }
+    : {};
+
+  return { editableProps, elementRef };
+}
+
+/**
+ * CodeBlock - Multi-line code block with optional syntax highlighting
+ *
+ * Supports editable mode (R-200e) with proper Tab handling and plain text paste.
+ *
+ * @example
+ * ```tsx
+ * // Static code block
+ * <CodeBlock language="typescript">
+ *   const greeting = "Hello, World!";
+ * </CodeBlock>
+ *
+ * // Editable code block
+ * <CodeBlock
+ *   editable
+ *   language={language}
+ *   onChange={(code) => setCode(code)}
+ *   onLanguageChange={(lang) => setLanguage(lang)}
+ *   showLineNumbers
+ * >
+ *   {code}
+ * </CodeBlock>
+ * ```
+ */
+export const CodeBlock = React.forwardRef<HTMLPreElement, EditableCodeBlockProps>(
+  (
+    {
+      children,
+      language,
+      editable,
+      onChange,
+      onLanguageChange,
+      showLineNumbers = false,
+      tabSize = 2,
+      placeholder,
+      className,
+      ...props
+    },
+    ref,
+  ) => {
+    const { editableProps, elementRef } = useEditableCodeBlock({
+      editable,
+      onChange,
+      tabSize,
+      placeholder,
+    });
+
+    // Combine refs
+    const combinedRef = (element: HTMLPreElement | null) => {
+      (elementRef as React.MutableRefObject<HTMLPreElement | null>).current = element;
+      if (typeof ref === 'function') {
+        ref(element);
+      } else if (ref) {
+        (ref as React.MutableRefObject<HTMLPreElement | null>).current = element;
+      }
+    };
+
+    const lines = children.split('\n');
+
+    return (
+      <div className="group" data-editable={editable || undefined}>
+        {/* Language selector for editable mode */}
+        {editable && onLanguageChange && (
+          <div className="flex items-center justify-between bg-muted/50 px-4 py-2 rounded-t-lg border-b border-border">
+            <select
+              value={language ?? ''}
+              onChange={(e) => onLanguageChange(e.target.value)}
+              className="bg-transparent text-xs text-muted-foreground border-none outline-none cursor-pointer"
+            >
+              <option value="">Plain text</option>
+              <option value="javascript">JavaScript</option>
+              <option value="typescript">TypeScript</option>
+              <option value="python">Python</option>
+              <option value="rust">Rust</option>
+              <option value="go">Go</option>
+              <option value="html">HTML</option>
+              <option value="css">CSS</option>
+              <option value="json">JSON</option>
+              <option value="bash">Bash</option>
+              <option value="sql">SQL</option>
+            </select>
+            {language && <span className="text-xs text-muted-foreground">{language}</span>}
+          </div>
+        )}
+
+        <pre
+          ref={combinedRef}
+          className={classy(
+            typographyClasses.codeblock,
+            editable && 'outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+            editable && onLanguageChange && 'rounded-t-none',
+            className,
+          )}
+          data-language={language}
+          {...editableProps}
+          {...props}
+        >
+          {showLineNumbers && !editable ? (
+            <code className="flex">
+              <span className="select-none pr-4 text-muted-foreground border-r border-border mr-4">
+                {lines.map((_, i) => (
+                  <span key={`line-${i + 1}`} className="block">
+                    {i + 1}
+                  </span>
+                ))}
+              </span>
+              <span className="flex-1">{children}</span>
+            </code>
+          ) : (
+            <code>{children}</code>
+          )}
+        </pre>
+      </div>
+    );
+  },
+);
+CodeBlock.displayName = 'CodeBlock';
+
+// ============================================================================
+// Additional Typography Components
+// ============================================================================
+
+/**
+ * Mark - Highlighted text
+ * Use for search results, emphasized terms, or important callouts
+ *
+ * @example
+ * ```tsx
+ * <P>The <Mark>important</Mark> part of this sentence.</P>
+ * ```
+ */
+export const Mark = React.forwardRef<HTMLElement, TypographyProps>(
+  ({ as, className, ...props }, ref) => {
+    const Component = as ?? 'mark';
+    return (
+      <Component
+        ref={ref as React.Ref<HTMLElement>}
+        className={classy(typographyClasses.mark, className)}
+        {...props}
+      />
+    );
+  },
+);
+Mark.displayName = 'Mark';
+
+/**
+ * Abbr - Abbreviation with tooltip
+ * Use for acronyms or technical terms that need explanation
+ *
+ * @example
+ * ```tsx
+ * <P>The <Abbr title="Application Programming Interface">API</Abbr> is well documented.</P>
+ * ```
+ */
+export const Abbr = React.forwardRef<HTMLElement, TypographyProps & { title: string }>(
+  ({ as, className, title, ...props }, ref) => {
+    const Component = as ?? 'abbr';
+    return (
+      <Component
+        ref={ref as React.Ref<HTMLElement>}
+        className={classy(typographyClasses.abbr, className)}
+        title={title}
+        {...props}
+      />
+    );
+  },
+);
+Abbr.displayName = 'Abbr';
 
 // Export typography classes for direct use
 export { typographyClasses };

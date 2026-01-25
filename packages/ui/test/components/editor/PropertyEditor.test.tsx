@@ -521,7 +521,7 @@ describe('PropertyEditor - Validation', () => {
 });
 
 describe('PropertyEditor - Accessibility', () => {
-  it('has form role and aria-label', () => {
+  it('has form role with aria-labelledby when title is present', () => {
     const schema = z.object({
       field: z.string(),
     });
@@ -536,7 +536,10 @@ describe('PropertyEditor - Accessibility', () => {
     );
 
     const form = screen.getByRole('form');
-    expect(form).toHaveAttribute('aria-label', 'Settings');
+    // When title is present, uses aria-labelledby pointing to heading
+    expect(form).toHaveAttribute('aria-labelledby');
+    // Verify the heading text is visible
+    expect(screen.getByText('Settings')).toBeInTheDocument();
   });
 
   it('uses default aria-label when no title', () => {

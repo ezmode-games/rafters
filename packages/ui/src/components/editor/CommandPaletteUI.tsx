@@ -339,7 +339,7 @@ export function CommandPaletteUI({
     <div
       ref={containerRef}
       role="dialog"
-      aria-modal="false"
+      aria-modal="true"
       aria-label="Command palette"
       className={containerClasses}
       style={{

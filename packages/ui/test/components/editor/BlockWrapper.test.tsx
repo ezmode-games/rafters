@@ -41,7 +41,7 @@ describe('BlockWrapper', () => {
       render(<BlockWrapper {...props} />);
 
       const wrapper = screen.getByTestId('block-wrapper-block-1');
-      expect(wrapper).toHaveClass('ring-2', 'ring-purple-500');
+      expect(wrapper).toHaveClass('ring-2', 'ring-ring');
     });
 
     it('should show both rings when selected and focused', () => {
@@ -51,7 +51,7 @@ describe('BlockWrapper', () => {
 
       const wrapper = screen.getByTestId('block-wrapper-block-1');
       expect(wrapper).toHaveClass('ring-2', 'ring-primary');
-      expect(wrapper).toHaveClass('outline', 'outline-purple-500');
+      expect(wrapper).toHaveClass('outline', 'outline-ring');
     });
 
     it('should have correct data attributes for state', () => {
@@ -286,12 +286,15 @@ describe('BlockWrapper', () => {
   });
 
   describe('Accessibility', () => {
-    it('should have listitem role', () => {
+    it('should be a div wrapper (listbox semantics on BlockCanvas)', () => {
+      // BlockWrapper no longer has role="listitem" - the listbox/option
+      // pattern is now implemented at the BlockCanvas level with
+      // aria-setsize/aria-posinset on each block's option role
       const props = createDefaultProps();
 
       render(<BlockWrapper {...props} />);
 
-      const wrapper = screen.getByRole('listitem');
+      const wrapper = screen.getByTestId('block-wrapper-block-1');
       expect(wrapper).toBeInTheDocument();
     });
 
