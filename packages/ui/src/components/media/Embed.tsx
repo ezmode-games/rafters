@@ -121,7 +121,8 @@ function TwitterEmbed({ tweetId }: { tweetId: string }) {
             theme: 'light',
             dnt: true,
           });
-        } finally {
+          setIsLoading(false);
+        } catch {
           setIsLoading(false);
         }
       }
