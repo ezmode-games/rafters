@@ -216,8 +216,14 @@ mod tests {
         let structure = ComponentStructure {
             name: "Button".to_string(),
             variant_lookup: vec![
-                ("primary".to_string(), "bg-primary text-primary-foreground".to_string()),
-                ("secondary".to_string(), "bg-secondary text-secondary-foreground".to_string()),
+                (
+                    "primary".to_string(),
+                    "bg-primary text-primary-foreground".to_string(),
+                ),
+                (
+                    "secondary".to_string(),
+                    "bg-secondary text-secondary-foreground".to_string(),
+                ),
             ],
             size_lookup: vec![
                 ("sm".to_string(), "h-8 px-3".to_string()),

@@ -257,6 +257,12 @@ importers:
         specifier: ^4.54.0
         version: 4.54.0(@cloudflare/workers-types@4.20251213.0)
 
+  apps/docs:
+    devDependencies:
+      tailwindcss:
+        specifier: ^4.1.0
+        version: 4.1.18
+
   apps/website:
     dependencies:
       '@astrojs/cloudflare':

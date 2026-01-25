@@ -118,10 +118,8 @@ fn parse_props(props_str: &str) -> HashMap<String, PropValue> {
 
     // Match: name="value" or name='value' or name={expr} or name (boolean)
     static PROP_RE: LazyLock<Regex> = LazyLock::new(|| {
-        Regex::new(
-            r#"([a-zA-Z][a-zA-Z0-9]*)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|\{([^}]*)\}))?"#,
-        )
-        .expect("Invalid prop regex")
+        Regex::new(r#"([a-zA-Z][a-zA-Z0-9]*)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|\{([^}]*)\}))?"#)
+            .expect("Invalid prop regex")
     });
 
     for caps in PROP_RE.captures_iter(props_str) {

@@ -122,7 +122,11 @@ impl StaticBuilder {
             if components_dir.exists() {
                 match registry.scan(components_dir) {
                     Ok(count) => {
-                        tracing::info!("Loaded {} components from {}", count, components_dir.display());
+                        tracing::info!(
+                            "Loaded {} components from {}",
+                            count,
+                            components_dir.display()
+                        );
                     }
                     Err(e) => {
                         tracing::warn!("Failed to scan components directory: {}", e);
@@ -389,7 +393,10 @@ impl StaticBuilder {
 
                         // Only generate Web Component JS once per component type
                         if !generated_components.contains_key(component_name) {
-                            match self.registry.generate_web_component(component_name, &tag_name) {
+                            match self
+                                .registry
+                                .generate_web_component(component_name, &tag_name)
+                            {
                                 Ok(transformed) => {
                                     generated_components
                                         .insert(component_name.clone(), tag_name.clone());
@@ -445,7 +452,11 @@ impl StaticBuilder {
         }
 
         // Render markdown to HTML
-        let content_html = self.render_markdown(&page.doc.content, &page.doc.code_blocks, &block_replacements);
+        let content_html = self.render_markdown(
+            &page.doc.content,
+            &page.doc.code_blocks,
+            &block_replacements,
+        );
 
         // Build TOC
         let toc: Vec<TocEntry> = page
@@ -529,10 +540,8 @@ impl StaticBuilder {
                     // Find the code block in the content and replace with preview HTML
                     // Code blocks are fenced with ```lang live ... ```
                     let escaped_source = regex::escape(&block.source);
-                    let pattern = format!(
-                        r"```[a-z]+\s+live[^\n]*\n{}\n?```",
-                        escaped_source.trim()
-                    );
+                    let pattern =
+                        format!(r"```[a-z]+\s+live[^\n]*\n{}\n?```", escaped_source.trim());
 
                     if let Ok(re) = Regex::new(&pattern) {
                         let preview = format!(
@@ -549,7 +558,8 @@ impl StaticBuilder {
                             },
                             block.source.trim()
                         );
-                        processed_content = re.replace(&processed_content, preview.as_str()).to_string();
+                        processed_content =
+                            re.replace(&processed_content, preview.as_str()).to_string();
                     }
                 }
             }
