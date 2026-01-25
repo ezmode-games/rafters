@@ -570,4 +570,86 @@ describe('PropertyEditor - Accessibility', () => {
       expect(screen.getByRole('alert')).toHaveAttribute('id', 'property-field-error');
     });
   });
+
+  // React 19 purity tests - verify values are derived from props without useEffect
+  describe('React 19 purity', () => {
+    it('reflects value changes from props immediately', () => {
+      const schema = z.object({
+        title: z.string(),
+      });
+
+      // Initial render with value "Hello"
+      const { rerender } = render(
+        <PropertyEditor schema={schema} values={{ title: 'Hello' }} onChange={() => {}} />,
+      );
+
+      let input = screen.getByRole('textbox');
+      expect(input).toHaveValue('Hello');
+
+      // Update props with new value - should reflect immediately
+      rerender(<PropertyEditor schema={schema} values={{ title: 'World' }} onChange={() => {}} />);
+
+      input = screen.getByRole('textbox');
+      expect(input).toHaveValue('World');
+    });
+
+    it('preserves error state when values change from props', async () => {
+      const user = userEvent.setup();
+      const schema = z.object({
+        title: z.string().min(5, 'Too short'),
+      });
+
+      // Start with an invalid value (too short)
+      const { rerender } = render(
+        <PropertyEditor schema={schema} values={{ title: 'Hi' }} onChange={() => {}} />,
+      );
+
+      const input = screen.getByRole('textbox');
+
+      // Blur to trigger validation
+      await user.click(input);
+      await user.tab();
+
+      // Should have error displayed
+      await waitFor(() => {
+        expect(screen.getByRole('alert')).toHaveTextContent('Too short');
+      });
+
+      // Update props with different (but still invalid) value
+      // Error should persist because touched is still true
+      rerender(<PropertyEditor schema={schema} values={{ title: 'Ho' }} onChange={() => {}} />);
+
+      // Error should still be visible
+      expect(screen.getByRole('alert')).toHaveTextContent('Too short');
+
+      // But input value should reflect props
+      expect(input).toHaveValue('Ho');
+    });
+
+    it('clears error when user types new value', async () => {
+      const user = userEvent.setup();
+      const schema = z.object({
+        title: z.string().min(5, 'Too short'),
+      });
+
+      render(<PropertyEditor schema={schema} values={{ title: 'Hi' }} onChange={() => {}} />);
+
+      const input = screen.getByRole('textbox');
+
+      // Trigger validation error
+      await user.click(input);
+      await user.tab();
+
+      await waitFor(() => {
+        expect(screen.getByRole('alert')).toHaveTextContent('Too short');
+      });
+
+      // Type in input - error should clear (onChange handler is called)
+      await user.click(input);
+      await user.type(input, 'l');
+
+      // Error should be cleared after typing (handleFieldChange clears error)
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+  });
 });

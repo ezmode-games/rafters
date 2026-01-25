@@ -67,7 +67,19 @@ interface FieldConfig {
   description: string | undefined;
 }
 
+/**
+ * UI-only state for a field (stored in component state)
+ */
+interface FieldMeta {
+  error: string | null;
+  touched: boolean;
+}
+
+/**
+ * Complete field state including value (derived via useMemo)
+ */
 interface FieldState {
+  value: unknown;
   error: string | null;
   touched: boolean;
 }
@@ -303,18 +315,33 @@ export function PropertyEditor<T extends ZodRawShape>({
   // Parse schema into field configurations
   const fields = React.useMemo(() => parseSchema(schema), [schema]);
 
-  // Track field UI states (errors and touched status)
-  // Value is derived directly from props, not stored in state (React 19 purity)
-  const [fieldStates, setFieldStates] = React.useState<Record<string, FieldState>>(() => {
-    const initialStates: Record<string, FieldState> = {};
+  // Track field UI-only meta (errors and touched status)
+  // Value is derived from props via useMemo, not stored in state (React 19 purity)
+  const [fieldMeta, setFieldMeta] = React.useState<Record<string, FieldMeta>>(() => {
+    const initialMeta: Record<string, FieldMeta> = {};
     for (const field of fields) {
-      initialStates[field.key] = {
+      initialMeta[field.key] = {
         error: null,
         touched: false,
       };
     }
-    return initialStates;
+    return initialMeta;
   });
+
+  // Derive complete field states by combining values prop with field meta
+  // This ensures values are always read from props, never stored in component state
+  const fieldStates = React.useMemo(() => {
+    const states: Record<string, FieldState> = {};
+    for (const field of fields) {
+      const meta = fieldMeta[field.key] ?? { error: null, touched: false };
+      states[field.key] = {
+        value: values[field.key],
+        error: meta.error,
+        touched: meta.touched,
+      };
+    }
+    return states;
+  }, [fields, fieldMeta, values]);
 
   // Handle field value change
   const handleFieldChange = React.useCallback(
@@ -323,12 +350,12 @@ export function PropertyEditor<T extends ZodRawShape>({
       onChange(updatedValues);
 
       // Clear error on change
-      setFieldStates((prev) => ({
+      setFieldMeta((prev) => ({
         ...prev,
         [key]: {
           ...prev[key],
           error: null,
-        } as FieldState,
+        } as FieldMeta,
       }));
     },
     [values, onChange],
@@ -340,13 +367,13 @@ export function PropertyEditor<T extends ZodRawShape>({
       const currentValue = values[key];
       const error = validateField(schema, key, currentValue);
 
-      setFieldStates((prev) => ({
+      setFieldMeta((prev) => ({
         ...prev,
         [key]: {
           ...prev[key],
           touched: true,
           error,
-        } as FieldState,
+        } as FieldMeta,
       }));
     },
     [schema, values],
@@ -355,8 +382,7 @@ export function PropertyEditor<T extends ZodRawShape>({
   // Render a text input field
   const renderTextField = (field: FieldConfig): React.JSX.Element => {
     const state = fieldStates[field.key];
-    const value = values[field.key];
-    const stringValue = typeof value === 'string' ? value : '';
+    const stringValue = typeof state?.value === 'string' ? state.value : '';
 
     return (
       <Input
@@ -375,8 +401,7 @@ export function PropertyEditor<T extends ZodRawShape>({
   // Render a number input field
   const renderNumberField = (field: FieldConfig): React.JSX.Element => {
     const state = fieldStates[field.key];
-    const value = values[field.key];
-    const numValue = typeof value === 'number' ? value : '';
+    const numValue = typeof state?.value === 'number' ? state.value : '';
 
     return (
       <Input
@@ -397,8 +422,8 @@ export function PropertyEditor<T extends ZodRawShape>({
 
   // Render a checkbox field
   const renderCheckboxField = (field: FieldConfig): React.JSX.Element => {
-    const value = values[field.key];
-    const boolValue = typeof value === 'boolean' ? value : false;
+    const state = fieldStates[field.key];
+    const boolValue = typeof state?.value === 'boolean' ? state.value : false;
 
     return (
       <div className="flex items-center gap-2">
@@ -422,8 +447,7 @@ export function PropertyEditor<T extends ZodRawShape>({
   // Render a select dropdown field
   const renderEnumField = (field: FieldConfig): React.JSX.Element => {
     const state = fieldStates[field.key];
-    const value = values[field.key];
-    const stringValue = typeof value === 'string' ? value : '';
+    const stringValue = typeof state?.value === 'string' ? state.value : '';
 
     return (
       <Select
@@ -452,8 +476,7 @@ export function PropertyEditor<T extends ZodRawShape>({
   // Render an array field (comma-separated input)
   const renderArrayField = (field: FieldConfig): React.JSX.Element => {
     const state = fieldStates[field.key];
-    const value = values[field.key];
-    const stringValue = arrayToString(value);
+    const stringValue = arrayToString(state?.value);
 
     return (
       <Input
@@ -475,8 +498,9 @@ export function PropertyEditor<T extends ZodRawShape>({
 
   // Render an unknown type field (disabled text display)
   const renderUnknownField = (field: FieldConfig): React.JSX.Element => {
-    const value = values[field.key];
-    const displayValue = value !== undefined && value !== null ? String(value) : '';
+    const state = fieldStates[field.key];
+    const displayValue =
+      state?.value !== undefined && state?.value !== null ? String(state.value) : '';
 
     return (
       <Input
