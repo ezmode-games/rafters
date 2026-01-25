@@ -241,12 +241,7 @@ export const Container = React.forwardRef<HTMLElement, ContainerProps>(
     };
 
     // Determine content to render
-    const content =
-      editable && showDropZone && isEmpty ? (
-        <DropZonePlaceholder />
-      ) : (
-        children
-      );
+    const content = editable && showDropZone && isEmpty ? <DropZonePlaceholder /> : children;
 
     return React.createElement(
       Element,

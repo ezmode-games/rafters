@@ -279,11 +279,7 @@ function GridItem({ priority, colSpan, rowSpan, className, children, ...props }:
 
   // Show drop zone in edit mode when item is empty
   const content =
-    context?.editable && context?.showColumnDropZones && isEmpty ? (
-      <GridItemDropZone />
-    ) : (
-      children
-    );
+    context?.editable && context?.showColumnDropZones && isEmpty ? <GridItemDropZone /> : children;
 
   return (
     <div className={classes || undefined} data-priority={priority} {...props}>

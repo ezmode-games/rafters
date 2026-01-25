@@ -593,7 +593,7 @@ function useEditableParagraph({
       // Check for slash command trigger
       if (event.key === '/' && onSlashCommand) {
         const selection = window.getSelection();
-        if (selection && selection.isCollapsed) {
+        if (selection?.isCollapsed) {
           // Only trigger at start of element or after whitespace
           const node = selection.anchorNode;
           const offset = selection.anchorOffset;
