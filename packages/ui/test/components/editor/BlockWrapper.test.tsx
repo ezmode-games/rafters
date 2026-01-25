@@ -41,7 +41,7 @@ describe('BlockWrapper', () => {
       render(<BlockWrapper {...props} />);
 
       const wrapper = screen.getByTestId('block-wrapper-block-1');
-      expect(wrapper).toHaveClass('ring-2', 'ring-purple-500');
+      expect(wrapper).toHaveClass('ring-2', 'ring-ring');
     });
 
     it('should show both rings when selected and focused', () => {
@@ -51,7 +51,7 @@ describe('BlockWrapper', () => {
 
       const wrapper = screen.getByTestId('block-wrapper-block-1');
       expect(wrapper).toHaveClass('ring-2', 'ring-primary');
-      expect(wrapper).toHaveClass('outline', 'outline-purple-500');
+      expect(wrapper).toHaveClass('outline', 'outline-ring');
     });
 
     it('should have correct data attributes for state', () => {

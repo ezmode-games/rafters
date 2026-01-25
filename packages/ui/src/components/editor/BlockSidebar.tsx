@@ -214,7 +214,7 @@ function HighlightedText({
       if (currentPart) {
         parts.push(
           isHighlighted ? (
-            <mark key={`${parts.length}-mark`} className="bg-yellow-200 text-yellow-900 rounded">
+            <mark key={`${parts.length}-mark`} className="bg-accent text-accent-foreground rounded">
               {currentPart}
             </mark>
           ) : (
@@ -233,7 +233,7 @@ function HighlightedText({
   if (currentPart) {
     parts.push(
       isHighlighted ? (
-        <mark key={`${parts.length}-mark`} className="bg-yellow-200 text-yellow-900 rounded">
+        <mark key={`${parts.length}-mark`} className="bg-accent text-accent-foreground rounded">
           {currentPart}
         </mark>
       ) : (
