@@ -224,12 +224,12 @@ export function BlockWrapper({
     'rounded-md transition-all duration-150',
     // Selection ring
     isSelected && 'ring-2 ring-primary ring-offset-2',
-    // Focus ring (inner, different color)
-    isFocused && !isSelected && 'ring-2 ring-purple-500 ring-offset-2',
+    // Focus ring (uses ring token for proper theming)
+    isFocused && !isSelected && 'ring-2 ring-ring ring-offset-2',
     // Both selected and focused
     isFocused &&
       isSelected &&
-      'ring-2 ring-primary ring-offset-2 outline outline-2 outline-purple-500 outline-offset-4',
+      'ring-2 ring-primary ring-offset-2 outline outline-2 outline-ring outline-offset-4',
     className,
   );
 
@@ -237,7 +237,7 @@ export function BlockWrapper({
   const handleClasses = classy(
     'absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full',
     'flex items-center justify-center',
-    'w-6 h-8 mr-1',
+    'min-h-11 min-w-11 mr-1',
     'text-muted-foreground hover:text-foreground',
     'cursor-grab active:cursor-grabbing',
     'opacity-0 transition-opacity duration-150',
@@ -248,7 +248,7 @@ export function BlockWrapper({
   const menuButtonClasses = classy(
     'absolute right-0 top-1/2 -translate-y-1/2 translate-x-full',
     'flex items-center justify-center',
-    'w-6 h-6 ml-1',
+    'min-h-11 min-w-11 ml-1',
     'rounded hover:bg-muted',
     'text-muted-foreground hover:text-foreground',
     'opacity-0 transition-opacity duration-150',
@@ -257,9 +257,8 @@ export function BlockWrapper({
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: keyboard handled at BlockCanvas level
-    // biome-ignore lint/a11y/useSemanticElements: role="listitem" pairs with parent role="listbox"
+    // biome-ignore lint/a11y/noStaticElementInteractions: wrapper div for selection, not semantic button
     <div
-      role="listitem"
       data-block-wrapper={id}
       data-selected={isSelected}
       data-focused={isFocused}

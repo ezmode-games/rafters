@@ -31,6 +31,7 @@
  * ```
  */
 import * as React from 'react';
+import { useId } from 'react';
 import type { ZodObject, ZodRawShape, ZodTypeAny } from 'zod';
 import classy from '../../primitives/classy';
 import { Checkbox } from '../ui/checkbox';
@@ -295,6 +296,10 @@ export function PropertyEditor<T extends ZodRawShape>({
   title,
   className,
 }: PropertyEditorProps<T>): React.JSX.Element {
+  // Generate unique ID for heading (used by aria-labelledby)
+  const headingId = useId();
+  const hasHeading = Boolean(title ?? blockType);
+
   // Parse schema into field configurations
   const fields = React.useMemo(() => parseSchema(schema), [schema]);
 
@@ -544,12 +549,13 @@ export function PropertyEditor<T extends ZodRawShape>({
   return (
     <form
       className={containerClasses}
-      aria-label={title ?? 'Property editor'}
+      aria-labelledby={hasHeading ? headingId : undefined}
+      aria-label={hasHeading ? undefined : 'Property editor'}
       onSubmit={(e) => e.preventDefault()}
     >
-      {(title ?? blockType) && (
+      {hasHeading && (
         <div className="border-b pb-2">
-          <h3 className="text-sm font-semibold text-foreground">
+          <h3 id={headingId} className="text-sm font-semibold text-foreground">
             {title ?? `${blockType} Properties`}
           </h3>
         </div>
