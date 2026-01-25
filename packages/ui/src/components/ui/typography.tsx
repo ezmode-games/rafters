@@ -1950,7 +1950,7 @@ export const CodeBlock = React.forwardRef<HTMLPreElement, EditableCodeBlockProps
             <code className="flex">
               <span className="select-none pr-4 text-muted-foreground border-r border-border mr-4">
                 {lines.map((_, i) => (
-                  <span key={i} className="block">
+                  <span key={`line-${i + 1}`} className="block">
                     {i + 1}
                   </span>
                 ))}
