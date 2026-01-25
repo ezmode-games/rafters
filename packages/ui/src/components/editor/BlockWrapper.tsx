@@ -224,12 +224,12 @@ export function BlockWrapper({
     'rounded-md transition-all duration-150',
     // Selection ring
     isSelected && 'ring-2 ring-primary ring-offset-2',
-    // Focus ring (inner, different color)
-    isFocused && !isSelected && 'ring-2 ring-purple-500 ring-offset-2',
+    // Focus ring (uses ring token for proper theming)
+    isFocused && !isSelected && 'ring-2 ring-ring ring-offset-2',
     // Both selected and focused
     isFocused &&
       isSelected &&
-      'ring-2 ring-primary ring-offset-2 outline outline-2 outline-purple-500 outline-offset-4',
+      'ring-2 ring-primary ring-offset-2 outline outline-2 outline-ring outline-offset-4',
     className,
   );
 
