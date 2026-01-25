@@ -257,6 +257,7 @@ export function BlockWrapper({
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: keyboard handled at BlockCanvas level
+    // biome-ignore lint/a11y/noStaticElementInteractions: wrapper div for selection, not semantic button
     <div
       data-block-wrapper={id}
       data-selected={isSelected}
