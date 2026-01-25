@@ -1,0 +1,66 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/rafters-docs",
+    "crates/rafters-mdx",
+    "crates/rafters-adapters",
+    "crates/rafters-server",
+    "crates/rafters-static",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/ezmode-games/rafters"
+
+[workspace.dependencies]
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# CLI
+clap = { version = "4", features = ["derive"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+toml = "0.8"
+
+# Error handling
+thiserror = "2"
+anyhow = "1"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Web server
+axum = { version = "0.8", features = ["ws"] }
+tower-http = { version = "0.6", features = ["fs", "cors"] }
+
+# File watching
+notify = "8"
+
+# Parsing
+oxc_parser = "0.72"
+oxc_allocator = "0.72"
+oxc_ast = "0.72"
+oxc_span = "0.72"
+pulldown-cmark = "0.12"
+
+# Templates and CSS
+minijinja = { version = "2", features = ["loader"] }
+lightningcss = "1.0.0-alpha.70"
+
+# Utilities
+regex = "1"
+walkdir = "2"
+rayon = "1"
+open = "5"
+
+# Crate dependencies
+rafters-mdx = { path = "crates/rafters-mdx" }
+rafters-adapters = { path = "crates/rafters-adapters" }
+rafters-server = { path = "crates/rafters-server" }
+rafters-static = { path = "crates/rafters-static" }

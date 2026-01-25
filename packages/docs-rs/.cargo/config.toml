@@ -1,0 +1,6 @@
+[build]
+# Use all available cores for parallel compilation
+jobs = -1
+
+[alias]
+ck = "clippy --all-targets --all-features -- -D warnings"
