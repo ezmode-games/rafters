@@ -6,10 +6,10 @@
  * Asks about export targets and generates selected formats.
  */
 
-import { checkbox } from '@inquirer/prompts';
 import { existsSync } from 'node:fs';
 import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
+import { checkbox } from '@inquirer/prompts';
 import {
   buildColorSystem,
   NodePersistenceAdapter,
@@ -29,10 +29,10 @@ import {
 import {
   DEFAULT_EXPORTS,
   EXPORT_CHOICES,
+  type ExportConfig,
   FUTURE_EXPORTS,
   generateCompiledCss,
   selectionsToConfig,
-  type ExportConfig,
 } from '../utils/exports.js';
 import { getRaftersPaths } from '../utils/paths.js';
 import { log, setAgentMode } from '../utils/ui.js';

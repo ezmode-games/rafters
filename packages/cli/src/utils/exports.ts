@@ -90,9 +90,7 @@ export async function generateCompiledCss(
     try {
       execFileSync('pnpm', ['exec', 'tailwindcss', ...args], { cwd, stdio: 'pipe' });
     } catch {
-      throw new Error(
-        'Tailwind CLI not found. Install it with: pnpm add -D @tailwindcss/cli',
-      );
+      throw new Error('Tailwind CLI not found. Install it with: pnpm add -D @tailwindcss/cli');
     }
   }
 }
