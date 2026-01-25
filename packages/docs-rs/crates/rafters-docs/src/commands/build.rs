@@ -58,32 +58,25 @@ fn default_minify() -> bool {
 }
 
 /// Load configuration from docs.toml if it exists.
-fn load_config() -> ConfigFile {
+/// Returns an error if the config file exists but is malformed.
+fn load_config() -> Result<ConfigFile> {
     let config_path = PathBuf::from("docs.toml");
     if config_path.exists() {
-        match fs::read_to_string(&config_path) {
-            Ok(content) => match toml::from_str(&content) {
-                Ok(config) => {
-                    tracing::info!("Loaded config from docs.toml");
-                    return config;
-                }
-                Err(e) => {
-                    tracing::warn!("Failed to parse docs.toml: {}", e);
-                }
-            },
-            Err(e) => {
-                tracing::warn!("Failed to read docs.toml: {}", e);
-            }
-        }
+        let content = fs::read_to_string(&config_path)
+            .map_err(|e| anyhow::anyhow!("Failed to read docs.toml: {}", e))?;
+        let config: ConfigFile = toml::from_str(&content)
+            .map_err(|e| anyhow::anyhow!("Failed to parse docs.toml: {}", e))?;
+        tracing::info!("Loaded config from docs.toml");
+        return Ok(config);
     }
-    ConfigFile::default()
+    Ok(ConfigFile::default())
 }
 
 /// Run the build command.
 pub async fn run(output: Option<PathBuf>, minify: Option<bool>) -> Result<()> {
     tracing::info!("Building static site...");
 
-    let file_config = load_config();
+    let file_config = load_config()?;
 
     let config = BuildConfig {
         docs_dir: PathBuf::from(&file_config.docs.dir),

@@ -51,8 +51,8 @@ const sizeClasses = {{
 const baseClasses = '{base_classes}';
 const disabledClasses = '{disabled_classes}';
 
-// Cache for adopted stylesheets
-let cachedSheet = null;
+// Cache for adopted stylesheets (all page stylesheets)
+let cachedSheets = null;
 
 export class {class_name} extends HTMLElement {{
   static observedAttributes = [{attrs_array}];
@@ -76,9 +76,9 @@ export class {class_name} extends HTMLElement {{
   #adoptStyles() {{
     if (!this.shadowRoot) return;
 
-    // Use cached sheet if available
-    if (cachedSheet) {{
-      this.shadowRoot.adoptedStyleSheets = [cachedSheet];
+    // Use cached sheets if available
+    if (cachedSheets) {{
+      this.shadowRoot.adoptedStyleSheets = cachedSheets;
       return;
     }}
 
@@ -97,7 +97,7 @@ export class {class_name} extends HTMLElement {{
     }}
 
     if (sheets.length > 0) {{
-      cachedSheet = sheets[0]; // Cache first sheet (main styles)
+      cachedSheets = sheets; // Cache all sheets
       this.shadowRoot.adoptedStyleSheets = sheets;
     }}
   }}

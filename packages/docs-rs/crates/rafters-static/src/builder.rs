@@ -539,6 +539,8 @@ impl StaticBuilder {
                 if let Some(replacement_html) = block_replacements.get(&block.id) {
                     // Find the code block in the content and replace with preview HTML
                     // Code blocks are fenced with ```lang live ... ```
+                    // Note: Regex is compiled per-block because pattern includes dynamic source content.
+                    // This is acceptable since there are typically few live blocks per document.
                     let escaped_source = regex::escape(&block.source);
                     let pattern =
                         format!(r"```[a-z]+\s+live[^\n]*\n{}\n?```", escaped_source.trim());

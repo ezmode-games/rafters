@@ -77,6 +77,73 @@ fn parse_self_closing(source: &str) -> Option<InlineJsx> {
     })
 }
 
+/// Find the matching closing tag position, handling nested same-name components.
+fn find_matching_close_tag(source: &str, component: &str, start_pos: usize) -> Option<usize> {
+    let open_pattern = format!("<{}", component);
+    let close_tag = format!("</{}>", component);
+
+    let remaining = &source[start_pos..];
+    let mut depth = 1;
+    let mut pos = 0;
+
+    while depth > 0 && pos < remaining.len() {
+        // Look for next open or close tag
+        let next_open = remaining[pos..].find(&open_pattern);
+        let next_close = remaining[pos..].find(&close_tag);
+
+        match (next_open, next_close) {
+            (Some(o), Some(c)) if o < c => {
+                // Check if it's a self-closing tag or an opening tag
+                let tag_start = pos + o;
+                let after_name = &remaining[tag_start + open_pattern.len()..];
+                if after_name.starts_with("/>")
+                    || after_name.starts_with(" />")
+                    || after_name.starts_with('\t') && after_name.trim_start().starts_with("/>")
+                {
+                    // Self-closing, skip it
+                    pos = tag_start + open_pattern.len();
+                } else if after_name.starts_with(">")
+                    || after_name.starts_with(" ")
+                    || after_name.starts_with('\n')
+                {
+                    // Opening tag, increment depth
+                    depth += 1;
+                    pos = tag_start + open_pattern.len();
+                } else {
+                    // Not a valid tag, skip
+                    pos = tag_start + 1;
+                }
+            }
+            (Some(o), Some(c)) => {
+                // Close tag comes first
+                if c < o {
+                    depth -= 1;
+                    if depth == 0 {
+                        return Some(start_pos + pos + c);
+                    }
+                    pos += c + close_tag.len();
+                } else {
+                    pos += o + 1;
+                }
+            }
+            (None, Some(c)) => {
+                // Only close tag found
+                depth -= 1;
+                if depth == 0 {
+                    return Some(start_pos + pos + c);
+                }
+                pos += c + close_tag.len();
+            }
+            (Some(_), None) | (None, None) => {
+                // No more close tags
+                return None;
+            }
+        }
+    }
+
+    None
+}
+
 /// Parse a JSX element with children.
 fn parse_with_children(source: &str) -> Option<InlineJsx> {
     static OPEN_RE: LazyLock<Regex> = LazyLock::new(|| {
@@ -88,9 +155,8 @@ fn parse_with_children(source: &str) -> Option<InlineJsx> {
     let props_str = open_caps.get(2).map(|m| m.as_str()).unwrap_or("");
     let open_len = open_caps.get(0)?.len();
 
-    // Find matching close tag
-    let close_tag = format!("</{}>", component);
-    let close_pos = source.rfind(&close_tag)?;
+    // Find matching close tag (handles nested same-name components)
+    let close_pos = find_matching_close_tag(source, &component, open_len)?;
 
     let children = source[open_len..close_pos].trim();
     let children = if children.is_empty() {
@@ -180,12 +246,13 @@ pub fn to_custom_element(jsx: &InlineJsx, tag_name: &str) -> String {
     }
 }
 
-/// Escape HTML special characters.
+/// Escape HTML special characters including single quotes for XSS prevention.
 fn html_escape(s: &str) -> String {
     s.replace('&', "&amp;")
         .replace('<', "&lt;")
         .replace('>', "&gt;")
         .replace('"', "&quot;")
+        .replace('\'', "&#x27;")
 }
 
 #[cfg(test)]
