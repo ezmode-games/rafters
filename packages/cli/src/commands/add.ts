@@ -250,9 +250,15 @@ export async function add(components: string[], options: AddOptions): Promise<vo
   // Handle --list option
   if (options.list) {
     const availableComponents = await client.listComponents();
-    console.log('Available components:\n');
-    for (const comp of availableComponents) {
-      console.log(`  ${comp.name}  ${comp.description ?? ''}`);
+    if (options.agent) {
+      // Agent mode: output JSON
+      log({ event: 'add:list', components: availableComponents });
+    } else {
+      // Human mode: formatted output
+      console.log('Available components:\n');
+      for (const comp of availableComponents) {
+        console.log(`  ${comp.name}  ${comp.description ?? ''}`);
+      }
     }
     return;
   }
