@@ -64,3 +64,8 @@ rafters-mdx = { path = "crates/rafters-mdx" }
 rafters-adapters = { path = "crates/rafters-adapters" }
 rafters-server = { path = "crates/rafters-server" }
 rafters-static = { path = "crates/rafters-static" }
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1

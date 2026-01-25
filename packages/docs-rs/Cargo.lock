@@ -1527,7 +1527,9 @@ dependencies = [
  "oxc_span",
  "pretty_assertions",
  "regex",
+ "tempfile",
  "thiserror",
+ "walkdir",
 ]
 
 [[package]]
@@ -1591,6 +1593,7 @@ dependencies = [
  "rafters-adapters",
  "rafters-mdx",
  "rayon",
+ "regex",
  "serde",
  "serde_json",
  "tempfile",

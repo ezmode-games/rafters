@@ -3,12 +3,16 @@
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 use std::time::Instant;
 
 use rayon::prelude::*;
 use walkdir::WalkDir;
 
-use rafters_adapters::{FrameworkAdapter, ReactAdapter, TransformContext, TransformedBlock};
+use rafters_adapters::{
+    parse_inline_jsx, to_custom_element, ComponentRegistry, FrameworkAdapter, ReactAdapter,
+    TransformContext, TransformedBlock,
+};
 use rafters_mdx::{parse_mdx, CodeBlock, Frontmatter, ParsedDoc};
 
 use crate::assets::AssetPipeline;
@@ -22,6 +26,9 @@ pub struct BuildConfig {
 
     /// Output directory
     pub output_dir: PathBuf,
+
+    /// Components source directory (for looking up component definitions)
+    pub components_dir: Option<PathBuf>,
 
     /// Minify HTML/CSS/JS output
     pub minify: bool,
@@ -38,6 +45,7 @@ impl Default for BuildConfig {
         Self {
             docs_dir: PathBuf::from("docs"),
             output_dir: PathBuf::from("dist"),
+            components_dir: None,
             minify: true,
             base_url: "/".to_string(),
             title: "Documentation".to_string(),
@@ -100,15 +108,37 @@ struct PageInfo {
 pub struct StaticBuilder {
     config: BuildConfig,
     adapter: ReactAdapter,
+    registry: Arc<ComponentRegistry>,
     templates: TemplateEngine,
 }
 
 impl StaticBuilder {
     /// Create a new static builder.
     pub fn new(config: BuildConfig) -> Self {
+        let mut registry = ComponentRegistry::new();
+
+        // Scan components directory if configured
+        if let Some(ref components_dir) = config.components_dir {
+            if components_dir.exists() {
+                match registry.scan(components_dir) {
+                    Ok(count) => {
+                        tracing::info!(
+                            "Loaded {} components from {}",
+                            count,
+                            components_dir.display()
+                        );
+                    }
+                    Err(e) => {
+                        tracing::warn!("Failed to scan components directory: {}", e);
+                    }
+                }
+            }
+        }
+
         Self {
             config,
             adapter: ReactAdapter::new(),
+            registry: Arc::new(registry),
             templates: TemplateEngine::new(),
         }
     }
@@ -345,31 +375,88 @@ impl StaticBuilder {
     /// Build a single page.
     fn build_page(&self, page: &PageInfo, nav: &[NavItem]) -> Result<(usize, usize), BuildError> {
         let mut components_count = 0;
-        let mut web_components = Vec::new();
+        let mut web_components: Vec<TransformedBlock> = Vec::new();
+        let mut generated_components: HashMap<String, String> = HashMap::new();
+        let mut block_replacements: HashMap<String, String> = HashMap::new();
 
         // Transform live code blocks to Web Components
         for block in &page.doc.code_blocks {
             if block.is_live() {
-                let tag_name = format!("preview-{}", block.id);
-                match self.transform_block(block, &tag_name) {
-                    Ok(transformed) => {
-                        web_components.push(transformed);
+                // Try inline JSX parsing first (for documentation code blocks)
+                if let Some(jsx) = parse_inline_jsx(&block.source) {
+                    let component_name = &jsx.component;
+
+                    // Look up component in registry
+                    if self.registry.contains(component_name) {
+                        // Generate unique tag name for this component type
+                        let tag_name = format!("{}-preview", component_name.to_lowercase());
+
+                        // Only generate Web Component JS once per component type
+                        if !generated_components.contains_key(component_name) {
+                            match self
+                                .registry
+                                .generate_web_component(component_name, &tag_name)
+                            {
+                                Ok(transformed) => {
+                                    generated_components
+                                        .insert(component_name.clone(), tag_name.clone());
+                                    web_components.push(transformed);
+                                }
+                                Err(e) => {
+                                    tracing::warn!(
+                                        "Failed to generate Web Component for {}: {}",
+                                        component_name,
+                                        e
+                                    );
+                                    continue;
+                                }
+                            }
+                        }
+
+                        // Convert inline JSX to custom element HTML
+                        let actual_tag = generated_components
+                            .get(component_name)
+                            .map(|s| s.as_str())
+                            .unwrap_or(&tag_name);
+                        let custom_element_html = to_custom_element(&jsx, actual_tag);
+
+                        block_replacements.insert(block.id.clone(), custom_element_html);
                         components_count += 1;
-                    }
-                    Err(e) => {
+                    } else {
                         tracing::warn!(
-                            "Failed to transform block {} in {}: {}",
+                            "Component '{}' not found in registry (block {} in {})",
+                            component_name,
                             block.id,
-                            page.source_path.display(),
-                            e
+                            page.source_path.display()
                         );
+                    }
+                } else {
+                    // Fall back to full component transform (for component source files)
+                    let tag_name = format!("preview-{}", block.id);
+                    match self.transform_block(block, &tag_name) {
+                        Ok(transformed) => {
+                            web_components.push(transformed);
+                            components_count += 1;
+                        }
+                        Err(e) => {
+                            tracing::warn!(
+                                "Failed to transform block {} in {}: {}",
+                                block.id,
+                                page.source_path.display(),
+                                e
+                            );
+                        }
                     }
                 }
             }
         }
 
         // Render markdown to HTML
-        let content_html = self.render_markdown(&page.doc.content, &web_components);
+        let content_html = self.render_markdown(
+            &page.doc.content,
+            &page.doc.code_blocks,
+            &block_replacements,
+        );
 
         // Build TOC
         let toc: Vec<TocEntry> = page
@@ -435,29 +522,60 @@ impl StaticBuilder {
     }
 
     /// Render markdown to HTML, replacing live blocks with Web Components.
-    fn render_markdown(&self, content: &str, web_components: &[TransformedBlock]) -> String {
+    fn render_markdown(
+        &self,
+        content: &str,
+        code_blocks: &[CodeBlock],
+        block_replacements: &HashMap<String, String>,
+    ) -> String {
         use pulldown_cmark::{html, Options, Parser};
+        use regex::Regex;
+
+        // First, replace live code blocks in the markdown with markers
+        let mut processed_content = content.to_string();
+
+        for block in code_blocks {
+            if block.is_live() {
+                if let Some(replacement_html) = block_replacements.get(&block.id) {
+                    // Find the code block in the content and replace with preview HTML
+                    // Code blocks are fenced with ```lang live ... ```
+                    // Note: Regex is compiled per-block because pattern includes dynamic source content.
+                    // This is acceptable since there are typically few live blocks per document.
+                    let escaped_source = regex::escape(&block.source);
+                    let pattern =
+                        format!(r"```[a-z]+\s+live[^\n]*\n{}\n?```", escaped_source.trim());
+
+                    if let Ok(re) = Regex::new(&pattern) {
+                        let preview = format!(
+                            r#"<div class="preview-container">{}</div>
+
+```{}
+{}
+```"#,
+                            replacement_html,
+                            match block.language {
+                                rafters_mdx::Language::Tsx => "tsx",
+                                rafters_mdx::Language::Jsx => "jsx",
+                                _ => "tsx",
+                            },
+                            block.source.trim()
+                        );
+                        processed_content =
+                            re.replace(&processed_content, preview.as_str()).to_string();
+                    }
+                }
+            }
+        }
 
         let options = Options::ENABLE_TABLES
             | Options::ENABLE_FOOTNOTES
             | Options::ENABLE_STRIKETHROUGH
             | Options::ENABLE_TASKLISTS;
 
-        let parser = Parser::new_ext(content, options);
+        let parser = Parser::new_ext(&processed_content, options);
 
         let mut html_output = String::new();
         html::push_html(&mut html_output, parser);
-
-        // Replace live code block markers with Web Component tags
-        // This is a simplified approach - in production you'd want proper AST manipulation
-        for wc in web_components {
-            let marker = format!("<!-- live:{} -->", wc.tag_name);
-            let replacement = format!(
-                "<{} variant=\"primary\">Example</{}>",
-                wc.tag_name, wc.tag_name
-            );
-            html_output = html_output.replace(&marker, &replacement);
-        }
 
         html_output
     }
