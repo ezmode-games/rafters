@@ -1012,6 +1012,27 @@ describe('createInlineFormatter', () => {
       expect(fragment).toBeInstanceOf(DocumentFragment);
       fragmentFormatter.cleanup();
     });
+
+    it('throws descriptive error when deserializeToDOM is called during SSR', () => {
+      const originalWindow = globalThis.window;
+      // @ts-expect-error Testing SSR
+      delete globalThis.window;
+
+      const formatter = createInlineFormatter({
+        container,
+        formats: [BOLD, ITALIC],
+      });
+
+      // deserializeToDOM should throw with descriptive error during SSR
+      expect(() => formatter.deserializeToDOM([])).toThrow(
+        'deserializeToDOM cannot be called during server-side rendering',
+      );
+      expect(() => formatter.deserializeToDOM([])).toThrow(
+        'Ensure this method is only called in browser context',
+      );
+
+      globalThis.window = originalWindow;
+    });
   });
 
   describe('cleanup', () => {
