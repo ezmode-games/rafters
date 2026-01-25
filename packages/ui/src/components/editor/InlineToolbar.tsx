@@ -37,7 +37,7 @@
  * ```
  */
 import type * as React from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import classy from '../../primitives/classy';
 import type { InlineMark } from '../../primitives/types';
 import { Button } from '../ui/button';
@@ -280,21 +280,22 @@ function LinkPopover({
   const [url, setUrl] = useState(initialUrl ?? '');
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const wasOpenRef = useRef(false);
 
-  // Reset state when popover opens
-  useEffect(() => {
-    if (isOpen) {
-      setUrl(initialUrl ?? '');
-      setError(null);
-      // Focus input after a brief delay to allow animation
-      const timer = setTimeout(() => {
-        inputRef.current?.focus();
-        inputRef.current?.select();
-      }, 50);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [isOpen, initialUrl]);
+  // Reset state when popover opens (derived state pattern)
+  if (isOpen && !wasOpenRef.current) {
+    // Popover just opened - reset state synchronously
+    setUrl(initialUrl ?? '');
+    setError(null);
+  }
+  wasOpenRef.current = isOpen;
+
+  // Handle focus when popover opens
+  const handleOpenAutoFocus = useCallback((event: Event) => {
+    event.preventDefault(); // Prevent default focus behavior
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  }, []);
 
   const handleSubmit = useCallback(
     (event: React.FormEvent) => {
@@ -339,6 +340,7 @@ function LinkPopover({
       sideOffset={8}
       className="w-72 p-2"
       data-testid="link-popover"
+      onOpenAutoFocus={handleOpenAutoFocus}
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-2">
         <label htmlFor="link-url" className="sr-only">
@@ -441,6 +443,9 @@ export function InlineToolbar({
     undefined,
   );
 
+  // Track previous position to detect changes and reset adjusted position
+  const prevPositionRef = useRef<{ x: number; y: number } | undefined>(undefined);
+
   // Create a set for fast active format lookups
   const activeFormatsSet = useMemo(() => new Set(activeFormats), [activeFormats]);
 
@@ -448,33 +453,20 @@ export function InlineToolbar({
   const isLinkActive = activeFormatsSet.has('link');
 
   // ========================================================================
-  // Close popover when toolbar hides
+  // Position Adjustment (useLayoutEffect for DOM measurements before paint)
   // ========================================================================
 
-  useEffect(() => {
-    if (!isVisible) {
-      setLinkPopoverOpen(false);
-    }
-  }, [isVisible]);
-
-  // ========================================================================
-  // Reset adjusted position when position changes
-  // ========================================================================
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: position triggers reset even though value isn't used
-  useEffect(() => {
-    // Reset adjusted position whenever the source position changes
-    // This ensures we don't use stale adjusted values
-    setAdjustedPosition(undefined);
-  }, [position]);
-
-  // ========================================================================
-  // Position Adjustment
-  // ========================================================================
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isVisible || !position || !toolbarRef.current) {
       return;
+    }
+
+    // Detect position change and reset adjusted position
+    const positionChanged =
+      prevPositionRef.current?.x !== position.x || prevPositionRef.current?.y !== position.y;
+
+    if (positionChanged) {
+      prevPositionRef.current = position;
     }
 
     const toolbar = toolbarRef.current;
@@ -595,7 +587,8 @@ export function InlineToolbar({
         <div className="w-px h-6 bg-border mx-1" aria-hidden="true" />
 
         {/* Link button with popover - Popover.Trigger provides ARIA attributes */}
-        <Popover open={linkPopoverOpen} onOpenChange={setLinkPopoverOpen}>
+        {/* Popover open state is derived from both linkPopoverOpen AND isVisible */}
+        <Popover open={linkPopoverOpen && isVisible} onOpenChange={setLinkPopoverOpen}>
           <Tooltip>
             <Tooltip.Trigger asChild>
               <Popover.Trigger asChild>

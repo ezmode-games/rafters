@@ -2,8 +2,10 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import {
+  Abbr,
   Blockquote,
   Code,
+  CodeBlock,
   H1,
   H2,
   H3,
@@ -12,6 +14,8 @@ import {
   inlineContentToHtml,
   Large,
   Lead,
+  List,
+  Mark,
   Muted,
   P,
   Small,
@@ -1274,5 +1278,432 @@ describe('Editable Quote (R-200d)', () => {
       expect(quote.className).toContain('border-l-2');
       expect(quote.className).toContain('italic');
     });
+  });
+});
+
+// ============================================================================
+// List Tests (R-200c)
+// ============================================================================
+
+describe('List', () => {
+  describe('static rendering', () => {
+    it('renders unordered list by default', () => {
+      render(
+        <List
+          data-testid="list"
+          items={[
+            { id: '1', content: 'First item' },
+            { id: '2', content: 'Second item' },
+          ]}
+        />,
+      );
+      const list = screen.getByTestId('list');
+      expect(list.tagName).toBe('UL');
+    });
+
+    it('renders ordered list when ordered prop is true', () => {
+      render(<List data-testid="list" items={[{ id: '1', content: 'First item' }]} ordered />);
+      const list = screen.getByTestId('list');
+      expect(list.tagName).toBe('OL');
+    });
+
+    it('renders items as li elements', () => {
+      render(
+        <List
+          data-testid="list"
+          items={[
+            { id: '1', content: 'First' },
+            { id: '2', content: 'Second' },
+            { id: '3', content: 'Third' },
+          ]}
+        />,
+      );
+      const items = screen.getAllByRole('listitem');
+      expect(items).toHaveLength(3);
+      expect(items[0]).toHaveTextContent('First');
+      expect(items[1]).toHaveTextContent('Second');
+      expect(items[2]).toHaveTextContent('Third');
+    });
+
+    it('applies unordered list classes', () => {
+      render(<List data-testid="list" items={[{ id: '1', content: 'Item' }]} />);
+      const list = screen.getByTestId('list');
+      expect(list.className).toContain('list-disc');
+    });
+
+    it('applies ordered list classes', () => {
+      render(<List data-testid="list" items={[{ id: '1', content: 'Item' }]} ordered />);
+      const list = screen.getByTestId('list');
+      expect(list.className).toContain('list-decimal');
+    });
+
+    it('renders InlineContent correctly', () => {
+      render(
+        <List
+          data-testid="list"
+          items={[
+            {
+              id: '1',
+              content: [{ text: 'Bold ', marks: ['bold'] }, { text: 'text' }],
+            },
+          ]}
+        />,
+      );
+      const item = screen.getByRole('listitem');
+      expect(item.innerHTML).toContain('<strong>Bold </strong>');
+    });
+
+    it('applies indentation classes', () => {
+      render(
+        <List
+          data-testid="list"
+          items={[
+            { id: '1', content: 'Level 0' },
+            { id: '2', content: 'Level 1', indent: 1 },
+            { id: '3', content: 'Level 2', indent: 2 },
+          ]}
+        />,
+      );
+      const items = screen.getAllByRole('listitem');
+      expect(items[0]).not.toHaveClass('ml-6');
+      expect(items[1]).toHaveClass('ml-6');
+      expect(items[2]).toHaveClass('ml-12');
+    });
+
+    it('merges custom className', () => {
+      render(
+        <List data-testid="list" items={[{ id: '1', content: 'Item' }]} className="custom-list" />,
+      );
+      const list = screen.getByTestId('list');
+      expect(list).toHaveClass('custom-list');
+    });
+  });
+
+  describe('editable mode', () => {
+    it('makes items contenteditable when editable is true', () => {
+      render(<List data-testid="list" items={[{ id: '1', content: 'Editable item' }]} editable />);
+      const item = screen.getByRole('listitem');
+      expect(item).toHaveAttribute('contenteditable', 'true');
+    });
+
+    it('sets data-editable attribute on list', () => {
+      render(<List data-testid="list" items={[{ id: '1', content: 'Item' }]} editable />);
+      const list = screen.getByTestId('list');
+      expect(list).toHaveAttribute('data-editable', 'true');
+    });
+
+    it('calls onChange when item content changes', () => {
+      const onChange = vi.fn();
+      render(<List items={[{ id: '1', content: 'Original' }]} editable onChange={onChange} />);
+      const item = screen.getByRole('listitem');
+
+      item.innerHTML = 'Modified';
+      fireEvent.input(item);
+
+      expect(onChange).toHaveBeenCalled();
+    });
+
+    it('calls onItemAdd when Enter is pressed', () => {
+      const onItemAdd = vi.fn();
+      render(<List items={[{ id: '1', content: 'Item' }]} editable onItemAdd={onItemAdd} />);
+      const item = screen.getByRole('listitem');
+
+      fireEvent.keyDown(item, { key: 'Enter' });
+
+      expect(onItemAdd).toHaveBeenCalledWith(1);
+    });
+
+    it('calls onIndent when Tab is pressed', () => {
+      const onIndent = vi.fn();
+      render(<List items={[{ id: '1', content: 'Item' }]} editable onIndent={onIndent} />);
+      const item = screen.getByRole('listitem');
+
+      fireEvent.keyDown(item, { key: 'Tab' });
+
+      expect(onIndent).toHaveBeenCalledWith(0);
+    });
+
+    it('calls onOutdent when Shift+Tab is pressed', () => {
+      const onOutdent = vi.fn();
+      render(
+        <List items={[{ id: '1', content: 'Item', indent: 1 }]} editable onOutdent={onOutdent} />,
+      );
+      const item = screen.getByRole('listitem');
+
+      fireEvent.keyDown(item, { key: 'Tab', shiftKey: true });
+
+      expect(onOutdent).toHaveBeenCalledWith(0);
+    });
+  });
+
+  describe('backward compatibility', () => {
+    it('works without editable props', () => {
+      render(<List data-testid="list" items={[{ id: '1', content: 'Static item' }]} />);
+      const list = screen.getByTestId('list');
+      const item = screen.getByRole('listitem');
+      expect(list).not.toHaveAttribute('data-editable');
+      expect(item).not.toHaveAttribute('contenteditable');
+    });
+  });
+});
+
+// ============================================================================
+// CodeBlock Tests (R-200e)
+// ============================================================================
+
+describe('CodeBlock', () => {
+  describe('static rendering', () => {
+    it('renders pre element', () => {
+      render(<CodeBlock data-testid="code">const x = 1;</CodeBlock>);
+      const pre = screen.getByTestId('code');
+      expect(pre.tagName).toBe('PRE');
+    });
+
+    it('renders code content inside code element', () => {
+      render(<CodeBlock data-testid="code">console.log("test");</CodeBlock>);
+      const code = screen.getByTestId('code').querySelector('code');
+      expect(code).toBeInTheDocument();
+      expect(code).toHaveTextContent('console.log("test");');
+    });
+
+    it('applies codeblock classes', () => {
+      render(<CodeBlock data-testid="code">code</CodeBlock>);
+      const pre = screen.getByTestId('code');
+      expect(pre.className).toContain('font-mono');
+      expect(pre.className).toContain('bg-muted');
+      expect(pre.className).toContain('rounded-lg');
+    });
+
+    it('sets data-language attribute', () => {
+      render(
+        <CodeBlock data-testid="code" language="typescript">
+          const x: number = 1;
+        </CodeBlock>,
+      );
+      const pre = screen.getByTestId('code');
+      expect(pre).toHaveAttribute('data-language', 'typescript');
+    });
+
+    it('renders line numbers when showLineNumbers is true', () => {
+      render(
+        <CodeBlock data-testid="code" showLineNumbers>
+          {'line1\nline2\nline3'}
+        </CodeBlock>,
+      );
+      const pre = screen.getByTestId('code');
+      expect(pre.textContent).toContain('1');
+      expect(pre.textContent).toContain('2');
+      expect(pre.textContent).toContain('3');
+    });
+
+    it('merges custom className', () => {
+      render(
+        <CodeBlock data-testid="code" className="custom-code">
+          code
+        </CodeBlock>,
+      );
+      const pre = screen.getByTestId('code');
+      expect(pre).toHaveClass('custom-code');
+    });
+
+    it('forwards ref to pre element', () => {
+      const ref = createRef<HTMLPreElement>();
+      render(<CodeBlock ref={ref}>code</CodeBlock>);
+      expect(ref.current).toBeInstanceOf(HTMLPreElement);
+    });
+  });
+
+  describe('editable mode', () => {
+    it('makes pre contenteditable when editable is true', () => {
+      render(
+        <CodeBlock data-testid="code" editable>
+          editable code
+        </CodeBlock>,
+      );
+      const pre = screen.getByTestId('code');
+      expect(pre).toHaveAttribute('contenteditable', 'true');
+    });
+
+    it('disables spellcheck in editable mode', () => {
+      render(
+        <CodeBlock data-testid="code" editable>
+          code
+        </CodeBlock>,
+      );
+      const pre = screen.getByTestId('code');
+      expect(pre).toHaveAttribute('spellcheck', 'false');
+    });
+
+    it('shows language selector when onLanguageChange is provided', () => {
+      render(
+        <CodeBlock editable onLanguageChange={vi.fn()} language="javascript">
+          code
+        </CodeBlock>,
+      );
+      const select = screen.getByRole('combobox');
+      expect(select).toBeInTheDocument();
+      expect(select).toHaveValue('javascript');
+    });
+
+    it('calls onChange when code content changes', () => {
+      const onChange = vi.fn();
+      render(
+        <CodeBlock data-testid="code" editable onChange={onChange}>
+          original
+        </CodeBlock>,
+      );
+      const pre = screen.getByTestId('code');
+
+      pre.textContent = 'modified';
+      fireEvent.input(pre);
+
+      expect(onChange).toHaveBeenCalledWith('modified');
+    });
+
+    it('calls onLanguageChange when language is selected', () => {
+      const onLanguageChange = vi.fn();
+      render(
+        <CodeBlock editable onLanguageChange={onLanguageChange} language="">
+          code
+        </CodeBlock>,
+      );
+      const select = screen.getByRole('combobox');
+
+      fireEvent.change(select, { target: { value: 'python' } });
+
+      expect(onLanguageChange).toHaveBeenCalledWith('python');
+    });
+  });
+
+  describe('backward compatibility', () => {
+    it('works without editable props', () => {
+      render(<CodeBlock data-testid="code">static code</CodeBlock>);
+      const pre = screen.getByTestId('code');
+      expect(pre).not.toHaveAttribute('contenteditable');
+    });
+  });
+});
+
+// ============================================================================
+// Mark Tests
+// ============================================================================
+
+describe('Mark', () => {
+  it('renders as mark element by default', () => {
+    render(<Mark data-testid="mark">Highlighted</Mark>);
+    const mark = screen.getByTestId('mark');
+    expect(mark.tagName).toBe('MARK');
+  });
+
+  it('applies mark classes with semantic tokens', () => {
+    render(<Mark data-testid="mark">Highlighted</Mark>);
+    const mark = screen.getByTestId('mark');
+    expect(mark.className).toContain('bg-accent');
+    expect(mark.className).toContain('text-accent-foreground');
+  });
+
+  it('renders as custom element via as prop', () => {
+    render(
+      <Mark as="span" data-testid="mark">
+        Highlighted
+      </Mark>,
+    );
+    const mark = screen.getByTestId('mark');
+    expect(mark.tagName).toBe('SPAN');
+  });
+
+  it('merges custom className', () => {
+    render(
+      <Mark data-testid="mark" className="custom-mark">
+        Highlighted
+      </Mark>,
+    );
+    const mark = screen.getByTestId('mark');
+    expect(mark).toHaveClass('custom-mark');
+    expect(mark).toHaveClass('bg-accent');
+  });
+
+  it('forwards ref', () => {
+    const ref = createRef<HTMLElement>();
+    render(<Mark ref={ref}>Highlighted</Mark>);
+    expect(ref.current).toBeInstanceOf(HTMLElement);
+  });
+
+  it('passes through HTML attributes', () => {
+    render(
+      <Mark data-testid="mark" id="search-match">
+        Match
+      </Mark>,
+    );
+    expect(screen.getByTestId('mark')).toHaveAttribute('id', 'search-match');
+  });
+});
+
+// ============================================================================
+// Abbr Tests
+// ============================================================================
+
+describe('Abbr', () => {
+  it('renders as abbr element by default', () => {
+    render(
+      <Abbr data-testid="abbr" title="Application Programming Interface">
+        API
+      </Abbr>,
+    );
+    const abbr = screen.getByTestId('abbr');
+    expect(abbr.tagName).toBe('ABBR');
+  });
+
+  it('sets title attribute', () => {
+    render(
+      <Abbr data-testid="abbr" title="HyperText Markup Language">
+        HTML
+      </Abbr>,
+    );
+    const abbr = screen.getByTestId('abbr');
+    expect(abbr).toHaveAttribute('title', 'HyperText Markup Language');
+  });
+
+  it('applies abbr classes', () => {
+    render(
+      <Abbr data-testid="abbr" title="Test">
+        TLA
+      </Abbr>,
+    );
+    const abbr = screen.getByTestId('abbr');
+    expect(abbr.className).toContain('cursor-help');
+    expect(abbr.className).toContain('underline');
+    expect(abbr.className).toContain('decoration-dotted');
+  });
+
+  it('renders as custom element via as prop', () => {
+    render(
+      <Abbr as="span" data-testid="abbr" title="Test">
+        TLA
+      </Abbr>,
+    );
+    const abbr = screen.getByTestId('abbr');
+    expect(abbr.tagName).toBe('SPAN');
+  });
+
+  it('merges custom className', () => {
+    render(
+      <Abbr data-testid="abbr" title="Test" className="custom-abbr">
+        TLA
+      </Abbr>,
+    );
+    const abbr = screen.getByTestId('abbr');
+    expect(abbr).toHaveClass('custom-abbr');
+    expect(abbr).toHaveClass('cursor-help');
+  });
+
+  it('forwards ref', () => {
+    const ref = createRef<HTMLElement>();
+    render(
+      <Abbr ref={ref} title="Test">
+        TLA
+      </Abbr>,
+    );
+    expect(ref.current).toBeInstanceOf(HTMLElement);
   });
 });
