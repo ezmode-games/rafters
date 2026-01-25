@@ -67,7 +67,6 @@ interface FieldConfig {
 }
 
 interface FieldState {
-  value: unknown;
   error: string | null;
   touched: boolean;
 }
@@ -299,12 +298,12 @@ export function PropertyEditor<T extends ZodRawShape>({
   // Parse schema into field configurations
   const fields = React.useMemo(() => parseSchema(schema), [schema]);
 
-  // Track field states (errors and touched)
+  // Track field UI states (errors and touched status)
+  // Value is derived directly from props, not stored in state (React 19 purity)
   const [fieldStates, setFieldStates] = React.useState<Record<string, FieldState>>(() => {
     const initialStates: Record<string, FieldState> = {};
     for (const field of fields) {
       initialStates[field.key] = {
-        value: values[field.key],
         error: null,
         touched: false,
       };
@@ -312,33 +311,17 @@ export function PropertyEditor<T extends ZodRawShape>({
     return initialStates;
   });
 
-  // Update field states when values prop changes
-  React.useEffect(() => {
-    setFieldStates((prev) => {
-      const updated: Record<string, FieldState> = {};
-      for (const field of fields) {
-        updated[field.key] = {
-          value: values[field.key],
-          error: prev[field.key]?.error ?? null,
-          touched: prev[field.key]?.touched ?? false,
-        };
-      }
-      return updated;
-    });
-  }, [values, fields]);
-
   // Handle field value change
   const handleFieldChange = React.useCallback(
     (key: string, newValue: unknown) => {
       const updatedValues = { ...values, [key]: newValue };
       onChange(updatedValues);
 
-      // Clear error on change if field was touched
+      // Clear error on change
       setFieldStates((prev) => ({
         ...prev,
         [key]: {
           ...prev[key],
-          value: newValue,
           error: null,
         } as FieldState,
       }));
