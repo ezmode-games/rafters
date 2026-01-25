@@ -95,6 +95,20 @@ export function log(event: Record<string, unknown>): void {
       console.log(`  Imported ${event.count} existing colors`);
       break;
 
+    case 'init:exports_default':
+      console.log('  Using default exports (agent mode)');
+      break;
+
+    case 'init:exports_selected':
+      context.spinner = ora('Generating outputs...').start();
+      break;
+
+    case 'init:compiling_css':
+      if (context.spinner) {
+        context.spinner.text = 'Compiling CSS with Tailwind...';
+      }
+      break;
+
     case 'init:complete': {
       context.spinner?.succeed('Done!');
       console.log(`\n  Output: ${event.path}`);

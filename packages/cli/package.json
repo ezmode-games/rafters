@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@antfu/ni": "^28.1.0",
+    "@inquirer/prompts": "^8.2.0",
     "@modelcontextprotocol/sdk": "^1.25.1",
     "commander": "^13.0.0",
     "execa": "^9.6.1",

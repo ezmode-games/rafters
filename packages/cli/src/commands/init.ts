@@ -3,8 +3,10 @@
  *
  * Creates .rafters/ folder with tokens.
  * Detects existing shadcn setup and maps their colors into the registry.
+ * Asks about export targets and generates selected formats.
  */
 
+import { checkbox } from '@inquirer/prompts';
 import { existsSync } from 'node:fs';
 import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
@@ -24,6 +26,14 @@ import {
   type ShadcnColors,
   type ShadcnConfig,
 } from '../utils/detect.js';
+import {
+  DEFAULT_EXPORTS,
+  EXPORT_CHOICES,
+  FUTURE_EXPORTS,
+  generateCompiledCss,
+  selectionsToConfig,
+  type ExportConfig,
+} from '../utils/exports.js';
 import { getRaftersPaths } from '../utils/paths.js';
 import { log, setAgentMode } from '../utils/ui.js';
 
@@ -60,7 +70,7 @@ const COMPONENT_PATHS: Record<Framework, { components: string; primitives: strin
 };
 
 /**
- * Configuration persisted in `.rafters/rafters.config.json`.
+ * Configuration persisted in `.rafters/config.rafters.json`.
  * Used by the CLI to resolve framework-specific defaults and perform
  * path transformations when generating or updating files.
  * All paths are relative to the project root.
@@ -74,6 +84,8 @@ export interface RaftersConfig {
   primitivesPath: string;
   /** Entry CSS file for design tokens, or null if not detected */
   cssPath: string | null;
+  /** Export format selections */
+  exports: ExportConfig;
 }
 
 async function findMainCssFile(cwd: string, framework: Framework): Promise<string | null> {
@@ -127,12 +139,105 @@ async function updateMainCss(cwd: string, cssPath: string, themePath: string): P
   });
 }
 
+/**
+ * Prompt user for export format selections
+ */
+async function promptExportFormats(existingConfig?: ExportConfig): Promise<ExportConfig> {
+  // Build choices with existing config as defaults if available
+  const choices = EXPORT_CHOICES.map((choice) => ({
+    name: choice.name,
+    value: choice.value,
+    checked: existingConfig ? existingConfig[choice.value] : choice.checked,
+  }));
+
+  // Add future exports as disabled options
+  const allChoices = [
+    ...choices,
+    ...FUTURE_EXPORTS.map((choice) => ({
+      name: `${choice.name} (${choice.disabled})`,
+      value: choice.value,
+      checked: false,
+      disabled: true,
+    })),
+  ];
+
+  const selections = await checkbox({
+    message: 'What would you like to export?',
+    choices: allChoices,
+    required: true,
+  });
+
+  return selectionsToConfig(selections);
+}
+
+/**
+ * Generate output files based on export config
+ */
+async function generateOutputs(
+  cwd: string,
+  paths: ReturnType<typeof getRaftersPaths>,
+  registry: TokenRegistry,
+  exports: ExportConfig,
+  shadcn: ShadcnConfig | null,
+): Promise<string[]> {
+  const outputs: string[] = [];
+
+  // Tailwind CSS (with @import "tailwindcss")
+  if (exports.tailwind) {
+    const tailwindCss = registryToTailwind(registry, { includeImport: !shadcn });
+    await writeFile(join(paths.output, 'rafters.css'), tailwindCss);
+    outputs.push('rafters.css');
+  }
+
+  // TypeScript constants
+  if (exports.typescript) {
+    const typescriptSrc = registryToTypeScript(registry, { includeJSDoc: true });
+    await writeFile(join(paths.output, 'rafters.ts'), typescriptSrc);
+    outputs.push('rafters.ts');
+  }
+
+  // DTCG JSON (W3C Design Tokens)
+  if (exports.dtcg) {
+    const dtcgJson = toDTCG(registry.list());
+    await writeFile(join(paths.output, 'rafters.json'), JSON.stringify(dtcgJson, null, 2));
+    outputs.push('rafters.json');
+  }
+
+  // Compiled CSS (processed by Tailwind, no @import)
+  if (exports.compiled) {
+    // Need Tailwind CSS first as input
+    if (!exports.tailwind) {
+      const tailwindCss = registryToTailwind(registry, { includeImport: !shadcn });
+      await writeFile(join(paths.output, 'rafters.css'), tailwindCss);
+    }
+
+    const inputPath = join(paths.output, 'rafters.css');
+    const outputPath = join(paths.output, 'rafters.compiled.css');
+
+    log({ event: 'init:compiling_css' });
+    await generateCompiledCss(cwd, inputPath, outputPath);
+    outputs.push('rafters.compiled.css');
+  }
+
+  return outputs;
+}
+
 async function regenerateFromExisting(
   cwd: string,
   paths: ReturnType<typeof getRaftersPaths>,
   shadcn: ShadcnConfig | null,
+  isAgentMode: boolean,
 ): Promise<void> {
   log({ event: 'init:regenerate', cwd });
+
+  // Load existing config for export settings
+  let existingConfig: RaftersConfig | null = null;
+  try {
+    const configContent = await readFile(paths.config, 'utf-8');
+    existingConfig = JSON.parse(configContent) as RaftersConfig;
+  } catch {
+    // No config file, will use defaults
+  }
 
   // Load all tokens from .rafters/tokens/
   const adapter = new NodePersistenceAdapter(cwd);
@@ -154,30 +259,39 @@ async function regenerateFromExisting(
     namespaces,
   });
 
-  // Create registry and generate exports
+  // Create registry
   const registry = new TokenRegistry(allTokens);
 
-  const tailwindCss = registryToTailwind(registry, { includeImport: !shadcn });
-  const typescriptSrc = registryToTypeScript(registry, { includeJSDoc: true });
-  const dtcgJson = toDTCG(allTokens);
+  // Prompt for exports (or use existing config in agent mode)
+  let exports: ExportConfig;
+  if (isAgentMode) {
+    exports = existingConfig?.exports ?? DEFAULT_EXPORTS;
+  } else {
+    exports = await promptExportFormats(existingConfig?.exports);
+  }
 
   // Ensure output directory exists
   await mkdir(paths.output, { recursive: true });
 
-  // Write output files
-  await writeFile(join(paths.output, 'rafters.css'), tailwindCss);
-  await writeFile(join(paths.output, 'rafters.ts'), typescriptSrc);
-  await writeFile(join(paths.output, 'rafters.json'), JSON.stringify(dtcgJson, null, 2));
+  // Generate outputs
+  const outputs = await generateOutputs(cwd, paths, registry, exports, shadcn);
+
+  // Update config with new export settings
+  if (existingConfig) {
+    existingConfig.exports = exports;
+    await writeFile(paths.config, JSON.stringify(existingConfig, null, 2));
+  }
 
   log({
     event: 'init:complete',
-    outputs: ['rafters.css', 'rafters.ts', 'rafters.json'],
+    outputs,
     path: paths.output,
   });
 }
 
 export async function init(options: InitOptions): Promise<void> {
   setAgentMode(options.agent ?? false);
+  const isAgentMode = options.agent ?? false;
 
   const cwd = process.cwd();
   const paths = getRaftersPaths(cwd);
@@ -210,7 +324,7 @@ export async function init(options: InitOptions): Promise<void> {
 
   // If --force and rafters exists, regenerate from existing config
   if (raftersExists && options.force) {
-    await regenerateFromExisting(cwd, paths, shadcn);
+    await regenerateFromExisting(cwd, paths, shadcn, isAgentMode);
     return;
   }
 
@@ -236,6 +350,16 @@ export async function init(options: InitOptions): Promise<void> {
     } catch (err) {
       log({ event: 'init:shadcn_css_error', error: String(err) });
     }
+  }
+
+  // Prompt for export formats (use defaults in agent mode)
+  let exports: ExportConfig;
+  if (isAgentMode) {
+    exports = DEFAULT_EXPORTS;
+    log({ event: 'init:exports_default', exports });
+  } else {
+    exports = await promptExportFormats();
+    log({ event: 'init:exports_selected', exports });
   }
 
   // Generate default token system - registry is the source of truth
@@ -316,18 +440,12 @@ export async function init(options: InitOptions): Promise<void> {
     namespaceCount: tokensByNamespace.size,
   });
 
-  // Generate outputs from registry
-  const tailwindCss = registryToTailwind(registry, { includeImport: !shadcn });
-  const typescriptSrc = registryToTypeScript(registry, { includeJSDoc: true });
-  const dtcgJson = toDTCG(registry.list());
-
-  await writeFile(join(paths.output, 'rafters.css'), tailwindCss);
-  await writeFile(join(paths.output, 'rafters.ts'), typescriptSrc);
-  await writeFile(join(paths.output, 'rafters.json'), JSON.stringify(dtcgJson, null, 2));
+  // Generate outputs based on export config
+  const outputs = await generateOutputs(cwd, paths, registry, exports, shadcn);
 
   // Find and update the main CSS file (if not using shadcn which has its own CSS path)
   let detectedCssPath: string | null = null;
-  if (!shadcn) {
+  if (!shadcn && exports.tailwind) {
     detectedCssPath = await findMainCssFile(cwd, framework as Framework);
     if (detectedCssPath) {
       await updateMainCss(cwd, detectedCssPath, '.rafters/output/rafters.css');
@@ -342,19 +460,20 @@ export async function init(options: InitOptions): Promise<void> {
     detectedCssPath = shadcn.tailwind.css;
   }
 
-  // Create config file with detected settings
+  // Create config file with detected settings and export selections
   const frameworkPaths = COMPONENT_PATHS[framework as Framework] || COMPONENT_PATHS.unknown;
   const config: RaftersConfig = {
     framework: framework as Framework,
     componentsPath: frameworkPaths.components,
     primitivesPath: frameworkPaths.primitives,
     cssPath: detectedCssPath,
+    exports,
   };
   await writeFile(paths.config, JSON.stringify(config, null, 2));
 
   log({
     event: 'init:complete',
-    outputs: ['rafters.css', 'rafters.ts', 'rafters.json', 'config.rafters.json'],
+    outputs: [...outputs, 'config.rafters.json'],
     path: paths.output,
   });
 }
