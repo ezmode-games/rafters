@@ -1562,7 +1562,7 @@ function useEditableList({
         if (!element) return;
 
         const selection = window.getSelection();
-        if (selection && selection.isCollapsed && selection.anchorOffset === 0) {
+        if (selection?.isCollapsed && selection.anchorOffset === 0) {
           // Check if at the very start
           const range = selection.getRangeAt(0);
           const preRange = document.createRange();

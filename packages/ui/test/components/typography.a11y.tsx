@@ -373,9 +373,7 @@ describe('CodeBlock - Accessibility', () => {
 
   it('has no violations with line numbers', async () => {
     const { container } = render(
-      <CodeBlock showLineNumbers>
-        {'const a = 1;\nconst b = 2;\nconst c = a + b;'}
-      </CodeBlock>,
+      <CodeBlock showLineNumbers>{'const a = 1;\nconst b = 2;\nconst c = a + b;'}</CodeBlock>,
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();
