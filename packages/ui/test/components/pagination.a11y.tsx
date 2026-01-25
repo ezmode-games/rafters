@@ -136,7 +136,8 @@ describe('Pagination - Accessibility', () => {
     );
     const nav = container.querySelector('nav');
     expect(nav).toHaveAttribute('aria-label', 'Pagination');
-    expect(nav).toHaveAttribute('role', 'navigation');
+    // Native <nav> elements have implicit navigation role, so explicit role is not needed
+    expect(nav?.tagName).toBe('NAV');
   });
 
   it('uses proper semantic structure with ul and li', () => {

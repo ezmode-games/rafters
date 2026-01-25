@@ -15,14 +15,13 @@ describe('AspectRatio - Accessibility', () => {
   });
 
   it('has no accessibility violations with video content', async () => {
+    // Use a native video element instead of iframe to avoid cross-origin axe issues
     const { container } = render(
       <AspectRatio ratio={16 / 9}>
-        <iframe
-          src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-          title="Video player"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
+        <video controls aria-label="Video player">
+          <source src="/video.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
       </AspectRatio>,
     );
     const results = await axe(container);

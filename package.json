@@ -15,7 +15,7 @@
     "test:unit": "./scripts/test-mutex.sh 'pnpm -r test:unit'",
     "test:component": "./scripts/test-mutex.sh 'pnpm -r test:component'",
     "test:e2e": "./scripts/test-mutex.sh 'pnpm -r test:e2e'",
-    "test:a11y": "./scripts/test-mutex.sh 'playwright test --grep @a11y'",
+    "test:a11y": "./scripts/test-mutex.sh 'pnpm --filter=@rafters/ui test:a11y'",
     "test:quick": "pnpm test:unit && pnpm test:component",
     "test:all": "pnpm preflight && pnpm test:e2e",
     "test:watch": "./scripts/test-mutex.sh 'pnpm -r test:unit --watch'",

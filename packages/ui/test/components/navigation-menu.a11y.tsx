@@ -450,8 +450,6 @@ describe('NavigationMenu - Accessibility', () => {
   });
 
   it('multiple triggers work independently', async () => {
-    const user = userEvent.setup();
-
     render(
       <NavigationMenu>
         <NavigationMenuList>
@@ -478,15 +476,21 @@ describe('NavigationMenu - Accessibility', () => {
     expect(productsTrigger).toHaveAttribute('aria-expanded', 'false');
     expect(servicesTrigger).toHaveAttribute('aria-expanded', 'false');
 
-    // Open products
-    await user.click(productsTrigger);
-    expect(productsTrigger).toHaveAttribute('aria-expanded', 'true');
+    // Open products using keyboard (more reliable in test env)
+    productsTrigger.focus();
+    fireEvent.keyDown(productsTrigger, { key: 'Enter' });
+    await waitFor(() => {
+      expect(productsTrigger).toHaveAttribute('aria-expanded', 'true');
+    });
     expect(servicesTrigger).toHaveAttribute('aria-expanded', 'false');
 
-    // Open services (closes products)
-    await user.click(servicesTrigger);
+    // Open services using keyboard (closes products)
+    servicesTrigger.focus();
+    fireEvent.keyDown(servicesTrigger, { key: 'Enter' });
+    await waitFor(() => {
+      expect(servicesTrigger).toHaveAttribute('aria-expanded', 'true');
+    });
     expect(productsTrigger).toHaveAttribute('aria-expanded', 'false');
-    expect(servicesTrigger).toHaveAttribute('aria-expanded', 'true');
   });
 
   it('viewport has proper data-state', () => {

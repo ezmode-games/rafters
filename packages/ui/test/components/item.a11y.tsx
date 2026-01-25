@@ -124,14 +124,20 @@ describe('Item - Accessibility', () => {
   });
 
   it('has no violations in menu context', async () => {
+    // Menu items require role="menu" or role="menubar" parent, and aria-selected is not valid on menuitem
     const { container } = render(
-      <menu aria-label="Actions">
-        <Item role="menuitem">Edit</Item>
-        <Item role="menuitem">Duplicate</Item>
-        <Item role="menuitem" disabled>
+      // biome-ignore lint/a11y/useSemanticElements: Testing menu context requires role="menu"
+      <div role="menu" aria-label="Actions">
+        <Item role="menuitem" selected={false}>
+          Edit
+        </Item>
+        <Item role="menuitem" selected={false}>
+          Duplicate
+        </Item>
+        <Item role="menuitem" disabled selected={false}>
           Delete
         </Item>
-      </menu>,
+      </div>,
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();

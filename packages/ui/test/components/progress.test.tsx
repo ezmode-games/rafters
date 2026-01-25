@@ -196,9 +196,15 @@ describe('Progress', () => {
 
   describe('HTML attributes passthrough', () => {
     it('passes through HTML attributes', () => {
-      render(<Progress data-testid="progress" aria-label="Loading progress" />);
+      render(<Progress data-testid="progress" data-custom="test-value" />);
       const progress = screen.getByTestId('progress');
-      expect(progress).toHaveAttribute('aria-label', 'Loading progress');
+      expect(progress).toHaveAttribute('data-custom', 'test-value');
+    });
+
+    it('forwards aria-label to progress element', () => {
+      const { container } = render(<Progress aria-label="Loading progress" />);
+      const progressElement = container.querySelector('progress');
+      expect(progressElement).toHaveAttribute('aria-label', 'Loading progress');
     });
 
     it('passes through id attribute', () => {

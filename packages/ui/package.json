@@ -11,15 +11,15 @@
     "./skeleton": "./src/components/ui/skeleton.tsx"
   },
   "scripts": {
-    "test": "vitest",
+    "test": "vitest run && VITEST_A11Y=1 vitest run",
     "test:unit": "vitest run",
+    "test:a11y": "VITEST_A11Y=1 vitest run",
     "test:component": "playwright test --config=playwright-ct.config.ts",
     "test:component:ui": "playwright test --config=playwright-ct.config.ts --ui",
     "test:component:debug": "playwright test --config=playwright-ct.config.ts --debug",
     "test:component:chromium": "playwright test --config=playwright-ct.config.ts --project=chromium",
     "test:component:firefox": "playwright test --config=playwright-ct.config.ts --project=firefox",
     "test:component:webkit": "playwright test --config=playwright-ct.config.ts --project=webkit",
-    "test:a11y": "playwright test --config=playwright-ct.config.ts --grep @a11y",
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {

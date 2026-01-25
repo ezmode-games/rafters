@@ -128,6 +128,9 @@ export const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
       orientation = 'horizontal',
       variant = 'default',
       size = 'default',
+      'aria-label': ariaLabel,
+      'aria-labelledby': ariaLabelledby,
+      'aria-describedby': ariaDescribedby,
       ...props
     },
     ref,
@@ -401,6 +404,9 @@ export const Slider = React.forwardRef<HTMLDivElement, SliderProps>(
               aria-valuenow={thumbValue}
               aria-disabled={disabled ? true : undefined}
               aria-orientation={orientation}
+              aria-label={ariaLabel}
+              aria-labelledby={ariaLabelledby}
+              aria-describedby={ariaDescribedby}
               className={classy(
                 'absolute block rounded-full border-2 bg-background',
                 s?.thumb,

@@ -96,10 +96,11 @@ describe('Empty - Accessibility', () => {
   });
 
   it('has no violations in a list context', async () => {
+    // Empty states in list context should not be inside role="list" directly
+    // Instead, show empty state alongside or replacing the list
     const { container } = render(
-      // biome-ignore lint/a11y/useSemanticElements: Testing empty state in list context requires role="list"
-      <div role="list" aria-label="Projects list">
-        <Empty>
+      <div aria-label="Projects section">
+        <Empty role="status">
           <EmptyTitle>No projects</EmptyTitle>
           <EmptyDescription>Create a new project to get started.</EmptyDescription>
           <EmptyAction>
@@ -130,13 +131,18 @@ describe('Empty - Accessibility', () => {
   });
 
   it('has no violations when used inside a main landmark', async () => {
+    // EmptyTitle renders as h3, so we need h1 -> h2 -> h3 for proper heading order
+    // Or use a different heading level in Empty component context
     const { container } = render(
       <main>
         <h1>Search Results</h1>
-        <Empty>
-          <EmptyTitle>No results</EmptyTitle>
-          <EmptyDescription>Try a different search term.</EmptyDescription>
-        </Empty>
+        <section>
+          <h2>Results</h2>
+          <Empty>
+            <EmptyTitle>No results</EmptyTitle>
+            <EmptyDescription>Try a different search term.</EmptyDescription>
+          </Empty>
+        </section>
       </main>,
     );
     const results = await axe(container);

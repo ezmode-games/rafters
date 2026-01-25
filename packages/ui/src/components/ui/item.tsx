@@ -134,12 +134,19 @@ export const Item = React.forwardRef<HTMLDivElement, ItemProps>(
       className,
     );
 
+    // Determine the effective role - use provided role or default to "option"
+    const effectiveRole = props.role ?? 'option';
+    // aria-selected is only valid for option, treeitem, gridcell, row, columnheader, rowheader roles
+    const supportsAriaSelected = ['option', 'treeitem', 'gridcell', 'row', 'columnheader', 'rowheader'].includes(
+      effectiveRole,
+    );
+
     return (
       <div
         ref={ref}
-        role="option"
+        role={effectiveRole}
         tabIndex={disabled ? undefined : 0}
-        aria-selected={selected}
+        aria-selected={supportsAriaSelected ? selected : undefined}
         aria-disabled={disabled || undefined}
         data-selected={selected ? '' : undefined}
         data-disabled={disabled ? '' : undefined}
