@@ -175,11 +175,13 @@ function GridRoot({
   role = 'presentation',
   editable,
   showColumnDropZones,
-  onConfigChange,
+  onConfigChange: _onConfigChange,
   className,
   children,
   ...props
 }: GridProps) {
+  // TODO: Implement grid config UI that calls _onConfigChange
+  void _onConfigChange;
   const classes = classy(
     'grid',
 
@@ -264,7 +266,7 @@ function GridItemDropZone() {
 
 function GridItem({ priority, colSpan, rowSpan, className, children, ...props }: GridItemProps) {
   const context = useGridContext();
-  const isEmpty = !children || (Array.isArray(children) && children.length === 0);
+  const isEmpty = React.Children.count(children) === 0;
 
   const classes = classy(
     // Explicit spans override preset behavior

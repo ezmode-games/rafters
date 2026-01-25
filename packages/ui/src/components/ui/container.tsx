@@ -75,8 +75,8 @@ export interface ContainerProps extends React.HTMLAttributes<HTMLElement> {
   editable?: boolean | undefined;
 
   /**
-   * Background color preset or custom class
-   * Presets: 'none', 'muted', 'accent', 'card'
+   * Background color preset
+   * Allowed presets: 'none', 'muted', 'accent', 'card'
    */
   background?: ContainerBackground | undefined;
 
@@ -196,7 +196,7 @@ export const Container = React.forwardRef<HTMLElement, ContainerProps>(
       editable,
       background,
       showDropZone,
-      onBackgroundChange,
+      onBackgroundChange: _onBackgroundChange,
       className,
       style,
       children,
@@ -204,8 +204,11 @@ export const Container = React.forwardRef<HTMLElement, ContainerProps>(
     },
     ref,
   ) => {
+    // TODO: Implement background picker UI that calls _onBackgroundChange
+    void _onBackgroundChange;
+
     const isArticle = Element === 'article';
-    const isEmpty = !children || (Array.isArray(children) && children.length === 0);
+    const isEmpty = React.Children.count(children) === 0;
 
     const classes = classy(
       // Container queries - w-full prevents width collapse when container-type: inline-size

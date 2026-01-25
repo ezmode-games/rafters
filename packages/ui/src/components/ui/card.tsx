@@ -175,6 +175,26 @@ export const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
       context.onTitleChange(text);
     }, [context]);
 
+    // Prevent Enter from inserting line breaks in titles
+    const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+      }
+    }, []);
+
+    // Strip formatting on paste - titles are plain text
+    const handlePaste = useCallback((event: React.ClipboardEvent) => {
+      event.preventDefault();
+      const text = event.clipboardData.getData('text/plain').replace(/[\r\n]+/g, ' ');
+      const selection = window.getSelection();
+      if (selection?.rangeCount) {
+        const range = selection.getRangeAt(0);
+        range.deleteContents();
+        range.insertNode(document.createTextNode(text));
+        range.collapse(false);
+      }
+    }, []);
+
     // Combine refs
     const combinedRef = (element: HTMLHeadingElement | null) => {
       (elementRef as React.MutableRefObject<HTMLHeadingElement | null>).current = element;
@@ -196,7 +216,10 @@ export const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
           contentEditable: true,
           suppressContentEditableWarning: true,
           onInput: handleInput,
+          onKeyDown: handleKeyDown,
+          onPaste: handlePaste,
           'data-placeholder': placeholder,
+          'aria-placeholder': placeholder,
         }
       : {};
 
@@ -226,6 +249,26 @@ export const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescri
       context.onDescriptionChange(text);
     }, [context]);
 
+    // Prevent Enter from inserting line breaks in descriptions
+    const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+      }
+    }, []);
+
+    // Strip formatting on paste - descriptions are plain text
+    const handlePaste = useCallback((event: React.ClipboardEvent) => {
+      event.preventDefault();
+      const text = event.clipboardData.getData('text/plain').replace(/[\r\n]+/g, ' ');
+      const selection = window.getSelection();
+      if (selection?.rangeCount) {
+        const range = selection.getRangeAt(0);
+        range.deleteContents();
+        range.insertNode(document.createTextNode(text));
+        range.collapse(false);
+      }
+    }, []);
+
     // Combine refs
     const combinedRef = (element: HTMLParagraphElement | null) => {
       (elementRef as React.MutableRefObject<HTMLParagraphElement | null>).current = element;
@@ -247,7 +290,10 @@ export const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescri
           contentEditable: true,
           suppressContentEditableWarning: true,
           onInput: handleInput,
+          onKeyDown: handleKeyDown,
+          onPaste: handlePaste,
           'data-placeholder': placeholder,
+          'aria-placeholder': placeholder,
         }
       : {};
 
