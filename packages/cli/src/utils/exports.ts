@@ -117,10 +117,15 @@ export async function generateCompiledCss(
 
   // Fallback to package manager exec
   const pm = await getPackageManager(cwd, { withFallback: true });
-  const execCmd = pm === 'pnpm' ? ['pnpm', 'exec'] : pm === 'bun' ? ['bunx'] : ['npx'];
+  const [cmd, ...prefix] =
+    pm === 'pnpm'
+      ? (['pnpm', 'exec'] as const)
+      : pm === 'bun'
+        ? (['bunx'] as const)
+        : (['npx'] as const);
 
   try {
-    execFileSync(execCmd[0], [...execCmd.slice(1), 'tailwindcss', ...args], { cwd, stdio: 'pipe' });
+    execFileSync(cmd, [...prefix, 'tailwindcss', ...args], { cwd, stdio: 'pipe' });
   } catch {
     throw new Error(
       'Tailwind CLI not found. Install @tailwindcss/cli in your project or ensure tailwindcss is available on your PATH.',
