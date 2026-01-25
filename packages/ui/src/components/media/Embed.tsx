@@ -111,22 +111,19 @@ function TwitterEmbed({ tweetId }: { tweetId: string }) {
       }
     };
 
-    const renderTweet = () => {
+    const renderTweet = async () => {
       if (containerRef.current && window.twttr?.widgets) {
         // Clear container using textContent (safe - no XSS risk)
         containerRef.current.textContent = '';
 
-        window.twttr.widgets
-          .createTweet(tweetId, containerRef.current, {
+        try {
+          await window.twttr.widgets.createTweet(tweetId, containerRef.current, {
             theme: 'light',
             dnt: true,
-          })
-          .then(() => {
-            setIsLoading(false);
-          })
-          .catch(() => {
-            setIsLoading(false);
           });
+        } finally {
+          setIsLoading(false);
+        }
       }
     };
 
