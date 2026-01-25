@@ -408,7 +408,7 @@ function FormatButton({ config, isActive, onClick }: FormatButtonProps): React.J
           onClick={onClick}
           aria-pressed={isActive}
           data-testid={`format-${config.format}`}
-          className="h-8 w-8"
+          className="h-11 w-11"
         >
           {config.icon}
           <span className="sr-only">{config.label}</span>
@@ -598,7 +598,7 @@ export function InlineToolbar({
                   size="icon"
                   aria-pressed={isLinkActive}
                   data-testid="format-link"
-                  className="h-8 w-8"
+                  className="h-11 w-11"
                 >
                   <LinkIcon />
                   <span className="sr-only">Link</span>
@@ -627,7 +627,7 @@ export function InlineToolbar({
                 size="icon"
                 onClick={handleUnlinkClick}
                 data-testid="unlink-button"
-                className="h-8 w-8"
+                className="h-11 w-11"
               >
                 <UnlinkIcon />
                 <span className="sr-only">Remove link</span>
