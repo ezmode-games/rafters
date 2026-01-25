@@ -393,7 +393,7 @@ function removeFormatFromRange(
  * ```
  */
 export function createInlineFormatter(options: InlineFormatterOptions): InlineFormatterController {
-  // SSR guard
+  // SSR guard - return safe no-op implementation when running on server
   if (typeof window === 'undefined') {
     return {
       getActiveFormats: () => [],
@@ -403,7 +403,12 @@ export function createInlineFormatter(options: InlineFormatterOptions): InlineFo
       removeFormat: () => {},
       removeAllFormatting: () => {},
       serializeSelection: () => [],
-      deserializeToDOM: () => document.createDocumentFragment(),
+      deserializeToDOM: () => {
+        throw new Error(
+          'deserializeToDOM cannot be called during server-side rendering. ' +
+            'Ensure this method is only called in browser context.',
+        );
+      },
       cleanup: () => {},
     };
   }

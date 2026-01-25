@@ -1,0 +1,13 @@
+# Rafters Documentation Site
+
+[docs]
+dir = "docs"
+output = "dist"
+title = "Rafters"
+base_url = "/"
+
+[components]
+dir = "../../packages/ui/src/components/ui"
+
+[build]
+minify = true
