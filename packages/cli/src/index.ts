@@ -28,7 +28,8 @@ program
 program
   .command('add')
   .description('Add rafters components to the project')
-  .argument('<components...>', 'Component names to add')
+  .argument('[components...]', 'Component names to add')
+  .option('--list', 'List available components')
   .option('--overwrite', 'Overwrite existing component files')
   .option('--registry-url <url>', 'Custom registry URL')
   .option('--agent', 'Output JSON for machine consumption')

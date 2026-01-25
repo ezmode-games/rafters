@@ -174,12 +174,14 @@ Then('the tokens directory should contain namespace files', async () => {
 });
 
 Then('the theme.css should exist', async () => {
-  const themePath = join(context.fixturePath, '.rafters', 'output', 'theme.css');
+  // CLI outputs rafters.css, not theme.css
+  const themePath = join(context.fixturePath, '.rafters', 'output', 'rafters.css');
   expect(existsSync(themePath)).toBe(true);
 });
 
 Then('theme.css should be regenerated', async () => {
-  const themePath = join(context.fixturePath, '.rafters', 'output', 'theme.css');
+  // CLI outputs rafters.css, not theme.css
+  const themePath = join(context.fixturePath, '.rafters', 'output', 'rafters.css');
   expect(existsSync(themePath)).toBe(true);
 });
 

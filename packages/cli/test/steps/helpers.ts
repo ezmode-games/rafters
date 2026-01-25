@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
-const CLI_BIN = join(__dirname, '../../bin/rafters.js');
+const CLI_BIN = join(__dirname, '../../dist/index.js');
 
 interface CommandResult {
   exitCode: number;

@@ -74,6 +74,8 @@ export interface RaftersConfig {
   primitivesPath: string;
   /** Entry CSS file for design tokens, or null if not detected */
   cssPath: string | null;
+  /** Whether shadcn/ui was detected in the project */
+  shadcn: boolean;
 }
 
 async function findMainCssFile(cwd: string, framework: Framework): Promise<string | null> {
@@ -349,6 +351,7 @@ export async function init(options: InitOptions): Promise<void> {
     componentsPath: frameworkPaths.components,
     primitivesPath: frameworkPaths.primitives,
     cssPath: detectedCssPath,
+    shadcn: !!shadcn,
   };
   await writeFile(paths.config, JSON.stringify(config, null, 2));
 

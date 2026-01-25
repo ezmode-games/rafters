@@ -127,6 +127,14 @@ export class RegistryClient {
   }
 
   /**
+   * List all available components
+   */
+  async listComponents(): Promise<Array<{ name: string; description?: string }>> {
+    const index = await this.fetchIndex();
+    return index.components.map((name) => ({ name }));
+  }
+
+  /**
    * Check if a component exists in the registry
    */
   async componentExists(name: string): Promise<boolean> {
