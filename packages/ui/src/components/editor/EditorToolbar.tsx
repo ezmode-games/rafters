@@ -248,7 +248,7 @@ function ToolbarButton({ onClick, disabled, label, shortcut, children }: Toolbar
           disabled={disabled}
           aria-label={label}
           aria-disabled={disabled ? 'true' : undefined}
-          className="h-8 w-8"
+          className="h-11 w-11"
         >
           {children}
         </Button>

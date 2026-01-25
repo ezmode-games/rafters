@@ -237,7 +237,7 @@ export function BlockWrapper({
   const handleClasses = classy(
     'absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full',
     'flex items-center justify-center',
-    'w-6 h-8 mr-1',
+    'min-h-11 min-w-11 mr-1',
     'text-muted-foreground hover:text-foreground',
     'cursor-grab active:cursor-grabbing',
     'opacity-0 transition-opacity duration-150',
@@ -248,7 +248,7 @@ export function BlockWrapper({
   const menuButtonClasses = classy(
     'absolute right-0 top-1/2 -translate-y-1/2 translate-x-full',
     'flex items-center justify-center',
-    'w-6 h-6 ml-1',
+    'min-h-11 min-w-11 ml-1',
     'rounded hover:bg-muted',
     'text-muted-foreground hover:text-foreground',
     'opacity-0 transition-opacity duration-150',

@@ -497,7 +497,7 @@ export function BlockSidebar({
         {onCollapse && (
           <button
             type="button"
-            className="p-3 hover:bg-muted transition-colors flex-shrink-0"
+            className="min-h-11 min-w-11 p-3 hover:bg-muted transition-colors flex-shrink-0"
             onClick={handleCollapseToggle}
             aria-label="Expand sidebar"
           >
@@ -577,7 +577,7 @@ export function BlockSidebar({
         {onCollapse && (
           <button
             type="button"
-            className="p-1.5 rounded hover:bg-muted transition-colors"
+            className="min-h-11 min-w-11 p-1.5 rounded hover:bg-muted transition-colors"
             onClick={handleCollapseToggle}
             aria-label="Collapse sidebar"
           >
