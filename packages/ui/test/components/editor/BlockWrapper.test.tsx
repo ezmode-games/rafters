@@ -78,7 +78,7 @@ describe('BlockWrapper', () => {
       // Initially hidden
       expect(dragHandle).toHaveClass('opacity-0');
 
-      // Show on hover
+      // Visible on hover
       await user.hover(wrapper);
       expect(dragHandle).toHaveClass('opacity-100');
     });

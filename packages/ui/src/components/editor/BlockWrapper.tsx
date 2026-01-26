@@ -114,6 +114,10 @@ export interface BlockWrapperProps {
   onMoveUp: () => void;
   /** Called when block should move down */
   onMoveDown: () => void;
+  /** Called when drag starts on this block */
+  onDragStart?: () => void;
+  /** Called when drag ends on this block */
+  onDragEnd?: () => void;
   /** Whether the block can be dragged */
   draggable?: boolean;
   /** Block content */
@@ -138,6 +142,8 @@ export function BlockWrapper({
   onDuplicate,
   onMoveUp,
   onMoveDown,
+  onDragStart,
+  onDragEnd,
   draggable = true,
   children,
   className,
@@ -145,7 +151,7 @@ export function BlockWrapper({
   const [isHovered, setIsHovered] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Drag handle setup
+  // Drag handle setup using our primitive
   const dragHandle = useDraggable({
     data: id,
     onDragStart: () => {
@@ -153,6 +159,12 @@ export function BlockWrapper({
       if (!isSelected) {
         onSelect();
       }
+      // Notify parent that drag started
+      onDragStart?.();
+    },
+    onDragEnd: () => {
+      // Notify parent that drag ended
+      onDragEnd?.();
     },
   });
 
@@ -233,15 +245,14 @@ export function BlockWrapper({
     className,
   );
 
-  // Handle classes
+  // Handle classes - hidden by default, visible on hover/focus
   const handleClasses = classy(
     'absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full',
     'flex items-center justify-center',
     'min-h-11 min-w-11 mr-1',
-    'text-muted-foreground hover:text-foreground',
     'cursor-grab active:cursor-grabbing',
-    'opacity-0 transition-opacity duration-150',
-    showChrome && 'opacity-100',
+    'transition-opacity duration-150',
+    showChrome ? 'opacity-100 text-foreground' : 'opacity-0 hover:opacity-60 text-muted-foreground',
   );
 
   // Menu button classes
@@ -272,12 +283,13 @@ export function BlockWrapper({
       {draggable && (
         <div
           ref={dragHandle.ref}
+          draggable="true"
           data-drag-handle
           className={handleClasses}
           aria-hidden="true"
           data-testid={`block-drag-handle-${id}`}
         >
-          <GripIcon className="w-4 h-4" />
+          <GripIcon className="w-4 h-4 pointer-events-none" />
         </div>
       )}
 

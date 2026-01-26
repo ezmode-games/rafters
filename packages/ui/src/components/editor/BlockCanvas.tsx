@@ -40,7 +40,6 @@
  */
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useDropZone } from '../../hooks/use-drag-drop';
 import classy from '../../primitives/classy';
 import { createKeyboardHandler } from '../../primitives/keyboard-handler';
 
@@ -90,20 +89,26 @@ export interface BlockCanvasProps {
   selectedIds: Set<string>;
   /** ID of the currently focused block */
   focusedId?: string;
+  /** Index where a drop indicator should be shown (null = no indicator) */
+  dropTargetIndex?: number | null;
   /** Called when selection changes */
   onSelectionChange: (ids: Set<string>) => void;
   /** Called when focus changes */
   onFocusChange?: (id: string | null) => void;
-  /** Called when blocks array changes (reorder, etc.) */
-  onBlocksChange: (blocks: Block[]) => void;
-  /** Called when a new block should be added */
-  onBlockAdd: (block: Block, index: number) => void;
-  /** Called when a block should be removed */
-  onBlockRemove: (id: string) => void;
-  /** Called when a block should be moved */
-  onBlockMove: (id: string, toIndex: number) => void;
+  /** Called when blocks array changes (reorder, etc.) - optional, for future keyboard shortcuts */
+  onBlocksChange?: (blocks: Block[]) => void;
+  /** Called when a new block should be added - optional, for future keyboard shortcuts */
+  onBlockAdd?: (block: Block, index: number) => void;
+  /** Called when a block should be removed - optional, for future keyboard shortcuts */
+  onBlockRemove?: (id: string) => void;
+  /** Called when a block should be moved - optional, for future keyboard shortcuts */
+  onBlockMove?: (id: string, toIndex: number) => void;
   /** Render function for individual blocks */
   renderBlock: (block: Block, context: BlockRenderContext) => React.ReactNode;
+  /** Called when slash command is triggered (e.g., on empty canvas) */
+  onSlashCommand?: (position: { x: number; y: number }) => void;
+  /** Called when clicking on the canvas background (not on a block) */
+  onCanvasClick?: (event: React.MouseEvent) => void;
   /** Additional CSS classes */
   className?: string;
   /** Content to show when there are no blocks */
@@ -137,23 +142,27 @@ export function BlockCanvas({
   blocks,
   selectedIds,
   focusedId,
+  dropTargetIndex,
   onSelectionChange,
   onFocusChange,
   onBlocksChange: _onBlocksChange,
   onBlockAdd: _onBlockAdd,
   onBlockRemove: _onBlockRemove,
-  onBlockMove,
+  onBlockMove: _onBlockMove,
   renderBlock,
+  onSlashCommand,
+  onCanvasClick,
   className,
   emptyState,
 }: BlockCanvasProps): React.JSX.Element {
-  // Note: _onBlocksChange, _onBlockAdd, _onBlockRemove are part of the API
-  // and will be used by keyboard handlers and other features in future iterations
+  // Note: These callbacks are optional and reserved for future keyboard shortcuts
+  // (e.g., Delete key to remove block, Cmd+D to duplicate). Currently the parent
+  // component handles all block mutations directly.
   void _onBlocksChange;
   void _onBlockAdd;
   void _onBlockRemove;
+  void _onBlockMove;
   const containerRef = useRef<HTMLDivElement>(null);
-  const [dropTargetIndex, setDropTargetIndex] = React.useState<number | null>(null);
 
   // Create block ID to index map for efficient lookups
   const blockIndexMap = useMemo(() => {
@@ -262,62 +271,85 @@ export function BlockCanvas({
     const container = containerRef.current;
     if (!container) return;
 
+    // Check if event originated from an editable element (contenteditable or input/textarea)
+    // If so, skip handling to allow normal text editing
+    const isFromEditable = (event: KeyboardEvent): boolean => {
+      const target = event.target as HTMLElement;
+      if (!target) return false;
+      // Check for contenteditable
+      if (target.isContentEditable) return true;
+      // Check for input/textarea/select - these should handle their own keyboard events
+      const tagName = target.tagName.toLowerCase();
+      if (tagName === 'input' || tagName === 'textarea' || tagName === 'select') return true;
+      return false;
+    };
+
+    // Wrap handler to skip if from editable element, otherwise prevent default and handle
+    const guardHandler =
+      (handler: () => void) =>
+      (event: KeyboardEvent): void => {
+        if (isFromEditable(event)) return;
+        event.preventDefault();
+        handler();
+      };
+
     // createKeyboardHandler attaches listeners and returns cleanup functions
     const cleanups = [
       // Navigation
       createKeyboardHandler(container, {
         key: 'ArrowUp',
-        handler: () => moveFocus('up'),
-        preventDefault: true,
+        handler: guardHandler(() => moveFocus('up')),
+        preventDefault: false, // Don't prevent default - let guardHandler decide
       }),
       createKeyboardHandler(container, {
         key: 'ArrowDown',
-        handler: () => moveFocus('down'),
-        preventDefault: true,
+        handler: guardHandler(() => moveFocus('down')),
+        preventDefault: false,
       }),
       createKeyboardHandler(container, {
         key: 'Home',
-        handler: () => moveFocus('first'),
-        preventDefault: true,
+        handler: guardHandler(() => moveFocus('first')),
+        preventDefault: false,
       }),
       createKeyboardHandler(container, {
         key: 'End',
-        handler: () => moveFocus('last'),
-        preventDefault: true,
+        handler: guardHandler(() => moveFocus('last')),
+        preventDefault: false,
       }),
       // Selection extension
       createKeyboardHandler(container, {
         key: 'ArrowUp',
         modifiers: { shift: true },
-        handler: () => extendSelection('up'),
-        preventDefault: true,
+        handler: guardHandler(() => extendSelection('up')),
+        preventDefault: false,
       }),
       createKeyboardHandler(container, {
         key: 'ArrowDown',
         modifiers: { shift: true },
-        handler: () => extendSelection('down'),
-        preventDefault: true,
+        handler: guardHandler(() => extendSelection('down')),
+        preventDefault: false,
       }),
       // Selection actions
       createKeyboardHandler(container, {
         key: 'Escape',
-        handler: clearSelection,
-        preventDefault: true,
+        handler: guardHandler(clearSelection),
+        preventDefault: false,
       }),
       createKeyboardHandler(container, {
         key: 'Space',
-        handler: toggleSelectionOnFocused,
-        preventDefault: true,
+        handler: guardHandler(toggleSelectionOnFocused),
+        preventDefault: false,
       }),
       createKeyboardHandler(container, {
         key: 'Enter',
-        handler: toggleSelectionOnFocused,
-        preventDefault: true,
+        handler: guardHandler(toggleSelectionOnFocused),
+        preventDefault: false,
       }),
     ];
 
     // Handle Cmd/Ctrl+A separately since 'a' is not in KeyboardKey type
     const handleSelectAll = (event: KeyboardEvent) => {
+      if (isFromEditable(event)) return;
       if (event.key === 'a' && (event.metaKey || event.ctrlKey)) {
         event.preventDefault();
         selectAll();
@@ -325,13 +357,37 @@ export function BlockCanvas({
     };
     container.addEventListener('keydown', handleSelectAll);
 
+    // Handle slash command on empty canvas or when canvas has focus
+    const handleSlashKey = (event: KeyboardEvent) => {
+      if (isFromEditable(event)) return;
+      if (event.key === '/' && onSlashCommand) {
+        event.preventDefault();
+        // Get position from the container center or cursor position
+        const rect = container.getBoundingClientRect();
+        const position = {
+          x: rect.left + rect.width / 2 - 144, // Center the 288px wide palette
+          y: rect.top + 100, // Below the top of canvas
+        };
+        onSlashCommand(position);
+      }
+    };
+    container.addEventListener('keydown', handleSlashKey);
+
     return () => {
       for (const cleanup of cleanups) {
         cleanup();
       }
       container.removeEventListener('keydown', handleSelectAll);
+      container.removeEventListener('keydown', handleSlashKey);
     };
-  }, [moveFocus, extendSelection, selectAll, clearSelection, toggleSelectionOnFocused]);
+  }, [
+    moveFocus,
+    extendSelection,
+    selectAll,
+    clearSelection,
+    toggleSelectionOnFocused,
+    onSlashCommand,
+  ]);
 
   // ========================================================================
   // Click Handling
@@ -382,87 +438,30 @@ export function BlockCanvas({
 
   const handleCanvasClick = useCallback(
     (event: React.MouseEvent) => {
-      // Only clear selection if clicking directly on canvas (not on a block)
-      if (event.target === event.currentTarget) {
-        clearSelection();
-        onFocusChange?.(null);
+      // Check if click is on a block or inside a block
+      const target = event.target as HTMLElement;
+      const isOnBlock = target.closest('[data-block-id]') !== null;
+
+      if (!isOnBlock) {
+        // Click is on canvas background or empty space
+        if (onCanvasClick) {
+          onCanvasClick(event);
+        } else {
+          // Default behavior: clear selection and focus
+          clearSelection();
+          onFocusChange?.(null);
+        }
       }
     },
-    [clearSelection, onFocusChange],
+    [clearSelection, onFocusChange, onCanvasClick],
   );
-
-  // ========================================================================
-  // Drop Zone
-  // ========================================================================
-
-  // Track last known drag position since useDropZone doesn't pass the event
-  const lastDragPositionRef = useRef<{ clientY: number } | null>(null);
-
-  // Listen for dragover events at the document level to track mouse position
-  useEffect(() => {
-    const handleDragOver = (event: DragEvent) => {
-      lastDragPositionRef.current = { clientY: event.clientY };
-    };
-
-    document.addEventListener('dragover', handleDragOver);
-    return () => {
-      document.removeEventListener('dragover', handleDragOver);
-    };
-  }, []);
-
-  const dropZone = useDropZone({
-    onDragEnter: () => {},
-    onDragLeave: () => {
-      setDropTargetIndex(null);
-    },
-    onDragOver: (data) => {
-      // Calculate drop index based on mouse position
-      const container = containerRef.current;
-      const lastPos = lastDragPositionRef.current;
-      if (!container || !data || !lastPos) return;
-
-      const pointerY = lastPos.clientY;
-      const blockElements = container.querySelectorAll('[data-block-id]');
-
-      let targetIndex = blocks.length;
-
-      for (let i = 0; i < blockElements.length; i += 1) {
-        const blockEl = blockElements.item(i);
-        if (!(blockEl instanceof HTMLElement)) {
-          continue;
-        }
-
-        const rect = blockEl.getBoundingClientRect();
-        const midpointY = rect.top + rect.height / 2;
-
-        if (pointerY < midpointY) {
-          targetIndex = i;
-          break;
-        }
-      }
-
-      setDropTargetIndex(targetIndex);
-    },
-    onDrop: (data) => {
-      if (!data || dropTargetIndex === null) return;
-
-      const draggedId = data as string;
-      const currentIndex = blockIndexMap.get(draggedId);
-
-      if (currentIndex !== undefined && currentIndex !== dropTargetIndex) {
-        onBlockMove(draggedId, dropTargetIndex);
-      }
-
-      setDropTargetIndex(null);
-    },
-  });
 
   // ========================================================================
   // Render
   // ========================================================================
 
   const containerClasses = classy(
-    'relative outline-none min-h-52',
+    'relative outline-none min-h-52 pb-32 overflow-visible',
     'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
     className,
   );
@@ -473,11 +472,7 @@ export function BlockCanvas({
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: keyboard events attached via useEffect to container
     <div
-      ref={(el) => {
-        // Combine refs
-        (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
-        dropZone.ref(el);
-      }}
+      ref={containerRef}
       className={containerClasses}
       role="listbox"
       aria-label="Block editor canvas"

@@ -110,14 +110,20 @@ describe('BlockSidebar', () => {
       // Find the Text category trigger
       const textTrigger = screen.getByRole('button', { name: 'Text' });
 
-      // Click to expand
-      await user.click(textTrigger);
-
-      // Check that blocks are visible
+      // Categories are expanded by default, so blocks should be visible
       expect(screen.getByTestId('block-item-paragraph')).toBeInTheDocument();
 
       // Click to collapse
       await user.click(textTrigger);
+
+      // Blocks should no longer be in the document
+      expect(screen.queryByTestId('block-item-paragraph')).not.toBeInTheDocument();
+
+      // Click to expand again
+      await user.click(textTrigger);
+
+      // Blocks should be visible again
+      expect(screen.getByTestId('block-item-paragraph')).toBeInTheDocument();
     });
   });
 
@@ -235,10 +241,7 @@ describe('BlockSidebar', () => {
 
       render(<BlockSidebar {...props} />);
 
-      // Expand text category first
-      const textTrigger = screen.getByRole('button', { name: 'Text' });
-      await user.click(textTrigger);
-
+      // Categories are expanded by default, so blocks are visible
       // Click a block
       const blockItem = screen.getByTestId('block-item-paragraph');
       await user.click(blockItem);
@@ -253,10 +256,7 @@ describe('BlockSidebar', () => {
 
       render(<BlockSidebar {...props} />);
 
-      // Expand text category
-      const textTrigger = screen.getByRole('button', { name: 'Text' });
-      await user.click(textTrigger);
-
+      // Categories are expanded by default
       // Focus and press Enter on a block
       const blockItem = screen.getByTestId('block-item-paragraph');
       blockItem.focus();
@@ -272,10 +272,7 @@ describe('BlockSidebar', () => {
 
       render(<BlockSidebar {...props} />);
 
-      // Expand text category
-      const textTrigger = screen.getByRole('button', { name: 'Text' });
-      await user.click(textTrigger);
-
+      // Categories are expanded by default
       // Focus and press Space on a block
       const blockItem = screen.getByTestId('block-item-paragraph');
       blockItem.focus();
@@ -286,16 +283,12 @@ describe('BlockSidebar', () => {
   });
 
   describe('Drag and Drop', () => {
-    it('makes blocks draggable', async () => {
-      const user = userEvent.setup();
+    it('makes blocks draggable', () => {
       const props = createDefaultProps();
 
       render(<BlockSidebar {...props} />);
 
-      // Expand text category
-      const textTrigger = screen.getByRole('button', { name: 'Text' });
-      await user.click(textTrigger);
-
+      // Categories are expanded by default
       const blockItem = screen.getByTestId('block-item-paragraph');
       expect(blockItem).toHaveAttribute('draggable', 'true');
     });
@@ -360,31 +353,23 @@ describe('BlockSidebar', () => {
       expect(searchInput).toBeInTheDocument();
     });
 
-    it('blocks are keyboard focusable', async () => {
-      const user = userEvent.setup();
+    it('blocks are keyboard focusable', () => {
       const props = createDefaultProps();
 
       render(<BlockSidebar {...props} />);
 
-      // Expand text category
-      const textTrigger = screen.getByRole('button', { name: 'Text' });
-      await user.click(textTrigger);
-
+      // Categories are expanded by default
       // Block should be focusable
       const blockItem = screen.getByTestId('block-item-paragraph');
       expect(blockItem).toHaveAttribute('tabIndex', '0');
     });
 
-    it('block items have option role', async () => {
-      const user = userEvent.setup();
+    it('block items have option role', () => {
       const props = createDefaultProps();
 
       render(<BlockSidebar {...props} />);
 
-      // Expand text category
-      const textTrigger = screen.getByRole('button', { name: 'Text' });
-      await user.click(textTrigger);
-
+      // Categories are expanded by default
       const blockItem = screen.getByTestId('block-item-paragraph');
       expect(blockItem).toHaveAttribute('role', 'option');
     });
