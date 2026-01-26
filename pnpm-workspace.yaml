@@ -3,7 +3,7 @@ packages:
   - packages/*
 
 catalog:
-  '@axe-core/playwright': ^4.10.0
+  '@axe-core/playwright': ^4.11.0
   '@biomejs/biome': ^2.3.2
   '@changesets/cli': ^2.29.8
   '@cloudflare/vitest-pool-workers': ^0.9.3
