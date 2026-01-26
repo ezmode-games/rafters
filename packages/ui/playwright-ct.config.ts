@@ -6,6 +6,14 @@
 import { defineConfig, devices } from '@playwright/experimental-ct-react';
 
 export default defineConfig({
+  ctViteConfig: {
+    server: {
+      watch: {
+        // Exclude large directories from vite's file watcher
+        ignored: ['**/target/**', '**/node_modules/**', '**/.git/**'],
+      },
+    },
+  },
   testDir: './test',
   testMatch: ['**/*.spec.{ts,tsx}'],
   fullyParallel: true,
