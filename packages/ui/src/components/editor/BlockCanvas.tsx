@@ -95,14 +95,14 @@ export interface BlockCanvasProps {
   onSelectionChange: (ids: Set<string>) => void;
   /** Called when focus changes */
   onFocusChange?: (id: string | null) => void;
-  /** Called when blocks array changes (reorder, etc.) */
-  onBlocksChange: (blocks: Block[]) => void;
-  /** Called when a new block should be added */
-  onBlockAdd: (block: Block, index: number) => void;
-  /** Called when a block should be removed */
-  onBlockRemove: (id: string) => void;
-  /** Called when a block should be moved */
-  onBlockMove: (id: string, toIndex: number) => void;
+  /** Called when blocks array changes (reorder, etc.) - optional, for future keyboard shortcuts */
+  onBlocksChange?: (blocks: Block[]) => void;
+  /** Called when a new block should be added - optional, for future keyboard shortcuts */
+  onBlockAdd?: (block: Block, index: number) => void;
+  /** Called when a block should be removed - optional, for future keyboard shortcuts */
+  onBlockRemove?: (id: string) => void;
+  /** Called when a block should be moved - optional, for future keyboard shortcuts */
+  onBlockMove?: (id: string, toIndex: number) => void;
   /** Render function for individual blocks */
   renderBlock: (block: Block, context: BlockRenderContext) => React.ReactNode;
   /** Called when slash command is triggered (e.g., on empty canvas) */
@@ -155,8 +155,9 @@ export function BlockCanvas({
   className,
   emptyState,
 }: BlockCanvasProps): React.JSX.Element {
-  // Note: These are part of the API and will be used by keyboard handlers
-  // and other features in future iterations
+  // Note: These callbacks are optional and reserved for future keyboard shortcuts
+  // (e.g., Delete key to remove block, Cmd+D to duplicate). Currently the parent
+  // component handles all block mutations directly.
   void _onBlocksChange;
   void _onBlockAdd;
   void _onBlockRemove;
@@ -277,9 +278,9 @@ export function BlockCanvas({
       if (!target) return false;
       // Check for contenteditable
       if (target.isContentEditable) return true;
-      // Check for input/textarea
+      // Check for input/textarea/select - these should handle their own keyboard events
       const tagName = target.tagName.toLowerCase();
-      if (tagName === 'input' || tagName === 'textarea') return true;
+      if (tagName === 'input' || tagName === 'textarea' || tagName === 'select') return true;
       return false;
     };
 
