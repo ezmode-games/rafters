@@ -348,7 +348,10 @@ export function BlockSidebar({
   onCollapse,
 }: BlockSidebarProps): React.JSX.Element {
   const [searchQuery, setSearchQuery] = useState('');
-  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+  // Default to all categories expanded
+  const [expandedCategories, setExpandedCategories] = useState<string[]>(() =>
+    registry.categories.map((c) => c.id),
+  );
 
   // Sort categories by order
   const sortedCategories = useMemo(() => {
