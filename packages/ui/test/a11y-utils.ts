@@ -24,18 +24,3 @@ export const COMPONENT_EXCLUDED_RULES = [
 export async function analyzeA11y(page: Page) {
   return new AxeBuilder({ page }).disableRules(COMPONENT_EXCLUDED_RULES).analyze();
 }
-
-/**
- * Assert no accessibility violations
- */
-export function expectNoViolations(results: Awaited<ReturnType<typeof analyzeA11y>>) {
-  if (results.violations.length > 0) {
-    const violations = results.violations.map((v) => ({
-      id: v.id,
-      description: v.description,
-      impact: v.impact,
-      nodes: v.nodes.length,
-    }));
-    throw new Error(`Accessibility violations found:\n${JSON.stringify(violations, null, 2)}`);
-  }
-}

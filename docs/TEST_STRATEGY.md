@@ -1253,9 +1253,46 @@ describe('Color Conversion Properties', () => {
 Every component in `@rafters/shared` and `@rafters/ui` MUST have:
 
 1. **Unit tests** (`.test.tsx`) - Rendering and behavior
-2. **Accessibility tests** (`.a11y.tsx`) - **MANDATORY**
+2. **Static accessibility tests** (`.a11y.tsx`) - vitest-axe for ARIA validation
+3. **Interactive accessibility tests** (`.a11y.spec.tsx`) - Playwright for keyboard/focus
 
-### Vitest-Axe Setup
+### Two-Tier Accessibility Testing Strategy
+
+**Tier 1: Static Checks (vitest-axe)**
+- File pattern: `*.a11y.tsx`
+- Tool: `vitest-axe` with happy-dom
+- Tests: ARIA attributes, roles, accessible names, color contrast ratios
+- Speed: Fast (runs in Node.js)
+- Limitation: Cannot test focus, keyboard navigation, or real browser behavior
+
+**Tier 2: Interactive Tests (Playwright + axe-core)**
+- File pattern: `*.a11y.spec.tsx`
+- Tool: `@axe-core/playwright` with real browsers
+- Tests: Keyboard navigation, focus traps, Escape key, tab order, focus indicators
+- Speed: Slower (requires browser)
+- Required for: Dialogs, menus, dropdowns, any component with keyboard interaction
+
+### When to Use Which
+
+| Test Type | Use vitest-axe (.a11y.tsx) | Use Playwright (.a11y.spec.tsx) |
+|-----------|---------------------------|--------------------------------|
+| ARIA attributes present | Yes | No |
+| Role validation | Yes | No |
+| Accessible name/description | Yes | No |
+| Color contrast | Yes | No |
+| Keyboard navigation | No | Yes |
+| Focus trap behavior | No | Yes |
+| Escape key closes modal | No | Yes |
+| Tab order | No | Yes |
+| Focus indicators visible | No | Yes |
+| Screen reader announcements | No | Yes (manual verification) |
+
+**Why two tiers?** happy-dom (used by vitest) does not properly simulate focus behavior,
+keyboard events, or real browser accessibility APIs. Tests for focus traps, keyboard
+navigation, and Escape key handling will pass in happy-dom even when broken in real
+browsers. Playwright tests catch these issues.
+
+### Vitest-Axe Setup (Tier 1)
 
 ```bash
 pnpm add -D vitest-axe
@@ -1272,13 +1309,45 @@ configureAxe({
 });
 ```
 
+### Playwright axe-core Setup (Tier 2)
+
+```bash
+pnpm add -D @axe-core/playwright
+```
+
+```typescript
+// test/a11y-utils.ts
+import AxeBuilder from '@axe-core/playwright';
+import type { Page } from '@playwright/test';
+
+// Exclude page-level rules that don't apply to component tests
+export const COMPONENT_EXCLUDED_RULES = [
+  'page-has-heading-one',
+  'region',
+  'landmark-one-main',
+  'landmark-unique',
+  'bypass',
+];
+
+export async function analyzeA11y(page: Page) {
+  return new AxeBuilder({ page })
+    .disableRules(COMPONENT_EXCLUDED_RULES)
+    .analyze();
+}
+```
+
 ### Component Accessibility Checklist
 
+**Static (vitest-axe):**
 - [ ] No axe violations
-- [ ] Keyboard navigation works
 - [ ] ARIA attributes present
 - [ ] Color contrast meets WCAG AA minimum
+
+**Interactive (Playwright):**
+- [ ] Keyboard navigation works
 - [ ] Focus indicators visible
+- [ ] Focus traps function correctly
+- [ ] Escape key closes modals/menus
 - [ ] Screen reader announcements tested
 
 ---
