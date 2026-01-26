@@ -80,7 +80,18 @@ function defaultValueLabel(value: number, max: number): string {
 
 export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
   (
-    { className, value, max = 100, getValueLabel, variant = 'default', size = 'default', ...props },
+    {
+      className,
+      value,
+      max = 100,
+      getValueLabel,
+      variant = 'default',
+      size = 'default',
+      'aria-label': ariaLabel,
+      'aria-labelledby': ariaLabelledby,
+      'aria-describedby': ariaDescribedby,
+      ...props
+    },
     ref,
   ) => {
     const isIndeterminate = value === undefined;
@@ -124,6 +135,9 @@ export const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
           aria-valuemin={0}
           aria-valuemax={max}
           aria-valuetext={valueLabel}
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledby}
+          aria-describedby={ariaDescribedby}
         >
           {valueLabel}
         </progress>

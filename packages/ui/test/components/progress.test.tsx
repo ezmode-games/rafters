@@ -195,10 +195,13 @@ describe('Progress', () => {
   });
 
   describe('HTML attributes passthrough', () => {
-    it('passes through HTML attributes', () => {
-      render(<Progress data-testid="progress" aria-label="Loading progress" />);
-      const progress = screen.getByTestId('progress');
-      expect(progress).toHaveAttribute('aria-label', 'Loading progress');
+    it('passes through aria-label to native progress element', () => {
+      const { container } = render(
+        <Progress data-testid="progress" aria-label="Loading progress" />,
+      );
+      // aria-label is forwarded to the native <progress> element for screen readers
+      const nativeProgress = container.querySelector('progress');
+      expect(nativeProgress).toHaveAttribute('aria-label', 'Loading progress');
     });
 
     it('passes through id attribute', () => {

@@ -27,7 +27,7 @@ describe('Select - Accessibility', () => {
   it('has no accessibility violations when closed', async () => {
     const { container } = render(
       <Select>
-        <SelectTrigger>
+        <SelectTrigger aria-label="Select a fruit">
           <SelectValue placeholder="Select a fruit" />
         </SelectTrigger>
         <SelectPortal>
@@ -46,7 +46,7 @@ describe('Select - Accessibility', () => {
   it('has no accessibility violations when open', async () => {
     const { container } = render(
       <Select defaultOpen>
-        <SelectTrigger>
+        <SelectTrigger aria-label="Select a fruit">
           <SelectValue placeholder="Select a fruit" />
         </SelectTrigger>
         <SelectPortal>
