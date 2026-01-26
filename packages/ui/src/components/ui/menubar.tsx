@@ -1011,12 +1011,7 @@ export interface MenubarSeparatorProps extends React.HTMLAttributes<HTMLHRElemen
 export const MenubarSeparator = React.forwardRef<HTMLHRElement, MenubarSeparatorProps>(
   ({ className, ...props }, ref) => {
     return (
-      <hr
-        ref={ref}
-        role="separator"
-        className={classy('-mx-1 my-1 h-px border-0 bg-muted', className)}
-        {...props}
-      />
+      <hr ref={ref} className={classy('-mx-1 my-1 h-px border-0 bg-muted', className)} {...props} />
     );
   },
 );

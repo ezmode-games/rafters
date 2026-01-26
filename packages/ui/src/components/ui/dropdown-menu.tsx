@@ -783,12 +783,7 @@ export interface DropdownMenuSeparatorProps extends React.HTMLAttributes<HTMLHRE
 export const DropdownMenuSeparator = React.forwardRef<HTMLHRElement, DropdownMenuSeparatorProps>(
   ({ className, ...props }, ref) => {
     return (
-      <hr
-        ref={ref}
-        role="separator"
-        className={classy('-mx-1 my-1 h-px border-0 bg-muted', className)}
-        {...props}
-      />
+      <hr ref={ref} className={classy('-mx-1 my-1 h-px border-0 bg-muted', className)} {...props} />
     );
   },
 );
