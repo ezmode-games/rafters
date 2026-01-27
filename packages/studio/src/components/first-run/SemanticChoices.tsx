@@ -87,7 +87,7 @@ function SemanticRow({
         }
         return (
           <button
-            key={i}
+            key={`${intent}-${hex}`}
             type="button"
             onClick={() => onPick(intent, color)}
             onMouseEnter={() => setHoveredIndex(i)}

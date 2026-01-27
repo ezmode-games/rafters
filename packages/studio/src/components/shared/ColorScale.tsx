@@ -27,7 +27,7 @@ export function ColorScale({ scale, size = 48, labels = DEFAULT_LABELS }: ColorS
         }
         return (
           <div
-            key={i}
+            key={labels[i] ?? `scale-${i}`}
             className="group/swatch relative rounded-md transition-transform hover:scale-110"
             style={{
               width: size,

@@ -94,7 +94,7 @@ export function ScalePaint({ color, onComplete }: ScalePaintProps) {
 
       {/* Scale: 48px boxes */}
       <div ref={scaleRef} className="flex items-center gap-1">
-        {scale.map((step, i) => {
+        {scale.map((step) => {
           let hex: string;
           try {
             hex = oklchToHex(step);
@@ -103,7 +103,7 @@ export function ScalePaint({ color, onComplete }: ScalePaintProps) {
           }
           return (
             <div
-              key={i}
+              key={`scale-step-${step.l}`}
               className="rounded-lg opacity-0"
               style={{
                 width: 48,
