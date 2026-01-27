@@ -1,10 +1,11 @@
 /**
  * Color Picker Hook
  *
- * Manages state for the spectrum color picker with OKLCH conversion.
+ * Manages state for the OKLCH color picker.
+ * No react-colorful dependency - works with custom canvas picker.
  */
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import type { Token } from '../api/token-loader';
 import {
   hexToOKLCH,
@@ -21,18 +22,14 @@ interface UseColorPickerProps {
 }
 
 interface UseColorPickerReturn {
-  /** Current color as hex for react-colorful */
-  hexColor: string;
   /** Current color as OKLCH */
   oklchColor: OKLCH;
+  /** Current color as hex */
+  hexColor: string;
   /** Whether current color is in sRGB gamut */
   inGamut: boolean;
-  /** Preview color while exploring (before confirmation) */
-  previewHex: string | null;
-  /** Set preview color (hover/drag state) */
-  setPreviewHex: (hex: string | null) => void;
-  /** Confirm the preview color as the new value */
-  confirmColor: (hex: string) => void;
+  /** Confirm color selection */
+  confirmColor: (oklch: OKLCH) => void;
 }
 
 const DEFAULT_OKLCH: OKLCH = { l: 0.5, c: 0.15, h: 250 };
@@ -41,8 +38,6 @@ export function useColorPicker({
   token,
   onColorChange,
 }: UseColorPickerProps): UseColorPickerReturn {
-  const [previewHex, setPreviewHex] = useState<string | null>(null);
-
   // Get current hex from token
   const currentHex = useMemo(() => {
     if (!token) return '#808080';
@@ -65,24 +60,17 @@ export function useColorPicker({
 
   // Confirm color selection
   const confirmColor = useCallback(
-    (hex: string) => {
-      try {
-        const oklch = roundOKLCH(hexToOKLCH(hex));
-        onColorChange?.(oklch);
-        setPreviewHex(null);
-      } catch {
-        // Invalid color, ignore
-      }
+    (oklch: OKLCH) => {
+      const rounded = roundOKLCH(oklch);
+      onColorChange?.(rounded);
     },
     [onColorChange],
   );
 
   return {
-    hexColor: currentHex,
     oklchColor,
+    hexColor: currentHex,
     inGamut,
-    previewHex,
-    setPreviewHex,
     confirmColor,
   };
 }

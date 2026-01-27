@@ -1,51 +1,69 @@
-import { useState } from 'react';
-import { Header } from './components/Header';
-import { Sidebar } from './components/Sidebar';
-import { TokenEditor } from './components/TokenEditor';
-import { useTokens } from './hooks/useTokens';
-import type { TokenNamespace } from './types';
+/**
+ * Studio App
+ *
+ * Root component. Routes between first-run and workspace phases.
+ * No header bar, no chrome. Logo + save float over content.
+ */
 
-export function App() {
-  const [selectedNamespace, setSelectedNamespace] = useState<TokenNamespace>('color');
-  const [selectedToken, setSelectedToken] = useState<string | null>(null);
-  const { namespaces, tokens, loading, error, refetch } = useTokens();
+import { QueryClientProvider, useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { FirstRun } from './components/first-run/FirstRun';
+import { SaveButton } from './components/shared/SaveButton';
+import { Workspace } from './components/workspaces/Workspace';
+import { StudioProvider, useStudioDispatch, useStudioState } from './context/StudioContext';
+import { fetchAllTokens, queryClient, tokenKeys } from './lib/query';
+
+function StudioRouter() {
+  const { phase } = useStudioState();
+  const dispatch = useStudioDispatch();
+
+  // Load tokens to detect first-run vs workspace
+  const { data, isLoading } = useQuery({
+    queryKey: tokenKeys.all,
+    queryFn: fetchAllTokens,
+  });
+
+  // Detect first-run: primary color not set
+  useEffect(() => {
+    if (isLoading || !data) return;
+
+    const colorTokens = data.tokens.color || [];
+    const hasSemanticTokens = data.tokens.semantic && data.tokens.semantic.length > 0;
+    const primaryToken = colorTokens.find(
+      (t) => t.name === 'color-primary' || t.name === 'primary',
+    );
+
+    const hasPrimary = primaryToken?.userOverride !== undefined;
+
+    if (hasPrimary && hasSemanticTokens) {
+      dispatch({ type: 'SET_PHASE', phase: 'workspace' });
+    } else {
+      dispatch({ type: 'SET_PHASE', phase: 'first-run' });
+    }
+  }, [data, isLoading, dispatch]);
+
+  if (phase === 'loading') {
+    return (
+      <div className="flex h-screen items-center justify-center bg-white">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-300 border-t-neutral-900" />
+      </div>
+    );
+  }
 
   return (
-    <div className="flex h-screen flex-col">
-      <Header />
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar
-          selectedNamespace={selectedNamespace}
-          onNamespaceChange={setSelectedNamespace}
-          selectedToken={selectedToken}
-          onTokenSelect={setSelectedToken}
-          tokens={tokens}
-          availableNamespaces={namespaces}
-          loading={loading}
-        />
-        <main className="flex-1 overflow-auto bg-neutral-50 p-6">
-          {error && (
-            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-              <p className="font-medium">Failed to load tokens</p>
-              <p className="mt-1">{error}</p>
-              <button
-                type="button"
-                onClick={() => refetch()}
-                className="mt-2 rounded bg-red-100 px-3 py-1 text-red-700 hover:bg-red-200"
-              >
-                Retry
-              </button>
-            </div>
-          )}
-          <TokenEditor
-            namespace={selectedNamespace}
-            tokenId={selectedToken}
-            tokens={tokens}
-            onTokenSelect={setSelectedToken}
-            onTokenSaved={refetch}
-          />
-        </main>
-      </div>
+    <div className="relative h-screen w-screen overflow-hidden bg-white">
+      {phase === 'first-run' ? <FirstRun /> : <Workspace />}
+      <SaveButton />
     </div>
+  );
+}
+
+export function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <StudioProvider>
+        <StudioRouter />
+      </StudioProvider>
+    </QueryClientProvider>
   );
 }
