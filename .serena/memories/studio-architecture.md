@@ -1,5 +1,7 @@
 # Studio Architecture (Issue #443)
 
+**READ `studio-vision` MEMORY FIRST.** That captures the design vision. This file is technical implementation details.
+
 ## Overview
 `rafters studio` - Vite-based visual token editor. Single designer, local machine, git-backed.
 
@@ -64,6 +66,19 @@ registryToTailwind(registry)       // Production combined
 registryToTailwindStatic(registry) // Studio static @theme inline
 registryToVars(registry)           // Studio dynamic CSS vars
 ```
+
+## Critical Principle: Tokens ARE Tailwind (Dogfooding)
+
+Studio uses Tailwind token classes for ALL styling. No hardcoded colors, spacing, or values.
+
+The @theme block in `rafters.tailwind.css` tells Tailwind: `--color-primary: var(--rafters-color-primary)`.
+Tailwind generates `bg-primary`, `text-primary`, etc. from this.
+When `rafters.vars.css` updates `--rafters-color-primary`, every `bg-primary` in Studio updates via HMR.
+
+**This means Studio dogfoods its own output automatically.** The designer changes primary color and the
+Studio UI itself - buttons, backgrounds, sidebar, everything using `bg-primary` - reflects the change instantly.
+No separate "self-consumption" feature needed. It's a constraint on how we build: every component uses
+Tailwind token classes, never hardcoded values.
 
 ## Constraints
 1. **Edit only** - No add/delete (dependency graph too complex for UI)
