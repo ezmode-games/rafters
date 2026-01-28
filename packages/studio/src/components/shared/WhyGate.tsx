@@ -12,10 +12,16 @@ interface WhyGateProps {
   onCommit: (reason: string) => void;
   context?: string;
   intelligenceHints?: string[];
+  initialValue?: string;
 }
 
-export function WhyGate({ onCommit, context = 'primary', intelligenceHints }: WhyGateProps) {
-  const [reason, setReason] = useState('');
+export function WhyGate({
+  onCommit,
+  context = 'primary',
+  intelligenceHints,
+  initialValue = '',
+}: WhyGateProps) {
+  const [reason, setReason] = useState(initialValue);
   const [showEnforcement, setShowEnforcement] = useState(false);
 
   const handleSubmit = useCallback(() => {

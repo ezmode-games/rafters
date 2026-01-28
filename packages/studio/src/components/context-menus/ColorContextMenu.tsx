@@ -18,7 +18,9 @@ interface ColorContextMenuProps {
   onClose: () => void;
   color: OKLCH;
   tokenName: string;
+  existingReason?: string;
   onCommit: (color: OKLCH, reason: string) => void;
+  onReasonEdit?: (reason: string) => void;
 }
 
 function clamp(v: number, min: number, max: number): number {
@@ -69,10 +71,12 @@ export function ColorContextMenu({
   onClose,
   color,
   tokenName,
+  existingReason,
   onCommit,
+  onReasonEdit,
 }: ColorContextMenuProps) {
   const [adjusted, setAdjusted] = useState<OKLCH>({ ...color });
-  const [step, setStep] = useState<'adjust' | 'cascade' | 'why'>('adjust');
+  const [step, setStep] = useState<'adjust' | 'cascade' | 'why' | 'editReason'>('adjust');
 
   const handleLChange = useCallback(
     (l: number) => setAdjusted((c) => ({ ...c, l: clamp(l, 0, 1) })),
@@ -103,6 +107,14 @@ export function ColorContextMenu({
     setStep('adjust');
   }, []);
 
+  const handleReasonEditCommit = useCallback(
+    (reason: string) => {
+      onReasonEdit?.(reason);
+      onClose();
+    },
+    [onReasonEdit, onClose],
+  );
+
   let previewHex: string;
   try {
     previewHex = oklchToHex(adjusted);
@@ -123,6 +135,26 @@ export function ColorContextMenu({
       <div className="px-3 py-2">
         <span className="text-xs font-medium text-neutral-900">{tokenName}</span>
       </div>
+
+      {/* Existing reason display + edit option */}
+      {existingReason && step !== 'editReason' && (
+        <>
+          <div className="px-3 py-1">
+            <p className="text-xs italic text-neutral-500 line-clamp-2">
+              &ldquo;{existingReason}&rdquo;
+            </p>
+          </div>
+          {onReasonEdit && (
+            <button
+              type="button"
+              className="w-full px-3 py-1.5 text-left text-xs text-neutral-600 hover:bg-neutral-50"
+              onClick={() => setStep('editReason')}
+            >
+              Edit reasoning...
+            </button>
+          )}
+        </>
+      )}
       <ContextMenuDivider />
 
       {/* Preview swatches */}
@@ -190,6 +222,11 @@ export function ColorContextMenu({
       {step === 'why' && (
         <div className="px-3 py-2">
           <WhyGate onCommit={handleCommit} />
+        </div>
+      )}
+      {step === 'editReason' && (
+        <div className="px-3 py-2">
+          <WhyGate onCommit={handleReasonEditCommit} initialValue={existingReason} />
         </div>
       )}
     </ContextMenu>

@@ -117,6 +117,21 @@ export function ColorWorkspace() {
     [menuTarget, tokenMutation, handleClose],
   );
 
+  const handleReasonEdit = useCallback(
+    (reason: string) => {
+      if (!menuTarget) return;
+      // Update reason without changing value
+      tokenMutation.mutate({
+        namespace: menuTarget.namespace,
+        name: menuTarget.name,
+        value: menuTarget.value,
+        reason,
+      });
+      handleClose();
+    },
+    [menuTarget, tokenMutation, handleClose],
+  );
+
   const colorTokens = (data?.tokens.color || []).filter(isColorToken);
   const semanticTokens = (data?.tokens.semantic || []).filter(isColorToken);
 
@@ -180,7 +195,9 @@ export function ColorWorkspace() {
           onClose={handleClose}
           color={menuColor}
           tokenName={menuTarget.name}
+          existingReason={menuTarget.userOverride?.reason}
           onCommit={handleCommit}
+          onReasonEdit={handleReasonEdit}
         />
       )}
     </div>
