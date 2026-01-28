@@ -10,6 +10,7 @@ import { useCallback, useState } from 'react';
 import type { OKLCH } from '../../utils/color-conversion';
 import { oklchToHex } from '../../utils/color-conversion';
 import { WhyGate } from '../shared/WhyGate';
+import { CascadePreview } from './CascadePreview';
 import { ContextMenu, ContextMenuDivider, type ContextMenuPosition } from './ContextMenu';
 
 interface ColorContextMenuProps {
@@ -71,7 +72,7 @@ export function ColorContextMenu({
   onCommit,
 }: ColorContextMenuProps) {
   const [adjusted, setAdjusted] = useState<OKLCH>({ ...color });
-  const [showWhy, setShowWhy] = useState(false);
+  const [step, setStep] = useState<'adjust' | 'cascade' | 'why'>('adjust');
 
   const handleLChange = useCallback(
     (l: number) => setAdjusted((c) => ({ ...c, l: clamp(l, 0, 1) })),
@@ -93,6 +94,14 @@ export function ColorContextMenu({
     },
     [adjusted, onCommit, onClose],
   );
+
+  const handleCascadeUpdateAll = useCallback(() => {
+    setStep('why');
+  }, []);
+
+  const handleCascadeCancel = useCallback(() => {
+    setStep('adjust');
+  }, []);
 
   let previewHex: string;
   try {
@@ -158,19 +167,30 @@ export function ColorContextMenu({
       />
       <ContextMenuDivider />
 
-      {/* Why gate or apply button */}
-      {showWhy ? (
-        <div className="px-3 py-2">
-          <WhyGate onCommit={handleCommit} />
-        </div>
-      ) : (
+      {/* Step flow: adjust -> cascade -> why */}
+      {step === 'adjust' && (
         <button
           type="button"
           className="w-full px-3 py-2 text-left text-sm font-medium text-neutral-900 hover:bg-neutral-50"
-          onClick={() => setShowWhy(true)}
+          onClick={() => setStep('cascade')}
         >
           Apply change...
         </button>
+      )}
+      {step === 'cascade' && (
+        <>
+          <ContextMenuDivider />
+          <CascadePreview
+            tokenName={tokenName}
+            onUpdateAll={handleCascadeUpdateAll}
+            onCancel={handleCascadeCancel}
+          />
+        </>
+      )}
+      {step === 'why' && (
+        <div className="px-3 py-2">
+          <WhyGate onCommit={handleCommit} />
+        </div>
       )}
     </ContextMenu>
   );

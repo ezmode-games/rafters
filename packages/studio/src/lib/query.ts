@@ -70,6 +70,26 @@ export async function updateToken(
   return data.token as Token;
 }
 
+export interface DependentInfo {
+  name: string;
+  namespace: string;
+  currentValue: unknown;
+  hasUserOverride: boolean;
+  overrideReason?: string;
+}
+
+/**
+ * Fetch tokens that depend on the given token name.
+ */
+export async function fetchTokenDependents(tokenName: string): Promise<DependentInfo[]> {
+  const response = await fetch(`/api/dependents/${encodeURIComponent(tokenName)}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch dependents: ${response.statusText}`);
+  }
+  const data = await response.json();
+  return data.dependents as DependentInfo[];
+}
+
 /**
  * Mutation hook for updating a token with reason.
  * Automatically invalidates the token cache on success.

@@ -81,6 +81,34 @@ export class WriteQueue {
   }
 
   /**
+   * Wait for all pending namespace queues to drain, then run an operation.
+   * Ensures no concurrent reads of partially-written files during save-all.
+   */
+  async drainThenRun<T>(operation: WriteOperation<T>): Promise<T> {
+    // Wait for all currently processing namespaces to finish
+    const namespaces = [...this.processing];
+    if (namespaces.length > 0) {
+      await Promise.all(
+        namespaces.map(
+          (ns) =>
+            new Promise<void>((resolve) => {
+              const check = () => {
+                if (!this.processing.has(ns)) {
+                  resolve();
+                } else {
+                  setTimeout(check, 10);
+                }
+              };
+              check();
+            }),
+        ),
+      );
+    }
+
+    return operation();
+  }
+
+  /**
    * Get current queue lengths (for debugging)
    */
   getQueueStats(): Record<string, number> {
