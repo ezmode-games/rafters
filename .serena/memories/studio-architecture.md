@@ -50,8 +50,22 @@ const response = await fetch(`https://api.rafters.studio/color/${l}-${c}-${h}?sy
 const intelligence = await response.json();
 ```
 
-## Architecture Overview
+## Architecture
 
+Single-designer local tool. Vite middleware (~50 lines) + React UI.
+
+```
+Browser (React)
+     │
+     ▼
+Vite Middleware (~50 lines)
+     │
+     ├── TokenRegistry (singleton)
+     ├── NodePersistenceAdapter  
+     └── setChangeCallback → write rafters.vars.css
+     │
+     ▼
+Vite HMR (CSS hot reload)
 ```
 pnpx rafters@latest studio
          │
