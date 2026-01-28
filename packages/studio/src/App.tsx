@@ -1,26 +1,88 @@
 /**
- * Studio App - Placeholder
+ * Studio App - Visual Decision Recorder
  *
- * Re-architecture in progress.
- * Previous implementation removed due to duplication of existing packages.
+ * Not a token editor. A canvas for capturing design decisions.
+ * The entire UI IS the preview - we dogfood our own tokens.
  *
- * Correct architecture must use:
- * - @rafters/color-utils for all color operations
- * - @rafters/math-utils for all mathematical operations
- * - @rafters/design-tokens for TokenRegistry (singleton with setChangeCallback)
- * - @rafters/shared for all Zod-first types
- * - apps/api Vectorize endpoints for AI color intelligence
+ * ALL styling uses Tailwind token classes via classy. No inline styles.
+ * When tokens change, the UI updates via CSS HMR.
  */
+
+import { Card, CardContent, CardHeader, CardTitle } from '@rafters/ui/components/ui/card';
+import { Container } from '@rafters/ui/components/ui/container';
+import { Grid } from '@rafters/ui/components/ui/grid';
+import { Muted } from '@rafters/ui/components/ui/typography';
+import classy from '@rafters/ui/primitives/classy';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useCallback, useState } from 'react';
+import { Snowstorm } from './components/first-run/Snowstorm';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60,
+      retry: 1,
+    },
+  },
+});
+
+type AppState = 'first-run' | 'workspace';
+
+interface OklchColor {
+  h: number;
+  s: number;
+  l: number;
+}
+
+function StudioContent() {
+  const [appState, setAppState] = useState<AppState>('first-run');
+  const [, setPrimaryColor] = useState<OklchColor | null>(null);
+
+  const handleColorSelect = useCallback((color: OklchColor) => {
+    setPrimaryColor(color);
+    // Issue #731 will add WhyGate modal here
+    // Issue #732 will paint the scale and write to tokens
+    // After that, bg-primary will reflect the choice via CSS HMR
+    console.log('Primary color selected:', `oklch(${color.l} ${color.s} ${color.h})`);
+    setAppState('workspace');
+  }, []);
+
+  if (appState === 'first-run') {
+    return <Snowstorm onColorSelect={handleColorSelect} />;
+  }
+
+  // Placeholder workspace - ALL styling via token classes through classy
+  return (
+    <Container
+      as="main"
+      size="full"
+      padding="6"
+      className={classy('min-h-screen', 'bg-background')}
+    >
+      <Grid preset="linear" columns={1} gap="6" className={classy('mx-auto', 'max-w-md')}>
+        <Grid.Item>
+          <Card>
+            <CardHeader>
+              <CardTitle>Primary Color Selected</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {/* Color swatch uses bg-primary - will update via HMR after #732 */}
+              <div
+                className={classy('mb-4', 'h-24', 'w-24', 'rounded-lg', 'bg-primary', 'shadow-md')}
+              />
+              <Muted>WhyGate and scale painting coming in issues #731, #732</Muted>
+            </CardContent>
+          </Card>
+        </Grid.Item>
+      </Grid>
+    </Container>
+  );
+}
 
 export function App() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-50">
-      <div className="max-w-md text-center">
-        <h1 className="mb-4 text-2xl font-semibold text-neutral-900">Studio Re-architecture</h1>
-        <p className="text-neutral-600">
-          Previous implementation removed. Rebuilding with proper package integration.
-        </p>
-      </div>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <StudioContent />
+    </QueryClientProvider>
   );
 }
