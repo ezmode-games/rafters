@@ -11,11 +11,15 @@ import { FirstRun } from './components/first-run/FirstRun';
 import { SaveButton } from './components/shared/SaveButton';
 import { Workspace } from './components/workspaces/Workspace';
 import { StudioProvider, useStudioDispatch, useStudioState } from './context/StudioContext';
+import { useTokenEvents } from './hooks/useTokenEvents';
 import { fetchAllTokens, queryClient, tokenKeys } from './lib/query';
 
 function StudioRouter() {
   const { phase } = useStudioState();
   const dispatch = useStudioDispatch();
+
+  // Subscribe to SSE token change events for multi-tab/external tool support
+  useTokenEvents();
 
   // Load tokens to detect first-run vs workspace
   const { data, isLoading } = useQuery({

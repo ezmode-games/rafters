@@ -10,6 +10,7 @@ import { useCallback, useState } from 'react';
 import type { OKLCH } from '../../utils/color-conversion';
 import { oklchToHex } from '../../utils/color-conversion';
 import { WhyGate } from '../shared/WhyGate';
+import { CascadePreview } from './CascadePreview';
 import { ContextMenu, ContextMenuDivider, type ContextMenuPosition } from './ContextMenu';
 
 interface ColorContextMenuProps {
@@ -17,7 +18,7 @@ interface ColorContextMenuProps {
   onClose: () => void;
   color: OKLCH;
   tokenName: string;
-  onCommit: (color: OKLCH, reason: string) => void;
+  onCommit: (color: OKLCH, reason: string, options?: { skipOverrides?: boolean }) => void;
 }
 
 function clamp(v: number, min: number, max: number): number {
@@ -71,7 +72,8 @@ export function ColorContextMenu({
   onCommit,
 }: ColorContextMenuProps) {
   const [adjusted, setAdjusted] = useState<OKLCH>({ ...color });
-  const [showWhy, setShowWhy] = useState(false);
+  const [step, setStep] = useState<'adjust' | 'cascade' | 'why'>('adjust');
+  const [skipOverrides, setSkipOverrides] = useState(false);
 
   const handleLChange = useCallback(
     (l: number) => setAdjusted((c) => ({ ...c, l: clamp(l, 0, 1) })),
@@ -88,11 +90,25 @@ export function ColorContextMenu({
 
   const handleCommit = useCallback(
     (reason: string) => {
-      onCommit(adjusted, reason);
+      onCommit(adjusted, reason, { skipOverrides });
       onClose();
     },
-    [adjusted, onCommit, onClose],
+    [adjusted, onCommit, onClose, skipOverrides],
   );
+
+  const handleCascadeUpdateAll = useCallback(() => {
+    setSkipOverrides(false);
+    setStep('why');
+  }, []);
+
+  const handleCascadeSkipOverrides = useCallback(() => {
+    setSkipOverrides(true);
+    setStep('why');
+  }, []);
+
+  const handleCascadeCancel = useCallback(() => {
+    setStep('adjust');
+  }, []);
 
   let previewHex: string;
   try {
@@ -158,19 +174,31 @@ export function ColorContextMenu({
       />
       <ContextMenuDivider />
 
-      {/* Why gate or apply button */}
-      {showWhy ? (
-        <div className="px-3 py-2">
-          <WhyGate onCommit={handleCommit} />
-        </div>
-      ) : (
+      {/* Step flow: adjust -> cascade -> why */}
+      {step === 'adjust' && (
         <button
           type="button"
           className="w-full px-3 py-2 text-left text-sm font-medium text-neutral-900 hover:bg-neutral-50"
-          onClick={() => setShowWhy(true)}
+          onClick={() => setStep('cascade')}
         >
           Apply change...
         </button>
+      )}
+      {step === 'cascade' && (
+        <>
+          <ContextMenuDivider />
+          <CascadePreview
+            tokenName={tokenName}
+            onUpdateAll={handleCascadeUpdateAll}
+            onSkipOverrides={handleCascadeSkipOverrides}
+            onCancel={handleCascadeCancel}
+          />
+        </>
+      )}
+      {step === 'why' && (
+        <div className="px-3 py-2">
+          <WhyGate onCommit={handleCommit} />
+        </div>
       )}
     </ContextMenu>
   );

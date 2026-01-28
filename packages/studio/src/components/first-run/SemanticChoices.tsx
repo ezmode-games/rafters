@@ -6,9 +6,10 @@
  * No labels - name appears centered on hover.
  */
 
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useStudioDispatch, useStudioState } from '../../context/StudioContext';
 import { useTokenMutation } from '../../lib/query';
+import { generateSemanticSuggestions } from '../../lib/semantic-suggestions';
 import { SEMANTIC_INTENTS, type SemanticIntent } from '../../types';
 import { type OKLCH, oklchToHex } from '../../utils/color-conversion';
 import { WhyGate } from '../shared/WhyGate';
@@ -17,57 +18,18 @@ interface SemanticChoicesProps {
   onComplete: () => void;
 }
 
-// Placeholder: generate 3 suggestions for each semantic
-// TODO: Use actual computation from color-utils + API
-function generateSuggestions(intent: SemanticIntent): OKLCH[] {
-  const hueMap: Record<SemanticIntent, number> = {
-    destructive: 25,
-    success: 145,
-    warning: 75,
-    info: 220,
-    secondary: 280,
-    muted: 0,
-    accent: 320,
-    background: 0,
-    foreground: 0,
-  };
-  const baseH = hueMap[intent];
-  const isNeutral = intent === 'muted' || intent === 'background' || intent === 'foreground';
-
-  if (intent === 'background') {
-    return [
-      { l: 0.98, c: 0.005, h: baseH },
-      { l: 0.96, c: 0.01, h: baseH },
-      { l: 0.99, c: 0, h: 0 },
-    ];
-  }
-
-  if (intent === 'foreground') {
-    return [
-      { l: 0.15, c: 0.01, h: baseH },
-      { l: 0.1, c: 0.005, h: baseH },
-      { l: 0.05, c: 0, h: 0 },
-    ];
-  }
-
-  return [
-    { l: 0.55, c: isNeutral ? 0.02 : 0.18, h: baseH },
-    { l: 0.6, c: isNeutral ? 0.015 : 0.15, h: baseH + 10 },
-    { l: 0.5, c: isNeutral ? 0.025 : 0.2, h: baseH - 10 },
-  ];
-}
-
 function SemanticRow({
   intent,
+  suggestions,
   onPick,
   completed,
 }: {
   intent: SemanticIntent;
+  suggestions: OKLCH[];
   onPick: (intent: SemanticIntent, color: OKLCH) => void;
   completed: boolean;
 }) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const suggestions = generateSuggestions(intent);
 
   if (completed) {
     return null; // Will be replaced by done state
@@ -116,8 +78,18 @@ function SemanticRow({
 
 export function SemanticChoices({ onComplete }: SemanticChoicesProps) {
   const dispatch = useStudioDispatch();
-  const { completedSemantics } = useStudioState();
+  const { completedSemantics, primaryColor } = useStudioState();
   const tokenMutation = useTokenMutation();
+
+  // Compute suggestions for all intents based on primary color
+  const suggestionsByIntent = useMemo(() => {
+    const primary: OKLCH = primaryColor ?? { l: 0.55, c: 0.15, h: 260 };
+    const result: Record<string, OKLCH[]> = {};
+    for (const intent of SEMANTIC_INTENTS) {
+      result[intent] = generateSemanticSuggestions(intent, primary);
+    }
+    return result;
+  }, [primaryColor]);
   const [pendingIntent, setPendingIntent] = useState<{
     intent: SemanticIntent;
     color: OKLCH;
@@ -164,6 +136,7 @@ export function SemanticChoices({ onComplete }: SemanticChoicesProps) {
         <SemanticRow
           key={intent}
           intent={intent}
+          suggestions={suggestionsByIntent[intent] ?? []}
           onPick={handlePick}
           completed={completedSemantics.has(intent)}
         />

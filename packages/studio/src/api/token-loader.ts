@@ -12,6 +12,7 @@ import { join } from 'node:path';
 import {
   NodePersistenceAdapter,
   registryToTailwindStatic,
+  registryToTypeScript,
   registryToVars,
   TokenRegistry,
 } from '@rafters/design-tokens';
@@ -236,4 +237,89 @@ export async function updateSingleToken(
   await regenerateCss(projectPath);
 
   return updatedToken;
+}
+
+export interface DependentInfo {
+  name: string;
+  namespace: string;
+  currentValue: unknown;
+  hasUserOverride: boolean;
+  overrideReason?: string;
+}
+
+/**
+ * Get tokens that depend on a given token (reverse dependency lookup).
+ * Builds a fresh TokenRegistry to compute the dependency graph.
+ */
+export async function getTokenDependents(
+  projectPath: string,
+  tokenName: string,
+): Promise<DependentInfo[]> {
+  const adapter = new NodePersistenceAdapter(projectPath);
+  const namespaces = await adapter.listNamespaces();
+  const allTokens: SharedToken[] = [];
+
+  for (const ns of namespaces) {
+    const tokens = await adapter.loadNamespace(ns);
+    allTokens.push(...tokens);
+  }
+
+  if (allTokens.length === 0) return [];
+
+  const registry = new TokenRegistry(allTokens);
+  const dependentNames = registry.getDependents(tokenName);
+
+  const result: DependentInfo[] = [];
+  for (const depName of dependentNames) {
+    const token = registry.get(depName);
+    if (!token) continue;
+    result.push({
+      name: depName,
+      namespace: token.namespace ?? 'unknown',
+      currentValue: token.value,
+      hasUserOverride: token.userOverride !== undefined,
+      overrideReason: token.userOverride?.reason,
+    });
+  }
+
+  return result;
+}
+
+/**
+ * Regenerate all output files (CSS, TypeScript, Tailwind)
+ *
+ * Called by the "Save" button to produce complete output files.
+ * Unlike regenerateCss() which only writes vars for HMR, this writes
+ * the full set of export files.
+ */
+export async function regenerateAllOutputs(projectPath: string): Promise<void> {
+  const outputDir = join(projectPath, '.rafters', 'output');
+  const adapter = new NodePersistenceAdapter(projectPath);
+
+  const namespaces = await adapter.listNamespaces();
+  const allTokens: SharedToken[] = [];
+
+  for (const ns of namespaces) {
+    const tokens = await adapter.loadNamespace(ns);
+    allTokens.push(...tokens);
+  }
+
+  if (allTokens.length === 0) {
+    return;
+  }
+
+  const registry = new TokenRegistry(allTokens);
+
+  await mkdir(outputDir, { recursive: true });
+
+  // Write all output formats
+  const staticCSS = registryToTailwindStatic(registry);
+  const varsCSS = registryToVars(registry);
+  const tsOutput = registryToTypeScript(registry);
+
+  await writeFile(join(outputDir, 'rafters.tailwind.css'), staticCSS);
+  await writeFile(join(outputDir, 'rafters.vars.css'), varsCSS);
+  await writeFile(join(outputDir, 'rafters.ts'), tsOutput);
+
+  console.log('[studio] Regenerated all output files');
 }

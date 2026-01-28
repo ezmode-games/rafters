@@ -7,12 +7,32 @@
 
 import type { Plugin, ViteDevServer } from 'vite';
 import {
+  getTokenDependents,
   initializeStudioCss,
   loadProjectTokens,
+  regenerateAllOutputs,
   saveTokenUpdate,
   updateSingleToken,
 } from './token-loader';
 import { writeQueue } from './write-queue';
+
+/**
+ * SSE client management for live token update broadcasting.
+ * Each connected client gets a writable ServerResponse.
+ */
+const sseClients = new Set<import('node:http').ServerResponse>();
+
+/** Broadcast a token change event to all connected SSE clients */
+export function broadcastTokenChange(namespace: string): void {
+  const data = JSON.stringify({ type: 'token-change', namespace, timestamp: Date.now() });
+  for (const client of sseClients) {
+    try {
+      client.write(`data: ${data}\n\n`);
+    } catch {
+      sseClients.delete(client);
+    }
+  }
+}
 
 export function studioApiPlugin(): Plugin {
   return {
@@ -95,6 +115,38 @@ export function studioApiPlugin(): Plugin {
         }
       });
 
+      // GET /api/dependents/:tokenName - Get tokens that depend on a given token
+      server.middlewares.use('/api/dependents/', async (req, res, next) => {
+        if (req.method !== 'GET') {
+          next();
+          return;
+        }
+
+        const tokenName = req.url?.replace('/', '').split('?')[0];
+        if (!tokenName) {
+          next();
+          return;
+        }
+
+        try {
+          if (!projectPath) {
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ dependents: [] }));
+            return;
+          }
+
+          const dependents = await getTokenDependents(projectPath, tokenName);
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ tokenName, dependents }));
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Unknown error';
+          console.error(`[studio] Failed to get dependents for ${tokenName}:`, error);
+          res.statusCode = 500;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ error: message }));
+        }
+      });
+
       // POST /api/tokens/:namespace - Update tokens in a namespace
       server.middlewares.use('/api/save/', async (req, res, next) => {
         if (req.method !== 'POST') {
@@ -134,6 +186,57 @@ export function studioApiPlugin(): Plugin {
           res.statusCode = 500;
           res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify({ error: `Failed to save namespace ${namespace}` }));
+        }
+      });
+
+      // GET /api/events - Server-Sent Events for live token updates
+      server.middlewares.use('/api/events', (req, res, next) => {
+        if (req.method !== 'GET') {
+          next();
+          return;
+        }
+
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.flushHeaders();
+
+        // Send initial connection event
+        res.write('data: {"type":"connected"}\n\n');
+
+        sseClients.add(res);
+
+        req.on('close', () => {
+          sseClients.delete(res);
+        });
+      });
+
+      // POST /api/save/all - Regenerate all output files
+      server.middlewares.use('/api/save/all', async (req, res, next) => {
+        if (req.method !== 'POST') {
+          next();
+          return;
+        }
+
+        try {
+          if (!projectPath) {
+            res.statusCode = 400;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ error: 'No project path configured' }));
+            return;
+          }
+
+          await writeQueue.enqueue('__save_all__', () => regenerateAllOutputs(projectPath));
+
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ success: true }));
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Unknown error';
+          console.error('[studio] Failed to regenerate outputs:', error);
+          res.statusCode = 500;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ error: message }));
         }
       });
 
@@ -194,6 +297,7 @@ export function studioApiPlugin(): Plugin {
             }),
           );
 
+          broadcastTokenChange(namespace);
           res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify({ success: true, token: updatedToken }));
         } catch (error) {
