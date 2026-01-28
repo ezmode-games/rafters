@@ -2,7 +2,7 @@
  * React Query hooks for Studio token management
  */
 
-import type { Token } from '@rafters/shared';
+import type { OKLCH, Token } from '@rafters/shared';
 import {
   type UseMutationResult,
   type UseQueryResult,
@@ -74,6 +74,49 @@ export function useTokenMutation(): UseMutationResult<
     },
     onSuccess: () => {
       // Invalidate token queries to refetch
+      queryClient.invalidateQueries({ queryKey: tokenKeys.all });
+    },
+  });
+}
+
+interface PrimaryColorMutationVars {
+  color: OKLCH;
+  reason: string;
+}
+
+interface PrimaryColorResponse {
+  success: boolean;
+  scale: Record<string, OKLCH>;
+}
+
+/**
+ * Mutation to set the primary color scale
+ * Generates a full 50-950 scale from the base color and writes all tokens
+ */
+export function usePrimaryColorMutation(): UseMutationResult<
+  PrimaryColorResponse,
+  Error,
+  PrimaryColorMutationVars
+> {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ color, reason }: PrimaryColorMutationVars) => {
+      const res = await fetch('/api/tokens/primary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ color, reason }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to set primary color');
+      }
+
+      return res.json();
+    },
+    onSuccess: () => {
+      // Invalidate token queries to refetch - CSS will update via HMR
       queryClient.invalidateQueries({ queryKey: tokenKeys.all });
     },
   });
