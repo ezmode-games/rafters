@@ -1,0 +1,139 @@
+/**
+ * Studio API Vite Plugin
+ *
+ * Minimal ~50 line plugin providing token API endpoints:
+ * - GET /api/tokens - returns tokens grouped by namespace
+ * - PATCH /api/token/:ns/:name - updates a token value
+ *
+ * Uses singleton TokenRegistry with setChangeCallback for CSS HMR.
+ */
+
+import { mkdir, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { NodePersistenceAdapter, registryToVars, TokenRegistry } from '@rafters/design-tokens';
+import type { Token } from '@rafters/shared';
+import type { Plugin, ViteDevServer } from 'vite';
+
+let registry: TokenRegistry | null = null;
+let persistence: NodePersistenceAdapter | null = null;
+
+async function initRegistry(projectPath: string): Promise<TokenRegistry> {
+  if (registry) return registry;
+
+  persistence = new NodePersistenceAdapter(projectPath);
+  registry = new TokenRegistry();
+
+  // Load all namespaces
+  const namespaces = await persistence.listNamespaces();
+  for (const ns of namespaces) {
+    const tokens = await persistence.loadNamespace(ns);
+    for (const token of tokens) {
+      registry.add(token);
+    }
+  }
+
+  // Set up change callback for CSS HMR
+  const outputDir = join(projectPath, '.rafters', 'output');
+  await mkdir(outputDir, { recursive: true });
+
+  registry.setChangeCallback(async () => {
+    if (!registry) return;
+    const css = registryToVars(registry);
+    await writeFile(join(outputDir, 'rafters.vars.css'), css);
+  });
+
+  return registry;
+}
+
+export function studioApiPlugin(): Plugin {
+  const projectPath = process.env.RAFTERS_PROJECT_PATH;
+
+  return {
+    name: 'studio-api',
+
+    configureServer(server: ViteDevServer) {
+      server.middlewares.use(async (req, res, next) => {
+        if (!projectPath) {
+          if (req.url?.startsWith('/api/')) {
+            res.statusCode = 400;
+            res.end(JSON.stringify({ error: 'RAFTERS_PROJECT_PATH not set' }));
+            return;
+          }
+          return next();
+        }
+
+        // GET /api/tokens
+        if (req.method === 'GET' && req.url === '/api/tokens') {
+          try {
+            const reg = await initRegistry(projectPath);
+            const tokens = reg.list();
+            const grouped: Record<string, Token[]> = {};
+
+            for (const token of tokens) {
+              const ns = token.namespace || 'default';
+              if (!grouped[ns]) grouped[ns] = [];
+              grouped[ns].push(token);
+            }
+
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ tokens: grouped }));
+          } catch (err) {
+            res.statusCode = 500;
+            res.end(JSON.stringify({ error: String(err) }));
+          }
+          return;
+        }
+
+        // PATCH /api/token/:ns/:name
+        const patchMatch = req.url?.match(/^\/api\/token\/([^/]+)\/([^/]+)$/);
+        if (req.method === 'PATCH' && patchMatch) {
+          const [, ns, name] = patchMatch;
+          let body = '';
+
+          req.on('data', (chunk) => {
+            body += chunk;
+          });
+
+          req.on('end', async () => {
+            try {
+              const { value } = JSON.parse(body);
+              if (value === undefined) {
+                res.statusCode = 400;
+                res.end(JSON.stringify({ error: 'value required' }));
+                return;
+              }
+
+              const reg = await initRegistry(projectPath);
+              const tokenId = `${ns}/${name}`;
+
+              if (!reg.has(tokenId)) {
+                res.statusCode = 404;
+                res.end(JSON.stringify({ error: 'Token not found' }));
+                return;
+              }
+
+              // Note: reason is captured for WhyGate but updateToken only takes value
+              // Future: store reason in token metadata
+              reg.updateToken(tokenId, value);
+
+              // Persist to file
+              if (persistence) {
+                const tokens = reg.list().filter((t) => t.namespace === ns);
+                await persistence.saveNamespace(ns, tokens);
+              }
+
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ success: true }));
+            } catch (err) {
+              res.statusCode = 500;
+              res.end(JSON.stringify({ error: String(err) }));
+            }
+          });
+          return;
+        }
+
+        next();
+      });
+    },
+  };
+}
