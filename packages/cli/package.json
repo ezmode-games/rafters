@@ -1,6 +1,6 @@
 {
   "name": "rafters",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "CLI for Rafters design system - scaffold tokens and add components",
   "type": "module",
   "bin": {
