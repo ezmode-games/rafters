@@ -1,28 +1,57 @@
-# Studio Architecture (Issue #443)
+# Studio Architecture
 
-**READ `studio-vision` MEMORY FIRST.** That captures the design vision. This file is technical implementation details.
+**STATUS: RE-ARCHITECTURE REQUIRED**
 
-## Overview
-`rafters studio` - Vite-based visual token editor. Single designer, local machine, git-backed.
+Previous implementation (2025-01) was removed due to systematic duplication of existing packages.
+Must rebuild using correct package integration.
 
-## Key Design Decisions
+## Non-Negotiable Package Dependencies
 
-### 1. No API layer
-Studio directly imports `@rafters/design-tokens` (workspace dependency).
-Vite middleware is ~80 lines of HTTP glue.
+Studio MUST use these packages - NO reimplementation allowed:
 
-### 2. Split CSS for instant HMR
-`@theme` blocks require Tailwind reprocessing. Pure CSS variables don't.
-
-**Production (apps):**
-```tsx
-import '.rafters/output/rafters.css';  // combined @theme + values
+### @rafters/color-utils
+```typescript
+import { hexToOKLCH, oklchToHex, generateOKLCHScale, generateSemanticColorSuggestions, buildColorValue } from '@rafters/color-utils';
 ```
 
-**Studio (HMR):**
-```tsx
-import '.rafters/output/rafters.tailwind.css';  // static @theme inline, processed once
-import '.rafters/output/rafters.vars.css';       // pure CSS vars, instant HMR
+### @rafters/math-utils
+```typescript
+import { generateProgression, generateModularScale } from '@rafters/math-utils';
+```
+
+### @rafters/design-tokens
+```typescript
+import { TokenRegistry, NodePersistenceAdapter, registryToVars, registryToTailwindStatic } from '@rafters/design-tokens';
+
+// SINGLETON pattern - ONE registry at startup
+const registry = new TokenRegistry(allTokens);
+
+// Event-driven CSS regeneration
+registry.setChangeCallback(async (event) => {
+  const css = registryToVars(registry);
+  await writeFile('.rafters/output/rafters.vars.css', css);
+});
+
+// Update via registry (auto-cascades, respects overrides)
+await registry.set('primary', 'oklch(0.5 0.2 250)');
+```
+
+### @rafters/shared (Zod-first types)
+```typescript
+import { TokenSchema, NamespaceFileSchema, ColorValueSchema, OKLCHSchema } from '@rafters/shared';
+import type { Token, NamespaceFile, ColorValue, OKLCH } from '@rafters/shared';
+// Types come from z.infer<typeof Schema> - NEVER define manually
+```
+
+### apps/api (AI Color Intelligence)
+```typescript
+// Vectorize endpoint for color intelligence
+const response = await fetch(`https://api.rafters.studio/color/${l}-${c}-${h}?sync=true`);
+const intelligence = await response.json();
+```
+
+## Architecture Overview
+
 ```
 pnpx rafters@latest studio
          │
@@ -35,8 +64,8 @@ pnpx rafters@latest studio
 React UI   Vite middleware (~80 lines)
     │         │
     │         ▼
-    │    @rafters/design-tokens (direct workspace import)
-    │    ├── TokenRegistry.setChangeCallback() → CSS regen
+    │    @rafters/design-tokens (workspace import)
+    │    ├── TokenRegistry singleton + setChangeCallback()
     │    ├── registry.set() → auto-cascade dependents
     │    ├── NodePersistenceAdapter → filesystem
     │    └── registryToVars() → rafters.vars.css
@@ -50,75 +79,30 @@ React UI   Vite middleware (~80 lines)
     Vite HMR (CSS hot reload) → React repaints
 ```
 
-## File Outputs (all named rafters.*)
+## Split CSS for Instant HMR
 
-| File | When Generated | Purpose |
-|------|----------------|---------|
-| `rafters.css` | `init`, Studio save | Production - apps import this |
-| `rafters.tailwind.css` | Studio startup | Static Tailwind config with `var()` refs |
-| `rafters.vars.css` | Studio edit | Pure CSS variables - instant HMR |
-| `rafters.ts` | `init`, Studio save | TypeScript token constants |
-| `rafters.json` | `init`, Studio save | DTCG format |
-
-## Exporter Functions (design-tokens, workspace-only)
-```typescript
-registryToTailwind(registry)       // Production combined
-registryToTailwindStatic(registry) // Studio static @theme inline
-registryToVars(registry)           // Studio dynamic CSS vars
+```tsx
+// Studio main.tsx - split CSS imports
+import '.rafters/output/rafters.tailwind.css';  // static @theme, processed once
+import '.rafters/output/rafters.vars.css';       // pure CSS vars, instant HMR
 ```
 
-## Critical Principle: Tokens ARE Tailwind (Dogfooding)
+| File | Generated | Purpose |
+|------|-----------|---------|
+| `rafters.css` | init, save | Production combined |
+| `rafters.tailwind.css` | startup | Static Tailwind @theme |
+| `rafters.vars.css` | edit | Pure CSS vars - instant HMR |
 
-Studio uses Tailwind token classes for ALL styling. No hardcoded colors, spacing, or values.
+## Dogfooding Principle
 
-The @theme block in `rafters.tailwind.css` tells Tailwind: `--color-primary: var(--rafters-color-primary)`.
-Tailwind generates `bg-primary`, `text-primary`, etc. from this.
-When `rafters.vars.css` updates `--rafters-color-primary`, every `bg-primary` in Studio updates via HMR.
-
-**This means Studio dogfoods its own output automatically.** The designer changes primary color and the
-Studio UI itself - buttons, backgrounds, sidebar, everything using `bg-primary` - reflects the change instantly.
-No separate "self-consumption" feature needed. It's a constraint on how we build: every component uses
-Tailwind token classes, never hardcoded values.
+Studio uses Tailwind token classes (bg-primary, text-foreground) for ALL styling.
+When rafters.vars.css updates, Studio UI itself reflects changes via HMR.
+No hardcoded colors. No separate self-consumption feature needed.
 
 ## Constraints
-1. **Edit only** - No add/delete (dependency graph too complex for UI)
-2. **Write queue** - Simple promise chain prevents race conditions
-3. **registry.set()** - Already handles cascade + userOverride respect
-4. **Live vars only** - rafters.css/ts/json on explicit save, not realtime
-5. **Override prompts** - UI shows conflicts before cascading
 
-## Override Conflict Flow
-When editing a token with dependents that have `userOverride`:
-1. PATCH returns `{ requiresConfirmation: true, affectedTokens: [...] }`
-2. UI shows dialog with affected tokens and override reasons
-3. User picks: [Update all] [Skip overrides] [Cancel]
-4. `cascadeMode` sent with retry PATCH
-
-## File Structure
-```
-packages/
-├── cli/src/commands/studio.ts    # CLI (spawns Vite)
-└── studio/
-    ├── vite.config.ts            # Vite + middleware plugin
-    ├── src/
-    │   ├── main.tsx              # imports rafters.vars.css for HMR
-    │   ├── app.tsx
-    │   └── components/
-    │       ├── sidebar.tsx       # namespace list
-    │       ├── token-list.tsx    # tokens + dependency info
-    │       ├── token-editor.tsx  # color picker / text input
-    │       └── cascade-dialog.tsx
-    └── index.html
-```
-
-## Event-Driven Pattern
-```typescript
-// In Vite middleware setup:
-registry.setChangeCallback(async (event) => {
-  if (event.type === 'token-changed' || event.type === 'tokens-batch-changed') {
-    const css = registryToVars(registry);
-    await writeFile('.rafters/output/rafters.vars.css', css);
-    // Vite HMR detects change, hot-reloads CSS
-  }
-});
-```
+1. **Edit only** - No add/delete (dependency graph too complex)
+2. **Singleton registry** - Created once with setChangeCallback, not per-request
+3. **registry.set()** - Handles cascade + userOverride respect
+4. **Zod-first** - All types from @rafters/shared schemas
+5. **No duplication** - Use existing packages, never reimplement
