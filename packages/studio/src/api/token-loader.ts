@@ -267,6 +267,27 @@ export async function getTokenDependents(
   if (allTokens.length === 0) return [];
 
   const registry = new TokenRegistry(allTokens);
+
+  // Populate dependency graph from token metadata
+  for (const token of allTokens) {
+    const deps = token.dependsOn as string[] | undefined;
+    const rule = token.generationRule as string | undefined;
+
+    if (Array.isArray(deps) && deps.length > 0 && typeof rule === 'string') {
+      try {
+        registry.addDependency(token.name, deps, rule);
+      } catch {
+        // Skip tokens with missing dependencies
+      }
+    } else if (typeof rule === 'string' && rule.length > 0) {
+      try {
+        registry.addDependencyWithRuleParsing(token.name, rule);
+      } catch {
+        // Skip tokens with unparseable rules
+      }
+    }
+  }
+
   const dependentNames = registry.getDependents(tokenName);
 
   const result: DependentInfo[] = [];

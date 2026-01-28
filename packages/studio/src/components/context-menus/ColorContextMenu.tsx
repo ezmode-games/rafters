@@ -18,7 +18,7 @@ interface ColorContextMenuProps {
   onClose: () => void;
   color: OKLCH;
   tokenName: string;
-  onCommit: (color: OKLCH, reason: string, options?: { skipOverrides?: boolean }) => void;
+  onCommit: (color: OKLCH, reason: string) => void;
 }
 
 function clamp(v: number, min: number, max: number): number {
@@ -73,7 +73,6 @@ export function ColorContextMenu({
 }: ColorContextMenuProps) {
   const [adjusted, setAdjusted] = useState<OKLCH>({ ...color });
   const [step, setStep] = useState<'adjust' | 'cascade' | 'why'>('adjust');
-  const [skipOverrides, setSkipOverrides] = useState(false);
 
   const handleLChange = useCallback(
     (l: number) => setAdjusted((c) => ({ ...c, l: clamp(l, 0, 1) })),
@@ -90,19 +89,13 @@ export function ColorContextMenu({
 
   const handleCommit = useCallback(
     (reason: string) => {
-      onCommit(adjusted, reason, { skipOverrides });
+      onCommit(adjusted, reason);
       onClose();
     },
-    [adjusted, onCommit, onClose, skipOverrides],
+    [adjusted, onCommit, onClose],
   );
 
   const handleCascadeUpdateAll = useCallback(() => {
-    setSkipOverrides(false);
-    setStep('why');
-  }, []);
-
-  const handleCascadeSkipOverrides = useCallback(() => {
-    setSkipOverrides(true);
     setStep('why');
   }, []);
 
@@ -190,7 +183,6 @@ export function ColorContextMenu({
           <CascadePreview
             tokenName={tokenName}
             onUpdateAll={handleCascadeUpdateAll}
-            onSkipOverrides={handleCascadeSkipOverrides}
             onCancel={handleCascadeCancel}
           />
         </>

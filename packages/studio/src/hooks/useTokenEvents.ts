@@ -10,12 +10,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { tokenKeys } from '../lib/query';
 
-interface TokenChangeEvent {
-  type: 'token-change';
-  namespace: string;
-  timestamp: number;
-}
-
 /**
  * Subscribe to SSE token change events.
  * Automatically invalidates the token query cache on changes
@@ -29,11 +23,11 @@ export function useTokenEvents(): void {
 
     source.onmessage = (event) => {
       try {
-        const data = JSON.parse(event.data) as { type: string; namespace?: string };
+        const data = JSON.parse(event.data) as { type: string; namespace?: unknown };
         if (data.type === 'token-change') {
-          const change = data as TokenChangeEvent;
-          // Invalidate specific namespace and the "all tokens" query
-          queryClient.invalidateQueries({ queryKey: tokenKeys.namespace(change.namespace) });
+          if (typeof data.namespace === 'string') {
+            queryClient.invalidateQueries({ queryKey: tokenKeys.namespace(data.namespace) });
+          }
           queryClient.invalidateQueries({ queryKey: tokenKeys.all });
         }
       } catch {

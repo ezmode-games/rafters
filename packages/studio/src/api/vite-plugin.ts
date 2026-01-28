@@ -122,7 +122,8 @@ export function studioApiPlugin(): Plugin {
           return;
         }
 
-        const tokenName = req.url?.replace('/', '').split('?')[0];
+        const rawPath = req.url?.slice(1).split('?')[0] ?? '';
+        const tokenName = rawPath ? decodeURIComponent(rawPath) : '';
         if (!tokenName) {
           next();
           return;
@@ -227,7 +228,7 @@ export function studioApiPlugin(): Plugin {
             return;
           }
 
-          await writeQueue.enqueue('__save_all__', () => regenerateAllOutputs(projectPath));
+          await writeQueue.drainThenRun(() => regenerateAllOutputs(projectPath));
 
           res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify({ success: true }));

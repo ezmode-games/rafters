@@ -82,7 +82,7 @@ export interface DependentInfo {
  * Fetch tokens that depend on the given token name.
  */
 export async function fetchTokenDependents(tokenName: string): Promise<DependentInfo[]> {
-  const response = await fetch(`/api/dependents/${tokenName}`);
+  const response = await fetch(`/api/dependents/${encodeURIComponent(tokenName)}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch dependents: ${response.statusText}`);
   }

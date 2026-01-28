@@ -14,16 +14,10 @@ import { type DependentInfo, fetchTokenDependents } from '../../lib/query';
 interface CascadePreviewProps {
   tokenName: string;
   onUpdateAll: () => void;
-  onSkipOverrides: () => void;
   onCancel: () => void;
 }
 
-export function CascadePreview({
-  tokenName,
-  onUpdateAll,
-  onSkipOverrides,
-  onCancel,
-}: CascadePreviewProps) {
+export function CascadePreview({ tokenName, onUpdateAll, onCancel }: CascadePreviewProps) {
   const [dependents, setDependents] = useState<DependentInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -69,11 +63,30 @@ export function CascadePreview({
   }
 
   if (dependents.length === 0) {
-    return null;
+    return (
+      <div className="flex flex-col gap-2 px-3 py-2">
+        <p className="text-xs text-neutral-600">No dependent tokens. Safe to apply.</p>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            className="rounded bg-neutral-900 px-2 py-1 text-xs font-medium text-white hover:bg-neutral-800"
+            onClick={onUpdateAll}
+          >
+            Continue
+          </button>
+          <button
+            type="button"
+            className="px-2 py-1 text-xs text-neutral-500 hover:text-neutral-700"
+            onClick={onCancel}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const overrideCount = dependents.filter((d) => d.hasUserOverride).length;
-  const autoCount = dependents.length - overrideCount;
 
   return (
     <div className="flex flex-col gap-1 px-3 py-2">
@@ -134,15 +147,6 @@ export function CascadePreview({
         >
           Update all ({dependents.length})
         </button>
-        {overrideCount > 0 && (
-          <button
-            type="button"
-            className="flex-1 rounded bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-200"
-            onClick={onSkipOverrides}
-          >
-            Skip overrides ({autoCount})
-          </button>
-        )}
         <button
           type="button"
           className="rounded px-2 py-1 text-xs text-neutral-500 hover:text-neutral-700"
