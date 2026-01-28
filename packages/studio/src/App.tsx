@@ -38,12 +38,12 @@ function StudioContent() {
   const [appState, setAppState] = useState<AppState>('first-run');
   const [, setPrimaryColor] = useState<OklchColor | null>(null);
 
-  const handleColorSelect = useCallback((color: OklchColor) => {
+  const handleColorSelect = useCallback((color: OklchColor, reason: string) => {
     setPrimaryColor(color);
-    // Issue #731 will add WhyGate modal here
     // Issue #732 will paint the scale and write to tokens
     // After that, bg-primary will reflect the choice via CSS HMR
     console.log('Primary color selected:', `oklch(${color.l} ${color.s} ${color.h})`);
+    console.log('Reason:', reason);
     setAppState('workspace');
   }, []);
 
