@@ -5,7 +5,8 @@
  * on a white canvas, with a bouncing invitation to choose the primary color.
  *
  * Click anywhere to capture a color from that position (hue derived from x,
- * lightness from y).
+ * lightness from y). A WhyGate appears requiring the designer to explain
+ * their choice before proceeding.
  *
  * Uses GSAP for smooth 60fps animations.
  * Uses @rafters/ui components and classy for dogfooding.
@@ -17,7 +18,8 @@ import { Container } from '@rafters/ui/components/ui/container';
 import { Muted, P } from '@rafters/ui/components/ui/typography';
 import classy from '@rafters/ui/primitives/classy';
 import gsap from 'gsap';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { ColorPicker, type ColorPickerColor } from './ColorPicker';
 
 interface Particle {
   x: number;
@@ -29,7 +31,12 @@ interface Particle {
 }
 
 interface SnowstormProps {
-  onColorSelect: (color: { h: number; s: number; l: number }) => void;
+  onColorSelect: (color: { h: number; s: number; l: number }, reason: string) => void;
+}
+
+interface PendingSelection {
+  color: ColorPickerColor;
+  position: { x: number; y: number };
 }
 
 /**
@@ -55,6 +62,9 @@ export function Snowstorm({ onColorSelect }: SnowstormProps) {
   const boxRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const tickerRef = useRef<gsap.Callback | null>(null);
+
+  // State for color picker (WhyGate flow)
+  const [pendingSelection, setPendingSelection] = useState<PendingSelection | null>(null);
 
   // Initialize and run GSAP animations
   useEffect(() => {
@@ -175,6 +185,9 @@ export function Snowstorm({ onColorSelect }: SnowstormProps) {
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
+      // Don't capture new color if picker is open
+      if (pendingSelection) return;
+
       const canvas = canvasRef.current;
       if (!canvas) return;
 
@@ -183,11 +196,27 @@ export function Snowstorm({ onColorSelect }: SnowstormProps) {
       const y = e.clientY - rect.top;
 
       const color = positionToColor(x, y, rect.width, rect.height);
-      console.log('Color captured:', color);
-      onColorSelect(color);
+
+      // Show ColorPicker anchored to click position
+      setPendingSelection({
+        color,
+        position: { x: e.clientX, y: e.clientY },
+      });
+    },
+    [pendingSelection],
+  );
+
+  const handleColorConfirm = useCallback(
+    (color: ColorPickerColor, reason: string) => {
+      setPendingSelection(null);
+      onColorSelect(color, reason);
     },
     [onColorSelect],
   );
+
+  const handleColorCancel = useCallback(() => {
+    setPendingSelection(null);
+  }, []);
 
   return (
     <Container
@@ -210,6 +239,16 @@ export function Snowstorm({ onColorSelect }: SnowstormProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* ColorPicker with WhyGate - appears on click */}
+      {pendingSelection && (
+        <ColorPicker
+          color={pendingSelection.color}
+          anchorPosition={pendingSelection.position}
+          onConfirm={handleColorConfirm}
+          onCancel={handleColorCancel}
+        />
+      )}
     </Container>
   );
 }
