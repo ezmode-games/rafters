@@ -441,7 +441,8 @@ describe('studioApiPlugin', () => {
 
       expect(res._statusCode).toBe(400);
       const response = JSON.parse(res._body);
-      expect(response.error).toContain('color');
+      expect(response.error).toBe('Invalid request');
+      expect(response.details).toBeDefined();
     });
 
     it('returns 400 when color format is invalid', async () => {

@@ -12,8 +12,16 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { generateOKLCHScale, oklchToCSS } from '@rafters/color-utils';
 import { NodePersistenceAdapter, registryToVars, TokenRegistry } from '@rafters/design-tokens';
-import type { OKLCH, Token } from '@rafters/shared';
+import { OKLCHSchema } from '@rafters/shared';
+import type { Token } from '@rafters/shared';
+import { z } from 'zod';
 import type { Plugin, ViteDevServer } from 'vite';
+
+/** Schema for POST /api/tokens/primary request body */
+const PrimaryColorRequestSchema = z.object({
+  color: OKLCHSchema,
+  reason: z.string().min(1),
+});
 
 let registry: TokenRegistry | null = null;
 let persistence: NodePersistenceAdapter | null = null;
@@ -95,16 +103,13 @@ export function studioApiPlugin(): Plugin {
 
           req.on('end', async () => {
             try {
-              const { color, reason } = JSON.parse(body) as {
-                color: OKLCH;
-                reason: string;
-              };
-
-              if (!color || typeof color.l !== 'number') {
+              const parsed = PrimaryColorRequestSchema.safeParse(JSON.parse(body));
+              if (!parsed.success) {
                 res.statusCode = 400;
-                res.end(JSON.stringify({ error: 'color (OKLCH) required' }));
+                res.end(JSON.stringify({ error: 'Invalid request', details: parsed.error.issues }));
                 return;
               }
+              const { color, reason } = parsed.data;
 
               const reg = await initRegistry(projectPath);
               const scale = generateOKLCHScale(color);
