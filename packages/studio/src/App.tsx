@@ -8,6 +8,7 @@
  * When tokens change, the UI updates via CSS HMR.
  */
 
+import type { OKLCH } from '@rafters/shared';
 import { Card, CardContent, CardHeader, CardTitle } from '@rafters/ui/components/ui/card';
 import { Container } from '@rafters/ui/components/ui/container';
 import { Grid } from '@rafters/ui/components/ui/grid';
@@ -15,8 +16,10 @@ import { Muted, P } from '@rafters/ui/components/ui/typography';
 import classy from '@rafters/ui/primitives/classy';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
+import type { SemanticColorChoices } from './components/first-run/SemanticChoices';
+import { SemanticChoices } from './components/first-run/SemanticChoices';
 import { Snowstorm } from './components/first-run/Snowstorm';
-import { usePrimaryColorMutation } from './lib/query';
+import { usePrimaryColorMutation, useSemanticColorsMutation } from './lib/query';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,7 +30,7 @@ const queryClient = new QueryClient({
   },
 });
 
-type AppState = 'first-run' | 'workspace';
+type AppState = 'first-run' | 'semantic-choices' | 'workspace';
 
 interface OklchColor {
   h: number;
@@ -38,9 +41,12 @@ interface OklchColor {
 function StudioContent() {
   const [appState, setAppState] = useState<AppState>('first-run');
   const [primaryColor, setPrimaryColor] = useState<OklchColor | null>(null);
+  const [primaryOklch, setPrimaryOklch] = useState<OKLCH | null>(null);
   const [colorReason, setColorReason] = useState<string>('');
+  const [semanticChoices, setSemanticChoices] = useState<SemanticColorChoices | null>(null);
 
   const primaryColorMutation = usePrimaryColorMutation();
+  const semanticColorsMutation = useSemanticColorsMutation();
 
   const handleColorSelect = useCallback(
     (color: OklchColor, reason: string) => {
@@ -48,12 +54,13 @@ function StudioContent() {
       setColorReason(reason);
 
       // Convert to OKLCH format (s is actually chroma in Snowstorm)
-      const oklch = {
+      const oklch: OKLCH = {
         l: color.l,
         c: color.s,
         h: color.h,
         alpha: 1,
       };
+      setPrimaryOklch(oklch);
 
       // Paint the scale and write to tokens
       primaryColorMutation.mutate(
@@ -61,12 +68,13 @@ function StudioContent() {
         {
           onSuccess: () => {
             console.log('Primary color scale applied');
-            setAppState('workspace');
+            // Move to semantic choices instead of workspace
+            setAppState('semantic-choices');
           },
           onError: (err) => {
             console.error('Failed to apply primary color:', err);
-            // Still transition to workspace, but show error state
-            setAppState('workspace');
+            // Still transition to semantic choices
+            setAppState('semantic-choices');
           },
         },
       );
@@ -74,8 +82,35 @@ function StudioContent() {
     [primaryColorMutation],
   );
 
+  const handleSemanticComplete = useCallback(
+    (choices: SemanticColorChoices) => {
+      setSemanticChoices(choices);
+
+      // Persist all semantic colors
+      semanticColorsMutation.mutate(
+        { colors: choices },
+        {
+          onSuccess: () => {
+            console.log('Semantic colors applied');
+            setAppState('workspace');
+          },
+          onError: (err) => {
+            console.error('Failed to apply semantic colors:', err);
+            // Still transition to workspace
+            setAppState('workspace');
+          },
+        },
+      );
+    },
+    [semanticColorsMutation],
+  );
+
   if (appState === 'first-run') {
     return <Snowstorm onColorSelect={handleColorSelect} />;
+  }
+
+  if (appState === 'semantic-choices' && primaryOklch) {
+    return <SemanticChoices primaryColor={primaryOklch} onComplete={handleSemanticComplete} />;
   }
 
   // Workspace view - ALL styling via token classes through classy
@@ -91,7 +126,7 @@ function StudioContent() {
         <Grid.Item>
           <Card>
             <CardHeader>
-              <CardTitle>Primary Color Selected</CardTitle>
+              <CardTitle>Design System Complete</CardTitle>
             </CardHeader>
             <CardContent>
               {/* Color swatch uses bg-primary - updates via HMR */}
@@ -107,6 +142,11 @@ function StudioContent() {
               {colorReason && <Muted>{colorReason}</Muted>}
               {primaryColorMutation.isPending && (
                 <Muted className={classy('mt-2')}>Generating color scale...</Muted>
+              )}
+              {semanticChoices && (
+                <Muted className={classy('mt-2')}>
+                  {Object.keys(semanticChoices).length} semantic colors configured
+                </Muted>
               )}
             </CardContent>
           </Card>

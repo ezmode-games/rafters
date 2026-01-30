@@ -23,6 +23,17 @@ const PrimaryColorRequestSchema = z.object({
   reason: z.string().min(1),
 });
 
+/** Schema for semantic color choice */
+const SemanticColorChoiceSchema = z.object({
+  color: OKLCHSchema,
+  reason: z.string().min(1),
+});
+
+/** Schema for POST /api/tokens/semantics request body */
+const SemanticColorsRequestSchema = z.object({
+  colors: z.record(z.string(), SemanticColorChoiceSchema),
+});
+
 let registry: TokenRegistry | null = null;
 let persistence: NodePersistenceAdapter | null = null;
 
@@ -157,6 +168,58 @@ export function studioApiPlugin(): Plugin {
 
               res.setHeader('Content-Type', 'application/json');
               res.end(JSON.stringify({ success: true, scale }));
+            } catch (err) {
+              res.statusCode = 500;
+              res.end(JSON.stringify({ error: String(err) }));
+            }
+          });
+          return;
+        }
+
+        // POST /api/tokens/semantics - Set all semantic colors
+        if (req.method === 'POST' && req.url === '/api/tokens/semantics') {
+          let body = '';
+
+          req.on('data', (chunk) => {
+            body += chunk;
+          });
+
+          req.on('end', async () => {
+            try {
+              const parsed = SemanticColorsRequestSchema.safeParse(JSON.parse(body));
+              if (!parsed.success) {
+                res.statusCode = 400;
+                res.end(JSON.stringify({ error: 'Invalid request', details: parsed.error.issues }));
+                return;
+              }
+              const { colors } = parsed.data;
+
+              const reg = await initRegistry(projectPath);
+              const ns = 'color';
+              const updated: string[] = [];
+
+              // Update each semantic color
+              for (const [name, { color, reason }] of Object.entries(colors)) {
+                const tokenId = `${ns}/color-${name}`;
+
+                if (reg.has(tokenId)) {
+                  const cssValue = oklchToCSS(color);
+                  reg.updateToken(tokenId, cssValue);
+                  updated.push(name);
+
+                  // Log for design intelligence
+                  console.log(`[studio] Semantic color '${name}' set. Reason: ${reason}`);
+                }
+              }
+
+              // Persist to file
+              if (persistence) {
+                const tokens = reg.list().filter((t) => t.namespace === ns);
+                await persistence.saveNamespace(ns, tokens);
+              }
+
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ success: true, updated }));
             } catch (err) {
               res.statusCode = 500;
               res.end(JSON.stringify({ error: String(err) }));
