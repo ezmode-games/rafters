@@ -10,9 +10,18 @@
 
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { generateOKLCHScale, oklchToCSS } from '@rafters/color-utils';
 import { NodePersistenceAdapter, registryToVars, TokenRegistry } from '@rafters/design-tokens';
 import type { Token } from '@rafters/shared';
+import { OKLCHSchema } from '@rafters/shared';
 import type { Plugin, ViteDevServer } from 'vite';
+import { z } from 'zod';
+
+/** Schema for POST /api/tokens/primary request body */
+const PrimaryColorRequestSchema = z.object({
+  color: OKLCHSchema,
+  reason: z.string().min(1),
+});
 
 let registry: TokenRegistry | null = null;
 let persistence: NodePersistenceAdapter | null = null;
@@ -81,6 +90,78 @@ export function studioApiPlugin(): Plugin {
             res.statusCode = 500;
             res.end(JSON.stringify({ error: String(err) }));
           }
+          return;
+        }
+
+        // POST /api/tokens/primary - Generate and set primary color scale
+        if (req.method === 'POST' && req.url === '/api/tokens/primary') {
+          let body = '';
+
+          req.on('data', (chunk) => {
+            body += chunk;
+          });
+
+          req.on('end', async () => {
+            try {
+              const parsed = PrimaryColorRequestSchema.safeParse(JSON.parse(body));
+              if (!parsed.success) {
+                res.statusCode = 400;
+                res.end(JSON.stringify({ error: 'Invalid request', details: parsed.error.issues }));
+                return;
+              }
+              const { color, reason } = parsed.data;
+
+              const reg = await initRegistry(projectPath);
+              const scale = generateOKLCHScale(color);
+
+              // Update each scale step as a token
+              const scaleSteps = [
+                '50',
+                '100',
+                '200',
+                '300',
+                '400',
+                '500',
+                '600',
+                '700',
+                '800',
+                '900',
+                '950',
+              ];
+              const ns = 'color';
+
+              for (const step of scaleSteps) {
+                const tokenId = `${ns}/color-primary-${step}`;
+                const scaleColor = scale[step];
+
+                if (scaleColor && reg.has(tokenId)) {
+                  const cssValue = oklchToCSS(scaleColor);
+                  reg.updateToken(tokenId, cssValue);
+                }
+              }
+
+              // Also update the base primary token if it exists
+              const baseTokenId = `${ns}/color-primary`;
+              if (reg.has(baseTokenId)) {
+                reg.updateToken(baseTokenId, oklchToCSS(scale['500'] ?? color));
+              }
+
+              // Persist to file
+              if (persistence) {
+                const tokens = reg.list().filter((t) => t.namespace === ns);
+                await persistence.saveNamespace(ns, tokens);
+              }
+
+              // Log the reason for design intelligence
+              console.log(`[studio] Primary color scale generated. Reason: ${reason}`);
+
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ success: true, scale }));
+            } catch (err) {
+              res.statusCode = 500;
+              res.end(JSON.stringify({ error: String(err) }));
+            }
+          });
           return;
         }
 
