@@ -13,13 +13,15 @@
  * Canvas reads token colors from CSS custom properties.
  */
 
+import { oklchToHex } from '@rafters/color-utils';
+import { Button } from '@rafters/ui/components/ui/button';
 import { Card, CardContent } from '@rafters/ui/components/ui/card';
 import { Container } from '@rafters/ui/components/ui/container';
+import { Input } from '@rafters/ui/components/ui/input';
 import { P } from '@rafters/ui/components/ui/typography';
 import classy from '@rafters/ui/primitives/classy';
 import gsap from 'gsap';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ColorPicker, type ColorPickerColor } from './ColorPicker';
 
 interface Particle {
   x: number;
@@ -34,9 +36,10 @@ interface SnowstormProps {
   onColorSelect: (color: { h: number; s: number; l: number }, reason: string) => void;
 }
 
-interface PendingSelection {
-  color: ColorPickerColor;
-  position: { x: number; y: number };
+interface SelectedColor {
+  h: number;
+  s: number;
+  l: number;
 }
 
 /**
@@ -62,9 +65,11 @@ export function Snowstorm({ onColorSelect }: SnowstormProps) {
   const boxRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const tickerRef = useRef<gsap.Callback | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  // State for color picker (WhyGate flow)
-  const [pendingSelection, setPendingSelection] = useState<PendingSelection | null>(null);
+  // State for selected color and reason
+  const [selectedColor, setSelectedColor] = useState<SelectedColor | null>(null);
+  const [reason, setReason] = useState('');
 
   // Initialize and run GSAP animations
   useEffect(() => {
@@ -148,9 +153,6 @@ export function Snowstorm({ onColorSelect }: SnowstormProps) {
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
-      // Don't capture new color if picker is open
-      if (pendingSelection) return;
-
       const canvas = canvasRef.current;
       if (!canvas) return;
 
@@ -159,27 +161,29 @@ export function Snowstorm({ onColorSelect }: SnowstormProps) {
       const y = e.clientY - rect.top;
 
       const color = positionToColor(x, y, rect.width, rect.height);
+      setSelectedColor(color);
+      setReason('');
 
-      // Show ColorPicker anchored to click position
-      setPendingSelection({
-        color,
-        position: { x: e.clientX, y: e.clientY },
-      });
+      // Focus the input after state updates
+      setTimeout(() => inputRef.current?.focus(), 0);
     },
-    [pendingSelection],
+    [],
   );
 
-  const handleColorConfirm = useCallback(
-    (color: ColorPickerColor, reason: string) => {
-      setPendingSelection(null);
-      onColorSelect(color, reason);
-    },
-    [onColorSelect],
-  );
+  const handleSubmit = useCallback(() => {
+    if (selectedColor && reason.trim()) {
+      onColorSelect(selectedColor, reason.trim());
+    }
+  }, [selectedColor, reason, onColorSelect]);
 
-  const handleColorCancel = useCallback(() => {
-    setPendingSelection(null);
-  }, []);
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' && reason.trim()) {
+        handleSubmit();
+      }
+    },
+    [reason, handleSubmit],
+  );
 
   return (
     <Container
@@ -193,48 +197,56 @@ export function Snowstorm({ onColorSelect }: SnowstormProps) {
         onClick={handleClick}
       />
 
-      {/* Large centered invitation card with gentle float - hidden when picking */}
-      {!pendingSelection && (
-        <div
-          className={classy(
-            'pointer-events-none',
-            'absolute',
-            'inset-0',
-            'flex',
-            'items-center',
-            'justify-center',
-          )}
-        >
-          <div ref={boxRef}>
-            <Card
+      {/* Centered card - shows prompt or selected color */}
+      <div
+        className={classy(
+          'absolute',
+          'inset-0',
+          'flex',
+          'items-center',
+          'justify-center',
+          selectedColor ? 'pointer-events-auto' : 'pointer-events-none',
+        )}
+      >
+        <div ref={boxRef}>
+          <Card
+            className={classy('backdrop-blur-sm', 'shadow-lg', 'h-64', 'w-64', 'overflow-hidden')}
+            style={selectedColor ? { backgroundColor: oklchToHex({ ...selectedColor, c: selectedColor.s, alpha: 1 }) } : undefined}
+          >
+            <CardContent
               className={classy(
-                'bg-card/90',
-                'backdrop-blur-sm',
-                'shadow-lg',
-                'h-64',
-                'w-64',
+                'h-full',
                 'flex',
+                'flex-col',
                 'items-center',
                 'justify-center',
+                'text-center',
               )}
             >
-              <CardContent className={classy('text-center')}>
+              {!selectedColor ? (
                 <P>Choose Your Primary Color</P>
-              </CardContent>
-            </Card>
-          </div>
+              ) : (
+                <div className={classy('w-full', 'space-y-3')}>
+                  <Input
+                    ref={inputRef}
+                    type="text"
+                    placeholder="Why?"
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className={classy('bg-white/90', 'text-center')}
+                  />
+                  {reason.trim() && (
+                    <Button onClick={handleSubmit} className={classy('w-full')}>
+                      Continue
+                    </Button>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
-      )}
-
-      {/* ColorPicker with WhyGate - appears on click */}
-      {pendingSelection && (
-        <ColorPicker
-          color={pendingSelection.color}
-          anchorPosition={pendingSelection.position}
-          onConfirm={handleColorConfirm}
-          onCancel={handleColorCancel}
-        />
-      )}
+      </div>
     </Container>
   );
 }
