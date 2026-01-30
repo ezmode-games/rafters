@@ -205,8 +205,19 @@ export function Snowstorm({ onColorSelect }: SnowstormProps) {
         )}
       >
         <div ref={boxRef}>
-          <Card className={classy('bg-card/90', 'backdrop-blur-sm', 'shadow-lg')}>
-            <CardContent className={classy('p-16', 'text-center')}>
+          <Card
+            className={classy(
+              'bg-card/90',
+              'backdrop-blur-sm',
+              'shadow-lg',
+              'h-64',
+              'w-64',
+              'flex',
+              'items-center',
+              'justify-center',
+            )}
+          >
+            <CardContent className={classy('text-center')}>
               <P>Choose Your Primary Color</P>
             </CardContent>
           </Card>
