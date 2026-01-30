@@ -2,13 +2,13 @@
  * Snowstorm - First Run Entry Point
  *
  * Visual representation of blank page anxiety. A gentle snowstorm of particles
- * on a white canvas, with a bouncing invitation to choose the primary color.
+ * on a white canvas, with a centered invitation to choose the primary color.
  *
  * Click anywhere to capture a color from that position (hue derived from x,
  * lightness from y). A WhyGate appears requiring the designer to explain
  * their choice before proceeding.
  *
- * Uses GSAP for smooth 60fps animations.
+ * Uses GSAP for smooth 60fps particle animations.
  * Uses @rafters/ui components and classy for dogfooding.
  * Canvas reads token colors from CSS custom properties.
  */
@@ -130,56 +130,19 @@ export function Snowstorm({ onColorSelect }: SnowstormProps) {
     tickerRef.current = drawParticles;
     gsap.ticker.add(drawParticles);
 
-    // GSAP bouncing box animation
-    const boxWidth = 240;
-    const boxHeight = 80;
-    const startX = width / 2 - boxWidth / 2;
-    const startY = height / 2 - boxHeight / 2;
-
-    // Set initial position
-    gsap.set(box, { x: startX, y: startY });
-
-    // Create bouncing timeline
-    const bounceTl = gsap.timeline({ repeat: -1 });
-
-    // Animate to corners with easing for smooth bounces
-    bounceTl
-      .to(box, {
-        x: width - boxWidth - 20,
-        y: 20,
-        duration: 4,
-        ease: 'sine.inOut',
-      })
-      .to(box, {
-        x: 20,
-        y: height - boxHeight - 20,
-        duration: 5,
-        ease: 'sine.inOut',
-      })
-      .to(box, {
-        x: width - boxWidth - 20,
-        y: height - boxHeight - 20,
-        duration: 4,
-        ease: 'sine.inOut',
-      })
-      .to(box, {
-        x: 20,
-        y: 20,
-        duration: 5,
-        ease: 'sine.inOut',
-      })
-      .to(box, {
-        x: startX,
-        y: startY,
-        duration: 3,
-        ease: 'sine.inOut',
-      });
+    // Gentle floating animation - subtle vertical movement
+    const floatTl = gsap.timeline({ repeat: -1, yoyo: true });
+    floatTl.to(box, {
+      y: 15,
+      duration: 3,
+      ease: 'sine.inOut',
+    });
 
     return () => {
       if (tickerRef.current) {
         gsap.ticker.remove(tickerRef.current);
       }
-      bounceTl.kill();
+      floatTl.kill();
     };
   }, []);
 
@@ -230,14 +193,27 @@ export function Snowstorm({ onColorSelect }: SnowstormProps) {
         onClick={handleClick}
       />
 
-      {/* Bouncing invitation card - uses @rafters/ui Card */}
-      <div ref={boxRef} className={classy('pointer-events-none', 'absolute')}>
-        <Card className={classy('bg-card/80', 'backdrop-blur-sm')}>
-          <CardContent className={classy('p-4')}>
-            <P className={classy('mb-1', 'font-medium')}>choose primary color...</P>
-            <Muted>click anywhere</Muted>
-          </CardContent>
-        </Card>
+      {/* Large centered invitation card with gentle float */}
+      <div
+        className={classy(
+          'pointer-events-none',
+          'absolute',
+          'inset-0',
+          'flex',
+          'items-center',
+          'justify-center',
+        )}
+      >
+        <div ref={boxRef}>
+          <Card className={classy('bg-card/90', 'backdrop-blur-sm', 'shadow-lg')}>
+            <CardContent className={classy('px-16', 'py-12', 'text-center')}>
+              <P className={classy('mb-3', 'text-2xl', 'font-semibold')}>
+                Choose Your Primary Color
+              </P>
+              <Muted className={classy('text-lg')}>Click anywhere on the canvas</Muted>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* ColorPicker with WhyGate - appears on click */}
