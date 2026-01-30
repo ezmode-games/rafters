@@ -51,10 +51,13 @@ async function main() {
   }
 
   // Generate CSS output
+  // Studio expects two files:
+  // - rafters.tailwind.css: static @theme with var() refs (processed by Tailwind)
+  // - rafters.vars.css: pure CSS variables (instant HMR on token changes)
   const css = registryToTailwind(registry, { includeImport: true });
-  await writeFile(join(OUTPUT_DIR, 'rafters.css'), css);
+  await writeFile(join(OUTPUT_DIR, 'rafters.tailwind.css'), css);
   await writeFile(join(OUTPUT_DIR, 'rafters.vars.css'), css);
-  console.log('\n  Generated rafters.css and rafters.vars.css');
+  console.log('\n  Generated rafters.tailwind.css and rafters.vars.css');
 
   // Create config
   const config = {
