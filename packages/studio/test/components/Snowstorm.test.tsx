@@ -60,11 +60,6 @@ describe('Snowstorm', () => {
       expect(screen.getByText('Choose Your Primary Color')).toBeInTheDocument();
     });
 
-    it('renders click instruction', () => {
-      render(<Snowstorm {...defaultProps} />);
-      expect(screen.getByText('Click anywhere on the canvas')).toBeInTheDocument();
-    });
-
     it('canvas has crosshair cursor', () => {
       const { container } = render(<Snowstorm {...defaultProps} />);
       const canvas = container.querySelector('canvas');

@@ -15,7 +15,7 @@
 
 import { Card, CardContent } from '@rafters/ui/components/ui/card';
 import { Container } from '@rafters/ui/components/ui/container';
-import { Muted, P } from '@rafters/ui/components/ui/typography';
+import { P } from '@rafters/ui/components/ui/typography';
 import classy from '@rafters/ui/primitives/classy';
 import gsap from 'gsap';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -207,10 +207,7 @@ export function Snowstorm({ onColorSelect }: SnowstormProps) {
         <div ref={boxRef}>
           <Card className={classy('bg-card/90', 'backdrop-blur-sm', 'shadow-lg')}>
             <CardContent className={classy('px-16', 'py-12', 'text-center')}>
-              <P className={classy('mb-3', 'text-2xl', 'font-semibold')}>
-                Choose Your Primary Color
-              </P>
-              <Muted className={classy('text-lg')}>Click anywhere on the canvas</Muted>
+              <P className={classy('text-2xl', 'font-semibold')}>Choose Your Primary Color</P>
             </CardContent>
           </Card>
         </div>
