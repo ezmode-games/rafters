@@ -193,36 +193,38 @@ export function Snowstorm({ onColorSelect }: SnowstormProps) {
         onClick={handleClick}
       />
 
-      {/* Large centered invitation card with gentle float */}
-      <div
-        className={classy(
-          'pointer-events-none',
-          'absolute',
-          'inset-0',
-          'flex',
-          'items-center',
-          'justify-center',
-        )}
-      >
-        <div ref={boxRef}>
-          <Card
-            className={classy(
-              'bg-card/90',
-              'backdrop-blur-sm',
-              'shadow-lg',
-              'h-64',
-              'w-64',
-              'flex',
-              'items-center',
-              'justify-center',
-            )}
-          >
-            <CardContent className={classy('text-center')}>
-              <P>Choose Your Primary Color</P>
-            </CardContent>
-          </Card>
+      {/* Large centered invitation card with gentle float - hidden when picking */}
+      {!pendingSelection && (
+        <div
+          className={classy(
+            'pointer-events-none',
+            'absolute',
+            'inset-0',
+            'flex',
+            'items-center',
+            'justify-center',
+          )}
+        >
+          <div ref={boxRef}>
+            <Card
+              className={classy(
+                'bg-card/90',
+                'backdrop-blur-sm',
+                'shadow-lg',
+                'h-64',
+                'w-64',
+                'flex',
+                'items-center',
+                'justify-center',
+              )}
+            >
+              <CardContent className={classy('text-center')}>
+                <P>Choose Your Primary Color</P>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ColorPicker with WhyGate - appears on click */}
       {pendingSelection && (
