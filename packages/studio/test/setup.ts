@@ -14,14 +14,14 @@ afterEach(() => {
 // Mock GSAP
 vi.mock('gsap', () => ({
   default: {
-    to: vi.fn((target, vars) => {
+    to: vi.fn((_target, vars) => {
       // Immediately call onComplete if provided
       if (vars.onComplete) {
         vars.onComplete();
       }
       return { kill: vi.fn() };
     }),
-    fromTo: vi.fn((target, fromVars, toVars) => {
+    fromTo: vi.fn((_target, _fromVars, toVars) => {
       if (toVars.onComplete) {
         toVars.onComplete();
       }

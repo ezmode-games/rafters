@@ -239,7 +239,7 @@ describe('Query Hooks', () => {
       await waitFor(() => expect(result.current.isPending).toBe(true));
 
       act(() => {
-        resolvePromise!();
+        resolvePromise?.();
       });
 
       await waitFor(() => expect(result.current.isPending).toBe(false));
@@ -374,7 +374,7 @@ describe('Query Hooks', () => {
       await waitFor(() => expect(result.current.isPending).toBe(true));
 
       act(() => {
-        resolvePromise!();
+        resolvePromise?.();
       });
 
       await waitFor(() => expect(result.current.isPending).toBe(false));
@@ -390,10 +390,7 @@ describe('Query Hooks', () => {
       const { result } = renderHook(() => usePrimaryColorMutation(), { wrapper });
 
       await act(async () => {
-        result.current.mutate(
-          { color: mockColor, reason: 'test' },
-          { onSuccess },
-        );
+        result.current.mutate({ color: mockColor, reason: 'test' }, { onSuccess });
       });
 
       await waitFor(() => expect(onSuccess).toHaveBeenCalled());
@@ -409,10 +406,7 @@ describe('Query Hooks', () => {
       const { result } = renderHook(() => usePrimaryColorMutation(), { wrapper });
 
       await act(async () => {
-        result.current.mutate(
-          { color: mockColor, reason: 'test' },
-          { onError },
-        );
+        result.current.mutate({ color: mockColor, reason: 'test' }, { onError });
       });
 
       await waitFor(() => expect(onError).toHaveBeenCalled());
@@ -464,9 +458,7 @@ describe('Query Hooks', () => {
       });
 
       // Wait for refetch after invalidation
-      await waitFor(() =>
-        expect(tokensResult.current.data?.tokens.color[0].value).toBe('red'),
-      );
+      await waitFor(() => expect(tokensResult.current.data?.tokens.color[0].value).toBe('red'));
     });
   });
 });

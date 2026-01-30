@@ -12,7 +12,12 @@ import { ColorPicker, type ColorPickerColor } from '../../src/components/first-r
 // Mock @rafters/color-utils
 vi.mock('@rafters/color-utils', () => ({
   generateColorName: vi.fn((oklch) => `color-${oklch.h.toFixed(0)}`),
-  oklchToHex: vi.fn((oklch) => `#${Math.round(oklch.l * 255).toString(16).padStart(2, '0')}0000`),
+  oklchToHex: vi.fn(
+    (oklch) =>
+      `#${Math.round(oklch.l * 255)
+        .toString(16)
+        .padStart(2, '0')}0000`,
+  ),
 }));
 
 describe('ColorPicker', () => {
@@ -68,7 +73,7 @@ describe('ColorPicker', () => {
 
   describe('color conversion', () => {
     it('converts Snowstorm HSL format to OKLCH', async () => {
-      const { generateColorName, oklchToHex } = await import('@rafters/color-utils');
+      const { generateColorName } = await import('@rafters/color-utils');
 
       render(<ColorPicker {...defaultProps} />);
 
@@ -245,10 +250,7 @@ describe('ColorPicker', () => {
   describe('accessibility', () => {
     it('swatch has aria-label with color name', () => {
       render(<ColorPicker {...defaultProps} />);
-      expect(screen.getByRole('img')).toHaveAttribute(
-        'aria-label',
-        'Selected color: color-180',
-      );
+      expect(screen.getByRole('img')).toHaveAttribute('aria-label', 'Selected color: color-180');
     });
 
     it('textarea is labeled', () => {
@@ -284,9 +286,7 @@ describe('ColorPicker', () => {
 
     it('handles zero position', () => {
       const zeroPosition = { x: 0, y: 0 };
-      const { container } = render(
-        <ColorPicker {...defaultProps} anchorPosition={zeroPosition} />,
-      );
+      const { container } = render(<ColorPicker {...defaultProps} anchorPosition={zeroPosition} />);
       const picker = container.firstChild as HTMLElement;
 
       // Should position at 0 + 20 for x, constrained to minimum padding for y

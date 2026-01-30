@@ -12,10 +12,10 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { generateOKLCHScale, oklchToCSS } from '@rafters/color-utils';
 import { NodePersistenceAdapter, registryToVars, TokenRegistry } from '@rafters/design-tokens';
-import { OKLCHSchema } from '@rafters/shared';
 import type { Token } from '@rafters/shared';
-import { z } from 'zod';
+import { OKLCHSchema } from '@rafters/shared';
 import type { Plugin, ViteDevServer } from 'vite';
+import { z } from 'zod';
 
 /** Schema for POST /api/tokens/primary request body */
 const PrimaryColorRequestSchema = z.object({

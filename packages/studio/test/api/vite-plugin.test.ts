@@ -4,9 +4,9 @@
  * Exhaustive tests for the Studio API endpoints.
  */
 
-import type { IncomingMessage, ServerResponse } from 'node:http';
 import { EventEmitter } from 'node:events';
-import { beforeAll, beforeEach, describe, expect, it, vi, afterAll, afterEach } from 'vitest';
+import type { IncomingMessage, ServerResponse } from 'node:http';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Use vi.hoisted to ensure mock objects are created before vi.mock runs
 const { mockRegistry, mockPersistence, mockMkdir, mockWriteFile } = vi.hoisted(() => ({
@@ -128,11 +128,7 @@ function waitForAsyncMiddleware(ms = 20): Promise<void> {
 
 describe('studioApiPlugin', () => {
   let studioApiPlugin: typeof import('../../src/api/vite-plugin').studioApiPlugin;
-  let middleware: (
-    req: IncomingMessage,
-    res: ServerResponse,
-    next: () => void,
-  ) => Promise<void>;
+  let middleware: (req: IncomingMessage, res: ServerResponse, next: () => void) => Promise<void>;
 
   beforeAll(async () => {
     // Set environment variable before importing
@@ -277,9 +273,7 @@ describe('studioApiPlugin', () => {
     });
 
     it('persists changes to file', async () => {
-      mockRegistry.list.mockReturnValue([
-        { name: 'primary', value: 'red', namespace: 'color' },
-      ]);
+      mockRegistry.list.mockReturnValue([{ name: 'primary', value: 'red', namespace: 'color' }]);
 
       const req = createMockRequest('PATCH', '/api/token/color/primary', {
         value: 'red',
@@ -290,10 +284,7 @@ describe('studioApiPlugin', () => {
       await middleware(req, res, next);
       await waitForAsyncMiddleware();
 
-      expect(mockPersistence.saveNamespace).toHaveBeenCalledWith(
-        'color',
-        expect.any(Array),
-      );
+      expect(mockPersistence.saveNamespace).toHaveBeenCalledWith('color', expect.any(Array));
     });
 
     it('returns 400 when value is missing', async () => {
@@ -338,10 +329,7 @@ describe('studioApiPlugin', () => {
       await middleware(req, res, next);
       await waitForAsyncMiddleware();
 
-      expect(mockRegistry.updateToken).toHaveBeenCalledWith(
-        'color/color-primary-500',
-        'blue',
-      );
+      expect(mockRegistry.updateToken).toHaveBeenCalledWith('color/color-primary-500', 'blue');
     });
   });
 
@@ -380,7 +368,19 @@ describe('studioApiPlugin', () => {
       await waitForAsyncMiddleware();
 
       // Should update each scale step
-      const expectedSteps = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
+      const expectedSteps = [
+        '50',
+        '100',
+        '200',
+        '300',
+        '400',
+        '500',
+        '600',
+        '700',
+        '800',
+        '900',
+        '950',
+      ];
       for (const step of expectedSteps) {
         expect(mockRegistry.updateToken).toHaveBeenCalledWith(
           `color/color-primary-${step}`,
@@ -423,10 +423,7 @@ describe('studioApiPlugin', () => {
       await middleware(req, res, next);
       await waitForAsyncMiddleware();
 
-      expect(mockPersistence.saveNamespace).toHaveBeenCalledWith(
-        'color',
-        expect.any(Array),
-      );
+      expect(mockPersistence.saveNamespace).toHaveBeenCalledWith('color', expect.any(Array));
     });
 
     it('returns 400 when color is missing', async () => {
@@ -497,9 +494,7 @@ describe('studioApiPlugin', () => {
       await middleware(req, res, next);
       await waitForAsyncMiddleware(50); // Extra time for logging
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('brand guidelines update'),
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('brand guidelines update'));
 
       consoleSpy.mockRestore();
     });
@@ -572,11 +567,7 @@ describe('studioApiPlugin', () => {
 });
 
 describe('studioApiPlugin - missing project path', () => {
-  let middleware: (
-    req: IncomingMessage,
-    res: ServerResponse,
-    next: () => void,
-  ) => Promise<void>;
+  let middleware: (req: IncomingMessage, res: ServerResponse, next: () => void) => Promise<void>;
   let originalEnv: string | undefined;
 
   beforeAll(async () => {
