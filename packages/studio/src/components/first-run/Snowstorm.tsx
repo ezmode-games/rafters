@@ -191,7 +191,20 @@ export function Snowstorm({ onColorSelect, cardDelay = 3000 }: SnowstormProps) {
     const cardWrapper = cardWrapperRef.current;
     const box = transitionBoxRef.current;
 
-    if (!card || !snowContainer || !cardWrapper || !box) return;
+    // Debug: log which refs are missing
+    if (!card || !snowContainer || !cardWrapper || !box) {
+      console.error('[Snowstorm] Missing refs:', {
+        card: !!card,
+        snowContainer: !!snowContainer,
+        cardWrapper: !!cardWrapper,
+        box: !!box,
+      });
+      // Still call onColorSelect even if animation can't run
+      const { colorValue } = await onColorSelect(color, reason.trim());
+      setScaleColors(colorValue.scale);
+      setStage('done');
+      return;
+    }
 
     // Get full ColorValue FROM the registry via API - single source of truth
     const { colorValue } = await onColorSelect(color, reason.trim());
