@@ -3,25 +3,29 @@
  *
  * Creates a minimal .rafters structure within the studio package
  * so Studio can run without the CLI or a real project.
+ *
+ * Uses the same pattern as `rafters init` - buildColorSystem + NodePersistenceAdapter.
  */
 
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { buildColorSystem, registryToTailwind } from '@rafters/design-tokens';
+import {
+  buildColorSystem,
+  NodePersistenceAdapter,
+  registryToTailwind,
+} from '@rafters/design-tokens';
 
 const STUDIO_ROOT = join(import.meta.dirname, '..');
 const RAFTERS_ROOT = join(STUDIO_ROOT, '.rafters');
-const TOKENS_DIR = join(RAFTERS_ROOT, 'tokens');
 const OUTPUT_DIR = join(RAFTERS_ROOT, 'output');
 
 async function main() {
   console.log('Setting up standalone Studio development...\n');
 
-  // Create directories
-  await mkdir(TOKENS_DIR, { recursive: true });
+  // Create output directory
   await mkdir(OUTPUT_DIR, { recursive: true });
 
-  // Generate default token system
+  // Generate default token system (same as rafters init)
   const result = buildColorSystem({
     exports: {
       tailwind: { includeImport: true },
@@ -33,7 +37,8 @@ async function main() {
   const { registry } = result;
   console.log(`Generated ${registry.size()} tokens\n`);
 
-  // Group tokens by namespace
+  // Save tokens using NodePersistenceAdapter (same as rafters init)
+  const adapter = new NodePersistenceAdapter(STUDIO_ROOT);
   const tokensByNamespace = new Map<string, typeof result.system.allTokens>();
 
   for (const token of registry.list()) {
@@ -43,10 +48,8 @@ async function main() {
     tokensByNamespace.get(token.namespace)?.push(token);
   }
 
-  // Save each namespace
   for (const [namespace, tokens] of tokensByNamespace) {
-    const filePath = join(TOKENS_DIR, `${namespace}.rafters.json`);
-    await writeFile(filePath, JSON.stringify(tokens, null, 2));
+    await adapter.saveNamespace(namespace, tokens);
     console.log(`  Saved ${tokens.length} tokens to ${namespace}.rafters.json`);
   }
 
