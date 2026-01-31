@@ -4,19 +4,22 @@
  * Not a token editor. A canvas for capturing design decisions.
  * The entire UI IS the preview - we dogfood our own tokens.
  *
- * ALL styling uses Tailwind token classes via classy. No inline styles.
- * When tokens change, the UI updates via CSS HMR.
+ * After primary color: system paints from defaults (math-derived).
+ * Designer only speaks when deviating from defaults.
  */
 
-import { Card, CardContent, CardHeader, CardTitle } from '@rafters/ui/components/ui/card';
-import { Container } from '@rafters/ui/components/ui/container';
-import { Grid } from '@rafters/ui/components/ui/grid';
-import { Muted, P } from '@rafters/ui/components/ui/typography';
-import classy from '@rafters/ui/primitives/classy';
+import type { ColorValue, OKLCH } from '@rafters/shared';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { Snowstorm } from './components/first-run/Snowstorm';
-import { usePrimaryColorMutation } from './lib/query';
+import {
+  type LogEntry,
+  useConfig,
+  useConfigMutation,
+  usePrimaryColorMutation,
+  useRegistryLog,
+  useTokens,
+} from './lib/query';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,92 +30,178 @@ const queryClient = new QueryClient({
   },
 });
 
-type AppState = 'first-run' | 'workspace';
+const LOG_TYPE_COLORS: Record<LogEntry['type'], string> = {
+  init: 'text-blue-400',
+  load: 'text-green-400',
+  add: 'text-emerald-400',
+  update: 'text-yellow-400',
+  change: 'text-orange-400',
+  persist: 'text-purple-400',
+};
 
-interface OklchColor {
-  h: number;
-  s: number;
-  l: number;
+function RegistryActivityLog() {
+  const { data, isLoading } = useRegistryLog();
+
+  if (isLoading) return <div className="text-muted-foreground text-xs">Loading log...</div>;
+  if (!data?.log.length)
+    return <div className="text-muted-foreground text-xs">No activity yet</div>;
+
+  return (
+    <div className="space-y-0.5 font-mono text-[10px]">
+      {data.log.slice(0, 50).map((entry, i) => (
+        <div key={`${entry.timestamp}-${i}`} className="flex gap-2">
+          <span className="text-muted-foreground shrink-0">
+            {new Date(entry.timestamp).toLocaleTimeString()}
+          </span>
+          <span className={`shrink-0 w-14 ${LOG_TYPE_COLORS[entry.type]}`}>[{entry.type}]</span>
+          <span className="text-foreground truncate">{entry.message}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function RegistryTokensList() {
+  const { data, isLoading, error } = useTokens();
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  if (isLoading) return <div className="text-muted-foreground text-xs">Loading tokens...</div>;
+  if (error) return <div className="text-destructive text-xs">Error: {error.message}</div>;
+  if (!data) return null;
+
+  const namespaces = Object.entries(data.tokens);
+  const totalTokens = namespaces.reduce((sum, [, tokens]) => sum + tokens.length, 0);
+
+  return (
+    <div className="space-y-2">
+      <div className="text-xs text-muted-foreground">{totalTokens} tokens in registry</div>
+      {namespaces.map(([ns, tokens]) => (
+        <div key={ns}>
+          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
+            {ns} ({tokens.length})
+          </div>
+          <div className="space-y-1">
+            {tokens.slice(0, 10).map((token) => {
+              const isColorValue = typeof token.value === 'object' && 'scale' in token.value;
+              const isExpanded = expanded === token.name;
+
+              return (
+                <div key={token.name} className="text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setExpanded(isExpanded ? null : token.name)}
+                    className="flex items-center gap-2 w-full text-left hover:bg-muted/50 px-1 rounded"
+                  >
+                    <span className="text-muted-foreground">{isExpanded ? '-' : '+'}</span>
+                    <span className="font-mono">{token.name}</span>
+                    {isColorValue && (
+                      <span className="text-muted-foreground">
+                        [{(token.value as ColorValue).name}]
+                      </span>
+                    )}
+                    {typeof token.value === 'string' && (
+                      <span className="text-muted-foreground truncate max-w-32">{token.value}</span>
+                    )}
+                  </button>
+                  {isExpanded && (
+                    <pre className="ml-4 mt-1 p-2 bg-muted/30 rounded text-[10px] overflow-auto max-h-48">
+                      {JSON.stringify(token, null, 2)}
+                    </pre>
+                  )}
+                </div>
+              );
+            })}
+            {tokens.length > 10 && (
+              <div className="text-xs text-muted-foreground pl-4">
+                ...and {tokens.length - 10} more
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function RegistryDebugPanel() {
+  const [activeTab, setActiveTab] = useState<'log' | 'tokens'>('log');
+
+  return (
+    <div>
+      <div className="flex gap-4 mb-2">
+        <button
+          type="button"
+          onClick={() => setActiveTab('log')}
+          className={`text-xs font-semibold ${activeTab === 'log' ? 'text-foreground' : 'text-muted-foreground'}`}
+        >
+          Activity Log
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('tokens')}
+          className={`text-xs font-semibold ${activeTab === 'tokens' ? 'text-foreground' : 'text-muted-foreground'}`}
+        >
+          Tokens
+        </button>
+      </div>
+      {activeTab === 'log' ? <RegistryActivityLog /> : <RegistryTokensList />}
+    </div>
+  );
+}
+
+function ColorManager() {
+  // Main color management UI - shown after onboarding
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-semibold mb-4">Color System</h1>
+      <p className="text-muted-foreground">Your color system is configured. Color management UI coming soon.</p>
+    </div>
+  );
 }
 
 function StudioContent() {
-  const [appState, setAppState] = useState<AppState>('first-run');
-  const [primaryColor, setPrimaryColor] = useState<OklchColor | null>(null);
-  const [colorReason, setColorReason] = useState<string>('');
-
+  const { data: config, isLoading: configLoading } = useConfig();
+  const configMutation = useConfigMutation();
   const primaryColorMutation = usePrimaryColorMutation();
 
   const handleColorSelect = useCallback(
-    (color: OklchColor, reason: string) => {
-      setPrimaryColor(color);
-      setColorReason(reason);
-
-      // Convert to OKLCH format (s is actually chroma in Snowstorm)
-      const oklch = {
-        l: color.l,
-        c: color.s,
-        h: color.h,
-        alpha: 1,
-      };
-
-      // Paint the scale and write to tokens
-      primaryColorMutation.mutate(
-        { color: oklch, reason },
-        {
-          onSuccess: () => {
-            console.log('Primary color scale applied');
-            setAppState('workspace');
-          },
-          onError: (err) => {
-            console.error('Failed to apply primary color:', err);
-            // Still transition to workspace, but show error state
-            setAppState('workspace');
-          },
-        },
-      );
+    async (color: OKLCH, reason: string) => {
+      // Write to registry, return full ColorValue from it
+      const result = await primaryColorMutation.mutateAsync({ color, reason });
+      console.log(`Primary color set: ${result.colorValue.name}`);
+      return { colorValue: result.colorValue };
     },
     [primaryColorMutation],
   );
 
-  if (appState === 'first-run') {
-    return <Snowstorm onColorSelect={handleColorSelect} />;
+  const handleOnboardingComplete = useCallback(() => {
+    // Mark as onboarded in config
+    configMutation.mutate({ onboarded: true });
+  }, [configMutation]);
+
+  // Show loading while checking config
+  if (configLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
   }
 
-  // Workspace view - ALL styling via token classes through classy
-  // bg-primary will reflect the chosen color via CSS HMR
+  const isOnboarded = config?.onboarded === true;
+
   return (
-    <Container
-      as="main"
-      size="full"
-      padding="6"
-      className={classy('min-h-screen', 'bg-background')}
-    >
-      <Grid preset="linear" columns={1} gap="6" className={classy('mx-auto', 'max-w-md')}>
-        <Grid.Item>
-          <Card>
-            <CardHeader>
-              <CardTitle>Primary Color Selected</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {/* Color swatch uses bg-primary - updates via HMR */}
-              <div
-                className={classy('mb-4', 'h-24', 'w-24', 'rounded-lg', 'bg-primary', 'shadow-md')}
-              />
-              {primaryColor && (
-                <P className={classy('mb-2', 'text-sm', 'font-mono')}>
-                  oklch({primaryColor.l.toFixed(2)} {primaryColor.s.toFixed(2)}{' '}
-                  {primaryColor.h.toFixed(0)})
-                </P>
-              )}
-              {colorReason && <Muted>{colorReason}</Muted>}
-              {primaryColorMutation.isPending && (
-                <Muted className={classy('mt-2')}>Generating color scale...</Muted>
-              )}
-            </CardContent>
-          </Card>
-        </Grid.Item>
-      </Grid>
-    </Container>
+    <>
+      {isOnboarded ? (
+        <ColorManager />
+      ) : (
+        <Snowstorm onColorSelect={handleColorSelect} onComplete={handleOnboardingComplete} />
+      )}
+      <div className="fixed bottom-0 left-0 right-0 max-h-64 overflow-auto bg-background/95 backdrop-blur border-t p-3 z-50">
+        <div className="text-xs font-semibold mb-2">Registry Debug</div>
+        <RegistryDebugPanel />
+      </div>
+    </>
   );
 }
 

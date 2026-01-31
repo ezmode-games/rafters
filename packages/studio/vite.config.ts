@@ -16,6 +16,24 @@ export default defineConfig({
       '@rafters-output': resolve(projectPath, '.rafters', 'output'),
     },
   },
+  // Handle workspace packages that export TypeScript directly
+  optimizeDeps: {
+    include: [
+      '@rafters/color-utils',
+      '@rafters/design-tokens',
+      '@rafters/shared',
+      '@rafters/math-utils',
+    ],
+  },
+  ssr: {
+    // Don't externalize workspace packages - bundle them
+    noExternal: [
+      '@rafters/color-utils',
+      '@rafters/design-tokens',
+      '@rafters/shared',
+      '@rafters/math-utils',
+    ],
+  },
   server: {
     port: 7777,
     strictPort: true,

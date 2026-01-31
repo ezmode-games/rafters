@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:standalone": "RAFTERS_PROJECT_PATH=$PWD NODE_OPTIONS='--import tsx/esm' vite",
+    "setup:standalone": "tsx scripts/setup-standalone.ts",
     "build": "echo 'Studio is dev-only, no build needed'",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
@@ -38,6 +40,7 @@
     "jsdom": "^26.1.0",
     "msw": "^2.10.0",
     "tailwindcss": "^4.1.18",
+    "tsx": "^4.21.0",
     "typescript": "catalog:",
     "vite": "^6.2.0",
     "vitest": "^3.2.2"

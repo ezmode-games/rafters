@@ -1,2 +1,2 @@
-export { ColorPicker } from './ColorPicker';
+export { ColorScale } from './ColorScale';
 export { Snowstorm } from './Snowstorm';
