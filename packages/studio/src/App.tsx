@@ -12,7 +12,14 @@ import type { ColorValue, OKLCH } from '@rafters/shared';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { Snowstorm } from './components/first-run/Snowstorm';
-import { type LogEntry, usePrimaryColorMutation, useRegistryLog, useTokens } from './lib/query';
+import {
+  type LogEntry,
+  useConfig,
+  useConfigMutation,
+  usePrimaryColorMutation,
+  useRegistryLog,
+  useTokens,
+} from './lib/query';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -142,7 +149,19 @@ function RegistryDebugPanel() {
   );
 }
 
+function ColorManager() {
+  // Main color management UI - shown after onboarding
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-semibold mb-4">Color System</h1>
+      <p className="text-muted-foreground">Your color system is configured. Color management UI coming soon.</p>
+    </div>
+  );
+}
+
 function StudioContent() {
+  const { data: config, isLoading: configLoading } = useConfig();
+  const configMutation = useConfigMutation();
   const primaryColorMutation = usePrimaryColorMutation();
 
   const handleColorSelect = useCallback(
@@ -155,9 +174,29 @@ function StudioContent() {
     [primaryColorMutation],
   );
 
+  const handleOnboardingComplete = useCallback(() => {
+    // Mark as onboarded in config
+    configMutation.mutate({ onboarded: true });
+  }, [configMutation]);
+
+  // Show loading while checking config
+  if (configLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  const isOnboarded = config?.onboarded === true;
+
   return (
     <>
-      <Snowstorm onColorSelect={handleColorSelect} />
+      {isOnboarded ? (
+        <ColorManager />
+      ) : (
+        <Snowstorm onColorSelect={handleColorSelect} onComplete={handleOnboardingComplete} />
+      )}
       <div className="fixed bottom-0 left-0 right-0 max-h-64 overflow-auto bg-background/95 backdrop-blur border-t p-3 z-50">
         <div className="text-xs font-semibold mb-2">Registry Debug</div>
         <RegistryDebugPanel />

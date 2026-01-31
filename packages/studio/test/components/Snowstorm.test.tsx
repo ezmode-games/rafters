@@ -1,24 +1,20 @@
 /**
  * Snowstorm Component Tests
  *
- * Tests for the first-run color selection canvas.
+ * Tests for the first-run color selection flow.
+ * Flow: Click card -> ColorPicker -> Select -> Why? -> Commit
  */
 
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Snowstorm } from '../../src/components/first-run/Snowstorm';
-
-/** Helper to get canvas element with null check */
-function getCanvas(container: HTMLElement): HTMLCanvasElement {
-  const canvas = container.querySelector('canvas');
-  if (!canvas) throw new Error('Canvas not found');
-  return canvas;
-}
+import { mockColorValue } from '../fixtures';
 
 describe('Snowstorm', () => {
   const defaultProps = {
-    onColorSelect: vi.fn(),
+    onColorSelect: vi.fn().mockResolvedValue({ colorValue: mockColorValue }),
+    cardDelay: 0, // Skip delay for tests
   };
 
   beforeEach(() => {
@@ -26,21 +22,15 @@ describe('Snowstorm', () => {
   });
 
   describe('rendering', () => {
-    it('renders canvas element', () => {
+    it('renders snow container', () => {
       const { container } = render(<Snowstorm {...defaultProps} />);
-      const canvas = container.querySelector('canvas');
-      expect(canvas).toBeInTheDocument();
+      const snowContainer = container.querySelector('.pointer-events-none');
+      expect(snowContainer).toBeInTheDocument();
     });
 
-    it('renders invitation card', () => {
+    it('renders prompt text', () => {
       render(<Snowstorm {...defaultProps} />);
       expect(screen.getByText('Choose Your Primary Color')).toBeInTheDocument();
-    });
-
-    it('canvas has crosshair cursor', () => {
-      const { container } = render(<Snowstorm {...defaultProps} />);
-      const canvas = container.querySelector('canvas');
-      expect(canvas).toHaveClass('cursor-crosshair');
     });
 
     it('uses full screen container', () => {
@@ -50,161 +40,175 @@ describe('Snowstorm', () => {
     });
   });
 
-  describe('color picking', () => {
-    it('shows Why input on canvas click', () => {
-      const { container } = render(<Snowstorm {...defaultProps} />);
-      const canvas = getCanvas(container);
+  describe('stage transitions', () => {
+    it('shows ColorPicker when card is clicked', async () => {
+      const user = userEvent.setup();
+      render(<Snowstorm {...defaultProps} />);
 
-      fireEvent.click(canvas, { clientX: 400, clientY: 300 });
+      await user.click(screen.getByText('Choose Your Primary Color'));
 
-      expect(screen.getByPlaceholderText('Why?')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument();
+      });
     });
 
-    it('hides prompt text after click', () => {
-      const { container } = render(<Snowstorm {...defaultProps} />);
-      const canvas = getCanvas(container);
+    it('hides prompt text after clicking card', async () => {
+      const user = userEvent.setup();
+      render(<Snowstorm {...defaultProps} />);
 
-      fireEvent.click(canvas, { clientX: 400, clientY: 300 });
+      await user.click(screen.getByText('Choose Your Primary Color'));
 
-      expect(screen.queryByText('Choose Your Primary Color')).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.queryByText('Choose Your Primary Color')).not.toBeInTheDocument();
+      });
     });
 
-    it('changes card background to selected color', () => {
-      const { container } = render(<Snowstorm {...defaultProps} />);
-      const canvas = getCanvas(container);
+    it('shows Why stage after selecting color', async () => {
+      const user = userEvent.setup();
+      render(<Snowstorm {...defaultProps} />);
 
-      fireEvent.click(canvas, { clientX: 400, clientY: 300 });
+      await user.click(screen.getByText('Choose Your Primary Color'));
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument();
+      });
 
-      // Card should have a background color style
-      const card = container.querySelector('[class*="shadow-lg"]');
-      expect(card).toHaveStyle({ backgroundColor: expect.any(String) });
+      await user.click(screen.getByRole('button', { name: 'Select' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('What drew you to this?')).toBeInTheDocument();
+        expect(screen.getByRole('textbox')).toBeInTheDocument();
+      });
     });
   });
 
   describe('color confirmation', () => {
-    it('shows Continue button when reason is entered', async () => {
+    it('enables Continue button when reason is entered', async () => {
       const user = userEvent.setup();
-      const { container } = render(<Snowstorm {...defaultProps} />);
-      const canvas = getCanvas(container);
+      render(<Snowstorm {...defaultProps} />);
 
-      fireEvent.click(canvas, { clientX: 400, clientY: 300 });
-      await user.type(screen.getByPlaceholderText('Why?'), 'brand color');
+      // Go through the flow
+      await user.click(screen.getByText('Choose Your Primary Color'));
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: 'Select' }));
+      await waitFor(() => {
+        expect(screen.getByRole('textbox')).toBeInTheDocument();
+      });
 
-      expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument();
+      await user.type(screen.getByRole('textbox'), 'brand color');
+
+      expect(screen.getByRole('button', { name: 'Continue' })).not.toBeDisabled();
     });
 
-    it('does not show Continue button with empty reason', async () => {
-      const { container } = render(<Snowstorm {...defaultProps} />);
-      const canvas = getCanvas(container);
+    it('disables Continue button with empty reason', async () => {
+      const user = userEvent.setup();
+      render(<Snowstorm {...defaultProps} />);
 
-      fireEvent.click(canvas, { clientX: 400, clientY: 300 });
+      await user.click(screen.getByText('Choose Your Primary Color'));
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: 'Select' }));
+      await waitFor(() => {
+        expect(screen.getByRole('textbox')).toBeInTheDocument();
+      });
 
-      expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
     });
 
-    it('calls onColorSelect when Continue is clicked', async () => {
-      const onColorSelect = vi.fn();
+    it('allows clicking inspiration chips to add reason', async () => {
       const user = userEvent.setup();
-      const { container } = render(<Snowstorm onColorSelect={onColorSelect} />);
-      const canvas = getCanvas(container);
+      render(<Snowstorm {...defaultProps} />);
 
-      fireEvent.click(canvas, { clientX: 400, clientY: 300 });
-      await user.type(screen.getByPlaceholderText('Why?'), 'brand color');
+      await user.click(screen.getByText('Choose Your Primary Color'));
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: 'Select' }));
+      await waitFor(() => {
+        expect(screen.getByRole('textbox')).toBeInTheDocument();
+      });
+
+      // Click a chip
+      await user.click(screen.getByRole('button', { name: 'Brand guidelines' }));
+
+      expect(screen.getByRole('textbox')).toHaveValue('Brand guidelines');
+      expect(screen.getByRole('button', { name: 'Continue' })).not.toBeDisabled();
+    });
+
+    it('calls onColorSelect after transition when Continue is clicked', async () => {
+      const onColorSelect = vi.fn().mockResolvedValue({ colorValue: mockColorValue });
+      const user = userEvent.setup();
+      render(<Snowstorm onColorSelect={onColorSelect} cardDelay={0} />);
+
+      await user.click(screen.getByText('Choose Your Primary Color'));
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: 'Select' }));
+      await waitFor(() => {
+        expect(screen.getByRole('textbox')).toBeInTheDocument();
+      });
+
+      await user.type(screen.getByRole('textbox'), 'brand color');
       await user.click(screen.getByRole('button', { name: 'Continue' }));
 
-      expect(onColorSelect).toHaveBeenCalled();
-      const [color, reason] = onColorSelect.mock.calls[0];
-      expect(color.h).toBeCloseTo(180, 0);
+      // Wait for transition animation to complete and callback to fire
+      await waitFor(
+        () => {
+          expect(onColorSelect).toHaveBeenCalled();
+        },
+        { timeout: 3000 },
+      );
+
+      const [color, reason, family] = onColorSelect.mock.calls[0];
+      expect(color).toHaveProperty('l');
+      expect(color).toHaveProperty('c');
+      expect(color).toHaveProperty('h');
       expect(reason).toBe('brand color');
+      expect(family).toBe('primary');
     });
 
-    it('calls onColorSelect on Enter key', async () => {
-      const onColorSelect = vi.fn();
+    it('calls onColorSelect after transition on Enter key', async () => {
+      const onColorSelect = vi.fn().mockResolvedValue({ colorValue: mockColorValue });
       const user = userEvent.setup();
-      const { container } = render(<Snowstorm onColorSelect={onColorSelect} />);
-      const canvas = getCanvas(container);
+      render(<Snowstorm onColorSelect={onColorSelect} cardDelay={0} />);
 
-      fireEvent.click(canvas, { clientX: 400, clientY: 300 });
-      await user.type(screen.getByPlaceholderText('Why?'), 'brand color{Enter}');
+      await user.click(screen.getByText('Choose Your Primary Color'));
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: 'Select' }));
+      await waitFor(() => {
+        expect(screen.getByRole('textbox')).toBeInTheDocument();
+      });
 
-      expect(onColorSelect).toHaveBeenCalled();
-    });
-  });
+      await user.type(screen.getByRole('textbox'), 'brand color{Enter}');
 
-  describe('re-picking color', () => {
-    it('allows clicking canvas again to pick different color', async () => {
-      const { container } = render(<Snowstorm {...defaultProps} />);
-      const canvas = getCanvas(container);
-
-      // First click
-      fireEvent.click(canvas, { clientX: 100, clientY: 100 });
-      expect(screen.getByPlaceholderText('Why?')).toBeInTheDocument();
-
-      // Second click picks new color
-      fireEvent.click(canvas, { clientX: 700, clientY: 500 });
-      expect(screen.getByPlaceholderText('Why?')).toBeInTheDocument();
-    });
-  });
-
-  describe('position to color mapping', () => {
-    it('maps top-left to light red', async () => {
-      const onColorSelect = vi.fn();
-      const user = userEvent.setup();
-      const { container } = render(<Snowstorm onColorSelect={onColorSelect} />);
-      const canvas = getCanvas(container);
-
-      fireEvent.click(canvas, { clientX: 0, clientY: 0 });
-      await user.type(screen.getByPlaceholderText('Why?'), 'test{Enter}');
-
-      const [color] = onColorSelect.mock.calls[0];
-      expect(color.h).toBeCloseTo(0, 0);
-      expect(color.l).toBeCloseTo(0.9, 1);
-    });
-
-    it('maps center to mid cyan', async () => {
-      const onColorSelect = vi.fn();
-      const user = userEvent.setup();
-      const { container } = render(<Snowstorm onColorSelect={onColorSelect} />);
-      const canvas = getCanvas(container);
-
-      fireEvent.click(canvas, { clientX: 400, clientY: 300 });
-      await user.type(screen.getByPlaceholderText('Why?'), 'test{Enter}');
-
-      const [color] = onColorSelect.mock.calls[0];
-      expect(color.h).toBeCloseTo(180, 0);
-      expect(color.l).toBeCloseTo(0.6, 1);
-    });
-
-    it('maps bottom-right to dark red', async () => {
-      const onColorSelect = vi.fn();
-      const user = userEvent.setup();
-      const { container } = render(<Snowstorm onColorSelect={onColorSelect} />);
-      const canvas = getCanvas(container);
-
-      fireEvent.click(canvas, { clientX: 800, clientY: 600 });
-      await user.type(screen.getByPlaceholderText('Why?'), 'test{Enter}');
-
-      const [color] = onColorSelect.mock.calls[0];
-      expect(color.h).toBeCloseTo(360, 0);
-      expect(color.l).toBeCloseTo(0.3, 1);
+      // Wait for transition animation to complete and callback to fire
+      await waitFor(
+        () => {
+          expect(onColorSelect).toHaveBeenCalled();
+        },
+        { timeout: 3000 },
+      );
     });
   });
 
   describe('GSAP integration', () => {
-    it('initializes GSAP ticker on mount', async () => {
+    it('creates snow container for particles on mount', () => {
+      const { container } = render(<Snowstorm {...defaultProps} />);
+      // Particles are created as DOM elements in the snow container
+      const particles = container.querySelectorAll('.bg-muted-foreground');
+      expect(particles.length).toBeGreaterThan(0);
+    });
+
+    it('creates float animation for card', async () => {
       const gsap = await import('gsap');
       render(<Snowstorm {...defaultProps} />);
 
-      expect(gsap.default.ticker.add).toHaveBeenCalled();
-    });
-
-    it('cleans up GSAP ticker on unmount', async () => {
-      const gsap = await import('gsap');
-      const { unmount } = render(<Snowstorm {...defaultProps} />);
-
-      unmount();
-
-      expect(gsap.default.ticker.remove).toHaveBeenCalled();
+      expect(gsap.default.timeline).toHaveBeenCalled();
     });
   });
 });

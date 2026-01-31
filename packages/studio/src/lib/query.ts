@@ -1,7 +1,20 @@
 /**
  * React Query hooks for Studio token management
+ *
+ * Studio is a THIN UI on the registry. All token generation happens CLIENT-SIDE
+ * using @rafters/color-utils and @rafters/design-tokens, then POSTed to /api/tokens.
  */
 
+import {
+  buildColorValue,
+  generateOKLCHScale,
+  generateRaftersHarmony,
+} from '@rafters/color-utils';
+import {
+  DEFAULT_SYSTEM_CONFIG,
+  generateColorTokens,
+  resolveConfig,
+} from '@rafters/design-tokens';
 import type { ColorValue, OKLCH, Token } from '@rafters/shared';
 import {
   type UseMutationResult,
@@ -18,6 +31,7 @@ export const tokenKeys = {
   all: ['tokens'] as const,
   namespace: (ns: string) => ['tokens', ns] as const,
   log: ['registry', 'log'] as const,
+  config: ['config'] as const,
 } as const;
 
 /**
@@ -36,6 +50,24 @@ interface LogResponse {
 
 interface TokensResponse {
   tokens: Record<string, Token[]>;
+}
+
+/**
+ * Rafters config structure
+ */
+export interface RaftersConfig {
+  framework?: string;
+  componentsPath?: string;
+  primitivesPath?: string;
+  cssPath?: string | null;
+  shadcn?: boolean;
+  exports?: {
+    tailwind?: boolean;
+    typescript?: boolean;
+    dtcg?: boolean;
+    compiled?: boolean;
+  };
+  onboarded?: boolean;
 }
 
 interface TokenMutationVars {
@@ -112,41 +144,183 @@ export function useTokenMutation(): UseMutationResult<
   });
 }
 
-interface PrimaryColorMutationVars {
+interface ColorMutationVars {
   color: OKLCH;
   reason: string;
 }
 
-interface PrimaryColorResponse {
-  success: boolean;
+interface ColorMutationResponse {
   colorValue: ColorValue;
+  families: Record<string, OKLCH>;
 }
 
 /**
- * Mutation to set the primary color
- * Builds full ColorValue (scale, harmonies, accessibility, etc.) and writes to registry
+ * The 11 Rafters color families derived from a primary color
+ */
+interface RaftersFamilies {
+  // From generateRaftersHarmony (7)
+  primary: OKLCH;
+  secondary: OKLCH;
+  tertiary: OKLCH;
+  accent: OKLCH;
+  highlight: OKLCH;
+  surface: OKLCH;
+  neutral: OKLCH;
+  // From semanticSuggestions (4)
+  destructive: OKLCH;
+  success: OKLCH;
+  warning: OKLCH;
+  info: OKLCH;
+}
+
+/**
+ * Generate all 11 Rafters families from a primary color
+ */
+function generateAllFamilies(primaryOklch: OKLCH): RaftersFamilies {
+  const harmony = generateRaftersHarmony(primaryOklch);
+  const colorValue = buildColorValue(primaryOklch);
+
+  return {
+    // From harmony
+    primary: harmony.primary,
+    secondary: harmony.secondary,
+    tertiary: harmony.tertiary,
+    accent: harmony.accent,
+    highlight: harmony.highlight,
+    surface: harmony.surface,
+    neutral: harmony.neutral,
+    // From semantic suggestions (pick first option as default)
+    destructive: colorValue.semanticSuggestions.danger[0],
+    success: colorValue.semanticSuggestions.success[0],
+    warning: colorValue.semanticSuggestions.warning[0],
+    info: colorValue.semanticSuggestions.info[0],
+  };
+}
+
+/**
+ * Fetch ColorValue with AI intelligence from Rafters API (async enrichment)
+ */
+async function fetchColorIntelligence(oklch: OKLCH): Promise<ColorValue> {
+  const params = new URLSearchParams({
+    l: oklch.l.toString(),
+    c: oklch.c.toString(),
+    h: oklch.h.toString(),
+    sync: 'true',
+  });
+
+  const res = await fetch(`/api/tokens/color?${params}`);
+  if (!res.ok) {
+    throw new Error('Failed to fetch color intelligence');
+  }
+
+  const data = await res.json();
+  return data.color;
+}
+
+/**
+ * Enrich a family token with AI intelligence (async, non-blocking)
+ */
+function enrichFamilyWithIntelligence(
+  familyName: string,
+  oklch: OKLCH,
+  queryClient: ReturnType<typeof useQueryClient>,
+): void {
+  fetchColorIntelligence(oklch)
+    .then(async (enrichedColorValue) => {
+      if (enrichedColorValue.intelligence) {
+        const enrichedToken: Token = {
+          name: familyName,
+          value: enrichedColorValue,
+          category: 'color',
+          namespace: 'color',
+          generatedAt: new Date().toISOString(),
+        };
+
+        await fetch('/api/tokens', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify([enrichedToken]),
+        });
+
+        queryClient.invalidateQueries({ queryKey: tokenKeys.all });
+      }
+    })
+    .catch((err) => {
+      // Non-fatal - math already written, intelligence is optional
+      console.warn(`Failed to fetch intelligence for ${familyName}:`, err);
+    });
+}
+
+/**
+ * Mutation to set the primary color and generate all 11 families
+ *
+ * Two-phase approach:
+ * 1. INSTANT: Generate all 11 families locally (math from color-utils)
+ * 2. ASYNC: Fetch AI intelligence for each family from Rafters API
+ *
+ * Only primary requires userOverride (user's arbitrary choice).
+ * Other families are mathematically derived - no explanation needed.
  */
 export function usePrimaryColorMutation(): UseMutationResult<
-  PrimaryColorResponse,
+  ColorMutationResponse,
   Error,
-  PrimaryColorMutationVars
+  ColorMutationVars
 > {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ color, reason }: PrimaryColorMutationVars) => {
-      const res = await fetch('/api/tokens/primary', {
+    mutationFn: async ({ color, reason }: ColorMutationVars) => {
+      // PHASE 1: Generate all 11 families instantly
+      const families = generateAllFamilies(color);
+      const colorValue = buildColorValue(color);
+      const config = resolveConfig(DEFAULT_SYSTEM_CONFIG);
+      const timestamp = new Date().toISOString();
+
+      // Generate tokens for all families
+      const allTokens: Token[] = [];
+
+      for (const [familyName, familyOklch] of Object.entries(families)) {
+        const scale = generateOKLCHScale(familyOklch);
+        const familyTokens = generateColorTokens(config, [
+          { name: familyName, scale, description: `${familyName} color family` },
+        ]);
+
+        // Only primary gets userOverride (user's arbitrary choice)
+        // Other families are mathematically derived - no explanation needed
+        if (familyName === 'primary') {
+          allTokens.push(
+            ...familyTokens.tokens.map((t) => ({
+              ...t,
+              userOverride: {
+                reason,
+                overriddenAt: timestamp,
+              },
+            })),
+          );
+        } else {
+          allTokens.push(...familyTokens.tokens);
+        }
+      }
+
+      // Write all tokens to registry
+      const res = await fetch('/api/tokens', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ color, reason }),
+        body: JSON.stringify(allTokens),
       });
 
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error || 'Failed to set primary color');
+        throw new Error(err.error || 'Failed to write tokens');
       }
 
-      return res.json();
+      // PHASE 2: Async enrichment - fetch AI intelligence for each family
+      // Fire and forget - don't block the UI
+      for (const [familyName, familyOklch] of Object.entries(families)) {
+        enrichFamilyWithIntelligence(familyName, familyOklch, queryClient);
+      }
+
+      return { colorValue, families };
     },
     onSuccess: () => {
       // Invalidate token queries to refetch - CSS will update via HMR
@@ -199,6 +373,54 @@ export function useSemanticColorsMutation(): UseMutationResult<
     onSuccess: () => {
       // Invalidate token queries to refetch - CSS will update via HMR
       queryClient.invalidateQueries({ queryKey: tokenKeys.all });
+    },
+  });
+}
+
+/**
+ * Fetch rafters config
+ */
+export function useConfig(): UseQueryResult<RaftersConfig> {
+  return useQuery({
+    queryKey: tokenKeys.config,
+    queryFn: async (): Promise<RaftersConfig> => {
+      const res = await fetch('/api/config');
+      if (!res.ok) {
+        // Return default if not found
+        return { onboarded: false };
+      }
+      return res.json();
+    },
+  });
+}
+
+/**
+ * Mutation to update rafters config
+ */
+export function useConfigMutation(): UseMutationResult<
+  { success: boolean; config: RaftersConfig },
+  Error,
+  Partial<RaftersConfig>
+> {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (updates: Partial<RaftersConfig>) => {
+      const res = await fetch('/api/config', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to update config');
+      }
+
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: tokenKeys.config });
     },
   });
 }

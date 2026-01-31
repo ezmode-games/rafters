@@ -8,38 +8,16 @@
  * Uses singleton TokenRegistry with setChangeCallback for CSS HMR.
  */
 
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { buildColorValue, generateOKLCHScale, oklchToCSS } from '@rafters/color-utils';
-import {
-  DEFAULT_SYSTEM_CONFIG,
-  generateColorTokens,
-  NodePersistenceAdapter,
-  registryToVars,
-  resolveConfig,
-  TokenRegistry,
-} from '@rafters/design-tokens';
-import type { ColorValue, Token } from '@rafters/shared';
-import { OKLCHSchema } from '@rafters/shared';
+import { NodePersistenceAdapter, registryToVars, TokenRegistry } from '@rafters/design-tokens';
+import type { Token } from '@rafters/shared';
+import { TokenSchema } from '@rafters/shared';
 import type { Plugin, ViteDevServer } from 'vite';
 import { z } from 'zod';
 
-/** Schema for POST /api/tokens/primary request body */
-const PrimaryColorRequestSchema = z.object({
-  color: OKLCHSchema,
-  reason: z.string().min(1),
-});
-
-/** Schema for semantic color choice */
-const SemanticColorChoiceSchema = z.object({
-  color: OKLCHSchema,
-  reason: z.string().min(1),
-});
-
-/** Schema for POST /api/tokens/semantics request body */
-const SemanticColorsRequestSchema = z.object({
-  colors: z.record(z.string(), SemanticColorChoiceSchema),
-});
+/** Schema for POST /api/tokens request body - accepts single token or array */
+const TokensRequestSchema = z.union([TokenSchema, z.array(TokenSchema)]);
 
 let registry: TokenRegistry | null = null;
 let persistence: NodePersistenceAdapter | null = null;
@@ -152,8 +130,8 @@ export function studioApiPlugin(): Plugin {
           return;
         }
 
-        // POST /api/tokens/primary - Build and set primary ColorValue
-        if (req.method === 'POST' && req.url === '/api/tokens/primary') {
+        // POST /api/tokens - Add tokens to registry (validates against TokenSchema)
+        if (req.method === 'POST' && req.url === '/api/tokens') {
           let body = '';
 
           req.on('data', (chunk) => {
@@ -162,110 +140,44 @@ export function studioApiPlugin(): Plugin {
 
           req.on('end', async () => {
             try {
-              const parsed = PrimaryColorRequestSchema.safeParse(JSON.parse(body));
+              const parsed = TokensRequestSchema.safeParse(JSON.parse(body));
               if (!parsed.success) {
                 res.statusCode = 400;
                 res.end(JSON.stringify({ error: 'Invalid request', details: parsed.error.issues }));
                 return;
               }
-              const { color, reason } = parsed.data;
 
               const reg = await initRegistry(projectPath);
-              const ns = 'color';
 
-              log('update', `Setting primary color`, { color, reason });
+              // Normalize to array
+              const tokens = Array.isArray(parsed.data) ? parsed.data : [parsed.data];
 
-              // Build full ColorValue with all intelligence from @rafters/color-utils
-              const colorValue = buildColorValue(color, { token: 'primary', use: reason });
-              log('add', `Built ColorValue: ${colorValue.name}`, { token: 'primary' });
-
-              // Generate scale for the color generator
-              const scale = generateOKLCHScale(color);
-
-              // Use the color generator to create properly structured tokens
-              const config = resolveConfig(DEFAULT_SYSTEM_CONFIG);
-              const { tokens } = generateColorTokens(config, [
-                { name: 'primary', scale, description: reason },
-              ]);
-
-              // Add all generated tokens to registry
-              log('add', `Adding ${tokens.length} generated tokens to registry`);
+              log('update', `Upserting ${tokens.length} tokens in registry`);
               for (const token of tokens) {
-                reg.add(token);
-              }
-
-              // Update the family token's value to include full ColorValue intelligence
-              const familyTokenId = `${ns}/color-primary`;
-              const familyToken = reg.get(familyTokenId);
-              if (familyToken) {
-                reg.add({ ...familyToken, value: colorValue as ColorValue });
-              }
-
-              // Persist to file
-              if (persistence) {
-                const tokensToSave = reg.list().filter((t) => t.namespace === ns);
-                await persistence.saveNamespace(ns, tokensToSave);
-                log('persist', `Saved ${tokensToSave.length} tokens to namespace "${ns}"`);
-              }
-
-              // Log the reason for design intelligence
-              log('update', `Primary color committed: ${colorValue.name}`, { reason });
-              console.log(`[studio] Primary color set: ${colorValue.name}. Reason: ${reason}`);
-
-              res.setHeader('Content-Type', 'application/json');
-              res.end(JSON.stringify({ success: true, colorValue }));
-            } catch (err) {
-              res.statusCode = 500;
-              res.end(JSON.stringify({ error: String(err) }));
-            }
-          });
-          return;
-        }
-
-        // POST /api/tokens/semantics - Set all semantic colors
-        if (req.method === 'POST' && req.url === '/api/tokens/semantics') {
-          let body = '';
-
-          req.on('data', (chunk) => {
-            body += chunk;
-          });
-
-          req.on('end', async () => {
-            try {
-              const parsed = SemanticColorsRequestSchema.safeParse(JSON.parse(body));
-              if (!parsed.success) {
-                res.statusCode = 400;
-                res.end(JSON.stringify({ error: 'Invalid request', details: parsed.error.issues }));
-                return;
-              }
-              const { colors } = parsed.data;
-
-              const reg = await initRegistry(projectPath);
-              const ns = 'color';
-              const updated: string[] = [];
-
-              // Update each semantic color
-              for (const [name, { color, reason }] of Object.entries(colors)) {
-                const tokenId = `${ns}/color-${name}`;
-
-                if (reg.has(tokenId)) {
-                  const cssValue = oklchToCSS(color);
-                  reg.updateToken(tokenId, cssValue);
-                  updated.push(name);
-
-                  // Log for design intelligence
-                  console.log(`[studio] Semantic color '${name}' set. Reason: ${reason}`);
+                if (reg.has(token.name)) {
+                  // Token exists - use set() to update and cascade dependents
+                  const value = typeof token.value === 'string' ? token.value : JSON.stringify(token.value);
+                  await reg.set(token.name, value);
+                  log('update', `Updated existing token "${token.name}"`);
+                } else {
+                  // Token doesn't exist - use add() to create it
+                  reg.add(token);
+                  log('add', `Added new token "${token.name}"`);
                 }
               }
 
-              // Persist to file
+              // Group tokens by namespace and persist each
               if (persistence) {
-                const tokens = reg.list().filter((t) => t.namespace === ns);
-                await persistence.saveNamespace(ns, tokens);
+                const namespaces = new Set(tokens.map((t) => t.namespace));
+                for (const ns of namespaces) {
+                  const nsTokens = reg.list().filter((t) => t.namespace === ns);
+                  await persistence.saveNamespace(ns, nsTokens);
+                  log('persist', `Saved ${nsTokens.length} tokens to namespace "${ns}"`);
+                }
               }
 
               res.setHeader('Content-Type', 'application/json');
-              res.end(JSON.stringify({ success: true, updated }));
+              res.end(JSON.stringify({ success: true, count: tokens.length }));
             } catch (err) {
               res.statusCode = 500;
               res.end(JSON.stringify({ error: String(err) }));
@@ -322,6 +234,99 @@ export function studioApiPlugin(): Plugin {
               res.end(JSON.stringify({ error: String(err) }));
             }
           });
+          return;
+        }
+
+        // GET /api/config - Get rafters config
+        if (req.method === 'GET' && req.url === '/api/config') {
+          try {
+            const configPath = join(projectPath, '.rafters', 'config.rafters.json');
+            const configData = await readFile(configPath, 'utf-8');
+            res.setHeader('Content-Type', 'application/json');
+            res.end(configData);
+          } catch (err) {
+            // Return default config if file doesn't exist
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ onboarded: false }));
+          }
+          return;
+        }
+
+        // PATCH /api/config - Update rafters config
+        if (req.method === 'PATCH' && req.url === '/api/config') {
+          let body = '';
+
+          req.on('data', (chunk) => {
+            body += chunk;
+          });
+
+          req.on('end', async () => {
+            try {
+              const updates = JSON.parse(body);
+              const configPath = join(projectPath, '.rafters', 'config.rafters.json');
+
+              // Read existing config
+              let config: Record<string, unknown> = {};
+              try {
+                const existing = await readFile(configPath, 'utf-8');
+                config = JSON.parse(existing);
+              } catch {
+                // Start with empty config if file doesn't exist
+              }
+
+              // Merge updates
+              config = { ...config, ...updates };
+
+              // Write back
+              await mkdir(join(projectPath, '.rafters'), { recursive: true });
+              await writeFile(configPath, JSON.stringify(config, null, 2));
+              log('persist', `Config updated: ${Object.keys(updates).join(', ')}`);
+
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ success: true, config }));
+            } catch (err) {
+              res.statusCode = 500;
+              res.end(JSON.stringify({ error: String(err) }));
+            }
+          });
+          return;
+        }
+
+        // GET /api/tokens/color?l=0.6&c=0.15&h=200 - Get ColorValue from Rafters API
+        const colorUrl = new URL(req.url || '', 'http://localhost');
+        if (req.method === 'GET' && colorUrl.pathname === '/api/tokens/color') {
+          const l = colorUrl.searchParams.get('l');
+          const c = colorUrl.searchParams.get('c');
+          const h = colorUrl.searchParams.get('h');
+          const sync = colorUrl.searchParams.get('sync') !== 'false'; // default true
+
+          if (!l || !c || !h) {
+            res.statusCode = 400;
+            res.end(JSON.stringify({ error: 'l, c, h query params required' }));
+            return;
+          }
+
+          try {
+            // Format: L.LLL-C.CCC-H
+            const oklchParam = `${parseFloat(l).toFixed(3)}-${parseFloat(c).toFixed(3)}-${Math.round(parseFloat(h))}`;
+            const apiUrl = `https://api.rafters.studio/color/${oklchParam}?${sync ? 'sync=true' : 'adhoc=true'}`;
+
+            log('update', `Fetching color from Rafters API: ${oklchParam}`);
+            const apiRes = await fetch(apiUrl);
+
+            if (!apiRes.ok) {
+              throw new Error(`Rafters API error: ${apiRes.status}`);
+            }
+
+            const data = await apiRes.json();
+            log('update', `Got ColorValue: ${data.color?.name || 'unknown'}`);
+
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(data));
+          } catch (err) {
+            res.statusCode = 500;
+            res.end(JSON.stringify({ error: String(err) }));
+          }
           return;
         }
 
