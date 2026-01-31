@@ -2,6 +2,8 @@
  * Vite Plugin API Tests
  *
  * Exhaustive tests for the Studio API endpoints.
+ * Uses real @rafters/color-utils and @rafters/design-tokens implementations.
+ * Only mocks file system and persistence layer.
  */
 
 import { EventEmitter } from 'node:events';
@@ -12,6 +14,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 const { mockRegistry, mockPersistence, mockMkdir, mockWriteFile } = vi.hoisted(() => ({
   mockRegistry: {
     add: vi.fn(),
+    get: vi.fn().mockReturnValue(null),
     list: vi.fn().mockReturnValue([]),
     has: vi.fn().mockReturnValue(true),
     updateToken: vi.fn(),
@@ -26,7 +29,7 @@ const { mockRegistry, mockPersistence, mockMkdir, mockWriteFile } = vi.hoisted((
   mockWriteFile: vi.fn().mockResolvedValue(undefined),
 }));
 
-// Mock modules - these must be at the top level
+// Mock only file system - not the package implementations
 vi.mock('node:fs/promises', async (importOriginal) => {
   const actual = await importOriginal<typeof import('node:fs/promises')>();
   return {
@@ -36,28 +39,22 @@ vi.mock('node:fs/promises', async (importOriginal) => {
   };
 });
 
-vi.mock('@rafters/color-utils', () => ({
-  generateOKLCHScale: vi.fn((baseColor) => ({
-    '50': { l: 0.98, c: baseColor.c * 0.15, h: baseColor.h, alpha: 1 },
-    '100': { l: 0.95, c: baseColor.c * 0.25, h: baseColor.h, alpha: 1 },
-    '200': { l: 0.9, c: baseColor.c * 0.25, h: baseColor.h, alpha: 1 },
-    '300': { l: 0.8, c: baseColor.c * 0.7, h: baseColor.h, alpha: 1 },
-    '400': { l: 0.7, c: baseColor.c * 0.7, h: baseColor.h, alpha: 1 },
-    '500': { l: baseColor.l, c: baseColor.c, h: baseColor.h, alpha: 1 },
-    '600': { l: 0.4, c: baseColor.c, h: baseColor.h, alpha: 1 },
-    '700': { l: 0.25, c: baseColor.c * 0.9, h: baseColor.h, alpha: 1 },
-    '800': { l: 0.15, c: baseColor.c * 0.8, h: baseColor.h, alpha: 1 },
-    '900': { l: 0.08, c: baseColor.c * 0.8, h: baseColor.h, alpha: 1 },
-    '950': { l: 0.04, c: baseColor.c * 0.8, h: baseColor.h, alpha: 1 },
-  })),
-  oklchToCSS: vi.fn((oklch) => `oklch(${oklch.l} ${oklch.c} ${oklch.h})`),
-}));
+// Mock only the persistence and registry classes, not the utility functions
+vi.mock('@rafters/design-tokens', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@rafters/design-tokens')>();
+  return {
+    ...actual,
+    // Use real implementations for these - they create proper structures
+    generateColorTokens: actual.generateColorTokens,
+    resolveConfig: actual.resolveConfig,
+    registryToVars: actual.registryToVars,
+    // Mock only the classes that interact with file system/state
+    TokenRegistry: vi.fn().mockImplementation(() => mockRegistry),
+    NodePersistenceAdapter: vi.fn().mockImplementation(() => mockPersistence),
+  };
+});
 
-vi.mock('@rafters/design-tokens', () => ({
-  TokenRegistry: vi.fn().mockImplementation(() => mockRegistry),
-  NodePersistenceAdapter: vi.fn().mockImplementation(() => mockPersistence),
-  registryToVars: vi.fn().mockReturnValue('/* mocked css */'),
-}));
+// Use real color-utils - no mocking, these functions create proper structures
 
 // Helper to create mock request
 function createMockRequest(
@@ -340,9 +337,7 @@ describe('studioApiPlugin', () => {
       mockRegistry.has.mockReturnValue(true);
     });
 
-    it('generates color scale from base color', async () => {
-      const { generateOKLCHScale } = await import('@rafters/color-utils');
-
+    it('calls buildColorValue with correct parameters', async () => {
       const req = createMockRequest('POST', '/api/tokens/primary', {
         color: mockColor,
         reason: 'brand update',
@@ -353,10 +348,15 @@ describe('studioApiPlugin', () => {
       await middleware(req, res, next);
       await waitForAsyncMiddleware();
 
-      expect(generateOKLCHScale).toHaveBeenCalledWith(mockColor);
+      // Real buildColorValue was called - check the response has proper ColorValue structure
+      expect(res._statusCode).toBe(200);
+      const response = JSON.parse(res._body);
+      expect(response.colorValue).toBeDefined();
+      expect(response.colorValue.token).toBe('primary');
+      expect(response.colorValue.use).toBe('brand update');
     });
 
-    it('updates all scale tokens', async () => {
+    it('adds generated tokens to registry', async () => {
       const req = createMockRequest('POST', '/api/tokens/primary', {
         color: mockColor,
         reason: 'test',
@@ -367,29 +367,11 @@ describe('studioApiPlugin', () => {
       await middleware(req, res, next);
       await waitForAsyncMiddleware();
 
-      // Should update each scale step
-      const expectedSteps = [
-        '50',
-        '100',
-        '200',
-        '300',
-        '400',
-        '500',
-        '600',
-        '700',
-        '800',
-        '900',
-        '950',
-      ];
-      for (const step of expectedSteps) {
-        expect(mockRegistry.updateToken).toHaveBeenCalledWith(
-          `color/color-primary-${step}`,
-          expect.stringContaining('oklch('),
-        );
-      }
+      // Real generateColorTokens creates proper tokens - verify registry.add was called
+      expect(mockRegistry.add).toHaveBeenCalled();
     });
 
-    it('returns generated scale in response', async () => {
+    it('returns full ColorValue from real buildColorValue', async () => {
       const req = createMockRequest('POST', '/api/tokens/primary', {
         color: mockColor,
         reason: 'test',
@@ -404,8 +386,12 @@ describe('studioApiPlugin', () => {
       expect(res._body).not.toBe(''); // Ensure body was set
       const response = JSON.parse(res._body);
       expect(response.success).toBe(true);
-      expect(response.scale).toBeDefined();
-      expect(response.scale['500']).toBeDefined();
+      expect(response.colorValue).toBeDefined();
+      // Real buildColorValue creates proper ColorValue with name from OKLCH analysis
+      expect(response.colorValue.name).toBeDefined();
+      expect(response.colorValue.scale).toBeInstanceOf(Array);
+      // Real scale has 11 positions (50-950)
+      expect(response.colorValue.scale.length).toBe(11);
     });
 
     it('persists updated tokens', async () => {
@@ -456,12 +442,7 @@ describe('studioApiPlugin', () => {
       expect(res._statusCode).toBe(400);
     });
 
-    it('skips tokens that do not exist', async () => {
-      mockRegistry.has.mockImplementation((tokenId: string) => {
-        // Only color-primary-500 exists
-        return tokenId === 'color/color-primary-500';
-      });
-
+    it('adds tokens from generator to registry', async () => {
       const req = createMockRequest('POST', '/api/tokens/primary', {
         color: mockColor,
         reason: 'test',
@@ -472,12 +453,8 @@ describe('studioApiPlugin', () => {
       await middleware(req, res, next);
       await waitForAsyncMiddleware();
 
-      // Should only update existing token (500 step)
-      expect(mockRegistry.updateToken).toHaveBeenCalledTimes(1);
-      expect(mockRegistry.updateToken).toHaveBeenCalledWith(
-        'color/color-primary-500',
-        expect.any(String),
-      );
+      // Generator creates tokens and adds them to registry
+      expect(mockRegistry.add).toHaveBeenCalled();
     });
 
     it('logs reason for design intelligence', async () => {
@@ -499,9 +476,20 @@ describe('studioApiPlugin', () => {
       consoleSpy.mockRestore();
     });
 
-    it('updates base primary token if it exists', async () => {
+    it('updates family token with full ColorValue', async () => {
+      // Set up existing family token with metadata we want preserved
+      const existingFamilyToken = {
+        name: 'color-primary',
+        namespace: 'color',
+        category: 'color',
+        value: { name: 'old-blue', scale: [] },
+        semanticMeaning: 'Primary brand color',
+      };
+      mockRegistry.get.mockImplementation((tokenId: string) => {
+        if (tokenId === 'color/color-primary') return existingFamilyToken;
+        return null;
+      });
       mockRegistry.has.mockImplementation((tokenId: string) => {
-        // Both scale token and base token exist
         return tokenId === 'color/color-primary-500' || tokenId === 'color/color-primary';
       });
 
@@ -515,15 +503,24 @@ describe('studioApiPlugin', () => {
       await middleware(req, res, next);
       await waitForAsyncMiddleware();
 
-      // Should update both the scale token and base token
-      expect(mockRegistry.updateToken).toHaveBeenCalledWith(
-        'color/color-primary',
-        expect.stringContaining('oklch('),
+      // Should update the family token with real ColorValue from buildColorValue
+      expect(mockRegistry.add).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'color-primary',
+          namespace: 'color',
+          semanticMeaning: 'Primary brand color', // Preserved from existing
+          value: expect.objectContaining({
+            // Real buildColorValue creates proper name from OKLCH color analysis
+            name: expect.any(String),
+            // Real scale has 11 OKLCH positions
+            scale: expect.any(Array),
+          }),
+        }),
       );
     });
 
     it('handles server error gracefully', async () => {
-      mockRegistry.has.mockImplementation(() => {
+      mockRegistry.get.mockImplementation(() => {
         throw new Error('Database connection failed');
       });
 
@@ -578,7 +575,7 @@ describe('studioApiPlugin - missing project path', () => {
     // Reset modules to get fresh import without RAFTERS_PROJECT_PATH
     vi.resetModules();
 
-    // Re-apply mocks after module reset
+    // Re-apply mocks after module reset - only mock file system and persistence classes
     vi.doMock('node:fs/promises', async (importOriginal) => {
       const actual = await importOriginal<typeof import('node:fs/promises')>();
       return {
@@ -588,11 +585,19 @@ describe('studioApiPlugin - missing project path', () => {
       };
     });
 
-    vi.doMock('@rafters/design-tokens', () => ({
-      TokenRegistry: vi.fn().mockImplementation(() => mockRegistry),
-      NodePersistenceAdapter: vi.fn().mockImplementation(() => mockPersistence),
-      registryToVars: vi.fn().mockReturnValue('/* mocked css */'),
-    }));
+    vi.doMock('@rafters/design-tokens', async (importOriginal) => {
+      const actual = await importOriginal<typeof import('@rafters/design-tokens')>();
+      return {
+        ...actual,
+        // Use real implementations for utility functions
+        generateColorTokens: actual.generateColorTokens,
+        resolveConfig: actual.resolveConfig,
+        registryToVars: actual.registryToVars,
+        // Mock only the classes
+        TokenRegistry: vi.fn().mockImplementation(() => mockRegistry),
+        NodePersistenceAdapter: vi.fn().mockImplementation(() => mockPersistence),
+      };
+    });
 
     const { studioApiPlugin } = await import('../../src/api/vite-plugin');
     const plugin = studioApiPlugin();

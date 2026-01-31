@@ -2,7 +2,7 @@
  * React Query hooks for Studio token management
  */
 
-import type { OKLCH, Token } from '@rafters/shared';
+import type { ColorValue, OKLCH, Token } from '@rafters/shared';
 import {
   type UseMutationResult,
   type UseQueryResult,
@@ -17,7 +17,22 @@ import {
 export const tokenKeys = {
   all: ['tokens'] as const,
   namespace: (ns: string) => ['tokens', ns] as const,
+  log: ['registry', 'log'] as const,
 } as const;
+
+/**
+ * Registry activity log entry
+ */
+export interface LogEntry {
+  timestamp: string;
+  type: 'load' | 'add' | 'update' | 'change' | 'persist' | 'init';
+  message: string;
+  details?: unknown;
+}
+
+interface LogResponse {
+  log: LogEntry[];
+}
 
 interface TokensResponse {
   tokens: Record<string, Token[]>;
@@ -44,6 +59,24 @@ export function useTokens(): UseQueryResult<TokensResponse> {
       }
       return res.json();
     },
+  });
+}
+
+/**
+ * Fetch registry activity log - polls every 2 seconds
+ */
+export function useRegistryLog(): UseQueryResult<LogResponse> {
+  return useQuery({
+    queryKey: tokenKeys.log,
+    queryFn: async (): Promise<LogResponse> => {
+      const res = await fetch('/api/registry/log');
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to fetch log');
+      }
+      return res.json();
+    },
+    refetchInterval: 2000, // Poll every 2 seconds
   });
 }
 
@@ -86,12 +119,12 @@ interface PrimaryColorMutationVars {
 
 interface PrimaryColorResponse {
   success: boolean;
-  scale: Record<string, OKLCH>;
+  colorValue: ColorValue;
 }
 
 /**
- * Mutation to set the primary color scale
- * Generates a full 50-950 scale from the base color and writes all tokens
+ * Mutation to set the primary color
+ * Builds full ColorValue (scale, harmonies, accessibility, etc.) and writes to registry
  */
 export function usePrimaryColorMutation(): UseMutationResult<
   PrimaryColorResponse,
