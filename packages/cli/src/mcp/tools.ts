@@ -943,16 +943,12 @@ export class RaftersToolHandler {
         intelligence.computedValue = foundToken.computedValue;
       }
 
-      // Human override context - the key intelligence
+      // Human override - previousValue for undo, reason for agents
       if (foundToken.userOverride) {
         intelligence.override = {
           previousValue: foundToken.userOverride.previousValue,
           reason: foundToken.userOverride.reason,
-          overriddenBy: foundToken.userOverride.overriddenBy,
-          overriddenAt: foundToken.userOverride.overriddenAt,
           context: foundToken.userOverride.context,
-          tags: foundToken.userOverride.tags,
-          revertAfter: foundToken.userOverride.revertAfter,
         };
         intelligence.isOverridden = true;
       } else {

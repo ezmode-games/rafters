@@ -6,7 +6,7 @@
  * but the exports reflect the updated underlying color values.
  */
 
-import type { ColorReference, Token } from '@rafters/shared';
+import { COMPUTED, type ColorReference, type Token } from '@rafters/shared';
 import { describe, expect, it } from 'vitest';
 import { tokensToTailwind } from '../src/exporters/tailwind.js';
 import { generateBaseSystem } from '../src/index.js';
@@ -149,13 +149,8 @@ describe('Registry Regeneration', () => {
         dependsOn: ['secondary'],
         generationRule: 'state:ring',
         userOverride: {
+          previousValue: 'oklch(0.5 0.1 200)',
           reason: 'Brand team requested pink for Q1 campaign',
-          overriddenBy: 'jane@design.co',
-          overriddenAt: '2024-01-15T10:00:00Z',
-          approvedBy: 'design-review-2024-01-15',
-          revertAfter: '2024-04-01',
-          context: 'Q1 marketing campaign',
-          tags: ['temporary', 'brand'],
         },
       };
 
@@ -195,7 +190,7 @@ describe('Registry Regeneration', () => {
       expect(token?.userOverride).toBeUndefined();
     });
 
-    it('userOverride includes full context for agent intelligence', () => {
+    it('userOverride stores previousValue for undo and reason for agents', () => {
       const token: Token = {
         name: 'test-token',
         value: 'pink',
@@ -204,30 +199,122 @@ describe('Registry Regeneration', () => {
         userOverride: {
           previousValue: 'blue',
           reason: 'Accessibility audit found blue had insufficient contrast',
-          overriddenBy: 'a11y-team@company.com',
-          overriddenAt: '2024-02-01T14:30:00Z',
-          approvedBy: 'wcag-review-2024-02',
-          context: 'WCAG 2.2 AA compliance audit',
-          tags: ['accessibility', 'permanent', 'compliance'],
         },
-        computedValue: 'blue', // What the rule would produce
+        computedValue: 'blue',
       };
 
       const registry = new TokenRegistry([token]);
       const retrieved = registry.get('test-token');
 
-      // Agent can now understand:
-      // - Value is 'pink' (what's actually used)
-      // - ComputedValue is 'blue' (what the rule would produce)
-      // - Override reason: accessibility compliance
-      // - Who: a11y team
-      // - When: Feb 1, 2024
-      // - Approved: WCAG review
-      // - Tags: accessibility, permanent
+      // Value is what human chose, previousValue enables undo
       expect(retrieved?.value).toBe('pink');
-      expect(retrieved?.computedValue).toBe('blue');
+      expect(retrieved?.userOverride?.previousValue).toBe('blue');
       expect(retrieved?.userOverride?.reason).toContain('contrast');
-      expect(retrieved?.userOverride?.tags).toContain('accessibility');
+    });
+
+    it('clearOverride removes override and regenerates from rule (self-repair)', async () => {
+      const baseToken: Token = {
+        name: 'spacing-base',
+        value: '0.25rem',
+        category: 'spacing',
+        namespace: 'spacing',
+      };
+
+      const overriddenToken: Token = {
+        name: 'spacing-4',
+        value: '2rem', // Human override
+        category: 'spacing',
+        namespace: 'spacing',
+        dependsOn: ['spacing-base'],
+        generationRule: 'calc({spacing-base}*4)',
+        userOverride: {
+          previousValue: '1rem',
+          reason: 'Design review wanted more spacing',
+        },
+      };
+
+      const registry = new TokenRegistry([baseToken, overriddenToken]);
+      registry.addDependency('spacing-4', ['spacing-base'], 'calc({spacing-base}*4)');
+
+      // Before: has override
+      const before = registry.get('spacing-4');
+      expect(before?.value).toBe('2rem');
+      expect(before?.userOverride).toBeDefined();
+
+      // Clear override - triggers self-repair
+      await registry.set('spacing-4', COMPUTED);
+
+      // After: no override, value regenerated from rule
+      const after = registry.get('spacing-4');
+      expect(after?.userOverride).toBeUndefined();
+      expect(after?.value).toBe('calc(0.25rem*4)'); // Regenerated from rule
+    });
+
+    it('clearOverride is no-op when no override exists', async () => {
+      const token: Token = {
+        name: 'test',
+        value: '1rem',
+        category: 'spacing',
+        namespace: 'spacing',
+      };
+
+      const registry = new TokenRegistry([token]);
+
+      // Should not throw
+      await registry.set('test', COMPUTED);
+
+      const retrieved = registry.get('test');
+      expect(retrieved?.value).toBe('1rem');
+    });
+
+    it('throws when setting COMPUTED on non-existent token', async () => {
+      const registry = new TokenRegistry([]);
+
+      await expect(registry.set('nonexistent', COMPUTED)).rejects.toThrow(
+        'Token "nonexistent" does not exist',
+      );
+    });
+
+    it('root token with override restores previousValue on COMPUTED', async () => {
+      const rootToken: Token = {
+        name: 'brand-color',
+        value: 'pink', // Current override
+        category: 'color',
+        namespace: 'color',
+        userOverride: {
+          previousValue: 'blue', // Original value
+          reason: 'Testing pink for campaign',
+        },
+      };
+
+      const registry = new TokenRegistry([rootToken]);
+
+      // Clear override on root token (no generation rule)
+      await registry.set('brand-color', COMPUTED);
+
+      const restored = registry.get('brand-color');
+      expect(restored?.value).toBe('blue'); // Restored to previousValue
+      expect(restored?.userOverride).toBeUndefined();
+    });
+
+    it('throws when clearing override on root token without previousValue', async () => {
+      const rootToken: Token = {
+        name: 'orphan',
+        value: 'something',
+        category: 'color',
+        namespace: 'color',
+        userOverride: {
+          // @ts-expect-error Simulating invalid persisted token with missing previousValue
+          previousValue: undefined,
+          reason: 'Bad state',
+        },
+      };
+
+      const registry = new TokenRegistry([rootToken]);
+
+      await expect(registry.set('orphan', COMPUTED)).rejects.toThrow(
+        'Cannot clear override for root token "orphan": no previousValue to restore',
+      );
     });
   });
 

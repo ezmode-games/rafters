@@ -6,6 +6,16 @@
 import { z } from 'zod';
 
 /**
+ * Signal to clear an override and revert to computed value.
+ * Use with registry.set(tokenName, COMPUTED) to let the system decide.
+ */
+declare const computedBrand: unique symbol;
+export const COMPUTED: typeof computedBrand = Symbol.for(
+  'rafters.computed',
+) as typeof computedBrand;
+export type ComputedSymbol = typeof COMPUTED;
+
+/**
  * OKLCH Color Space
  * Perceptually uniform color space based on human vision
  * https://www.w3.org/TR/css-color-4/#ok-lab
@@ -446,27 +456,15 @@ export const TokenSchema = z.object({
     })
     .optional(),
 
-  // Human override tracking - CRITICAL for agent intelligence
-  // When a human manually sets a value, this captures the full context
-  // so agents know WHY it was changed and can respect intentional decisions
+  // Human override tracking - enables undo and agent intelligence
   userOverride: z
     .object({
-      // The value before the human changed it (computed from generation rule)
-      previousValue: z.union([z.string(), ColorValueSchema, ColorReferenceSchema]).optional(),
-      // WHY was this overridden? This is the key intelligence for agents
-      reason: z.string(), // "Brand team requested pink for Q1 campaign"
-      // Who made this change?
-      overriddenBy: z.string().optional(), // "jane@design.co" or "design-review-2024-01-15"
-      // When was it overridden?
-      overriddenAt: z.string(), // ISO timestamp
-      // Was this approved in a review process?
-      approvedBy: z.string().optional(), // "design-review-2024-01-15"
-      // Is this a temporary override that should revert?
-      revertAfter: z.string().optional(), // ISO date - cascade can auto-revert after this
-      // What triggered the need for override?
-      context: z.string().optional(), // "Q1 marketing campaign", "accessibility audit finding"
-      // Tags for querying overrides
-      tags: z.array(z.string()).optional(), // ["temporary", "brand", "accessibility"]
+      // Value before override (for undo)
+      previousValue: z.union([z.string(), ColorValueSchema, ColorReferenceSchema]),
+      // Why was this overridden
+      reason: z.string(),
+      // Additional context (e.g. "Q1 marketing campaign", "accessibility audit")
+      context: z.string().optional(),
     })
     .optional(),
 

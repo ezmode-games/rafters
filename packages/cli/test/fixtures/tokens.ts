@@ -111,10 +111,6 @@ export const fixtures = {
       userOverride: {
         previousValue: '1.75rem',
         reason: 'Design review requested larger spacing for hero',
-        overriddenBy: 'designer@example.com',
-        overriddenAt: '2024-01-15T10:30:00Z',
-        context: 'Hero section redesign Q1 2024',
-        tags: ['hero', 'redesign'],
       },
     }),
 

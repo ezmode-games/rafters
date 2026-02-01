@@ -244,8 +244,6 @@ describe('RaftersToolHandler', () => {
       expect(data.override).toBeDefined();
       expect(data.override.previousValue).toBe('1.75rem');
       expect(data.override.reason).toContain('Design review');
-      expect(data.override.overriddenBy).toBe('designer@example.com');
-      expect(data.override.tags).toContain('hero');
     });
 
     it('should suggest similar tokens when token not found', async () => {
