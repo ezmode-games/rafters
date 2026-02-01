@@ -63,11 +63,19 @@ const TokenPatchSchema = z.object({
   description: z.string().optional(),
 });
 
-// Helper to read request body as JSON
+// Helper to read request body as JSON with size limit
+const MAX_BODY_SIZE = 1024 * 1024; // 1MB limit
+
 function readJsonBody(req: import('node:http').IncomingMessage): Promise<unknown> {
   return new Promise((resolve, reject) => {
     let body = '';
+    let size = 0;
     req.on('data', (chunk: Buffer) => {
+      size += chunk.length;
+      if (size > MAX_BODY_SIZE) {
+        reject(new Error('Request body too large'));
+        return;
+      }
       body += chunk.toString();
     });
     req.on('end', () => {
@@ -177,6 +185,14 @@ export function studioApiPlugin(): Plugin {
 
           res.setHeader('Content-Type', 'application/json');
 
+          // Only allow GET and POST methods
+          if (req.method !== 'GET' && req.method !== 'POST') {
+            res.statusCode = 405;
+            res.setHeader('Allow', 'GET, POST');
+            res.end(JSON.stringify({ ok: false, error: 'Method not allowed' }));
+            return;
+          }
+
           // POST /api/tokens/:name - Update token with partial data
           if (req.method === 'POST') {
             (async () => {
@@ -192,9 +208,10 @@ export function studioApiPlugin(): Plugin {
               let body: unknown;
               try {
                 body = await readJsonBody(req);
-              } catch {
+              } catch (error) {
                 res.statusCode = 400;
-                res.end(JSON.stringify({ ok: false, error: 'Invalid JSON body' }));
+                const message = error instanceof Error ? error.message : 'Invalid JSON body';
+                res.end(JSON.stringify({ ok: false, error: message }));
                 return;
               }
 
@@ -228,21 +245,9 @@ export function studioApiPlugin(): Plugin {
                 return;
               }
 
-              // Update via registry (handles cascade + persist)
+              // Update full token via registry (handles cascade + persist)
               try {
-                await registry.set(name, tokenResult.data.value);
-
-                // For fields beyond value, we need to update the full token
-                // The registry.set only updates value, so update other fields directly
-                const currentToken = registry.get(name);
-                if (currentToken) {
-                  // Apply non-value fields from patch
-                  const { value: _value, ...otherFields } = patchResult.data;
-                  if (Object.keys(otherFields).length > 0) {
-                    Object.assign(currentToken, otherFields);
-                  }
-                }
-
+                await registry.setToken(tokenResult.data);
                 const updatedToken = registry.get(name);
                 const response = TokenResponseSchema.parse({ ok: true, token: updatedToken });
                 res.end(JSON.stringify(response));

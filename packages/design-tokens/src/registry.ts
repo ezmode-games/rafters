@@ -344,6 +344,46 @@ export class TokenRegistry {
     await this.persist();
   }
 
+  /**
+   * Update a token with full token data (not just value).
+   * Use this when you need to update metadata fields like trustLevel, description, etc.
+   * Handles cascade + persist like set().
+   */
+  async setToken(token: Token): Promise<void> {
+    const existingToken = this.tokens.get(token.name);
+    if (!existingToken) {
+      throw new Error(`Token "${token.name}" does not exist. Use add() for new tokens.`);
+    }
+
+    const oldValue = existingToken.value;
+    const valueChanged = JSON.stringify(oldValue) !== JSON.stringify(token.value);
+
+    // Mark namespace dirty for persistence
+    this.markDirty(token.namespace);
+
+    // Update the full token
+    this.tokens.set(token.name, token);
+
+    // Fire change callback
+    if (this.changeCallback) {
+      this.changeCallback({
+        type: 'token-changed',
+        tokenName: token.name,
+        oldValue,
+        newValue: token.value,
+        timestamp: Date.now(),
+      });
+    }
+
+    // Regenerate dependents only if value changed
+    if (valueChanged) {
+      await this.regenerateDependents(token.name);
+    }
+
+    // Persist dirty namespaces
+    await this.persist();
+  }
+
   has(tokenName: string): boolean {
     return this.tokens.has(tokenName);
   }
