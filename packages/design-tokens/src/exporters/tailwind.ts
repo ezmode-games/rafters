@@ -54,17 +54,43 @@ function colorRefToString(ref: { family: string; position: string }): string {
 }
 
 /**
- * Build semantic mappings from DEFAULT_SEMANTIC_COLOR_MAPPINGS
- * Returns { light: 'neutral-50', dark: 'neutral-950' } format
+ * Build semantic mappings from actual tokens in the registry.
+ * Falls back to DEFAULT_SEMANTIC_COLOR_MAPPINGS for tokens not in registry.
+ *
+ * @param semanticTokens - Semantic tokens from the registry
+ * @returns { light: 'neutral-50', dark: 'neutral-950' } format
  */
-function getSemanticMappings(): Record<string, { light: string; dark: string }> {
+function getSemanticMappingsFromTokens(
+  semanticTokens: Token[],
+): Record<string, { light: string; dark: string }> {
   const mappings: Record<string, { light: string; dark: string }> = {};
 
+  for (const token of semanticTokens) {
+    const { name, value, dependsOn } = token;
+
+    // Skip non-ColorReference values (state variants like primary-hover have string values)
+    if (typeof value !== 'object' || value === null || !('family' in value)) {
+      continue;
+    }
+
+    const colorRef = value as ColorReference;
+    const lightRef = `${colorRef.family}-${colorRef.position}`;
+
+    // Dark mode is in dependsOn[1] as string like 'neutral-50'
+    // If not available, use light mode as fallback
+    const darkRef = dependsOn?.[1] ?? lightRef;
+
+    mappings[name] = { light: lightRef, dark: darkRef };
+  }
+
+  // Fill in any missing mappings from defaults (for completeness)
   for (const [name, mapping] of Object.entries(DEFAULT_SEMANTIC_COLOR_MAPPINGS)) {
-    mappings[name] = {
-      light: colorRefToString(mapping.light),
-      dark: colorRefToString(mapping.dark),
-    };
+    if (!mappings[name]) {
+      mappings[name] = {
+        light: colorRefToString(mapping.light),
+        dark: colorRefToString(mapping.dark),
+      };
+    }
   }
 
   return mappings;
@@ -175,8 +201,8 @@ function groupTokens(tokens: Token[]): GroupedTokens {
  * These reference :root variables and must use @theme inline for dynamic resolution
  * @see https://tailwindcss.com/docs/theme#using-custom-values
  */
-function generateThemeInlineBlock(): string {
-  const semanticMappings = getSemanticMappings();
+function generateThemeInlineBlock(semanticTokens: Token[]): string {
+  const semanticMappings = getSemanticMappingsFromTokens(semanticTokens);
   const lines: string[] = [];
   lines.push('@theme inline {');
 
@@ -191,10 +217,10 @@ function generateThemeInlineBlock(): string {
 
 /**
  * Generate :root block with --rafters-* namespace and dark mode via media query
- * Reads from DEFAULT_SEMANTIC_COLOR_MAPPINGS via getSemanticMappings()
+ * Reads semantic mappings from actual tokens in the registry.
  */
-function generateRootBlock(): string {
-  const semanticMappings = getSemanticMappings();
+function generateRootBlock(semanticTokens: Token[]): string {
+  const semanticMappings = getSemanticMappingsFromTokens(semanticTokens);
   const lines: string[] = [];
   lines.push(':root {');
 
@@ -446,12 +472,12 @@ export function tokensToTailwind(tokens: Token[], options: TailwindExportOptions
   sections.push('');
 
   // @theme inline block for semantic color bridges (reference :root variables)
-  const themeInlineBlock = generateThemeInlineBlock();
+  const themeInlineBlock = generateThemeInlineBlock(groups.semantic);
   sections.push(themeInlineBlock);
   sections.push('');
 
   // :root block with --rafters-* namespace and dark mode
-  const rootBlock = generateRootBlock();
+  const rootBlock = generateRootBlock(groups.semantic);
   sections.push(rootBlock);
   sections.push('');
 
@@ -766,7 +792,7 @@ export function registryToTailwindStatic(registry: TokenRegistry): string {
   sections.push('');
 
   // @theme inline block for semantic color bridges
-  const themeInlineBlock = generateThemeInlineBlock();
+  const themeInlineBlock = generateThemeInlineBlock(groups.semantic);
   sections.push(themeInlineBlock);
   sections.push('');
 
@@ -816,7 +842,7 @@ export function registryToVars(registry: TokenRegistry): string {
   sections.push('');
 
   // Include semantic variable blocks for light/dark mode switching
-  const rootBlock = generateRootBlock();
+  const rootBlock = generateRootBlock(groups.semantic);
   sections.push(rootBlock);
 
   return sections.join('\n');
