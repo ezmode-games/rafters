@@ -74,10 +74,15 @@ export class TokenRegistry {
   private populateDependencyGraph(): void {
     for (const token of this.tokens.values()) {
       if (token.dependsOn && token.dependsOn.length > 0 && token.generationRule) {
-        const allDepsExist = token.dependsOn.every((dep) => this.tokens.has(dep));
-        if (allDepsExist) {
-          this.dependencyGraph.addDependency(token.name, token.dependsOn, token.generationRule);
+        const missingDeps = token.dependsOn.filter((dep) => !this.tokens.has(dep));
+        if (missingDeps.length > 0) {
+          console.warn(
+            `[TokenRegistry] Token "${token.name}" skipped in dependency graph: ` +
+              `missing dependencies [${missingDeps.join(', ')}]`,
+          );
+          continue;
         }
+        this.dependencyGraph.addDependency(token.name, token.dependsOn, token.generationRule);
       }
     }
   }
@@ -124,17 +129,24 @@ export class TokenRegistry {
    * Public method to add a token to the registry.
    * Also populates the dependency graph if token has dependencies and all targets exist.
    * Used during initialization - no cascade, no events.
+   *
+   * NOTE: Dependencies must be added before dependent tokens. For bulk loading with
+   * forward references, use the constructor which does a two-pass resolution.
    */
   add(token: Token): void {
     this.addToken(token);
 
     // Populate dependency graph from token's dependency metadata
     if (token.dependsOn && token.dependsOn.length > 0 && token.generationRule) {
-      // Only add if all dependency targets exist
-      const allDepsExist = token.dependsOn.every((dep) => this.tokens.has(dep));
-      if (allDepsExist) {
-        this.dependencyGraph.addDependency(token.name, token.dependsOn, token.generationRule);
+      const missingDeps = token.dependsOn.filter((dep) => !this.tokens.has(dep));
+      if (missingDeps.length > 0) {
+        console.warn(
+          `[TokenRegistry] Token "${token.name}" added but dependency graph not populated: ` +
+            `missing [${missingDeps.join(', ')}]. Add dependencies first or use constructor.`,
+        );
+        return;
       }
+      this.dependencyGraph.addDependency(token.name, token.dependsOn, token.generationRule);
     }
   }
 
