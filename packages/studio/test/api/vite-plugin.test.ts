@@ -5,10 +5,13 @@
  * Integration with actual Vite server is tested manually.
  */
 
+import { EventEmitter } from 'node:events';
+import { TokenRegistry } from '@rafters/design-tokens';
+import type { Token } from '@rafters/shared';
 import { ColorReferenceSchema, ColorValueSchema, TokenSchema } from '@rafters/shared';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { studioApiPlugin } from '../../src/api/vite-plugin';
+import { handlePostToken, studioApiPlugin, TokenPatchSchema } from '../../src/api/vite-plugin';
 
 // Replicate schemas from vite-plugin.ts to test validation logic
 const SetTokenMessageSchema = z.object({
@@ -341,6 +344,427 @@ describe('studioApiPlugin', () => {
       it('throws on invalid UTF-8 sequence', () => {
         expect(() => decodeURIComponent('%C0%C1')).toThrow();
       });
+    });
+  });
+
+  describe('TokenPatchSchema validation (POST /api/tokens/:name)', () => {
+    describe('value field (required)', () => {
+      it('accepts string value', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.5 0.2 250)',
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('accepts ColorReference value', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: { family: 'neutral', position: '500' },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('accepts ColorValue object', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: {
+            name: 'ocean-blue',
+            scale: [
+              { l: 0.98, c: 0.01, h: 250 }, // 50
+              { l: 0.95, c: 0.02, h: 250 }, // 100
+              { l: 0.85, c: 0.08, h: 250 }, // 200
+              { l: 0.75, c: 0.12, h: 250 }, // 300
+              { l: 0.65, c: 0.16, h: 250 }, // 400
+              { l: 0.55, c: 0.18, h: 250 }, // 500
+              { l: 0.45, c: 0.16, h: 250 }, // 600
+              { l: 0.35, c: 0.14, h: 250 }, // 700
+              { l: 0.25, c: 0.1, h: 250 }, // 800
+              { l: 0.15, c: 0.06, h: 250 }, // 900
+              { l: 0.08, c: 0.03, h: 250 }, // 950
+            ],
+          },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects missing value', () => {
+        const result = TokenPatchSchema.safeParse({});
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects null value', () => {
+        const result = TokenPatchSchema.safeParse({ value: null });
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects number value', () => {
+        const result = TokenPatchSchema.safeParse({ value: 42 });
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects incomplete ColorReference (missing family)', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: { position: '500' },
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects incomplete ColorReference (missing position)', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: { family: 'neutral' },
+        });
+        expect(result.success).toBe(false);
+      });
+    });
+
+    describe('optional enum fields', () => {
+      it('accepts valid trustLevel', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.5 0.2 250)',
+          trustLevel: 'critical',
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects invalid trustLevel', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.5 0.2 250)',
+          trustLevel: 'maximum',
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('accepts valid elevationLevel', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: '40',
+          elevationLevel: 'modal',
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects invalid elevationLevel', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: '40',
+          elevationLevel: 'top',
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('accepts valid motionIntent', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: '150ms',
+          motionIntent: 'enter',
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects invalid motionIntent', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: '150ms',
+          motionIntent: 'fast',
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('accepts valid accessibilityLevel', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: '2px solid blue',
+          accessibilityLevel: 'AAA',
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects invalid accessibilityLevel', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: '2px solid blue',
+          accessibilityLevel: 'A',
+        });
+        expect(result.success).toBe(false);
+      });
+    });
+
+    describe('userOverride field', () => {
+      it('accepts valid userOverride', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.6 0.2 250)',
+          userOverride: {
+            previousValue: 'oklch(0.5 0.2 250)',
+            reason: 'Brand requirement',
+          },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('accepts userOverride with context', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.6 0.2 250)',
+          userOverride: {
+            previousValue: 'oklch(0.5 0.2 250)',
+            reason: 'Brand requirement',
+            context: 'Q1 rebrand',
+          },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects userOverride without reason', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.6 0.2 250)',
+          userOverride: {
+            previousValue: 'oklch(0.5 0.2 250)',
+          },
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects userOverride without previousValue', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.6 0.2 250)',
+          userOverride: {
+            reason: 'Brand requirement',
+          },
+        });
+        expect(result.success).toBe(false);
+      });
+    });
+
+    describe('description field', () => {
+      it('accepts description', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.5 0.2 250)',
+          description: 'Primary brand color',
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects non-string description', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.5 0.2 250)',
+          description: 123,
+        });
+        expect(result.success).toBe(false);
+      });
+    });
+
+    describe('combined fields', () => {
+      it('accepts multiple optional fields', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: { family: 'red', position: '600' },
+          trustLevel: 'critical',
+          description: 'Destructive action color',
+          userOverride: {
+            previousValue: { family: 'red', position: '500' },
+            reason: 'Need higher contrast for accessibility',
+          },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('strips unknown fields', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.5 0.2 250)',
+          unknownField: 'should be ignored',
+        });
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect('unknownField' in result.data).toBe(false);
+        }
+      });
+    });
+  });
+
+  describe('handlePostToken integration', () => {
+    // Helper to create mock request with body
+    function createMockRequest(body: unknown): import('node:http').IncomingMessage {
+      const req = new EventEmitter() as import('node:http').IncomingMessage;
+      // Simulate body data
+      setTimeout(() => {
+        req.emit('data', Buffer.from(JSON.stringify(body)));
+        req.emit('end');
+      }, 0);
+      return req;
+    }
+
+    // Helper to create mock response
+    function createMockResponse(): import('node:http').ServerResponse & {
+      _statusCode: number;
+      _body: string;
+      _headers: Record<string, string>;
+    } {
+      const res = {
+        _statusCode: 200,
+        _body: '',
+        _headers: {} as Record<string, string>,
+        headersSent: false,
+        set statusCode(code: number) {
+          this._statusCode = code;
+        },
+        get statusCode() {
+          return this._statusCode;
+        },
+        setHeader(name: string, value: string) {
+          this._headers[name] = value;
+        },
+        end(body?: string) {
+          this._body = body ?? '';
+          this.headersSent = true;
+        },
+      };
+      return res as import('node:http').ServerResponse & {
+        _statusCode: number;
+        _body: string;
+        _headers: Record<string, string>;
+      };
+    }
+
+    // Create test token
+    const testToken: Token = {
+      name: 'test-token',
+      value: 'oklch(0.5 0.2 250)',
+      category: 'color',
+      namespace: 'color',
+    };
+
+    it('returns 404 for non-existent token', async () => {
+      const registry = new TokenRegistry([]);
+      const req = createMockRequest({ value: 'new-value' });
+      const res = createMockResponse();
+
+      await handlePostToken(req, res, 'non-existent', registry);
+
+      expect(res._statusCode).toBe(404);
+      expect(JSON.parse(res._body)).toEqual({
+        ok: false,
+        error: 'Token "non-existent" not found',
+      });
+    });
+
+    it('returns 400 for invalid JSON body', async () => {
+      const registry = new TokenRegistry([testToken]);
+      const req = new EventEmitter() as import('node:http').IncomingMessage;
+      const res = createMockResponse();
+
+      // Simulate invalid JSON
+      setTimeout(() => {
+        req.emit('data', Buffer.from('not valid json'));
+        req.emit('end');
+      }, 0);
+
+      await handlePostToken(req, res, 'test-token', registry);
+
+      expect(res._statusCode).toBe(400);
+      expect(JSON.parse(res._body).ok).toBe(false);
+      expect(JSON.parse(res._body).error).toContain('Invalid JSON');
+    });
+
+    it('returns 400 for missing value field', async () => {
+      const registry = new TokenRegistry([testToken]);
+      const req = createMockRequest({ description: 'no value' });
+      const res = createMockResponse();
+
+      await handlePostToken(req, res, 'test-token', registry);
+
+      expect(res._statusCode).toBe(400);
+      expect(JSON.parse(res._body).ok).toBe(false);
+    });
+
+    it('returns 400 for invalid enum value', async () => {
+      const registry = new TokenRegistry([testToken]);
+      const req = createMockRequest({
+        value: 'oklch(0.6 0.2 250)',
+        trustLevel: 'invalid-level',
+      });
+      const res = createMockResponse();
+
+      await handlePostToken(req, res, 'test-token', registry);
+
+      expect(res._statusCode).toBe(400);
+      expect(JSON.parse(res._body).ok).toBe(false);
+    });
+
+    it('successfully updates token value', async () => {
+      const registry = new TokenRegistry([testToken]);
+      const req = createMockRequest({ value: 'oklch(0.7 0.3 260)' });
+      const res = createMockResponse();
+
+      await handlePostToken(req, res, 'test-token', registry);
+
+      expect(res._statusCode).toBe(200);
+      const response = JSON.parse(res._body);
+      expect(response.ok).toBe(true);
+      expect(response.token.value).toBe('oklch(0.7 0.3 260)');
+    });
+
+    it('successfully updates token with optional fields', async () => {
+      const registry = new TokenRegistry([testToken]);
+      const req = createMockRequest({
+        value: 'oklch(0.7 0.3 260)',
+        description: 'Updated color',
+        trustLevel: 'high',
+      });
+      const res = createMockResponse();
+
+      await handlePostToken(req, res, 'test-token', registry);
+
+      expect(res._statusCode).toBe(200);
+      const response = JSON.parse(res._body);
+      expect(response.ok).toBe(true);
+      expect(response.token.value).toBe('oklch(0.7 0.3 260)');
+      expect(response.token.description).toBe('Updated color');
+      expect(response.token.trustLevel).toBe('high');
+    });
+
+    it('persists updated token in registry', async () => {
+      const registry = new TokenRegistry([testToken]);
+      const req = createMockRequest({
+        value: 'oklch(0.8 0.1 270)',
+        description: 'Persisted update',
+      });
+      const res = createMockResponse();
+
+      await handlePostToken(req, res, 'test-token', registry);
+
+      // Verify token is updated in registry
+      const updatedToken = registry.get('test-token');
+      expect(updatedToken?.value).toBe('oklch(0.8 0.1 270)');
+      expect(updatedToken?.description).toBe('Persisted update');
+    });
+
+    it('preserves existing token fields not in patch', async () => {
+      const tokenWithFields: Token = {
+        ...testToken,
+        description: 'Original description',
+        trustLevel: 'medium',
+      };
+      const registry = new TokenRegistry([tokenWithFields]);
+      const req = createMockRequest({ value: 'oklch(0.6 0.2 250)' });
+      const res = createMockResponse();
+
+      await handlePostToken(req, res, 'test-token', registry);
+
+      expect(res._statusCode).toBe(200);
+      const response = JSON.parse(res._body);
+      expect(response.token.value).toBe('oklch(0.6 0.2 250)');
+      expect(response.token.description).toBe('Original description');
+      expect(response.token.trustLevel).toBe('medium');
+    });
+
+    it('handles ColorReference value', async () => {
+      const semanticToken: Token = {
+        name: 'primary',
+        value: { family: 'neutral', position: '500' },
+        category: 'color',
+        namespace: 'semantic',
+      };
+      const registry = new TokenRegistry([semanticToken]);
+      const req = createMockRequest({
+        value: { family: 'blue', position: '600' },
+      });
+      const res = createMockResponse();
+
+      await handlePostToken(req, res, 'primary', registry);
+
+      expect(res._statusCode).toBe(200);
+      const response = JSON.parse(res._body);
+      expect(response.token.value).toEqual({ family: 'blue', position: '600' });
     });
   });
 });

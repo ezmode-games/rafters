@@ -42,6 +42,113 @@ const SetTokenMessageSchema = z.object({
   persist: z.boolean().optional(),
 });
 
+// Schema for POST /api/tokens/:name - partial token update
+// Derived from TokenSchema: value required, patchable fields optional
+export const TokenPatchSchema = TokenSchema.pick({
+  value: true,
+  trustLevel: true,
+  elevationLevel: true,
+  motionIntent: true,
+  accessibilityLevel: true,
+  userOverride: true,
+  description: true,
+});
+
+// Helper to read request body as JSON with size limit
+const MAX_BODY_SIZE = 1024 * 1024; // 1MB limit
+
+function readJsonBody(req: import('node:http').IncomingMessage): Promise<unknown> {
+  return new Promise((resolve, reject) => {
+    let body = '';
+    let size = 0;
+    req.on('data', (chunk: Buffer) => {
+      size += chunk.length;
+      if (size > MAX_BODY_SIZE) {
+        reject(new Error('Request body too large'));
+        return;
+      }
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      try {
+        resolve(body ? JSON.parse(body) : {});
+      } catch {
+        reject(new Error('Invalid JSON body'));
+      }
+    });
+    req.on('error', reject);
+  });
+}
+
+// Extracted async handler for POST /api/tokens/:name (exported for testing)
+export async function handlePostToken(
+  req: import('node:http').IncomingMessage,
+  res: import('node:http').ServerResponse,
+  name: string,
+  registry: TokenRegistry,
+): Promise<void> {
+  // Token must exist for update
+  const existingToken = registry.get(name);
+  if (!existingToken) {
+    res.statusCode = 404;
+    res.end(JSON.stringify({ ok: false, error: `Token "${name}" not found` }));
+    return;
+  }
+
+  // Parse request body
+  let body: unknown;
+  try {
+    body = await readJsonBody(req);
+  } catch (error) {
+    res.statusCode = 400;
+    const message = error instanceof Error ? error.message : 'Invalid JSON body';
+    res.end(JSON.stringify({ ok: false, error: message }));
+    return;
+  }
+
+  // Validate patch data
+  const patchResult = TokenPatchSchema.safeParse(body);
+  if (!patchResult.success) {
+    res.statusCode = 400;
+    const issues = patchResult.error.issues;
+    const message = issues[0]
+      ? `${issues[0].path.join('.') || 'value'}: ${issues[0].message}`
+      : patchResult.error.message;
+    res.end(JSON.stringify({ ok: false, error: message }));
+    return;
+  }
+
+  // Merge patch with existing token
+  const mergedToken = {
+    ...existingToken,
+    ...patchResult.data,
+  };
+
+  // Validate merged token against full schema
+  const tokenResult = TokenSchema.safeParse(mergedToken);
+  if (!tokenResult.success) {
+    res.statusCode = 400;
+    const issues = tokenResult.error.issues;
+    const message = issues[0]
+      ? `${issues[0].path.join('.') || 'token'}: ${issues[0].message}`
+      : tokenResult.error.message;
+    res.end(JSON.stringify({ ok: false, error: message }));
+    return;
+  }
+
+  // Update full token via registry (handles cascade + persist)
+  try {
+    await registry.setToken(tokenResult.data);
+    const updatedToken = registry.get(name);
+    const response = TokenResponseSchema.parse({ ok: true, token: updatedToken });
+    res.end(JSON.stringify(response));
+  } catch (error) {
+    console.log(`[rafters] Token update failed for "${name}": ${error}`);
+    res.statusCode = 500;
+    res.end(JSON.stringify({ ok: false, error: String(error) }));
+  }
+}
+
 export function studioApiPlugin(): Plugin {
   let registry: TokenRegistry;
   let initialized = false;
@@ -123,7 +230,7 @@ export function studioApiPlugin(): Plugin {
           return;
         }
 
-        // GET /api/tokens/:name - Get specific token
+        // /api/tokens/:name - GET or POST specific token
         const tokenMatch = pathname.match(/^\/api\/tokens\/(.+)$/);
         if (tokenMatch) {
           let name: string;
@@ -136,9 +243,32 @@ export function studioApiPlugin(): Plugin {
             return;
           }
 
+          res.setHeader('Content-Type', 'application/json');
+
+          // Only allow GET and POST methods
+          if (req.method !== 'GET' && req.method !== 'POST') {
+            res.statusCode = 405;
+            res.setHeader('Allow', 'GET, POST');
+            res.end(JSON.stringify({ ok: false, error: 'Method not allowed' }));
+            return;
+          }
+
+          // POST /api/tokens/:name - Update token with partial data
+          if (req.method === 'POST') {
+            handlePostToken(req, res, name, registry).catch((error) => {
+              // Catch any unhandled errors from the async handler
+              console.log(`[rafters] Unhandled error in POST /api/tokens/${name}: ${error}`);
+              if (!res.headersSent) {
+                res.statusCode = 500;
+                res.end(JSON.stringify({ ok: false, error: 'Internal server error' }));
+              }
+            });
+            return;
+          }
+
+          // GET /api/tokens/:name - Get specific token
           const token = registry.get(name);
 
-          res.setHeader('Content-Type', 'application/json');
           if (!token) {
             const errorResponse = ErrorResponseSchema.parse({
               ok: false,
