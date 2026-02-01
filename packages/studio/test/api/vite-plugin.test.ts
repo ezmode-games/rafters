@@ -8,7 +8,7 @@
 import { ColorReferenceSchema, ColorValueSchema, TokenSchema } from '@rafters/shared';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { studioApiPlugin } from '../../src/api/vite-plugin';
+import { studioApiPlugin, TokenPatchSchema } from '../../src/api/vite-plugin';
 
 // Replicate schemas from vite-plugin.ts to test validation logic
 const SetTokenMessageSchema = z.object({
@@ -30,27 +30,6 @@ const TokensResponseSchema = z.object({
 const ErrorResponseSchema = z.object({
   ok: z.literal(false),
   error: z.string(),
-});
-
-// Schema for POST /api/tokens/:name - partial token update
-// At minimum requires value, can include any optional token fields
-const TokenPatchSchema = z.object({
-  value: z.union([z.string(), ColorValueSchema, ColorReferenceSchema]),
-  // Optional fields that can be patched
-  trustLevel: z.enum(['low', 'medium', 'high', 'critical']).optional(),
-  elevationLevel: z
-    .enum(['surface', 'raised', 'overlay', 'sticky', 'modal', 'popover', 'tooltip'])
-    .optional(),
-  motionIntent: z.enum(['enter', 'exit', 'emphasis', 'transition']).optional(),
-  accessibilityLevel: z.enum(['AA', 'AAA']).optional(),
-  userOverride: z
-    .object({
-      previousValue: z.union([z.string(), ColorValueSchema, ColorReferenceSchema]),
-      reason: z.string(),
-      context: z.string().optional(),
-    })
-    .optional(),
-  description: z.string().optional(),
 });
 
 describe('studioApiPlugin', () => {

@@ -43,24 +43,15 @@ const SetTokenMessageSchema = z.object({
 });
 
 // Schema for POST /api/tokens/:name - partial token update
-// Requires value, can include optional token fields for merge
-const TokenPatchSchema = z.object({
-  value: z.union([z.string(), ColorValueSchema, ColorReferenceSchema]),
-  // Optional fields that can be patched
-  trustLevel: z.enum(['low', 'medium', 'high', 'critical']).optional(),
-  elevationLevel: z
-    .enum(['surface', 'raised', 'overlay', 'sticky', 'modal', 'popover', 'tooltip'])
-    .optional(),
-  motionIntent: z.enum(['enter', 'exit', 'emphasis', 'transition']).optional(),
-  accessibilityLevel: z.enum(['AA', 'AAA']).optional(),
-  userOverride: z
-    .object({
-      previousValue: z.union([z.string(), ColorValueSchema, ColorReferenceSchema]),
-      reason: z.string(),
-      context: z.string().optional(),
-    })
-    .optional(),
-  description: z.string().optional(),
+// Derived from TokenSchema: value required, patchable fields optional
+export const TokenPatchSchema = TokenSchema.pick({
+  value: true,
+  trustLevel: true,
+  elevationLevel: true,
+  motionIntent: true,
+  accessibilityLevel: true,
+  userOverride: true,
+  description: true,
 });
 
 // Helper to read request body as JSON with size limit
