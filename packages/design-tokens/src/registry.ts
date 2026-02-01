@@ -110,7 +110,7 @@ export class TokenRegistry {
   /**
    * Update a single token and fire change event
    */
-  updateToken(name: string, value: string): void {
+  updateToken(name: string, value: Token['value']): void {
     const oldValue = this.tokens.get(name)?.value;
     const existingToken = this.tokens.get(name);
 
@@ -196,7 +196,7 @@ export class TokenRegistry {
     }
   }
 
-  async set(tokenName: string, value: string): Promise<void> {
+  async set(tokenName: string, value: Token['value']): Promise<void> {
     // Use updateToken for consistency and event firing
     this.updateToken(tokenName, value);
 

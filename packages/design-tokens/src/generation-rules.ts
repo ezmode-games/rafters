@@ -2,9 +2,11 @@
  * Generation Rule Parser and Executor
  *
  * Parses and executes token generation rules for automatic token transformation.
- * Supports calc, scale, state, contrast, and invert rule types.
+ * Supports calc, scale, scale-position, state, contrast, and invert rule types.
  */
 
+import type { ColorValue, OKLCH } from '@rafters/shared';
+import scalePlugin from './plugins/scale';
 import type { TokenRegistry } from './registry';
 
 export interface ParsedRule {
@@ -16,7 +18,28 @@ export interface ParsedRule {
   stateType?: string | undefined;
   contrast?: 'high' | 'medium' | 'low' | 'auto' | undefined;
   ratio?: number | undefined;
+  scalePosition?: number | undefined;
 }
+
+/**
+ * Maps Tailwind-style scale positions to array indices.
+ * Standard 11-position scale: 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950
+ */
+const SCALE_POSITION_MAP: Record<number, number> = {
+  50: 0,
+  100: 1,
+  200: 2,
+  300: 3,
+  400: 4,
+  500: 5,
+  600: 6,
+  700: 7,
+  800: 8,
+  900: 9,
+  950: 10,
+};
+
+const VALID_SCALE_POSITIONS = Object.keys(SCALE_POSITION_MAP).map(Number);
 
 export class GenerationRuleParser {
   /**
@@ -75,13 +98,30 @@ export class GenerationRuleParser {
         };
       }
       case 'scale': {
-        const ratio = parseFloat(value);
-        if (Number.isNaN(ratio) || ratio <= 0) {
-          throw new Error(`Invalid scale ratio: ${value}`);
+        // Strict validation: only accept clean integers or decimals
+        // Reject trailing chars (500foo), scientific notation (1e2), etc.
+        if (!/^\d+(\.\d+)?$/.test(value)) {
+          throw new Error(`Invalid scale value: ${value}`);
         }
+
+        const numValue = parseFloat(value);
+        if (Number.isNaN(numValue) || numValue <= 0) {
+          throw new Error(`Invalid scale value: ${value}`);
+        }
+
+        // Check if this is a Tailwind-style scale position (50, 100, 200, etc.)
+        // Must be an integer for scale positions
+        if (Number.isInteger(numValue) && VALID_SCALE_POSITIONS.includes(numValue)) {
+          return {
+            type: 'scale-position',
+            scalePosition: SCALE_POSITION_MAP[numValue],
+          };
+        }
+
+        // Otherwise treat as a ratio for numeric scaling
         return {
           type: 'scale',
-          ratio,
+          ratio: numValue,
         };
       }
       case 'contrast': {
@@ -205,12 +245,14 @@ export class GenerationRuleExecutor {
   /**
    * Execute a parsed rule and return the computed value
    */
-  execute(rule: ParsedRule, _tokenName: string): string {
+  execute(rule: ParsedRule, tokenName: string): string {
     switch (rule.type) {
       case 'calc':
         return this.executeCalcRule(rule);
       case 'scale':
         return this.executeScaleRule(rule);
+      case 'scale-position':
+        return this.executeScalePositionRule(rule, tokenName);
       case 'state':
         return this.executeStateRule(rule);
       case 'contrast':
@@ -269,6 +311,76 @@ export class GenerationRuleExecutor {
 
     // For non-numeric values, return calc expression
     return `calc(${baseValue} * ${ratio})`;
+  }
+
+  /**
+   * Execute a scale-position rule to extract a value from a ColorValue's scale array.
+   * Delegates to the scale plugin for lazy reference, then resolves to CSS.
+   */
+  private executeScalePositionRule(_rule: ParsedRule, tokenName: string): string {
+    // Get the token's dependencies
+    const dependencies = this.registry.getDependencies(tokenName);
+
+    // Use the scale plugin to get the reference
+    const reference = scalePlugin(this.registry, tokenName, dependencies);
+
+    // Resolve the reference to a CSS value
+    return this.resolveColorReference(reference);
+  }
+
+  /**
+   * Resolve a color reference {family, position} to a CSS value.
+   * This is the bridge between lazy plugin references and immediate CSS values.
+   */
+  resolveColorReference(reference: { family: string; position: string | number }): string {
+    const familyToken = this.registry.get(reference.family);
+    if (!familyToken) {
+      throw new Error(`Family token not found: ${reference.family}`);
+    }
+
+    const colorValue = familyToken.value as ColorValue;
+    if (!colorValue || !Array.isArray(colorValue.scale)) {
+      throw new Error(`Token ${reference.family} is not a ColorValue with a scale array`);
+    }
+
+    // Convert position to array index
+    const positionNum =
+      typeof reference.position === 'string'
+        ? parseInt(reference.position, 10)
+        : reference.position;
+
+    const index = SCALE_POSITION_MAP[positionNum];
+    if (index === undefined) {
+      throw new Error(`Invalid scale position: ${reference.position}`);
+    }
+
+    if (index < 0 || index >= colorValue.scale.length) {
+      throw new Error(
+        `Scale position ${reference.position} out of bounds (0-${colorValue.scale.length - 1})`,
+      );
+    }
+
+    const oklch = colorValue.scale[index];
+    if (!oklch) {
+      throw new Error(`No color value at scale position ${reference.position}`);
+    }
+
+    return this.oklchToCSS(oklch);
+  }
+
+  /**
+   * Convert an OKLCH color to CSS string format
+   */
+  private oklchToCSS(oklch: OKLCH): string {
+    const l = oklch.l.toFixed(3);
+    const c = oklch.c.toFixed(3);
+    const h = Math.round(oklch.h);
+    const alpha = oklch.alpha ?? 1;
+
+    if (alpha < 1) {
+      return `oklch(${l} ${c} ${h} / ${alpha.toFixed(2)})`;
+    }
+    return `oklch(${l} ${c} ${h})`;
   }
 
   private executeStateRule(rule: ParsedRule): string {
