@@ -6,7 +6,7 @@
  * Automatically enriches color tokens with intelligence from Color Intelligence API
  */
 
-import type { Token } from '@rafters/shared';
+import { COMPUTED, type ComputedSymbol, type Token } from '@rafters/shared';
 import { TokenDependencyGraph } from './dependencies';
 import { GenerationRuleExecutor, GenerationRuleParser } from './generation-rules';
 
@@ -108,7 +108,7 @@ export class TokenRegistry {
   }
 
   /**
-   * Update a single token and fire change event
+   * Update a single token's value and fire change event
    */
   updateToken(name: string, value: Token['value']): void {
     const oldValue = this.tokens.get(name)?.value;
@@ -135,6 +135,44 @@ export class TokenRegistry {
         newValue: value,
         timestamp: Date.now(),
       });
+    }
+  }
+
+  /**
+   * Clear a token's override and restore to computed/previous value.
+   * - Derived tokens: regenerate from rule
+   * - Root tokens: restore previousValue from override
+   */
+  private async clearOverride(tokenName: string): Promise<void> {
+    const existingToken = this.tokens.get(tokenName);
+    if (!existingToken) {
+      throw new Error(`Token "${tokenName}" does not exist`);
+    }
+
+    if (!existingToken.userOverride) {
+      return; // No override to clear
+    }
+
+    const rule = this.dependencyGraph.getGenerationRule(tokenName);
+
+    if (rule) {
+      // Derived token: remove override and regenerate from rule
+      const { userOverride: _, ...tokenWithoutOverride } = existingToken;
+      this.tokens.set(tokenName, tokenWithoutOverride as Token);
+      await this.regenerateToken(tokenName);
+    } else {
+      // Root token: restore previousValue
+      const { previousValue } = existingToken.userOverride;
+      if (previousValue === undefined) {
+        throw new Error(
+          `Cannot clear override for root token "${tokenName}": no previousValue to restore`,
+        );
+      }
+      const { userOverride: _, ...tokenWithoutOverride } = existingToken;
+      this.tokens.set(tokenName, {
+        ...tokenWithoutOverride,
+        value: previousValue,
+      } as Token);
     }
   }
 
@@ -196,7 +234,29 @@ export class TokenRegistry {
     }
   }
 
-  async set(tokenName: string, value: Token['value']): Promise<void> {
+  async set(tokenName: string, value: Token['value'] | ComputedSymbol): Promise<void> {
+    // COMPUTED = clear override and restore to computed/previous value
+    if (value === COMPUTED) {
+      const oldValue = this.tokens.get(tokenName)?.value;
+      await this.clearOverride(tokenName);
+      const newValue = this.tokens.get(tokenName)?.value;
+
+      // Fire change event if value actually changed
+      if (this.changeCallback && oldValue !== newValue) {
+        this.changeCallback({
+          type: 'token-changed',
+          tokenName,
+          oldValue,
+          newValue,
+          timestamp: Date.now(),
+        });
+      }
+
+      // Regenerate dependents
+      await this.regenerateDependents(tokenName);
+      return;
+    }
+
     // Use updateToken for consistency and event firing
     this.updateToken(tokenName, value);
 
