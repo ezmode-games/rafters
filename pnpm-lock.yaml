@@ -88,7 +88,7 @@ catalogs:
       specifier: ^1.0.0-pre.3
       version: 1.0.0-pre.5
     zocker:
-      specifier: ^3.0.0
+      specifier: 3.0.0
       version: 3.0.0
     zod:
       specifier: ^4.0.0
@@ -548,6 +548,9 @@ importers:
       vitest:
         specifier: ^3.2.2
         version: 3.2.4(@types/debug@4.1.12)(@types/node@24.10.0)(@vitest/ui@3.2.4)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.30.2)(msw@2.11.6(@types/node@24.10.0)(typescript@5.9.3))(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
+      zocker:
+        specifier: 'catalog:'
+        version: 3.0.0(zod@4.1.12)
 
   packages/ui:
     dependencies:

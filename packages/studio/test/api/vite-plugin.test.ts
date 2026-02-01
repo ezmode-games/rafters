@@ -10,8 +10,14 @@ import { TokenRegistry } from '@rafters/design-tokens';
 import type { Token } from '@rafters/shared';
 import { ColorReferenceSchema, ColorValueSchema, TokenSchema } from '@rafters/shared';
 import { describe, expect, it } from 'vitest';
+import { zocker } from 'zocker';
 import { z } from 'zod';
-import { handlePostToken, studioApiPlugin, TokenPatchSchema } from '../../src/api/vite-plugin';
+import {
+  handlePostToken,
+  handlePostTokens,
+  studioApiPlugin,
+  TokenPatchSchema,
+} from '../../src/api/vite-plugin';
 
 // Replicate schemas from vite-plugin.ts to test validation logic
 const SetTokenMessageSchema = z.object({
@@ -765,6 +771,295 @@ describe('studioApiPlugin', () => {
       expect(res._statusCode).toBe(200);
       const response = JSON.parse(res._body);
       expect(response.token.value).toEqual({ family: 'blue', position: '600' });
+    });
+  });
+
+  describe('handlePostTokens batch integration', () => {
+    // Helper to create mock request with body
+    function createMockRequest(body: unknown): import('node:http').IncomingMessage {
+      const req = new EventEmitter() as import('node:http').IncomingMessage;
+      setTimeout(() => {
+        req.emit('data', Buffer.from(JSON.stringify(body)));
+        req.emit('end');
+      }, 0);
+      return req;
+    }
+
+    // Helper to create mock response
+    function createMockResponse(): import('node:http').ServerResponse & {
+      _statusCode: number;
+      _body: string;
+      _headers: Record<string, string>;
+    } {
+      const res = {
+        _statusCode: 200,
+        _body: '',
+        _headers: {} as Record<string, string>,
+        headersSent: false,
+        set statusCode(code: number) {
+          this._statusCode = code;
+        },
+        get statusCode() {
+          return this._statusCode;
+        },
+        setHeader(name: string, value: string) {
+          this._headers[name] = value;
+        },
+        end(body?: string) {
+          this._body = body ?? '';
+          this.headersSent = true;
+        },
+      };
+      return res as import('node:http').ServerResponse & {
+        _statusCode: number;
+        _body: string;
+        _headers: Record<string, string>;
+      };
+    }
+
+    // Generate test tokens using zocker
+    const generateColorToken = (name: string): Token => ({
+      name,
+      value: `oklch(0.${Math.floor(Math.random() * 9) + 1} 0.2 ${Math.floor(Math.random() * 360)})`,
+      category: 'color',
+      namespace: 'color',
+    });
+
+    // Schema for batch response validation
+    const BatchResponseSchema = z.object({
+      tokens: z.array(TokenSchema),
+      initialized: z.boolean(),
+    });
+
+    const BatchErrorSchema = z.object({
+      ok: z.literal(false),
+      error: z.string(),
+    });
+
+    it('returns 400 for invalid JSON body', async () => {
+      const registry = new TokenRegistry([]);
+      const req = new EventEmitter() as import('node:http').IncomingMessage;
+      const res = createMockResponse();
+
+      setTimeout(() => {
+        req.emit('data', Buffer.from('not valid json'));
+        req.emit('end');
+      }, 0);
+
+      await handlePostTokens(req, res, registry);
+
+      expect(res._statusCode).toBe(400);
+      const response = BatchErrorSchema.safeParse(JSON.parse(res._body));
+      expect(response.success).toBe(true);
+      if (response.success) {
+        expect(response.data.error).toContain('Invalid JSON');
+      }
+    });
+
+    it('returns 400 for non-array body', async () => {
+      const registry = new TokenRegistry([]);
+      const req = createMockRequest({ name: 'not-an-array' });
+      const res = createMockResponse();
+
+      await handlePostTokens(req, res, registry);
+
+      expect(res._statusCode).toBe(400);
+      const response = BatchErrorSchema.safeParse(JSON.parse(res._body));
+      expect(response.success).toBe(true);
+    });
+
+    it('returns 400 for invalid token in array', async () => {
+      const token = generateColorToken('valid-token');
+      const registry = new TokenRegistry([token]);
+      const req = createMockRequest([
+        { ...token, value: 'updated' },
+        { name: 'missing-fields' }, // Invalid - missing required fields
+      ]);
+      const res = createMockResponse();
+
+      await handlePostTokens(req, res, registry);
+
+      expect(res._statusCode).toBe(400);
+      const response = BatchErrorSchema.safeParse(JSON.parse(res._body));
+      expect(response.success).toBe(true);
+    });
+
+    it('returns 404 when any token does not exist', async () => {
+      const existingToken = generateColorToken('existing-token');
+      const registry = new TokenRegistry([existingToken]);
+
+      // Create a valid token that doesn't exist in registry
+      const nonExistentToken = zocker(TokenSchema).generate();
+      nonExistentToken.name = 'non-existent-token';
+
+      const req = createMockRequest([{ ...existingToken, value: 'updated' }, nonExistentToken]);
+      const res = createMockResponse();
+
+      await handlePostTokens(req, res, registry);
+
+      expect(res._statusCode).toBe(404);
+      const response = BatchErrorSchema.safeParse(JSON.parse(res._body));
+      expect(response.success).toBe(true);
+      if (response.success) {
+        expect(response.data.error).toContain('non-existent-token');
+      }
+    });
+
+    it('successfully updates single token in batch', async () => {
+      const token = generateColorToken('single-token');
+      const registry = new TokenRegistry([token]);
+      const updatedToken = { ...token, value: 'oklch(0.8 0.3 180)' };
+      const req = createMockRequest([updatedToken]);
+      const res = createMockResponse();
+
+      await handlePostTokens(req, res, registry);
+
+      expect(res._statusCode).toBe(200);
+      const response = BatchResponseSchema.safeParse(JSON.parse(res._body));
+      expect(response.success).toBe(true);
+      if (response.success) {
+        expect(response.data.tokens).toHaveLength(1);
+        expect(response.data.tokens[0].value).toBe('oklch(0.8 0.3 180)');
+        expect(response.data.initialized).toBe(true);
+      }
+    });
+
+    it('successfully updates multiple tokens in batch', async () => {
+      // Create color scale tokens (like a 11-position scale)
+      const scaleTokens: Token[] = [];
+      for (let i = 0; i <= 10; i++) {
+        scaleTokens.push({
+          name: `primary-${i * 100 || 50}`,
+          value: `oklch(${0.98 - i * 0.08} 0.2 250)`,
+          category: 'color',
+          namespace: 'color',
+          scalePosition: i,
+        });
+      }
+
+      const registry = new TokenRegistry(scaleTokens);
+
+      // Update all tokens with new values
+      const updatedTokens = scaleTokens.map((t, i) => ({
+        ...t,
+        value: `oklch(${0.95 - i * 0.07} 0.25 260)`,
+      }));
+
+      const req = createMockRequest(updatedTokens);
+      const res = createMockResponse();
+
+      await handlePostTokens(req, res, registry);
+
+      expect(res._statusCode).toBe(200);
+      const response = BatchResponseSchema.safeParse(JSON.parse(res._body));
+      expect(response.success).toBe(true);
+      if (response.success) {
+        expect(response.data.tokens).toHaveLength(11);
+        expect(response.data.initialized).toBe(true);
+      }
+    });
+
+    it('persists all tokens in registry after batch update', async () => {
+      const tokens: Token[] = [
+        generateColorToken('batch-token-1'),
+        generateColorToken('batch-token-2'),
+        generateColorToken('batch-token-3'),
+      ];
+      const registry = new TokenRegistry(tokens);
+
+      const updatedTokens = tokens.map((t) => ({
+        ...t,
+        value: 'oklch(0.5 0.1 120)',
+        description: 'Batch updated',
+      }));
+
+      const req = createMockRequest(updatedTokens);
+      const res = createMockResponse();
+
+      await handlePostTokens(req, res, registry);
+
+      expect(res._statusCode).toBe(200);
+
+      // Verify all tokens updated in registry
+      for (const token of tokens) {
+        const updated = registry.get(token.name);
+        expect(updated?.value).toBe('oklch(0.5 0.1 120)');
+        expect(updated?.description).toBe('Batch updated');
+      }
+    });
+
+    it('handles empty array (no-op)', async () => {
+      const token = generateColorToken('unchanged-token');
+      const registry = new TokenRegistry([token]);
+      const req = createMockRequest([]);
+      const res = createMockResponse();
+
+      await handlePostTokens(req, res, registry);
+
+      expect(res._statusCode).toBe(200);
+      const response = BatchResponseSchema.safeParse(JSON.parse(res._body));
+      expect(response.success).toBe(true);
+      if (response.success) {
+        expect(response.data.tokens).toHaveLength(0);
+      }
+
+      // Original token should be unchanged
+      expect(registry.get('unchanged-token')?.value).toBe(token.value);
+    });
+
+    it('validates tokens with zocker-generated data', async () => {
+      // Generate valid tokens using zocker
+      const generatedToken = zocker(TokenSchema).generate();
+      generatedToken.name = 'zocker-generated';
+
+      const registry = new TokenRegistry([generatedToken]);
+
+      // Update with new zocker-generated value
+      const updatedToken = zocker(TokenSchema).generate();
+      updatedToken.name = 'zocker-generated';
+
+      const req = createMockRequest([updatedToken]);
+      const res = createMockResponse();
+
+      await handlePostTokens(req, res, registry);
+
+      expect(res._statusCode).toBe(200);
+      const response = BatchResponseSchema.safeParse(JSON.parse(res._body));
+      expect(response.success).toBe(true);
+    });
+
+    it('updates tokens with optional fields preserved', async () => {
+      const token: Token = {
+        name: 'detailed-token',
+        value: 'oklch(0.5 0.2 250)',
+        category: 'color',
+        namespace: 'semantic',
+        trustLevel: 'high',
+        description: 'Original description',
+      };
+      const registry = new TokenRegistry([token]);
+
+      // Update only value, keeping other fields
+      const req = createMockRequest([
+        {
+          ...token,
+          value: 'oklch(0.6 0.3 260)',
+          trustLevel: 'critical',
+        },
+      ]);
+      const res = createMockResponse();
+
+      await handlePostTokens(req, res, registry);
+
+      expect(res._statusCode).toBe(200);
+      const response = BatchResponseSchema.safeParse(JSON.parse(res._body));
+      expect(response.success).toBe(true);
+      if (response.success) {
+        const updatedToken = response.data.tokens[0];
+        expect(updatedToken.value).toBe('oklch(0.6 0.3 260)');
+        expect(updatedToken.trustLevel).toBe('critical');
+        expect(updatedToken.description).toBe('Original description');
+      }
     });
   });
 });
