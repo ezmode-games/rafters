@@ -149,6 +149,117 @@ export async function handlePostToken(
   }
 }
 
+// Batch token schema - array of tokens
+const TokenArraySchema = z.array(TokenSchema);
+
+// Schema for namespace query param validation
+const NamespaceParamSchema = z.string().min(1).optional();
+
+// Extracted handler for GET /api/tokens (with optional namespace filter) - exported for testing
+export function handleGetTokens(
+  url: string,
+  res: import('node:http').ServerResponse,
+  registry: TokenRegistry,
+  initialized: boolean,
+): void {
+  try {
+    // Parse query params for namespace filter
+    const parsedUrl = new URL(url, 'http://localhost');
+    const namespaceParam = parsedUrl.searchParams.get('namespace');
+
+    // Validate namespace param if provided (empty string is invalid)
+    const namespaceResult = NamespaceParamSchema.safeParse(namespaceParam ?? undefined);
+    if (namespaceParam !== null && !namespaceResult.success) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ ok: false, error: 'Invalid namespace parameter' }));
+      return;
+    }
+
+    let tokens = registry.list();
+
+    // Filter by namespace if provided and non-empty
+    if (namespaceParam && namespaceResult.success && namespaceResult.data) {
+      tokens = tokens.filter((t) => t.namespace === namespaceResult.data);
+    }
+
+    const tokensResult = z.array(TokenSchema).safeParse(tokens);
+    if (!tokensResult.success) {
+      console.log(`[rafters] Tokens list failed validation: ${tokensResult.error.message}`);
+      res.statusCode = 500;
+      res.end(JSON.stringify({ ok: false, error: 'Token validation failed' }));
+      return;
+    }
+
+    const response = TokensResponseSchema.parse({
+      tokens: tokensResult.data,
+      initialized,
+    });
+    res.end(JSON.stringify(response));
+  } catch (error) {
+    console.log(`[rafters] Failed to list tokens: ${error}`);
+    res.statusCode = 500;
+    res.end(JSON.stringify({ ok: false, error: 'Failed to retrieve tokens' }));
+  }
+}
+
+// Extracted async handler for POST /api/tokens (batch) - exported for testing
+export async function handlePostTokens(
+  req: import('node:http').IncomingMessage,
+  res: import('node:http').ServerResponse,
+  registry: TokenRegistry,
+): Promise<void> {
+  // Parse request body
+  let body: unknown;
+  try {
+    body = await readJsonBody(req);
+  } catch (error) {
+    res.statusCode = 400;
+    const message = error instanceof Error ? error.message : 'Invalid JSON body';
+    res.end(JSON.stringify({ ok: false, error: message }));
+    return;
+  }
+
+  // Validate as array of tokens
+  const tokensResult = TokenArraySchema.safeParse(body);
+  if (!tokensResult.success) {
+    res.statusCode = 400;
+    const issues = tokensResult.error.issues;
+    const message = issues[0]
+      ? `${issues[0].path.join('.') || 'tokens'}: ${issues[0].message}`
+      : tokensResult.error.message;
+    res.end(JSON.stringify({ ok: false, error: message }));
+    return;
+  }
+
+  const tokens = tokensResult.data;
+
+  // Validate all tokens exist before updating
+  for (const token of tokens) {
+    if (!registry.has(token.name)) {
+      res.statusCode = 404;
+      res.end(JSON.stringify({ ok: false, error: `Token "${token.name}" not found` }));
+      return;
+    }
+  }
+
+  // Batch update via registry (single persist)
+  try {
+    await registry.setTokens(tokens);
+
+    // Return updated tokens
+    const updatedTokens = tokens.map((t) => registry.get(t.name)).filter(Boolean);
+    const response = TokensResponseSchema.parse({
+      tokens: updatedTokens,
+      initialized: true,
+    });
+    res.end(JSON.stringify(response));
+  } catch (error) {
+    console.log(`[rafters] Batch token update failed: ${error}`);
+    res.statusCode = 500;
+    res.end(JSON.stringify({ ok: false, error: String(error) }));
+  }
+}
+
 export function studioApiPlugin(): Plugin {
   let registry: TokenRegistry;
   let initialized = false;
@@ -299,31 +410,32 @@ export function studioApiPlugin(): Plugin {
           return;
         }
 
-        // GET /api/tokens - List all tokens
+        // /api/tokens - GET list or POST batch update
         if (pathname === '/api/tokens') {
-          try {
-            const tokens = registry.list();
-            const tokensResult = z.array(TokenSchema).safeParse(tokens);
-            if (!tokensResult.success) {
-              console.log(`[rafters] Tokens list failed validation: ${tokensResult.error.message}`);
-              res.statusCode = 500;
-              res.setHeader('Content-Type', 'application/json');
-              res.end(JSON.stringify({ ok: false, error: 'Token validation failed' }));
-              return;
-            }
+          res.setHeader('Content-Type', 'application/json');
 
-            const response = TokensResponseSchema.parse({
-              tokens: tokensResult.data,
-              initialized,
-            });
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(response));
-          } catch (error) {
-            console.log(`[rafters] Failed to list tokens: ${error}`);
-            res.statusCode = 500;
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify({ ok: false, error: 'Failed to retrieve tokens' }));
+          // Only allow GET and POST methods
+          if (req.method !== 'GET' && req.method !== 'POST') {
+            res.statusCode = 405;
+            res.setHeader('Allow', 'GET, POST');
+            res.end(JSON.stringify({ ok: false, error: 'Method not allowed' }));
+            return;
           }
+
+          // POST /api/tokens - Batch update tokens
+          if (req.method === 'POST') {
+            handlePostTokens(req, res, registry).catch((error) => {
+              console.log(`[rafters] Unhandled error in POST /api/tokens: ${error}`);
+              if (!res.headersSent) {
+                res.statusCode = 500;
+                res.end(JSON.stringify({ ok: false, error: 'Internal server error' }));
+              }
+            });
+            return;
+          }
+
+          // GET /api/tokens - List tokens (optionally filtered by namespace)
+          handleGetTokens(req.url ?? '', res, registry, initialized);
           return;
         }
 

@@ -43,6 +43,7 @@
     "tsx": "^4.21.0",
     "typescript": "catalog:",
     "vite": "^6.2.0",
-    "vitest": "^3.2.2"
+    "vitest": "^3.2.2",
+    "zocker": "catalog:"
   }
 }

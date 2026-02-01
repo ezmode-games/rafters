@@ -384,6 +384,55 @@ export class TokenRegistry {
     await this.persist();
   }
 
+  /**
+   * Batch update multiple tokens with single persist.
+   * More efficient than calling setToken() multiple times.
+   * All tokens must already exist in the registry.
+   */
+  async setTokens(tokens: Token[]): Promise<void> {
+    const tokensToRegenerate: string[] = [];
+
+    for (const token of tokens) {
+      const existingToken = this.tokens.get(token.name);
+      if (!existingToken) {
+        throw new Error(`Token "${token.name}" does not exist. Use add() for new tokens.`);
+      }
+
+      const oldValue = existingToken.value;
+      const valueChanged = JSON.stringify(oldValue) !== JSON.stringify(token.value);
+
+      // Mark namespace dirty for persistence
+      this.markDirty(token.namespace);
+
+      // Update the full token
+      this.tokens.set(token.name, token);
+
+      // Fire change callback
+      if (this.changeCallback) {
+        this.changeCallback({
+          type: 'token-changed',
+          tokenName: token.name,
+          oldValue,
+          newValue: token.value,
+          timestamp: Date.now(),
+        });
+      }
+
+      // Track tokens that need dependent regeneration
+      if (valueChanged) {
+        tokensToRegenerate.push(token.name);
+      }
+    }
+
+    // Regenerate dependents for all changed tokens
+    for (const tokenName of tokensToRegenerate) {
+      await this.regenerateDependents(tokenName);
+    }
+
+    // Single persist at the end
+    await this.persist();
+  }
+
   has(tokenName: string): boolean {
     return this.tokens.has(tokenName);
   }

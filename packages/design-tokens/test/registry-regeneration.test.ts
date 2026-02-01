@@ -412,4 +412,99 @@ describe('Registry Regeneration', () => {
       expect(css).toContain('--rafters-primary: var(--color-neutral-900)');
     });
   });
+
+  describe('setTokens batch updates', () => {
+    it('updates multiple tokens in a single operation', async () => {
+      const tokens: Token[] = [
+        { name: 'color-a', value: 'oklch(0.5 0.1 200)', category: 'color', namespace: 'color' },
+        { name: 'color-b', value: 'oklch(0.6 0.1 200)', category: 'color', namespace: 'color' },
+        { name: 'color-c', value: 'oklch(0.7 0.1 200)', category: 'color', namespace: 'color' },
+      ];
+
+      const registry = new TokenRegistry(tokens);
+
+      // Update all tokens at once
+      await registry.setTokens([
+        { ...tokens[0], value: 'oklch(0.8 0.2 250)' },
+        { ...tokens[1], value: 'oklch(0.9 0.2 250)' },
+        { ...tokens[2], value: 'oklch(0.95 0.2 250)' },
+      ]);
+
+      expect(registry.get('color-a')?.value).toBe('oklch(0.8 0.2 250)');
+      expect(registry.get('color-b')?.value).toBe('oklch(0.9 0.2 250)');
+      expect(registry.get('color-c')?.value).toBe('oklch(0.95 0.2 250)');
+    });
+
+    it('throws error if any token does not exist', async () => {
+      const tokens: Token[] = [
+        { name: 'existing', value: 'oklch(0.5 0.1 200)', category: 'color', namespace: 'color' },
+      ];
+
+      const registry = new TokenRegistry(tokens);
+
+      await expect(
+        registry.setTokens([
+          { name: 'existing', value: 'updated', category: 'color', namespace: 'color' },
+          { name: 'non-existent', value: 'value', category: 'color', namespace: 'color' },
+        ]),
+      ).rejects.toThrow('Token "non-existent" does not exist');
+    });
+
+    it('updates full token including metadata fields', async () => {
+      const token: Token = {
+        name: 'test-token',
+        value: 'oklch(0.5 0.1 200)',
+        category: 'color',
+        namespace: 'color',
+      };
+
+      const registry = new TokenRegistry([token]);
+
+      await registry.setTokens([
+        {
+          ...token,
+          value: 'oklch(0.6 0.2 250)',
+          description: 'Updated description',
+          trustLevel: 'high',
+        },
+      ]);
+
+      const updated = registry.get('test-token');
+      expect(updated?.value).toBe('oklch(0.6 0.2 250)');
+      expect(updated?.description).toBe('Updated description');
+      expect(updated?.trustLevel).toBe('high');
+    });
+
+    it('fires change callback for each token', async () => {
+      const tokens: Token[] = [
+        { name: 'token-1', value: 'a', category: 'color', namespace: 'color' },
+        { name: 'token-2', value: 'b', category: 'color', namespace: 'color' },
+      ];
+
+      const registry = new TokenRegistry(tokens);
+      const changes: string[] = [];
+
+      registry.setChangeCallback((event) => {
+        if (event.type === 'token-changed') {
+          changes.push(event.tokenName);
+        }
+      });
+
+      await registry.setTokens([
+        { ...tokens[0], value: 'updated-a' },
+        { ...tokens[1], value: 'updated-b' },
+      ]);
+
+      expect(changes).toContain('token-1');
+      expect(changes).toContain('token-2');
+    });
+
+    it('handles empty array without error', async () => {
+      const registry = new TokenRegistry([
+        { name: 'test', value: 'value', category: 'color', namespace: 'color' },
+      ]);
+
+      await expect(registry.setTokens([])).resolves.toBeUndefined();
+    });
+  });
 });
