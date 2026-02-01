@@ -17,7 +17,7 @@ describe('NodePersistenceAdapter', () => {
     await rm(testDir, { recursive: true, force: true });
   });
 
-  it('should save and load namespace tokens', async () => {
+  it('should save and load tokens', async () => {
     const tokens: Token[] = [
       {
         name: 'test-token',
@@ -27,10 +27,9 @@ describe('NodePersistenceAdapter', () => {
       },
     ];
 
-    await adapter.saveNamespace('spacing', tokens);
-    const loaded = await adapter.loadNamespace('spacing');
+    await adapter.save(tokens);
+    const loaded = await adapter.load();
 
-    // Zod adds defaults (e.g., containerQueryAware), so check core properties
     expect(loaded).toHaveLength(1);
     expect(loaded[0]).toMatchObject({
       name: 'test-token',
@@ -50,7 +49,7 @@ describe('NodePersistenceAdapter', () => {
       },
     ];
 
-    await adapter.saveNamespace('test', tokens);
+    await adapter.save(tokens);
 
     const content = await readFile(
       join(testDir, '.rafters', 'tokens', 'test.rafters.json'),
@@ -62,7 +61,10 @@ describe('NodePersistenceAdapter', () => {
   });
 
   it('should include schema and version in saved files', async () => {
-    await adapter.saveNamespace('color', []);
+    const tokens: Token[] = [
+      { name: 'color-1', value: '#fff', category: 'color', namespace: 'color' },
+    ];
+    await adapter.save(tokens);
 
     const content = await readFile(
       join(testDir, '.rafters', 'tokens', 'color.rafters.json'),
@@ -75,57 +77,75 @@ describe('NodePersistenceAdapter', () => {
     expect(data.generatedAt).toBeDefined();
   });
 
-  it('should list available namespaces', async () => {
-    await adapter.saveNamespace('color', []);
-    await adapter.saveNamespace('spacing', []);
-
-    const namespaces = await adapter.listNamespaces();
-
-    expect(namespaces).toContain('color');
-    expect(namespaces).toContain('spacing');
-  });
-
   it('should return empty array if tokens directory does not exist', async () => {
-    const namespaces = await adapter.listNamespaces();
-    expect(namespaces).toEqual([]);
+    const loaded = await adapter.load();
+    expect(loaded).toEqual([]);
   });
 
-  it('should check namespace existence', async () => {
-    await adapter.saveNamespace('color', []);
-
-    expect(await adapter.namespaceExists('color')).toBe(true);
-    expect(await adapter.namespaceExists('nonexistent')).toBe(false);
-  });
-
-  it('should handle multiple tokens in a namespace', async () => {
+  it('should group tokens by namespace into separate files', async () => {
     const tokens: Token[] = [
-      { name: 'spacing-1', value: '0.25rem', category: 'spacing', namespace: 'spacing' },
-      { name: 'spacing-2', value: '0.5rem', category: 'spacing', namespace: 'spacing' },
-      { name: 'spacing-4', value: '1rem', category: 'spacing', namespace: 'spacing' },
+      { name: 'color-1', value: '#fff', category: 'color', namespace: 'color' },
+      { name: 'spacing-1', value: '1rem', category: 'spacing', namespace: 'spacing' },
     ];
 
-    await adapter.saveNamespace('spacing', tokens);
-    const loaded = await adapter.loadNamespace('spacing');
+    await adapter.save(tokens);
+
+    // Check color file
+    const colorContent = await readFile(
+      join(testDir, '.rafters', 'tokens', 'color.rafters.json'),
+      'utf-8',
+    );
+    const colorData = JSON.parse(colorContent);
+    expect(colorData.tokens).toHaveLength(1);
+    expect(colorData.tokens[0].name).toBe('color-1');
+
+    // Check spacing file
+    const spacingContent = await readFile(
+      join(testDir, '.rafters', 'tokens', 'spacing.rafters.json'),
+      'utf-8',
+    );
+    const spacingData = JSON.parse(spacingContent);
+    expect(spacingData.tokens).toHaveLength(1);
+    expect(spacingData.tokens[0].name).toBe('spacing-1');
+  });
+
+  it('should load tokens from multiple namespace files', async () => {
+    const tokens: Token[] = [
+      { name: 'color-1', value: '#fff', category: 'color', namespace: 'color' },
+      { name: 'color-2', value: '#000', category: 'color', namespace: 'color' },
+      { name: 'spacing-1', value: '1rem', category: 'spacing', namespace: 'spacing' },
+    ];
+
+    await adapter.save(tokens);
+    const loaded = await adapter.load();
 
     expect(loaded).toHaveLength(3);
-    expect(loaded[0]?.name).toBe('spacing-1');
-    expect(loaded[2]?.name).toBe('spacing-4');
+    expect(loaded.map((t) => t.name).sort()).toEqual(['color-1', 'color-2', 'spacing-1']);
   });
 
   it('should overwrite existing namespace on save', async () => {
     const tokens1: Token[] = [{ name: 'old', value: '1', category: 'test', namespace: 'test' }];
     const tokens2: Token[] = [{ name: 'new', value: '2', category: 'test', namespace: 'test' }];
 
-    await adapter.saveNamespace('test', tokens1);
-    await adapter.saveNamespace('test', tokens2);
+    await adapter.save(tokens1);
+    await adapter.save(tokens2);
 
-    const loaded = await adapter.loadNamespace('test');
+    const loaded = await adapter.load();
 
     expect(loaded).toHaveLength(1);
     expect(loaded[0]?.name).toBe('new');
   });
 
-  it('should throw when loading non-existent namespace', async () => {
-    await expect(adapter.loadNamespace('nonexistent')).rejects.toThrow();
+  it('should handle multiple tokens in same namespace', async () => {
+    const tokens: Token[] = [
+      { name: 'spacing-1', value: '0.25rem', category: 'spacing', namespace: 'spacing' },
+      { name: 'spacing-2', value: '0.5rem', category: 'spacing', namespace: 'spacing' },
+      { name: 'spacing-4', value: '1rem', category: 'spacing', namespace: 'spacing' },
+    ];
+
+    await adapter.save(tokens);
+    const loaded = await adapter.load();
+
+    expect(loaded).toHaveLength(3);
   });
 });

@@ -1,41 +1,24 @@
 /**
- * Persistence Adapter Types
+ * Persistence Adapter
  *
- * Defines the interface for reading/writing token files to storage.
- * Only Node.js implementation is provided (browser uses API).
+ * Simple interface: load all, save what you're given.
+ * The adapter handles storage details (files, cloud, whatever).
+ * The registry doesn't know or care how storage works.
  */
 
 import type { Token } from '@rafters/shared';
 
-// Re-export NamespaceFile from shared for convenience
 export { type NamespaceFile, NamespaceFileSchema } from '@rafters/shared';
 
-/**
- * Adapter interface for reading/writing token files
- * Implementations handle storage-specific logic (filesystem, API, etc.)
- */
 export interface PersistenceAdapter {
   /**
-   * Load tokens for a namespace
-   * @throws If file does not exist
+   * Load all tokens from storage
    */
-  loadNamespace(namespace: string): Promise<Token[]>;
+  load(): Promise<Token[]>;
 
   /**
-   * Save tokens for a namespace
-   * Creates parent directory if it does not exist
+   * Save tokens to storage
+   * Adapter groups by namespace and handles file/record splitting internally
    */
-  saveNamespace(namespace: string, tokens: Token[]): Promise<void>;
-
-  /**
-   * List available namespaces
-   * @returns Array of namespace names (without .rafters.json extension)
-   */
-  listNamespaces(): Promise<string[]>;
-
-  /**
-   * Check if a namespace exists
-   * @returns true if file exists, false otherwise
-   */
-  namespaceExists(namespace: string): Promise<boolean>;
+  save(tokens: Token[]): Promise<void>;
 }

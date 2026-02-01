@@ -33,6 +33,7 @@ Studio does NOT generate tokens, build color values, or do any design system log
 ## add() vs set()
 - `add(token)` - Initialization only (loading from disk into empty registry)
 - `set(name, value)` - All runtime operations (fires changeCallback, cascades dependents)
+- `set(name, COMPUTED)` - Clear override and trigger self-repair (regenerate from rule or restore previousValue)
 
 The default design system is always loaded at startup. Even "first run" is an UPDATE to existing tokens, not creating new ones. See `registry-add-vs-set` memory for details.
 

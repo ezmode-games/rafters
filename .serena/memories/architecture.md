@@ -32,7 +32,7 @@ src/routes/{feature}/
 └── {feature}.handlers.ts # Handler implementations
 ```
 
-### CLI (apps/cli)
+### CLI (packages/cli)
 Like shadcn CLI but multi-framework with intelligence:
 ```bash
 npx rafters init       # Setup, detect framework
@@ -94,10 +94,10 @@ React components with cognitive metadata:
     "harmonies": { "complementary": [...], "triadic": [...] },
     "accessibility": { "wcagAA": [...], "wcagAAA": [...] },
     "states": { "hover": "...", "focus": "...", "active": "...", "disabled": "..." },
-    "override": {
-      "from": "oklch(0.60 0.22 240)",
+    "userOverride": {
+      "previousValue": "oklch(0.60 0.22 240)",
       "reason": "Brand requires higher saturation",
-      "decidedBy": "designer@company.com"
+      "context": "Q1 2026 rebrand initiative"
     }
   }
 }

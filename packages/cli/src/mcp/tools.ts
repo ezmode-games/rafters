@@ -24,6 +24,7 @@ import {
   extractVariants,
   parseDescription,
   parseJSDocIntelligence,
+  type Token,
   toDisplayName,
 } from '@rafters/shared';
 
@@ -424,6 +425,14 @@ export class RaftersToolHandler {
   }
 
   /**
+   * Load tokens for a specific namespace
+   */
+  private async loadNamespace(namespace: string): Promise<Token[]> {
+    const allTokens = await this.adapter.load();
+    return allTokens.filter((t) => t.namespace === namespace);
+  }
+
+  /**
    * Handle a tool call from MCP
    */
   async handleToolCall(name: string, args: Record<string, unknown>): Promise<CallToolResult> {
@@ -490,7 +499,7 @@ export class RaftersToolHandler {
     palettes: Array<{ name: string; positions: string[] }>;
   }> {
     try {
-      const tokens = await this.adapter.loadNamespace('color');
+      const tokens = await this.loadNamespace('color');
       const semantic: string[] = [];
       const palettes = new Map<string, Set<string>>();
 
@@ -526,7 +535,7 @@ export class RaftersToolHandler {
    */
   private async getSpacingVocabulary(): Promise<{ scale: Record<string, string> }> {
     try {
-      const tokens = await this.adapter.loadNamespace('spacing');
+      const tokens = await this.loadNamespace('spacing');
       const scale: Record<string, string> = {};
 
       for (const token of tokens) {
@@ -549,7 +558,7 @@ export class RaftersToolHandler {
     weights: string[];
   }> {
     try {
-      const tokens = await this.adapter.loadNamespace('typography');
+      const tokens = await this.loadNamespace('typography');
       const sizes: Record<string, string> = {};
       const weights = new Set<string>();
 
@@ -873,7 +882,7 @@ export class RaftersToolHandler {
 
       for (const ns of namespaces) {
         try {
-          const tokens = await this.adapter.loadNamespace(ns);
+          const tokens = await this.loadNamespace(ns);
           const token = tokens.find((t) => t.name === tokenName);
           if (token) {
             foundToken = token;
@@ -888,7 +897,7 @@ export class RaftersToolHandler {
         const allTokenNames: string[] = [];
         for (const ns of namespaces) {
           try {
-            const tokens = await this.adapter.loadNamespace(ns);
+            const tokens = await this.loadNamespace(ns);
             allTokenNames.push(...tokens.map((t) => t.name));
           } catch {}
         }

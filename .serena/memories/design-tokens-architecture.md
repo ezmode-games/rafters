@@ -109,6 +109,32 @@ if (existingToken.userOverride) {
 }
 ```
 
+### COMPUTED Symbol - Override Clearing and Self-Repair
+
+The `COMPUTED` symbol (from @rafters/shared) enables clearing overrides and triggering DAG self-repair:
+
+```typescript
+import { COMPUTED } from '@rafters/shared';
+
+// Clear override and restore to computed/previous value
+await registry.set('spacing-4', COMPUTED);
+```
+
+**Behavior depends on token type:**
+- **Derived tokens** (have `generationRule`): Override removed, value regenerated from rule
+- **Root tokens** (no rule): Override removed, value restored to `previousValue`
+
+**Why a symbol?** Prevents accidental `null` clearing. `Symbol.for('rafters.computed')` is globally unique across packages.
+
+**Self-repair cascade:** After clearing an override, all dependents automatically regenerate via `regenerateDependents()`.
+
+```typescript
+// Example: Clear override triggers cascade
+registry.set('spacing-base', COMPUTED);
+// -> spacing-base regenerates
+// -> spacing-2, spacing-4, spacing-8, etc. all regenerate
+```
+
 ### Event Types
 ```typescript
 type TokenChangeEvent =
@@ -201,13 +227,9 @@ interface Token {
 
   // Human override (CRITICAL for agent intelligence)
   userOverride?: {
-    reason: string;           // WHY overridden
-    overriddenBy?: string;    // WHO
-    overriddenAt: string;     // WHEN (ISO)
-    approvedBy?: string;
-    revertAfter?: string;     // auto-revert date
-    context?: string;
-    tags?: string[];
+    previousValue: string | ColorValue | ColorReference;  // enables undo/self-repair
+    reason: string;           // WHY overridden (required)
+    context?: string;         // optional additional context
   };
 
   // Designer intent

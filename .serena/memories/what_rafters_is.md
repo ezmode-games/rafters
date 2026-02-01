@@ -43,7 +43,7 @@ The AI can see: "system says X, human chose Y because Z."
 
 ## The MCP Tools
 
-Three tools, progressive disclosure:
+Four tools, progressive disclosure:
 
 1. **rafters_vocabulary** - "What do I have?"
    - Color palettes, spacing scale, type scale
@@ -63,6 +63,13 @@ Three tools, progressive disclosure:
    - Trust building patterns
    - Do/never guidance
    - Variants, sizes, dependencies
+
+4. **rafters_token** - "Tell me everything about this token"
+   - Current value and computed value
+   - Derivation rule (calc, state, scale, contrast, invert)
+   - Dependencies (what it depends on)
+   - Dependents (cascade impact if changed)
+   - Human override context (what, why, previousValue for undo)
 
 The AI never guesses. It queries the designer's decisions.
 

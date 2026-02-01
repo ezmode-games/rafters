@@ -9,6 +9,7 @@
 import { COMPUTED, type ComputedSymbol, type Token } from '@rafters/shared';
 import { TokenDependencyGraph } from './dependencies';
 import { GenerationRuleExecutor, GenerationRuleParser } from './generation-rules';
+import type { PersistenceAdapter } from './persistence/types';
 
 // Event types (inline to replace deleted types/events.js)
 export type TokenChangeEvent =
@@ -52,6 +53,8 @@ export class TokenRegistry {
   private ruleParser = new GenerationRuleParser();
   private ruleExecutor = new GenerationRuleExecutor(this);
   private changeCallback?: RegistryChangeCallback;
+  private adapter?: PersistenceAdapter;
+  private dirtyNamespaces = new Set<string>();
 
   constructor(initialTokens?: Token[]) {
     if (initialTokens) {
@@ -60,6 +63,36 @@ export class TokenRegistry {
         this.addToken(token);
       }
     }
+  }
+
+  /**
+   * Set persistence adapter for auto-save on changes
+   */
+  setAdapter(adapter: PersistenceAdapter): void {
+    this.adapter = adapter;
+  }
+
+  /**
+   * Mark a namespace as needing persistence
+   */
+  private markDirty(namespace: string): void {
+    this.dirtyNamespaces.add(namespace);
+  }
+
+  /**
+   * Persist dirty namespaces to storage
+   */
+  private async persist(): Promise<void> {
+    if (!this.adapter || this.dirtyNamespaces.size === 0) return;
+
+    // Collect tokens from dirty namespaces only
+    const tokensToSave: Token[] = [];
+    for (const ns of this.dirtyNamespaces) {
+      tokensToSave.push(...this.list({ namespace: ns }));
+    }
+
+    await this.adapter.save(tokensToSave);
+    this.dirtyNamespaces.clear();
   }
 
   /**
@@ -235,6 +268,9 @@ export class TokenRegistry {
   }
 
   async set(tokenName: string, value: Token['value'] | ComputedSymbol): Promise<void> {
+    const token = this.tokens.get(tokenName);
+    if (token) this.markDirty(token.namespace);
+
     // COMPUTED = clear override and restore to computed/previous value
     if (value === COMPUTED) {
       const oldValue = this.tokens.get(tokenName)?.value;
@@ -254,6 +290,7 @@ export class TokenRegistry {
 
       // Regenerate dependents
       await this.regenerateDependents(tokenName);
+      await this.persist();
       return;
     }
 
@@ -262,6 +299,9 @@ export class TokenRegistry {
 
     // Regenerate all dependent tokens
     await this.regenerateDependents(tokenName);
+
+    // Persist dirty namespaces
+    await this.persist();
   }
 
   has(tokenName: string): boolean {
@@ -397,6 +437,9 @@ export class TokenRegistry {
       // Parse and execute the rule
       const parsedRule = this.ruleParser.parse(rule);
       const newComputedValue = this.ruleExecutor.execute(parsedRule, tokenName);
+
+      // Mark namespace dirty since we're changing this token
+      this.markDirty(existingToken.namespace);
 
       if (existingToken.userOverride) {
         // Token has human override - update computedValue but preserve value

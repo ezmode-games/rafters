@@ -22,8 +22,12 @@ add(token: Token): void {
 
 ### set() Behavior
 ```typescript
-async set(tokenName: string, value: string): Promise<void> {
-  this.updateToken(tokenName, value);        // update + fire changeCallback
+async set(tokenName: string, value: Token['value'] | ComputedSymbol): Promise<void> {
+  if (value === COMPUTED) {
+    await this.clearOverride(tokenName);     // restore computed/previous value
+  } else {
+    this.updateToken(tokenName, value);      // update + fire changeCallback
+  }
   await this.regenerateDependents(tokenName); // cascade through graph
 }
 ```
@@ -31,6 +35,7 @@ async set(tokenName: string, value: string): Promise<void> {
 - Regenerates all dependent tokens
 - Respects `userOverride` on dependents
 - Required for live editing
+- Accepts `COMPUTED` symbol to clear overrides and trigger self-repair
 
 ## When to Use Each
 

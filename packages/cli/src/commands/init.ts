@@ -18,7 +18,6 @@ import {
   TokenRegistry,
   toDTCG,
 } from '@rafters/design-tokens';
-import type { Token } from '@rafters/shared';
 import {
   detectProject,
   isTailwindV3,
@@ -256,17 +255,14 @@ async function regenerateFromExisting(
 
   // Load all tokens from .rafters/tokens/
   const adapter = new NodePersistenceAdapter(cwd);
-  const namespaces = await adapter.listNamespaces();
+  const allTokens = await adapter.load();
 
-  if (namespaces.length === 0) {
+  if (allTokens.length === 0) {
     throw new Error('No tokens found. Cannot regenerate without existing tokens.');
   }
 
-  const allTokens: Token[] = [];
-  for (const namespace of namespaces) {
-    const tokens = await adapter.loadNamespace(namespace);
-    allTokens.push(...tokens);
-  }
+  // Get unique namespaces for logging
+  const namespaces = [...new Set(allTokens.map((t) => t.namespace))];
 
   log({
     event: 'init:loaded',
@@ -446,23 +442,14 @@ export async function init(options: InitOptions): Promise<void> {
 
   // Save registry to .rafters/tokens/
   const adapter = new NodePersistenceAdapter(cwd);
-  const tokensByNamespace = new Map<string, typeof result.system.allTokens>();
+  const allTokensToSave = registry.list();
+  await adapter.save(allTokensToSave);
 
-  for (const token of registry.list()) {
-    if (!tokensByNamespace.has(token.namespace)) {
-      tokensByNamespace.set(token.namespace, []);
-    }
-    tokensByNamespace.get(token.namespace)?.push(token);
-  }
-
-  for (const [namespace, tokens] of tokensByNamespace) {
-    await adapter.saveNamespace(namespace, tokens);
-  }
-
+  const namespaceCount = new Set(allTokensToSave.map((t) => t.namespace)).size;
   log({
     event: 'init:registry_saved',
     path: paths.tokens,
-    namespaceCount: tokensByNamespace.size,
+    namespaceCount,
   });
 
   // Generate outputs based on export config
