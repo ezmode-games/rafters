@@ -700,14 +700,21 @@ describe('studioApiPlugin', () => {
     });
 
     it('returns 400 for invalid enum value', async () => {
-      const registry = new TokenRegistry([testToken]);
+      // Use semantic token - trustLevel is only valid for semantic namespace
+      const semanticToken: Token = {
+        name: 'semantic-test',
+        value: { family: 'blue', position: '500' },
+        category: 'color',
+        namespace: 'semantic',
+      };
+      const registry = new TokenRegistry([semanticToken]);
       const req = createMockRequest({
-        value: 'oklch(0.6 0.2 250)',
+        value: { family: 'blue', position: '600' },
         trustLevel: 'invalid-level',
       });
       const res = createMockResponse();
 
-      await handlePostToken(req, res, 'test-token', registry);
+      await handlePostToken(req, res, 'semantic-test', registry);
 
       expect(res._statusCode).toBe(400);
       expect(JSON.parse(res._body).ok).toBe(false);
@@ -727,21 +734,28 @@ describe('studioApiPlugin', () => {
     });
 
     it('successfully updates token with optional fields', async () => {
-      const registry = new TokenRegistry([testToken]);
+      // Use semantic token - trustLevel is only valid for semantic namespace
+      const semanticToken: Token = {
+        name: 'semantic-test',
+        value: { family: 'blue', position: '500' },
+        category: 'color',
+        namespace: 'semantic',
+      };
+      const registry = new TokenRegistry([semanticToken]);
       const req = createMockRequest({
-        value: 'oklch(0.7 0.3 260)',
-        description: 'Updated color',
+        value: { family: 'red', position: '600' },
+        description: 'Updated semantic',
         trustLevel: 'high',
       });
       const res = createMockResponse();
 
-      await handlePostToken(req, res, 'test-token', registry);
+      await handlePostToken(req, res, 'semantic-test', registry);
 
       expect(res._statusCode).toBe(200);
       const response = JSON.parse(res._body);
       expect(response.ok).toBe(true);
-      expect(response.token.value).toBe('oklch(0.7 0.3 260)');
-      expect(response.token.description).toBe('Updated color');
+      expect(response.token.value).toEqual({ family: 'red', position: '600' });
+      expect(response.token.description).toBe('Updated semantic');
       expect(response.token.trustLevel).toBe('high');
     });
 
@@ -798,6 +812,378 @@ describe('studioApiPlugin', () => {
       expect(res._statusCode).toBe(200);
       const response = JSON.parse(res._body);
       expect(response.token.value).toEqual({ family: 'blue', position: '600' });
+    });
+  });
+
+  describe('namespace-specific validation', () => {
+    // Helper to create mock request with body
+    function createMockRequest(body: unknown): import('node:http').IncomingMessage {
+      const req = new EventEmitter() as import('node:http').IncomingMessage;
+      setTimeout(() => {
+        req.emit('data', Buffer.from(JSON.stringify(body)));
+        req.emit('end');
+      }, 0);
+      return req;
+    }
+
+    // Helper to create mock response
+    function createMockResponse(): import('node:http').ServerResponse & {
+      _statusCode: number;
+      _body: string;
+    } {
+      const res = {
+        _statusCode: 200,
+        _body: '',
+        headersSent: false,
+        set statusCode(code: number) {
+          this._statusCode = code;
+        },
+        get statusCode() {
+          return this._statusCode;
+        },
+        setHeader() {},
+        end(body?: string) {
+          this._body = body ?? '';
+          this.headersSent = true;
+        },
+      };
+      return res as import('node:http').ServerResponse & { _statusCode: number; _body: string };
+    }
+
+    describe('color namespace', () => {
+      const colorToken: Token = {
+        name: 'color-test',
+        value: 'oklch(0.5 0.2 250)',
+        category: 'color',
+        namespace: 'color',
+      };
+
+      it('accepts oklch string value', async () => {
+        const registry = new TokenRegistry([colorToken]);
+        const req = createMockRequest({ value: 'oklch(0.7 0.3 260)' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'color-test', registry);
+
+        expect(res._statusCode).toBe(200);
+      });
+
+      it('rejects non-oklch string value', async () => {
+        const registry = new TokenRegistry([colorToken]);
+        const req = createMockRequest({ value: 'red' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'color-test', registry);
+
+        expect(res._statusCode).toBe(400);
+        expect(JSON.parse(res._body).error).toContain('oklch');
+      });
+
+      it('rejects invalid scalePosition', async () => {
+        const registry = new TokenRegistry([colorToken]);
+        const req = createMockRequest({ value: 'oklch(0.5 0.2 250)', scalePosition: 15 });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'color-test', registry);
+
+        expect(res._statusCode).toBe(400);
+      });
+    });
+
+    describe('semantic namespace', () => {
+      const semanticToken: Token = {
+        name: 'semantic-test',
+        value: { family: 'blue', position: '500' },
+        category: 'color',
+        namespace: 'semantic',
+      };
+
+      it('accepts ColorReference value', async () => {
+        const registry = new TokenRegistry([semanticToken]);
+        const req = createMockRequest({ value: { family: 'red', position: '600' } });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'semantic-test', registry);
+
+        expect(res._statusCode).toBe(200);
+      });
+
+      it('rejects string value (must be ColorReference)', async () => {
+        const registry = new TokenRegistry([semanticToken]);
+        const req = createMockRequest({ value: 'oklch(0.5 0.2 250)' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'semantic-test', registry);
+
+        expect(res._statusCode).toBe(400);
+      });
+
+      it('accepts valid trustLevel', async () => {
+        const registry = new TokenRegistry([semanticToken]);
+        const req = createMockRequest({
+          value: { family: 'blue', position: '500' },
+          trustLevel: 'critical',
+        });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'semantic-test', registry);
+
+        expect(res._statusCode).toBe(200);
+        expect(JSON.parse(res._body).token.trustLevel).toBe('critical');
+      });
+
+      it('rejects invalid trustLevel', async () => {
+        const registry = new TokenRegistry([semanticToken]);
+        const req = createMockRequest({
+          value: { family: 'blue', position: '500' },
+          trustLevel: 'extreme',
+        });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'semantic-test', registry);
+
+        expect(res._statusCode).toBe(400);
+      });
+    });
+
+    describe('spacing namespace', () => {
+      const spacingToken: Token = {
+        name: 'spacing-test',
+        value: '1rem',
+        category: 'spacing',
+        namespace: 'spacing',
+      };
+
+      it('accepts rem value', async () => {
+        const registry = new TokenRegistry([spacingToken]);
+        const req = createMockRequest({ value: '0.5rem' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'spacing-test', registry);
+
+        expect(res._statusCode).toBe(200);
+      });
+
+      it('accepts negative rem value', async () => {
+        const registry = new TokenRegistry([spacingToken]);
+        const req = createMockRequest({ value: '-0.25rem' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'spacing-test', registry);
+
+        expect(res._statusCode).toBe(200);
+      });
+
+      it('rejects px value', async () => {
+        const registry = new TokenRegistry([spacingToken]);
+        const req = createMockRequest({ value: '16px' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'spacing-test', registry);
+
+        expect(res._statusCode).toBe(400);
+        expect(JSON.parse(res._body).error).toContain('rem');
+      });
+    });
+
+    describe('depth namespace', () => {
+      const depthToken: Token = {
+        name: 'depth-test',
+        value: '10',
+        category: 'depth',
+        namespace: 'depth',
+      };
+
+      it('accepts numeric z-index', async () => {
+        const registry = new TokenRegistry([depthToken]);
+        const req = createMockRequest({ value: '50' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'depth-test', registry);
+
+        expect(res._statusCode).toBe(200);
+      });
+
+      it('accepts negative z-index', async () => {
+        const registry = new TokenRegistry([depthToken]);
+        const req = createMockRequest({ value: '-1' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'depth-test', registry);
+
+        expect(res._statusCode).toBe(200);
+      });
+
+      it('rejects non-numeric value', async () => {
+        const registry = new TokenRegistry([depthToken]);
+        const req = createMockRequest({ value: 'auto' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'depth-test', registry);
+
+        expect(res._statusCode).toBe(400);
+        expect(JSON.parse(res._body).error).toContain('numeric');
+      });
+
+      it('accepts valid elevationLevel', async () => {
+        const registry = new TokenRegistry([depthToken]);
+        const req = createMockRequest({ value: '40', elevationLevel: 'modal' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'depth-test', registry);
+
+        expect(res._statusCode).toBe(200);
+        expect(JSON.parse(res._body).token.elevationLevel).toBe('modal');
+      });
+
+      it('rejects invalid elevationLevel', async () => {
+        const registry = new TokenRegistry([depthToken]);
+        const req = createMockRequest({ value: '40', elevationLevel: 'top' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'depth-test', registry);
+
+        expect(res._statusCode).toBe(400);
+      });
+    });
+
+    describe('motion namespace', () => {
+      const motionToken: Token = {
+        name: 'motion-test',
+        value: '200ms',
+        category: 'motion',
+        namespace: 'motion',
+      };
+
+      it('accepts ms duration', async () => {
+        const registry = new TokenRegistry([motionToken]);
+        const req = createMockRequest({ value: '150ms' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'motion-test', registry);
+
+        expect(res._statusCode).toBe(200);
+      });
+
+      it('accepts cubic-bezier easing', async () => {
+        const registry = new TokenRegistry([motionToken]);
+        const req = createMockRequest({ value: 'cubic-bezier(0.4, 0, 0.2, 1)' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'motion-test', registry);
+
+        expect(res._statusCode).toBe(200);
+      });
+
+      it('rejects invalid duration format', async () => {
+        const registry = new TokenRegistry([motionToken]);
+        const req = createMockRequest({ value: '200' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'motion-test', registry);
+
+        expect(res._statusCode).toBe(400);
+      });
+
+      it('accepts valid motionIntent', async () => {
+        const registry = new TokenRegistry([motionToken]);
+        const req = createMockRequest({ value: '200ms', motionIntent: 'enter' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'motion-test', registry);
+
+        expect(res._statusCode).toBe(200);
+        expect(JSON.parse(res._body).token.motionIntent).toBe('enter');
+      });
+    });
+
+    describe('radius namespace', () => {
+      const radiusToken: Token = {
+        name: 'radius-test',
+        value: '0.5rem',
+        category: 'radius',
+        namespace: 'radius',
+      };
+
+      it('accepts rem value', async () => {
+        const registry = new TokenRegistry([radiusToken]);
+        const req = createMockRequest({ value: '1rem' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'radius-test', registry);
+
+        expect(res._statusCode).toBe(200);
+      });
+
+      it('accepts 0 for sharp corners', async () => {
+        const registry = new TokenRegistry([radiusToken]);
+        const req = createMockRequest({ value: '0' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'radius-test', registry);
+
+        expect(res._statusCode).toBe(200);
+      });
+
+      it('accepts 9999px for pill shape', async () => {
+        const registry = new TokenRegistry([radiusToken]);
+        const req = createMockRequest({ value: '9999px' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'radius-test', registry);
+
+        expect(res._statusCode).toBe(200);
+      });
+
+      it('rejects arbitrary px values', async () => {
+        const registry = new TokenRegistry([radiusToken]);
+        const req = createMockRequest({ value: '8px' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'radius-test', registry);
+
+        expect(res._statusCode).toBe(400);
+      });
+    });
+
+    describe('focus namespace', () => {
+      const focusToken: Token = {
+        name: 'focus-test',
+        value: '2px solid blue',
+        category: 'focus',
+        namespace: 'focus',
+      };
+
+      it('accepts focus ring value', async () => {
+        const registry = new TokenRegistry([focusToken]);
+        const req = createMockRequest({ value: '3px solid var(--primary)' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'focus-test', registry);
+
+        expect(res._statusCode).toBe(200);
+      });
+
+      it('accepts valid accessibilityLevel', async () => {
+        const registry = new TokenRegistry([focusToken]);
+        const req = createMockRequest({ value: '2px solid blue', accessibilityLevel: 'AAA' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'focus-test', registry);
+
+        expect(res._statusCode).toBe(200);
+        expect(JSON.parse(res._body).token.accessibilityLevel).toBe('AAA');
+      });
+
+      it('rejects invalid accessibilityLevel', async () => {
+        const registry = new TokenRegistry([focusToken]);
+        const req = createMockRequest({ value: '2px solid blue', accessibilityLevel: 'A' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'focus-test', registry);
+
+        expect(res._statusCode).toBe(400);
+      });
     });
   });
 

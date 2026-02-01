@@ -54,6 +54,160 @@ export const TokenPatchSchema = TokenSchema.pick({
   description: true,
 });
 
+// ============================================================================
+// Namespace-specific validation schemas
+// Each namespace has specific rules for what values and fields are valid
+// ============================================================================
+
+// Color namespace: OKLCH strings or ColorValue objects for scale families
+const ColorNamespacePatchSchema = z.object({
+  value: z.union([
+    z.string().regex(/^oklch\(/, 'Color value must be oklch() format'),
+    ColorValueSchema,
+  ]),
+  scalePosition: z.number().min(0).max(10).optional(),
+  description: z.string().optional(),
+  userOverride: TokenSchema.shape.userOverride.optional(),
+});
+
+// Semantic namespace: ColorReference pointing to color family + position
+const SemanticNamespacePatchSchema = z.object({
+  value: ColorReferenceSchema,
+  trustLevel: z.enum(['low', 'medium', 'high', 'critical']).optional(),
+  consequence: z.enum(['reversible', 'significant', 'permanent', 'destructive']).optional(),
+  description: z.string().optional(),
+  userOverride: TokenSchema.shape.userOverride.optional(),
+});
+
+// Spacing namespace: rem values only
+const SpacingNamespacePatchSchema = z.object({
+  value: z
+    .string()
+    .regex(/^-?\d+(\.\d+)?rem$/, 'Spacing value must be rem (e.g., "1rem", "0.25rem")'),
+  scalePosition: z.number().min(0).max(12).optional(),
+  description: z.string().optional(),
+  userOverride: TokenSchema.shape.userOverride.optional(),
+});
+
+// Typography namespace: various string formats
+const TypographyNamespacePatchSchema = z.object({
+  value: z.string().min(1),
+  lineHeight: z.string().optional(),
+  description: z.string().optional(),
+  userOverride: TokenSchema.shape.userOverride.optional(),
+});
+
+// Breakpoint namespace: px (viewport) or rem (container) values
+const BreakpointNamespacePatchSchema = z.object({
+  value: z.string().regex(/^\d+(\.\d+)?(px|rem)$/, 'Breakpoint must be px or rem value'),
+  viewportAware: z.boolean().optional(),
+  containerQueryAware: z.boolean().optional(),
+  description: z.string().optional(),
+  userOverride: TokenSchema.shape.userOverride.optional(),
+});
+
+// Radius namespace: rem, '0', or '9999px' for pill shapes
+const RadiusNamespacePatchSchema = z.object({
+  value: z.union([
+    z.literal('0'),
+    z.literal('9999px'),
+    z.string().regex(/^\d+(\.\d+)?rem$/, 'Radius must be rem value, "0", or "9999px"'),
+  ]),
+  scalePosition: z.number().optional(),
+  description: z.string().optional(),
+  userOverride: TokenSchema.shape.userOverride.optional(),
+});
+
+// Shadow namespace: CSS shadow strings
+const ShadowNamespacePatchSchema = z.object({
+  value: z.string().min(1),
+  shadowToken: z.string().optional(),
+  description: z.string().optional(),
+  userOverride: TokenSchema.shape.userOverride.optional(),
+});
+
+// Depth namespace: numeric z-index values
+const DepthNamespacePatchSchema = z.object({
+  value: z.string().regex(/^-?\d+$/, 'Depth value must be numeric z-index'),
+  elevationLevel: z
+    .enum(['surface', 'raised', 'overlay', 'sticky', 'modal', 'popover', 'tooltip'])
+    .optional(),
+  description: z.string().optional(),
+  userOverride: TokenSchema.shape.userOverride.optional(),
+});
+
+// Motion namespace: duration (ms) or easing (cubic-bezier)
+const MotionNamespacePatchSchema = z.object({
+  value: z.union([
+    z.string().regex(/^\d+ms$/, 'Duration must be in ms'),
+    z.string().regex(/^cubic-bezier\(/, 'Easing must be cubic-bezier()'),
+  ]),
+  motionIntent: z.enum(['enter', 'exit', 'emphasis', 'transition']).optional(),
+  easingName: z
+    .enum([
+      'linear',
+      'ease',
+      'ease-in',
+      'ease-out',
+      'ease-in-out',
+      'ease-in-quad',
+      'ease-out-quad',
+      'ease-in-out-quad',
+      'ease-in-cubic',
+      'ease-out-cubic',
+      'ease-in-out-cubic',
+      'spring',
+      'bounce',
+    ])
+    .optional(),
+  reducedMotionAware: z.boolean().optional(),
+  description: z.string().optional(),
+  userOverride: TokenSchema.shape.userOverride.optional(),
+});
+
+// Elevation namespace: composite depth + shadow
+const ElevationNamespacePatchSchema = z.object({
+  value: z.union([z.string(), z.object({ depth: z.string(), shadow: z.string() })]),
+  elevationLevel: z
+    .enum(['surface', 'raised', 'overlay', 'sticky', 'modal', 'popover', 'tooltip'])
+    .optional(),
+  shadowToken: z.string().optional(),
+  description: z.string().optional(),
+  userOverride: TokenSchema.shape.userOverride.optional(),
+});
+
+// Focus namespace: focus ring properties
+const FocusNamespacePatchSchema = z.object({
+  value: z.string().min(1),
+  focusRingWidth: z.string().optional(),
+  focusRingColor: z.string().optional(),
+  focusRingOffset: z.string().optional(),
+  focusRingStyle: z.string().optional(),
+  accessibilityLevel: z.enum(['AA', 'AAA']).optional(),
+  description: z.string().optional(),
+  userOverride: TokenSchema.shape.userOverride.optional(),
+});
+
+// Map namespace to its validation schema
+const namespacePatchSchemas: Record<string, z.ZodTypeAny> = {
+  color: ColorNamespacePatchSchema,
+  semantic: SemanticNamespacePatchSchema,
+  spacing: SpacingNamespacePatchSchema,
+  typography: TypographyNamespacePatchSchema,
+  breakpoint: BreakpointNamespacePatchSchema,
+  radius: RadiusNamespacePatchSchema,
+  shadow: ShadowNamespacePatchSchema,
+  depth: DepthNamespacePatchSchema,
+  motion: MotionNamespacePatchSchema,
+  elevation: ElevationNamespacePatchSchema,
+  focus: FocusNamespacePatchSchema,
+};
+
+// Get the appropriate schema for a namespace, falling back to generic TokenPatchSchema
+export function getNamespacePatchSchema(namespace: string): z.ZodTypeAny {
+  return namespacePatchSchemas[namespace] ?? TokenPatchSchema;
+}
+
 // Helper to read request body as JSON with size limit
 const MAX_BODY_SIZE = 1024 * 1024; // 1MB limit
 
@@ -106,8 +260,9 @@ export async function handlePostToken(
     return;
   }
 
-  // Validate patch data
-  const patchResult = TokenPatchSchema.safeParse(body);
+  // Validate patch data against namespace-specific schema
+  const namespaceSchema = getNamespacePatchSchema(existingToken.namespace);
+  const patchResult = namespaceSchema.safeParse(body);
   if (!patchResult.success) {
     res.statusCode = 400;
     const issues = patchResult.error.issues;
