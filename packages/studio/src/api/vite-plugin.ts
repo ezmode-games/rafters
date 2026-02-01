@@ -42,6 +42,45 @@ const SetTokenMessageSchema = z.object({
   persist: z.boolean().optional(),
 });
 
+// Schema for POST /api/tokens/:name - partial token update
+// Requires value, can include optional token fields for merge
+const TokenPatchSchema = z.object({
+  value: z.union([z.string(), ColorValueSchema, ColorReferenceSchema]),
+  // Optional fields that can be patched
+  trustLevel: z.enum(['low', 'medium', 'high', 'critical']).optional(),
+  elevationLevel: z
+    .enum(['surface', 'raised', 'overlay', 'sticky', 'modal', 'popover', 'tooltip'])
+    .optional(),
+  motionIntent: z.enum(['enter', 'exit', 'emphasis', 'transition']).optional(),
+  accessibilityLevel: z.enum(['AA', 'AAA']).optional(),
+  userOverride: z
+    .object({
+      previousValue: z.union([z.string(), ColorValueSchema, ColorReferenceSchema]),
+      reason: z.string(),
+      context: z.string().optional(),
+    })
+    .optional(),
+  description: z.string().optional(),
+});
+
+// Helper to read request body as JSON
+function readJsonBody(req: import('node:http').IncomingMessage): Promise<unknown> {
+  return new Promise((resolve, reject) => {
+    let body = '';
+    req.on('data', (chunk: Buffer) => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      try {
+        resolve(body ? JSON.parse(body) : {});
+      } catch {
+        reject(new Error('Invalid JSON body'));
+      }
+    });
+    req.on('error', reject);
+  });
+}
+
 export function studioApiPlugin(): Plugin {
   let registry: TokenRegistry;
   let initialized = false;
@@ -123,7 +162,7 @@ export function studioApiPlugin(): Plugin {
           return;
         }
 
-        // GET /api/tokens/:name - Get specific token
+        // /api/tokens/:name - GET or POST specific token
         const tokenMatch = pathname.match(/^\/api\/tokens\/(.+)$/);
         if (tokenMatch) {
           let name: string;
@@ -136,9 +175,89 @@ export function studioApiPlugin(): Plugin {
             return;
           }
 
+          res.setHeader('Content-Type', 'application/json');
+
+          // POST /api/tokens/:name - Update token with partial data
+          if (req.method === 'POST') {
+            (async () => {
+              // Token must exist for update
+              const existingToken = registry.get(name);
+              if (!existingToken) {
+                res.statusCode = 404;
+                res.end(JSON.stringify({ ok: false, error: `Token "${name}" not found` }));
+                return;
+              }
+
+              // Parse request body
+              let body: unknown;
+              try {
+                body = await readJsonBody(req);
+              } catch {
+                res.statusCode = 400;
+                res.end(JSON.stringify({ ok: false, error: 'Invalid JSON body' }));
+                return;
+              }
+
+              // Validate patch data
+              const patchResult = TokenPatchSchema.safeParse(body);
+              if (!patchResult.success) {
+                res.statusCode = 400;
+                const issues = patchResult.error.issues;
+                const message = issues[0]
+                  ? `${issues[0].path.join('.') || 'value'}: ${issues[0].message}`
+                  : patchResult.error.message;
+                res.end(JSON.stringify({ ok: false, error: message }));
+                return;
+              }
+
+              // Merge patch with existing token
+              const mergedToken = {
+                ...existingToken,
+                ...patchResult.data,
+              };
+
+              // Validate merged token against full schema
+              const tokenResult = TokenSchema.safeParse(mergedToken);
+              if (!tokenResult.success) {
+                res.statusCode = 400;
+                const issues = tokenResult.error.issues;
+                const message = issues[0]
+                  ? `${issues[0].path.join('.') || 'token'}: ${issues[0].message}`
+                  : tokenResult.error.message;
+                res.end(JSON.stringify({ ok: false, error: message }));
+                return;
+              }
+
+              // Update via registry (handles cascade + persist)
+              try {
+                await registry.set(name, tokenResult.data.value);
+
+                // For fields beyond value, we need to update the full token
+                // The registry.set only updates value, so update other fields directly
+                const currentToken = registry.get(name);
+                if (currentToken) {
+                  // Apply non-value fields from patch
+                  const { value: _value, ...otherFields } = patchResult.data;
+                  if (Object.keys(otherFields).length > 0) {
+                    Object.assign(currentToken, otherFields);
+                  }
+                }
+
+                const updatedToken = registry.get(name);
+                const response = TokenResponseSchema.parse({ ok: true, token: updatedToken });
+                res.end(JSON.stringify(response));
+              } catch (error) {
+                console.log(`[rafters] Token update failed for "${name}": ${error}`);
+                res.statusCode = 500;
+                res.end(JSON.stringify({ ok: false, error: String(error) }));
+              }
+            })();
+            return;
+          }
+
+          // GET /api/tokens/:name - Get specific token
           const token = registry.get(name);
 
-          res.setHeader('Content-Type', 'application/json');
           if (!token) {
             const errorResponse = ErrorResponseSchema.parse({
               ok: false,

@@ -32,6 +32,27 @@ const ErrorResponseSchema = z.object({
   error: z.string(),
 });
 
+// Schema for POST /api/tokens/:name - partial token update
+// At minimum requires value, can include any optional token fields
+const TokenPatchSchema = z.object({
+  value: z.union([z.string(), ColorValueSchema, ColorReferenceSchema]),
+  // Optional fields that can be patched
+  trustLevel: z.enum(['low', 'medium', 'high', 'critical']).optional(),
+  elevationLevel: z
+    .enum(['surface', 'raised', 'overlay', 'sticky', 'modal', 'popover', 'tooltip'])
+    .optional(),
+  motionIntent: z.enum(['enter', 'exit', 'emphasis', 'transition']).optional(),
+  accessibilityLevel: z.enum(['AA', 'AAA']).optional(),
+  userOverride: z
+    .object({
+      previousValue: z.union([z.string(), ColorValueSchema, ColorReferenceSchema]),
+      reason: z.string(),
+      context: z.string().optional(),
+    })
+    .optional(),
+  description: z.string().optional(),
+});
+
 describe('studioApiPlugin', () => {
   describe('plugin factory', () => {
     it('exports a function', () => {
@@ -340,6 +361,230 @@ describe('studioApiPlugin', () => {
 
       it('throws on invalid UTF-8 sequence', () => {
         expect(() => decodeURIComponent('%C0%C1')).toThrow();
+      });
+    });
+  });
+
+  describe('TokenPatchSchema validation (POST /api/tokens/:name)', () => {
+    describe('value field (required)', () => {
+      it('accepts string value', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.5 0.2 250)',
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('accepts ColorReference value', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: { family: 'neutral', position: '500' },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('accepts ColorValue object', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: {
+            name: 'ocean-blue',
+            scale: [
+              { l: 0.98, c: 0.01, h: 250 }, // 50
+              { l: 0.95, c: 0.02, h: 250 }, // 100
+              { l: 0.85, c: 0.08, h: 250 }, // 200
+              { l: 0.75, c: 0.12, h: 250 }, // 300
+              { l: 0.65, c: 0.16, h: 250 }, // 400
+              { l: 0.55, c: 0.18, h: 250 }, // 500
+              { l: 0.45, c: 0.16, h: 250 }, // 600
+              { l: 0.35, c: 0.14, h: 250 }, // 700
+              { l: 0.25, c: 0.1, h: 250 }, // 800
+              { l: 0.15, c: 0.06, h: 250 }, // 900
+              { l: 0.08, c: 0.03, h: 250 }, // 950
+            ],
+          },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects missing value', () => {
+        const result = TokenPatchSchema.safeParse({});
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects null value', () => {
+        const result = TokenPatchSchema.safeParse({ value: null });
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects number value', () => {
+        const result = TokenPatchSchema.safeParse({ value: 42 });
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects incomplete ColorReference (missing family)', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: { position: '500' },
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects incomplete ColorReference (missing position)', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: { family: 'neutral' },
+        });
+        expect(result.success).toBe(false);
+      });
+    });
+
+    describe('optional enum fields', () => {
+      it('accepts valid trustLevel', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.5 0.2 250)',
+          trustLevel: 'critical',
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects invalid trustLevel', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.5 0.2 250)',
+          trustLevel: 'maximum',
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('accepts valid elevationLevel', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: '40',
+          elevationLevel: 'modal',
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects invalid elevationLevel', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: '40',
+          elevationLevel: 'top',
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('accepts valid motionIntent', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: '150ms',
+          motionIntent: 'enter',
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects invalid motionIntent', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: '150ms',
+          motionIntent: 'fast',
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('accepts valid accessibilityLevel', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: '2px solid blue',
+          accessibilityLevel: 'AAA',
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects invalid accessibilityLevel', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: '2px solid blue',
+          accessibilityLevel: 'A',
+        });
+        expect(result.success).toBe(false);
+      });
+    });
+
+    describe('userOverride field', () => {
+      it('accepts valid userOverride', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.6 0.2 250)',
+          userOverride: {
+            previousValue: 'oklch(0.5 0.2 250)',
+            reason: 'Brand requirement',
+          },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('accepts userOverride with context', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.6 0.2 250)',
+          userOverride: {
+            previousValue: 'oklch(0.5 0.2 250)',
+            reason: 'Brand requirement',
+            context: 'Q1 rebrand',
+          },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects userOverride without reason', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.6 0.2 250)',
+          userOverride: {
+            previousValue: 'oklch(0.5 0.2 250)',
+          },
+        });
+        expect(result.success).toBe(false);
+      });
+
+      it('rejects userOverride without previousValue', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.6 0.2 250)',
+          userOverride: {
+            reason: 'Brand requirement',
+          },
+        });
+        expect(result.success).toBe(false);
+      });
+    });
+
+    describe('description field', () => {
+      it('accepts description', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.5 0.2 250)',
+          description: 'Primary brand color',
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('rejects non-string description', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.5 0.2 250)',
+          description: 123,
+        });
+        expect(result.success).toBe(false);
+      });
+    });
+
+    describe('combined fields', () => {
+      it('accepts multiple optional fields', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: { family: 'red', position: '600' },
+          trustLevel: 'critical',
+          description: 'Destructive action color',
+          userOverride: {
+            previousValue: { family: 'red', position: '500' },
+            reason: 'Need higher contrast for accessibility',
+          },
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it('strips unknown fields', () => {
+        const result = TokenPatchSchema.safeParse({
+          value: 'oklch(0.5 0.2 250)',
+          unknownField: 'should be ignored',
+        });
+        expect(result.success).toBe(true);
+        if (result.success) {
+          expect('unknownField' in result.data).toBe(false);
+        }
       });
     });
   });
