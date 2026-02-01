@@ -1185,6 +1185,164 @@ describe('studioApiPlugin', () => {
         expect(res._statusCode).toBe(400);
       });
     });
+
+    describe('typography namespace', () => {
+      const typographyToken: Token = {
+        name: 'typography-test',
+        value: '1rem',
+        category: 'typography',
+        namespace: 'typography',
+      };
+
+      it('accepts string value', async () => {
+        const registry = new TokenRegistry([typographyToken]);
+        const req = createMockRequest({ value: '1.25rem' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'typography-test', registry);
+
+        expect(res._statusCode).toBe(200);
+      });
+
+      it('accepts lineHeight', async () => {
+        const registry = new TokenRegistry([typographyToken]);
+        const req = createMockRequest({ value: '1rem', lineHeight: '1.5' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'typography-test', registry);
+
+        expect(res._statusCode).toBe(200);
+      });
+
+      it('rejects empty value', async () => {
+        const registry = new TokenRegistry([typographyToken]);
+        const req = createMockRequest({ value: '' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'typography-test', registry);
+
+        expect(res._statusCode).toBe(400);
+      });
+    });
+
+    describe('breakpoint namespace', () => {
+      const breakpointToken: Token = {
+        name: 'breakpoint-test',
+        value: '768px',
+        category: 'breakpoint',
+        namespace: 'breakpoint',
+      };
+
+      it('accepts px value', async () => {
+        const registry = new TokenRegistry([breakpointToken]);
+        const req = createMockRequest({ value: '1024px' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'breakpoint-test', registry);
+
+        expect(res._statusCode).toBe(200);
+      });
+
+      it('accepts rem value', async () => {
+        const registry = new TokenRegistry([breakpointToken]);
+        const req = createMockRequest({ value: '48rem' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'breakpoint-test', registry);
+
+        expect(res._statusCode).toBe(200);
+      });
+
+      it('rejects invalid format', async () => {
+        const registry = new TokenRegistry([breakpointToken]);
+        const req = createMockRequest({ value: 'large' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'breakpoint-test', registry);
+
+        expect(res._statusCode).toBe(400);
+      });
+    });
+
+    describe('shadow namespace', () => {
+      const shadowToken: Token = {
+        name: 'shadow-test',
+        value: '0 4px 6px rgba(0,0,0,0.1)',
+        category: 'shadow',
+        namespace: 'shadow',
+      };
+
+      it('accepts CSS shadow string', async () => {
+        const registry = new TokenRegistry([shadowToken]);
+        const req = createMockRequest({ value: '0 8px 16px rgba(0,0,0,0.2)' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'shadow-test', registry);
+
+        expect(res._statusCode).toBe(200);
+      });
+
+      it('accepts shadowToken reference', async () => {
+        const registry = new TokenRegistry([shadowToken]);
+        const req = createMockRequest({ value: '0 4px 6px black', shadowToken: 'shadow-md' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'shadow-test', registry);
+
+        expect(res._statusCode).toBe(200);
+      });
+    });
+
+    describe('elevation namespace', () => {
+      const elevationToken: Token = {
+        name: 'elevation-test',
+        value: 'var(--depth-raised)',
+        category: 'elevation',
+        namespace: 'elevation',
+      };
+
+      it('accepts string value', async () => {
+        const registry = new TokenRegistry([elevationToken]);
+        const req = createMockRequest({ value: 'var(--depth-modal)' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'elevation-test', registry);
+
+        expect(res._statusCode).toBe(200);
+      });
+
+      it('accepts elevationLevel', async () => {
+        const registry = new TokenRegistry([elevationToken]);
+        const req = createMockRequest({ value: 'var(--depth-overlay)', elevationLevel: 'overlay' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'elevation-test', registry);
+
+        expect(res._statusCode).toBe(200);
+        expect(JSON.parse(res._body).token.elevationLevel).toBe('overlay');
+      });
+    });
+
+    describe('unknown namespace fallback', () => {
+      const unknownToken: Token = {
+        name: 'unknown-test',
+        value: 'any-value',
+        category: 'custom',
+        namespace: 'custom-namespace',
+      };
+
+      it('falls back to TokenPatchSchema for unknown namespace', async () => {
+        const registry = new TokenRegistry([unknownToken]);
+        const req = createMockRequest({ value: 'new-value', description: 'Updated' });
+        const res = createMockResponse();
+
+        await handlePostToken(req, res, 'unknown-test', registry);
+
+        expect(res._statusCode).toBe(200);
+        expect(JSON.parse(res._body).token.value).toBe('new-value');
+        expect(JSON.parse(res._body).token.description).toBe('Updated');
+      });
+    });
   });
 
   describe('handlePostTokens batch integration', () => {

@@ -143,31 +143,15 @@ const MotionNamespacePatchSchema = z.object({
     z.string().regex(/^cubic-bezier\(/, 'Easing must be cubic-bezier()'),
   ]),
   motionIntent: z.enum(['enter', 'exit', 'emphasis', 'transition']).optional(),
-  easingName: z
-    .enum([
-      'linear',
-      'ease',
-      'ease-in',
-      'ease-out',
-      'ease-in-out',
-      'ease-in-quad',
-      'ease-out-quad',
-      'ease-in-out-quad',
-      'ease-in-cubic',
-      'ease-out-cubic',
-      'ease-in-out-cubic',
-      'spring',
-      'bounce',
-    ])
-    .optional(),
+  easingName: TokenSchema.shape.easingName,
   reducedMotionAware: z.boolean().optional(),
   description: z.string().optional(),
   userOverride: TokenSchema.shape.userOverride.optional(),
 });
 
-// Elevation namespace: composite depth + shadow
+// Elevation namespace: depth via reference or string value
 const ElevationNamespacePatchSchema = z.object({
-  value: z.union([z.string(), z.object({ depth: z.string(), shadow: z.string() })]),
+  value: z.string(),
   elevationLevel: z
     .enum(['surface', 'raised', 'overlay', 'sticky', 'modal', 'popover', 'tooltip'])
     .optional(),
