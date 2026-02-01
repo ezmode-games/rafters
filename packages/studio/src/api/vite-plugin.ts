@@ -11,8 +11,10 @@
 
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { buildColorValue } from '@rafters/color-utils';
 import { NodePersistenceAdapter, registryToVars, TokenRegistry } from '@rafters/design-tokens';
-import { ColorReferenceSchema, ColorValueSchema, TokenSchema } from '@rafters/shared';
+import type { OKLCH } from '@rafters/shared';
+import { ColorReferenceSchema, ColorValueSchema, OKLCHSchema, TokenSchema } from '@rafters/shared';
 import type { Plugin, ViteDevServer } from 'vite';
 import { z } from 'zod';
 
@@ -30,6 +32,20 @@ const TokensResponseSchema = z.object({
 const ErrorResponseSchema = z.object({
   ok: z.literal(false),
   error: z.string(),
+});
+
+// Color build response schema
+const ColorBuildResponseSchema = z.object({
+  ok: z.literal(true),
+  colorValue: ColorValueSchema,
+});
+
+// Schema for color build options
+const ColorBuildOptionsSchema = z.object({
+  token: z.string().optional(),
+  value: z.string().optional(),
+  use: z.string().optional(),
+  states: z.record(z.string()).optional(),
 });
 
 const projectPath = process.env.RAFTERS_PROJECT_PATH || process.cwd();
@@ -216,6 +232,63 @@ function readJsonBody(req: import('node:http').IncomingMessage): Promise<unknown
     });
     req.on('error', reject);
   });
+}
+
+// Handler for POST /api/color/build - builds ColorValue from OKLCH (exported for testing)
+export async function handleBuildColor(
+  req: import('node:http').IncomingMessage,
+  res: import('node:http').ServerResponse,
+): Promise<void> {
+  // Parse request body
+  let body: unknown;
+  try {
+    body = await readJsonBody(req);
+  } catch (error) {
+    res.statusCode = 400;
+    const message = error instanceof Error ? error.message : 'Invalid JSON body';
+    res.end(JSON.stringify({ ok: false, error: message }));
+    return;
+  }
+
+  // Validate OKLCH input - expect { oklch: { l, c, h }, options?: { token, value, use, states } }
+  const inputSchema = z.object({
+    oklch: OKLCHSchema,
+    options: ColorBuildOptionsSchema.optional(),
+  });
+
+  const inputResult = inputSchema.safeParse(body);
+  if (!inputResult.success) {
+    res.statusCode = 400;
+    const issues = inputResult.error.issues;
+    const message = issues[0]
+      ? `${issues[0].path.join('.') || 'oklch'}: ${issues[0].message}`
+      : inputResult.error.message;
+    res.end(JSON.stringify({ ok: false, error: message }));
+    return;
+  }
+
+  const { oklch, options } = inputResult.data;
+
+  // Build the ColorValue using color-utils
+  try {
+    const colorValue = buildColorValue(oklch as OKLCH, options ?? {});
+
+    // Validate output against schema
+    const outputResult = ColorValueSchema.safeParse(colorValue);
+    if (!outputResult.success) {
+      console.log(`[rafters] ColorValue validation failed: ${outputResult.error.message}`);
+      res.statusCode = 500;
+      res.end(JSON.stringify({ ok: false, error: 'ColorValue generation failed validation' }));
+      return;
+    }
+
+    const response = ColorBuildResponseSchema.parse({ ok: true, colorValue: outputResult.data });
+    res.end(JSON.stringify(response));
+  } catch (error) {
+    console.log(`[rafters] Color build failed: ${error}`);
+    res.statusCode = 500;
+    res.end(JSON.stringify({ ok: false, error: String(error) }));
+  }
 }
 
 // Extracted async handler for POST /api/tokens/:name (exported for testing)
@@ -477,6 +550,27 @@ export function studioApiPlugin(): Plugin {
           pathname = new URL(req.url ?? '', 'http://localhost').pathname;
         } catch {
           next();
+          return;
+        }
+
+        // /api/color/build - POST to build ColorValue from OKLCH
+        if (pathname === '/api/color/build') {
+          res.setHeader('Content-Type', 'application/json');
+
+          if (req.method !== 'POST') {
+            res.statusCode = 405;
+            res.setHeader('Allow', 'POST');
+            res.end(JSON.stringify({ ok: false, error: 'Method not allowed' }));
+            return;
+          }
+
+          handleBuildColor(req, res).catch((error) => {
+            console.log(`[rafters] Unhandled error in POST /api/color/build: ${error}`);
+            if (!res.headersSent) {
+              res.statusCode = 500;
+              res.end(JSON.stringify({ ok: false, error: 'Internal server error' }));
+            }
+          });
           return;
         }
 
