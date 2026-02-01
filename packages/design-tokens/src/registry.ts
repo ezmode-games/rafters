@@ -58,9 +58,26 @@ export class TokenRegistry {
 
   constructor(initialTokens?: Token[]) {
     if (initialTokens) {
-      // Process tokens synchronously; async enrichment is available via enrichColorToken and should be called after registry creation if needed
+      // First pass: add all tokens
       for (const token of initialTokens) {
         this.addToken(token);
+      }
+      // Second pass: populate dependency graph now that all tokens exist
+      this.populateDependencyGraph();
+    }
+  }
+
+  /**
+   * Populate dependency graph from tokens that have dependsOn/generationRule.
+   * Called after bulk loading to ensure all dependency targets exist.
+   */
+  private populateDependencyGraph(): void {
+    for (const token of this.tokens.values()) {
+      if (token.dependsOn && token.dependsOn.length > 0 && token.generationRule) {
+        const allDepsExist = token.dependsOn.every((dep) => this.tokens.has(dep));
+        if (allDepsExist) {
+          this.dependencyGraph.addDependency(token.name, token.dependsOn, token.generationRule);
+        }
       }
     }
   }
@@ -104,10 +121,21 @@ export class TokenRegistry {
   }
 
   /**
-   * Public method to add a token to the registry
+   * Public method to add a token to the registry.
+   * Also populates the dependency graph if token has dependencies and all targets exist.
+   * Used during initialization - no cascade, no events.
    */
   add(token: Token): void {
     this.addToken(token);
+
+    // Populate dependency graph from token's dependency metadata
+    if (token.dependsOn && token.dependsOn.length > 0 && token.generationRule) {
+      // Only add if all dependency targets exist
+      const allDepsExist = token.dependsOn.every((dep) => this.tokens.has(dep));
+      if (allDepsExist) {
+        this.dependencyGraph.addDependency(token.name, token.dependsOn, token.generationRule);
+      }
+    }
   }
 
   /**

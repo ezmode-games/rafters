@@ -74,6 +74,61 @@ describe('Registry Regeneration', () => {
       expect(typeof registry.getTopologicalOrder).toBe('function');
     });
 
+    it('auto-populates dependency graph from token dependsOn/generationRule fields', () => {
+      // Tokens with dependency info should auto-populate the graph
+      const baseToken: Token = {
+        name: 'spacing-base',
+        value: '0.25rem',
+        category: 'spacing',
+        namespace: 'spacing',
+      };
+
+      const derivedToken: Token = {
+        name: 'spacing-4',
+        value: '1rem',
+        category: 'spacing',
+        namespace: 'spacing',
+        dependsOn: ['spacing-base'],
+        generationRule: 'calc({spacing-base}*4)',
+      };
+
+      // Create registry - should auto-populate graph
+      const registry = new TokenRegistry([baseToken, derivedToken]);
+
+      // Graph should be populated without manual addDependency call
+      const dependents = registry.getDependents('spacing-base');
+      expect(dependents).toContain('spacing-4');
+
+      const dependencies = registry.getDependencies('spacing-4');
+      expect(dependencies).toContain('spacing-base');
+    });
+
+    it('cascades changes through auto-populated graph', async () => {
+      const baseToken: Token = {
+        name: 'spacing-base',
+        value: '0.25rem',
+        category: 'spacing',
+        namespace: 'spacing',
+      };
+
+      const derivedToken: Token = {
+        name: 'spacing-4',
+        value: '1rem',
+        category: 'spacing',
+        namespace: 'spacing',
+        dependsOn: ['spacing-base'],
+        generationRule: 'calc({spacing-base}*4)',
+      };
+
+      const registry = new TokenRegistry([baseToken, derivedToken]);
+
+      // Change base - should cascade to derived
+      await registry.set('spacing-base', '0.5rem');
+
+      const updated = registry.get('spacing-4');
+      expect(updated?.value).toBe('calc(0.5rem*4)');
+    });
+
     it('spacing tokens regenerate when base changes', async () => {
       // Create minimal tokens for testing regeneration
       const baseToken: Token = {

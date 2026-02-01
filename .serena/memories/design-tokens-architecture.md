@@ -158,12 +158,42 @@ const registry = new TokenRegistry(tokens);
 // Export to Tailwind CSS
 const css = registryToTailwind(registry, { includeImport: true });
 
-// Node persistence
+// Node persistence (simple 2-method interface)
 const adapter = new NodePersistenceAdapter(cwd);
-const namespaces = await adapter.listNamespaces();
-const tokens = await adapter.loadNamespace('color');
-await adapter.saveNamespace('color', tokens);
+const tokens = await adapter.load();   // All tokens from all namespace files
+await adapter.save(tokens);            // Groups by namespace internally
 ```
+
+## Persistence Architecture
+
+The `PersistenceAdapter` interface is intentionally minimal:
+
+```typescript
+interface PersistenceAdapter {
+  load(): Promise<Token[]>;
+  save(tokens: Token[]): Promise<void>;
+}
+```
+
+**Why so simple?** This contract enables any storage backend:
+- `NodePersistenceAdapter` - .rafters/tokens/*.rafters.json (groups by namespace internally)
+- Future: `CloudflareKVAdapter`, `D1Adapter`, `IndexedDBAdapter`
+
+The adapter hides storage details. Callers don't know if tokens are in files, KV, or a database.
+
+### Registry Integration
+
+The registry owns persistence through dirty tracking:
+
+```typescript
+// Registry manages its own persistence
+registry.setAdapter(adapter);
+
+// set() marks namespace dirty and auto-persists
+await registry.set('spacing-4', '2rem');  // Saves only affected namespaces
+```
+
+**Dirty tracking** ensures only changed namespaces are written, not the entire token set.
 
 ## Tailwind Exporters
 
@@ -255,14 +285,13 @@ import {
   toDTCG
 } from '@rafters/design-tokens';
 
-// Load all tokens
+// Load all tokens and create registry
 const adapter = new NodePersistenceAdapter(cwd);
-const namespaces = await adapter.listNamespaces();
-const allTokens = [];
-for (const ns of namespaces) {
-  allTokens.push(...await adapter.loadNamespace(ns));
-}
+const allTokens = await adapter.load();
 const registry = new TokenRegistry(allTokens);
+
+// Connect adapter for auto-persistence
+registry.setAdapter(adapter);
 
 // Studio startup - write static Tailwind config (processed once)
 await writeFile('.rafters/output/rafters.tailwind.css', registryToTailwindStatic(registry));
@@ -272,9 +301,9 @@ registry.setChangeCallback(async () => {
   await writeFile('.rafters/output/rafters.vars.css', registryToVars(registry));
 });
 
-// Edit (auto-cascades, respects overrides, triggers callback)
+// Edit (auto-cascades, respects overrides, auto-persists dirty namespaces)
 await registry.set('primary', 'oklch(0.5 0.2 250)');
-await adapter.saveNamespace('semantic', registry.list({ namespace: 'semantic' }));
+// No manual save needed - registry.set() persists automatically
 
 // Explicit save - generate production files
 await writeFile('.rafters/output/rafters.css', registryToTailwind(registry));
