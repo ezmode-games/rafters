@@ -5,10 +5,13 @@
  * Integration with actual Vite server is tested manually.
  */
 
+import { EventEmitter } from 'node:events';
+import { TokenRegistry } from '@rafters/design-tokens';
+import type { Token } from '@rafters/shared';
 import { ColorReferenceSchema, ColorValueSchema, TokenSchema } from '@rafters/shared';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { studioApiPlugin, TokenPatchSchema } from '../../src/api/vite-plugin';
+import { handlePostToken, studioApiPlugin, TokenPatchSchema } from '../../src/api/vite-plugin';
 
 // Replicate schemas from vite-plugin.ts to test validation logic
 const SetTokenMessageSchema = z.object({
@@ -565,6 +568,203 @@ describe('studioApiPlugin', () => {
           expect('unknownField' in result.data).toBe(false);
         }
       });
+    });
+  });
+
+  describe('handlePostToken integration', () => {
+    // Helper to create mock request with body
+    function createMockRequest(body: unknown): import('node:http').IncomingMessage {
+      const req = new EventEmitter() as import('node:http').IncomingMessage;
+      // Simulate body data
+      setTimeout(() => {
+        req.emit('data', Buffer.from(JSON.stringify(body)));
+        req.emit('end');
+      }, 0);
+      return req;
+    }
+
+    // Helper to create mock response
+    function createMockResponse(): import('node:http').ServerResponse & {
+      _statusCode: number;
+      _body: string;
+      _headers: Record<string, string>;
+    } {
+      const res = {
+        _statusCode: 200,
+        _body: '',
+        _headers: {} as Record<string, string>,
+        headersSent: false,
+        set statusCode(code: number) {
+          this._statusCode = code;
+        },
+        get statusCode() {
+          return this._statusCode;
+        },
+        setHeader(name: string, value: string) {
+          this._headers[name] = value;
+        },
+        end(body?: string) {
+          this._body = body ?? '';
+          this.headersSent = true;
+        },
+      };
+      return res as import('node:http').ServerResponse & {
+        _statusCode: number;
+        _body: string;
+        _headers: Record<string, string>;
+      };
+    }
+
+    // Create test token
+    const testToken: Token = {
+      name: 'test-token',
+      value: 'oklch(0.5 0.2 250)',
+      category: 'color',
+      namespace: 'color',
+    };
+
+    it('returns 404 for non-existent token', async () => {
+      const registry = new TokenRegistry([]);
+      const req = createMockRequest({ value: 'new-value' });
+      const res = createMockResponse();
+
+      await handlePostToken(req, res, 'non-existent', registry);
+
+      expect(res._statusCode).toBe(404);
+      expect(JSON.parse(res._body)).toEqual({
+        ok: false,
+        error: 'Token "non-existent" not found',
+      });
+    });
+
+    it('returns 400 for invalid JSON body', async () => {
+      const registry = new TokenRegistry([testToken]);
+      const req = new EventEmitter() as import('node:http').IncomingMessage;
+      const res = createMockResponse();
+
+      // Simulate invalid JSON
+      setTimeout(() => {
+        req.emit('data', Buffer.from('not valid json'));
+        req.emit('end');
+      }, 0);
+
+      await handlePostToken(req, res, 'test-token', registry);
+
+      expect(res._statusCode).toBe(400);
+      expect(JSON.parse(res._body).ok).toBe(false);
+      expect(JSON.parse(res._body).error).toContain('Invalid JSON');
+    });
+
+    it('returns 400 for missing value field', async () => {
+      const registry = new TokenRegistry([testToken]);
+      const req = createMockRequest({ description: 'no value' });
+      const res = createMockResponse();
+
+      await handlePostToken(req, res, 'test-token', registry);
+
+      expect(res._statusCode).toBe(400);
+      expect(JSON.parse(res._body).ok).toBe(false);
+    });
+
+    it('returns 400 for invalid enum value', async () => {
+      const registry = new TokenRegistry([testToken]);
+      const req = createMockRequest({
+        value: 'oklch(0.6 0.2 250)',
+        trustLevel: 'invalid-level',
+      });
+      const res = createMockResponse();
+
+      await handlePostToken(req, res, 'test-token', registry);
+
+      expect(res._statusCode).toBe(400);
+      expect(JSON.parse(res._body).ok).toBe(false);
+    });
+
+    it('successfully updates token value', async () => {
+      const registry = new TokenRegistry([testToken]);
+      const req = createMockRequest({ value: 'oklch(0.7 0.3 260)' });
+      const res = createMockResponse();
+
+      await handlePostToken(req, res, 'test-token', registry);
+
+      expect(res._statusCode).toBe(200);
+      const response = JSON.parse(res._body);
+      expect(response.ok).toBe(true);
+      expect(response.token.value).toBe('oklch(0.7 0.3 260)');
+    });
+
+    it('successfully updates token with optional fields', async () => {
+      const registry = new TokenRegistry([testToken]);
+      const req = createMockRequest({
+        value: 'oklch(0.7 0.3 260)',
+        description: 'Updated color',
+        trustLevel: 'high',
+      });
+      const res = createMockResponse();
+
+      await handlePostToken(req, res, 'test-token', registry);
+
+      expect(res._statusCode).toBe(200);
+      const response = JSON.parse(res._body);
+      expect(response.ok).toBe(true);
+      expect(response.token.value).toBe('oklch(0.7 0.3 260)');
+      expect(response.token.description).toBe('Updated color');
+      expect(response.token.trustLevel).toBe('high');
+    });
+
+    it('persists updated token in registry', async () => {
+      const registry = new TokenRegistry([testToken]);
+      const req = createMockRequest({
+        value: 'oklch(0.8 0.1 270)',
+        description: 'Persisted update',
+      });
+      const res = createMockResponse();
+
+      await handlePostToken(req, res, 'test-token', registry);
+
+      // Verify token is updated in registry
+      const updatedToken = registry.get('test-token');
+      expect(updatedToken?.value).toBe('oklch(0.8 0.1 270)');
+      expect(updatedToken?.description).toBe('Persisted update');
+    });
+
+    it('preserves existing token fields not in patch', async () => {
+      const tokenWithFields: Token = {
+        ...testToken,
+        description: 'Original description',
+        trustLevel: 'medium',
+      };
+      const registry = new TokenRegistry([tokenWithFields]);
+      const req = createMockRequest({ value: 'oklch(0.6 0.2 250)' });
+      const res = createMockResponse();
+
+      await handlePostToken(req, res, 'test-token', registry);
+
+      expect(res._statusCode).toBe(200);
+      const response = JSON.parse(res._body);
+      expect(response.token.value).toBe('oklch(0.6 0.2 250)');
+      expect(response.token.description).toBe('Original description');
+      expect(response.token.trustLevel).toBe('medium');
+    });
+
+    it('handles ColorReference value', async () => {
+      const semanticToken: Token = {
+        name: 'primary',
+        value: { family: 'neutral', position: '500' },
+        category: 'color',
+        namespace: 'semantic',
+      };
+      const registry = new TokenRegistry([semanticToken]);
+      const req = createMockRequest({
+        value: { family: 'blue', position: '600' },
+      });
+      const res = createMockResponse();
+
+      await handlePostToken(req, res, 'primary', registry);
+
+      expect(res._statusCode).toBe(200);
+      const response = JSON.parse(res._body);
+      expect(response.token.value).toEqual({ family: 'blue', position: '600' });
     });
   });
 });

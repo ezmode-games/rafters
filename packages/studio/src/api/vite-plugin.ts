@@ -80,6 +80,75 @@ function readJsonBody(req: import('node:http').IncomingMessage): Promise<unknown
   });
 }
 
+// Extracted async handler for POST /api/tokens/:name (exported for testing)
+export async function handlePostToken(
+  req: import('node:http').IncomingMessage,
+  res: import('node:http').ServerResponse,
+  name: string,
+  registry: TokenRegistry,
+): Promise<void> {
+  // Token must exist for update
+  const existingToken = registry.get(name);
+  if (!existingToken) {
+    res.statusCode = 404;
+    res.end(JSON.stringify({ ok: false, error: `Token "${name}" not found` }));
+    return;
+  }
+
+  // Parse request body
+  let body: unknown;
+  try {
+    body = await readJsonBody(req);
+  } catch (error) {
+    res.statusCode = 400;
+    const message = error instanceof Error ? error.message : 'Invalid JSON body';
+    res.end(JSON.stringify({ ok: false, error: message }));
+    return;
+  }
+
+  // Validate patch data
+  const patchResult = TokenPatchSchema.safeParse(body);
+  if (!patchResult.success) {
+    res.statusCode = 400;
+    const issues = patchResult.error.issues;
+    const message = issues[0]
+      ? `${issues[0].path.join('.') || 'value'}: ${issues[0].message}`
+      : patchResult.error.message;
+    res.end(JSON.stringify({ ok: false, error: message }));
+    return;
+  }
+
+  // Merge patch with existing token
+  const mergedToken = {
+    ...existingToken,
+    ...patchResult.data,
+  };
+
+  // Validate merged token against full schema
+  const tokenResult = TokenSchema.safeParse(mergedToken);
+  if (!tokenResult.success) {
+    res.statusCode = 400;
+    const issues = tokenResult.error.issues;
+    const message = issues[0]
+      ? `${issues[0].path.join('.') || 'token'}: ${issues[0].message}`
+      : tokenResult.error.message;
+    res.end(JSON.stringify({ ok: false, error: message }));
+    return;
+  }
+
+  // Update full token via registry (handles cascade + persist)
+  try {
+    await registry.setToken(tokenResult.data);
+    const updatedToken = registry.get(name);
+    const response = TokenResponseSchema.parse({ ok: true, token: updatedToken });
+    res.end(JSON.stringify(response));
+  } catch (error) {
+    console.log(`[rafters] Token update failed for "${name}": ${error}`);
+    res.statusCode = 500;
+    res.end(JSON.stringify({ ok: false, error: String(error) }));
+  }
+}
+
 export function studioApiPlugin(): Plugin {
   let registry: TokenRegistry;
   let initialized = false;
@@ -186,68 +255,14 @@ export function studioApiPlugin(): Plugin {
 
           // POST /api/tokens/:name - Update token with partial data
           if (req.method === 'POST') {
-            (async () => {
-              // Token must exist for update
-              const existingToken = registry.get(name);
-              if (!existingToken) {
-                res.statusCode = 404;
-                res.end(JSON.stringify({ ok: false, error: `Token "${name}" not found` }));
-                return;
-              }
-
-              // Parse request body
-              let body: unknown;
-              try {
-                body = await readJsonBody(req);
-              } catch (error) {
-                res.statusCode = 400;
-                const message = error instanceof Error ? error.message : 'Invalid JSON body';
-                res.end(JSON.stringify({ ok: false, error: message }));
-                return;
-              }
-
-              // Validate patch data
-              const patchResult = TokenPatchSchema.safeParse(body);
-              if (!patchResult.success) {
-                res.statusCode = 400;
-                const issues = patchResult.error.issues;
-                const message = issues[0]
-                  ? `${issues[0].path.join('.') || 'value'}: ${issues[0].message}`
-                  : patchResult.error.message;
-                res.end(JSON.stringify({ ok: false, error: message }));
-                return;
-              }
-
-              // Merge patch with existing token
-              const mergedToken = {
-                ...existingToken,
-                ...patchResult.data,
-              };
-
-              // Validate merged token against full schema
-              const tokenResult = TokenSchema.safeParse(mergedToken);
-              if (!tokenResult.success) {
-                res.statusCode = 400;
-                const issues = tokenResult.error.issues;
-                const message = issues[0]
-                  ? `${issues[0].path.join('.') || 'token'}: ${issues[0].message}`
-                  : tokenResult.error.message;
-                res.end(JSON.stringify({ ok: false, error: message }));
-                return;
-              }
-
-              // Update full token via registry (handles cascade + persist)
-              try {
-                await registry.setToken(tokenResult.data);
-                const updatedToken = registry.get(name);
-                const response = TokenResponseSchema.parse({ ok: true, token: updatedToken });
-                res.end(JSON.stringify(response));
-              } catch (error) {
-                console.log(`[rafters] Token update failed for "${name}": ${error}`);
+            handlePostToken(req, res, name, registry).catch((error) => {
+              // Catch any unhandled errors from the async handler
+              console.log(`[rafters] Unhandled error in POST /api/tokens/${name}: ${error}`);
+              if (!res.headersSent) {
                 res.statusCode = 500;
-                res.end(JSON.stringify({ ok: false, error: String(error) }));
+                res.end(JSON.stringify({ ok: false, error: 'Internal server error' }));
               }
-            })();
+            });
             return;
           }
 
