@@ -12,9 +12,25 @@
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { NodePersistenceAdapter, registryToVars, TokenRegistry } from '@rafters/design-tokens';
-import { ColorReferenceSchema, ColorValueSchema } from '@rafters/shared';
+import { ColorReferenceSchema, ColorValueSchema, TokenSchema } from '@rafters/shared';
 import type { Plugin, ViteDevServer } from 'vite';
 import { z } from 'zod';
+
+// Response schemas
+const TokenResponseSchema = z.object({
+  ok: z.literal(true),
+  token: TokenSchema,
+});
+
+const TokensResponseSchema = z.object({
+  tokens: z.array(TokenSchema),
+  initialized: z.boolean(),
+});
+
+const ErrorResponseSchema = z.object({
+  ok: z.literal(false),
+  error: z.string(),
+});
 
 const projectPath = process.env.RAFTERS_PROJECT_PATH || process.cwd();
 const outputPath = join(projectPath, '.rafters', 'output', 'rafters.vars.css');
@@ -96,17 +112,92 @@ export function studioApiPlugin(): Plugin {
         }
       });
 
-      // Endpoint to get current tokens (REST fallback)
-      server.middlewares.use('/api/tokens', (_req, res) => {
+      // REST endpoints for token queries
+      server.middlewares.use((req, res, next) => {
+        // Parse pathname only (ignore query strings)
+        let pathname: string;
         try {
-          res.setHeader('Content-Type', 'application/json');
-          res.end(JSON.stringify({ tokens: registry.list(), initialized }));
-        } catch (error) {
-          console.log(`[rafters] Failed to list tokens: ${error}`);
-          res.statusCode = 500;
-          res.setHeader('Content-Type', 'application/json');
-          res.end(JSON.stringify({ error: 'Failed to retrieve tokens' }));
+          pathname = new URL(req.url ?? '', 'http://localhost').pathname;
+        } catch {
+          next();
+          return;
         }
+
+        // GET /api/tokens/:name - Get specific token
+        const tokenMatch = pathname.match(/^\/api\/tokens\/(.+)$/);
+        if (tokenMatch) {
+          let name: string;
+          try {
+            name = decodeURIComponent(tokenMatch[1]);
+          } catch {
+            res.statusCode = 400;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ ok: false, error: 'Invalid token name encoding' }));
+            return;
+          }
+
+          const token = registry.get(name);
+
+          res.setHeader('Content-Type', 'application/json');
+          if (!token) {
+            const errorResponse = ErrorResponseSchema.parse({
+              ok: false,
+              error: `Token "${name}" not found`,
+            });
+            res.statusCode = 404;
+            res.end(JSON.stringify(errorResponse));
+            return;
+          }
+
+          // Validate token against schema before returning
+          const tokenResult = TokenSchema.safeParse(token);
+          if (!tokenResult.success) {
+            console.log(
+              `[rafters] Token "${name}" failed validation: ${tokenResult.error.message}`,
+            );
+            const errorResponse = ErrorResponseSchema.parse({
+              ok: false,
+              error: `Token "${name}" has invalid structure`,
+            });
+            res.statusCode = 500;
+            res.end(JSON.stringify(errorResponse));
+            return;
+          }
+
+          const response = TokenResponseSchema.parse({ ok: true, token: tokenResult.data });
+          res.end(JSON.stringify(response));
+          return;
+        }
+
+        // GET /api/tokens - List all tokens
+        if (pathname === '/api/tokens') {
+          try {
+            const tokens = registry.list();
+            const tokensResult = z.array(TokenSchema).safeParse(tokens);
+            if (!tokensResult.success) {
+              console.log(`[rafters] Tokens list failed validation: ${tokensResult.error.message}`);
+              res.statusCode = 500;
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ ok: false, error: 'Token validation failed' }));
+              return;
+            }
+
+            const response = TokensResponseSchema.parse({
+              tokens: tokensResult.data,
+              initialized,
+            });
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(response));
+          } catch (error) {
+            console.log(`[rafters] Failed to list tokens: ${error}`);
+            res.statusCode = 500;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ ok: false, error: 'Failed to retrieve tokens' }));
+          }
+          return;
+        }
+
+        next();
       });
     },
   };
