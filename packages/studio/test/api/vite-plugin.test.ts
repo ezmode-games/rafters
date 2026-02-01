@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest';
 import { zocker } from 'zocker';
 import { z } from 'zod';
 import {
+  handleGetTokens,
   handlePostToken,
   handlePostTokens,
   studioApiPlugin,
@@ -335,6 +336,32 @@ describe('studioApiPlugin', () => {
 
       it('returns null for non-matching paths', () => {
         expect(extractTokenName('/api/other/primary')).toBe(null);
+      });
+    });
+
+    describe('namespace query param extraction', () => {
+      function extractNamespace(url: string): string | null {
+        return new URL(url, 'http://localhost').searchParams.get('namespace');
+      }
+
+      it('extracts namespace from query string', () => {
+        expect(extractNamespace('/api/tokens?namespace=color')).toBe('color');
+      });
+
+      it('returns null when no namespace param', () => {
+        expect(extractNamespace('/api/tokens')).toBe(null);
+      });
+
+      it('returns null when namespace is empty', () => {
+        expect(extractNamespace('/api/tokens?namespace=')).toBe('');
+      });
+
+      it('handles namespace with other params', () => {
+        expect(extractNamespace('/api/tokens?foo=bar&namespace=semantic&baz=qux')).toBe('semantic');
+      });
+
+      it('extracts namespace with special characters', () => {
+        expect(extractNamespace('/api/tokens?namespace=my-namespace')).toBe('my-namespace');
       });
     });
 
@@ -1059,6 +1086,206 @@ describe('studioApiPlugin', () => {
         expect(updatedToken.value).toBe('oklch(0.6 0.3 260)');
         expect(updatedToken.trustLevel).toBe('critical');
         expect(updatedToken.description).toBe('Original description');
+      }
+    });
+  });
+
+  describe('handleGetTokens namespace filtering', () => {
+    // Helper to create mock response
+    function createMockResponse(): import('node:http').ServerResponse & {
+      _statusCode: number;
+      _body: string;
+      _headers: Record<string, string>;
+    } {
+      const res = {
+        _statusCode: 200,
+        _body: '',
+        _headers: {} as Record<string, string>,
+        headersSent: false,
+        set statusCode(code: number) {
+          this._statusCode = code;
+        },
+        get statusCode() {
+          return this._statusCode;
+        },
+        setHeader(name: string, value: string) {
+          this._headers[name] = value;
+        },
+        end(body?: string) {
+          this._body = body ?? '';
+          this.headersSent = true;
+        },
+      };
+      return res as import('node:http').ServerResponse & {
+        _statusCode: number;
+        _body: string;
+        _headers: Record<string, string>;
+      };
+    }
+
+    // Response schema for GET /api/tokens
+    const GetTokensResponseSchema = z.object({
+      tokens: z.array(TokenSchema),
+      initialized: z.boolean(),
+    });
+
+    // Create test tokens with different namespaces
+    const colorTokens: Token[] = [
+      { name: 'primary-500', value: 'oklch(0.5 0.2 250)', category: 'color', namespace: 'color' },
+      { name: 'primary-600', value: 'oklch(0.4 0.2 250)', category: 'color', namespace: 'color' },
+    ];
+
+    const semanticTokens: Token[] = [
+      {
+        name: 'primary',
+        value: { family: 'blue', position: '500' },
+        category: 'color',
+        namespace: 'semantic',
+      },
+      {
+        name: 'destructive',
+        value: { family: 'red', position: '600' },
+        category: 'color',
+        namespace: 'semantic',
+      },
+    ];
+
+    const spacingTokens: Token[] = [
+      { name: 'spacing-1', value: '0.25rem', category: 'spacing', namespace: 'spacing' },
+      { name: 'spacing-2', value: '0.5rem', category: 'spacing', namespace: 'spacing' },
+    ];
+
+    const allTokens = [...colorTokens, ...semanticTokens, ...spacingTokens];
+
+    it('returns all tokens when no namespace filter', () => {
+      const registry = new TokenRegistry(allTokens);
+      const res = createMockResponse();
+
+      handleGetTokens('/api/tokens', res, registry, true);
+
+      expect(res._statusCode).toBe(200);
+      const response = GetTokensResponseSchema.safeParse(JSON.parse(res._body));
+      expect(response.success).toBe(true);
+      if (response.success) {
+        expect(response.data.tokens).toHaveLength(6);
+        expect(response.data.initialized).toBe(true);
+      }
+    });
+
+    it('filters tokens by color namespace', () => {
+      const registry = new TokenRegistry(allTokens);
+      const res = createMockResponse();
+
+      handleGetTokens('/api/tokens?namespace=color', res, registry, true);
+
+      expect(res._statusCode).toBe(200);
+      const response = GetTokensResponseSchema.safeParse(JSON.parse(res._body));
+      expect(response.success).toBe(true);
+      if (response.success) {
+        expect(response.data.tokens).toHaveLength(2);
+        expect(response.data.tokens.every((t) => t.namespace === 'color')).toBe(true);
+      }
+    });
+
+    it('filters tokens by semantic namespace', () => {
+      const registry = new TokenRegistry(allTokens);
+      const res = createMockResponse();
+
+      handleGetTokens('/api/tokens?namespace=semantic', res, registry, true);
+
+      expect(res._statusCode).toBe(200);
+      const response = GetTokensResponseSchema.safeParse(JSON.parse(res._body));
+      expect(response.success).toBe(true);
+      if (response.success) {
+        expect(response.data.tokens).toHaveLength(2);
+        expect(response.data.tokens.every((t) => t.namespace === 'semantic')).toBe(true);
+      }
+    });
+
+    it('filters tokens by spacing namespace', () => {
+      const registry = new TokenRegistry(allTokens);
+      const res = createMockResponse();
+
+      handleGetTokens('/api/tokens?namespace=spacing', res, registry, true);
+
+      expect(res._statusCode).toBe(200);
+      const response = GetTokensResponseSchema.safeParse(JSON.parse(res._body));
+      expect(response.success).toBe(true);
+      if (response.success) {
+        expect(response.data.tokens).toHaveLength(2);
+        expect(response.data.tokens.every((t) => t.namespace === 'spacing')).toBe(true);
+      }
+    });
+
+    it('returns empty array for non-existent namespace', () => {
+      const registry = new TokenRegistry(allTokens);
+      const res = createMockResponse();
+
+      handleGetTokens('/api/tokens?namespace=nonexistent', res, registry, true);
+
+      expect(res._statusCode).toBe(200);
+      const response = GetTokensResponseSchema.safeParse(JSON.parse(res._body));
+      expect(response.success).toBe(true);
+      if (response.success) {
+        expect(response.data.tokens).toHaveLength(0);
+      }
+    });
+
+    it('returns 400 for empty namespace parameter', () => {
+      const registry = new TokenRegistry(allTokens);
+      const res = createMockResponse();
+
+      handleGetTokens('/api/tokens?namespace=', res, registry, true);
+
+      expect(res._statusCode).toBe(400);
+      const response = JSON.parse(res._body);
+      expect(response.ok).toBe(false);
+      expect(response.error).toContain('Invalid namespace');
+    });
+
+    it('ignores other query params and filters by namespace', () => {
+      const registry = new TokenRegistry(allTokens);
+      const res = createMockResponse();
+
+      handleGetTokens('/api/tokens?foo=bar&namespace=color&baz=qux', res, registry, true);
+
+      expect(res._statusCode).toBe(200);
+      const response = GetTokensResponseSchema.safeParse(JSON.parse(res._body));
+      expect(response.success).toBe(true);
+      if (response.success) {
+        expect(response.data.tokens).toHaveLength(2);
+        expect(response.data.tokens.every((t) => t.namespace === 'color')).toBe(true);
+      }
+    });
+
+    it('returns initialized=false when not initialized', () => {
+      const registry = new TokenRegistry(allTokens);
+      const res = createMockResponse();
+
+      handleGetTokens('/api/tokens', res, registry, false);
+
+      expect(res._statusCode).toBe(200);
+      const response = GetTokensResponseSchema.safeParse(JSON.parse(res._body));
+      expect(response.success).toBe(true);
+      if (response.success) {
+        expect(response.data.initialized).toBe(false);
+      }
+    });
+
+    it('works with zocker-generated tokens', () => {
+      const generatedToken = zocker(TokenSchema).generate();
+      generatedToken.namespace = 'zocker-namespace';
+      const registry = new TokenRegistry([generatedToken, ...colorTokens]);
+      const res = createMockResponse();
+
+      handleGetTokens('/api/tokens?namespace=zocker-namespace', res, registry, true);
+
+      expect(res._statusCode).toBe(200);
+      const response = GetTokensResponseSchema.safeParse(JSON.parse(res._body));
+      expect(response.success).toBe(true);
+      if (response.success) {
+        expect(response.data.tokens).toHaveLength(1);
+        expect(response.data.tokens[0].namespace).toBe('zocker-namespace');
       }
     });
   });

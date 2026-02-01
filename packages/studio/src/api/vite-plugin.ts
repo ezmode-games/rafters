@@ -152,6 +152,56 @@ export async function handlePostToken(
 // Batch token schema - array of tokens
 const TokenArraySchema = z.array(TokenSchema);
 
+// Schema for namespace query param validation
+const NamespaceParamSchema = z.string().min(1).optional();
+
+// Extracted handler for GET /api/tokens (with optional namespace filter) - exported for testing
+export function handleGetTokens(
+  url: string,
+  res: import('node:http').ServerResponse,
+  registry: TokenRegistry,
+  initialized: boolean,
+): void {
+  try {
+    // Parse query params for namespace filter
+    const parsedUrl = new URL(url, 'http://localhost');
+    const namespaceParam = parsedUrl.searchParams.get('namespace');
+
+    // Validate namespace param if provided (empty string is invalid)
+    const namespaceResult = NamespaceParamSchema.safeParse(namespaceParam ?? undefined);
+    if (namespaceParam !== null && !namespaceResult.success) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ ok: false, error: 'Invalid namespace parameter' }));
+      return;
+    }
+
+    let tokens = registry.list();
+
+    // Filter by namespace if provided and non-empty
+    if (namespaceParam && namespaceResult.success && namespaceResult.data) {
+      tokens = tokens.filter((t) => t.namespace === namespaceResult.data);
+    }
+
+    const tokensResult = z.array(TokenSchema).safeParse(tokens);
+    if (!tokensResult.success) {
+      console.log(`[rafters] Tokens list failed validation: ${tokensResult.error.message}`);
+      res.statusCode = 500;
+      res.end(JSON.stringify({ ok: false, error: 'Token validation failed' }));
+      return;
+    }
+
+    const response = TokensResponseSchema.parse({
+      tokens: tokensResult.data,
+      initialized,
+    });
+    res.end(JSON.stringify(response));
+  } catch (error) {
+    console.log(`[rafters] Failed to list tokens: ${error}`);
+    res.statusCode = 500;
+    res.end(JSON.stringify({ ok: false, error: 'Failed to retrieve tokens' }));
+  }
+}
+
 // Extracted async handler for POST /api/tokens (batch) - exported for testing
 export async function handlePostTokens(
   req: import('node:http').IncomingMessage,
@@ -384,27 +434,8 @@ export function studioApiPlugin(): Plugin {
             return;
           }
 
-          // GET /api/tokens - List all tokens
-          try {
-            const tokens = registry.list();
-            const tokensResult = z.array(TokenSchema).safeParse(tokens);
-            if (!tokensResult.success) {
-              console.log(`[rafters] Tokens list failed validation: ${tokensResult.error.message}`);
-              res.statusCode = 500;
-              res.end(JSON.stringify({ ok: false, error: 'Token validation failed' }));
-              return;
-            }
-
-            const response = TokensResponseSchema.parse({
-              tokens: tokensResult.data,
-              initialized,
-            });
-            res.end(JSON.stringify(response));
-          } catch (error) {
-            console.log(`[rafters] Failed to list tokens: ${error}`);
-            res.statusCode = 500;
-            res.end(JSON.stringify({ ok: false, error: 'Failed to retrieve tokens' }));
-          }
+          // GET /api/tokens - List tokens (optionally filtered by namespace)
+          handleGetTokens(req.url ?? '', res, registry, initialized);
           return;
         }
 
