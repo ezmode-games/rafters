@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest';
 import { zocker } from 'zocker';
 import { z } from 'zod';
 import {
+  handleBuildColor,
   handleGetTokens,
   handlePostToken,
   handlePostTokens,
@@ -1831,6 +1832,155 @@ describe('studioApiPlugin', () => {
         expect(response.data.tokens).toHaveLength(1);
         expect(response.data.tokens[0].namespace).toBe('zocker-namespace');
       }
+    });
+  });
+
+  describe('handleBuildColor', () => {
+    // Helper to create mock request with body
+    function createMockRequest(body: unknown): import('node:http').IncomingMessage {
+      const req = new EventEmitter() as import('node:http').IncomingMessage;
+      setTimeout(() => {
+        req.emit('data', Buffer.from(JSON.stringify(body)));
+        req.emit('end');
+      }, 0);
+      return req;
+    }
+
+    // Helper to create mock response
+    function createMockResponse(): import('node:http').ServerResponse & {
+      _statusCode: number;
+      _body: string;
+    } {
+      const res = {
+        _statusCode: 200,
+        _body: '',
+        headersSent: false,
+        set statusCode(code: number) {
+          this._statusCode = code;
+        },
+        get statusCode() {
+          return this._statusCode;
+        },
+        setHeader() {},
+        end(body?: string) {
+          this._body = body ?? '';
+          this.headersSent = true;
+        },
+      };
+      return res as import('node:http').ServerResponse & { _statusCode: number; _body: string };
+    }
+
+    // Response schema
+    const ColorBuildResponseSchema = z.object({
+      ok: z.literal(true),
+      colorValue: ColorValueSchema,
+    });
+
+    it('builds ColorValue from valid OKLCH', async () => {
+      const req = createMockRequest({
+        oklch: { l: 0.5, c: 0.15, h: 240 },
+      });
+      const res = createMockResponse();
+
+      await handleBuildColor(req, res);
+
+      expect(res._statusCode).toBe(200);
+      const response = ColorBuildResponseSchema.safeParse(JSON.parse(res._body));
+      expect(response.success).toBe(true);
+      if (response.success) {
+        expect(response.data.colorValue.scale).toHaveLength(11);
+        expect(response.data.colorValue.name).toBeDefined();
+        expect(response.data.colorValue.harmonies).toBeDefined();
+        expect(response.data.colorValue.accessibility).toBeDefined();
+      }
+    });
+
+    it('builds ColorValue with options', async () => {
+      const req = createMockRequest({
+        oklch: { l: 0.6, c: 0.2, h: 180 },
+        options: {
+          token: 'primary',
+          use: 'Brand primary color',
+        },
+      });
+      const res = createMockResponse();
+
+      await handleBuildColor(req, res);
+
+      expect(res._statusCode).toBe(200);
+      const response = ColorBuildResponseSchema.safeParse(JSON.parse(res._body));
+      expect(response.success).toBe(true);
+      if (response.success) {
+        expect(response.data.colorValue.token).toBe('primary');
+        expect(response.data.colorValue.use).toBe('Brand primary color');
+      }
+    });
+
+    it('returns 400 for missing oklch', async () => {
+      const req = createMockRequest({});
+      const res = createMockResponse();
+
+      await handleBuildColor(req, res);
+
+      expect(res._statusCode).toBe(400);
+      expect(JSON.parse(res._body).ok).toBe(false);
+    });
+
+    it('returns 400 for invalid oklch (missing l)', async () => {
+      const req = createMockRequest({
+        oklch: { c: 0.15, h: 240 },
+      });
+      const res = createMockResponse();
+
+      await handleBuildColor(req, res);
+
+      expect(res._statusCode).toBe(400);
+      expect(JSON.parse(res._body).ok).toBe(false);
+    });
+
+    it('returns 400 for invalid JSON body', async () => {
+      const req = new EventEmitter() as import('node:http').IncomingMessage;
+      const res = createMockResponse();
+
+      setTimeout(() => {
+        req.emit('data', Buffer.from('not valid json'));
+        req.emit('end');
+      }, 0);
+
+      await handleBuildColor(req, res);
+
+      expect(res._statusCode).toBe(400);
+      expect(JSON.parse(res._body).error).toContain('Invalid JSON');
+    });
+
+    it('generates accessibility metadata', async () => {
+      const req = createMockRequest({
+        oklch: { l: 0.5, c: 0.15, h: 240 },
+      });
+      const res = createMockResponse();
+
+      await handleBuildColor(req, res);
+
+      expect(res._statusCode).toBe(200);
+      const response = JSON.parse(res._body);
+      expect(response.colorValue.accessibility.onWhite).toBeDefined();
+      expect(response.colorValue.accessibility.onBlack).toBeDefined();
+      expect(response.colorValue.accessibility.apca).toBeDefined();
+    });
+
+    it('generates harmonies', async () => {
+      const req = createMockRequest({
+        oklch: { l: 0.5, c: 0.15, h: 240 },
+      });
+      const res = createMockResponse();
+
+      await handleBuildColor(req, res);
+
+      expect(res._statusCode).toBe(200);
+      const response = JSON.parse(res._body);
+      expect(response.colorValue.harmonies.complementary).toBeDefined();
+      expect(response.colorValue.harmonies.triadic).toHaveLength(2);
+      expect(response.colorValue.harmonies.analogous).toHaveLength(2);
     });
   });
 });
