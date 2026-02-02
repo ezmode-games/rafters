@@ -58,26 +58,26 @@ describe('Image', () => {
     });
   });
 
-  describe('dimensions', () => {
-    it('should apply pixel width', () => {
-      render(<Image src="/test.jpg" alt="Test image" width={400} />);
+  describe('size presets', () => {
+    it('should apply size preset classes', () => {
+      render(<Image src="/test.jpg" alt="Test image" size="md" />);
 
       const figure = screen.getByRole('figure');
-      expect(figure).toHaveStyle({ width: '400px' });
+      expect(figure).toHaveClass('max-w-md');
     });
 
     it('should apply full width', () => {
-      render(<Image src="/test.jpg" alt="Test image" width="full" />);
+      render(<Image src="/test.jpg" alt="Test image" size="full" />);
 
       const figure = screen.getByRole('figure');
-      expect(figure).toHaveStyle({ width: '100%' });
+      expect(figure).toHaveClass('w-full');
     });
 
-    it('should apply pixel height', () => {
-      render(<Image src="/test.jpg" alt="Test image" height={300} />);
+    it('should apply small size', () => {
+      render(<Image src="/test.jpg" alt="Test image" size="sm" />);
 
-      const img = screen.getByRole('img');
-      expect(img).toHaveStyle({ height: '300px' });
+      const figure = screen.getByRole('figure');
+      expect(figure).toHaveClass('max-w-sm');
     });
   });
 

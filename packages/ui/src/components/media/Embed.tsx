@@ -157,17 +157,17 @@ function ProviderBadge({ provider }: { provider: EmbedProvider }) {
   };
 
   const colors: Record<EmbedProvider, string> = {
-    youtube: 'bg-red-500',
-    vimeo: 'bg-blue-500',
-    twitch: 'bg-purple-500',
-    twitter: 'bg-sky-500',
-    generic: 'bg-gray-500',
+    youtube: 'bg-destructive text-destructive-foreground',
+    vimeo: 'bg-info text-info-foreground',
+    twitch: 'bg-accent text-accent-foreground',
+    twitter: 'bg-primary text-primary-foreground',
+    generic: 'bg-muted text-muted-foreground',
   };
 
   return (
     <span
       className={classy(
-        'absolute left-2 top-2 rounded px-2 py-0.5 text-xs font-medium text-white',
+        'absolute left-2 top-2 rounded px-2 py-0.5 text-xs font-medium',
         colors[provider],
       )}
     >

@@ -36,15 +36,27 @@ import classy from '../../primitives/classy';
 
 export type ImageAlignment = 'left' | 'center' | 'right';
 
+/** Token-based image size presets */
+export type ImageSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
+
+/** Size preset to Tailwind max-width class mapping */
+const sizeClasses: Record<ImageSize, string> = {
+  xs: 'max-w-xs', // 320px
+  sm: 'max-w-sm', // 384px
+  md: 'max-w-md', // 448px
+  lg: 'max-w-lg', // 512px
+  xl: 'max-w-xl', // 576px
+  '2xl': 'max-w-2xl', // 672px
+  full: 'w-full', // 100%
+};
+
 export interface ImageProps extends Omit<React.HTMLAttributes<HTMLElement>, 'onChange'> {
   /** Image source URL */
   src: string;
   /** Alt text for accessibility (required) */
   alt: string;
-  /** Image width - number in pixels or 'full' for 100% */
-  width?: number | 'full' | undefined;
-  /** Image height in pixels */
-  height?: number | undefined;
+  /** Image size preset - uses token-based max-width */
+  size?: ImageSize | undefined;
   /** Horizontal alignment */
   alignment?: ImageAlignment | undefined;
   /** Caption text below image */
@@ -157,8 +169,7 @@ export const Image = React.forwardRef<HTMLElement, ImageProps>(
     {
       src,
       alt,
-      width,
-      height,
+      size,
       alignment = 'center',
       caption,
       editable = false,
@@ -287,21 +298,17 @@ export const Image = React.forwardRef<HTMLElement, ImageProps>(
       right: 'ml-auto',
     };
 
-    // Compute width style
-    const widthStyle = width === 'full' ? '100%' : width ? `${width}px` : undefined;
-    const heightStyle = height ? `${height}px` : undefined;
-
     return (
       <figure
         ref={ref}
         className={classy(
           'relative',
+          size && sizeClasses[size],
           alignmentClasses[alignment],
           editable && 'group',
           isDragOver && 'ring-2 ring-primary ring-offset-2',
           className,
         )}
-        style={{ width: widthStyle, maxWidth: '100%' }}
         onDragOver={editable ? handleDragOver : undefined}
         onDragLeave={editable ? handleDragLeave : undefined}
         onDrop={editable ? handleDrop : undefined}
@@ -316,8 +323,7 @@ export const Image = React.forwardRef<HTMLElement, ImageProps>(
             alt={alt}
             onLoad={handleLoad}
             onError={handleError}
-            className="block max-w-full"
-            style={{ height: heightStyle }}
+            className="block w-full h-auto"
           />
 
           {/* Loading overlay */}
@@ -345,7 +351,7 @@ export const Image = React.forwardRef<HTMLElement, ImageProps>(
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
+                    className="absolute inset-0 flex cursor-pointer items-center justify-center bg-foreground/50 opacity-0 transition-opacity group-hover:opacity-100"
                     aria-label="Upload new image"
                   >
                     <span className="rounded-md bg-background px-3 py-1.5 text-sm font-medium shadow">

@@ -258,7 +258,7 @@ export function DrawerOverlay({
   const overlayProps = {
     ...ariaProps,
     className: classy(
-      'fixed inset-0 z-depth-overlay bg-black/80',
+      'fixed inset-0 z-depth-overlay bg-foreground/80',
       'data-[state=open]:animate-in data-[state=closed]:animate-out',
       'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
       className,

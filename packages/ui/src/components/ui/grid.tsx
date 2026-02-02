@@ -149,7 +149,7 @@ const columnClasses: Record<string | number, string> = {
   4: 'grid-cols-4',
   5: 'grid-cols-5',
   6: 'grid-cols-6',
-  auto: 'grid-cols-[repeat(auto-fit,minmax(280px,1fr))]',
+  auto: 'grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 @xl:grid-cols-4',
 };
 
 // Bento pattern grid definitions

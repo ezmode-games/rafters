@@ -211,7 +211,7 @@ export function CommandDialog({
       {/* Backdrop */}
       <button
         type="button"
-        className="fixed inset-0 z-50 bg-black/80 cursor-default"
+        className="fixed inset-0 z-50 bg-foreground/80 cursor-default"
         onClick={() => onOpenChange?.(false)}
         aria-label="Close command palette"
       />

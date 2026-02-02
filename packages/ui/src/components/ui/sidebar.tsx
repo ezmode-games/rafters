@@ -233,7 +233,7 @@ export function Sidebar({
           <button
             type="button"
             data-sidebar="overlay"
-            className="fixed inset-0 z-depth-overlay bg-black/80 cursor-default"
+            className="fixed inset-0 z-depth-overlay bg-foreground/80 cursor-default"
             onClick={() => setOpenMobile(false)}
             aria-label="Close sidebar"
           />

@@ -223,7 +223,7 @@ export function DialogOverlay({ asChild, forceMount, className, ...props }: Dial
 
   const overlayProps = {
     ...ariaProps,
-    className: classy('fixed inset-0 z-depth-overlay bg-black/80', className),
+    className: classy('fixed inset-0 z-depth-overlay bg-foreground/80', className),
     ...props,
   };
 

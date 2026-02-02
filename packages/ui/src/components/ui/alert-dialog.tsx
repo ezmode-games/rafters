@@ -232,7 +232,7 @@ export function AlertDialogOverlay({
 
   const overlayProps = {
     ...ariaProps,
-    className: classy('fixed inset-0 z-50 bg-black/80', className),
+    className: classy('fixed inset-0 z-50 bg-foreground/80', className),
     ...props,
   };
 
