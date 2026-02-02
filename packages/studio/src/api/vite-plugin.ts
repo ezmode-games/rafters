@@ -13,7 +13,6 @@ import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { buildColorValue } from '@rafters/color-utils';
 import { NodePersistenceAdapter, registryToVars, TokenRegistry } from '@rafters/design-tokens';
-import type { OKLCH } from '@rafters/shared';
 import { ColorReferenceSchema, ColorValueSchema, OKLCHSchema, TokenSchema } from '@rafters/shared';
 import type { Plugin, ViteDevServer } from 'vite';
 import { z } from 'zod';
@@ -271,7 +270,7 @@ export async function handleBuildColor(
 
   // Build the ColorValue using color-utils
   try {
-    const colorValue = buildColorValue(oklch as OKLCH, options ?? {});
+    const colorValue = buildColorValue(oklch, options ?? {});
 
     // Validate output against schema
     const outputResult = ColorValueSchema.safeParse(colorValue);
