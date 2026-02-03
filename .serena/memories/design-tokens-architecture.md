@@ -197,7 +197,7 @@ await registry.set('spacing-4', '2rem');  // Saves only affected namespaces
 
 ## Tailwind Exporters
 
-Three functions for different use cases:
+Four functions for different use cases:
 
 ```typescript
 // Production - combined @theme + values (apps import rafters.css)
@@ -208,7 +208,16 @@ registryToTailwindStatic(registry): string
 
 // Studio dynamic - pure CSS variables (instant HMR, no Tailwind rebuild)
 registryToVars(registry): string
+
+// Standalone - fully compiled CSS via Tailwind CLI (no build step needed)
+registryToCompiled(registry, options?): Promise<string>
 ```
+
+The `registryToCompiled` function:
+- Generates theme CSS with `registryToTailwind()`
+- Runs it through `@tailwindcss/cli` (bundled dependency)
+- Returns fully resolved CSS with all utilities
+- Options: `{ minify?: boolean, includeImport?: boolean }`
 
 ## Tailwind Export Structure (rafters.css)
 ```css

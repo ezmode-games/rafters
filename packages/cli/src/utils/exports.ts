@@ -2,11 +2,6 @@
  * Export utilities for generating different output formats
  */
 
-import { execFileSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
-import { getPackageManager } from './get-package-manager.js';
-
 export interface ExportConfig {
   tailwind: boolean;
   typescript: boolean;
@@ -45,7 +40,7 @@ export const EXPORT_CHOICES: ExportChoice[] = [
     checked: false,
   },
   {
-    name: 'Compiled CSS (documentation, no build step)',
+    name: 'Standalone CSS (pre-built, no Tailwind required)',
     value: 'compiled',
     checked: false,
   },
@@ -66,72 +61,6 @@ export const FUTURE_EXPORTS: ExportChoice[] = [
     disabled: 'coming soon',
   },
 ];
-
-/**
- * Find the Tailwind CLI binary path (cross-platform)
- */
-function findTailwindBin(cwd: string): string | null {
-  const binDir = join(cwd, 'node_modules', '.bin');
-  const candidates = [join(binDir, 'tailwindcss')];
-
-  // Windows uses .cmd extension
-  if (process.platform === 'win32') {
-    candidates.unshift(join(binDir, 'tailwindcss.cmd'));
-  }
-
-  for (const candidate of candidates) {
-    if (existsSync(candidate)) {
-      return candidate;
-    }
-  }
-
-  return null;
-}
-
-/**
- * Generate compiled CSS by running Tailwind CLI
- * Tailwind v4 uses @tailwindcss/cli package
- * Uses execFileSync for safety (no shell injection)
- */
-export async function generateCompiledCss(
-  cwd: string,
-  inputPath: string,
-  outputPath: string,
-): Promise<void> {
-  const args = ['-i', inputPath, '-o', outputPath, '--minify'];
-
-  // Try local node_modules/.bin first (cross-platform)
-  const localBin = findTailwindBin(cwd);
-  if (localBin) {
-    execFileSync(localBin, args, { cwd, stdio: 'pipe' });
-    return;
-  }
-
-  // Try global tailwindcss on PATH
-  try {
-    execFileSync('tailwindcss', args, { cwd, stdio: 'pipe' });
-    return;
-  } catch {
-    // Continue to package manager fallback
-  }
-
-  // Fallback to package manager exec
-  const pm = await getPackageManager(cwd, { withFallback: true });
-  const [cmd, ...prefix] =
-    pm === 'pnpm'
-      ? (['pnpm', 'exec'] as const)
-      : pm === 'bun'
-        ? (['bunx'] as const)
-        : (['npx'] as const);
-
-  try {
-    execFileSync(cmd, [...prefix, 'tailwindcss', ...args], { cwd, stdio: 'pipe' });
-  } catch {
-    throw new Error(
-      'Tailwind CLI not found. Install @tailwindcss/cli in your project or ensure tailwindcss is available on your PATH.',
-    );
-  }
-}
 
 /**
  * Convert checkbox selections to ExportConfig
