@@ -115,4 +115,19 @@ export const AlertDescription = React.forwardRef<
 
 AlertDescription.displayName = 'AlertDescription';
 
+export interface AlertActionProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export const AlertAction = React.forwardRef<HTMLDivElement, AlertActionProps>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      data-slot="alert-action"
+      className={classy('ml-auto shrink-0', className)}
+      {...props}
+    />
+  ),
+);
+
+AlertAction.displayName = 'AlertAction';
+
 export default Alert;

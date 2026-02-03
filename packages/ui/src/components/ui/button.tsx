@@ -42,8 +42,9 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
     | 'muted'
     | 'accent'
     | 'outline'
-    | 'ghost';
-  size?: 'default' | 'sm' | 'lg' | 'icon';
+    | 'ghost'
+    | 'link';
+  size?: 'default' | 'xs' | 'sm' | 'lg' | 'icon' | 'icon-xs' | 'icon-sm' | 'icon-lg';
   loading?: boolean;
 }
 
@@ -95,13 +96,21 @@ const variantClasses: Record<string, string> = {
     'bg-transparent text-foreground ' +
     'hover:bg-accent hover:text-accent-foreground ' +
     'focus-visible:ring-2 focus-visible:ring-ring',
+  link:
+    'text-primary underline-offset-4 ' +
+    'hover:underline ' +
+    'focus-visible:ring-2 focus-visible:ring-ring',
 };
 
 const sizeClasses: Record<string, string> = {
   default: 'h-10 px-4 py-2',
+  xs: 'h-6 px-2 text-xs',
   sm: 'h-8 px-3 text-xs',
   lg: 'h-12 px-6 text-base',
   icon: 'h-10 w-10',
+  'icon-xs': 'h-6 w-6',
+  'icon-sm': 'h-8 w-8',
+  'icon-lg': 'h-12 w-12',
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(

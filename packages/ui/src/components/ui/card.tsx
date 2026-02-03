@@ -74,6 +74,8 @@ function useCardContext() {
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   as?: 'div' | 'article' | 'section' | 'aside';
   interactive?: boolean;
+  /** Size variant for compact cards */
+  size?: 'default' | 'sm';
 
   // ============================================================================
   // Editable Props (R-202)
@@ -101,6 +103,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
     {
       as: Component = 'div',
       interactive,
+      size = 'default',
       editable,
       onTitleChange,
       onDescriptionChange,
@@ -112,6 +115,9 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ) => {
     const base = 'bg-card text-card-foreground border border-card-border rounded-lg shadow-sm';
 
+    // Size variants (shadcn v4 compatibility)
+    const sizeStyles = size === 'sm' ? 'group/card-sm' : '';
+
     const interactiveStyles = interactive
       ? 'hover:bg-card-hover hover:shadow-md transition-shadow duration-normal motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
       : '';
@@ -121,7 +127,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
       ? 'outline-2 outline-dashed outline-muted-foreground/30 outline-offset-2'
       : '';
 
-    const cls = classy(base, interactiveStyles, editableStyles, className);
+    const cls = classy(base, sizeStyles, interactiveStyles, editableStyles, className);
 
     const contextValue: CardContextValue = {
       editable,
@@ -152,7 +158,7 @@ export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
 export const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
   ({ className, ...props }, ref) => {
     const cls = classy('flex flex-col gap-1.5 p-6', className);
-    return <div ref={ref} className={cls} {...props} />;
+    return <div ref={ref} data-slot="card-header" className={cls} {...props} />;
   },
 );
 
@@ -306,6 +312,17 @@ export const CardDescription = React.forwardRef<HTMLParagraphElement, CardDescri
 );
 
 CardDescription.displayName = 'CardDescription';
+
+export interface CardActionProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export const CardAction = React.forwardRef<HTMLDivElement, CardActionProps>(
+  ({ className, ...props }, ref) => {
+    const cls = classy('col-start-2 row-span-2 row-start-1 self-start justify-self-end', className);
+    return <div ref={ref} data-slot="card-action" className={cls} {...props} />;
+  },
+);
+
+CardAction.displayName = 'CardAction';
 
 export interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {}
 

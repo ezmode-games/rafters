@@ -35,7 +35,7 @@ rafters init --agent      # JSON output for CI/machine consumption
 | Tailwind CSS | `rafters.css` | Yes | CSS custom properties with `@theme` |
 | TypeScript | `rafters.ts` | Yes | Type-safe constants with JSDoc intelligence |
 | DTCG JSON | `rafters.json` | No | W3C Design Tokens standard format |
-| Compiled CSS | `rafters.compiled.css` | No | Pre-processed, no build step needed |
+| Standalone CSS | `rafters.standalone.css` | No | Pre-built, no Tailwind required |
 
 Automatically detects and migrates existing shadcn/ui color values. Requires Tailwind v4.
 

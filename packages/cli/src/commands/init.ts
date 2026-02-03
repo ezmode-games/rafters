@@ -13,6 +13,7 @@ import { checkbox } from '@inquirer/prompts';
 import {
   buildColorSystem,
   NodePersistenceAdapter,
+  registryToCompiled,
   registryToTailwind,
   registryToTypeScript,
   TokenRegistry,
@@ -30,7 +31,6 @@ import {
   EXPORT_CHOICES,
   type ExportConfig,
   FUTURE_EXPORTS,
-  generateCompiledCss,
   selectionsToConfig,
 } from '../utils/exports.js';
 import { getRaftersPaths } from '../utils/paths.js';
@@ -188,7 +188,6 @@ async function promptExportFormats(existingConfig?: ExportConfig): Promise<Expor
  * Generate output files based on export config
  */
 async function generateOutputs(
-  cwd: string,
   paths: ReturnType<typeof getRaftersPaths>,
   registry: TokenRegistry,
   exports: ExportConfig,
@@ -219,18 +218,10 @@ async function generateOutputs(
 
   // Compiled CSS (processed by Tailwind, no @import)
   if (exports.compiled) {
-    // Need Tailwind CSS first as input
-    if (!exports.tailwind) {
-      const tailwindCss = registryToTailwind(registry, { includeImport: !shadcn });
-      await writeFile(join(paths.output, 'rafters.css'), tailwindCss);
-    }
-
-    const inputPath = join(paths.output, 'rafters.css');
-    const outputPath = join(paths.output, 'rafters.compiled.css');
-
     log({ event: 'init:compiling_css' });
-    await generateCompiledCss(cwd, inputPath, outputPath);
-    outputs.push('rafters.compiled.css');
+    const compiledCss = await registryToCompiled(registry, { includeImport: !shadcn });
+    await writeFile(join(paths.output, 'rafters.standalone.css'), compiledCss);
+    outputs.push('rafters.standalone.css');
   }
 
   return outputs;
@@ -291,7 +282,7 @@ async function regenerateFromExisting(
   await mkdir(paths.output, { recursive: true });
 
   // Generate outputs
-  const outputs = await generateOutputs(cwd, paths, registry, exports, shadcn);
+  const outputs = await generateOutputs(paths, registry, exports, shadcn);
 
   // Update config with new export settings
   if (existingConfig) {
@@ -453,7 +444,7 @@ export async function init(options: InitOptions): Promise<void> {
   });
 
   // Generate outputs based on export config
-  const outputs = await generateOutputs(cwd, paths, registry, exports, shadcn);
+  const outputs = await generateOutputs(paths, registry, exports, shadcn);
 
   // Find and update the main CSS file (if not using shadcn which has its own CSS path)
   let detectedCssPath: string | null = null;

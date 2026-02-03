@@ -21,6 +21,7 @@
     "@rafters/color-utils": "workspace:*",
     "@rafters/math-utils": "workspace:*",
     "@rafters/shared": "workspace:*",
+    "@tailwindcss/cli": "^4.1.18",
     "zod": "catalog:"
   },
   "devDependencies": {

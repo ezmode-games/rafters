@@ -43,6 +43,8 @@ pub struct Context {
     pub base_url: String,
     /// Web Component scripts to include
     pub web_components: Vec<String>,
+    /// Path to Rafters CSS (design tokens + Tailwind)
+    pub rafters_css: Option<String>,
 }
 
 /// Template engine using minijinja.
@@ -86,6 +88,7 @@ impl TemplateEngine {
             toc => &context.toc,
             base_url => &context.base_url,
             web_components => &context.web_components,
+            rafters_css => &context.rafters_css,
         })
     }
 }
@@ -102,6 +105,7 @@ const BASE_TEMPLATE: &str = r##"<!DOCTYPE html>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ title }} - {{ site_title }}</title>
+  {% if rafters_css %}<link rel="stylesheet" href="{{ rafters_css }}">{% endif %}
   <link rel="stylesheet" href="{{ base_url }}assets/main.css">
 </head>
 <body>
@@ -179,6 +183,7 @@ mod tests {
             toc: vec![],
             base_url: "/".to_string(),
             web_components: vec![],
+            rafters_css: None,
         };
 
         let html = engine.render_page("doc.html", &context).unwrap();
@@ -217,6 +222,7 @@ mod tests {
             toc: vec![],
             base_url: "/".to_string(),
             web_components: vec![],
+            rafters_css: None,
         };
 
         let html = engine.render_page("doc.html", &context).unwrap();
@@ -238,6 +244,7 @@ mod tests {
             toc: vec![],
             base_url: "/".to_string(),
             web_components: vec!["class MyButton extends HTMLElement {}".to_string()],
+            rafters_css: None,
         };
 
         let html = engine.render_page("doc.html", &context).unwrap();

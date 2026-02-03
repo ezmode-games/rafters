@@ -291,3 +291,75 @@ describe('registryToTailwind', () => {
     expect(css).toContain('--color-neutral-500: oklch(0.55 0 0);');
   });
 });
+
+describe('registryToCompiled', () => {
+  it('should compile registry to standalone CSS via Tailwind CLI', async () => {
+    const { registryToCompiled } = await import('../../src/exporters/tailwind.js');
+
+    const registry = new TokenRegistry([
+      { name: 'neutral-500', value: 'oklch(0.55 0 0)', category: 'color', namespace: 'color' },
+      { name: 'spacing-4', value: '1rem', category: 'spacing', namespace: 'spacing' },
+    ]);
+
+    const css = await registryToCompiled(registry);
+
+    // Compiled output should NOT have @import or @theme (those are source directives)
+    expect(css).not.toContain('@import "tailwindcss"');
+    expect(css).not.toContain('@theme {');
+
+    // Should have the actual CSS custom properties in :root
+    expect(css).toContain(':root');
+    expect(css).toContain('--color-neutral-500');
+    expect(css).toContain('--spacing-spacing-4');
+  });
+
+  it('should minify output by default', async () => {
+    const { registryToCompiled } = await import('../../src/exporters/tailwind.js');
+
+    const registry = new TokenRegistry([
+      { name: 'neutral-500', value: 'oklch(0.55 0 0)', category: 'color', namespace: 'color' },
+    ]);
+
+    const css = await registryToCompiled(registry);
+
+    // Minified CSS has minimal whitespace
+    expect(css).not.toMatch(/\n\s+\n/); // No empty lines
+  });
+
+  it('should not minify when minify=false', async () => {
+    const { registryToCompiled } = await import('../../src/exporters/tailwind.js');
+
+    const registry = new TokenRegistry([
+      { name: 'neutral-500', value: 'oklch(0.55 0 0)', category: 'color', namespace: 'color' },
+    ]);
+
+    const css = await registryToCompiled(registry, { minify: false });
+
+    // Non-minified CSS has readable formatting
+    expect(css).toContain('\n');
+  });
+
+  it('should throw on empty registry', async () => {
+    const { registryToCompiled } = await import('../../src/exporters/tailwind.js');
+
+    const registry = new TokenRegistry([]);
+
+    await expect(registryToCompiled(registry)).rejects.toThrow('Registry is empty');
+  });
+
+  it('should include semantic color mappings with dark mode', async () => {
+    const { registryToCompiled } = await import('../../src/exporters/tailwind.js');
+
+    const registry = new TokenRegistry([
+      { name: 'neutral-50', value: 'oklch(0.98 0 0)', category: 'color', namespace: 'color' },
+      { name: 'neutral-950', value: 'oklch(0.1 0 0)', category: 'color', namespace: 'color' },
+    ]);
+
+    const css = await registryToCompiled(registry);
+
+    // Should have semantic variables
+    expect(css).toContain('--background');
+    expect(css).toContain('--rafters-background');
+    expect(css).toContain('--rafters-dark-background');
+  });
+});

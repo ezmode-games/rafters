@@ -847,3 +847,88 @@ export function registryToVars(registry: TokenRegistry): string {
 
   return sections.join('\n');
 }
+
+/**
+ * Options for compiled CSS export
+ */
+export interface CompiledCssOptions {
+  /** Minify the output (default: true) */
+  minify?: boolean;
+  /** Include @import "tailwindcss" in source (default: true) */
+  includeImport?: boolean;
+}
+
+/**
+ * Export registry tokens to fully compiled CSS
+ *
+ * Generates Tailwind theme CSS and runs it through the Tailwind CLI
+ * to produce standalone CSS with all utilities resolved.
+ * No Tailwind installation required by consumers.
+ *
+ * @param registry - TokenRegistry containing tokens
+ * @param options - Compilation options
+ * @returns Fully compiled CSS string
+ *
+ * @example
+ * ```typescript
+ * import { TokenRegistry, registryToCompiled } from '@rafters/design-tokens';
+ *
+ * const registry = new TokenRegistry(tokens);
+ * const css = await registryToCompiled(registry);
+ *
+ * await writeFile('.rafters/output/rafters.standalone.css', css);
+ * ```
+ */
+export async function registryToCompiled(
+  registry: TokenRegistry,
+  options: CompiledCssOptions = {},
+): Promise<string> {
+  const { minify = true, includeImport = true } = options;
+
+  // Generate the Tailwind theme CSS
+  const themeCss = registryToTailwind(registry, { includeImport });
+
+  const { execFileSync } = await import('node:child_process');
+  const { mkdtempSync, writeFileSync, readFileSync, rmSync } = await import('node:fs');
+  const { join, dirname } = await import('node:path');
+  const { createRequire } = await import('node:module');
+
+  // Resolve the @tailwindcss/cli package location using createRequire
+  const require = createRequire(import.meta.url);
+  let pkgDir: string;
+  try {
+    const pkgJsonPath = require.resolve('@tailwindcss/cli/package.json');
+    pkgDir = dirname(pkgJsonPath);
+  } catch {
+    throw new Error('Failed to resolve @tailwindcss/cli');
+  }
+
+  // The bin is at dist/index.mjs relative to package.json
+  const binPath = join(pkgDir, 'dist', 'index.mjs');
+
+  // Create temp dir in the package location where tailwindcss can be resolved
+  const tempDir = mkdtempSync(join(pkgDir, '.tmp-compile-'));
+  const tempInput = join(tempDir, 'input.css');
+  const tempOutput = join(tempDir, 'output.css');
+
+  try {
+    // Write theme CSS to temp file
+    writeFileSync(tempInput, themeCss);
+
+    // Run Tailwind CLI
+    const args = [binPath, '-i', tempInput, '-o', tempOutput];
+    if (minify) {
+      args.push('--minify');
+    }
+    execFileSync('node', args, { stdio: 'pipe' });
+
+    // Read and return compiled output
+    return readFileSync(tempOutput, 'utf-8');
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to compile CSS: ${message}`);
+  } finally {
+    // Clean up temp dir
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+}
