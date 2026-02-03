@@ -38,7 +38,9 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
     | 'info'
     | 'muted'
     | 'accent'
-    | 'outline';
+    | 'outline'
+    | 'ghost'
+    | 'link';
   /** Size variant */
   size?: 'sm' | 'default' | 'lg';
 }
@@ -55,6 +57,8 @@ const variantClasses: Record<string, string> = {
   muted: 'bg-muted text-muted-foreground',
   accent: 'bg-accent text-accent-foreground',
   outline: 'bg-transparent border border-input text-foreground',
+  ghost: 'hover:bg-muted hover:text-muted-foreground',
+  link: 'text-primary underline-offset-4 hover:underline',
 };
 
 const sizeClasses: Record<string, string> = {
