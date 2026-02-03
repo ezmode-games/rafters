@@ -32,32 +32,15 @@ impl AssetPipeline {
     }
 }
 
-const DEFAULT_CSS: &str = r#"/* Rafters Docs - Generated Styles */
-:root {
-  --color-bg: #ffffff;
-  --color-bg-secondary: #f9fafb;
-  --color-text: #111827;
-  --color-text-secondary: #6b7280;
-  --color-border: #e5e7eb;
-  --color-primary: #3b82f6;
-  --color-primary-hover: #2563eb;
+// CSS using Rafters design tokens
+// Expects Rafters vars to be loaded (--background, --foreground, --primary, etc.)
+const DEFAULT_CSS: &str = r#"/* Rafters Docs Theme - Uses Rafters Design Tokens */
 
+/* Layout tokens */
+:root {
   --sidebar-width: 280px;
   --toc-width: 200px;
   --content-max-width: 800px;
-
-  --font-sans: system-ui, -apple-system, sans-serif;
-  --font-mono: ui-monospace, monospace;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #111827;
-    --color-bg-secondary: #1f2937;
-    --color-text: #f9fafb;
-    --color-text-secondary: #9ca3af;
-    --color-border: #374151;
-  }
 }
 
 * {
@@ -67,9 +50,9 @@ const DEFAULT_CSS: &str = r#"/* Rafters Docs - Generated Styles */
 }
 
 body {
-  font-family: var(--font-sans);
-  background: var(--color-bg);
-  color: var(--color-text);
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+  background: var(--background);
+  color: var(--foreground);
   line-height: 1.6;
 }
 
@@ -79,9 +62,10 @@ body {
   min-height: 100vh;
 }
 
+/* Sidebar */
 .sidebar {
-  background: var(--color-bg-secondary);
-  border-right: 1px solid var(--color-border);
+  background: var(--muted);
+  border-right: 1px solid var(--border);
   padding: 1.5rem;
   position: sticky;
   top: 0;
@@ -96,7 +80,7 @@ body {
 .nav-logo {
   font-weight: 700;
   font-size: 1.25rem;
-  color: var(--color-text);
+  color: var(--foreground);
   text-decoration: none;
 }
 
@@ -111,20 +95,20 @@ body {
 .nav-item a {
   display: block;
   padding: 0.5rem 0.75rem;
-  color: var(--color-text-secondary);
+  color: var(--muted-foreground);
   text-decoration: none;
-  border-radius: 0.375rem;
+  border-radius: var(--radius, 0.375rem);
   transition: background 0.15s, color 0.15s;
 }
 
 .nav-item a:hover {
-  background: var(--color-bg);
-  color: var(--color-text);
+  background: var(--accent);
+  color: var(--accent-foreground);
 }
 
 .nav-item.active > a {
-  background: var(--color-primary);
-  color: white;
+  background: var(--primary);
+  color: var(--primary-foreground);
 }
 
 .nav-children {
@@ -133,6 +117,7 @@ body {
   margin-top: 0.25rem;
 }
 
+/* Main content */
 .main {
   display: grid;
   grid-template-columns: 1fr var(--toc-width);
@@ -145,10 +130,11 @@ body {
   max-width: var(--content-max-width);
 }
 
-.doc header h1 {
+.content h1 {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
+  color: var(--foreground);
 }
 
 .content h2 {
@@ -156,55 +142,105 @@ body {
   font-weight: 600;
   margin: 2rem 0 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
 }
 
 .content h3 {
   font-size: 1.25rem;
   font-weight: 600;
   margin: 1.5rem 0 0.75rem;
+  color: var(--foreground);
 }
 
 .content p {
   margin-bottom: 1rem;
+  color: var(--foreground);
 }
 
+.content a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.content a:hover {
+  color: var(--primary-hover);
+}
+
+.content strong {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+/* Code blocks */
 .content pre {
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: 0.5rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 0.5rem);
   padding: 1rem;
   overflow-x: auto;
-  font-family: var(--font-mono);
+  font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 0.875rem;
   margin-bottom: 1rem;
+  position: relative;
 }
 
 .content code {
-  font-family: var(--font-mono);
+  font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 0.875em;
-  background: var(--color-bg-secondary);
-  padding: 0.125rem 0.25rem;
+  background: var(--muted);
+  color: var(--foreground);
+  padding: 0.125rem 0.375rem;
   border-radius: 0.25rem;
 }
 
 .content pre code {
   background: none;
   padding: 0;
+  color: var(--card-foreground);
 }
 
-.preview {
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: 0.5rem;
+/* Preview container for live components */
+.preview-container {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 0.5rem);
   padding: 2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
+/* Copy button - uses Rafters button styling */
+.copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+  border: none;
+  border-radius: var(--radius, 0.375rem);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.copy-btn:hover {
+  background: var(--secondary-hover);
+}
+
+.copy-btn:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Table of contents */
 .toc {
   position: sticky;
   top: 2rem;
@@ -212,11 +248,11 @@ body {
 }
 
 .toc h2 {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--color-text-secondary);
+  color: var(--muted-foreground);
   margin-bottom: 0.75rem;
 }
 
@@ -230,12 +266,17 @@ body {
 
 .toc a {
   font-size: 0.875rem;
-  color: var(--color-text-secondary);
+  color: var(--muted-foreground);
   text-decoration: none;
+  transition: color 0.15s;
 }
 
 .toc a:hover {
-  color: var(--color-text);
+  color: var(--foreground);
+}
+
+.toc-level-2 {
+  padding-left: 0;
 }
 
 .toc-level-3 {
@@ -246,6 +287,7 @@ body {
   padding-left: 2rem;
 }
 
+/* Responsive */
 @media (max-width: 1024px) {
   .layout {
     grid-template-columns: 1fr;
@@ -256,6 +298,7 @@ body {
     left: -100%;
     z-index: 50;
     transition: left 0.3s;
+    width: var(--sidebar-width);
   }
 
   .sidebar.open {
@@ -270,9 +313,30 @@ body {
     display: none;
   }
 }
+
+/* Menu button for mobile */
+.menu-btn {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 100;
+  padding: 0.5rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius, 0.375rem);
+  cursor: pointer;
+}
+
+@media (max-width: 1024px) {
+  .menu-btn {
+    display: block;
+  }
+}
 "#;
 
-const DEFAULT_JS: &str = r#"// Rafters Docs - Generated JavaScript
+const DEFAULT_JS: &str = r#"// Rafters Docs - Runtime JavaScript
 (function() {
   'use strict';
 
@@ -291,22 +355,36 @@ const DEFAULT_JS: &str = r#"// Rafters Docs - Generated JavaScript
   const navLinks = document.querySelectorAll('.nav-item a');
 
   navLinks.forEach(link => {
-    if (link.getAttribute('href') === currentPath) {
+    const href = link.getAttribute('href');
+    if (href === currentPath || (currentPath.startsWith(href) && href !== '/')) {
       link.parentElement.classList.add('active');
     }
   });
 
-  // Copy code button
-  document.querySelectorAll('pre').forEach(pre => {
+  // Copy code button for pre blocks
+  document.querySelectorAll('.content pre').forEach(pre => {
+    // Skip if already has a copy button
+    if (pre.querySelector('.copy-btn')) return;
+
     const btn = document.createElement('button');
     btn.className = 'copy-btn';
     btn.textContent = 'Copy';
-    btn.addEventListener('click', () => {
-      navigator.clipboard.writeText(pre.textContent || '');
-      btn.textContent = 'Copied!';
-      setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+    btn.setAttribute('type', 'button');
+
+    btn.addEventListener('click', async () => {
+      const code = pre.querySelector('code');
+      const text = code ? code.textContent : pre.textContent;
+
+      try {
+        await navigator.clipboard.writeText(text || '');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+      } catch (err) {
+        btn.textContent = 'Error';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+      }
     });
-    pre.style.position = 'relative';
+
     pre.appendChild(btn);
   });
 })();
@@ -320,13 +398,15 @@ mod tests {
     fn generates_css() {
         let css = AssetPipeline::generate_css();
         assert!(css.contains(":root"));
-        assert!(css.contains("--color-bg"));
+        assert!(css.contains("--background"));
+        assert!(css.contains("--primary"));
     }
 
     #[test]
     fn generates_js() {
         let js = AssetPipeline::generate_js();
         assert!(js.contains("addEventListener"));
+        assert!(js.contains("clipboard"));
     }
 
     #[test]

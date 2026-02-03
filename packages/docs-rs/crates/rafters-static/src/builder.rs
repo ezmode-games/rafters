@@ -38,6 +38,9 @@ pub struct BuildConfig {
 
     /// Site title
     pub title: String,
+
+    /// Path to Rafters CSS (design tokens + Tailwind utilities)
+    pub rafters_css: Option<String>,
 }
 
 impl Default for BuildConfig {
@@ -49,6 +52,7 @@ impl Default for BuildConfig {
             minify: true,
             base_url: "/".to_string(),
             title: "Documentation".to_string(),
+            rafters_css: None,
         }
     }
 }
@@ -489,6 +493,7 @@ impl StaticBuilder {
                 .iter()
                 .map(|w| w.web_component.clone())
                 .collect(),
+            rafters_css: self.config.rafters_css.as_ref().map(|_| format!("{}assets/rafters.css", self.config.base_url)),
         };
 
         // Render template
@@ -599,6 +604,20 @@ impl StaticBuilder {
         let js = AssetPipeline::generate_js();
         fs::write(assets_dir.join("main.js"), js)
             .map_err(|e| BuildError::WriteError(e.to_string()))?;
+
+        // Copy Rafters CSS if configured
+        if let Some(ref rafters_css_path) = self.config.rafters_css {
+            let source_path = PathBuf::from(rafters_css_path);
+            if source_path.exists() {
+                let content = fs::read_to_string(&source_path)
+                    .map_err(|e| BuildError::ReadError(format!("Failed to read Rafters CSS: {}", e)))?;
+                fs::write(assets_dir.join("rafters.css"), content)
+                    .map_err(|e| BuildError::WriteError(e.to_string()))?;
+                tracing::info!("Copied Rafters CSS from {}", rafters_css_path);
+            } else {
+                tracing::warn!("Rafters CSS file not found: {}", rafters_css_path);
+            }
+        }
 
         Ok(())
     }

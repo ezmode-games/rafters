@@ -1,36 +1,39 @@
 #!/bin/bash
 # pre-edit-rafters.sh
 # PreToolUse hook - routes to relevant context based on file being edited
+# Returns JSON with hookSpecificOutput.additionalContext for Claude visibility
 
 INPUT=$(cat)
 FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
 
-# Always output core rules
-cat << 'CORE'
-=== RAFTERS PRE-EDIT ===
+# Build context message based on file path
+build_context() {
+  local context=""
+
+  # Always include core rules
+  context+="=== RAFTERS PRE-EDIT ===
 
 BEFORE WRITING: Did you read the file first?
 
 ALWAYS:
-- TypeScript strict (no `any`, narrow with type guards)
+- TypeScript strict (no \`any\`, narrow with type guards)
 - React 19 pure (no side effects in render)
 - pnpm only, no emoji, preflight before commit
 - Check existing utilities before writing new ones
 
-CORE
+"
 
-# Route based on file path (order matters - specific patterns first)
-case "$FILE_PATH" in
-  *.test.* | *.spec.* | *.a11y.*)
-    cat << 'TESTING'
---- TESTING CONTEXT ---
+  # Route based on file path (order matters - specific patterns first)
+  case "$FILE_PATH" in
+    *.test.* | *.spec.* | *.a11y.*)
+      context+="--- TESTING CONTEXT ---
 You're editing tests. Read memory: testing_strategy
 
 Stack:
 - zocker for property-based testing from Zod schemas
 - vitest-axe for accessibility (MANDATORY for UI)
 - Playwright for component tests
-- vi.mocked() not `as any`
+- vi.mocked() not \`as any\`
 
 File naming:
 - .test.ts = unit tests
@@ -39,13 +42,11 @@ File naming:
 
 Pattern:
 const fixtures = zocker(TokenSchema).generate();
-expect(TokenSchema.parse(fixture)).toBeDefined();
-TESTING
-    ;;
+expect(TokenSchema.parse(fixture)).toBeDefined();"
+      ;;
 
-  *color-utils*)
-    cat << 'COLOR_UTILS'
---- COLOR-UTILS CONTEXT ---
+    *color-utils*)
+      context+="--- COLOR-UTILS CONTEXT ---
 You're editing @rafters/color-utils. Read memory: design-tokens-architecture
 
 Key exports:
@@ -63,13 +64,11 @@ ColorValue structure:
 - semanticSuggestions (danger[], success[], warning[], info[])
 - perceptualWeight, atmosphericWeight
 
-OKLCH: { l: 0-1, c: 0-0.4, h: 0-360, alpha: 0-1 }
-COLOR_UTILS
-    ;;
+OKLCH: { l: 0-1, c: 0-0.4, h: 0-360, alpha: 0-1 }"
+      ;;
 
-  *design-tokens*)
-    cat << 'DESIGN_TOKENS'
---- DESIGN-TOKENS CONTEXT ---
+    *design-tokens*)
+      context+="--- DESIGN-TOKENS CONTEXT ---
 You're editing @rafters/design-tokens. Read memory: design-tokens-architecture
 
 TokenRegistry:
@@ -89,13 +88,11 @@ Three Tailwind exporters:
 - registryToTailwindStatic() - Studio static (@theme with var refs)
 - registryToVars() - Studio dynamic (HMR)
 
-Persistence: NodePersistenceAdapter -> .rafters/tokens/*.rafters.json
-DESIGN_TOKENS
-    ;;
+Persistence: NodePersistenceAdapter -> .rafters/tokens/*.rafters.json"
+      ;;
 
-  *studio*)
-    cat << 'STUDIO'
---- STUDIO CONTEXT ---
+    *studio*)
+      context+="--- STUDIO CONTEXT ---
 You're editing @rafters/studio. Read memory: studio-architecture
 
 CRITICAL: Studio is a THIN UI on TokenRegistry.
@@ -109,6 +106,9 @@ Self-consumption: Studio styled BY its own tokens.
 - Use Tailwind token classes (bg-primary, text-destructive)
 - NEVER hardcode values
 - Token change -> HMR updates UI instantly
+- USE RAFTERS COMPONENTS - Container, Typography, Grid
+- NEVER make design choices (font sizes, spacing, colors)
+- The designer's decisions are IN the tokens and components
 
 Two-phase color selection:
 1. Instant: buildColorValue() + generateColorTokens() locally
@@ -123,13 +123,11 @@ WhyGate: Only primary needs userOverride.reason. Math-derived = no explanation.
 API endpoints:
 - GET/POST /api/tokens
 - PATCH /api/token/:ns/:name
-- GET /api/tokens/color (proxy to Rafters API)
-STUDIO
-    ;;
+- GET /api/tokens/color (proxy to Rafters API)"
+      ;;
 
-  *packages/ui*)
-    cat << 'UI'
---- UI COMPONENTS CONTEXT ---
+    *packages/ui*)
+      context+="--- UI COMPONENTS CONTEXT ---
 You're editing @rafters/ui. Read memory: jsdoc-intelligence-template
 
 SHADCN COMPATIBILITY (critical):
@@ -167,13 +165,11 @@ Tailwind v4:
 Testing MANDATORY:
 - .test.tsx for unit
 - .a11y.tsx for accessibility (vitest-axe)
-- Playwright for component tests
-UI
-    ;;
+- Playwright for component tests"
+      ;;
 
-  *apps/api*)
-    cat << 'API'
---- API CONTEXT ---
+    *apps/api*)
+      context+="--- API CONTEXT ---
 You're editing apps/api. Read memory: architecture
 
 Hono + @hono/zod-openapi stack:
@@ -188,13 +184,11 @@ Color endpoint patterns:
 - Cache hit -> return full ColorValue
 - Cache miss + adhoc=true -> math-only (buildColorValue)
 - Cache miss + sync=true -> wait for AI generation
-- Default -> return math-only, queue AI generation
-API
-    ;;
+- Default -> return math-only, queue AI generation"
+      ;;
 
-  *shared*)
-    cat << 'SHARED'
---- SHARED CONTEXT ---
+    *shared*)
+      context+="--- SHARED CONTEXT ---
 You're editing @rafters/shared.
 
 Contains:
@@ -203,13 +197,11 @@ Contains:
 - Test fixtures: zocker-generated
 
 This is the source of truth for types across all packages.
-Changes here cascade everywhere - be careful.
-SHARED
-    ;;
+Changes here cascade everywhere - be careful."
+      ;;
 
-  *)
-    cat << 'DEFAULT'
---- GENERAL CONTEXT ---
+    *)
+      context+="--- GENERAL CONTEXT ---
 Check relevant Serena memories:
 - what_rafters_is - Core concepts
 - design-tokens-architecture - Token system
@@ -221,12 +213,26 @@ Key packages to check before writing utilities:
 - @rafters/shared (types, schemas)
 - @rafters/color-utils (OKLCH math)
 - @rafters/math-utils (progressions)
-- @rafters/design-tokens (registry, generators)
-DEFAULT
-    ;;
-esac
+- @rafters/design-tokens (registry, generators)"
+      ;;
+  esac
 
-echo ""
-echo "=== END PRE-EDIT ==="
+  context+="
+
+=== END PRE-EDIT ==="
+
+  echo "$context"
+}
+
+# Build the context
+CONTEXT=$(build_context)
+
+# Output JSON with hookSpecificOutput.additionalContext for Claude visibility
+jq -n --arg context "$CONTEXT" '{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "additionalContext": $context
+  }
+}'
 
 exit 0

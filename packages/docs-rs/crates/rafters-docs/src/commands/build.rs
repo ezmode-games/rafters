@@ -28,6 +28,8 @@ struct DocsConfig {
     title: String,
     #[serde(default = "default_base_url")]
     base_url: String,
+    /// Path to Rafters CSS file (design tokens + Tailwind)
+    rafters_css: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Default)]
@@ -85,6 +87,7 @@ pub async fn run(output: Option<PathBuf>, minify: Option<bool>) -> Result<()> {
         minify: minify.unwrap_or(file_config.build.minify),
         base_url: file_config.docs.base_url,
         title: file_config.docs.title,
+        rafters_css: file_config.docs.rafters_css,
     };
 
     let result = StaticBuilder::new(config).build().await?;
