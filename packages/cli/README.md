@@ -22,7 +22,8 @@ Initialize a project with design tokens. Detects your framework, scaffolds `.raf
 
 ```bash
 rafters init              # Interactive setup
-rafters init --force      # Regenerate output from existing config
+rafters init --rebuild    # Regenerate output files from existing tokens
+rafters init --reset      # Re-run generators fresh, replacing persisted tokens
 rafters init --agent      # JSON output for CI/machine consumption
 ```
 

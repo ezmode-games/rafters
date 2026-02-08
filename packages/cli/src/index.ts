@@ -21,7 +21,8 @@ program
 program
   .command('init')
   .description('Initialize .rafters/ with default tokens and config')
-  .option('-f, --force', 'Regenerate output files from existing config')
+  .option('-r, --rebuild', 'Regenerate output files from existing tokens')
+  .option('--reset', 'Re-run generators fresh, replacing persisted tokens')
   .option('--agent', 'Output JSON for machine consumption')
   .action(init);
 

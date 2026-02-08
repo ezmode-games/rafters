@@ -7,7 +7,7 @@
  */
 
 import { existsSync } from 'node:fs';
-import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { checkbox } from '@inquirer/prompts';
 import {
@@ -37,7 +37,8 @@ import { getRaftersPaths } from '../utils/paths.js';
 import { log, setAgentMode } from '../utils/ui.js';
 
 interface InitOptions {
-  force?: boolean;
+  rebuild?: boolean;
+  reset?: boolean;
   agent?: boolean;
 }
 
@@ -297,6 +298,112 @@ async function regenerateFromExisting(
   });
 }
 
+async function resetToDefaults(
+  cwd: string,
+  paths: ReturnType<typeof getRaftersPaths>,
+  shadcn: ShadcnConfig | null,
+  isAgentMode: boolean,
+): Promise<void> {
+  log({ event: 'init:reset', cwd });
+
+  // Load existing config for export settings + shadcn flag
+  let existingConfig: RaftersConfig | null = null;
+  try {
+    const configContent = await readFile(paths.config, 'utf-8');
+    existingConfig = JSON.parse(configContent) as RaftersConfig;
+  } catch {
+    // No config file, will use defaults
+  }
+
+  // Load existing tokens to check for userOverride backups
+  const adapter = new NodePersistenceAdapter(cwd);
+  const existingTokens = await adapter.load();
+
+  // Back up any tokens with userOverride before replacing
+  const overriddenTokens = existingTokens.filter((t) => t.userOverride);
+  if (overriddenTokens.length > 0) {
+    const backup = {
+      resetAt: new Date().toISOString(),
+      reason: 'rafters init --reset',
+      overrides: overriddenTokens.map((t) => ({
+        name: t.name,
+        value: t.value,
+        userOverride: t.userOverride,
+        namespace: t.namespace,
+      })),
+    };
+    await mkdir(paths.output, { recursive: true });
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const backupPath = join(paths.output, `reset-${timestamp}.json`);
+    await writeFile(backupPath, JSON.stringify(backup, null, 2));
+    log({
+      event: 'init:reset_backup',
+      path: backupPath,
+      overrideCount: overriddenTokens.length,
+    });
+  }
+
+  // Prompt for exports (or use existing config in agent mode / non-interactive)
+  let exports: ExportConfig;
+  if (isAgentMode) {
+    exports = existingConfig?.exports ?? DEFAULT_EXPORTS;
+    log({ event: 'init:exports_default', exports });
+  } else {
+    if (isInteractive()) {
+      log({ event: 'init:prompting_exports' });
+    }
+    exports = await promptExportFormats(existingConfig?.exports);
+    log({ event: 'init:exports_selected', exports });
+  }
+
+  // Re-run generators fresh
+  const result = buildColorSystem({
+    exports: {
+      tailwind: { includeImport: !shadcn },
+      typescript: { includeJSDoc: true },
+      dtcg: true,
+    },
+  });
+
+  const { registry } = result;
+
+  log({
+    event: 'init:reset_generated',
+    tokenCount: registry.size(),
+  });
+
+  // Clear stale namespace files before saving fresh registry
+  await rm(paths.tokens, { recursive: true, force: true });
+  await mkdir(paths.tokens, { recursive: true });
+  const allTokensToSave = registry.list();
+  await adapter.save(allTokensToSave);
+
+  const namespaceCount = new Set(allTokensToSave.map((t) => t.namespace)).size;
+  log({
+    event: 'init:registry_saved',
+    path: paths.tokens,
+    namespaceCount,
+  });
+
+  // Ensure output directory exists
+  await mkdir(paths.output, { recursive: true });
+
+  // Generate outputs
+  const outputs = await generateOutputs(paths, registry, exports, shadcn);
+
+  // Update config with new export settings
+  if (existingConfig) {
+    existingConfig.exports = exports;
+    await writeFile(paths.config, JSON.stringify(existingConfig, null, 2));
+  }
+
+  log({
+    event: 'init:complete',
+    outputs,
+    path: paths.output,
+  });
+}
+
 export async function init(options: InitOptions): Promise<void> {
   setAgentMode(options.agent ?? false);
   const isAgentMode = options.agent ?? false;
@@ -324,14 +431,25 @@ export async function init(options: InitOptions): Promise<void> {
   // Check if .rafters/ already exists
   const raftersExists = existsSync(paths.root);
 
-  if (raftersExists && !options.force) {
+  // --reset without .rafters/ is an error
+  if (options.reset && !raftersExists) {
+    throw new Error('Nothing to reset. No .rafters/ directory found.');
+  }
+
+  // --reset takes precedence over --rebuild
+  if (raftersExists && options.reset) {
+    await resetToDefaults(cwd, paths, shadcn, isAgentMode);
+    return;
+  }
+
+  if (raftersExists && !options.rebuild) {
     throw new Error(
-      '.rafters/ directory already exists. Use --force to regenerate output files from existing config.',
+      '.rafters/ directory already exists. Use --rebuild to regenerate output files, or --reset to start from defaults.',
     );
   }
 
-  // If --force and rafters exists, regenerate from existing config
-  if (raftersExists && options.force) {
+  // If --rebuild and rafters exists, regenerate from existing config
+  if (raftersExists && options.rebuild) {
     await regenerateFromExisting(cwd, paths, shadcn, isAgentMode);
     return;
   }

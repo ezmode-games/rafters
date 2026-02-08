@@ -29,8 +29,15 @@ Feature: rafters init command
     Then the command should fail
     And the error should contain "Tailwind v3"
 
-  Scenario: Force regenerate existing project
+  Scenario: Rebuild existing project outputs
     Given a Next.js project with .rafters already initialized
-    When I run "rafters init --force"
+    When I run "rafters init --rebuild"
     Then the command should succeed
     And theme.css should be regenerated
+
+  Scenario: Reset existing project to defaults
+    Given a Next.js project with .rafters already initialized
+    When I run "rafters init --reset"
+    Then the command should succeed
+    And the tokens directory should contain namespace files
+    And the theme.css should exist

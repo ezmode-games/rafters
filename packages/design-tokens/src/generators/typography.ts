@@ -40,7 +40,7 @@ export function generateTypographyTokens(
       fontSizes[scale] = modularScale.base;
     } else if (step < 0) {
       // Smaller sizes
-      const idx = Math.abs(step) - 1;
+      const idx = modularScale.smaller.length - Math.abs(step);
       fontSizes[scale] = modularScale.smaller[idx] ?? baseFontSize * ratioValue ** step;
     } else {
       // Larger sizes

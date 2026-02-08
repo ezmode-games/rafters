@@ -19,8 +19,9 @@ Build `@rafters/cli` - a CLI that initializes projects, adds components, runs an
 Detects framework and shadcn, creates `.rafters/` folder with configuration and default tokens, generates output files.
 
 ```bash
-rafters init          # Initialize in current directory
-rafters init --force  # Regenerate from config (overwrites output files)
+rafters init            # Initialize in current directory
+rafters init --rebuild  # Regenerate output files from existing tokens
+rafters init --reset    # Re-run generators fresh, replacing persisted tokens
 ```
 
 **Detection:**
@@ -51,8 +52,9 @@ rafters init --force  # Regenerate from config (overwrites output files)
 
 **Behavior:**
 - First run: Generates default tokens, writes config and output
-- With `--force`: Reads existing config, regenerates all output files
-- Without `--force` on existing project: Warns and exits (or prompts)
+- With `--rebuild`: Reads existing tokens, regenerates all output files
+- With `--reset`: Re-runs generators fresh, replaces persisted tokens, backs up userOverride tokens
+- On existing project without flags: Warns and exits
 
 Uses existing exporters from `@rafters/design-tokens`:
 - `registryToTailwind()` -> theme.css
@@ -194,7 +196,8 @@ import { registryToTailwind, registryToDTCG, registryToTypeScript } from '@rafte
 
 - [ ] `pnpx rafters init` detects framework and shadcn
 - [ ] `pnpx rafters init` creates valid .rafters/ structure with default tokens
-- [ ] `pnpx rafters init --force` regenerates output from existing config
+- [ ] `pnpx rafters init --rebuild` regenerates output from existing tokens
+- [ ] `pnpx rafters init --reset` re-runs generators fresh, replacing persisted tokens
 - [ ] `pnpx rafters add <component>` adds component files
 - [ ] `pnpx rafters mcp` starts stdio MCP server
 - [ ] `pnpx rafters studio` launches Studio UI
