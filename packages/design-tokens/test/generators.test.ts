@@ -274,6 +274,32 @@ describe('Token Structure Validation', () => {
         validateTokenStructure(token);
       }
     });
+
+    it('smaller font sizes follow correct scale ordering (sm > xs)', () => {
+      const smToken = result.tokens.find((t) => t.name === 'font-size-sm');
+      const xsToken = result.tokens.find((t) => t.name === 'font-size-xs');
+      const baseToken = result.tokens.find((t) => t.name === 'font-size-base');
+
+      expect(smToken).toBeDefined();
+      expect(xsToken).toBeDefined();
+      expect(baseToken).toBeDefined();
+
+      const smRem = Number.parseFloat(smToken!.value as string);
+      const xsRem = Number.parseFloat(xsToken!.value as string);
+      const baseRem = Number.parseFloat(baseToken!.value as string);
+
+      // sm (step -1) should be smaller than base but larger than xs (step -2)
+      expect(smRem).toBeLessThan(baseRem);
+      expect(smRem).toBeGreaterThan(xsRem);
+
+      // Both should be reasonable sizes (> 0.5rem = 8px)
+      expect(smRem).toBeGreaterThan(0.5);
+      expect(xsRem).toBeGreaterThan(0.5);
+
+      // sm should equal base / ratio (minor-third = 1.2)
+      // 16px / 1.2 = 13.33px = 0.833rem
+      expect(smRem).toBeCloseTo(1 / 1.2, 2);
+    });
   });
 
   describe('generateSemanticTokens', () => {
