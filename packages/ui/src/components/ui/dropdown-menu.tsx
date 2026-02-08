@@ -259,7 +259,7 @@ export const DropdownMenuContent = React.forwardRef<HTMLDivElement, DropdownMenu
       alignOffset = 0,
       onEscapeKeyDown: onEscapeKeyDownProp,
       onPointerDownOutside: onPointerDownOutsideProp,
-      onCloseAutoFocus,
+      onCloseAutoFocus: _onCloseAutoFocus,
       loop = true,
       className,
       style,

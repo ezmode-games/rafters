@@ -380,7 +380,7 @@ export function SelectContent({
   align = 'start',
   sideOffset = 4,
   alignOffset = 0,
-  position = 'popper',
+  position: _position = 'popper',
   style,
   asChild,
   ...props

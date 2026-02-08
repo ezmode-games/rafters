@@ -182,14 +182,14 @@ export interface PopoverContentProps extends React.HTMLAttributes<HTMLDivElement
 }
 
 export function PopoverContent({
-  asChild,
+  asChild: _asChild,
   forceMount,
   side = 'bottom',
   align = 'center',
   sideOffset = 4,
   alignOffset = 0,
-  onOpenAutoFocus,
-  onCloseAutoFocus,
+  onOpenAutoFocus: _onOpenAutoFocus,
+  onCloseAutoFocus: _onCloseAutoFocus,
   onEscapeKeyDown,
   onPointerDownOutside,
   onInteractOutside,
