@@ -209,7 +209,7 @@ const FloatContent = React.forwardRef<HTMLDivElement, FloatContentProps>(functio
     disablePortal = false,
     onEscapeKeyDown: onEscapeKeyDownProp,
     onPointerDownOutside: onPointerDownOutsideProp,
-    onFocusOutside,
+    onFocusOutside: _onFocusOutside,
     disableOutsideClick = false,
     disableEscapeKey = false,
     className,

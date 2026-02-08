@@ -591,7 +591,7 @@ export function SidebarMenuButton({
   isActive = false,
   variant = 'default',
   size = 'default',
-  tooltip,
+  tooltip: _tooltip,
   className,
   children,
   ...props
