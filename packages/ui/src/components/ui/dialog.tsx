@@ -255,8 +255,8 @@ export interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement>
 export function DialogContent({
   asChild,
   forceMount,
-  onOpenAutoFocus,
-  onCloseAutoFocus,
+  onOpenAutoFocus: _onOpenAutoFocus,
+  onCloseAutoFocus: _onCloseAutoFocus,
   onEscapeKeyDown: onEscapeKeyDownProp,
   onPointerDownOutside: onPointerDownOutsideProp,
   onInteractOutside,
