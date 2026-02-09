@@ -2,32 +2,28 @@
 
 Design Intelligence CLI. Scaffold tokens, add components, and serve an MCP server so AI agents build UIs with designer-level judgment instead of guessing.
 
-## Install
+## Quick Start
 
 ```bash
-npx rafters init
+pnpm dlx rafters init
 ```
 
-Or install globally:
-
-```bash
-pnpm add -g rafters
-```
+This detects your framework, scaffolds `.rafters/` with a complete token system, and generates output files.
 
 ## Commands
 
 ### `rafters init`
 
-Initialize a project with design tokens. Detects your framework, scaffolds `.rafters/` with a complete token system, and generates output files.
+Initialize a project with design tokens.
 
 ```bash
-rafters init              # Interactive setup
-rafters init --rebuild    # Regenerate output files from existing tokens
-rafters init --reset      # Re-run generators fresh, replacing persisted tokens
-rafters init --agent      # JSON output for CI/machine consumption
+pnpm dlx rafters init              # Interactive setup
+pnpm dlx rafters init --rebuild    # Regenerate output files from existing tokens
+pnpm dlx rafters init --reset      # Re-run generators fresh, replacing persisted tokens
+pnpm dlx rafters init --agent      # JSON output for CI/machine consumption
 ```
 
-**Supported frameworks:** Next.js, Vite, Remix, React Router, Astro
+**Detected frameworks:** Next.js, Vite, Remix, React Router, Astro
 
 **Export formats** (configured during init):
 
@@ -45,29 +41,27 @@ Automatically detects and migrates existing shadcn/ui color values. Requires Tai
 Add components from the Rafters registry to your project.
 
 ```bash
-rafters add button dialog    # Add specific components
-rafters add --list           # List all available components
-rafters add --overwrite      # Replace existing files
+pnpm dlx rafters add button dialog    # Add specific components
+pnpm dlx rafters add --list           # List all available components
+pnpm dlx rafters add --overwrite      # Replace existing files
 ```
 
 Components include embedded design intelligence: cognitive load ratings (1-7), accessibility requirements, do/never guidance, and trust-building patterns. Dependencies are resolved automatically.
-
-### `rafters studio`
-
-Launch Studio for visual token editing.
-
-```bash
-rafters studio
-```
-
-Opens a Vite-powered UI where you design by doing: pick a primary color, explain why, watch the system paint your scale. Every decision is recorded with reasoning so AI agents read intent instead of guessing.
 
 ### `rafters mcp`
 
 Start the MCP server for AI agent access via stdio transport.
 
 ```bash
-rafters mcp
+pnpm dlx rafters mcp
+```
+
+### `rafters studio`
+
+Launch Studio for visual token editing. Spawns a local Vite dev server from the `@rafters/studio` package.
+
+```bash
+pnpm dlx rafters studio
 ```
 
 ## MCP Tools
@@ -96,13 +90,13 @@ Token dependency graph, derivation rules, and human override context. Returns ho
 
 ## How It Works
 
-Rafters is a Design Intelligence Protocol. AI agents don't have taste - they guess at colors, spacing, hierarchy. Rafters encodes a designer's judgment into queryable data so AI reads decisions instead of guessing.
+Rafters is a Design Intelligence Protocol. AI agents don't have taste -- they guess at colors, spacing, hierarchy. Rafters encodes a designer's judgment into queryable data so AI reads decisions instead of guessing.
 
 Three layers:
 
-- **What** (Components) - 55 React components with embedded intelligence metadata
-- **Where** (Tokens) - 240+ tokens with dependency graph and human override tracking
-- **Why** (Decisions) - Do/never patterns, cognitive load scores, trust patterns, accessibility requirements
+- **What** (Components) -- 55 React components with embedded intelligence metadata
+- **Where** (Tokens) -- 240+ tokens with dependency graph and human override tracking
+- **Why** (Decisions) -- Do/never patterns, cognitive load scores, trust patterns, accessibility requirements
 
 The token system uses OKLCH color space, modular scales based on musical ratios, and a dependency engine that automatically derives related values. When a designer overrides a computed value, the system records the reason so AI agents respect the intent.
 
