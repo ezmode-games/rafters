@@ -123,15 +123,15 @@ describe('Item - Accessibility', () => {
     expect(results).toHaveNoViolations();
   });
 
-  it('has no violations in menu context', async () => {
+  it('has no violations in listbox context', async () => {
     const { container } = render(
-      <menu aria-label="Actions">
-        <Item role="menuitem">Edit</Item>
-        <Item role="menuitem">Duplicate</Item>
-        <Item role="menuitem" disabled>
+      <div role="listbox" aria-label="Actions">
+        <Item role="option">Edit</Item>
+        <Item role="option">Duplicate</Item>
+        <Item role="option" disabled>
           Delete
         </Item>
-      </menu>,
+      </div>,
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();

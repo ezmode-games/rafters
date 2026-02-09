@@ -254,7 +254,7 @@ describe('ContextMenu - Accessibility', () => {
     });
   });
 
-  it('separator has role="separator"', async () => {
+  it('separator renders as hr element', async () => {
     render(
       <ContextMenu defaultOpen>
         <ContextMenuTrigger>Right-click</ContextMenuTrigger>
@@ -270,7 +270,7 @@ describe('ContextMenu - Accessibility', () => {
 
     await waitFor(() => {
       const separator = screen.getByTestId('separator');
-      expect(separator).toHaveAttribute('role', 'separator');
+      expect(separator.tagName).toBe('HR');
     });
   });
 

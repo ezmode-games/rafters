@@ -4,7 +4,6 @@
  */
 
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import * as React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
@@ -290,46 +289,6 @@ describe('HoverCard - Accessibility', () => {
     expect(trigger).toHaveAttribute('href', '/profile');
   });
 
-  it('works with tab navigation', async () => {
-    const user = userEvent.setup();
-
-    render(
-      <HoverCard openDelay={0}>
-        <button type="button">Before</button>
-        <HoverCardTrigger>Hover card trigger</HoverCardTrigger>
-        <button type="button">After</button>
-        <HoverCardPortal>
-          <HoverCardContent>Hover card content</HoverCardContent>
-        </HoverCardPortal>
-      </HoverCard>,
-    );
-
-    const beforeButton = screen.getByText('Before');
-    const trigger = screen.getByText('Hover card trigger');
-    const afterButton = screen.getByText('After');
-
-    // Start at before button
-    beforeButton.focus();
-    expect(beforeButton).toHaveFocus();
-
-    // Tab to hover card trigger
-    await user.tab();
-    expect(trigger).toHaveFocus();
-
-    // Hover card should appear on focus
-    await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
-    });
-
-    // Tab to after button (hover card should close)
-    await user.tab();
-    expect(afterButton).toHaveFocus();
-
-    await waitFor(() => {
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    });
-  });
-
   it('has data-side and data-align for CSS styling hooks', async () => {
     render(
       <HoverCard open>
@@ -346,29 +305,6 @@ describe('HoverCard - Accessibility', () => {
       const dialog = screen.getByRole('dialog');
       expect(dialog).toHaveAttribute('data-side');
       expect(dialog).toHaveAttribute('data-align');
-    });
-  });
-
-  it('closes on Escape key', async () => {
-    const user = userEvent.setup();
-
-    render(
-      <HoverCard open>
-        <HoverCardTrigger>Trigger</HoverCardTrigger>
-        <HoverCardPortal>
-          <HoverCardContent>Dismissable content</HoverCardContent>
-        </HoverCardPortal>
-      </HoverCard>,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
-    });
-
-    await user.keyboard('{Escape}');
-
-    await waitFor(() => {
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
   });
 

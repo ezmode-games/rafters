@@ -126,17 +126,22 @@ Model Context Protocol server enables AI agents to query design intelligence in 
 ```
 rafters/
 ├── apps/
-│   ├── cli/          # AI-first CLI with embedded MCP server
-│   ├── api/          # Hono backend for intelligence generation
-│   └── website/      # Documentation and Studio interface
+│   ├── api/              # Hono backend for intelligence generation
+│   ├── demo/             # Demo application
+│   └── website/          # Documentation and Studio interface
 ├── packages/
+│   ├── cli/              # AI-first CLI with embedded MCP server
+│   ├── color-utils/      # OKLCH color intelligence
 │   ├── design-tokens/    # Dependency-aware token engine
-│   ├── ui/              # Components with cognitive metadata
-│   └── shared/          # Consolidated utilities: OKLCH color intelligence, mathematical foundations, types
-└── .rafters/            # Your design intelligence (Git-tracked)
-    ├── tokens/          # Token registry with dependencies
-    ├── registry/        # Component intelligence cache
-    └── config.json      # System configuration
+│   ├── docs-rs/          # Rust-based documentation engine
+│   ├── math-utils/       # Mathematical progressions and scales
+│   ├── shared/           # Consolidated utilities and types
+│   ├── studio/           # Visual design studio
+│   └── ui/               # Components with cognitive metadata
+└── .rafters/             # Your design intelligence (Git-tracked)
+    ├── tokens/           # Token registry with dependencies
+    ├── registry/         # Component intelligence cache
+    └── config.json       # System configuration
 ```
 
 **Distribution Model**: Design systems ship as ZIP archives (SQIDs - System Quality Intelligence Distributions). One file contains your entire design intelligence. Version controlled. Cryptographically signed.
@@ -173,16 +178,16 @@ This transforms component documentation from static visual demos into interactiv
 
 ```bash
 # Initialize Rafters in your project
-npx rafters init
+pnpm dlx rafters init
 
 # Add your first component
-npx rafters add button
+pnpm dlx rafters add button
 
 # Start the MCP server for AI agents
-npx rafters mcp
+pnpm dlx rafters mcp
 
 # Launch Studio to add your brand
-npx rafters studio
+pnpm dlx rafters studio
 ```
 
 That's it. You now have a mathematically-sound, AI-readable design system with 18+ components that work immediately with grayscale defaults. Run Studio later to add your brand personality.
@@ -218,7 +223,7 @@ We're building the infrastructure for AI-generated interfaces that don't suck. H
 
 ```bash
 # Clone the repository
-git clone https://github.com/realhandy/rafters.git
+git clone https://github.com/ezmode-games/rafters.git
 cd rafters
 
 # Install dependencies (MUST use pnpm)
@@ -363,7 +368,7 @@ MIT
 ## Support
 
 - [Documentation](https://rafters.studio)
-- [GitHub Issues](https://github.com/realhandy/rafters/issues)
+- [GitHub Issues](https://github.com/ezmode-games/rafters/issues)
 - [Discord](https://discord.gg/rafters)
 
 ---

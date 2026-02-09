@@ -99,13 +99,16 @@ describe('Empty - Accessibility', () => {
     const { container } = render(
       // biome-ignore lint/a11y/useSemanticElements: Testing empty state in list context requires role="list"
       <div role="list" aria-label="Projects list">
-        <Empty>
-          <EmptyTitle>No projects</EmptyTitle>
-          <EmptyDescription>Create a new project to get started.</EmptyDescription>
-          <EmptyAction>
-            <button type="button">Create project</button>
-          </EmptyAction>
-        </Empty>
+        {/* biome-ignore lint/a11y/useSemanticElements: Testing empty state in list context requires role="listitem" */}
+        <div role="listitem">
+          <Empty>
+            <EmptyTitle>No projects</EmptyTitle>
+            <EmptyDescription>Create a new project to get started.</EmptyDescription>
+            <EmptyAction>
+              <button type="button">Create project</button>
+            </EmptyAction>
+          </Empty>
+        </div>
       </div>,
     );
     const results = await axe(container);
@@ -132,7 +135,7 @@ describe('Empty - Accessibility', () => {
   it('has no violations when used inside a main landmark', async () => {
     const { container } = render(
       <main>
-        <h1>Search Results</h1>
+        <h2>Search Results</h2>
         <Empty>
           <EmptyTitle>No results</EmptyTitle>
           <EmptyDescription>Try a different search term.</EmptyDescription>

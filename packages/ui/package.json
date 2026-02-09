@@ -15,13 +15,7 @@
   "scripts": {
     "test": "vitest",
     "test:unit": "vitest run",
-    "test:component": "playwright test --config=playwright-ct.config.ts",
-    "test:component:ui": "playwright test --config=playwright-ct.config.ts --ui",
-    "test:component:debug": "playwright test --config=playwright-ct.config.ts --debug",
-    "test:component:chromium": "playwright test --config=playwright-ct.config.ts --project=chromium",
-    "test:component:firefox": "playwright test --config=playwright-ct.config.ts --project=firefox",
-    "test:component:webkit": "playwright test --config=playwright-ct.config.ts --project=webkit",
-    "test:a11y": "playwright test --config=playwright-ct.config.ts --grep @a11y",
+    "test:a11y": "vitest run .a11y.",
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
@@ -36,7 +30,6 @@
     }
   },
   "devDependencies": {
-    "@axe-core/playwright": "catalog:",
     "@hookform/resolvers": "^5.2.2",
     "@testing-library/jest-dom": "catalog:",
     "@testing-library/react": "catalog:",
