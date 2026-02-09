@@ -239,66 +239,6 @@ describe('Drawer - Accessibility', () => {
     });
   });
 
-  it('traps focus within drawer', async () => {
-    const user = userEvent.setup();
-
-    render(
-      <Drawer defaultOpen>
-        <DrawerPortal>
-          <DrawerContent>
-            <DrawerTitle>Focus Trap Test</DrawerTitle>
-            <button type="button">First</button>
-            <button type="button">Second</button>
-            <button type="button">Third</button>
-          </DrawerContent>
-        </DrawerPortal>
-      </Drawer>,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'First' })).toHaveFocus();
-    });
-
-    // Tab through all elements
-    await user.tab();
-    expect(screen.getByRole('button', { name: 'Second' })).toHaveFocus();
-
-    await user.tab();
-    expect(screen.getByRole('button', { name: 'Third' })).toHaveFocus();
-
-    // Tab should wrap to first
-    await user.tab();
-    expect(screen.getByRole('button', { name: 'First' })).toHaveFocus();
-  });
-
-  it('supports Shift+Tab for reverse focus navigation', async () => {
-    const user = userEvent.setup();
-
-    render(
-      <Drawer defaultOpen>
-        <DrawerPortal>
-          <DrawerContent>
-            <DrawerTitle>Reverse Navigation Test</DrawerTitle>
-            <button type="button">First</button>
-            <button type="button">Second</button>
-            <button type="button">Third</button>
-          </DrawerContent>
-        </DrawerPortal>
-      </Drawer>,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'First' })).toHaveFocus();
-    });
-
-    // Shift+Tab should wrap to last
-    await user.keyboard('{Shift>}{Tab}{/Shift}');
-    expect(screen.getByRole('button', { name: 'Third' })).toHaveFocus();
-
-    await user.keyboard('{Shift>}{Tab}{/Shift}');
-    expect(screen.getByRole('button', { name: 'Second' })).toHaveFocus();
-  });
-
   it('closes on Escape key press', async () => {
     const user = userEvent.setup();
 

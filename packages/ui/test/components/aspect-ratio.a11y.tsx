@@ -17,12 +17,9 @@ describe('AspectRatio - Accessibility', () => {
   it('has no accessibility violations with video content', async () => {
     const { container } = render(
       <AspectRatio ratio={16 / 9}>
-        <iframe
-          src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-          title="Video player"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
+        <video controls aria-label="Video player">
+          <track kind="captions" />
+        </video>
       </AspectRatio>,
     );
     const results = await axe(container);

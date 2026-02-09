@@ -284,9 +284,9 @@ describe('Token Structure Validation', () => {
       expect(xsToken).toBeDefined();
       expect(baseToken).toBeDefined();
 
-      const smRem = Number.parseFloat(smToken!.value as string);
-      const xsRem = Number.parseFloat(xsToken!.value as string);
-      const baseRem = Number.parseFloat(baseToken!.value as string);
+      const smRem = Number.parseFloat(smToken?.value as string);
+      const xsRem = Number.parseFloat(xsToken?.value as string);
+      const baseRem = Number.parseFloat(baseToken?.value as string);
 
       // sm (step -1) should be smaller than base but larger than xs (step -2)
       expect(smRem).toBeLessThan(baseRem);

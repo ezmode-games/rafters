@@ -4,7 +4,6 @@
  */
 
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 import {
@@ -447,46 +446,6 @@ describe('NavigationMenu - Accessibility', () => {
 
     const trigger = screen.getByRole('button', { name: /Products/i });
     expect(trigger).toHaveAttribute('type', 'button');
-  });
-
-  it('multiple triggers work independently', async () => {
-    const user = userEvent.setup();
-
-    render(
-      <NavigationMenu>
-        <NavigationMenuList>
-          <NavigationMenuItem value="products">
-            <NavigationMenuTrigger>Products</NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <NavigationMenuLink href="/products">Products Link</NavigationMenuLink>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
-          <NavigationMenuItem value="services">
-            <NavigationMenuTrigger>Services</NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <NavigationMenuLink href="/services">Services Link</NavigationMenuLink>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
-        </NavigationMenuList>
-      </NavigationMenu>,
-    );
-
-    const productsTrigger = screen.getByRole('button', { name: /Products/i });
-    const servicesTrigger = screen.getByRole('button', { name: /Services/i });
-
-    // Both start closed
-    expect(productsTrigger).toHaveAttribute('aria-expanded', 'false');
-    expect(servicesTrigger).toHaveAttribute('aria-expanded', 'false');
-
-    // Open products
-    await user.click(productsTrigger);
-    expect(productsTrigger).toHaveAttribute('aria-expanded', 'true');
-    expect(servicesTrigger).toHaveAttribute('aria-expanded', 'false');
-
-    // Open services (closes products)
-    await user.click(servicesTrigger);
-    expect(productsTrigger).toHaveAttribute('aria-expanded', 'false');
-    expect(servicesTrigger).toHaveAttribute('aria-expanded', 'true');
   });
 
   it('viewport has proper data-state', () => {

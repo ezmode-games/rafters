@@ -52,16 +52,13 @@ pnpm format
 # Unit tests only
 pnpm test:unit
 
-# Component tests (Playwright)
-pnpm test:component
-
 # E2E tests
 pnpm test:e2e
 
-# Accessibility tests (playwright with @a11y tag)
+# Accessibility tests (vitest-axe)
 pnpm test:a11y
 
-# Quick feedback (unit + component)
+# Quick feedback (unit + a11y)
 pnpm test:quick
 
 # Full CI (preflight + e2e)
@@ -76,8 +73,6 @@ pnpm test:watch
 # Run command in specific package
 pnpm --filter=@rafters/cli build
 pnpm --filter=@rafters/design-tokens test
-pnpm --filter=@rafters/ui test:component
-
 # Test specific package
 pnpm --filter=@rafters/shared test
 ```
@@ -141,9 +136,8 @@ The `@rafters/design-tokens` package implements a sophisticated dependency graph
 
 ### Testing Requirements
 - Unit tests: `src/component.test.ts`
-- Component tests: Playwright (primary UI testing method)
-- E2E tests: `test/component.e2e.ts`
-- Accessibility tests: MANDATORY for UI components (`.a11y.tsx`)
+- E2E tests: `test/component.e2e.ts` (Playwright)
+- Accessibility tests: MANDATORY for UI components (`.a11y.tsx`, vitest-axe)
 - Mock typing: Use `vi.mocked(func).mockReturnValue()`, never `as any`
 - Fixtures: Use `zocker` v3.0.0 for test fixture generation from Zod schemas
 - Test data: Import fixtures from `@rafters/shared/test/fixtures`
@@ -180,7 +174,6 @@ pnpm update -r
 - React 19 with strict purity requirements
 - Cognitive load intelligence embedded in component metadata
 - Tailwind v4 integration with CSS variables
-- Playwright component testing as primary UI testing method
 - shadcn drop-in compatibility: Overlay components include Portal/Overlay internally
 
 ### Environment Requirements
@@ -199,8 +192,8 @@ pnpm --filter=@rafters/design-tokens test dependencies.test.ts
 # Test pattern
 pnpm test --run "dependency graph"
 
-# Component test specific file
-pnpm --filter=@rafters/ui test:component button.spec.ts
+# A11y test specific component
+pnpm --filter=@rafters/ui test:a11y
 ```
 
 ### Adding New Packages

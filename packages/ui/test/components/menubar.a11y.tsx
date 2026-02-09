@@ -412,7 +412,7 @@ describe('Menubar - Accessibility', () => {
     });
   });
 
-  it('separator has role="separator"', async () => {
+  it('separator renders as hr element', async () => {
     const user = userEvent.setup();
 
     render(
@@ -434,7 +434,7 @@ describe('Menubar - Accessibility', () => {
 
     await waitFor(() => {
       const separator = screen.getByTestId('separator');
-      expect(separator).toHaveAttribute('role', 'separator');
+      expect(separator.tagName).toBe('HR');
     });
   });
 

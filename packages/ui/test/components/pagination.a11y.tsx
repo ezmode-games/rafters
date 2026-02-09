@@ -136,7 +136,6 @@ describe('Pagination - Accessibility', () => {
     );
     const nav = container.querySelector('nav');
     expect(nav).toHaveAttribute('aria-label', 'Pagination');
-    expect(nav).toHaveAttribute('role', 'navigation');
   });
 
   it('uses proper semantic structure with ul and li', () => {

@@ -69,7 +69,7 @@ describe('Select - Accessibility', () => {
   it('has no accessibility violations with groups', async () => {
     const { container } = render(
       <Select defaultOpen>
-        <SelectTrigger>
+        <SelectTrigger aria-label="Select option">
           <SelectValue placeholder="Select" />
         </SelectTrigger>
         <SelectPortal>

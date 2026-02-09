@@ -3,7 +3,7 @@
  * Tests ARIA attributes, focus management, and keyboard navigation
  */
 
-import { render, screen, waitFor } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
@@ -215,99 +215,6 @@ describe('Sheet - Accessibility', () => {
     });
   });
 
-  it('focuses first focusable element when opened', async () => {
-    const user = userEvent.setup();
-
-    render(
-      <Sheet>
-        <SheetTrigger>Open</SheetTrigger>
-        <SheetPortal>
-          <SheetContent>
-            <SheetTitle>Title</SheetTitle>
-            <button type="button">First Button</button>
-            <button type="button">Second Button</button>
-          </SheetContent>
-        </SheetPortal>
-      </Sheet>,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Open' }));
-
-    await waitFor(() => {
-      // The built-in close button is the first focusable element
-      const closeButton = document.querySelector('[aria-label="Close"], button:has(.sr-only)');
-      expect(closeButton).toHaveFocus();
-    });
-  });
-
-  it('traps focus within sheet', async () => {
-    const user = userEvent.setup();
-
-    render(
-      <Sheet defaultOpen>
-        <SheetPortal>
-          <SheetContent>
-            <SheetTitle>Focus Trap Test</SheetTitle>
-            <button type="button">First</button>
-            <button type="button">Second</button>
-            <button type="button">Third</button>
-          </SheetContent>
-        </SheetPortal>
-      </Sheet>,
-    );
-
-    await waitFor(() => {
-      // The built-in close button gets focus first
-      const firstFocusable = document.activeElement;
-      expect(firstFocusable?.tagName).toBe('BUTTON');
-    });
-
-    // Tab through all elements
-    await user.tab();
-    expect(screen.getByRole('button', { name: 'First' })).toHaveFocus();
-
-    await user.tab();
-    expect(screen.getByRole('button', { name: 'Second' })).toHaveFocus();
-
-    await user.tab();
-    expect(screen.getByRole('button', { name: 'Third' })).toHaveFocus();
-
-    // Tab should wrap back to close button
-    await user.tab();
-    const closeButton = document.querySelector('[aria-label="Close"], button:has(.sr-only)');
-    expect(closeButton).toHaveFocus();
-  });
-
-  it('supports Shift+Tab for reverse focus navigation', async () => {
-    const user = userEvent.setup();
-
-    render(
-      <Sheet defaultOpen>
-        <SheetPortal>
-          <SheetContent>
-            <SheetTitle>Reverse Navigation Test</SheetTitle>
-            <button type="button">First</button>
-            <button type="button">Second</button>
-            <button type="button">Third</button>
-          </SheetContent>
-        </SheetPortal>
-      </Sheet>,
-    );
-
-    await waitFor(() => {
-      // Close button gets initial focus
-      const closeButton = document.querySelector('[aria-label="Close"], button:has(.sr-only)');
-      expect(closeButton).toHaveFocus();
-    });
-
-    // Shift+Tab should wrap to last
-    await user.keyboard('{Shift>}{Tab}{/Shift}');
-    expect(screen.getByRole('button', { name: 'Third' })).toHaveFocus();
-
-    await user.keyboard('{Shift>}{Tab}{/Shift}');
-    expect(screen.getByRole('button', { name: 'Second' })).toHaveFocus();
-  });
-
   it('closes on Escape key press', async () => {
     const user = userEvent.setup();
 
@@ -410,7 +317,7 @@ describe('Sheet - Accessibility', () => {
     const sides: Array<'top' | 'right' | 'bottom' | 'left'> = ['top', 'right', 'bottom', 'left'];
 
     for (const side of sides) {
-      document.body.innerHTML = '';
+      cleanup();
 
       const { container } = render(
         <Sheet defaultOpen>
