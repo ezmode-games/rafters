@@ -10,8 +10,8 @@ import Color from 'colorjs.io';
  */
 export function oklchToHex(oklch: OKLCH): string {
   const color = new Color('oklch', [oklch.l, oklch.c, oklch.h], oklch.alpha);
-  const srgb = color.to('srgb');
-  return srgb.toString({ format: 'hex', collapse: false });
+  const clamped = color.toGamut({ space: 'srgb' });
+  return clamped.toString({ format: 'hex', collapse: false });
 }
 
 /**

@@ -21,6 +21,9 @@ declare module 'colorjs.io' {
     b: number;
     srgb: { r: number; g: number; b: number };
 
+    // Gamut methods
+    inGamut(space?: string): boolean;
+
     // Conversion methods
     to(space: string): Color;
     toGamut(options?: { space?: string; method?: string }): Color;
