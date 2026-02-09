@@ -25,9 +25,9 @@ export { hexToOKLCH, oklchToCSS, oklchToHex, roundOKLCH } from './conversion.js'
 
 // Gamut
 export {
+  computeGamutBoundaries,
   type GamutBoundaryPoint,
   type GamutTier,
-  computeGamutBoundaries,
   getGamutTier,
   isInP3Gamut,
   isInSRGBGamut,
