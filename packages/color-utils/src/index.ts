@@ -23,6 +23,17 @@ export { type BuildColorValueOptions, buildColorValue } from './builder.js';
 // Conversion
 export { hexToOKLCH, oklchToCSS, oklchToHex, roundOKLCH } from './conversion.js';
 
+// Gamut
+export {
+  type GamutBoundaryPoint,
+  type GamutTier,
+  computeGamutBoundaries,
+  getGamutTier,
+  isInP3Gamut,
+  isInSRGBGamut,
+  toNearestGamut,
+} from './gamut.js';
+
 // Harmony
 export {
   calculateAtmosphericWeight,
