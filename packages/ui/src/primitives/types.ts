@@ -3,6 +3,12 @@
  */
 export type CleanupFunction = () => void;
 
+/**
+ * Gamut tier for color swatch display
+ * Caller-provided label indicating how well a color maps to a target gamut.
+ */
+export type GamutTier = 'gold' | 'silver' | 'fail';
+
 export type OutsideClickHandler = (event: MouseEvent | TouchEvent | PointerEvent) => void;
 
 export type EscapeKeyHandler = (event: KeyboardEvent) => void;
