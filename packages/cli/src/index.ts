@@ -10,6 +10,7 @@ import { add } from './commands/add.js';
 import { init } from './commands/init.js';
 import { mcp } from './commands/mcp.js';
 import { studio } from './commands/studio.js';
+import { withErrorHandler } from './utils/ui.js';
 
 const program = new Command();
 
@@ -24,7 +25,7 @@ program
   .option('-r, --rebuild', 'Regenerate output files from existing tokens')
   .option('--reset', 'Re-run generators fresh, replacing persisted tokens')
   .option('--agent', 'Output JSON for machine consumption')
-  .action(init);
+  .action(withErrorHandler(init));
 
 program
   .command('add')
@@ -34,7 +35,7 @@ program
   .option('--overwrite', 'Overwrite existing component files')
   .option('--registry-url <url>', 'Custom registry URL')
   .option('--agent', 'Output JSON for machine consumption')
-  .action(add);
+  .action(withErrorHandler(add));
 
 program.command('mcp').description('Start MCP server for AI agent access (stdio)').action(mcp);
 

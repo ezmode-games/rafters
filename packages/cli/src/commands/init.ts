@@ -8,8 +8,9 @@
 
 import { existsSync } from 'node:fs';
 import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { join, relative } from 'node:path';
-import { checkbox } from '@inquirer/prompts';
+import { checkbox, confirm } from '@inquirer/prompts';
 import {
   buildColorSystem,
   NodePersistenceAdapter,
@@ -34,7 +35,8 @@ import {
   selectionsToConfig,
 } from '../utils/exports.js';
 import { getRaftersPaths } from '../utils/paths.js';
-import { log, setAgentMode } from '../utils/ui.js';
+import { isAgentMode, log, setAgentMode } from '../utils/ui.js';
+import { updateDependencies } from '../utils/update-dependencies.js';
 
 interface InitOptions {
   rebuild?: boolean;
@@ -186,9 +188,55 @@ async function promptExportFormats(existingConfig?: ExportConfig): Promise<Expor
 }
 
 /**
+ * Check if @tailwindcss/cli is installed (required for compiled CSS output)
+ */
+export function isTailwindCliInstalled(): boolean {
+  const require = createRequire(import.meta.url);
+  try {
+    require.resolve('@tailwindcss/cli/package.json');
+    return true;
+  } catch (err: unknown) {
+    if (err instanceof Error && 'code' in err && err.code === 'MODULE_NOT_FOUND') {
+      return false;
+    }
+    throw err;
+  }
+}
+
+/**
+ * Prompt to install @tailwindcss/cli (required for compiled CSS output).
+ * In non-interactive/agent mode, throws with install instructions.
+ */
+export async function ensureTailwindCli(cwd: string): Promise<void> {
+  if (!isInteractive() || isAgentMode()) {
+    throw new Error(
+      'Standalone CSS export requires @tailwindcss/cli. Install it as a dev dependency in your project.',
+    );
+  }
+
+  const shouldInstall = await confirm({
+    message: 'Standalone CSS requires @tailwindcss/cli. Install it now?',
+    default: true,
+  });
+
+  if (!shouldInstall) {
+    throw new Error('Standalone CSS export requires @tailwindcss/cli.');
+  }
+
+  await updateDependencies([], ['@tailwindcss/cli'], { cwd });
+
+  if (!isTailwindCliInstalled()) {
+    throw new Error(
+      '@tailwindcss/cli was installed but cannot be resolved. Try installing at the workspace root.',
+    );
+  }
+}
+
+/**
  * Generate output files based on export config
  */
 async function generateOutputs(
+  cwd: string,
   paths: ReturnType<typeof getRaftersPaths>,
   registry: TokenRegistry,
   exports: ExportConfig,
@@ -219,6 +267,9 @@ async function generateOutputs(
 
   // Compiled CSS (processed by Tailwind, no @import)
   if (exports.compiled) {
+    if (!isTailwindCliInstalled()) {
+      await ensureTailwindCli(cwd);
+    }
     log({ event: 'init:compiling_css' });
     const compiledCss = await registryToCompiled(registry, { includeImport: !shadcn });
     await writeFile(join(paths.output, 'rafters.standalone.css'), compiledCss);
@@ -283,7 +334,7 @@ async function regenerateFromExisting(
   await mkdir(paths.output, { recursive: true });
 
   // Generate outputs
-  const outputs = await generateOutputs(paths, registry, exports, shadcn);
+  const outputs = await generateOutputs(cwd, paths, registry, exports, shadcn);
 
   // Update config with new export settings
   if (existingConfig) {
@@ -389,7 +440,7 @@ async function resetToDefaults(
   await mkdir(paths.output, { recursive: true });
 
   // Generate outputs
-  const outputs = await generateOutputs(paths, registry, exports, shadcn);
+  const outputs = await generateOutputs(cwd, paths, registry, exports, shadcn);
 
   // Update config with new export settings
   if (existingConfig) {
@@ -562,7 +613,7 @@ export async function init(options: InitOptions): Promise<void> {
   });
 
   // Generate outputs based on export config
-  const outputs = await generateOutputs(paths, registry, exports, shadcn);
+  const outputs = await generateOutputs(cwd, paths, registry, exports, shadcn);
 
   // Find and update the main CSS file (if not using shadcn which has its own CSS path)
   let detectedCssPath: string | null = null;

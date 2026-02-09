@@ -219,3 +219,26 @@ export function cleanup(): void {
   context.spinner?.stop();
   context.spinner = null;
 }
+
+/**
+ * Wrap an async action so thrown errors are logged cleanly
+ * instead of dumping a stack trace.
+ *
+ * Set DEBUG=1 to also print the full stack trace for diagnostics.
+ */
+export function withErrorHandler<T extends (...args: never[]) => Promise<void>>(
+  action: T,
+): (...args: Parameters<T>) => Promise<void> {
+  return async (...args: Parameters<T>) => {
+    try {
+      await action(...args);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      error(message);
+      if (process.env.DEBUG && err instanceof Error && err.stack) {
+        console.error(err.stack);
+      }
+      process.exitCode = 1;
+    }
+  };
+}
