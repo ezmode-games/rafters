@@ -38,6 +38,12 @@ describe('createSwatch', () => {
     cleanup();
   });
 
+  it('includes alpha in aria-label when less than 1', () => {
+    const cleanup = createSwatch(el, { l: 0.5, c: 0.1, h: 180, alpha: 0.8 });
+    expect(el.getAttribute('aria-label')).toBe('Color: oklch(0.5 0.1 180 / 0.8)');
+    cleanup();
+  });
+
   it('includes tier in aria-label when provided', () => {
     const cleanup = createSwatch(el, { l: 0.6, c: 0.15, h: 250, tier: 'gold' });
     expect(el.getAttribute('aria-label')).toBe('Color: oklch(0.6 0.15 250), gamut: gold');

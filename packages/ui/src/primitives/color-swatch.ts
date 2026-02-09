@@ -51,7 +51,7 @@ export function toOklch(options: SwatchOptions): string {
  * Build a human-readable aria-label for the swatch
  */
 function toAriaLabel(options: SwatchOptions): string {
-  const base = `Color: oklch(${options.l} ${options.c} ${options.h})`;
+  const base = `Color: ${toOklch(options)}`;
   if (options.tier) {
     return `${base}, gamut: ${options.tier}`;
   }
