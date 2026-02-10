@@ -1,0 +1,120 @@
+/**
+ * Hue Bar primitive
+ * Renders a 1D gradient strip showing the 0-360 hue spectrum
+ * at a given lightness and chroma. Hues within sRGB or Display P3
+ * are painted with their OKLCH color; hues outside both are painted black.
+ *
+ * Framework-agnostic, SSR-safe. The caller provides the canvas element;
+ * the primitive handles rendering and ARIA attributes.
+ */
+
+import { inP3, inSrgb } from './oklch-gamut';
+import type { CleanupFunction } from './types';
+
+export interface HueBarOptions {
+  /** Lightness at which to render the hue spectrum (0-1) */
+  lightness: number;
+
+  /** Chroma at which to render the hue spectrum (0-~0.4) */
+  chroma: number;
+
+  /**
+   * Orientation of the strip.
+   * @default 'horizontal'
+   */
+  orientation?: 'horizontal' | 'vertical';
+
+  /** Device pixel ratio override (default: window.devicePixelRatio) */
+  dpr?: number;
+}
+
+/**
+ * Render the hue spectrum onto a canvas.
+ * Gracefully handles getContext('2d') returning null (SSR, happy-dom).
+ */
+function renderHueBar(canvas: HTMLCanvasElement, options: HueBarOptions): void {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    return;
+  }
+
+  const orientation = options.orientation ?? 'horizontal';
+  const dpr = options.dpr ?? window.devicePixelRatio;
+
+  const cssWidth = canvas.clientWidth;
+  const cssHeight = canvas.clientHeight;
+
+  canvas.width = cssWidth * dpr;
+  canvas.height = cssHeight * dpr;
+
+  // Scale so drawing uses CSS pixels; loop iterates over cssWidth/cssHeight
+  ctx.scale(dpr, dpr);
+
+  const { lightness, chroma } = options;
+  const isHorizontal = orientation === 'horizontal';
+  const steps = isHorizontal ? cssWidth : cssHeight;
+
+  for (let i = 0; i < steps; i++) {
+    const h = (i / steps) * 360;
+    if (inSrgb(lightness, chroma, h) || inP3(lightness, chroma, h)) {
+      ctx.fillStyle = `oklch(${lightness} ${chroma} ${h})`;
+    } else {
+      ctx.fillStyle = '#000';
+    }
+    if (isHorizontal) {
+      ctx.fillRect(i, 0, 1, cssHeight);
+    } else {
+      ctx.fillRect(0, i, cssWidth, 1);
+    }
+  }
+}
+
+/**
+ * Restore an attribute to its previous value, or remove it if it was absent.
+ */
+function restoreAttribute(element: HTMLElement, name: string, previous: string | null): void {
+  if (previous === null) {
+    element.removeAttribute(name);
+  } else {
+    element.setAttribute(name, previous);
+  }
+}
+
+/**
+ * Apply hue bar rendering and ARIA attributes to a canvas element.
+ * Returns a cleanup function that restores original state.
+ */
+export function createHueBar(canvas: HTMLCanvasElement, options: HueBarOptions): CleanupFunction {
+  if (typeof window === 'undefined') {
+    return () => {};
+  }
+
+  const prevRole = canvas.getAttribute('role');
+  const prevAriaLabel = canvas.getAttribute('aria-label');
+
+  canvas.setAttribute('role', 'img');
+  canvas.setAttribute('aria-label', 'Hue spectrum');
+
+  renderHueBar(canvas, options);
+
+  return () => {
+    restoreAttribute(canvas, 'role', prevRole);
+    restoreAttribute(canvas, 'aria-label', prevAriaLabel);
+
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  };
+}
+
+/**
+ * Update an existing hue bar without teardown/rebuild.
+ * Re-renders the canvas with new options. ARIA label stays the same.
+ */
+export function updateHueBar(canvas: HTMLCanvasElement, options: HueBarOptions): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  renderHueBar(canvas, options);
+}
