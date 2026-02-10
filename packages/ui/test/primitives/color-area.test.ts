@@ -73,3 +73,19 @@ describe('updateColorArea', () => {
     expect(canvas.getAttribute('aria-label')).toBe('Color area for hue 120 degrees');
   });
 });
+
+describe('SSR safety', () => {
+  it('returns a no-op cleanup when window is undefined', () => {
+    const savedWindow = globalThis.window;
+    // biome-ignore lint/performance/noDelete: SSR simulation
+    delete (globalThis as Record<string, unknown>).window;
+    try {
+      const canvas = {} as HTMLCanvasElement;
+      const cleanup = createColorArea(canvas, { hue: 250 });
+      expect(typeof cleanup).toBe('function');
+      cleanup(); // should not throw
+    } finally {
+      globalThis.window = savedWindow;
+    }
+  });
+});

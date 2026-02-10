@@ -27,7 +27,8 @@ export interface ColorAreaOptions {
 
 /**
  * Render the Lightness x Chroma surface onto a canvas.
- * Gracefully handles missing 2D context (SSR, happy-dom).
+ * Gracefully handles getContext('2d') returning null (e.g. happy-dom).
+ * SSR is guarded at the public API boundary (createColorArea/updateColorArea).
  */
 function renderArea(canvas: HTMLCanvasElement, options: ColorAreaOptions): void {
   const ctx = canvas.getContext('2d');
@@ -44,10 +45,13 @@ function renderArea(canvas: HTMLCanvasElement, options: ColorAreaOptions): void 
   canvas.width = width;
   canvas.height = height;
 
+  const maxX = width > 1 ? width - 1 : 1;
+  const maxY = height > 1 ? height - 1 : 1;
+
   for (let x = 0; x < width; x++) {
     for (let y = 0; y < height; y++) {
-      const l = x / width; // 0 (black) at left, 1 (white) at right
-      const c = (1 - y / height) * maxChroma; // maxChroma at top, 0 (gray) at bottom
+      const l = x / maxX; // 0 (black) at left, 1 (white) at right
+      const c = (1 - y / maxY) * maxChroma; // maxChroma at top, 0 (gray) at bottom
 
       if (inSrgb(l, c, hue) || inP3(l, c, hue)) {
         ctx.fillStyle = `oklch(${l} ${c} ${hue})`;
