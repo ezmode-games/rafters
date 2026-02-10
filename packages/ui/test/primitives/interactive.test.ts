@@ -135,6 +135,42 @@ describe('createInteractive', () => {
       pressKey('ArrowLeft');
       expect(onKeyMove).toHaveBeenCalledWith({ dLeft: 0.01, dTop: 0 });
     });
+
+    it('emits PageDown as horizontal delta in 2d mode', () => {
+      const { onKeyMove } = setup({ mode: '2d' });
+      pressKey('PageDown');
+      expect(onKeyMove).toHaveBeenCalledWith({ dLeft: 0.05, dTop: 0 });
+    });
+
+    it('emits PageUp as negative horizontal delta in 2d mode', () => {
+      const { onKeyMove } = setup({ mode: '2d' });
+      pressKey('PageUp');
+      expect(onKeyMove).toHaveBeenCalledWith({ dLeft: -0.05, dTop: 0 });
+    });
+
+    it('emits PageDown as vertical delta in 1d-vertical mode', () => {
+      const { onKeyMove } = setup({ mode: '1d-vertical' });
+      pressKey('PageDown');
+      expect(onKeyMove).toHaveBeenCalledWith({ dLeft: 0, dTop: 0.05 });
+    });
+
+    it('emits Home as horizontal -Infinity in 2d mode', () => {
+      const { onKeyMove } = setup({ mode: '2d' });
+      pressKey('Home');
+      expect(onKeyMove).toHaveBeenCalledWith({ dLeft: -Infinity, dTop: 0 });
+    });
+
+    it('emits End as horizontal Infinity in 2d mode', () => {
+      const { onKeyMove } = setup({ mode: '2d' });
+      pressKey('End');
+      expect(onKeyMove).toHaveBeenCalledWith({ dLeft: Infinity, dTop: 0 });
+    });
+
+    it('emits Home as vertical -Infinity in 1d-vertical mode', () => {
+      const { onKeyMove } = setup({ mode: '1d-vertical' });
+      pressKey('Home');
+      expect(onKeyMove).toHaveBeenCalledWith({ dLeft: 0, dTop: -Infinity });
+    });
   });
 });
 

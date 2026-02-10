@@ -11,26 +11,33 @@
  */
 
 import { createKeyBindings } from './keyboard-handler';
-import type { CleanupFunction, InteractiveMode, MoveDelta, NormalizedPoint } from './types';
+import type {
+  CleanupFunction,
+  Direction,
+  InteractiveMode,
+  MoveDelta,
+  NormalizedPoint,
+} from './types';
 
 export interface InteractiveOptions {
   mode: InteractiveMode;
   onMove: (point: NormalizedPoint) => void;
   onKeyMove?: (delta: MoveDelta) => void;
   disabled?: boolean;
-  dir?: 'ltr' | 'rtl';
+  dir?: Direction;
 }
 
 const STEP = 0.01;
 const SHIFT_MULTIPLIER = 5;
 const PAGE_STEP = 0.05;
 
-/** Clamp a value between min and max */
+/** Timeout (ms) to suppress synthesized mouse events after a touch gesture */
+const TOUCH_DEDUP_MS = 500;
+
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
 
-/** Restore an element attribute to its previous value, removing if it was absent */
 function restoreAttribute(element: HTMLElement, name: string, previous: string | null): void {
   if (previous === null) {
     element.removeAttribute(name);
@@ -39,26 +46,31 @@ function restoreAttribute(element: HTMLElement, name: string, previous: string |
   }
 }
 
-/** Convert pointer clientX/clientY to a NormalizedPoint using the element rect */
+// Mutable point reused across pointer/touch moves to avoid per-event allocation
+const _point: NormalizedPoint = { left: 0, top: 0 };
+
 function pointerToNormalized(
   clientX: number,
   clientY: number,
   rect: DOMRect,
   mode: InteractiveMode,
 ): NormalizedPoint {
-  let left = rect.width > 0 ? clamp((clientX - rect.left) / rect.width, 0, 1) : 0;
-  let top = rect.height > 0 ? clamp((clientY - rect.top) / rect.height, 0, 1) : 0;
+  _point.left =
+    mode === '1d-vertical'
+      ? 0
+      : rect.width > 0
+        ? clamp((clientX - rect.left) / rect.width, 0, 1)
+        : 0;
+  _point.top =
+    mode === '1d-horizontal'
+      ? 0
+      : rect.height > 0
+        ? clamp((clientY - rect.top) / rect.height, 0, 1)
+        : 0;
 
-  if (mode === '1d-horizontal') {
-    top = 0;
-  } else if (mode === '1d-vertical') {
-    left = 0;
-  }
-
-  return { left, top };
+  return _point;
 }
 
-/** Apply ARIA attributes based on current options */
 function applyAria(element: HTMLElement, options: InteractiveOptions): void {
   element.setAttribute('tabindex', '0');
   element.setAttribute('role', options.mode === '2d' ? 'application' : 'slider');
@@ -82,21 +94,25 @@ export function createInteractive(
   element: HTMLElement,
   options: InteractiveOptions,
 ): CleanupFunction {
-  // SSR guard
   if (typeof window === 'undefined') {
     return () => {};
   }
 
-  // Save original attributes for cleanup
   const prevRole = element.getAttribute('role');
   const prevTabindex = element.getAttribute('tabindex');
   const prevAriaDisabled = element.getAttribute('aria-disabled');
 
-  // Mutable options ref so updateInteractive can change behavior without teardown
   const state = { options };
   interactiveRegistry.set(element, state);
 
   applyAria(element, options);
+
+  // Track active document listeners so cleanup can remove them mid-drag
+  let activeMouseMove: ((e: MouseEvent) => void) | null = null;
+  let activeMouseUp: (() => void) | null = null;
+
+  // Touch dedup: suppress synthesized mouse events shortly after touch
+  let lastTouchTime = 0;
 
   // --------------------------------------------------------------------------
   // Pointer tracking (mouse)
@@ -110,6 +126,7 @@ export function createInteractive(
 
   function handleMouseDown(event: MouseEvent): void {
     if (state.options.disabled) return;
+    if (Date.now() - lastTouchTime < TOUCH_DEDUP_MS) return;
 
     emitPointer(event.clientX, event.clientY);
 
@@ -121,8 +138,12 @@ export function createInteractive(
     function handleMouseUp(): void {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      activeMouseMove = null;
+      activeMouseUp = null;
     }
 
+    activeMouseMove = handleMouseMove;
+    activeMouseUp = handleMouseUp;
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
   }
@@ -133,9 +154,12 @@ export function createInteractive(
 
   function handleTouch(event: TouchEvent): void {
     if (state.options.disabled) return;
+    if (event.type === 'touchstart') {
+      lastTouchTime = Date.now();
+    }
     event.preventDefault();
 
-    const touch = event.touches[0];
+    const touch = event.touches[0] ?? event.changedTouches[0];
     if (!touch) return;
 
     emitPointer(touch.clientX, touch.clientY);
@@ -162,12 +186,13 @@ export function createInteractive(
     return state.options.dir === 'rtl' ? -1 : 1;
   }
 
-  /** Emit a single-axis delta: horizontal for 1d-horizontal, vertical otherwise */
+  /** Emit a single-axis delta: horizontal for 1d-horizontal and 2d, vertical for 1d-vertical */
   function emitAxisDelta(magnitude: number): void {
-    if (state.options.mode === '1d-horizontal') {
-      emitKeyDelta(magnitude, 0);
-    } else {
+    if (state.options.mode === '1d-vertical') {
       emitKeyDelta(0, magnitude);
+    } else {
+      // 1d-horizontal and 2d both use horizontal axis for page/boundary keys
+      emitKeyDelta(magnitude, 0);
     }
   }
 
@@ -252,6 +277,7 @@ export function createInteractive(
   element.addEventListener('mousedown', handleMouseDown);
   element.addEventListener('touchstart', handleTouch, { passive: false });
   element.addEventListener('touchmove', handleTouch, { passive: false });
+  element.addEventListener('touchend', handleTouch, { passive: false });
 
   // --------------------------------------------------------------------------
   // Cleanup
@@ -261,6 +287,12 @@ export function createInteractive(
     element.removeEventListener('mousedown', handleMouseDown);
     element.removeEventListener('touchstart', handleTouch);
     element.removeEventListener('touchmove', handleTouch);
+    element.removeEventListener('touchend', handleTouch);
+
+    // Remove any active document-level drag listeners
+    if (activeMouseMove) document.removeEventListener('mousemove', activeMouseMove);
+    if (activeMouseUp) document.removeEventListener('mouseup', activeMouseUp);
+
     cleanupKeyboard();
     interactiveRegistry.delete(element);
 
