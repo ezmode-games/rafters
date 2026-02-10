@@ -30,7 +30,8 @@ export interface HueBarOptions {
 
 /**
  * Render the hue spectrum onto a canvas.
- * Gracefully handles getContext('2d') returning null (SSR, happy-dom).
+ * Gracefully handles getContext('2d') returning null (e.g. happy-dom).
+ * SSR is guarded at the public API boundary (createHueBar/updateHueBar).
  */
 function renderHueBar(canvas: HTMLCanvasElement, options: HueBarOptions): void {
   const ctx = canvas.getContext('2d');
@@ -44,18 +45,24 @@ function renderHueBar(canvas: HTMLCanvasElement, options: HueBarOptions): void {
   const cssWidth = canvas.clientWidth;
   const cssHeight = canvas.clientHeight;
 
-  canvas.width = cssWidth * dpr;
-  canvas.height = cssHeight * dpr;
+  const backingWidth = Math.round(cssWidth * dpr);
+  const backingHeight = Math.round(cssHeight * dpr);
 
-  // Scale so drawing uses CSS pixels; loop iterates over cssWidth/cssHeight
-  ctx.scale(dpr, dpr);
+  canvas.width = backingWidth;
+  canvas.height = backingHeight;
+
+  // Scale so drawing uses CSS pixels; derive from rounded backing size for accuracy
+  const scaleX = cssWidth > 0 ? backingWidth / cssWidth : 1;
+  const scaleY = cssHeight > 0 ? backingHeight / cssHeight : 1;
+  ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0);
 
   const { lightness, chroma } = options;
   const isHorizontal = orientation === 'horizontal';
   const steps = isHorizontal ? cssWidth : cssHeight;
+  const maxIndex = steps > 1 ? steps - 1 : 1;
 
   for (let i = 0; i < steps; i++) {
-    const h = (i / steps) * 360;
+    const h = (i / maxIndex) * 360;
     if (inSrgb(lightness, chroma, h) || inP3(lightness, chroma, h)) {
       ctx.fillStyle = `oklch(${lightness} ${chroma} ${h})`;
     } else {
