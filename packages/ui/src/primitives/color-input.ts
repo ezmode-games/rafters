@@ -4,8 +4,10 @@
  * Validates, clamps, and formats values per channel constraints.
  *
  * Framework-agnostic, SSR-safe. The caller provides input elements
- * mapped to OKLCH channels; the primitive sets attributes, attaches
- * event listeners, and handles value formatting.
+ * mapped to OKLCH channels as the first positional argument (consistent
+ * with the element-first pattern used by createInteractive, createColorArea,
+ * and createHueBar). The primitive sets attributes, attaches event
+ * listeners, and handles value formatting.
  *
  * onChange fires during live editing (input events, arrow keys).
  * onCommit fires when the user confirms a value (blur, Enter) and
@@ -62,7 +64,15 @@ const CHANNEL_CONFIG: Record<Channel, ChannelConfig> = {
 
 const MANAGED_ATTRIBUTES = ['inputmode', 'min', 'max', 'step', 'aria-label'] as const;
 
-// Registry to allow updateColorInput to sync the internal color state
+/** Digits, single decimal point, optional leading minus -- rejects "1abc", "1e2", etc. */
+const NUMERIC_RE = /^-?\d*\.?\d*$/;
+
+function isNumericInput(str: string): boolean {
+  return NUMERIC_RE.test(str);
+}
+
+// Registry maps every managed input element to shared state, so updateColorInput
+// can look up state from any field element regardless of array ordering.
 const colorInputRegistry = new WeakMap<HTMLInputElement, { currentColor: OklchColorAlpha }>();
 
 function getPrecision(channel: Channel, options: ColorInputOptions): number {
@@ -141,10 +151,9 @@ export function createColorInput(
     return () => {};
   }
 
-  const registryKey = fields[0]?.element;
   const state = { currentColor: { ...options.value } };
-  if (registryKey) {
-    colorInputRegistry.set(registryKey, state);
+  for (const { element } of fields) {
+    colorInputRegistry.set(element, state);
   }
   const cleanups: CleanupFunction[] = [];
 
@@ -159,24 +168,32 @@ export function createColorInput(
 
     applyFieldAttributes(element, channel);
     setFieldValue(element, channel, options.value, options);
+    let lastValidValue = element.value;
 
     const onInput = () => {
+      if (!isNumericInput(element.value)) return;
       const parsed = Number.parseFloat(element.value);
-      if (Number.isNaN(parsed)) {
-        return;
-      }
+      if (Number.isNaN(parsed)) return;
       const clamped = clamp(parsed, channel);
       state.currentColor = buildColor(state.currentColor, channel, clamped);
+      lastValidValue = element.value;
       options.onChange(state.currentColor);
     };
 
     const onCommit = () => {
+      if (!isNumericInput(element.value)) {
+        element.value = lastValidValue;
+        return;
+      }
       const parsed = Number.parseFloat(element.value);
       if (Number.isNaN(parsed)) {
+        element.value = lastValidValue;
         return;
       }
       const clamped = clamp(parsed, channel);
-      element.value = clamped.toFixed(getPrecision(channel, options));
+      const formatted = clamped.toFixed(getPrecision(channel, options));
+      element.value = formatted;
+      lastValidValue = formatted;
       state.currentColor = buildColor(state.currentColor, channel, clamped);
       options.onCommit?.(state.currentColor);
     };
@@ -193,7 +210,9 @@ export function createColorInput(
         const delta = config.step * multiplier * (event.key === 'ArrowUp' ? 1 : -1);
         const current = Number.parseFloat(element.value) || 0;
         const newValue = clamp(current + delta, channel);
-        element.value = newValue.toFixed(getPrecision(channel, options));
+        const formatted = newValue.toFixed(getPrecision(channel, options));
+        element.value = formatted;
+        lastValidValue = formatted;
         state.currentColor = buildColor(state.currentColor, channel, newValue);
         options.onChange(state.currentColor);
       }
@@ -219,8 +238,8 @@ export function createColorInput(
     for (const fn of cleanups) {
       fn();
     }
-    if (registryKey) {
-      colorInputRegistry.delete(registryKey);
+    for (const { element } of fields) {
+      colorInputRegistry.delete(element);
     }
   };
 }
@@ -234,8 +253,11 @@ export function updateColorInput(fields: ColorInputField[], options: ColorInputO
     return;
   }
 
-  const key = fields[0]?.element;
-  const entry = key ? colorInputRegistry.get(key) : undefined;
+  let entry: { currentColor: OklchColorAlpha } | undefined;
+  for (const { element } of fields) {
+    entry = colorInputRegistry.get(element);
+    if (entry) break;
+  }
   if (entry) {
     entry.currentColor = { ...options.value };
   }

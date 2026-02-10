@@ -163,6 +163,134 @@ describe('createColorInput', () => {
   });
 });
 
+describe('keyboard interaction', () => {
+  it('ArrowUp increments by step', () => {
+    const onChange = vi.fn();
+    const cleanup = createColorInput(fields, {
+      value: DEFAULT_COLOR,
+      onChange,
+    });
+
+    lInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ l: 0.71 }));
+    expect(lInput.value).toBe('0.71');
+
+    cleanup();
+  });
+
+  it('ArrowDown decrements by step', () => {
+    const onChange = vi.fn();
+    const cleanup = createColorInput(fields, {
+      value: DEFAULT_COLOR,
+      onChange,
+    });
+
+    hInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ h: 249 }));
+    expect(hInput.value).toBe('249');
+
+    cleanup();
+  });
+
+  it('Shift+ArrowUp increments by 10x step', () => {
+    const onChange = vi.fn();
+    const cleanup = createColorInput(fields, {
+      value: DEFAULT_COLOR,
+      onChange,
+    });
+
+    lInput.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowUp', shiftKey: true, bubbles: true }),
+    );
+    const color = onChange.mock.calls[0][0];
+    expect(color.l).toBeCloseTo(0.8, 10);
+    expect(lInput.value).toBe('0.80');
+
+    cleanup();
+  });
+
+  it('Enter fires onCommit', () => {
+    const onChange = vi.fn();
+    const onCommit = vi.fn();
+    const cleanup = createColorInput(fields, {
+      value: DEFAULT_COLOR,
+      onChange,
+      onCommit,
+    });
+
+    lInput.value = '0.5';
+    lInput.dispatchEvent(new Event('input', { bubbles: true }));
+    lInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    expect(onCommit).toHaveBeenCalledWith(expect.objectContaining({ l: 0.5 }));
+
+    cleanup();
+  });
+});
+
+describe('input validation', () => {
+  it('ignores non-numeric input like "abc"', () => {
+    const onChange = vi.fn();
+    const cleanup = createColorInput(fields, {
+      value: DEFAULT_COLOR,
+      onChange,
+    });
+
+    lInput.value = 'abc';
+    lInput.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(onChange).not.toHaveBeenCalled();
+
+    cleanup();
+  });
+
+  it('rejects partially numeric strings like "1abc"', () => {
+    const onChange = vi.fn();
+    const cleanup = createColorInput(fields, {
+      value: DEFAULT_COLOR,
+      onChange,
+    });
+
+    lInput.value = '1abc';
+    lInput.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(onChange).not.toHaveBeenCalled();
+
+    cleanup();
+  });
+
+  it('restores last valid value on blur with invalid text', () => {
+    const onChange = vi.fn();
+    const onCommit = vi.fn();
+    const cleanup = createColorInput(fields, {
+      value: DEFAULT_COLOR,
+      onChange,
+      onCommit,
+    });
+
+    lInput.value = 'invalid';
+    lInput.dispatchEvent(new Event('blur', { bubbles: true }));
+    expect(lInput.value).toBe('0.70');
+    expect(onCommit).not.toHaveBeenCalled();
+
+    cleanup();
+  });
+
+  it('restores last valid value on Enter with invalid text', () => {
+    const onChange = vi.fn();
+    const onCommit = vi.fn();
+    const cleanup = createColorInput(fields, {
+      value: DEFAULT_COLOR,
+      onChange,
+      onCommit,
+    });
+
+    lInput.value = 'invalid';
+    lInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    expect(lInput.value).toBe('0.70');
+    expect(onCommit).not.toHaveBeenCalled();
+
+    cleanup();
+  });
+});
+
 describe('updateColorInput', () => {
   it('updates values without firing onChange', () => {
     const onChange = vi.fn();
@@ -182,5 +310,41 @@ describe('updateColorInput', () => {
     expect(cInput.value).toBe('0.100');
     expect(hInput.value).toBe('180');
     expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('syncs state when fields are in different order', () => {
+    const onChange = vi.fn();
+    createColorInput(fields, {
+      value: DEFAULT_COLOR,
+      onChange,
+    });
+
+    const reorderedFields = [fields[2], fields[0], fields[1]];
+    updateColorInput(reorderedFields, {
+      value: { l: 0.5, c: 0.1, h: 180 },
+      onChange,
+    });
+
+    expect(hInput.value).toBe('180');
+    expect(lInput.value).toBe('0.50');
+    expect(cInput.value).toBe('0.100');
+  });
+});
+
+describe('SSR safety', () => {
+  it('returns a no-op cleanup when window is undefined', () => {
+    const savedWindow = globalThis.window;
+    delete (globalThis as Record<string, unknown>).window;
+    try {
+      const input = {} as HTMLInputElement;
+      const cleanup = createColorInput([{ element: input, channel: 'l' }], {
+        value: DEFAULT_COLOR,
+        onChange: () => {},
+      });
+      expect(typeof cleanup).toBe('function');
+      cleanup();
+    } finally {
+      globalThis.window = savedWindow;
+    }
   });
 });
