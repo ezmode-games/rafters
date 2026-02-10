@@ -231,3 +231,47 @@ export interface FormatDefinition {
   attributes?: Record<string, string>;
   class?: string;
 }
+
+// =============================================================================
+// Color Picker Types
+// =============================================================================
+
+/** Normalized 2D coordinate within a surface, both axes 0-1 */
+export interface NormalizedPoint {
+  /** Horizontal position, 0 = left edge, 1 = right edge */
+  left: number;
+  /** Vertical position, 0 = top edge, 1 = bottom edge */
+  top: number;
+}
+
+/** Keyboard movement delta (additive offset applied to a NormalizedPoint) */
+export interface MoveDelta {
+  /** Horizontal delta, positive = rightward */
+  dLeft: number;
+  /** Vertical delta, positive = downward */
+  dTop: number;
+}
+
+/**
+ * Dimension mode for the interactive primitive.
+ * '1d-horizontal' - only left axis is active (top locked to 0)
+ * '1d-vertical' - only top axis is active (left locked to 0)
+ * '2d' - both axes are active
+ */
+export type InteractiveMode = '1d-horizontal' | '1d-vertical' | '2d';
+
+/** OKLCH color triplet without alpha */
+export interface OklchColor {
+  /** Lightness, 0 (black) to 1 (white) */
+  l: number;
+  /** Chroma, 0 (gray) to ~0.4 (most vivid in sRGB) -- no theoretical max */
+  c: number;
+  /** Hue angle in degrees, 0 to 360 (circular: 0 and 360 are equivalent) */
+  h: number;
+}
+
+/** OKLCH color triplet with optional alpha */
+export interface OklchColorAlpha extends OklchColor {
+  /** Opacity, 0 (transparent) to 1 (opaque). Omit for fully opaque. */
+  alpha?: number;
+}
