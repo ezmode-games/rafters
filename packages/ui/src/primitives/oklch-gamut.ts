@@ -9,8 +9,13 @@ const RAD = Math.PI / 180;
 /** Floating-point tolerance for gamut boundary checks */
 const EPS = 0.001;
 
-/** Convert OKLCH to cubed LMS via Oklab (shared pipeline for both gamuts) */
-function toLmsCubed(l: number, c: number, h: number): [number, number, number] {
+// Module-level LMS values reused across calls to avoid per-pixel allocation
+let _L = 0;
+let _M = 0;
+let _S = 0;
+
+/** Compute cubed LMS values from OKLCH into module-level variables */
+function computeLms(l: number, c: number, h: number): void {
   // Polar (LCH) to cartesian (Lab)
   const a = c * Math.cos(h * RAD);
   const b = c * Math.sin(h * RAD);
@@ -20,7 +25,9 @@ function toLmsCubed(l: number, c: number, h: number): [number, number, number] {
   const mp = l - 0.1055613458 * a - 0.0638541728 * b;
   const sp = l - 0.0894841775 * a - 1.2914855480 * b;
 
-  return [lp * lp * lp, mp * mp * mp, sp * sp * sp];
+  _L = lp * lp * lp;
+  _M = mp * mp * mp;
+  _S = sp * sp * sp;
 }
 
 function inRange(v: number): boolean {
@@ -29,20 +36,20 @@ function inRange(v: number): boolean {
 
 /** Check whether an OKLCH color is within the sRGB gamut */
 export function inSrgb(l: number, c: number, h: number): boolean {
-  const [L, M, S] = toLmsCubed(l, c, h);
+  computeLms(l, c, h);
   return (
-    inRange(+4.0767416621 * L - 3.3077115913 * M + 0.2309699292 * S) &&
-    inRange(-1.2684380046 * L + 2.6097574011 * M - 0.3413193965 * S) &&
-    inRange(-0.0041960863 * L - 0.7034186147 * M + 1.7076147010 * S)
+    inRange(+4.0767416621 * _L - 3.3077115913 * _M + 0.2309699292 * _S) &&
+    inRange(-1.2684380046 * _L + 2.6097574011 * _M - 0.3413193965 * _S) &&
+    inRange(-0.0041960863 * _L - 0.7034186147 * _M + 1.7076147010 * _S)
   );
 }
 
 /** Check whether an OKLCH color is within the Display P3 gamut */
 export function inP3(l: number, c: number, h: number): boolean {
-  const [L, M, S] = toLmsCubed(l, c, h);
+  computeLms(l, c, h);
   return (
-    inRange(+3.1277147370 * L - 2.2571303530 * M + 0.1294156160 * S) &&
-    inRange(-1.0910898340 * L + 2.4133174100 * M - 0.3222275760 * S) &&
-    inRange(-0.0260731810 * L - 0.7034860280 * M + 1.7295592090 * S)
+    inRange(+3.1277147370 * _L - 2.2571303530 * _M + 0.1294156160 * _S) &&
+    inRange(-1.0910898340 * _L + 2.4133174100 * _M - 0.3222275760 * _S) &&
+    inRange(-0.0260731810 * _L - 0.7034860280 * _M + 1.7295592090 * _S)
   );
 }
