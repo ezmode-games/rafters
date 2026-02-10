@@ -29,7 +29,7 @@ import type { ColorInputField } from '../../primitives/color-input';
 import { createColorInput, updateColorInput } from '../../primitives/color-input';
 import { createSwatch, updateSwatch } from '../../primitives/color-swatch';
 import { createHueBar, updateHueBar } from '../../primitives/hue-bar';
-import { createInteractive, updateInteractive } from '../../primitives/interactive';
+import { createInteractive } from '../../primitives/interactive';
 import { inP3, inSrgb } from '../../primitives/oklch-gamut';
 import type {
   CleanupFunction,
@@ -41,7 +41,7 @@ import type {
 } from '../../primitives/types';
 
 export interface ColorPickerProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'defaultValue'> {
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> {
   /** Controlled OKLCH color value */
   value?: OklchColor;
   /** Default color for uncontrolled usage */
@@ -61,6 +61,15 @@ export interface ColorPickerProps
 const DEFAULT_COLOR: OklchColor = { l: 0.7, c: 0.15, h: 250 };
 const DEFAULT_MAX_CHROMA = 0.4;
 
+const INPUT_CLASS =
+  'w-full min-w-0 rounded-md border border-border bg-background px-2 py-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-ring';
+
+const GAMUT_LABELS: Record<GamutTier, string> = {
+  gold: 'sRGB',
+  silver: 'P3',
+  fail: 'Out of gamut',
+};
+
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
@@ -69,6 +78,26 @@ function getGamutTier(l: number, c: number, h: number): GamutTier {
   if (inSrgb(l, c, h)) return 'gold';
   if (inP3(l, c, h)) return 'silver';
   return 'fail';
+}
+
+/** Resolve a keyboard delta to a clamped absolute value */
+function resolveKeyDelta(current: number, delta: number, scale: number, max: number): number {
+  if (Number.isFinite(delta)) {
+    return clamp(current + delta * scale, 0, max);
+  }
+  return delta < 0 ? 0 : max;
+}
+
+function buildInputFields(
+  lInput: HTMLInputElement,
+  cInput: HTMLInputElement,
+  hInput: HTMLInputElement,
+): ColorInputField[] {
+  return [
+    { element: lInput, channel: 'l' },
+    { element: cInput, channel: 'c' },
+    { element: hInput, channel: 'h' },
+  ];
 }
 
 export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
@@ -89,6 +118,7 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
     const [uncontrolled, setUncontrolled] = React.useState(defaultValue);
     const isControlled = controlledValue !== undefined;
     const color = isControlled ? controlledValue : uncontrolled;
+    const safeMaxChroma = Math.max(maxChroma, 1e-6);
 
     // Refs for DOM elements
     const areaCanvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -111,12 +141,13 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
     colorRef.current = color;
 
     // Ref for maxChroma
-    const maxChromaRef = React.useRef(maxChroma);
-    maxChromaRef.current = maxChroma;
+    const maxChromaRef = React.useRef(safeMaxChroma);
+    maxChromaRef.current = safeMaxChroma;
 
     // Stable update function
     const updateColor = React.useCallback(
       (newColor: OklchColor) => {
+        colorRef.current = newColor;
         if (!isControlled) {
           setUncontrolled(newColor);
         }
@@ -156,35 +187,23 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
       }
 
       const cleanups: CleanupFunction[] = [];
+      const dirOption = dir !== undefined ? { dir } : {};
 
       // Area interactive (2D)
       cleanups.push(
         createInteractive(areaContainer, {
           mode: '2d',
           disabled,
-          ...(dir !== undefined && { dir }),
+          ...dirOption,
           onMove: (point: NormalizedPoint) => {
             const mc = maxChromaRef.current;
-            const newColor: OklchColor = {
-              l: point.left,
-              c: (1 - point.top) * mc,
-              h: colorRef.current.h,
-            };
-            updateColor(newColor);
+            updateColor({ l: point.left, c: (1 - point.top) * mc, h: colorRef.current.h });
           },
           onKeyMove: (delta: MoveDelta) => {
             const cur = colorRef.current;
             const mc = maxChromaRef.current;
-            const newL = Number.isFinite(delta.dLeft)
-              ? clamp(cur.l + delta.dLeft, 0, 1)
-              : delta.dLeft < 0
-                ? 0
-                : 1;
-            const newC = Number.isFinite(delta.dTop)
-              ? clamp(cur.c - delta.dTop * mc, 0, mc)
-              : delta.dTop > 0
-                ? 0
-                : mc;
+            const newL = resolveKeyDelta(cur.l, delta.dLeft, 1, 1);
+            const newC = resolveKeyDelta(cur.c, -delta.dTop, mc, mc);
             updateColor({ l: newL, c: newC, h: cur.h });
           },
         }),
@@ -195,33 +214,23 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
         createInteractive(hueContainer, {
           mode: '1d-horizontal',
           disabled,
-          ...(dir !== undefined && { dir }),
+          ...dirOption,
           onMove: (point: NormalizedPoint) => {
-            const newColor: OklchColor = {
-              ...colorRef.current,
-              h: point.left * 360,
-            };
-            updateColor(newColor);
+            updateColor({ ...colorRef.current, h: point.left * 360 });
           },
           onKeyMove: (delta: MoveDelta) => {
             const cur = colorRef.current;
-            const newH = Number.isFinite(delta.dLeft)
-              ? clamp(cur.h + delta.dLeft * 360, 0, 360)
-              : delta.dLeft < 0
-                ? 0
-                : 360;
+            const newH = resolveKeyDelta(cur.h, delta.dLeft, 360, 360);
             updateColor({ ...cur, h: newH });
           },
         }),
       );
 
-      // Hue slider ARIA attributes (must be set after createInteractive adds role="slider")
+      // ARIA attributes (set after createInteractive adds roles)
       hueContainer.setAttribute('aria-valuemin', '0');
       hueContainer.setAttribute('aria-valuemax', '360');
       hueContainer.setAttribute('aria-valuenow', String(Math.round(colorRef.current.h)));
       hueContainer.setAttribute('aria-label', 'Hue');
-
-      // Area container label (set after createInteractive adds role="application")
       areaContainer.setAttribute('aria-label', 'Lightness and chroma');
 
       // Color area canvas
@@ -238,27 +247,15 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
       );
 
       // Color inputs
-      const fields: ColorInputField[] = [
-        { element: lInput, channel: 'l' },
-        { element: cInput, channel: 'c' },
-        { element: hInput, channel: 'h' },
-      ];
+      const fields = buildInputFields(lInput, cInput, hInput);
       cleanups.push(
         createColorInput(fields, {
           value: colorRef.current,
-          onChange: (newColor) => {
-            updateColor({ l: newColor.l, c: newColor.c, h: newColor.h });
-          },
+          onChange: (newColor) => updateColor(newColor),
           onCommit: (newColor) => {
-            // Update color and commit
-            updateColor({ l: newColor.l, c: newColor.c, h: newColor.h });
-            // Use a microtask so the state update propagates first
+            updateColor(newColor);
             queueMicrotask(() => {
-              callbacksRef.current.onValueCommit?.({
-                l: newColor.l,
-                c: newColor.c,
-                h: newColor.h,
-              });
+              callbacksRef.current.onValueCommit?.(newColor);
             });
           },
         }),
@@ -267,23 +264,33 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
       // Swatches (area thumb, hue thumb, preview)
       const cur = colorRef.current;
       const tier = getGamutTier(cur.l, cur.c, cur.h);
-      cleanups.push(createSwatch(areaThumb, { l: cur.l, c: cur.c, h: cur.h, tier }));
-      cleanups.push(createSwatch(hueThumb, { l: cur.l, c: cur.c, h: cur.h, tier }));
-      cleanups.push(createSwatch(preview, { l: cur.l, c: cur.c, h: cur.h, tier }));
+      const swatchState = { l: cur.l, c: cur.c, h: cur.h, tier };
+      for (const el of [areaThumb, hueThumb, preview]) {
+        cleanups.push(createSwatch(el, swatchState));
+      }
 
-      // Pointer up listeners for onValueCommit
-      const handlePointerUp = () => {
+      // Pointer commit: attach document-level listeners on pointerdown so
+      // drag-release outside the container still fires onValueCommit.
+      const handleCommit = () => {
         callbacksRef.current.onValueCommit?.(colorRef.current);
+        document.removeEventListener('mouseup', handleCommit);
+        document.removeEventListener('touchend', handleCommit);
       };
-      areaContainer.addEventListener('mouseup', handlePointerUp);
-      areaContainer.addEventListener('touchend', handlePointerUp);
-      hueContainer.addEventListener('mouseup', handlePointerUp);
-      hueContainer.addEventListener('touchend', handlePointerUp);
+      const handlePointerDown = () => {
+        document.addEventListener('mouseup', handleCommit);
+        document.addEventListener('touchend', handleCommit);
+      };
+      for (const container of [areaContainer, hueContainer]) {
+        container.addEventListener('mousedown', handlePointerDown);
+        container.addEventListener('touchstart', handlePointerDown);
+      }
       cleanups.push(() => {
-        areaContainer.removeEventListener('mouseup', handlePointerUp);
-        areaContainer.removeEventListener('touchend', handlePointerUp);
-        hueContainer.removeEventListener('mouseup', handlePointerUp);
-        hueContainer.removeEventListener('touchend', handlePointerUp);
+        for (const container of [areaContainer, hueContainer]) {
+          container.removeEventListener('mousedown', handlePointerDown);
+          container.removeEventListener('touchstart', handlePointerDown);
+        }
+        document.removeEventListener('mouseup', handleCommit);
+        document.removeEventListener('touchend', handleCommit);
       });
 
       return () => {
@@ -294,12 +301,20 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
     }, [disabled, dir, updateColor]);
 
     // -------------------------------------------------------------------------
-    // Primitive updates: sync when color changes
+    // Primitive updates: area canvas only repaints when hue/maxChroma changes
     // -------------------------------------------------------------------------
     React.useEffect(() => {
       const areaCanvas = areaCanvasRef.current;
+      if (areaCanvas) {
+        updateColorArea(areaCanvas, { hue: color.h, maxChroma: safeMaxChroma });
+      }
+    }, [color.h, safeMaxChroma]);
+
+    // -------------------------------------------------------------------------
+    // Primitive updates: sync inputs, swatches, hue bar on any color change
+    // -------------------------------------------------------------------------
+    React.useEffect(() => {
       const hueCanvas = hueCanvasRef.current;
-      const areaContainer = areaContainerRef.current;
       const hueContainer = hueContainerRef.current;
       const lInput = lInputRef.current;
       const cInput = cInputRef.current;
@@ -309,9 +324,7 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
       const preview = previewRef.current;
 
       if (
-        !areaCanvas ||
         !hueCanvas ||
-        !areaContainer ||
         !hueContainer ||
         !lInput ||
         !cInput ||
@@ -323,86 +336,22 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
         return;
       }
 
-      // Update canvases
-      updateColorArea(areaCanvas, { hue: color.h, maxChroma });
       updateHueBar(hueCanvas, { lightness: color.l, chroma: color.c });
 
-      // Update inputs
-      const fields: ColorInputField[] = [
-        { element: lInput, channel: 'l' },
-        { element: cInput, channel: 'c' },
-        { element: hInput, channel: 'h' },
-      ];
+      const fields = buildInputFields(lInput, cInput, hInput);
       updateColorInput(fields, {
         value: { l: color.l, c: color.c, h: color.h },
         onChange: () => {},
       });
 
-      // Update swatches
       const tier = getGamutTier(color.l, color.c, color.h);
-      updateSwatch(areaThumb, { l: color.l, c: color.c, h: color.h, tier });
-      updateSwatch(hueThumb, { l: color.l, c: color.c, h: color.h, tier });
-      updateSwatch(preview, { l: color.l, c: color.c, h: color.h, tier });
+      const swatchState = { l: color.l, c: color.c, h: color.h, tier };
+      for (const el of [areaThumb, hueThumb, preview]) {
+        updateSwatch(el, swatchState);
+      }
 
-      // Update hue slider aria-valuenow
       hueContainer.setAttribute('aria-valuenow', String(Math.round(color.h)));
-    }, [color.l, color.c, color.h, maxChroma]);
-
-    // -------------------------------------------------------------------------
-    // Update interactive options when disabled/dir changes
-    // -------------------------------------------------------------------------
-    React.useEffect(() => {
-      const areaContainer = areaContainerRef.current;
-      const hueContainer = hueContainerRef.current;
-      if (!areaContainer || !hueContainer) return;
-
-      updateInteractive(areaContainer, {
-        mode: '2d',
-        disabled,
-        ...(dir !== undefined && { dir }),
-        onMove: (point: NormalizedPoint) => {
-          const mc = maxChromaRef.current;
-          updateColor({
-            l: point.left,
-            c: (1 - point.top) * mc,
-            h: colorRef.current.h,
-          });
-        },
-        onKeyMove: (delta: MoveDelta) => {
-          const cur = colorRef.current;
-          const mc = maxChromaRef.current;
-          const newL = Number.isFinite(delta.dLeft)
-            ? clamp(cur.l + delta.dLeft, 0, 1)
-            : delta.dLeft < 0
-              ? 0
-              : 1;
-          const newC = Number.isFinite(delta.dTop)
-            ? clamp(cur.c - delta.dTop * mc, 0, mc)
-            : delta.dTop > 0
-              ? 0
-              : mc;
-          updateColor({ l: newL, c: newC, h: cur.h });
-        },
-      });
-
-      updateInteractive(hueContainer, {
-        mode: '1d-horizontal',
-        disabled,
-        ...(dir !== undefined && { dir }),
-        onMove: (point: NormalizedPoint) => {
-          updateColor({ ...colorRef.current, h: point.left * 360 });
-        },
-        onKeyMove: (delta: MoveDelta) => {
-          const cur = colorRef.current;
-          const newH = Number.isFinite(delta.dLeft)
-            ? clamp(cur.h + delta.dLeft * 360, 0, 360)
-            : delta.dLeft < 0
-              ? 0
-              : 360;
-          updateColor({ ...cur, h: newH });
-        },
-      });
-    }, [disabled, dir, updateColor]);
+    }, [color.l, color.c, color.h]);
 
     // -------------------------------------------------------------------------
     // Render
@@ -435,10 +384,11 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
           <canvas ref={areaCanvasRef} className="absolute inset-0 h-full w-full" />
           <div
             ref={areaThumbRef}
+            aria-hidden="true"
             className="pointer-events-none absolute h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-md"
             style={{
               left: `${color.l * 100}%`,
-              top: `${(1 - color.c / maxChroma) * 100}%`,
+              top: `${(1 - color.c / safeMaxChroma) * 100}%`,
             }}
           />
         </div>
@@ -451,6 +401,7 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
           <canvas ref={hueCanvasRef} className="absolute inset-0 h-full w-full" />
           <div
             ref={hueThumbRef}
+            aria-hidden="true"
             className="pointer-events-none absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-md"
             style={{
               left: `${(color.h / 360) * 100}%`,
@@ -460,21 +411,9 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
 
         {/* Numeric inputs */}
         <div className="mt-3 flex gap-2">
-          <input
-            ref={lInputRef}
-            className="w-full min-w-0 rounded-md border border-border bg-background px-2 py-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-ring"
-            disabled={disabled}
-          />
-          <input
-            ref={cInputRef}
-            className="w-full min-w-0 rounded-md border border-border bg-background px-2 py-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-ring"
-            disabled={disabled}
-          />
-          <input
-            ref={hInputRef}
-            className="w-full min-w-0 rounded-md border border-border bg-background px-2 py-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-ring"
-            disabled={disabled}
-          />
+          <input ref={lInputRef} className={INPUT_CLASS} disabled={disabled} />
+          <input ref={cInputRef} className={INPUT_CLASS} disabled={disabled} />
+          <input ref={hInputRef} className={INPUT_CLASS} disabled={disabled} />
         </div>
 
         {/* Preview swatch */}
@@ -485,7 +424,7 @@ export const ColorPicker = React.forwardRef<HTMLDivElement, ColorPickerProps>(
             data-gamut-tier={gamutTier}
           />
           <span className="text-xs text-muted-foreground" aria-hidden="true">
-            {gamutTier === 'gold' ? 'sRGB' : gamutTier === 'silver' ? 'P3' : 'Out of gamut'}
+            {GAMUT_LABELS[gamutTier]}
           </span>
         </div>
       </div>
