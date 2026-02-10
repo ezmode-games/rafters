@@ -23,7 +23,7 @@ function computeLms(l: number, c: number, h: number): void {
   // Oklab to LMS (prime form -- spec notation: l', m', s')
   const lp = l + 0.3963377774 * a + 0.2158037573 * b;
   const mp = l - 0.1055613458 * a - 0.0638541728 * b;
-  const sp = l - 0.0894841775 * a - 1.2914855480 * b;
+  const sp = l - 0.0894841775 * a - 1.291485548 * b;
 
   _L = lp * lp * lp;
   _M = mp * mp * mp;
@@ -40,7 +40,7 @@ export function inSrgb(l: number, c: number, h: number): boolean {
   return (
     inRange(+4.0767416621 * _L - 3.3077115913 * _M + 0.2309699292 * _S) &&
     inRange(-1.2684380046 * _L + 2.6097574011 * _M - 0.3413193965 * _S) &&
-    inRange(-0.0041960863 * _L - 0.7034186147 * _M + 1.7076147010 * _S)
+    inRange(-0.0041960863 * _L - 0.7034186147 * _M + 1.707614701 * _S)
   );
 }
 
@@ -48,8 +48,8 @@ export function inSrgb(l: number, c: number, h: number): boolean {
 export function inP3(l: number, c: number, h: number): boolean {
   computeLms(l, c, h);
   return (
-    inRange(+3.1277147370 * _L - 2.2571303530 * _M + 0.1294156160 * _S) &&
-    inRange(-1.0910898340 * _L + 2.4133174100 * _M - 0.3222275760 * _S) &&
-    inRange(-0.0260731810 * _L - 0.7034860280 * _M + 1.7295592090 * _S)
+    inRange(+3.127714737 * _L - 2.257130353 * _M + 0.129415616 * _S) &&
+    inRange(-1.091089834 * _L + 2.41331741 * _M - 0.322227576 * _S) &&
+    inRange(-0.026073181 * _L - 0.703486028 * _M + 1.729559209 * _S)
   );
 }
