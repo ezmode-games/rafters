@@ -1,5 +1,11 @@
 # rafters
 
+## 0.0.8
+
+### Patch Changes
+
+- 79df2e0: Fix CLI error handling and Tailwind CSS detection. Updated component CSS with accent-foreground fix for container headings. Added color-swatch primitive and gamut-aware color utilities.
+
 ## 0.0.7
 
 ### Patch Changes
