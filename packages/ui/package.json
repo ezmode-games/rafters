@@ -6,7 +6,6 @@
   "exports": {
     "./primitives/*": "./src/primitives/*.ts",
     "./components/*": "./src/components/*.tsx",
-    "./components/editor": "./src/components/editor/index.ts",
     "./hooks/*": "./src/hooks/*.ts",
     "./dialog": "./src/components/ui/dialog.tsx",
     "./dialog.vue": "./src/components/ui/dialog.vue.ts",

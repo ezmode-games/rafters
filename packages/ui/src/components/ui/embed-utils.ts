@@ -1,6 +1,6 @@
 /**
  * Media utilities for embed detection and URL parsing
- * @module components/media/utils
+ * @module components/ui/embed-utils
  */
 
 /**

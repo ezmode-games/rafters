@@ -36,7 +36,7 @@ import {
   type EmbedProvider,
   getAspectRatioValue,
   isAllowedEmbedDomain,
-} from './utils';
+} from './embed-utils';
 
 export type AspectRatio = '16:9' | '4:3' | '1:1' | '9:16';
 

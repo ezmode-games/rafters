@@ -6,7 +6,7 @@ import {
   detectEmbedProvider,
   getAspectRatioValue,
   isAllowedEmbedDomain,
-} from '../../../src/components/media/utils';
+} from '../../../src/components/ui/embed-utils';
 
 describe('isAllowedEmbedDomain', () => {
   it('should allow YouTube domains', () => {

@@ -388,6 +388,109 @@ function generateThemeBlock(groups: GroupedTokens): string {
 }
 
 /**
+ * Article element type system - maps HTML elements to @apply utility compositions
+ *
+ * Each entry is [selector, utilityClasses]. The utilities reference design tokens
+ * (font sizes, weights, spacing, colors, leading, tracking) that are already in @theme.
+ * The exporter composes them here; the tokens are the atomic values.
+ */
+const ARTICLE_ELEMENT_STYLES: Array<[string, string]> = [
+  // Paragraphs
+  ['p', 'leading-relaxed mb-4'],
+  ['p:last-child', 'mb-0'],
+
+  // Headings
+  ['h1', 'text-4xl font-bold tracking-tight mb-4 mt-0 text-accent-foreground'],
+  ['h2', 'text-3xl font-semibold tracking-tight mb-3 mt-8 text-accent-foreground'],
+  ['h2:first-child', 'mt-0'],
+  ['h3', 'text-2xl font-semibold mb-2 mt-6 text-accent-foreground'],
+  ['h4', 'text-xl font-semibold mb-2 mt-4 text-accent-foreground'],
+  ['h5', 'text-lg font-semibold mb-2 mt-4 text-accent-foreground'],
+  ['h6', 'text-base font-semibold mb-2 mt-4 text-accent-foreground'],
+
+  // Lists
+  ['ul', 'list-disc pl-6 mb-4'],
+  ['ol', 'list-decimal pl-6 mb-4'],
+  ['li', 'mb-1'],
+  ['li > ul,\n  article li > ol', 'mt-1 mb-0'],
+
+  // Links
+  ['a', 'text-primary underline underline-offset-4'],
+  ['a:hover', 'text-primary/80'],
+
+  // Blockquotes
+  ['blockquote', 'border-l-4 border-muted pl-4 italic my-4'],
+
+  // Code
+  ['code', 'bg-muted px-1.5 py-0.5 rounded text-sm font-mono'],
+  ['pre', 'bg-muted p-4 rounded-lg overflow-x-auto my-4 text-sm font-mono'],
+  ['pre code', 'bg-transparent p-0 rounded-none text-[inherit]'],
+  ['kbd', 'bg-muted border border-border rounded px-1.5 py-0.5 text-sm font-mono'],
+
+  // Horizontal rules
+  ['hr', 'border-border my-8'],
+
+  // Media
+  ['img', 'rounded-lg my-4 max-w-full h-auto'],
+  ['video', 'rounded-lg my-4 max-w-full h-auto'],
+
+  // Tables
+  ['table', 'w-full my-4 border-collapse'],
+  ['caption', 'mt-2 text-sm text-muted-foreground text-left'],
+  ['th', 'border border-border px-3 py-2 text-left font-semibold'],
+  ['td', 'border border-border px-3 py-2'],
+
+  // Figures
+  ['figure', 'my-4'],
+  ['figcaption', 'mt-2 text-sm text-muted-foreground'],
+
+  // Definition lists
+  ['dl', 'my-4'],
+  ['dt', 'font-semibold mt-2'],
+  ['dd', 'pl-4 mb-2'],
+
+  // Details/Summary
+  ['details', 'my-4'],
+  ['summary', 'cursor-pointer font-semibold'],
+
+  // Inline formatting
+  ['strong,\n  article b', 'font-semibold'],
+  ['mark', 'bg-accent text-accent-foreground px-1 rounded'],
+  ['small', 'text-sm'],
+  ['sub', 'text-xs align-sub'],
+  ['sup', 'text-xs align-super'],
+  ['abbr[title]', 'underline decoration-dotted underline-offset-4 cursor-help'],
+  ['s,\n  article del', 'line-through'],
+  ['ins', 'underline'],
+];
+
+/**
+ * Generate @layer base block with article type system
+ *
+ * Composes design token utilities via @apply for all HTML content elements
+ * inside <article>. Every class referenced here is backed by a design token
+ * in @theme - font sizes, weights, leading, tracking, spacing, colors.
+ */
+function generateArticleBaseLayer(): string {
+  const lines: string[] = [];
+  lines.push('@layer base {');
+
+  for (const [selector, utilities] of ARTICLE_ELEMENT_STYLES) {
+    // Compound selectors already contain "article" for second+ parts
+    if (selector.includes('\n')) {
+      lines.push(`  article ${selector} {`);
+    } else {
+      lines.push(`  article ${selector} {`);
+    }
+    lines.push(`    @apply ${utilities};`);
+    lines.push('  }');
+  }
+
+  lines.push('}');
+  return lines.join('\n');
+}
+
+/**
  * Generate @keyframes from motion-keyframe-* tokens
  */
 function generateKeyframes(motionTokens: Token[]): string {
@@ -486,6 +589,10 @@ export function tokensToTailwind(tokens: Token[], options: TailwindExportOptions
   if (keyframes) {
     sections.push(keyframes);
   }
+
+  // Article type system - @layer base with @apply compositions
+  sections.push('');
+  sections.push(generateArticleBaseLayer());
 
   return sections.join('\n');
 }
@@ -801,6 +908,10 @@ export function registryToTailwindStatic(registry: TokenRegistry): string {
   if (keyframes) {
     sections.push(keyframes);
   }
+
+  // Article type system - @layer base with @apply compositions
+  sections.push('');
+  sections.push(generateArticleBaseLayer());
 
   return sections.join('\n');
 }

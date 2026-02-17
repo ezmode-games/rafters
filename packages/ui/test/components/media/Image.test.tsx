@@ -3,7 +3,7 @@
  */
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { Image } from '../../../src/components/media/Image';
+import { Image } from '../../../src/components/ui/image';
 
 describe('Image', () => {
   afterEach(() => {
