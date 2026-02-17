@@ -3,7 +3,7 @@
  */
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { Embed } from '../../../src/components/media/Embed';
+import { Embed } from '../../../src/components/ui/embed';
 
 describe('Embed', () => {
   afterEach(() => {
