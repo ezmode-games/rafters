@@ -2,7 +2,7 @@ import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { RaftersToolHandler, TOOL_DEFINITIONS } from '../../src/mcp/tools.js';
+import { RaftersToolHandler, SYSTEM_PREAMBLE, TOOL_DEFINITIONS } from '../../src/mcp/tools.js';
 import { fixtures, serializeNamespaceFile } from '../fixtures/tokens.js';
 
 describe('TOOL_DEFINITIONS', () => {
@@ -33,6 +33,16 @@ describe('TOOL_DEFINITIONS', () => {
   });
 });
 
+describe('SYSTEM_PREAMBLE', () => {
+  it('should contain key rules', () => {
+    expect(SYSTEM_PREAMBLE).toContain('RAFTERS IS NOT SHADCN');
+    expect(SYSTEM_PREAMBLE).toContain('CLASSY IS THE LAW');
+    expect(SYSTEM_PREAMBLE).toContain('LAYOUT IS SOLVED');
+    expect(SYSTEM_PREAMBLE).toContain('CONTAINER OWNS SPACING');
+    expect(SYSTEM_PREAMBLE).toContain('COMPONENTS ARE COMPLETE');
+  });
+});
+
 describe('RaftersToolHandler', () => {
   const testDir = join(tmpdir(), 'rafters-test-mcp-tools');
   let handler: RaftersToolHandler;
@@ -47,19 +57,78 @@ describe('RaftersToolHandler', () => {
   });
 
   describe('rafters_vocabulary', () => {
-    it('should return vocabulary structure with empty tokens', async () => {
+    it('should return vocabulary structure with system preamble', async () => {
       const result = await handler.handleToolCall('rafters_vocabulary', {});
 
       expect(result.isError).toBeFalsy();
       expect(result.content).toHaveLength(1);
 
       const data = JSON.parse(result.content[0].text as string);
+      expect(data.system).toContain('RAFTERS IS NOT SHADCN');
+      expect(data.system).toContain('CLASSY IS THE LAW');
       expect(data.colors).toBeDefined();
       expect(data.spacing).toBeDefined();
       expect(data.typography).toBeDefined();
       expect(data.components).toBeDefined();
+      expect(data.components.installed).toBeDefined();
+      expect(data.components.available).toBeDefined();
       expect(data.patterns).toBeDefined();
       expect(Array.isArray(data.patterns)).toBe(true);
+    });
+
+    it('should return empty installed when no config exists', async () => {
+      const result = await handler.handleToolCall('rafters_vocabulary', {});
+      const data = JSON.parse(result.content[0].text as string);
+
+      expect(data.components.installed).toEqual([]);
+    });
+
+    it('should return installed components from config', async () => {
+      await writeFile(
+        join(testDir, '.rafters', 'config.rafters.json'),
+        JSON.stringify({
+          framework: 'react-router',
+          componentsPath: 'components/ui',
+          primitivesPath: 'lib/primitives',
+          cssPath: null,
+          shadcn: false,
+          exports: { tailwind: true, typescript: true, dtcg: false, compiled: false },
+          installed: {
+            components: ['button', 'card'],
+            primitives: ['classy'],
+          },
+        }),
+      );
+
+      const result = await handler.handleToolCall('rafters_vocabulary', {});
+      const data = JSON.parse(result.content[0].text as string);
+
+      expect(data.components.installed).toEqual(['button', 'card']);
+    });
+
+    it('should exclude installed from available', async () => {
+      await writeFile(
+        join(testDir, '.rafters', 'config.rafters.json'),
+        JSON.stringify({
+          framework: 'react-router',
+          componentsPath: 'components/ui',
+          primitivesPath: 'lib/primitives',
+          cssPath: null,
+          shadcn: false,
+          exports: { tailwind: true, typescript: true, dtcg: false, compiled: false },
+          installed: {
+            components: ['button', 'card'],
+            primitives: ['classy'],
+          },
+        }),
+      );
+
+      const result = await handler.handleToolCall('rafters_vocabulary', {});
+      const data = JSON.parse(result.content[0].text as string);
+
+      // Available should not contain installed components
+      expect(data.components.available).not.toContain('button');
+      expect(data.components.available).not.toContain('card');
     });
 
     it('should return color vocabulary when tokens exist', async () => {
@@ -98,6 +167,25 @@ describe('RaftersToolHandler', () => {
       expect(data.patterns).toContain('destructive-action');
       expect(data.patterns).toContain('form-validation');
       expect(data.patterns).toContain('empty-state');
+    });
+
+    it('should handle config without installed field', async () => {
+      await writeFile(
+        join(testDir, '.rafters', 'config.rafters.json'),
+        JSON.stringify({
+          framework: 'react-router',
+          componentsPath: 'components/ui',
+          primitivesPath: 'lib/primitives',
+          cssPath: null,
+          shadcn: false,
+          exports: { tailwind: true, typescript: true, dtcg: false, compiled: false },
+        }),
+      );
+
+      const result = await handler.handleToolCall('rafters_vocabulary', {});
+      const data = JSON.parse(result.content[0].text as string);
+
+      expect(data.components.installed).toEqual([]);
     });
   });
 

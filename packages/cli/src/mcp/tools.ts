@@ -11,6 +11,7 @@
  * then drill into patterns or components as needed.
  */
 
+import { existsSync } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
@@ -27,6 +28,9 @@ import {
   type Token,
   toDisplayName,
 } from '@rafters/shared';
+import type { RaftersConfig } from '../commands/init.js';
+import { RegistryClient } from '../registry/client.js';
+import { getRaftersPaths } from '../utils/paths.js';
 
 // ==================== System Preamble ====================
 // Rules for agents using the Rafters design system
@@ -502,13 +506,12 @@ export class RaftersToolHandler {
       ]);
 
       const vocabulary = {
+        system: SYSTEM_PREAMBLE,
+        components,
         colors,
         spacing,
         typography,
-        components,
         patterns: Object.keys(DESIGN_PATTERNS),
-        usage:
-          'Use rafters_pattern for deep guidance on specific patterns, rafters_component for component details',
       };
 
       return {
@@ -614,42 +617,36 @@ export class RaftersToolHandler {
   /**
    * Extract compact component vocabulary
    */
-  private async getComponentVocabulary(): Promise<
-    Array<{ name: string; category: string; load?: number }>
-  > {
+  private async getComponentVocabulary(): Promise<{
+    installed: string[];
+    available: string[];
+  }> {
+    // Read installed components from config
+    let installed: string[] = [];
     try {
-      const componentsPath = this.getComponentsPath();
-      const files = await readdir(componentsPath);
-      const componentFiles = files.filter((f) => f.endsWith('.tsx'));
-
-      const components: Array<{ name: string; category: string; load?: number }> = [];
-
-      for (const file of componentFiles) {
-        const name = basename(file, '.tsx');
-        const metadata = await this.loadComponentMetadata(name);
-
-        if (metadata) {
-          const item: { name: string; category: string; load?: number } = {
-            name: metadata.name,
-            category: metadata.category,
-          };
-          if (metadata.intelligence?.cognitiveLoad !== undefined) {
-            item.load = metadata.intelligence.cognitiveLoad;
-          }
-          components.push(item);
-        }
+      const paths = getRaftersPaths(this.projectRoot);
+      if (existsSync(paths.config)) {
+        const content = await readFile(paths.config, 'utf-8');
+        const config = JSON.parse(content) as RaftersConfig;
+        installed = config.installed?.components ?? [];
       }
-
-      // Sort by category, then by name
-      components.sort((a, b) => {
-        if (a.category !== b.category) return a.category.localeCompare(b.category);
-        return a.name.localeCompare(b.name);
-      });
-
-      return components;
     } catch {
-      return [];
+      // No config or malformed -- installed stays empty
     }
+
+    // Fetch available components from registry
+    let available: string[] = [];
+    try {
+      const client = new RegistryClient();
+      const index = await client.fetchIndex();
+      const allComponents = index.components;
+      const installedSet = new Set(installed);
+      available = allComponents.filter((name) => !installedSet.has(name));
+    } catch {
+      // Registry unreachable -- available stays empty
+    }
+
+    return { installed, available };
   }
 
   // ==================== Tool 2: Pattern ====================
