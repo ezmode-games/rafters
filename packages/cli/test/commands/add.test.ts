@@ -10,7 +10,14 @@
 import { describe, expect, it } from 'vitest';
 import { zocker } from 'zocker';
 import { z } from 'zod';
-import { collectDependencies, transformFileContent } from '../../src/commands/add.js';
+import {
+  collectDependencies,
+  isAlreadyInstalled,
+  trackInstalled,
+  transformFileContent,
+} from '../../src/commands/add.js';
+import type { RaftersConfig } from '../../src/commands/init.js';
+import type { RegistryItem } from '../../src/registry/types.js';
 import { RegistryItemSchema } from '../../src/registry/types.js';
 import { generateRandomItems, registryFixtures } from '../fixtures/registry.js';
 
@@ -132,6 +139,160 @@ describe('collectDependencies', () => {
 
     expect(Array.isArray(result.dependencies)).toBe(true);
     expect(Array.isArray(result.devDependencies)).toBe(true);
+  });
+});
+
+describe('isAlreadyInstalled', () => {
+  const baseConfig: RaftersConfig = {
+    framework: 'react-router',
+    componentsPath: 'components/ui',
+    primitivesPath: 'lib/primitives',
+    cssPath: null,
+    shadcn: false,
+    exports: { tailwind: true, typescript: true, dtcg: false, compiled: false },
+    installed: {
+      components: ['button', 'card'],
+      primitives: ['classy'],
+    },
+  };
+
+  it('returns true for installed component', () => {
+    const item: RegistryItem = {
+      name: 'button',
+      type: 'registry:ui',
+      primitives: ['classy'],
+      files: [],
+    };
+    expect(isAlreadyInstalled(baseConfig, item)).toBe(true);
+  });
+
+  it('returns true for installed primitive', () => {
+    const item: RegistryItem = {
+      name: 'classy',
+      type: 'registry:primitive',
+      primitives: [],
+      files: [],
+    };
+    expect(isAlreadyInstalled(baseConfig, item)).toBe(true);
+  });
+
+  it('returns false for uninstalled component', () => {
+    const item: RegistryItem = { name: 'dialog', type: 'registry:ui', primitives: [], files: [] };
+    expect(isAlreadyInstalled(baseConfig, item)).toBe(false);
+  });
+
+  it('returns false when config is null', () => {
+    const item: RegistryItem = { name: 'button', type: 'registry:ui', primitives: [], files: [] };
+    expect(isAlreadyInstalled(null, item)).toBe(false);
+  });
+
+  it('returns false when installed field is missing', () => {
+    const configNoInstalled: RaftersConfig = {
+      ...baseConfig,
+      installed: undefined,
+    };
+    const item: RegistryItem = { name: 'button', type: 'registry:ui', primitives: [], files: [] };
+    expect(isAlreadyInstalled(configNoInstalled, item)).toBe(false);
+  });
+});
+
+describe('trackInstalled', () => {
+  it('adds components to installed list', () => {
+    const config: RaftersConfig = {
+      framework: 'react-router',
+      componentsPath: 'components/ui',
+      primitivesPath: 'lib/primitives',
+      cssPath: null,
+      shadcn: false,
+      exports: { tailwind: true, typescript: true, dtcg: false, compiled: false },
+      installed: { components: [], primitives: [] },
+    };
+
+    const items: RegistryItem[] = [registryFixtures.buttonComponent()];
+
+    trackInstalled(config, items);
+
+    expect(config.installed?.components).toContain('button');
+  });
+
+  it('adds primitives to installed list', () => {
+    const config: RaftersConfig = {
+      framework: 'react-router',
+      componentsPath: 'components/ui',
+      primitivesPath: 'lib/primitives',
+      cssPath: null,
+      shadcn: false,
+      exports: { tailwind: true, typescript: true, dtcg: false, compiled: false },
+      installed: { components: [], primitives: [] },
+    };
+
+    const items: RegistryItem[] = [registryFixtures.classyPrimitive()];
+
+    trackInstalled(config, items);
+
+    expect(config.installed?.primitives).toContain('classy');
+  });
+
+  it('deduplicates when adding same item twice', () => {
+    const config: RaftersConfig = {
+      framework: 'react-router',
+      componentsPath: 'components/ui',
+      primitivesPath: 'lib/primitives',
+      cssPath: null,
+      shadcn: false,
+      exports: { tailwind: true, typescript: true, dtcg: false, compiled: false },
+      installed: { components: ['button'], primitives: ['classy'] },
+    };
+
+    const items: RegistryItem[] = [
+      registryFixtures.buttonComponent(),
+      registryFixtures.classyPrimitive(),
+    ];
+
+    trackInstalled(config, items);
+
+    expect(config.installed?.components.filter((c) => c === 'button')).toHaveLength(1);
+    expect(config.installed?.primitives.filter((p) => p === 'classy')).toHaveLength(1);
+  });
+
+  it('sorts installed lists alphabetically', () => {
+    const config: RaftersConfig = {
+      framework: 'react-router',
+      componentsPath: 'components/ui',
+      primitivesPath: 'lib/primitives',
+      cssPath: null,
+      shadcn: false,
+      exports: { tailwind: true, typescript: true, dtcg: false, compiled: false },
+      installed: { components: [], primitives: [] },
+    };
+
+    const items: RegistryItem[] = [
+      registryFixtures.dialogComponent(),
+      registryFixtures.buttonComponent(),
+      registryFixtures.cardComponent(),
+    ];
+
+    trackInstalled(config, items);
+
+    expect(config.installed?.components).toEqual(['button', 'card', 'dialog']);
+  });
+
+  it('initializes installed field when missing', () => {
+    const config: RaftersConfig = {
+      framework: 'react-router',
+      componentsPath: 'components/ui',
+      primitivesPath: 'lib/primitives',
+      cssPath: null,
+      shadcn: false,
+      exports: { tailwind: true, typescript: true, dtcg: false, compiled: false },
+    };
+
+    const items: RegistryItem[] = [registryFixtures.buttonComponent()];
+
+    trackInstalled(config, items);
+
+    expect(config.installed).toBeDefined();
+    expect(config.installed?.components).toContain('button');
   });
 });
 

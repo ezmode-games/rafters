@@ -10,6 +10,7 @@ import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { RegistryClient } from '../registry/client.js';
 import type { RegistryItem } from '../registry/types.js';
+import { DEFAULT_EXPORTS } from '../utils/exports.js';
 import { getRaftersPaths } from '../utils/paths.js';
 import { error, log, setAgentMode } from '../utils/ui.js';
 import { updateDependencies } from '../utils/update-dependencies.js';
@@ -51,6 +52,48 @@ async function loadConfig(cwd: string): Promise<RaftersConfig | null> {
     }
     return null;
   }
+}
+
+/**
+ * Save config back to .rafters/config.rafters.json
+ */
+async function saveConfig(cwd: string, config: RaftersConfig): Promise<void> {
+  const paths = getRaftersPaths(cwd);
+  await writeFile(paths.config, JSON.stringify(config, null, 2));
+}
+
+/**
+ * Check if an item is already tracked in the installed list
+ */
+export function isAlreadyInstalled(config: RaftersConfig | null, item: RegistryItem): boolean {
+  if (!config?.installed) return false;
+  if (item.type === 'registry:ui') {
+    return config.installed.components.includes(item.name);
+  }
+  return config.installed.primitives.includes(item.name);
+}
+
+/**
+ * Update the installed list in config with newly installed items.
+ * Deduplicates and sorts alphabetically.
+ */
+export function trackInstalled(config: RaftersConfig, items: RegistryItem[]): void {
+  if (!config.installed) {
+    config.installed = { components: [], primitives: [] };
+  }
+  for (const item of items) {
+    if (item.type === 'registry:ui') {
+      if (!config.installed.components.includes(item.name)) {
+        config.installed.components.push(item.name);
+      }
+    } else {
+      if (!config.installed.primitives.includes(item.name)) {
+        config.installed.primitives.push(item.name);
+      }
+    }
+  }
+  config.installed.components.sort();
+  config.installed.primitives.sort();
 }
 
 /**
@@ -312,13 +355,26 @@ export async function add(components: string[], options: AddOptions): Promise<vo
   // Install all resolved items
   const installed: string[] = [];
   const skipped: string[] = [];
+  const installedItems: RegistryItem[] = [];
 
   for (const item of allItems) {
+    // Skip items already tracked in config (unless --overwrite)
+    if (!options.overwrite && isAlreadyInstalled(config, item)) {
+      log({
+        event: 'add:skip',
+        component: item.name,
+        reason: 'already installed',
+      });
+      skipped.push(item.name);
+      continue;
+    }
+
     try {
       const result = await installItem(cwd, item, options, config);
 
       if (result.installed) {
         installed.push(item.name);
+        installedItems.push(item);
         log({
           event: 'add:installed',
           component: item.name,
@@ -362,6 +418,25 @@ export async function add(components: string[], options: AddOptions): Promise<vo
       });
       // Don't fail the whole command - files are already written
     }
+  }
+
+  // Update config with installed items
+  if (installedItems.length > 0 && config) {
+    trackInstalled(config, installedItems);
+    await saveConfig(cwd, config);
+  } else if (installedItems.length > 0 && !config) {
+    // No config file yet -- create minimal installed tracking
+    const newConfig: RaftersConfig = {
+      framework: 'unknown' as RaftersConfig['framework'],
+      componentsPath: 'components/ui',
+      primitivesPath: 'lib/primitives',
+      cssPath: null,
+      shadcn: false,
+      exports: DEFAULT_EXPORTS,
+      installed: { components: [], primitives: [] },
+    };
+    trackInstalled(newConfig, installedItems);
+    await saveConfig(cwd, newConfig);
   }
 
   // Summary
