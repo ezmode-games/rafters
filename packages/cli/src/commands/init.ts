@@ -90,6 +90,11 @@ export interface RaftersConfig {
   shadcn: boolean;
   /** Export format selections */
   exports: ExportConfig;
+  /** Items installed via `rafters add` */
+  installed?: {
+    components: string[];
+    primitives: string[];
+  };
 }
 
 async function findMainCssFile(cwd: string, framework: Framework): Promise<string | null> {
@@ -641,6 +646,10 @@ export async function init(options: InitOptions): Promise<void> {
     cssPath: detectedCssPath,
     shadcn: !!shadcn,
     exports,
+    installed: {
+      components: [],
+      primitives: [],
+    },
   };
   await writeFile(paths.config, JSON.stringify(config, null, 2));
 
