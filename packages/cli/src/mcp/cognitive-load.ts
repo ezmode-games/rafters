@@ -68,6 +68,7 @@ export interface CompositionReview {
     suggestion: string;
   }>;
   violations: string[];
+  warnings: string[];
 }
 
 // ==================== Budget Constants ====================
@@ -1031,6 +1032,19 @@ export function evaluateComposition(
     );
   }
 
+  // Step 9: Warn about missing intelligence
+  const warnings: string[] = [];
+  const knownNames = [...componentCounts.keys()].filter((n) => COMPONENT_SCORES[n]);
+  const uninstrumented = knownNames.filter((n) => !enrichment.componentIntelligence.has(n));
+  if (uninstrumented.length > 0) {
+    warnings.push(
+      `No component intelligence loaded for: ${uninstrumented.join(', ')}. ` +
+        'Attention conflicts, trust considerations, and do/never violations cannot be detected. ' +
+        `Install components with rafters add (e.g. rafters add ${uninstrumented[0]}) ` +
+        'to get full design intelligence.',
+    );
+  }
+
   return {
     budget: budgetResult,
     components: componentResults,
@@ -1043,5 +1057,6 @@ export function evaluateComposition(
     designerNotes,
     hotspots,
     violations,
+    warnings,
   };
 }

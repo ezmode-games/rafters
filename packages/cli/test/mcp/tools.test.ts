@@ -395,6 +395,10 @@ describe('RaftersToolHandler', () => {
       expect(data.patterns).toBeDefined();
       expect(data.hotspots).toBeDefined();
       expect(data.violations).toBeDefined();
+      expect(data.warnings).toBeDefined();
+      // Components are in test dir (not monorepo), so intelligence is unavailable
+      expect(data.warnings.length).toBeGreaterThan(0);
+      expect(data.warnings[0]).toContain('rafters add');
     });
 
     it('should respect tier parameter', async () => {

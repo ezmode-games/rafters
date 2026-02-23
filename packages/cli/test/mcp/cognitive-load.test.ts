@@ -234,6 +234,33 @@ describe('evaluateComposition', () => {
     expect(review.budget.tier).toBe('page');
     expect(review.budget.budget).toBe(30);
   });
+
+  it('should warn when component intelligence is missing', () => {
+    const review = evaluateComposition(['button', 'card'], 'page', emptyEnrichment());
+
+    expect(review.warnings.length).toBe(1);
+    expect(review.warnings[0]).toContain('No component intelligence loaded');
+    expect(review.warnings[0]).toContain('button');
+    expect(review.warnings[0]).toContain('card');
+    expect(review.warnings[0]).toContain('rafters add');
+  });
+
+  it('should not warn when all components have intelligence', () => {
+    const enrichment = emptyEnrichment();
+    enrichment.componentIntelligence.set('button', {
+      name: 'button',
+      displayName: 'Button',
+      category: 'form',
+      variants: ['default'],
+      sizes: ['default'],
+      dependencies: [],
+      primitives: [],
+      filePath: '',
+    });
+
+    const review = evaluateComposition(['button'], 'page', enrichment);
+    expect(review.warnings.length).toBe(0);
+  });
 });
 
 // ==================== Attention Conflict Detection ====================
