@@ -44,40 +44,16 @@ export function parseDependency(dep: string): { name: string; version: string | 
     return { name: '', version: undefined };
   }
 
-  // Handle scoped packages: @scope/name@version
-  if (trimmed.startsWith('@')) {
-    const slashIndex = trimmed.indexOf('/');
-    if (slashIndex === -1) {
-      return { name: trimmed, version: undefined };
-    }
-    const afterSlash = trimmed.slice(slashIndex + 1);
-    const atIndex = afterSlash.indexOf('@');
-    if (atIndex === -1) {
-      return { name: trimmed, version: undefined };
-    }
-    return {
-      name: trimmed.slice(0, slashIndex + 1 + atIndex),
-      version: afterSlash.slice(atIndex + 1),
-    };
-  }
-
-  // Handle unscoped packages: name@version
-  const atIndex = trimmed.indexOf('@');
-  if (atIndex === -1) {
+  // The version separator is the last '@' that is not the scoped-package prefix at index 0
+  const versionAt = trimmed.lastIndexOf('@');
+  if (versionAt <= 0) {
     return { name: trimmed, version: undefined };
   }
-  return {
-    name: trimmed.slice(0, atIndex),
-    version: trimmed.slice(atIndex + 1),
-  };
-}
 
-/**
- * Check if a dependency is an internal @rafters/* package
- */
-function isInternalDep(dep: string): boolean {
-  const { name } = parseDependency(dep);
-  return name.startsWith('@rafters/');
+  return {
+    name: trimmed.slice(0, versionAt),
+    version: trimmed.slice(versionAt + 1),
+  };
 }
 
 interface ReadDepsResult {
@@ -93,31 +69,28 @@ async function readInstalledDeps(targetDir: string): Promise<ReadDepsResult> {
   let raw: string;
   try {
     raw = await readFile(join(targetDir, 'package.json'), 'utf-8');
-  } catch (err) {
-    if (err instanceof Error && 'code' in err && (err as NodeJS.ErrnoException).code === 'ENOENT') {
-      return { packageJsonFound: false, installed: new Set() };
-    }
-    // Log non-ENOENT errors (permission, etc) but continue
+  } catch {
+    // ENOENT, permission errors, etc -- treat as not found
     return { packageJsonFound: false, installed: new Set() };
   }
 
-  const installed = new Set<string>();
   try {
     const pkg = JSON.parse(raw) as Record<string, unknown>;
-    for (const field of ['dependencies', 'devDependencies', 'peerDependencies']) {
+    const installed = new Set<string>();
+    const depFields = ['dependencies', 'devDependencies', 'peerDependencies'] as const;
+    for (const field of depFields) {
       const section = pkg[field];
       if (section && typeof section === 'object') {
-        for (const name of Object.keys(section as Record<string, unknown>)) {
+        for (const name of Object.keys(section)) {
           installed.add(name);
         }
       }
     }
+    return { packageJsonFound: true, installed };
   } catch {
     // Malformed JSON -- treat as found but empty
     return { packageJsonFound: true, installed: new Set() };
   }
-
-  return { packageJsonFound: true, installed };
 }
 
 /**
@@ -133,32 +106,21 @@ export async function installRegistryDependencies(
   const result: InstallRegistryDepsResult = {
     installed: [],
     skipped: [],
-    // TODO: devDependencies installation not yet implemented.
-    // When registry items include devDependencies, pass them as the second
-    // argument to updateDependencies with the --save-dev flag.
     devInstalled: [],
     failed: [],
   };
 
-  // 1. Collect and deduplicate all deps from all files
-  const allDeps = new Set<string>();
-  for (const item of items) {
-    for (const file of item.files) {
-      for (const dep of file.dependencies) {
-        allDeps.add(dep);
-      }
-    }
-  }
+  // 1. Collect and deduplicate all deps across all files
+  const allDeps = new Set(items.flatMap((item) => item.files.flatMap((file) => file.dependencies)));
 
-  // Zero deps -- nothing to do
   if (allDeps.size === 0) {
     return result;
   }
 
-  // 2. Filter out @rafters/* internal deps
+  // 2. Partition into internal (@rafters/*) and external deps
   const externalDeps: string[] = [];
   for (const dep of allDeps) {
-    if (isInternalDep(dep)) {
+    if (parseDependency(dep).name.startsWith('@rafters/')) {
       result.skipped.push(dep);
     } else {
       externalDeps.push(dep);
@@ -210,7 +172,7 @@ export async function installRegistryDependencies(
   try {
     await updateDependencies(toInstall, [], {
       cwd: targetDir,
-      ...(options.silent !== undefined && { silent: options.silent }),
+      silent: options.silent,
     });
     result.installed = toInstall;
   } catch (err) {

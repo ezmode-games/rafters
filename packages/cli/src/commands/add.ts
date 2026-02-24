@@ -401,19 +401,21 @@ export async function add(components: string[], options: AddOptions): Promise<vo
     }
   }
 
-  // Collect, filter, and install dependencies
-  let depsResult: InstallRegistryDepsResult = {
+  // Collect, filter, and install dependencies (safety-net: never fails the whole command)
+  const emptyDeps: InstallRegistryDepsResult = {
     installed: [],
     skipped: [],
     devInstalled: [],
     failed: [],
   };
+  let depsResult = emptyDeps;
   try {
     depsResult = await installRegistryDependencies(allItems, cwd);
   } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
     log({
       event: 'add:deps:install-failed',
-      message: `Failed to process dependencies: ${err instanceof Error ? err.message : String(err)}`,
+      message: `Failed to process dependencies: ${message}`,
       dependencies: [],
       suggestion: 'Check package.json and try installing dependencies manually.',
     });
