@@ -10,6 +10,16 @@ function makeBlock(id: string, overrides?: Partial<Block>): Block {
   return { id, type: 'paragraph', content: `Content for ${id}`, ...overrides };
 }
 
+/** Extract ordered IDs from a handler's block list */
+function blockIds(handler: ReturnType<typeof createBlockHandler>): string[] {
+  return handler.$blocks.get().map((b) => b.id);
+}
+
+/** Find a block by ID in a handler's block list */
+function findBlock(handler: ReturnType<typeof createBlockHandler>, id: string): Block | undefined {
+  return handler.$blocks.get().find((b) => b.id === id);
+}
+
 // ============================================================================
 // Tests
 // ============================================================================
@@ -71,8 +81,7 @@ describe('createBlockHandler', () => {
 
       handler.addBlock(makeBlock('b'), 1);
 
-      const ids = handler.$blocks.get().map((b) => b.id);
-      expect(ids).toEqual(['a', 'b', 'c']);
+      expect(blockIds(handler)).toEqual(['a', 'b', 'c']);
     });
 
     it('clamps negative index to 0', () => {
@@ -80,8 +89,7 @@ describe('createBlockHandler', () => {
 
       handler.addBlock(makeBlock('b'), -5);
 
-      const ids = handler.$blocks.get().map((b) => b.id);
-      expect(ids).toEqual(['b', 'a']);
+      expect(blockIds(handler)).toEqual(['b', 'a']);
     });
 
     it('clamps out-of-range index to length', () => {
@@ -89,8 +97,7 @@ describe('createBlockHandler', () => {
 
       handler.addBlock(makeBlock('b'), 999);
 
-      const ids = handler.$blocks.get().map((b) => b.id);
-      expect(ids).toEqual(['a', 'b']);
+      expect(blockIds(handler)).toEqual(['a', 'b']);
     });
 
     it('throws on duplicate ID', () => {
@@ -114,8 +121,7 @@ describe('createBlockHandler', () => {
 
       handler.removeBlocks(new Set(['b']));
 
-      const ids = handler.$blocks.get().map((b) => b.id);
-      expect(ids).toEqual(['a', 'c']);
+      expect(blockIds(handler)).toEqual(['a', 'c']);
     });
 
     it('removes multiple blocks', () => {
@@ -125,8 +131,7 @@ describe('createBlockHandler', () => {
 
       handler.removeBlocks(new Set(['a', 'c']));
 
-      const ids = handler.$blocks.get().map((b) => b.id);
-      expect(ids).toEqual(['b']);
+      expect(blockIds(handler)).toEqual(['b']);
     });
 
     it('cascades removal to nested children', () => {
@@ -142,8 +147,7 @@ describe('createBlockHandler', () => {
 
       handler.removeBlocks(new Set(['parent']));
 
-      const ids = handler.$blocks.get().map((b) => b.id);
-      expect(ids).toEqual(['other']);
+      expect(blockIds(handler)).toEqual(['other']);
     });
 
     it('cleans up children references from surviving parents', () => {
@@ -157,8 +161,7 @@ describe('createBlockHandler', () => {
 
       handler.removeBlocks(new Set(['child1']));
 
-      const parent = handler.$blocks.get().find((b) => b.id === 'parent');
-      expect(parent?.children).toEqual(['child2']);
+      expect(findBlock(handler, 'parent')?.children).toEqual(['child2']);
     });
 
     it('cleans orphaned parentId when parent is removed but child survives', () => {
@@ -175,7 +178,7 @@ describe('createBlockHandler', () => {
       // Remove the parent -- child survives because it is not in parent.children
       handler.removeBlocks(new Set(['parent']));
 
-      const child = handler.$blocks.get().find((b) => b.id === 'child');
+      const child = findBlock(handler, 'child');
       expect(child).toBeDefined();
       expect(child?.parentId).toBeUndefined();
     });
@@ -189,7 +192,6 @@ describe('createBlockHandler', () => {
 
       handler.removeBlocks(new Set(['nonexistent']));
 
-      // onChange should not fire since nothing was actually removed
       expect(onChange).not.toHaveBeenCalled();
     });
 
@@ -238,8 +240,7 @@ describe('createBlockHandler', () => {
 
       handler.moveBlock('a', 2);
 
-      const ids = handler.$blocks.get().map((b) => b.id);
-      expect(ids).toEqual(['b', 'c', 'a']);
+      expect(blockIds(handler)).toEqual(['b', 'c', 'a']);
     });
 
     it('clamps target index to valid range', () => {
@@ -249,8 +250,7 @@ describe('createBlockHandler', () => {
 
       handler.moveBlock('a', 999);
 
-      const ids = handler.$blocks.get().map((b) => b.id);
-      expect(ids).toEqual(['b', 'a']);
+      expect(blockIds(handler)).toEqual(['b', 'a']);
     });
 
     it('throws for unknown block ID', () => {
@@ -276,8 +276,7 @@ describe('createBlockHandler', () => {
 
       handler.reorderBlocks(0, 2);
 
-      const ids = handler.$blocks.get().map((b) => b.id);
-      expect(ids).toEqual(['b', 'c', 'a']);
+      expect(blockIds(handler)).toEqual(['b', 'c', 'a']);
     });
 
     it('clamps out-of-range indices', () => {
@@ -287,8 +286,7 @@ describe('createBlockHandler', () => {
 
       handler.reorderBlocks(-1, 100);
 
-      const ids = handler.$blocks.get().map((b) => b.id);
-      expect(ids).toEqual(['b', 'c', 'a']);
+      expect(blockIds(handler)).toEqual(['b', 'c', 'a']);
     });
 
     it('is a no-op when from and to are the same', () => {
@@ -300,14 +298,12 @@ describe('createBlockHandler', () => {
 
       handler.reorderBlocks(1, 1);
 
-      // Should not have been called since indices are equal
       expect(onChange).not.toHaveBeenCalled();
     });
 
     it('handles empty block list', () => {
       const handler = createBlockHandler();
 
-      // Should not throw
       handler.reorderBlocks(0, 1);
 
       expect(handler.$blocks.get()).toEqual([]);
@@ -385,12 +381,8 @@ describe('createBlockHandler', () => {
 
       handler.nestBlock('child', 'parent');
 
-      const blocks = handler.$blocks.get();
-      const parent = blocks.find((b) => b.id === 'parent');
-      const child = blocks.find((b) => b.id === 'child');
-
-      expect(parent?.children).toEqual(['child']);
-      expect(child?.parentId).toBe('parent');
+      expect(findBlock(handler, 'parent')?.children).toEqual(['child']);
+      expect(findBlock(handler, 'child')?.parentId).toBe('parent');
     });
 
     it('moves a child from one parent to another', () => {
@@ -404,14 +396,9 @@ describe('createBlockHandler', () => {
 
       handler.nestBlock('child', 'parent2');
 
-      const blocks = handler.$blocks.get();
-      const parent1 = blocks.find((b) => b.id === 'parent1');
-      const parent2 = blocks.find((b) => b.id === 'parent2');
-      const child = blocks.find((b) => b.id === 'child');
-
-      expect(parent1?.children).toEqual([]);
-      expect(parent2?.children).toEqual(['child']);
-      expect(child?.parentId).toBe('parent2');
+      expect(findBlock(handler, 'parent1')?.children).toEqual([]);
+      expect(findBlock(handler, 'parent2')?.children).toEqual(['child']);
+      expect(findBlock(handler, 'child')?.parentId).toBe('parent2');
     });
 
     it('throws on self-nesting', () => {
@@ -466,11 +453,9 @@ describe('createBlockHandler', () => {
         ],
       });
 
-      // Nesting again under the same parent should not add a duplicate
       handler.nestBlock('child', 'parent');
 
-      const parent = handler.$blocks.get().find((b) => b.id === 'parent');
-      expect(parent?.children).toEqual(['child']);
+      expect(findBlock(handler, 'parent')?.children).toEqual(['child']);
     });
   });
 
@@ -489,12 +474,8 @@ describe('createBlockHandler', () => {
 
       handler.unnestBlock('child');
 
-      const blocks = handler.$blocks.get();
-      const parent = blocks.find((b) => b.id === 'parent');
-      const child = blocks.find((b) => b.id === 'child');
-
-      expect(parent?.children).toEqual([]);
-      expect(child?.parentId).toBeUndefined();
+      expect(findBlock(handler, 'parent')?.children).toEqual([]);
+      expect(findBlock(handler, 'child')?.parentId).toBeUndefined();
     });
 
     it('is a no-op for top-level blocks', () => {
@@ -506,7 +487,6 @@ describe('createBlockHandler', () => {
 
       handler.unnestBlock('a');
 
-      // Should not trigger a state change
       expect(onChange).not.toHaveBeenCalled();
     });
 
@@ -570,14 +550,11 @@ describe('createBlockHandler', () => {
 
       const callbacks = handler.getCanvasCallbacks();
 
-      // Must have these keys
       expect(callbacks).toHaveProperty('getBlocks');
       expect(callbacks).toHaveProperty('getSelectedIds');
       expect(callbacks).toHaveProperty('getFocusedId');
       expect(callbacks).toHaveProperty('onSelectionChange');
       expect(callbacks).toHaveProperty('onFocusChange');
-
-      // Must NOT have container (that comes from the caller)
       expect(callbacks).not.toHaveProperty('container');
     });
 
@@ -590,7 +567,6 @@ describe('createBlockHandler', () => {
       const blocks = callbacks.getBlocks();
 
       expect(blocks).toEqual([{ id: 'a', type: 'heading' }]);
-      // Should NOT include content or other Block fields
       expect(blocks[0]).not.toHaveProperty('content');
     });
 
@@ -737,7 +713,6 @@ describe('createBlockHandler', () => {
 
       handler.addBlock(makeBlock('a'));
 
-      // onChange should NOT have been called after destroy
       expect(onChange).not.toHaveBeenCalled();
     });
 
@@ -746,8 +721,6 @@ describe('createBlockHandler', () => {
 
       handler.destroy();
       handler.destroy();
-
-      // No error thrown
     });
 
     it('atoms remain readable after destroy', () => {
@@ -757,7 +730,6 @@ describe('createBlockHandler', () => {
 
       handler.destroy();
 
-      // Atoms should still be readable (just not subscribed)
       expect(handler.$blocks.get()).toHaveLength(1);
     });
   });
@@ -830,7 +802,6 @@ describe('createBlockHandler', () => {
         onChange,
       });
 
-      // Both will clamp to 0
       handler.reorderBlocks(0, 0);
       expect(onChange).not.toHaveBeenCalled();
     });

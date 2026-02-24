@@ -46,7 +46,7 @@
  * ```
  */
 import { atom, computed } from 'nanostores';
-import type { BlockCanvasBlock, BlockCanvasOptions } from './block-canvas';
+import type { BlockCanvasOptions } from './block-canvas';
 
 // ============================================================================
 // Types
@@ -160,20 +160,14 @@ function isAncestor(startId: string, targetId: string, blockMap: Map<string, Blo
  * Build a Map<string, Block> from an array.
  */
 function buildBlockMap(blocks: Block[]): Map<string, Block> {
-  const map = new Map<string, Block>();
-  for (const block of blocks) {
-    map.set(block.id, block);
-  }
-  return map;
+  return new Map(blocks.map((block) => [block.id, block]));
 }
 
 /**
  * Clamp an index into [0, max].
  */
 function clampIndex(index: number, max: number): number {
-  if (index < 0) return 0;
-  if (index > max) return max;
-  return index;
+  return Math.max(0, Math.min(index, max));
 }
 
 // ============================================================================
@@ -210,18 +204,12 @@ export function createBlockHandler(options?: BlockHandlerOptions): BlockHandlerI
     unsubscribes.push(unsub);
   }
 
-  // -- Notify helper ---------------------------------------------------------
-  function setBlocks(next: Block[]): void {
-    $blocks.set(next);
-  }
-
   // -- Mutations -------------------------------------------------------------
 
   function addBlock(block: Block, index?: number): void {
     const current = $blocks.get();
-    const map = buildBlockMap(current);
 
-    if (map.has(block.id)) {
+    if (current.some((b) => b.id === block.id)) {
       throw new Error(`Block with id '${block.id}' already exists`);
     }
 
@@ -233,7 +221,7 @@ export function createBlockHandler(options?: BlockHandlerOptions): BlockHandlerI
       next.splice(clamped, 0, block);
     }
 
-    setBlocks(next);
+    $blocks.set(next);
   }
 
   function removeBlocks(ids: Set<string>): void {
@@ -243,14 +231,19 @@ export function createBlockHandler(options?: BlockHandlerOptions): BlockHandlerI
     // Collect all IDs to remove (requested + descendants)
     const toRemove = new Set<string>(ids);
     for (const id of ids) {
-      const descendants = collectDescendants(id, map);
-      for (const descendantId of descendants) {
+      for (const descendantId of collectDescendants(id, map)) {
         toRemove.add(descendantId);
       }
     }
 
     // Short-circuit when none of the IDs exist in the current blocks
-    const hasRemovals = [...toRemove].some((id) => map.has(id));
+    let hasRemovals = false;
+    for (const id of toRemove) {
+      if (map.has(id)) {
+        hasRemovals = true;
+        break;
+      }
+    }
     if (!hasRemovals) return;
 
     // Remove children references from surviving parents and clean orphaned parentIds
@@ -275,16 +268,8 @@ export function createBlockHandler(options?: BlockHandlerOptions): BlockHandlerI
 
     // Clean up removed IDs from selection
     const selectedIds = $selectedIds.get();
-    let selectionChanged = false;
-    const newSelection = new Set<string>();
-    for (const id of selectedIds) {
-      if (!toRemove.has(id)) {
-        newSelection.add(id);
-      } else {
-        selectionChanged = true;
-      }
-    }
-    if (selectionChanged) {
+    const newSelection = new Set([...selectedIds].filter((id) => !toRemove.has(id)));
+    if (newSelection.size !== selectedIds.size) {
       $selectedIds.set(newSelection);
     }
 
@@ -294,7 +279,7 @@ export function createBlockHandler(options?: BlockHandlerOptions): BlockHandlerI
       $focusedId.set(null);
     }
 
-    setBlocks(next);
+    $blocks.set(next);
   }
 
   function moveBlock(id: string, toIndex: number): void {
@@ -306,16 +291,10 @@ export function createBlockHandler(options?: BlockHandlerOptions): BlockHandlerI
     }
 
     const next = [...current];
-    const spliced = next.splice(fromIndex, 1);
-    // fromIndex is validated above so splice always returns one element
-    const block = spliced[0];
-    if (!block)
-      throw new Error(`Unexpected: splice at validated index ${fromIndex} returned empty`);
+    const block = next.splice(fromIndex, 1)[0];
+    if (block) next.splice(clampIndex(toIndex, next.length), 0, block);
 
-    const clamped = clampIndex(toIndex, next.length);
-    next.splice(clamped, 0, block);
-
-    setBlocks(next);
+    $blocks.set(next);
   }
 
   function reorderBlocks(fromIndex: number, toIndex: number): void {
@@ -328,15 +307,10 @@ export function createBlockHandler(options?: BlockHandlerOptions): BlockHandlerI
     if (clampedFrom === clampedTo) return;
 
     const next = [...current];
-    const spliced = next.splice(clampedFrom, 1);
-    // clampedFrom is within bounds so splice always returns one element
-    const block = spliced[0];
-    if (!block)
-      throw new Error(`Unexpected: splice at clamped index ${clampedFrom} returned empty`);
+    const block = next.splice(clampedFrom, 1)[0];
+    if (block) next.splice(clampedTo, 0, block);
 
-    next.splice(clampedTo, 0, block);
-
-    setBlocks(next);
+    $blocks.set(next);
   }
 
   function updateBlock(id: string, updates: Partial<Block>): void {
@@ -357,9 +331,9 @@ export function createBlockHandler(options?: BlockHandlerOptions): BlockHandlerI
     if (!existing) return;
 
     const next = [...current];
-    next[index] = { ...existing, ...updates, id: existing.id };
+    next[index] = { ...existing, ...updates, id };
 
-    setBlocks(next);
+    $blocks.set(next);
   }
 
   function nestBlock(childId: string, parentId: string): void {
@@ -376,17 +350,13 @@ export function createBlockHandler(options?: BlockHandlerOptions): BlockHandlerI
       throw new Error(`Block with id '${parentId}' not found`);
     }
 
-    // Circular reference detection: check if parentId is a descendant of childId
-    if (childId === parentId) {
-      throw new Error(`Cannot nest block '${childId}' under '${parentId}': circular reference`);
-    }
-
-    const descendants = collectDescendants(childId, map);
-    if (descendants.has(parentId)) {
-      throw new Error(`Cannot nest block '${childId}' under '${parentId}': circular reference`);
-    }
-
-    if (isAncestor(parentId, childId, map)) {
+    // Circular reference detection: self-nesting, descendant check (children pointers),
+    // and ancestor check (parentId pointers) for robustness with inconsistent trees
+    if (
+      childId === parentId ||
+      collectDescendants(childId, map).has(parentId) ||
+      isAncestor(parentId, childId, map)
+    ) {
       throw new Error(`Cannot nest block '${childId}' under '${parentId}': circular reference`);
     }
 
@@ -423,7 +393,7 @@ export function createBlockHandler(options?: BlockHandlerOptions): BlockHandlerI
       return block;
     });
 
-    setBlocks(next);
+    $blocks.set(next);
   }
 
   function unnestBlock(childId: string): void {
@@ -460,7 +430,7 @@ export function createBlockHandler(options?: BlockHandlerOptions): BlockHandlerI
       return block;
     });
 
-    setBlocks(next);
+    $blocks.set(next);
   }
 
   function setSelection(ids: Set<string>): void {
@@ -475,21 +445,11 @@ export function createBlockHandler(options?: BlockHandlerOptions): BlockHandlerI
 
   function getCanvasCallbacks(): CanvasCallbacks {
     return {
-      getBlocks: (): BlockCanvasBlock[] => {
-        return $blocks.get().map((b) => ({ id: b.id, type: b.type }));
-      },
-      getSelectedIds: (): Set<string> => {
-        return $selectedIds.get();
-      },
-      getFocusedId: (): string | undefined => {
-        return $focusedId.get() ?? undefined;
-      },
-      onSelectionChange: (ids: Set<string>): void => {
-        $selectedIds.set(ids);
-      },
-      onFocusChange: (id: string | null): void => {
-        $focusedId.set(id);
-      },
+      getBlocks: () => $blocks.get().map((b) => ({ id: b.id, type: b.type })),
+      getSelectedIds: () => $selectedIds.get(),
+      getFocusedId: () => $focusedId.get() ?? undefined,
+      onSelectionChange: (ids) => $selectedIds.set(ids),
+      onFocusChange: (id) => $focusedId.set(id),
     };
   }
 
