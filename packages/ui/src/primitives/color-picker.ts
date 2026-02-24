@@ -260,6 +260,36 @@ export function createColorPickerState(options: ColorPickerStateOptions): ColorP
   });
   cleanups.push(unsubColor);
 
+  // Pointer commit: attach document-level listeners on pointerdown so
+  // drag-release outside the container still fires onColorCommit.
+  const handleCommit = () => {
+    try {
+      onColorCommit?.($color.get());
+    } catch (err) {
+      queueMicrotask(() => {
+        throw err;
+      });
+    }
+    document.removeEventListener('mouseup', handleCommit);
+    document.removeEventListener('touchend', handleCommit);
+  };
+  const handlePointerDown = () => {
+    document.addEventListener('mouseup', handleCommit);
+    document.addEventListener('touchend', handleCommit);
+  };
+  for (const container of [areaContainer, hueContainer]) {
+    container.addEventListener('mousedown', handlePointerDown);
+    container.addEventListener('touchstart', handlePointerDown);
+  }
+  cleanups.push(() => {
+    for (const container of [areaContainer, hueContainer]) {
+      container.removeEventListener('mousedown', handlePointerDown);
+      container.removeEventListener('touchstart', handlePointerDown);
+    }
+    document.removeEventListener('mouseup', handleCommit);
+    document.removeEventListener('touchend', handleCommit);
+  });
+
   function setColor(color: OklchColor): void {
     $color.set(color);
     onColorChange?.(color);
