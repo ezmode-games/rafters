@@ -22,9 +22,11 @@ import {
   type ColorValue,
   type ComponentMetadata,
   extractDependencies,
+  extractJSDocDependencies,
   extractPrimitiveDependencies,
   extractSizes,
   extractVariants,
+  type JSDocDependencies,
   parseDescription,
   parseJSDocIntelligence,
   type Token,
@@ -39,6 +41,13 @@ import {
   COMPONENT_SCORES,
   evaluateComposition,
 } from './cognitive-load.js';
+
+// ==================== Helpers ====================
+
+/** Check whether a JSDocDependencies object has any non-empty arrays */
+function hasAnyDeps(deps: JSDocDependencies): boolean {
+  return deps.runtime.length > 0 || deps.dev.length > 0 || deps.internal.length > 0;
+}
 
 // ==================== System Preamble ====================
 // Rules for agents using the Rafters design system
@@ -745,6 +754,13 @@ export class RaftersToolHandler {
       const intelligence = parseJSDocIntelligence(source);
       const description = parseDescription(source);
 
+      let jsDocDeps: JSDocDependencies = { runtime: [], dev: [], internal: [] };
+      try {
+        jsDocDeps = extractJSDocDependencies(source);
+      } catch {
+        // JSDoc parsing failure should not prevent component metadata from being returned
+      }
+
       const metadata: ComponentMetadata = {
         name,
         displayName: toDisplayName(name),
@@ -755,6 +771,10 @@ export class RaftersToolHandler {
         primitives: extractPrimitiveDependencies(source),
         filePath: `packages/ui/src/components/ui/${name}.tsx`,
       };
+
+      if (hasAnyDeps(jsDocDeps)) {
+        metadata.jsDocDependencies = jsDocDeps;
+      }
 
       if (description) {
         metadata.description = description;
@@ -919,6 +939,10 @@ export class RaftersToolHandler {
 
       if (metadata.dependencies.length > 0) {
         formatted.dependencies = metadata.dependencies;
+      }
+
+      if (metadata.jsDocDependencies && hasAnyDeps(metadata.jsDocDependencies)) {
+        formatted.jsDocDependencies = metadata.jsDocDependencies;
       }
 
       return {
