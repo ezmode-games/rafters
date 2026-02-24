@@ -204,7 +204,7 @@ export function extractDepsFromSource(content: string): {
   dependencies: string[];
   devDependencies: string[];
 } {
-  const result = { dependencies: [] as string[], devDependencies: [] as string[] };
+  const empty = { dependencies: [] as string[], devDependencies: [] as string[] };
 
   // Use comment-parser for JSDoc-aware parsing -- raw regex would match
   // @dependencies in string literals, line comments, and template literals
@@ -212,31 +212,64 @@ export function extractDepsFromSource(content: string): {
   try {
     blocks = parse(content);
   } catch {
-    return result;
+    return empty;
   }
 
-  if (blocks.length === 0) return result;
+  if (blocks.length === 0) return empty;
 
-  const filterInternal = (dep: string): boolean => !dep.startsWith('@rafters/');
+  const deps = new Set<string>();
+  const devDeps = new Set<string>();
 
   for (const block of blocks) {
     for (const tag of block.tags) {
       const tagName = tag.tag.toLowerCase();
-      // Reconstruct full value from comment-parser's name + description split
       const value = getTagValue(tag);
+      if (!value) continue;
 
-      if (tagName === 'dependencies' && value) {
-        result.dependencies.push(...value.split(/\s+/).filter(Boolean).filter(filterInternal));
-      }
-      if (tagName === 'devdependencies' && value) {
-        result.devDependencies.push(...value.split(/\s+/).filter(Boolean).filter(filterInternal));
+      const target =
+        tagName === 'dependencies' ? deps : tagName === 'devdependencies' ? devDeps : null;
+
+      if (target) {
+        for (const pkg of value.split(/\s+/)) {
+          if (pkg && !pkg.startsWith('@rafters/')) target.add(pkg);
+        }
       }
     }
   }
 
+  return { dependencies: [...deps], devDependencies: [...devDeps] };
+}
+
+/**
+ * Analyze source content to extract merged dependencies and intelligence metadata.
+ * Shared by loadComponent and loadPrimitive.
+ */
+function analyzeSource(
+  content: string,
+  isPrimitive: boolean,
+): {
+  importDeps: ReturnType<typeof extractDependencies>;
+  allExternalDeps: string[];
+  devDependencies: string[];
+  primitiveDeps: string[];
+  intelligence: ComponentIntelligence | undefined;
+} {
+  const importDeps = extractDependencies(content);
+  const jsDocDeps = extractDepsFromSource(content);
+  const primitiveDeps = extractPrimitiveDependencies(content, isPrimitive);
+  const intelligence = parseJSDocFromSource(content);
+
+  // Merge import-extracted and JSDoc-declared deps, deduplicated
+  const allExternalDeps = [
+    ...new Set([...versionDeps(importDeps.external), ...jsDocDeps.dependencies]),
+  ];
+
   return {
-    dependencies: [...new Set(result.dependencies)],
-    devDependencies: [...new Set(result.devDependencies)],
+    importDeps,
+    allExternalDeps,
+    devDependencies: jsDocDeps.devDependencies,
+    primitiveDeps,
+    intelligence,
   };
 }
 
@@ -244,39 +277,23 @@ export function extractDepsFromSource(content: string): {
  * Load a single component by name
  */
 export function loadComponent(name: string): RegistryItem | null {
-  const componentsDir = getComponentsPath();
-  const filePath = join(componentsDir, `${name}.tsx`);
+  const filePath = join(getComponentsPath(), `${name}.tsx`);
 
   try {
     const content = readFileSync(filePath, 'utf-8');
-
-    // Extract dependencies from imports
-    const deps = extractDependencies(content);
-
-    // Extract JSDoc-declared dependencies
-    const jsDocDeps = extractDepsFromSource(content);
-
-    // Extract primitive dependencies
-    const primitiveDeps = extractPrimitiveDependencies(content);
-
-    // Parse JSDoc for intelligence metadata
-    const intelligence = parseJSDocFromSource(content);
-
-    // Merge import-extracted and JSDoc-declared deps, deduplicated
-    const allExternalDeps = [
-      ...new Set([...versionDeps(deps.external), ...jsDocDeps.dependencies]),
-    ];
+    const { importDeps, allExternalDeps, devDependencies, primitiveDeps, intelligence } =
+      analyzeSource(content, false);
 
     const result: RegistryItem = {
       name,
       type: 'registry:ui',
-      primitives: [...deps.internal, ...primitiveDeps],
+      primitives: [...importDeps.internal, ...primitiveDeps],
       files: [
         {
           path: `components/ui/${name}.tsx`,
           content,
           dependencies: allExternalDeps,
-          devDependencies: jsDocDeps.devDependencies,
+          devDependencies,
         },
       ],
     };
@@ -305,31 +322,16 @@ export function loadPrimitive(name: string): RegistryItem | null {
   try {
     readFileSync(filePath, 'utf-8');
   } catch {
-    // Try .tsx
     filePath = join(primitivesDir, `${name}.tsx`);
     fileExt = '.tsx';
   }
 
   try {
     const content = readFileSync(filePath, 'utf-8');
-
-    // Extract dependencies from imports
-    const deps = extractDependencies(content);
-
-    // Extract JSDoc-declared dependencies
-    const jsDocDeps = extractDepsFromSource(content);
-
-    // Extract primitive dependencies (other primitives this one imports)
-    // Pass isPrimitive=true so ./foo imports are treated as sibling primitives
-    const primitiveDeps = extractPrimitiveDependencies(content, true);
-
-    // Parse JSDoc for intelligence metadata
-    const intelligence = parseJSDocFromSource(content);
-
-    // Merge import-extracted and JSDoc-declared deps, deduplicated
-    const allExternalDeps = [
-      ...new Set([...versionDeps(deps.external), ...jsDocDeps.dependencies]),
-    ];
+    const { allExternalDeps, devDependencies, primitiveDeps, intelligence } = analyzeSource(
+      content,
+      true,
+    );
 
     const result: RegistryItem = {
       name,
@@ -340,7 +342,7 @@ export function loadPrimitive(name: string): RegistryItem | null {
           path: `lib/primitives/${name}${fileExt}`,
           content,
           dependencies: allExternalDeps,
-          devDependencies: jsDocDeps.devDependencies,
+          devDependencies,
         },
       ],
     };

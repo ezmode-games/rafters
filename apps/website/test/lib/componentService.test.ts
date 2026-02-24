@@ -399,8 +399,6 @@ describe('componentService', () => {
       `;
       const result = extractDepsFromSource(source);
       expect(result.dependencies).toEqual(['nanostores', 'lodash']);
-      expect(result.dependencies).not.toContain('@rafters/shared');
-      expect(result.dependencies).not.toContain('@rafters/design-tokens');
     });
 
     it('filters out @rafters/* packages from devDependencies', () => {
@@ -412,7 +410,6 @@ describe('componentService', () => {
       `;
       const result = extractDepsFromSource(source);
       expect(result.devDependencies).toEqual(['vitest', '@testing-library/react']);
-      expect(result.devDependencies).not.toContain('@rafters/shared');
     });
 
     it('populates devDependencies correctly', () => {
@@ -455,19 +452,12 @@ describe('componentService', () => {
   });
 
   describe('registry build includes JSDoc deps', () => {
-    it('loadAllComponents returns items with devDependencies array', () => {
-      const components = loadAllComponents();
-      for (const component of components) {
-        for (const file of component.files) {
-          expect(Array.isArray(file.devDependencies)).toBe(true);
-        }
-      }
-    });
-
-    it('loadAllPrimitives returns items with devDependencies array', () => {
-      const primitives = loadAllPrimitives();
-      for (const primitive of primitives) {
-        for (const file of primitive.files) {
+    it.each([
+      ['components', loadAllComponents],
+      ['primitives', loadAllPrimitives],
+    ] as const)('all %s have devDependencies arrays', (_label, loader) => {
+      for (const item of loader()) {
+        for (const file of item.files) {
           expect(Array.isArray(file.devDependencies)).toBe(true);
         }
       }
