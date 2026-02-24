@@ -440,6 +440,18 @@ describe('componentService', () => {
       expect(result.dependencies).toEqual(['nanostores']);
       expect(result.devDependencies).toEqual([]);
     });
+
+    it('does not match @dependencies in string literals', () => {
+      const source = `
+        const help = "@dependencies are managed externally";
+        /**
+         * @dependencies nanostores@^0.11.0
+         */
+        export function handler() {}
+      `;
+      const result = extractDepsFromSource(source);
+      expect(result.dependencies).toEqual(['nanostores@^0.11.0']);
+    });
   });
 
   describe('registry build includes JSDoc deps', () => {

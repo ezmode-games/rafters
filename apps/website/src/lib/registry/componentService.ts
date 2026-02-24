@@ -190,6 +190,9 @@ function getTagValue(tag: Spec): string {
 /**
  * Extract dependencies and devDependencies from JSDoc tags in source content.
  *
+ * Uses comment-parser for JSDoc-aware parsing so that @dependencies appearing
+ * in string literals, line comments, or template literals are not matched.
+ *
  * Recognizes:
  *   @dependencies pkg1 pkg2 - runtime deps for consumers
  *   @devDependencies pkg1 pkg2 - dev-time deps for consumers
@@ -201,28 +204,39 @@ export function extractDepsFromSource(content: string): {
   dependencies: string[];
   devDependencies: string[];
 } {
-  // Match only to end of line (not across lines). Use negative lookahead so
-  // @dependencies does not match @devDependencies.
-  const depsMatch = content.match(/@dependencies(?![\w-])[ \t]+(.+)/);
-  const devDepsMatch = content.match(/@devDependencies[ \t]+(.+)/);
+  const result = { dependencies: [] as string[], devDependencies: [] as string[] };
+
+  // Use comment-parser for JSDoc-aware parsing -- raw regex would match
+  // @dependencies in string literals, line comments, and template literals
+  let blocks: ReturnType<typeof parse>;
+  try {
+    blocks = parse(content);
+  } catch {
+    return result;
+  }
+
+  if (blocks.length === 0) return result;
 
   const filterInternal = (dep: string): boolean => !dep.startsWith('@rafters/');
 
+  for (const block of blocks) {
+    for (const tag of block.tags) {
+      const tagName = tag.tag.toLowerCase();
+      // Reconstruct full value from comment-parser's name + description split
+      const value = getTagValue(tag);
+
+      if (tagName === 'dependencies' && value) {
+        result.dependencies.push(...value.split(/\s+/).filter(Boolean).filter(filterInternal));
+      }
+      if (tagName === 'devdependencies' && value) {
+        result.devDependencies.push(...value.split(/\s+/).filter(Boolean).filter(filterInternal));
+      }
+    }
+  }
+
   return {
-    dependencies: depsMatch
-      ? depsMatch[1]
-          .trim()
-          .split(/\s+/)
-          .filter((d) => d.length > 0)
-          .filter(filterInternal)
-      : [],
-    devDependencies: devDepsMatch
-      ? devDepsMatch[1]
-          .trim()
-          .split(/\s+/)
-          .filter((d) => d.length > 0)
-          .filter(filterInternal)
-      : [],
+    dependencies: [...new Set(result.dependencies)],
+    devDependencies: [...new Set(result.devDependencies)],
   };
 }
 
@@ -272,7 +286,8 @@ export function loadComponent(name: string): RegistryItem | null {
     }
 
     return result;
-  } catch {
+  } catch (err) {
+    console.error(`Failed to load component "${name}":`, err);
     return null;
   }
 }
@@ -335,7 +350,8 @@ export function loadPrimitive(name: string): RegistryItem | null {
     }
 
     return result;
-  } catch {
+  } catch (err) {
+    console.error(`Failed to load primitive "${name}":`, err);
     return null;
   }
 }
