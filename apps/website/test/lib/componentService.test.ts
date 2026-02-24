@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  extractDepsFromSource,
   getRegistryIndex,
   listComponentNames,
   listPrimitiveNames,
@@ -329,6 +330,137 @@ describe('componentService', () => {
       expect(intel?.semanticMeaning).toBe('Primary action confirmation');
       expect(intel?.usagePatterns?.dos).toContain('Use sparingly for main actions');
       expect(intel?.usagePatterns?.nevers).toContain('Use multiple primary buttons in one view');
+    });
+  });
+
+  describe('extractDepsFromSource', () => {
+    it('extracts a single dependency', () => {
+      const source = `
+        /**
+         * @dependencies nanostores
+         */
+        export function handler() {}
+      `;
+      const result = extractDepsFromSource(source);
+      expect(result.dependencies).toEqual(['nanostores']);
+    });
+
+    it('extracts multiple dependencies', () => {
+      const source = `
+        /**
+         * @dependencies nanostores @nanostores/react zustand
+         */
+        export function handler() {}
+      `;
+      const result = extractDepsFromSource(source);
+      expect(result.dependencies).toEqual(['nanostores', '@nanostores/react', 'zustand']);
+    });
+
+    it('returns empty arrays when no tags present', () => {
+      const source = `
+        /**
+         * A plain function with no dependency tags
+         */
+        export function handler() {}
+      `;
+      const result = extractDepsFromSource(source);
+      expect(result.dependencies).toEqual([]);
+      expect(result.devDependencies).toEqual([]);
+    });
+
+    it('returns empty arrays for source with no JSDoc at all', () => {
+      const source = `export function handler() { return true; }`;
+      const result = extractDepsFromSource(source);
+      expect(result.dependencies).toEqual([]);
+      expect(result.devDependencies).toEqual([]);
+    });
+
+    it('excludes @internal-dependencies from output', () => {
+      const source = `
+        /**
+         * @internal-dependencies @rafters/shared some-internal-tool
+         * @dependencies nanostores
+         */
+        export function handler() {}
+      `;
+      const result = extractDepsFromSource(source);
+      // @internal-dependencies tag is not recognized as @dependencies
+      // Only @dependencies tag is parsed
+      expect(result.dependencies).toEqual(['nanostores']);
+      expect(result.devDependencies).toEqual([]);
+    });
+
+    it('filters out @rafters/* packages from dependencies', () => {
+      const source = `
+        /**
+         * @dependencies nanostores @rafters/shared @rafters/design-tokens lodash
+         */
+        export function handler() {}
+      `;
+      const result = extractDepsFromSource(source);
+      expect(result.dependencies).toEqual(['nanostores', 'lodash']);
+    });
+
+    it('filters out @rafters/* packages from devDependencies', () => {
+      const source = `
+        /**
+         * @devDependencies vitest @rafters/shared @testing-library/react
+         */
+        export function handler() {}
+      `;
+      const result = extractDepsFromSource(source);
+      expect(result.devDependencies).toEqual(['vitest', '@testing-library/react']);
+    });
+
+    it('populates devDependencies correctly', () => {
+      const source = `
+        /**
+         * @dependencies nanostores
+         * @devDependencies vitest @testing-library/react
+         */
+        export function handler() {}
+      `;
+      const result = extractDepsFromSource(source);
+      expect(result.dependencies).toEqual(['nanostores']);
+      expect(result.devDependencies).toEqual(['vitest', '@testing-library/react']);
+    });
+
+    it('handles empty @devDependencies tag as empty array', () => {
+      const source = `
+        /**
+         * @dependencies nanostores
+         * @devDependencies
+         */
+        export function handler() {}
+      `;
+      const result = extractDepsFromSource(source);
+      expect(result.dependencies).toEqual(['nanostores']);
+      expect(result.devDependencies).toEqual([]);
+    });
+
+    it('does not match @dependencies in string literals', () => {
+      const source = `
+        const help = "@dependencies are managed externally";
+        /**
+         * @dependencies nanostores@^0.11.0
+         */
+        export function handler() {}
+      `;
+      const result = extractDepsFromSource(source);
+      expect(result.dependencies).toEqual(['nanostores@^0.11.0']);
+    });
+  });
+
+  describe('registry build includes JSDoc deps', () => {
+    it.each([
+      ['components', loadAllComponents],
+      ['primitives', loadAllPrimitives],
+    ] as const)('all %s have devDependencies arrays', (_label, loader) => {
+      for (const item of loader()) {
+        for (const file of item.files) {
+          expect(Array.isArray(file.devDependencies)).toBe(true);
+        }
+      }
     });
   });
 });

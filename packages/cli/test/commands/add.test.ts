@@ -131,6 +131,23 @@ describe('collectDependencies', () => {
     expect(dependencies).toEqual(sorted);
   });
 
+  it('collects devDependencies from registry items', () => {
+    const button = registryFixtures.buttonComponent();
+    button.files[0].devDependencies = ['vitest', '@testing-library/react'];
+    const { devDependencies } = collectDependencies([button]);
+    expect(devDependencies).toContain('vitest');
+    expect(devDependencies).toContain('@testing-library/react');
+  });
+
+  it('handles items without devDependencies field gracefully', () => {
+    // Simulates older registry data that lacks the devDependencies field
+    const button = registryFixtures.buttonComponent();
+    const file = button.files[0] as Omit<RegistryItem['files'][0], 'devDependencies'>;
+    const items = [{ ...button, files: [file as RegistryItem['files'][0]] }];
+    const { devDependencies } = collectDependencies(items);
+    expect(Array.isArray(devDependencies)).toBe(true);
+  });
+
   // Property-based test: for all valid items, dependencies are extracted
   it('PROPERTY: always returns arrays for dependencies', () => {
     const items = generateRandomItems(20);
