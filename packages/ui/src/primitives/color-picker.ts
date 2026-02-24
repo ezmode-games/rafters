@@ -62,7 +62,18 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
 
+function normalizeHue(h: number): number {
+  if (Number.isNaN(h)) return 0;
+  return ((h % 360) + 360) % 360;
+}
+
 function clampChannel(channel: keyof typeof CHANNEL_BOUNDS, value: number): number {
+  if (Number.isNaN(value)) {
+    return channel === 'h' ? 0 : CHANNEL_BOUNDS[channel].min;
+  }
+  if (channel === 'h') {
+    return normalizeHue(value);
+  }
   const { min, max } = CHANNEL_BOUNDS[channel];
   return clamp(value, min, max);
 }
@@ -89,13 +100,13 @@ function parseCssColor(css: string): OklchColorAlpha {
     // all CSS color syntaxes, not just hex
     const oklch = hexToOKLCH(css);
     return {
-      l: clampChannel('l', oklch.l),
-      c: clampChannel('c', oklch.c),
-      h: clampChannel('h', oklch.h),
-      alpha: clampChannel('alpha', oklch.alpha ?? 1),
+      l: clampChannel('l', Number.isNaN(oklch.l) ? 0 : oklch.l),
+      c: clampChannel('c', Number.isNaN(oklch.c) ? 0 : oklch.c),
+      h: clampChannel('h', Number.isNaN(oklch.h) ? 0 : oklch.h),
+      alpha: clampChannel('alpha', Number.isNaN(oklch.alpha) ? 1 : (oklch.alpha ?? 1)),
     };
-  } catch {
-    throw new Error(`Invalid CSS color: '${css}'`);
+  } catch (error) {
+    throw new Error(`Invalid CSS color: '${css}'`, { cause: error });
   }
 }
 
@@ -257,10 +268,13 @@ export function createColorPicker(options?: ColorPickerOptions): ColorPickerInst
 
   const $cssColor = computed($color, (color) => {
     const a = color.alpha ?? 1;
+    const l = +color.l.toFixed(4);
+    const c = +color.c.toFixed(4);
+    const h = +color.h.toFixed(2);
     if (a < 1) {
-      return `oklch(${color.l} ${color.c} ${color.h} / ${a})`;
+      return `oklch(${l} ${c} ${h} / ${+a.toFixed(2)})`;
     }
-    return `oklch(${color.l} ${color.c} ${color.h})`;
+    return `oklch(${l} ${c} ${h})`;
   });
 
   const $inGamut = computed($color, (color) => {
@@ -283,15 +297,23 @@ export function createColorPicker(options?: ColorPickerOptions): ColorPickerInst
         alpha: color.alpha ?? 1,
       });
       final = {
-        l: mapped.color.l,
-        c: mapped.color.c,
-        h: mapped.color.h,
+        l: clampChannel('l', mapped.color.l),
+        c: clampChannel('c', mapped.color.c),
+        h: clampChannel('h', mapped.color.h),
         alpha: color.alpha ?? 1,
       };
     }
 
     $color.set(final);
-    onChange?.(final);
+    if (onChange) {
+      try {
+        onChange(final);
+      } catch (error) {
+        queueMicrotask(() => {
+          throw error;
+        });
+      }
+    }
   }
 
   /** Build a new color with one channel replaced. */
@@ -311,7 +333,9 @@ export function createColorPicker(options?: ColorPickerOptions): ColorPickerInst
       typeof color.c !== 'number' ||
       typeof color.h !== 'number'
     ) {
-      throw new Error('ColorValue requires l, c, h, a fields');
+      throw new Error(
+        'setColor requires an object with numeric l, c, h fields (alpha is optional)',
+      );
     }
 
     commitColor({

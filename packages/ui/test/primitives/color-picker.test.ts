@@ -27,14 +27,14 @@ describe('createColorPicker', () => {
       expect(color).toEqual({ l: 0.5, c: 0.1, h: 180, alpha: 0.8 });
     });
 
-    it('clamps initial color values to valid ranges', () => {
+    it('clamps initial color values to valid ranges (hue wraps)', () => {
       picker = createColorPicker({
         initialColor: { l: 1.5, c: 0.6, h: 400, alpha: 2 },
       });
       const color = picker.$color.get();
       expect(color.l).toBe(1);
       expect(color.c).toBe(0.4);
-      expect(color.h).toBe(360);
+      expect(color.h).toBe(40); // 400 % 360 = 40
       expect(color.alpha).toBe(1);
     });
 
@@ -58,13 +58,13 @@ describe('createColorPicker', () => {
       expect(picker.$color.get()).toEqual({ l: 0.3, c: 0.2, h: 120, alpha: 0.5 });
     });
 
-    it('clamps out-of-range values', () => {
+    it('clamps out-of-range values (hue wraps)', () => {
       picker = createColorPicker();
       picker.setColor({ l: -0.5, c: -1, h: -10, alpha: -0.5 });
       const color = picker.$color.get();
       expect(color.l).toBe(0);
       expect(color.c).toBe(0);
-      expect(color.h).toBe(0);
+      expect(color.h).toBe(350); // -10 wraps to 350
       expect(color.alpha).toBe(0);
     });
 
@@ -77,9 +77,13 @@ describe('createColorPicker', () => {
     it('throws on missing required fields', () => {
       picker = createColorPicker();
       // @ts-expect-error -- testing runtime validation
-      expect(() => picker.setColor(null)).toThrow('ColorValue requires l, c, h, a fields');
+      expect(() => picker.setColor(null)).toThrow(
+        'setColor requires an object with numeric l, c, h fields (alpha is optional)',
+      );
       // @ts-expect-error -- testing runtime validation
-      expect(() => picker.setColor({})).toThrow('ColorValue requires l, c, h, a fields');
+      expect(() => picker.setColor({})).toThrow(
+        'setColor requires an object with numeric l, c, h fields (alpha is optional)',
+      );
     });
   });
 
@@ -142,11 +146,15 @@ describe('createColorPicker', () => {
       expect(picker.$color.get().c).toBe(0);
     });
 
-    it('setHue clamps to 0-360', () => {
+    it('setHue wraps using modular arithmetic (circular)', () => {
       picker = createColorPicker();
       picker.setHue(500);
-      expect(picker.$color.get().h).toBe(360);
+      expect(picker.$color.get().h).toBe(140);
       picker.setHue(-10);
+      expect(picker.$color.get().h).toBe(350);
+      picker.setHue(360);
+      expect(picker.$color.get().h).toBe(0);
+      picker.setHue(720);
       expect(picker.$color.get().h).toBe(0);
     });
 
@@ -496,6 +504,58 @@ describe('createColorPicker', () => {
       expect(onChange).toHaveBeenCalled();
 
       unsub();
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Achromatic color handling (NaN defense)
+  // ---------------------------------------------------------------------------
+
+  describe('achromatic colors', () => {
+    it('parses achromatic colors without NaN hue', () => {
+      picker = createColorPicker();
+      picker.setFromCss('#ffffff');
+      const color = picker.$color.get();
+      expect(Number.isNaN(color.h)).toBe(false);
+      expect(color.l).toBeCloseTo(1, 1);
+      expect(color.c).toBeCloseTo(0, 1);
+    });
+
+    it('parses black without NaN', () => {
+      picker = createColorPicker();
+      picker.setFromCss('#000000');
+      const color = picker.$color.get();
+      expect(Number.isNaN(color.h)).toBe(false);
+    });
+
+    it('parses gray without NaN', () => {
+      picker = createColorPicker();
+      picker.setFromCss('#808080');
+      const color = picker.$color.get();
+      expect(Number.isNaN(color.h)).toBe(false);
+      expect(Number.isNaN(color.l)).toBe(false);
+      expect(Number.isNaN(color.c)).toBe(false);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // NaN defense in channel setters
+  // ---------------------------------------------------------------------------
+
+  describe('NaN defense', () => {
+    it('handles NaN in channel setters gracefully', () => {
+      picker = createColorPicker();
+      picker.setLightness(NaN);
+      expect(picker.$color.get().l).toBe(0); // falls back to min
+
+      picker.setChroma(NaN);
+      expect(picker.$color.get().c).toBe(0); // falls back to min
+
+      picker.setHue(NaN);
+      expect(picker.$color.get().h).toBe(0); // falls back to 0
+
+      picker.setAlpha(NaN);
+      expect(picker.$color.get().alpha).toBe(0); // falls back to min
     });
   });
 

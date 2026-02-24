@@ -48,7 +48,6 @@
   },
   "dependencies": {
     "@rafters/color-utils": "workspace:*",
-    "@rafters/shared": "workspace:*",
     "nanostores": "^1.1.0"
   }
 }
