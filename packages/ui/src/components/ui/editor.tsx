@@ -567,7 +567,18 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
       () => INITIAL_HANDLER_STATE,
     );
 
+    // Stable identity for commandPalette prop -- avoids effect teardown when
+    // consumers pass an inline array. Keyed by sorted command IDs.
+    const commandPaletteRef = React.useRef(commandPalette);
+    const commandPaletteKey = commandPalette?.map((c) => c.id).join(',') ?? '';
+    const prevKeyRef = React.useRef(commandPaletteKey);
+    if (commandPaletteKey !== prevKeyRef.current) {
+      commandPaletteRef.current = commandPalette;
+      prevKeyRef.current = commandPaletteKey;
+    }
+
     // ----- Primitive lifecycle (DOM side effects) -----
+    // biome-ignore lint/correctness/useExhaustiveDependencies: commandPaletteKey triggers re-creation when commands change; actual data read from commandPaletteRef
     React.useEffect(() => {
       const canvasEl = canvasRef.current;
       if (!canvasEl || disabled) return;
@@ -575,7 +586,8 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
       const cleanups: CleanupFunction[] = [];
 
       // Convert SlashCommands to palette-aware callback
-      const hasCommandPalette = commandPalette && commandPalette.length > 0;
+      const cmds = commandPaletteRef.current;
+      const hasCommandPalette = cmds && cmds.length > 0;
       const onSlashCommand = hasCommandPalette
         ? (position: { x: number; y: number }) => {
             setPalettePosition(position);
@@ -619,12 +631,14 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
 
       // Command palette primitive
       if (hasCommandPalette) {
-        const commands: Command[] = commandPalette.map((sc) => {
+        const commands: Command[] = cmds.map((sc) => {
           const cmd: Command = {
             id: sc.id,
             label: sc.label,
             action: () => {
-              // action will be called via the overlay's onExecute
+              // No-op: the primitive's execute path is not used. Instead,
+              // handlePaletteExecute looks up the original SlashCommand by ID
+              // and calls its action with the full EditorControls handle.
             },
           };
           if (sc.keywords) {
@@ -687,7 +701,7 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
       return () => {
         for (const cleanup of cleanups) cleanup();
       };
-    }, [disabled, inlineToolbar, commandPalette, updateBlocks]);
+    }, [disabled, inlineToolbar, commandPaletteKey, updateBlocks]);
 
     // ----- Sync controlled value into atom -----
     React.useEffect(() => {
@@ -698,19 +712,22 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
 
     // ----- Imperative handle -----
     const editorControlsRef = React.useRef<EditorControls | null>(null);
-    const controls: EditorControls = {
-      addBlock,
-      removeBlocks,
-      moveBlock,
-      updateBlock,
-      undo: () => handlerRef.current?.undo(),
-      redo: () => handlerRef.current?.redo(),
-      selectAll: () => handlerRef.current?.selectAll(),
-      clearSelection: () => handlerRef.current?.clearSelection(),
-      focus: () => canvasRef.current?.focus(),
-    };
+    const controls = React.useMemo<EditorControls>(
+      () => ({
+        addBlock,
+        removeBlocks,
+        moveBlock,
+        updateBlock,
+        undo: () => handlerRef.current?.undo(),
+        redo: () => handlerRef.current?.redo(),
+        selectAll: () => handlerRef.current?.selectAll(),
+        clearSelection: () => handlerRef.current?.clearSelection(),
+        focus: () => canvasRef.current?.focus(),
+      }),
+      [addBlock, removeBlocks, moveBlock, updateBlock],
+    );
     editorControlsRef.current = controls;
-    React.useImperativeHandle(ref, () => controls);
+    React.useImperativeHandle(ref, () => controls, [controls]);
 
     // ----- Command palette handlers -----
     const handlePaletteQuery = React.useCallback((query: string) => {
@@ -721,7 +738,8 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
     const handlePaletteSelect = React.useCallback((index: number) => {
       const palette = paletteRef.current;
       if (!palette) return;
-      // Navigate to the index by selecting first then stepping
+      // The command-palette primitive only exposes selectFirst/selectNext/selectPrevious,
+      // so we step to the target index. Fine for small command lists.
       palette.selectFirst();
       for (let i = 0; i < index; i++) {
         palette.selectNext();
@@ -734,15 +752,15 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
       if (!palette) return;
       const state = palette.getState();
       const cmd = state.filteredCommands[state.selectedIndex];
-      if (cmd && commandPalette) {
-        const slashCmd = commandPalette.find((sc) => sc.id === cmd.id);
+      if (cmd && commandPaletteRef.current) {
+        const slashCmd = commandPaletteRef.current.find((sc) => sc.id === cmd.id);
         if (slashCmd && editorControlsRef.current) {
           slashCmd.action(editorControlsRef.current);
         }
       }
       palette.close();
       setPaletteState(INITIAL_PALETTE_STATE);
-    }, [commandPalette]);
+    }, []);
 
     const handlePaletteClose = React.useCallback(() => {
       paletteRef.current?.close();
