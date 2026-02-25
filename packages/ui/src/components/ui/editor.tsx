@@ -155,12 +155,7 @@ const INLINE_TOOLBAR_DIMENSIONS = { width: 320, height: 44 };
 // ============================================================================
 
 function defaultRenderBlock(block: EditorBlock): React.ReactNode {
-  const text =
-    typeof block.content === 'string'
-      ? block.content
-      : block.content != null
-        ? String(block.content)
-        : '';
+  const text = String(block.content ?? '');
   return <div className="px-3 py-2 text-sm text-foreground">{text || '\u00A0'}</div>;
 }
 
@@ -472,9 +467,6 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
     callbacksRef.current = { onValueChange, onValueCommit };
 
     // Ref for isControlled to avoid stale closure in updateBlocks
-    const isControlledRef = React.useRef(isControlled);
-    isControlledRef.current = isControlled;
-
     // ----- Handler + canvas refs -----
     const canvasRef = React.useRef<HTMLDivElement>(null);
     const handlerRef = React.useRef<BlockHandlerControls | null>(null);
@@ -496,16 +488,19 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
     const paletteRef = React.useRef<CommandPaletteController | null>(null);
 
     // ----- Stable block mutation function -----
-    const updateBlocks = React.useCallback((next: EditorBlock[], commit = false) => {
-      blocksAtomRef.current.set(next);
-      if (!isControlledRef.current) {
-        setUncontrolled(next);
-      }
-      callbacksRef.current.onValueChange?.(next);
-      if (commit) {
-        callbacksRef.current.onValueCommit?.(next);
-      }
-    }, []);
+    const updateBlocks = React.useCallback(
+      (next: EditorBlock[], commit = false) => {
+        blocksAtomRef.current.set(next);
+        if (!isControlled) {
+          setUncontrolled(next);
+        }
+        callbacksRef.current.onValueChange?.(next);
+        if (commit) {
+          callbacksRef.current.onValueCommit?.(next);
+        }
+      },
+      [isControlled],
+    );
 
     // ----- CRUD methods -----
     const addBlock = React.useCallback(
@@ -678,8 +673,6 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
       return () => {
         for (const cleanup of cleanups) cleanup();
       };
-      // Only re-run when structural config changes, not on every blocks change
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [disabled, inlineToolbar, commandPalette, updateBlocks]);
 
     // ----- Sync controlled value into atom -----
@@ -690,7 +683,8 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
     }, [isControlled, controlledValue]);
 
     // ----- Imperative handle -----
-    React.useImperativeHandle(ref, () => ({
+    const editorControlsRef = React.useRef<EditorControls | null>(null);
+    const controls: EditorControls = {
       addBlock,
       removeBlocks,
       moveBlock,
@@ -700,7 +694,9 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
       selectAll: () => handlerRef.current?.selectAll(),
       clearSelection: () => handlerRef.current?.clearSelection(),
       focus: () => canvasRef.current?.focus(),
-    }));
+    };
+    editorControlsRef.current = controls;
+    React.useImperativeHandle(ref, () => controls);
 
     // ----- Command palette handlers -----
     const handlePaletteQuery = React.useCallback((query: string) => {
@@ -718,19 +714,6 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
       }
       setPaletteState(palette.getState());
     }, []);
-
-    const editorControlsRef = React.useRef<EditorControls | null>(null);
-    editorControlsRef.current = {
-      addBlock,
-      removeBlocks,
-      moveBlock,
-      updateBlock,
-      undo: () => handlerRef.current?.undo(),
-      redo: () => handlerRef.current?.redo(),
-      selectAll: () => handlerRef.current?.selectAll(),
-      clearSelection: () => handlerRef.current?.clearSelection(),
-      focus: () => canvasRef.current?.focus(),
-    };
 
     const handlePaletteExecute = React.useCallback(() => {
       const palette = paletteRef.current;
