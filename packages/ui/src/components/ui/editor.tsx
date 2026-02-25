@@ -315,7 +315,7 @@ function CommandPaletteOverlay({
 
   return createPortal(
     <div
-      className="fixed z-50 w-72 rounded-lg border border-border bg-popover shadow-lg"
+      className="fixed z-depth-popover w-72 rounded-lg border border-border bg-popover shadow-lg"
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
@@ -387,7 +387,7 @@ function InlineToolbarOverlay({ position, activeFormats, onFormat }: InlineToolb
     <div
       role="toolbar"
       aria-label="Text formatting"
-      className="fixed z-50 flex items-center gap-0.5 rounded-lg border border-border bg-popover p-1 shadow-lg"
+      className="fixed z-depth-popover flex items-center gap-0.5 rounded-lg border border-border bg-popover p-1 shadow-lg"
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
