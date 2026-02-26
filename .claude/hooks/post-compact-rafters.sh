@@ -38,12 +38,13 @@ STRICT RULES:
 - pnpm only, no emoji
 - preflight before commit
 
-KEY MEMORIES TO READ:
-- what_rafters_is - Full concept explanation
-- studio-architecture - Studio patterns (THIN UI, set() not add())
-- design-tokens-architecture - Registry, dependencies, exporters
-- color-families-11 - 11 families from harmony + semanticSuggestions
-- testing_strategy - zocker, vitest-axe, Playwright
+PERSISTENT MEMORY:
+Check your auto memory directory for project knowledge:
+- what-rafters-is - Core identity and philosophy
+- why-the-registry-exists - Choices not values
+- studio-vision / studio-ai-limitations - Studio creative direction
+- mcp-architecture - 5 MCP tools, cognitive load model
+- component-intelligence-data - Ratings for 17 components
 
 Read the relevant memory for your current task before proceeding.
 

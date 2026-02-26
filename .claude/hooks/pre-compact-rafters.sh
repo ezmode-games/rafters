@@ -8,14 +8,13 @@ cat << 'PRECOMPACT'
 
 Your context is about to be compacted. BEFORE this happens:
 
-1. WRITE A MEMORY if you have important session state:
+1. SAVE A MEMORY if you have important session state:
    - Current task and progress
    - Key decisions made this session
    - Files modified and why
    - Anything the post-compact you needs to know
 
-   Use: mcp__plugin_serena_serena__write_memory
-   Name it: session-state-[topic] or decision-[topic]
+   Use: Write tool to save to your persistent memory directory
 
 2. If mid-task, note WHERE YOU ARE:
    - What step of the task?

@@ -27,7 +27,7 @@ ALWAYS:
   case "$FILE_PATH" in
     *.test.* | *.spec.* | *.a11y.*)
       context+="--- TESTING CONTEXT ---
-You're editing tests. Read memory: testing_strategy
+You're editing tests.
 
 Stack:
 - zocker for property-based testing from Zod schemas
@@ -47,7 +47,7 @@ expect(TokenSchema.parse(fixture)).toBeDefined();"
 
     *color-utils*)
       context+="--- COLOR-UTILS CONTEXT ---
-You're editing @rafters/color-utils. Read memory: design-tokens-architecture
+You're editing @rafters/color-utils.
 
 Key exports:
 - buildColorValue(oklch) -> Full ColorValue with scale, harmonies, accessibility, semanticSuggestions
@@ -69,7 +69,7 @@ OKLCH: { l: 0-1, c: 0-0.4, h: 0-360, alpha: 0-1 }"
 
     *design-tokens*)
       context+="--- DESIGN-TOKENS CONTEXT ---
-You're editing @rafters/design-tokens. Read memory: design-tokens-architecture
+You're editing @rafters/design-tokens.
 
 TokenRegistry:
 - add(token) = Initialization ONLY (bulk load)
@@ -93,7 +93,7 @@ Persistence: NodePersistenceAdapter -> .rafters/tokens/*.rafters.json"
 
     *studio*)
       context+="--- STUDIO CONTEXT ---
-You're editing @rafters/studio. Read memory: studio-architecture
+You're editing @rafters/studio.
 
 CRITICAL: Studio is a THIN UI on TokenRegistry.
 - ALL logic lives in packages (color-utils, design-tokens)
@@ -128,7 +128,7 @@ API endpoints:
 
     *packages/ui*)
       context+="--- UI COMPONENTS CONTEXT ---
-You're editing @rafters/ui. Read memory: jsdoc-intelligence-template
+You're editing @rafters/ui.
 
 SHADCN COMPATIBILITY (critical):
 - 52 of 55 components are shadcn-compatible drop-ins
@@ -170,7 +170,7 @@ Testing MANDATORY:
 
     *apps/api*)
       context+="--- API CONTEXT ---
-You're editing apps/api. Read memory: architecture
+You're editing apps/api.
 
 Hono + @hono/zod-openapi stack:
 - [route].index.ts - Router
@@ -202,13 +202,6 @@ Changes here cascade everywhere - be careful."
 
     *)
       context+="--- GENERAL CONTEXT ---
-Check relevant Serena memories:
-- what_rafters_is - Core concepts
-- design-tokens-architecture - Token system
-- studio-architecture - Studio patterns
-- code_style - Conventions
-- testing_strategy - Test patterns
-
 Key packages to check before writing utilities:
 - @rafters/shared (types, schemas)
 - @rafters/color-utils (OKLCH math)
