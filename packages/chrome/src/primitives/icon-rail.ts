@@ -171,13 +171,14 @@ export function createIconRail(options: IconRailOptions): IconRailControls {
   // =========================================================================
 
   /**
-   * Check if an item ID is disabled (global or per-item) using the items array.
-   * This is used during applyAria before the DOM is updated.
+   * Build a lookup map from item ID to item definition.
    */
-  function isItemIdDisabled(id: string): boolean {
-    if (disabled) return true;
-    const itemDef = items.find((item) => item.id === id);
-    return itemDef?.disabled ?? false;
+  function buildItemMap(): Map<string, IconRailItem> {
+    const map = new Map<string, IconRailItem>();
+    for (const item of items) {
+      map.set(item.id, item);
+    }
+    return map;
   }
 
   /**
@@ -188,59 +189,48 @@ export function createIconRail(options: IconRailOptions): IconRailControls {
     container.setAttribute('role', 'toolbar');
     container.setAttribute('aria-orientation', 'vertical');
 
+    const itemMap = buildItemMap();
     const allElements = getItemElements(container);
 
-    // Build list of enabled elements using the items array (not the DOM)
-    const enabledElements = allElements.filter((el) => {
-      const id = getItemId(el);
-      return id ? !isItemIdDisabled(id) : false;
-    });
-
     // Determine which element gets tabindex 0:
-    // Prefer the active item if it is enabled; fall back to first enabled item
+    // Prefer the active item if enabled; fall back to first enabled item
     let focusableElement: HTMLElement | null = null;
-    if (activeId && !isItemIdDisabled(activeId)) {
-      const activeEl = getItemById(container, activeId);
-      if (activeEl) {
-        focusableElement = activeEl;
-      }
-    }
-    if (!focusableElement && enabledElements.length > 0) {
-      focusableElement = enabledElements[0] ?? null;
-    }
 
     for (const el of allElements) {
       const id = getItemId(el);
       if (!id) continue;
 
-      const itemDef = items.find((item) => item.id === id);
+      const itemDef = itemMap.get(id);
+      const itemDisabled = disabled || (itemDef?.disabled ?? false);
 
       el.setAttribute('role', 'button');
 
-      // Set aria-label from item definition
       if (itemDef?.label) {
         el.setAttribute('aria-label', itemDef.label);
       }
 
-      // Disabled state: global or per-item
-      const itemDisabled = disabled || (itemDef?.disabled ?? false);
       if (itemDisabled) {
         el.setAttribute('aria-disabled', 'true');
       } else {
         el.removeAttribute('aria-disabled');
+
+        // Track focusable element: prefer active, else first enabled
+        if (!focusableElement || id === activeId) {
+          focusableElement = el;
+        }
       }
 
-      // Active state
       const isActive = id === activeId;
+      el.setAttribute('aria-pressed', isActive ? 'true' : 'false');
       if (isActive) {
         el.setAttribute('data-active', 'true');
-        el.setAttribute('aria-pressed', 'true');
       } else {
         el.removeAttribute('data-active');
-        el.setAttribute('aria-pressed', 'false');
       }
+    }
 
-      // Roving tabindex: only the focusable element gets 0
+    // Second pass: set roving tabindex
+    for (const el of allElements) {
       el.setAttribute('tabindex', el === focusableElement ? '0' : '-1');
     }
   }
@@ -306,15 +296,20 @@ export function createIconRail(options: IconRailOptions): IconRailControls {
   }
 
   // =========================================================================
+  // Helpers
+  // =========================================================================
+
+  function isDisabledItem(id: string): boolean {
+    if (disabled) return true;
+    return items.find((item) => item.id === id)?.disabled ?? false;
+  }
+
+  // =========================================================================
   // Activation
   // =========================================================================
 
   function activateItem(id: string): void {
-    if (disabled) return;
-
-    const itemDef = items.find((item) => item.id === id);
-    if (itemDef?.disabled) return;
-
+    if (isDisabledItem(id)) return;
     onActivate?.(id);
   }
 
@@ -330,11 +325,7 @@ export function createIconRail(options: IconRailOptions): IconRailControls {
   }
 
   function startHover(id: string): void {
-    if (disabled) return;
-
-    const itemDef = items.find((item) => item.id === id);
-    if (itemDef?.disabled) return;
-
+    if (isDisabledItem(id)) return;
     clearHoverTimer();
 
     if (hoverDelay <= 0) {
