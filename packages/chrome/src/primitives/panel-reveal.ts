@@ -107,7 +107,7 @@ let sharedAnnouncer: HTMLElement | null = null;
  * Get or create a visually hidden live region for screen reader announcements
  */
 function getOrCreateAnnouncer(): HTMLElement {
-  if (sharedAnnouncer) {
+  if (sharedAnnouncer && sharedAnnouncer.isConnected) {
     return sharedAnnouncer;
   }
 
@@ -192,6 +192,7 @@ export function createPanelReveal(options: PanelRevealOptions): PanelRevealContr
   function ensurePanelId(): string {
     let id = panel.getAttribute('id');
     if (!id) {
+      // Ephemeral DOM ID -- UUIDv7 not used to preserve zero-dep leaf primitive constraint
       id = `panel-reveal-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
       panel.setAttribute('id', id);
     }
