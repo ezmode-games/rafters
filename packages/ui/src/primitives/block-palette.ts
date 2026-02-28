@@ -235,6 +235,13 @@ export function createBlockPalette(options: BlockPaletteOptions): BlockPaletteCo
     }, ANNOUNCE_DELAY_MS);
   }
 
+  /** Announce the current filtered item count to screen readers */
+  function announceFilteredCount(): void {
+    const count = filtered.length;
+    const noun = count === 1 ? 'block' : 'blocks';
+    announce(`${count} ${noun} found`);
+  }
+
   // =========================================================================
   // ARIA setup
   // =========================================================================
@@ -257,6 +264,12 @@ export function createBlockPalette(options: BlockPaletteOptions): BlockPaletteCo
     return items.find((item) => item.id === id);
   }
 
+  /** Resolve the palette item from an event target, walking up the DOM */
+  function resolveItem(target: EventTarget | null): BlockPaletteItem | undefined {
+    const id = getItemId(target, container);
+    return id ? findItemById(id) : undefined;
+  }
+
   /**
    * Set aria-selected on the matching DOM element and clear previous selection.
    */
@@ -264,11 +277,7 @@ export function createBlockPalette(options: BlockPaletteOptions): BlockPaletteCo
     const elements = getItemElements(container);
     for (const el of elements) {
       const id = el.getAttribute('data-palette-id');
-      if (id === activeItemId) {
-        el.setAttribute('aria-selected', 'true');
-      } else {
-        el.setAttribute('aria-selected', 'false');
-      }
+      el.setAttribute('aria-selected', id === activeItemId ? 'true' : 'false');
     }
 
     // Keep activedescendant in sync
@@ -297,6 +306,14 @@ export function createBlockPalette(options: BlockPaletteOptions): BlockPaletteCo
       const el = elements.find((e) => e.getAttribute('data-palette-id') === id);
       el?.scrollIntoView?.({ block: 'nearest' });
     }
+  }
+
+  /** Update filter, activate first visible item, and announce count */
+  function applyFilterAndActivateFirst(): void {
+    updateFiltered();
+    const ids = getVisibleItemIds();
+    activateId(ids[0] ?? null);
+    announceFilteredCount();
   }
 
   // =========================================================================
@@ -372,22 +389,14 @@ export function createBlockPalette(options: BlockPaletteOptions): BlockPaletteCo
       case 'ArrowDown': {
         event.preventDefault();
         const idx = currentIndex(ids);
-        if (idx === -1) {
-          moveToIndex(ids, 0);
-        } else {
-          moveToIndex(ids, idx + 1);
-        }
+        moveToIndex(ids, idx === -1 ? 0 : idx + 1);
         break;
       }
 
       case 'ArrowUp': {
         event.preventDefault();
         const idx = currentIndex(ids);
-        if (idx === -1) {
-          moveToIndex(ids, ids.length - 1);
-        } else {
-          moveToIndex(ids, idx - 1);
-        }
+        moveToIndex(ids, idx === -1 ? ids.length - 1 : idx - 1);
         break;
       }
 
@@ -422,9 +431,7 @@ export function createBlockPalette(options: BlockPaletteOptions): BlockPaletteCo
         event.preventDefault();
         if (activeItemId) {
           const item = findItemById(activeItemId);
-          if (item) {
-            onActivate?.(item);
-          }
+          if (item) onActivate?.(item);
         }
         break;
       }
@@ -435,13 +442,10 @@ export function createBlockPalette(options: BlockPaletteOptions): BlockPaletteCo
 
   function handleClick(event: MouseEvent): void {
     if (disabled) return;
-    const id = getItemId(event.target, container);
-    if (id) {
-      activateId(id);
-      const item = findItemById(id);
-      if (item) {
-        onActivate?.(item);
-      }
+    const item = resolveItem(event.target);
+    if (item) {
+      activateId(item.id);
+      onActivate?.(item);
     }
   }
 
@@ -450,30 +454,21 @@ export function createBlockPalette(options: BlockPaletteOptions): BlockPaletteCo
       event.preventDefault();
       return;
     }
-    const id = getItemId(event.target, container);
-    if (id) {
-      const item = findItemById(id);
-      if (item) {
-        // Set drag data so drop zones can identify the payload
-        if (event.dataTransfer) {
-          event.dataTransfer.effectAllowed = 'copyMove';
-          event.dataTransfer.setData('application/x-rafters-block', JSON.stringify(item));
-          event.dataTransfer.setData('text/plain', item.label);
-        }
-        onDragStart?.(item);
+    const item = resolveItem(event.target);
+    if (item) {
+      if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = 'copyMove';
+        event.dataTransfer.setData('application/x-rafters-block', JSON.stringify(item));
+        event.dataTransfer.setData('text/plain', item.label);
       }
+      onDragStart?.(item);
     }
   }
 
   function handleDragEndEvent(event: DragEvent): void {
     if (disabled) return;
-    const id = getItemId(event.target, container);
-    if (id) {
-      const item = findItemById(id);
-      if (item) {
-        onDragEnd?.(item);
-      }
-    }
+    const item = resolveItem(event.target);
+    if (item) onDragEnd?.(item);
   }
 
   // =========================================================================
@@ -483,16 +478,7 @@ export function createBlockPalette(options: BlockPaletteOptions): BlockPaletteCo
   function handleSearchInput(): void {
     if (!searchInput) return;
     query = searchInput.value;
-    updateFiltered();
-
-    // Reset active to first visible item
-    const ids = getVisibleItemIds();
-    activateId(ids[0] ?? null);
-
-    // Announce count
-    const count = filtered.length;
-    const noun = count === 1 ? 'block' : 'blocks';
-    announce(`${count} ${noun} found`);
+    applyFilterAndActivateFirst();
   }
 
   // =========================================================================
@@ -528,14 +514,7 @@ export function createBlockPalette(options: BlockPaletteOptions): BlockPaletteCo
     if (searchInput) {
       searchInput.value = newQuery;
     }
-    updateFiltered();
-
-    const ids = getVisibleItemIds();
-    activateId(ids[0] ?? null);
-
-    const count = filtered.length;
-    const noun = count === 1 ? 'block' : 'blocks';
-    announce(`${count} ${noun} found`);
+    applyFilterAndActivateFirst();
   }
 
   function getFilteredItems(): BlockPaletteItem[] {
