@@ -410,7 +410,7 @@ export function createChromeHandler(options: ChromeHandlerOptions): ChromeHandle
       if (settingsReveal?.isOpen()) {
         settingsReveal.close();
         setState({ settingsOpen: false });
-          }
+      }
     }
 
     disabled = newDisabled;
