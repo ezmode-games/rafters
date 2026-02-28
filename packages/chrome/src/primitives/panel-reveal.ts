@@ -107,7 +107,7 @@ let sharedAnnouncer: HTMLElement | null = null;
  * Get or create a visually hidden live region for screen reader announcements
  */
 function getOrCreateAnnouncer(): HTMLElement {
-  if (sharedAnnouncer && sharedAnnouncer.isConnected) {
+  if (sharedAnnouncer?.isConnected) {
     return sharedAnnouncer;
   }
 
