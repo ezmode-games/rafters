@@ -219,17 +219,9 @@ export const Chrome = React.forwardRef<ChromeControls, ChromeProps>(
         }
       }
 
-      // Build rail items for the primitive (filter undefined disabled to satisfy exactOptionalPropertyTypes)
-      const railItems = railRef_.current.map((item) => {
-        const entry: { id: string; label: string; disabled?: boolean } = {
-          id: item.id,
-          label: item.label,
-        };
-        if (item.disabled !== undefined) {
-          entry.disabled = item.disabled;
-        }
-        return entry;
-      });
+      const railItems = railRef_.current.map(({ id, label, disabled: d }) =>
+        d !== undefined ? { id, label, disabled: d } : { id, label },
+      );
 
       // Build handler options, only adding optional settings refs when present
       const handlerOptions: Parameters<typeof createChromeHandler>[0] = {
@@ -284,38 +276,19 @@ export const Chrome = React.forwardRef<ChromeControls, ChromeProps>(
         if (landmarks.length === 0) return;
 
         const active = document.activeElement as HTMLElement | null;
-        // Find which landmark currently contains focus
-        let currentIdx = -1;
-        if (active) {
-          for (let i = 0; i < landmarks.length; i++) {
-            if (landmarks[i]?.contains(active)) {
-              currentIdx = i;
-              break;
-            }
-          }
-        }
+        const currentIdx = active
+          ? landmarks.findIndex((lm) => lm.contains(active))
+          : -1;
 
         const direction = event.shiftKey ? -1 : 1;
-        let nextIdx: number;
-        if (currentIdx === -1) {
-          nextIdx = direction === 1 ? 0 : landmarks.length - 1;
-        } else {
-          nextIdx = currentIdx + direction;
-          if (nextIdx < 0) nextIdx = landmarks.length - 1;
-          if (nextIdx >= landmarks.length) nextIdx = 0;
-        }
+        const nextIdx = (currentIdx + direction + landmarks.length) % landmarks.length;
 
         const target = landmarks[nextIdx];
         if (target) {
-          // Focus the first focusable child, or the landmark itself
           const focusable = target.querySelector<HTMLElement>(
             'button:not([disabled]), [tabindex="0"], a[href], input:not([disabled])',
           );
-          if (focusable) {
-            focusable.focus();
-          } else {
-            target.focus();
-          }
+          (focusable ?? target).focus();
         }
       }
 
@@ -457,30 +430,33 @@ export const Chrome = React.forwardRef<ChromeControls, ChromeProps>(
         </div>
 
         {/* Panel area */}
-        {rail.map((item) => (
-          <section
-            key={item.id}
-            ref={(el) => {
-              if (el) {
-                panelRefsMap.current.set(item.id, el);
-              } else {
-                panelRefsMap.current.delete(item.id);
-              }
-            }}
-            data-chrome-panel=""
-            data-panel-id={item.id}
-            data-state={chromeState.activePanelId === item.id ? 'open' : 'closed'}
-            aria-label={`${item.label} panel`}
-            className={classy('z-depth-base shrink-0 overflow-y-auto border-border bg-background', {
-              'w-64': chromeState.activePanelId === item.id,
-              hidden: chromeState.activePanelId !== item.id,
-              'border-r': chromeState.activePanelId === item.id && !isRtl,
-              'border-l': chromeState.activePanelId === item.id && isRtl,
-            })}
-          >
-            {item.panel}
-          </section>
-        ))}
+        {rail.map((item) => {
+          const isActive = chromeState.activePanelId === item.id;
+          return (
+            <section
+              key={item.id}
+              ref={(el) => {
+                if (el) {
+                  panelRefsMap.current.set(item.id, el);
+                } else {
+                  panelRefsMap.current.delete(item.id);
+                }
+              }}
+              data-chrome-panel=""
+              data-panel-id={item.id}
+              data-state={isActive ? 'open' : 'closed'}
+              aria-label={`${item.label} panel`}
+              className={classy('z-depth-base shrink-0 overflow-y-auto border-border bg-background', {
+                'w-64': isActive,
+                hidden: !isActive,
+                'border-r': isActive && !isRtl,
+                'border-l': isActive && isRtl,
+              })}
+            >
+              {item.panel}
+            </section>
+          );
+        })}
 
         {/* Settings panel */}
         {settings && (
