@@ -9,15 +9,7 @@ import type { EditorBlock } from '@rafters/ui';
 import classy from '@rafters/ui/primitives/classy';
 import type { CompositeDefinition } from '../manifest.js';
 
-// ============================================================================
-// Types
-// ============================================================================
-
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
-
-// ============================================================================
-// Constants
-// ============================================================================
 
 const HEADING_STYLES: Record<HeadingLevel, string> = {
   1: 'text-4xl font-bold tracking-tight',
@@ -28,37 +20,18 @@ const HEADING_STYLES: Record<HeadingLevel, string> = {
   6: 'text-base font-medium',
 };
 
-const DEFAULT_LEVEL: HeadingLevel = 2;
-const PLACEHOLDER = 'Untitled';
-
-// ============================================================================
-// Helpers
-// ============================================================================
-
 function resolveLevel(meta: Record<string, unknown> | undefined): HeadingLevel {
   const raw = meta?.level;
-  if (typeof raw === 'number' && raw >= 1 && raw <= 6) {
-    return raw as HeadingLevel;
-  }
-  return DEFAULT_LEVEL;
+  return typeof raw === 'number' && raw >= 1 && raw <= 6 ? (raw as HeadingLevel) : 2;
 }
 
-// ============================================================================
-// Preview
-// ============================================================================
-
 function HeadingPreview({ scale = 1 }: { scale?: number }) {
-  const fontSize = 16 * scale;
   return (
-    <span className={classy('font-semibold text-foreground')} style={{ fontSize: `${fontSize}px` }}>
+    <span className={classy('font-semibold text-foreground')} style={{ fontSize: `${16 * scale}px` }}>
       Heading
     </span>
   );
 }
-
-// ============================================================================
-// Render
-// ============================================================================
 
 function HeadingRender({
   block,
@@ -67,22 +40,15 @@ function HeadingRender({
   context: { index: number; total: number; isSelected: boolean; isFocused: boolean };
 }) {
   const level = resolveLevel(block.meta);
-  const text =
-    typeof block.content === 'string' && block.content.length > 0 ? block.content : PLACEHOLDER;
-  const isEmpty = typeof block.content !== 'string' || block.content.length === 0;
+  const hasContent = typeof block.content === 'string' && block.content.length > 0;
   const Tag = `h${level}` as `h${HeadingLevel}`;
-  const styles = HEADING_STYLES[level];
 
   return (
-    <Tag className={classy(styles, 'text-foreground', { 'text-muted-foreground': isEmpty })}>
-      {text}
+    <Tag className={classy(HEADING_STYLES[level], hasContent ? 'text-foreground' : 'text-muted-foreground')}>
+      {hasContent ? block.content : 'Untitled'}
     </Tag>
   );
 }
-
-// ============================================================================
-// Composite Definition
-// ============================================================================
 
 export const headingComposite: CompositeDefinition = {
   manifest: {

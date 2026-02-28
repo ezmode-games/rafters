@@ -10,36 +10,16 @@ import type { EditorBlock } from '@rafters/ui';
 import classy from '@rafters/ui/primitives/classy';
 import type { CompositeDefinition } from '../manifest.js';
 
-// ============================================================================
-// Helpers
-// ============================================================================
-
 function resolveItems(content: unknown): string[] {
   if (Array.isArray(content) && content.length > 0) {
-    const items: string[] = [];
-    for (const item of content) {
-      items.push(typeof item === 'string' ? item : String(item ?? ''));
-    }
-    return items;
+    return content.map((item) => (typeof item === 'string' ? item : String(item ?? '')));
   }
   return [''];
 }
 
-function resolveOrdered(meta: Record<string, unknown> | undefined): boolean {
-  return meta?.ordered === true;
-}
-
-// ============================================================================
-// Preview
-// ============================================================================
-
 function ListPreview(_props: { scale?: number }) {
   return <span className={classy('text-foreground')}>List</span>;
 }
-
-// ============================================================================
-// Render
-// ============================================================================
 
 function ListRender({
   block,
@@ -48,16 +28,11 @@ function ListRender({
   context: { index: number; total: number; isSelected: boolean; isFocused: boolean };
 }) {
   const items = resolveItems(block.content);
-  const ordered = resolveOrdered(block.meta);
+  const ordered = block.meta?.ordered === true;
   const Tag = ordered ? 'ol' : 'ul';
 
   return (
-    <Tag
-      className={classy('pl-6 text-base leading-7 text-foreground', {
-        'list-decimal': ordered,
-        'list-disc': !ordered,
-      })}
-    >
+    <Tag className={classy('pl-6 text-base leading-7 text-foreground', ordered ? 'list-decimal' : 'list-disc')}>
       {items.map((item, i) => (
         <li key={`${i}`} className={classy({ 'text-muted-foreground': item.length === 0 })}>
           {item.length > 0 ? item : '\u00A0'}
@@ -66,10 +41,6 @@ function ListRender({
     </Tag>
   );
 }
-
-// ============================================================================
-// Composite Definition
-// ============================================================================
 
 export const listComposite: CompositeDefinition = {
   manifest: {

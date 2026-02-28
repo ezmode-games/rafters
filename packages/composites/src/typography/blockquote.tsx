@@ -9,35 +9,9 @@ import type { EditorBlock } from '@rafters/ui';
 import classy from '@rafters/ui/primitives/classy';
 import type { CompositeDefinition } from '../manifest.js';
 
-// ============================================================================
-// Constants
-// ============================================================================
-
-const PLACEHOLDER = 'Quote...';
-
-// ============================================================================
-// Helpers
-// ============================================================================
-
-function resolveAttribution(meta: Record<string, unknown> | undefined): string {
-  const raw = meta?.attribution;
-  if (typeof raw === 'string' && raw.length > 0) {
-    return raw;
-  }
-  return '';
-}
-
-// ============================================================================
-// Preview
-// ============================================================================
-
 function BlockquotePreview(_props: { scale?: number }) {
   return <span className={classy('text-foreground italic')}>&ldquo;Quote&rdquo;</span>;
 }
-
-// ============================================================================
-// Render
-// ============================================================================
 
 function BlockquoteRender({
   block,
@@ -45,17 +19,14 @@ function BlockquoteRender({
   block: EditorBlock;
   context: { index: number; total: number; isSelected: boolean; isFocused: boolean };
 }) {
-  const text = typeof block.content === 'string' && block.content.length > 0 ? block.content : null;
-  const attribution = resolveAttribution(block.meta);
+  const hasContent = typeof block.content === 'string' && block.content.length > 0;
+  const attribution = typeof block.meta?.attribution === 'string' ? block.meta.attribution : '';
 
   return (
     <blockquote
-      className={classy('border-l-4 border-border pl-4 py-2', {
-        'text-foreground': !!text,
-        'text-muted-foreground': !text,
-      })}
+      className={classy('border-l-4 border-border pl-4 py-2', hasContent ? 'text-foreground' : 'text-muted-foreground')}
     >
-      <p className={classy('text-base italic leading-7')}>{text ?? PLACEHOLDER}</p>
+      <p className={classy('text-base italic leading-7')}>{hasContent ? block.content : 'Quote...'}</p>
       {attribution.length > 0 && (
         <footer className={classy('mt-2 text-sm text-muted-foreground')}>
           &mdash; <cite>{attribution}</cite>
@@ -64,10 +35,6 @@ function BlockquoteRender({
     </blockquote>
   );
 }
-
-// ============================================================================
-// Composite Definition
-// ============================================================================
 
 export const blockquoteComposite: CompositeDefinition = {
   manifest: {

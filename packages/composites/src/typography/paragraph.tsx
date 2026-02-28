@@ -9,28 +9,13 @@ import type { EditorBlock } from '@rafters/ui';
 import classy from '@rafters/ui/primitives/classy';
 import type { CompositeDefinition } from '../manifest.js';
 
-// ============================================================================
-// Constants
-// ============================================================================
-
-const PLACEHOLDER = 'Type something...';
-
-// ============================================================================
-// Preview
-// ============================================================================
-
 function ParagraphPreview({ scale = 1 }: { scale?: number }) {
-  const fontSize = 14 * scale;
   return (
-    <span className={classy('text-foreground')} style={{ fontSize: `${fontSize}px` }}>
+    <span className={classy('text-foreground')} style={{ fontSize: `${14 * scale}px` }}>
       Paragraph
     </span>
   );
 }
-
-// ============================================================================
-// Render
-// ============================================================================
 
 function ParagraphRender({
   block,
@@ -38,23 +23,14 @@ function ParagraphRender({
   block: EditorBlock;
   context: { index: number; total: number; isSelected: boolean; isFocused: boolean };
 }) {
-  const text = typeof block.content === 'string' && block.content.length > 0 ? block.content : null;
+  const hasContent = typeof block.content === 'string' && block.content.length > 0;
 
   return (
-    <p
-      className={classy('text-base leading-7', {
-        'text-foreground': !!text,
-        'text-muted-foreground': !text,
-      })}
-    >
-      {text ?? PLACEHOLDER}
+    <p className={classy('text-base leading-7', hasContent ? 'text-foreground' : 'text-muted-foreground')}>
+      {hasContent ? block.content : 'Type something...'}
     </p>
   );
 }
-
-// ============================================================================
-// Composite Definition
-// ============================================================================
 
 export const paragraphComposite: CompositeDefinition = {
   manifest: {
