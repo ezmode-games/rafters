@@ -231,8 +231,8 @@ describe('createChromeHandler', () => {
       expect(handler.$state.get().activePanelId).toBe('tokens');
 
       // Verify only one panel is open
-      const layersPanel = dom.panels.get('layers')!.panel;
-      const tokensPanel = dom.panels.get('tokens')!.panel;
+      const layersPanel = dom.panels.get('layers')?.panel;
+      const tokensPanel = dom.panels.get('tokens')?.panel;
       expect(layersPanel.getAttribute('data-state')).toBe('closed');
       expect(tokensPanel.getAttribute('data-state')).toBe('open');
     });
@@ -296,7 +296,7 @@ describe('createChromeHandler', () => {
       const handler = createHandler({ hoverDelay: 200 });
 
       // Simulate hover on first rail item
-      dom.railItems[0]!.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+      dom.railItems[0]?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
       vi.advanceTimersByTime(200);
 
       const state = handler.$state.get();
@@ -309,13 +309,13 @@ describe('createChromeHandler', () => {
       const handler = createHandler({ hoverDelay: 0 });
 
       // Hover enter
-      dom.railItems[0]!.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+      dom.railItems[0]?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
       vi.advanceTimersByTime(1);
 
       expect(handler.$state.get().activePanelId).toBe('layers');
 
       // Hover leave
-      dom.railItems[0]!.dispatchEvent(
+      dom.railItems[0]?.dispatchEvent(
         new MouseEvent('mouseout', { bubbles: true, relatedTarget: dom.railContainer }),
       );
 
@@ -331,9 +331,9 @@ describe('createChromeHandler', () => {
       handler.pinPanel('layers');
 
       // Simulate hover leave on the rail item
-      dom.railItems[0]!.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+      dom.railItems[0]?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
       vi.advanceTimersByTime(1);
-      dom.railItems[0]!.dispatchEvent(
+      dom.railItems[0]?.dispatchEvent(
         new MouseEvent('mouseout', { bubbles: true, relatedTarget: dom.railContainer }),
       );
 
@@ -352,7 +352,7 @@ describe('createChromeHandler', () => {
       const handler = createHandler();
 
       // Simulate click on rail item (icon-rail fires onActivate)
-      dom.railItems[0]!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      dom.railItems[0]?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
       const state = handler.$state.get();
       expect(state.activePanelId).toBe('layers');
@@ -362,8 +362,8 @@ describe('createChromeHandler', () => {
     it('Enter on a rail item pins the panel', () => {
       const handler = createHandler();
 
-      dom.railItems[1]!.focus();
-      dom.railItems[1]!.dispatchEvent(
+      dom.railItems[1]?.focus();
+      dom.railItems[1]?.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }),
       );
 
@@ -375,8 +375,8 @@ describe('createChromeHandler', () => {
     it('Space on a rail item pins the panel', () => {
       const handler = createHandler();
 
-      dom.railItems[2]!.focus();
-      dom.railItems[2]!.dispatchEvent(
+      dom.railItems[2]?.focus();
+      dom.railItems[2]?.dispatchEvent(
         new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }),
       );
 
@@ -718,7 +718,7 @@ describe('createChromeHandler', () => {
     it('cleans up panel-reveal ARIA attributes', () => {
       createHandler();
 
-      const layersPanel = dom.panels.get('layers')!.panel;
+      const layersPanel = dom.panels.get('layers')?.panel;
       expect(layersPanel.getAttribute('role')).toBe('region');
 
       controls.destroy();
