@@ -67,6 +67,14 @@ export function fuzzyScore(query: string, target: string): number {
   return qi === q.length ? score : 0;
 }
 
+/**
+ * Match mode for typeahead search.
+ * - 'prefix': Match from start of text (default, original behavior)
+ * - 'fuzzy': Characters must appear in order but not consecutively.
+ *   Consecutive matches and start-of-word matches score higher.
+ */
+export type TypeaheadMatchMode = 'prefix' | 'fuzzy';
+
 export interface TypeaheadOptions {
   /**
    * Function to get searchable items
@@ -97,7 +105,9 @@ export interface TypeaheadOptions {
   timeout?: number;
 
   /**
-   * Whether to match from start of text only
+   * Whether to match from start of text only.
+   * Only applies when matchMode is 'prefix' (default).
+   * Ignored when matchMode is 'fuzzy'.
    * @default true
    */
   matchFromStart?: boolean;
@@ -119,6 +129,15 @@ export interface TypeaheadOptions {
    * If provided, search starts from this index and wraps around
    */
   startIndex?: number;
+
+  /**
+   * Match mode for typeahead search.
+   * - 'prefix' (default): Matches from start or anywhere in text (controlled by matchFromStart)
+   * - 'fuzzy': Characters must appear in order but not consecutively.
+   *   Best match (highest score) wins. Used by block-palette for search.
+   * @default 'prefix'
+   */
+  matchMode?: TypeaheadMatchMode;
 }
 
 export interface TypeaheadState {
@@ -189,6 +208,7 @@ export function createTypeahead(
     caseSensitive = false,
     enabled = true,
     startIndex,
+    matchMode = 'prefix',
   } = options;
 
   if (!enabled) {
@@ -221,7 +241,32 @@ export function createTypeahead(
     // Determine starting index for search
     const start = startIndex !== undefined ? startIndex : 0;
 
-    // Search from start index to end, then wrap to beginning
+    if (matchMode === 'fuzzy') {
+      // Fuzzy: find the item with the highest score
+      let bestScore = 0;
+      let bestItem: HTMLElement | null = null;
+      let bestIndex = -1;
+
+      for (let i = 0; i < items.length; i++) {
+        const index = (start + i) % items.length;
+        const item = items[index];
+        if (!item) continue;
+        if (item.hasAttribute('disabled') || item.getAttribute('aria-disabled') === 'true') {
+          continue;
+        }
+        const text = getItemText(item);
+        const score = fuzzyScore(search, text);
+        if (score > bestScore) {
+          bestScore = score;
+          bestItem = item;
+          bestIndex = index;
+        }
+      }
+
+      return bestItem ? { item: bestItem, index: bestIndex } : null;
+    }
+
+    // Prefix mode (original behavior)
     for (let i = 0; i < items.length; i++) {
       const index = (start + i) % items.length;
       const item = items[index];
@@ -335,6 +380,7 @@ export function createControlledTypeahead(options: Omit<TypeaheadOptions, 'enabl
     matchFromStart = true,
     caseSensitive = false,
     startIndex,
+    matchMode = 'prefix',
   } = options;
 
   let searchString = '';
@@ -357,6 +403,30 @@ export function createControlledTypeahead(options: Omit<TypeaheadOptions, 'enabl
   ): { item: HTMLElement; index: number } | null => {
     const normalizedSearch = caseSensitive ? search : search.toLowerCase();
     const start = startIndex !== undefined ? startIndex : 0;
+
+    if (matchMode === 'fuzzy') {
+      let bestScore = 0;
+      let bestItem: HTMLElement | null = null;
+      let bestIndex = -1;
+
+      for (let i = 0; i < items.length; i++) {
+        const index = (start + i) % items.length;
+        const item = items[index];
+        if (!item) continue;
+        if (item.hasAttribute('disabled') || item.getAttribute('aria-disabled') === 'true') {
+          continue;
+        }
+        const text = getItemText(item);
+        const score = fuzzyScore(search, text);
+        if (score > bestScore) {
+          bestScore = score;
+          bestItem = item;
+          bestIndex = index;
+        }
+      }
+
+      return bestItem ? { item: bestItem, index: bestIndex } : null;
+    }
 
     for (let i = 0; i < items.length; i++) {
       const index = (start + i) % items.length;
