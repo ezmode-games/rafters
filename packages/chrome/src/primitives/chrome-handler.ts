@@ -165,35 +165,19 @@ export function createChromeHandler(options: ChromeHandlerOptions): ChromeHandle
   let disabled = options.disabled ?? false;
 
   // ---------------------------------------------------------------------------
-  // Validate panel IDs are unique
-  // ---------------------------------------------------------------------------
-
-  const panelIds = Array.from(panels.keys());
-  const uniqueIds = new Set(panelIds);
-  if (uniqueIds.size !== panelIds.length) {
-    throw new Error('chrome-handler: Panel IDs must be unique');
-  }
-
-  // ---------------------------------------------------------------------------
   // Reactive state atom
   // ---------------------------------------------------------------------------
 
   const $state = atom<ChromeHandlerState>({ ...INITIAL_STATE });
 
   function setState(patch: Partial<ChromeHandlerState>): void {
-    $state.set({ ...$state.get(), ...patch });
-  }
-
-  function computeMode(): ChromeMode {
-    const state = $state.get();
-    if (state.collapsed) return 'collapsed';
-    if (state.settingsOpen) return 'settings-open';
-    if (state.activePanelId !== undefined) return 'panel-open';
-    return 'idle';
-  }
-
-  function updateMode(): void {
-    setState({ mode: computeMode() });
+    const next = { ...$state.get(), ...patch };
+    // Derive mode from state
+    if (next.collapsed) next.mode = 'collapsed';
+    else if (next.settingsOpen) next.mode = 'settings-open';
+    else if (next.activePanelId !== undefined) next.mode = 'panel-open';
+    else next.mode = 'idle';
+    $state.set(next);
   }
 
   // ---------------------------------------------------------------------------
@@ -291,7 +275,6 @@ export function createChromeHandler(options: ChromeHandlerOptions): ChromeHandle
       activePanelId: id,
       pinnedPanelId: pin ? id : state.pinnedPanelId,
     });
-    updateMode();
   }
 
   /**
@@ -312,7 +295,6 @@ export function createChromeHandler(options: ChromeHandlerOptions): ChromeHandle
       activePanelId: undefined,
       pinnedPanelId: undefined,
     });
-    updateMode();
   }
 
   // ---------------------------------------------------------------------------
@@ -320,19 +302,15 @@ export function createChromeHandler(options: ChromeHandlerOptions): ChromeHandle
   // ---------------------------------------------------------------------------
 
   function openPanel(id: string): void {
-    if (disabled) return;
     openPanelInternal(id, false);
   }
 
   function closePanel(): void {
-    if (disabled) return;
     closePanelInternal();
   }
 
   function togglePanel(id: string): void {
-    if (disabled) return;
-    const state = $state.get();
-    if (state.activePanelId === id) {
+    if ($state.get().activePanelId === id) {
       closePanelInternal();
     } else {
       openPanelInternal(id, false);
@@ -340,16 +318,12 @@ export function createChromeHandler(options: ChromeHandlerOptions): ChromeHandle
   }
 
   function pinPanel(id: string): void {
-    if (disabled) return;
     openPanelInternal(id, true);
   }
 
   function unpinPanel(): void {
-    if (disabled) return;
-    const state = $state.get();
-    if (state.pinnedPanelId === undefined) return;
+    if (disabled || $state.get().pinnedPanelId === undefined) return;
     setState({ pinnedPanelId: undefined });
-    updateMode();
   }
 
   // ---------------------------------------------------------------------------
@@ -357,26 +331,15 @@ export function createChromeHandler(options: ChromeHandlerOptions): ChromeHandle
   // ---------------------------------------------------------------------------
 
   function openSettings(): void {
-    if (disabled) return;
-    if ($state.get().collapsed) return;
-    if (!settingsReveal) return;
-
-    if (!settingsReveal.isOpen()) {
-      settingsReveal.open();
-    }
+    if (disabled || $state.get().collapsed || !settingsReveal) return;
+    settingsReveal.open();
     setState({ settingsOpen: true });
-    updateMode();
   }
 
   function closeSettings(): void {
-    if (disabled) return;
-    if (!settingsReveal) return;
-
-    if (settingsReveal.isOpen()) {
-      settingsReveal.close();
-    }
+    if (disabled || !settingsReveal) return;
+    settingsReveal.close();
     setState({ settingsOpen: false });
-    updateMode();
   }
 
   // ---------------------------------------------------------------------------
@@ -386,28 +349,15 @@ export function createChromeHandler(options: ChromeHandlerOptions): ChromeHandle
   function doCollapse(): void {
     if (disabled) return;
 
-    // Close all panels
-    const state = $state.get();
-    if (state.activePanelId !== undefined) {
-      const reveal = panelReveals.get(state.activePanelId);
-      if (reveal?.isOpen()) {
-        reveal.close();
-      }
-    }
-    if (settingsReveal?.isOpen()) {
-      settingsReveal.close();
-    }
+    closePanelInternal();
+    settingsReveal?.close();
 
-    iconRail.setActiveId(undefined);
     iconRail.setDisabled(true);
 
     setState({
       collapsed: true,
-      activePanelId: undefined,
-      pinnedPanelId: undefined,
       settingsOpen: false,
     });
-    updateMode();
   }
 
   function doExpand(): void {
@@ -416,7 +366,6 @@ export function createChromeHandler(options: ChromeHandlerOptions): ChromeHandle
     iconRail.setDisabled(false);
 
     setState({ collapsed: false });
-    updateMode();
   }
 
   // ---------------------------------------------------------------------------
@@ -429,12 +378,7 @@ export function createChromeHandler(options: ChromeHandlerOptions): ChromeHandle
     // Cmd/Ctrl + Backslash -> toggle collapse
     if (event.key === '\\' && (event.metaKey || event.ctrlKey)) {
       event.preventDefault();
-      const state = $state.get();
-      if (state.collapsed) {
-        doExpand();
-      } else {
-        doCollapse();
-      }
+      $state.get().collapsed ? doExpand() : doCollapse();
       return;
     }
 
@@ -466,8 +410,7 @@ export function createChromeHandler(options: ChromeHandlerOptions): ChromeHandle
       if (settingsReveal?.isOpen()) {
         settingsReveal.close();
         setState({ settingsOpen: false });
-        updateMode();
-      }
+          }
     }
 
     disabled = newDisabled;
