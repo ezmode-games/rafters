@@ -7,6 +7,7 @@ export default defineConfig({
     globals: true,
     environment: 'happy-dom',
     setupFiles: ['./vitest.setup.ts'],
+    passWithNoTests: true,
     include: ['src/**/*.test.{ts,tsx}', 'test/**/*.test.{ts,tsx}', 'test/**/*.a11y.{ts,tsx}'],
     exclude: ['test/**/*.spec.{ts,tsx}', 'test/**/*.e2e.{ts,tsx}'],
     coverage: {
