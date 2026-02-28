@@ -231,22 +231,13 @@ export function createPanelReveal(options: PanelRevealOptions): PanelRevealContr
 
       const active = document.activeElement as HTMLElement | null;
       const currentIndex = active ? focusable.indexOf(active) : -1;
+      const direction = event.shiftKey ? -1 : 1;
+      const nextIndex = (currentIndex + direction + focusable.length) % focusable.length;
+      const target = focusable[nextIndex];
 
-      if (event.shiftKey) {
-        const prevIndex = currentIndex > 0 ? currentIndex - 1 : focusable.length - 1;
-        const target = focusable[prevIndex];
-        if (target) {
-          event.preventDefault();
-          target.focus();
-        }
-      } else {
-        const nextIndex =
-          currentIndex >= 0 && currentIndex < focusable.length - 1 ? currentIndex + 1 : 0;
-        const target = focusable[nextIndex];
-        if (target) {
-          event.preventDefault();
-          target.focus();
-        }
+      if (target) {
+        event.preventDefault();
+        target.focus();
       }
     };
 
@@ -345,13 +336,6 @@ export function createPanelReveal(options: PanelRevealOptions): PanelRevealContr
   // Event Handlers
   // =========================================================================
 
-  // -- Click on trigger toggles panel --
-
-  function handleTriggerClick(): void {
-    if (disabled) return;
-    doToggle();
-  }
-
   // -- Hover continuation --
   // Moving from trigger to panel (and vice versa) should keep it open.
   // Leaving both starts the close delay. Re-entering cancels it.
@@ -359,26 +343,16 @@ export function createPanelReveal(options: PanelRevealOptions): PanelRevealContr
   let hoveringTrigger = false;
   let hoveringPanel = false;
 
-  function handleTriggerMouseEnter(): void {
-    hoveringTrigger = true;
+  function handleMouseEnter(source: 'trigger' | 'panel'): void {
+    if (source === 'trigger') hoveringTrigger = true;
+    else hoveringPanel = true;
     clearCloseTimer();
   }
 
-  function handleTriggerMouseLeave(): void {
-    hoveringTrigger = false;
-    if (!hoveringPanel && open) {
-      scheduleClose();
-    }
-  }
-
-  function handlePanelMouseEnter(): void {
-    hoveringPanel = true;
-    clearCloseTimer();
-  }
-
-  function handlePanelMouseLeave(): void {
-    hoveringPanel = false;
-    if (!hoveringTrigger && open) {
+  function handleMouseLeave(source: 'trigger' | 'panel'): void {
+    if (source === 'trigger') hoveringTrigger = false;
+    else hoveringPanel = false;
+    if (!hoveringTrigger && !hoveringPanel && open) {
       scheduleClose();
     }
   }
@@ -408,7 +382,12 @@ export function createPanelReveal(options: PanelRevealOptions): PanelRevealContr
   // Event Binding
   // =========================================================================
 
-  trigger.addEventListener('click', handleTriggerClick);
+  const handleTriggerMouseEnter = () => handleMouseEnter('trigger');
+  const handleTriggerMouseLeave = () => handleMouseLeave('trigger');
+  const handlePanelMouseEnter = () => handleMouseEnter('panel');
+  const handlePanelMouseLeave = () => handleMouseLeave('panel');
+
+  trigger.addEventListener('click', doToggle);
   trigger.addEventListener('mouseenter', handleTriggerMouseEnter);
   trigger.addEventListener('mouseleave', handleTriggerMouseLeave);
 
@@ -436,7 +415,7 @@ export function createPanelReveal(options: PanelRevealOptions): PanelRevealContr
     disableFocusTrap();
 
     // Remove event listeners
-    trigger.removeEventListener('click', handleTriggerClick);
+    trigger.removeEventListener('click', doToggle);
     trigger.removeEventListener('mouseenter', handleTriggerMouseEnter);
     trigger.removeEventListener('mouseleave', handleTriggerMouseLeave);
 
