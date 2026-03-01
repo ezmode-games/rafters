@@ -26,3 +26,10 @@ export {
   register as registerComposite,
   search as searchComposites,
 } from './registry.js';
+
+export {
+  blockquoteComposite,
+  headingComposite,
+  listComposite,
+  paragraphComposite,
+} from './typography/index.js';
