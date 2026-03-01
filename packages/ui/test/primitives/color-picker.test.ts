@@ -96,7 +96,8 @@ function dragCommit(
   const Ctor = startEvent === 'mousedown' ? MouseEvent : TouchEvent;
   const EndCtor = endEvent === 'mouseup' ? MouseEvent : TouchEvent;
   container.dispatchEvent(new Ctor(startEvent, { bubbles: true }));
-  const expected = state!.$color.get();
+  if (!state) throw new Error('state not initialized');
+  const expected = state.$color.get();
   document.dispatchEvent(new EndCtor(endEvent, { bubbles: true }));
   return expected;
 }

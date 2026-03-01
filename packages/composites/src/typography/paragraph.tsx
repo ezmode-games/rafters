@@ -26,8 +26,13 @@ function ParagraphRender({
   const hasContent = typeof block.content === 'string' && block.content.length > 0;
 
   return (
-    <p className={classy('text-base leading-7', hasContent ? 'text-foreground' : 'text-muted-foreground')}>
-      {hasContent ? block.content : 'Type something...'}
+    <p
+      className={classy(
+        'text-base leading-7',
+        hasContent ? 'text-foreground' : 'text-muted-foreground',
+      )}
+    >
+      {hasContent ? String(block.content) : 'Type something...'}
     </p>
   );
 }

@@ -27,7 +27,10 @@ function resolveLevel(meta: Record<string, unknown> | undefined): HeadingLevel {
 
 function HeadingPreview({ scale = 1 }: { scale?: number }) {
   return (
-    <span className={classy('font-semibold text-foreground')} style={{ fontSize: `${16 * scale}px` }}>
+    <span
+      className={classy('font-semibold text-foreground')}
+      style={{ fontSize: `${16 * scale}px` }}
+    >
       Heading
     </span>
   );
@@ -44,8 +47,13 @@ function HeadingRender({
   const Tag = `h${level}` as `h${HeadingLevel}`;
 
   return (
-    <Tag className={classy(HEADING_STYLES[level], hasContent ? 'text-foreground' : 'text-muted-foreground')}>
-      {hasContent ? block.content : 'Untitled'}
+    <Tag
+      className={classy(
+        HEADING_STYLES[level],
+        hasContent ? 'text-foreground' : 'text-muted-foreground',
+      )}
+    >
+      {hasContent ? String(block.content) : 'Untitled'}
     </Tag>
   );
 }

@@ -24,9 +24,14 @@ function BlockquoteRender({
 
   return (
     <blockquote
-      className={classy('border-l-4 border-border pl-4 py-2', hasContent ? 'text-foreground' : 'text-muted-foreground')}
+      className={classy(
+        'border-l-4 border-border pl-4 py-2',
+        hasContent ? 'text-foreground' : 'text-muted-foreground',
+      )}
     >
-      <p className={classy('text-base italic leading-7')}>{hasContent ? block.content : 'Quote...'}</p>
+      <p className={classy('text-base italic leading-7')}>
+        {hasContent ? String(block.content) : 'Quote...'}
+      </p>
       {attribution.length > 0 && (
         <footer className={classy('mt-2 text-sm text-muted-foreground')}>
           &mdash; <cite>{attribution}</cite>

@@ -32,7 +32,12 @@ function ListRender({
   const Tag = ordered ? 'ol' : 'ul';
 
   return (
-    <Tag className={classy('pl-6 text-base leading-7 text-foreground', ordered ? 'list-decimal' : 'list-disc')}>
+    <Tag
+      className={classy(
+        'pl-6 text-base leading-7 text-foreground',
+        ordered ? 'list-decimal' : 'list-disc',
+      )}
+    >
       {items.map((item, i) => (
         <li key={`${i}`} className={classy({ 'text-muted-foreground': item.length === 0 })}>
           {item.length > 0 ? item : '\u00A0'}

@@ -23,8 +23,8 @@ const EditorBlockWithoutIdSchema = z.object({
   content: z.unknown(),
   children: z.array(z.string()).optional(),
   parentId: z.string().optional(),
-  meta: z.record(z.unknown()).optional(),
-}) satisfies z.ZodType<Omit<EditorBlock, 'id'>>;
+  meta: z.record(z.string(), z.unknown()).optional(),
+});
 
 /** Zod schema for composite manifest validation */
 export const CompositeManifestSchema = z.object({

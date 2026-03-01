@@ -928,6 +928,7 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
     }, [isControlled, controlledValue]);
 
     // ----- Imperative handle -----
+    // biome-ignore lint/style/noNonNullAssertion: ref is assigned via useEffect before any consumer reads it
     const controlsRef = React.useRef<EditorControls>(null!);
     const controls = React.useMemo<EditorControls>(
       () => ({

@@ -107,14 +107,6 @@ const AUTO_COLLAPSE_WIDTH = 768;
  * Landmark IDs for F6 navigation cycling: rail -> panel -> canvas
  * Only includes landmarks that are currently visible.
  */
-<<<<<<< HEAD
-export const Chrome = React.forwardRef<ChromeControls, ChromeProps>(function Chrome(
-  { children, ...props },
-  _ref,
-) {
-  return <div {...props}>{children}</div>;
-});
-=======
 function getLandmarkElements(root: HTMLElement): HTMLElement[] {
   const landmarks: HTMLElement[] = [];
   const rail = root.querySelector<HTMLElement>('[data-chrome-rail]');
@@ -288,9 +280,7 @@ export const Chrome = React.forwardRef<ChromeControls, ChromeProps>(
         if (landmarks.length === 0) return;
 
         const active = document.activeElement as HTMLElement | null;
-        const currentIdx = active
-          ? landmarks.findIndex((lm) => lm.contains(active))
-          : -1;
+        const currentIdx = active ? landmarks.findIndex((lm) => lm.contains(active)) : -1;
 
         const direction = event.shiftKey ? -1 : 1;
         const nextIdx = (currentIdx + direction + landmarks.length) % landmarks.length;
@@ -458,12 +448,15 @@ export const Chrome = React.forwardRef<ChromeControls, ChromeProps>(
               data-panel-id={item.id}
               data-state={isActive ? 'open' : 'closed'}
               aria-label={`${item.label} panel`}
-              className={classy('z-depth-base shrink-0 overflow-y-auto border-border bg-background', {
-                'w-64': isActive,
-                hidden: !isActive,
-                'border-r': isActive && !isRtl,
-                'border-l': isActive && isRtl,
-              })}
+              className={classy(
+                'z-depth-base shrink-0 overflow-y-auto border-border bg-background',
+                {
+                  'w-64': isActive,
+                  hidden: !isActive,
+                  'border-r': isActive && !isRtl,
+                  'border-l': isActive && isRtl,
+                },
+              )}
             >
               {item.panel}
             </section>
@@ -503,4 +496,3 @@ export const Chrome = React.forwardRef<ChromeControls, ChromeProps>(
 );
 
 Chrome.displayName = 'Chrome';
->>>>>>> b69e2d1 (feat(chrome): implement Chrome component with full test suite)

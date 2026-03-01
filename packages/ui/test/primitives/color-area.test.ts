@@ -77,7 +77,6 @@ describe('updateColorArea', () => {
 describe('SSR safety', () => {
   it('returns a no-op cleanup when window is undefined', () => {
     const savedWindow = globalThis.window;
-    // biome-ignore lint/performance/noDelete: SSR simulation
     delete (globalThis as Record<string, unknown>).window;
     try {
       const canvas = {} as HTMLCanvasElement;

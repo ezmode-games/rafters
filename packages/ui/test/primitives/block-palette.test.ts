@@ -855,7 +855,7 @@ describe('createBlockPalette', () => {
       const activedescendant = container.getAttribute('aria-activedescendant');
       expect(activedescendant).toBeTruthy();
       // The id should reference the heading element
-      const activeEl = document.getElementById(activedescendant!);
+      const activeEl = activedescendant ? document.getElementById(activedescendant) : null;
       expect(activeEl?.getAttribute('data-palette-id')).toBe('heading');
     });
   });
