@@ -52,10 +52,12 @@ export interface ContainerProps extends React.HTMLAttributes<HTMLElement> {
   padding?: '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16' | '20' | '24';
 
   /**
-   * Vertical flow gap between children using Tailwind spacing scale
-   * Applies flex flex-col gap-{n} to create a vertical stack with consistent spacing
+   * Vertical flow gap between children.
+   * When true, derives gap from size by walking the spacing scale positions.
+   * When a spacing value, overrides the size-derived default.
+   * Applies flex flex-col gap-{n} to create a vertical stack.
    */
-  gap?: '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16' | '20' | '24';
+  gap?: boolean | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16' | '20' | '24';
 
   /**
    * Enable container queries on this element
@@ -142,6 +144,26 @@ const gapClasses: Record<string, string> = {
   '16': 'flex flex-col gap-16',
   '20': 'flex flex-col gap-20',
   '24': 'flex flex-col gap-24',
+};
+
+/**
+ * Size-to-gap mapping: walks through the spacing scale positions
+ * from the component-padding tier (3-4) into the section-padding tier (5-12).
+ * These are spacing SCALE POSITIONS, not pixel values -- Tailwind v4 resolves
+ * gap-N to calc(var(--spacing) * N), so actual values track the design system's
+ * baseSpacingUnit automatically.
+ */
+const sizeGapScale: Record<string, string> = {
+  sm: '3',
+  md: '4',
+  lg: '5',
+  xl: '6',
+  '2xl': '6',
+  '3xl': '8',
+  '4xl': '8',
+  '5xl': '10',
+  '6xl': '10',
+  '7xl': '12',
 };
 
 // Article typography - the magic for readable content
@@ -233,6 +255,8 @@ export const Container = React.forwardRef<HTMLElement, ContainerProps>(
     const isArticle = Element === 'article';
     const isEmpty = React.Children.count(children) === 0;
 
+    const resolvedGap = gap === true ? (size && sizeGapScale[size]) || '6' : gap || undefined;
+
     const classes = classy(
       // Container queries - w-full prevents width collapse when container-type: inline-size
       // is applied to flex/grid children (Tailwind v4 behavior)
@@ -248,7 +272,7 @@ export const Container = React.forwardRef<HTMLElement, ContainerProps>(
       padding && paddingClasses[padding],
 
       // Vertical flow with gap
-      gap && gapClasses[gap],
+      resolvedGap && gapClasses[resolvedGap],
 
       // Background (R-202)
       background && backgroundClasses[background],
