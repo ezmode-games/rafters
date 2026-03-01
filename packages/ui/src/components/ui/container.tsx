@@ -52,6 +52,12 @@ export interface ContainerProps extends React.HTMLAttributes<HTMLElement> {
   padding?: '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16' | '20' | '24';
 
   /**
+   * Vertical flow gap between children using Tailwind spacing scale
+   * Applies flex flex-col gap-{n} to create a vertical stack with consistent spacing
+   */
+  gap?: '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16' | '20' | '24';
+
+  /**
    * Enable container queries on this element
    * Children can use @container queries to respond to this container's size
    * @default true
@@ -120,6 +126,22 @@ const paddingClasses: Record<string, string> = {
   '16': 'p-16',
   '20': 'p-20',
   '24': 'p-24',
+};
+
+const gapClasses: Record<string, string> = {
+  '0': 'flex flex-col gap-0',
+  '1': 'flex flex-col gap-1',
+  '2': 'flex flex-col gap-2',
+  '3': 'flex flex-col gap-3',
+  '4': 'flex flex-col gap-4',
+  '5': 'flex flex-col gap-5',
+  '6': 'flex flex-col gap-6',
+  '8': 'flex flex-col gap-8',
+  '10': 'flex flex-col gap-10',
+  '12': 'flex flex-col gap-12',
+  '16': 'flex flex-col gap-16',
+  '20': 'flex flex-col gap-20',
+  '24': 'flex flex-col gap-24',
 };
 
 // Article typography - the magic for readable content
@@ -191,6 +213,7 @@ export const Container = React.forwardRef<HTMLElement, ContainerProps>(
       as: Element = 'div',
       size,
       padding,
+      gap,
       query = true,
       queryName,
       editable,
@@ -223,6 +246,9 @@ export const Container = React.forwardRef<HTMLElement, ContainerProps>(
 
       // Padding
       padding && paddingClasses[padding],
+
+      // Vertical flow with gap
+      gap && gapClasses[gap],
 
       // Background (R-202)
       background && backgroundClasses[background],
