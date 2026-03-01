@@ -8,7 +8,11 @@
     "rafters": "./dist/index.js"
   },
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./dist/index.js",
+    "./registry/types": {
+      "types": "./dist/registry/types.d.ts",
+      "import": "./dist/registry/types.js"
+    }
   },
   "files": [
     "dist",
