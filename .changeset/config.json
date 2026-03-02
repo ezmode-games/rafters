@@ -7,15 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": [
-    "@rafters/chrome",
-    "@rafters/color-utils",
-    "@rafters/composites",
-    "@rafters/math-utils",
-    "@rafters/studio",
-    "@rafters/ui",
-    "rafters-api",
-    "demo",
-    "rafters-website"
-  ]
+  "ignore": []
 }
