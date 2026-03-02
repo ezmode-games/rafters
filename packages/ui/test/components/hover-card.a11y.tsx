@@ -328,21 +328,21 @@ describe('HoverCard - Accessibility', () => {
     });
   });
 
-  it('closes on Escape key press', async () => {
+  it('calls onOpenChange with false on Escape key press', async () => {
     vi.useFakeTimers();
 
     const handleOpenChange = vi.fn();
 
     render(
       <HoverCard openDelay={0} closeDelay={0} onOpenChange={handleOpenChange}>
-        <HoverCardTrigger>Focusable trigger</HoverCardTrigger>
+        <HoverCardTrigger>Trigger</HoverCardTrigger>
         <HoverCardPortal>
-          <HoverCardContent>Dismissible content</HoverCardContent>
+          <HoverCardContent>Content</HoverCardContent>
         </HoverCardPortal>
       </HoverCard>,
     );
 
-    const trigger = screen.getByText('Focusable trigger');
+    const trigger = screen.getByText('Trigger');
 
     // Focus to open
     fireEvent.focus(trigger);
@@ -365,7 +365,7 @@ describe('HoverCard - Accessibility', () => {
     vi.useRealTimers();
   });
 
-  it('closes on Escape in uncontrolled mode', async () => {
+  it('removes dialog from DOM on Escape in uncontrolled mode', async () => {
     vi.useFakeTimers();
 
     render(
