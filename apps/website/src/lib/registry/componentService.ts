@@ -74,7 +74,7 @@ export function listComponentNames(): string[] {
 export function listPrimitiveNames(): string[] {
   const primitivesDir = getPrimitivesPath();
   return readdirSync(primitivesDir)
-    .filter((f) => (f.endsWith('.ts') || f.endsWith('.tsx')) && f !== 'types.ts')
+    .filter((f) => f.endsWith('.ts') || f.endsWith('.tsx'))
     .map((f) => basename(f, f.endsWith('.tsx') ? '.tsx' : '.ts'));
 }
 
@@ -421,6 +421,13 @@ function extractDependencies(content: string): {
         const componentName = basename(pkg, '.tsx');
         internal.push(componentName);
       }
+      // Sibling component import (./foo with no nested path)
+      if (pkg.startsWith('./') && !pkg.slice(2).includes('/')) {
+        const componentName = basename(pkg).replace(/\.(tsx?|jsx?)$/, '');
+        if (componentName && !internal.includes(componentName)) {
+          internal.push(componentName);
+        }
+      }
       continue;
     }
 
@@ -459,7 +466,7 @@ function extractPrimitiveDependencies(content: string, isPrimitive = false): str
 
     if (isPrimitiveImport) {
       const primitiveName = basename(pkg, '.ts');
-      if (!primitives.includes(primitiveName) && primitiveName !== 'types') {
+      if (!primitives.includes(primitiveName)) {
         primitives.push(primitiveName);
       }
     }
