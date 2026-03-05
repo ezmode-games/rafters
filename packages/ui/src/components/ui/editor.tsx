@@ -63,6 +63,12 @@ import { Container } from './container';
 // ============================================================================
 
 /**
+ * A rule applied to a block. Simple rules are name strings.
+ * Parameterized rules carry configuration.
+ */
+export type AppliedRule = string | { name: string; config: Record<string, unknown> };
+
+/**
  * A single block in the Editor's content tree.
  *
  * Composites consume this type to render and interact with blocks.
@@ -74,10 +80,11 @@ import { Container } from './container';
 export interface EditorBlock {
   id: string;
   type: string;
-  content: unknown;
+  content?: unknown;
   children?: string[];
   parentId?: string;
   meta?: Record<string, unknown>;
+  rules?: AppliedRule[];
 }
 
 /** Configuration for palette-mode sidebar */
