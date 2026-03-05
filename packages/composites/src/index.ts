@@ -29,4 +29,10 @@ export {
   register as registerComposite,
   search as searchComposites,
 } from './registry';
+export type { RuleMatch } from './rules';
+export {
+  findCompatibleConsumers,
+  findCompatibleProducers,
+  matchRules,
+} from './rules';
 export { toMdx } from './serializer';
