@@ -97,6 +97,8 @@ export interface EditorSidebarConfig {
   searchable?: boolean;
   /** Custom item renderer for scaled previews */
   renderItem?: (item: BlockPaletteItem) => React.ReactNode;
+  /** Custom insert handler for palette activation (click or drop). Overrides default single-block insertion. */
+  onItemInsert?: (item: BlockPaletteItem, controls: EditorControls, insertIndex?: number) => void;
 }
 
 export interface SlashCommand {
@@ -186,6 +188,8 @@ export interface EditorControls {
   selectAll: () => void;
   /** Clear selection */
   clearSelection: () => void;
+  /** Clear both selection and block focus (as if clicking outside the editor) */
+  deselect: () => void;
   /** Move focus to the editor canvas */
   focus: () => void;
 }
@@ -909,14 +913,19 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
             // data may arrive as parsed JSON from either MIME type
             const item = data as BlockPaletteItem;
             if (!item.id) return;
-            addBlock(
-              {
-                id: crypto.randomUUID(),
-                type: item.id,
-                content: '',
-              },
-              insertIndex,
-            );
+            const cfg = typeof sidebarRef.current === 'object' ? sidebarRef.current : null;
+            if (cfg?.onItemInsert && controlsRef.current) {
+              cfg.onItemInsert(item, controlsRef.current, insertIndex);
+            } else {
+              addBlock(
+                {
+                  id: crypto.randomUUID(),
+                  type: item.id,
+                  content: '',
+                },
+                insertIndex,
+              );
+            }
           },
         });
         cleanups.push(() => dropZone.destroy());
@@ -947,6 +956,7 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
         redo: () => handlerRef.current?.redo(),
         selectAll: () => handlerRef.current?.selectAll(),
         clearSelection: () => handlerRef.current?.clearSelection(),
+        deselect: () => handlerRef.current?.handleCanvasBackgroundClick(),
         focus: () => canvasRef.current?.focus(),
       }),
       [addBlock, removeBlocks, moveBlock, updateBlock],
@@ -1039,11 +1049,16 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
     // ----- Palette sidebar handlers -----
     const handlePaletteActivate = React.useCallback(
       (item: BlockPaletteItem) => {
-        addBlock({
-          id: crypto.randomUUID(),
-          type: item.id,
-          content: '',
-        });
+        const cfg = typeof sidebarRef.current === 'object' ? sidebarRef.current : null;
+        if (cfg?.onItemInsert && controlsRef.current) {
+          cfg.onItemInsert(item, controlsRef.current);
+        } else {
+          addBlock({
+            id: crypto.randomUUID(),
+            type: item.id,
+            content: '',
+          });
+        }
       },
       [addBlock],
     );
