@@ -11,7 +11,11 @@
   "output": [],
   "blocks": [
     { "id": "h", "type": "heading", "content": "Ready to get started?", "meta": { "level": 2 } },
-    { "id": "p", "type": "text", "content": "Install Rafters in under a minute. Your AI agents will thank you." },
+    {
+      "id": "p",
+      "type": "text",
+      "content": "Install Rafters in under a minute. Your AI agents will thank you."
+    },
     { "id": "cta", "type": "button", "content": "Get Started", "meta": { "variant": "primary" } }
   ]
 }

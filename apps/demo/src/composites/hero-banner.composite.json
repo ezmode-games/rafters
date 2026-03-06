@@ -11,6 +11,10 @@
   "output": [],
   "blocks": [
     { "id": "h1", "type": "heading", "content": "Welcome to Rafters", "meta": { "level": 1 } },
-    { "id": "sub", "type": "text", "content": "Design intelligence for AI agents. Not another component library." }
+    {
+      "id": "sub",
+      "type": "text",
+      "content": "Design intelligence for AI agents. Not another component library."
+    }
   ]
 }

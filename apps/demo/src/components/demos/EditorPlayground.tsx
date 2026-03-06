@@ -106,7 +106,9 @@ function BlockPreview({ block }: { block: CompositeBlock }) {
   }
   if (block.type === 'blockquote') {
     return (
-      <div className={classy('truncate border-l-2 border-primary pl-1 text-muted-foreground italic')}>
+      <div
+        className={classy('truncate border-l-2 border-primary pl-1 text-muted-foreground italic')}
+      >
         {content}
       </div>
     );
@@ -145,9 +147,7 @@ function renderPaletteItem(item: BlockPaletteItem): React.ReactNode {
         {visibleBlocks.map((block) => (
           <BlockPreview key={block.id} block={block} />
         ))}
-        {hasMore && (
-          <div className={classy('text-muted-foreground text-center')}>...</div>
-        )}
+        {hasMore && <div className={classy('text-muted-foreground text-center')}>...</div>}
       </div>
     </div>
   );

@@ -16,8 +16,23 @@
       "children": ["f1", "f2", "f3"],
       "meta": { "columns": 3 }
     },
-    { "id": "f1", "type": "text", "content": "Design Tokens - Mathematical progressions, not magic numbers.", "parentId": "grid" },
-    { "id": "f2", "type": "text", "content": "MCP Tools - AI queries the system, not the docs.", "parentId": "grid" },
-    { "id": "f3", "type": "text", "content": "Cognitive Load - Every component scored 1-10.", "parentId": "grid" }
+    {
+      "id": "f1",
+      "type": "text",
+      "content": "Design Tokens - Mathematical progressions, not magic numbers.",
+      "parentId": "grid"
+    },
+    {
+      "id": "f2",
+      "type": "text",
+      "content": "MCP Tools - AI queries the system, not the docs.",
+      "parentId": "grid"
+    },
+    {
+      "id": "f3",
+      "type": "text",
+      "content": "Cognitive Load - Every component scored 1-10.",
+      "parentId": "grid"
+    }
   ]
 }
