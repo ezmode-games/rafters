@@ -9,16 +9,8 @@
 import type { BlockPaletteItem } from '@rafters/ui/primitives/block-palette';
 import type { CompositeBlock, CompositeFile } from './manifest';
 
-/** A block ready for insertion into the editor canvas. */
-export interface InstantiatedBlock {
-  id: string;
-  type: string;
-  content?: unknown;
-  children?: string[];
-  parentId?: string;
-  meta?: Record<string, unknown>;
-  rules?: CompositeBlock['rules'];
-}
+/** A block ready for insertion into the editor canvas (same shape as CompositeBlock). */
+export type InstantiatedBlock = CompositeBlock;
 
 /** Options for composite block instantiation. */
 export interface InstantiateOptions {
@@ -102,9 +94,8 @@ function expandBlocks(
         const topLevelIds = expanded
           .filter((eb) => !eb.parentId || eb.parentId === parentNewId)
           .map((eb) => eb.id);
-        const newParentId = block.parentId ? idMap.get(block.parentId) : undefined;
-        if (newParentId) {
-          const parent = result.find((r) => r.id === newParentId);
+        if (parentNewId) {
+          const parent = result.find((r) => r.id === parentNewId);
           if (parent?.children) {
             const placeholderId = idMap.get(block.id);
             if (placeholderId) {

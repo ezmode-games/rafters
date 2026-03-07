@@ -698,20 +698,6 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
     );
 
     // ----- CRUD methods -----
-    const addBlock = React.useCallback(
-      (block: EditorBlock, index?: number) => {
-        const current = blocksAtomRef.current.get();
-        const next = [...current];
-        if (index !== undefined && index >= 0 && index <= next.length) {
-          next.splice(index, 0, block);
-        } else {
-          next.push(block);
-        }
-        updateBlocks(next, true);
-      },
-      [updateBlocks],
-    );
-
     const addBlocks = React.useCallback(
       (newBlocks: EditorBlock[], index?: number) => {
         if (newBlocks.length === 0) return;
@@ -725,6 +711,11 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
         updateBlocks(next, true);
       },
       [updateBlocks],
+    );
+
+    const addBlock = React.useCallback(
+      (block: EditorBlock, index?: number) => addBlocks([block], index),
+      [addBlocks],
     );
 
     const removeBlocks = React.useCallback(
