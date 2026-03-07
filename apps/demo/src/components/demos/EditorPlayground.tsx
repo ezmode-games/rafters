@@ -14,7 +14,7 @@ import {
   toBridgeItems,
   toMdx,
   url,
-} from '@rafters/composites/client';
+} from '@rafters/composites';
 import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
