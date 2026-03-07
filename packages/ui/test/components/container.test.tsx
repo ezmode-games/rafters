@@ -4,14 +4,14 @@ import { Container } from '../../src/components/ui/container';
 
 function getGapValue(el: Element): string | null {
   const match = el.className.match(/gap-(\d+)/);
-  return match ? match[1]! : null;
+  return match?.[1] ?? null;
 }
 
 describe('Container', () => {
   describe('gap prop', () => {
     it('does not apply flex or gap classes when gap is not set', () => {
       const { container } = render(<Container>content</Container>);
-      const el = container.firstElementChild!;
+      const el = container.firstElementChild as Element;
       expect(el.className).not.toContain('flex-col');
       expect(el.className).not.toContain('gap-');
     });
@@ -101,7 +101,7 @@ describe('Container', () => {
           content
         </Container>,
       );
-      const el = container.firstElementChild!;
+      const el = container.firstElementChild as Element;
       expect(el.className).toContain('flex');
       expect(el.className).toContain('flex-col');
     });
@@ -112,7 +112,7 @@ describe('Container', () => {
           content
         </Container>,
       );
-      const el = container.firstElementChild!;
+      const el = container.firstElementChild as Element;
       expect(el.className).toContain('p-4');
       expect(el.className).toContain('gap-6');
       expect(el.className).toContain('custom');
