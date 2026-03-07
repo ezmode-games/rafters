@@ -98,6 +98,11 @@ const SAMPLE_COMPOSITES: CompositeFile[] = [
 const COMPOSITE_PALETTE_ITEMS = toBridgeItems(SAMPLE_COMPOSITES);
 const COMPOSITE_CATEGORIES = [...new Set(SAMPLE_COMPOSITES.map((c) => c.manifest.category))];
 const COMPOSITE_MAP = new Map(SAMPLE_COMPOSITES.map((c) => [c.manifest.id, c]));
+const resolveComposite = (id: string) => COMPOSITE_MAP.get(id) ?? null;
+
+// Stable references for CompositesDemo (avoids useMemo with constant deps)
+const LOGIN_FORM = SAMPLE_COMPOSITES[0] as CompositeFile;
+const PROFILE_CARD = SAMPLE_COMPOSITES[2] as CompositeFile;
 
 /** Miniature block preview rendered in sidebar palette */
 function BlockPreview({ block }: { block: CompositeBlock }) {
@@ -169,14 +174,8 @@ function handleCompositeInsert(
     controls.addBlock({ id: crypto.randomUUID(), type: item.id, content: '' }, insertIndex);
     return;
   }
-  const blocks = instantiateBlocks(composite.blocks, {
-    resolveComposite: (id) => COMPOSITE_MAP.get(id) ?? null,
-  });
-  for (let i = 0; i < blocks.length; i++) {
-    const block = blocks[i];
-    if (!block) continue;
-    controls.addBlock(block, insertIndex !== undefined ? insertIndex + i : undefined);
-  }
+  const blocks = instantiateBlocks(composite.blocks, { resolveComposite });
+  controls.addBlocks(blocks, insertIndex);
 }
 
 const SIDEBAR_CONFIG: EditorSidebarConfig = {
@@ -697,42 +696,37 @@ const RULE_VALIDATORS = {
   credentials,
 } as const;
 
+// Pre-computed values from stable module-level constants
+const PALETTE_ITEMS = toBridgeItems(SAMPLE_COMPOSITES);
+const CONSUMERS = findCompatibleConsumers(LOGIN_FORM, SAMPLE_COMPOSITES);
+const RULE_MATCH = matchRules(LOGIN_FORM, PROFILE_CARD);
+const INSTANTIATED = instantiateBlocks(LOGIN_FORM.blocks, { resolveComposite });
+const ROUNDTRIPPED = serializeToComposite(LOGIN_FORM.blocks, {
+  name: LOGIN_FORM.manifest.name,
+  category: LOGIN_FORM.manifest.category,
+  description: LOGIN_FORM.manifest.description,
+});
+const LOGIN_MDX = toMdx(LOGIN_FORM.blocks);
+
 function CompositesDemo() {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [validationInput, setValidationInput] = React.useState('');
   const [selectedRule, setSelectedRule] = React.useState<keyof typeof RULE_VALIDATORS>('email');
 
   // Register composites on mount
-  React.useMemo(() => {
+  React.useEffect(() => {
     for (const composite of SAMPLE_COMPOSITES) {
       registerComposite(composite);
     }
   }, []);
 
-  // Bridge: convert to palette items
-  const paletteItems = React.useMemo(() => toBridgeItems(SAMPLE_COMPOSITES), []);
-
-  // Registry search
+  // Registry search (depends on user input, must stay reactive)
   const searchResults = React.useMemo(
     () => (searchQuery.length > 0 ? searchComposites(searchQuery) : []),
     [searchQuery],
   );
 
-  // Rule matching: find what consumes login-form's output
-  const loginForm = SAMPLE_COMPOSITES[0];
-  const consumers = React.useMemo(
-    () => findCompatibleConsumers(loginForm, SAMPLE_COMPOSITES),
-    [loginForm],
-  );
-
-  // Rule match detail between login-form and profile-card
-  const profileCard = SAMPLE_COMPOSITES[2];
-  const ruleMatch = React.useMemo(
-    () => matchRules(loginForm, profileCard),
-    [loginForm, profileCard],
-  );
-
-  // Built-in rule validation
+  // Built-in rule validation (depends on user input, must stay reactive)
   const validationResult = React.useMemo(() => {
     const schema = RULE_VALIDATORS[selectedRule];
     const result = schema.safeParse(
@@ -749,29 +743,6 @@ function CompositesDemo() {
     return result;
   }, [selectedRule, validationInput]);
 
-  // instantiateBlocks: fresh IDs with remapped references
-  const instantiated = React.useMemo(
-    () =>
-      instantiateBlocks(loginForm.blocks, {
-        resolveComposite: (id) => COMPOSITE_MAP.get(id) ?? null,
-      }),
-    [loginForm],
-  );
-
-  // serializeToComposite roundtrip
-  const roundtripped = React.useMemo(
-    () =>
-      serializeToComposite(loginForm.blocks, {
-        name: loginForm.manifest.name,
-        category: loginForm.manifest.category,
-        description: loginForm.manifest.description,
-      }),
-    [loginForm],
-  );
-
-  // MDX from login-form blocks
-  const loginMdx = React.useMemo(() => toMdx(loginForm.blocks), [loginForm]);
-
   return (
     <div className={classy('space-y-8')}>
       <P className={classy('text-sm text-muted-foreground')}>
@@ -786,7 +757,7 @@ function CompositesDemo() {
           <Kbd>toBridgeItems()</Kbd> converts composite manifests into sidebar palette items.
         </P>
         <div className={classy('flex flex-wrap gap-2')}>
-          {paletteItems.map((item) => (
+          {PALETTE_ITEMS.map((item) => (
             <Badge key={item.id} variant="secondary">
               {item.label} ({item.category})
             </Badge>
@@ -811,7 +782,7 @@ function CompositesDemo() {
                 'max-h-32 overflow-auto rounded-md bg-muted p-3 text-xs font-mono text-muted-foreground',
               )}
             >
-              {loginForm.blocks.map((b) => `${b.id}: ${b.type}`).join('\n')}
+              {LOGIN_FORM.blocks.map((b) => `${b.id}: ${b.type}`).join('\n')}
             </pre>
           </div>
           <div>
@@ -821,7 +792,7 @@ function CompositesDemo() {
                 'max-h-32 overflow-auto rounded-md bg-muted p-3 text-xs font-mono text-muted-foreground',
               )}
             >
-              {instantiated.map((b) => `${b.id.slice(0, 8)}...: ${b.type}`).join('\n')}
+              {INSTANTIATED.map((b) => `${b.id.slice(0, 8)}...: ${b.type}`).join('\n')}
             </pre>
           </div>
         </div>
@@ -837,13 +808,13 @@ function CompositesDemo() {
           blocks automatically.
         </P>
         <div className={classy('flex flex-wrap gap-2 mb-2')}>
-          <Badge variant="outline">ID: {roundtripped.manifest.id}</Badge>
-          <Badge variant="outline">Load: {roundtripped.manifest.cognitiveLoad}/10</Badge>
-          <Badge variant="secondary">input: [{roundtripped.input.join(', ')}]</Badge>
-          <Badge variant="secondary">output: [{roundtripped.output.join(', ')}]</Badge>
+          <Badge variant="outline">ID: {ROUNDTRIPPED.manifest.id}</Badge>
+          <Badge variant="outline">Load: {ROUNDTRIPPED.manifest.cognitiveLoad}/10</Badge>
+          <Badge variant="secondary">input: [{ROUNDTRIPPED.input.join(', ')}]</Badge>
+          <Badge variant="secondary">output: [{ROUNDTRIPPED.output.join(', ')}]</Badge>
         </div>
         <div className={classy('flex flex-wrap gap-1')}>
-          {roundtripped.manifest.keywords.map((kw) => (
+          {ROUNDTRIPPED.manifest.keywords.map((kw) => (
             <Badge key={kw} variant="outline" size="sm">
               {kw}
             </Badge>
@@ -894,7 +865,7 @@ function CompositesDemo() {
           <div className={classy('flex items-center gap-2')}>
             <Badge>Login Form</Badge>
             <span className={classy('text-sm text-muted-foreground')}>outputs:</span>
-            {loginForm.output.map((o) => (
+            {LOGIN_FORM.output.map((o) => (
               <Badge key={o} variant="secondary">
                 {o}
               </Badge>
@@ -903,7 +874,7 @@ function CompositesDemo() {
           <div className={classy('flex items-center gap-2')}>
             <Badge>Profile Card</Badge>
             <span className={classy('text-sm text-muted-foreground')}>needs:</span>
-            {profileCard.input.map((i) => (
+            {PROFILE_CARD.input.map((i) => (
               <Badge key={i} variant="secondary">
                 {i}
               </Badge>
@@ -911,18 +882,18 @@ function CompositesDemo() {
           </div>
           <div className={classy('flex items-center gap-2')}>
             <span className={classy('text-sm')}>Compatible:</span>
-            <Badge variant={ruleMatch.compatible ? 'default' : 'destructive'}>
-              {ruleMatch.compatible ? 'Yes' : 'No'}
+            <Badge variant={RULE_MATCH.compatible ? 'default' : 'destructive'}>
+              {RULE_MATCH.compatible ? 'Yes' : 'No'}
             </Badge>
             <span className={classy('text-sm text-muted-foreground')}>
-              matched: [{ruleMatch.matched.join(', ')}]
+              matched: [{RULE_MATCH.matched.join(', ')}]
             </span>
           </div>
           <div className={classy('flex items-center gap-2')}>
             <span className={classy('text-sm text-muted-foreground')}>
               All consumers of Login Form output:
             </span>
-            {consumers.map((c) => (
+            {CONSUMERS.map((c) => (
               <Badge key={c.manifest.id} variant="outline">
                 {c.manifest.name}
               </Badge>
@@ -944,7 +915,7 @@ function CompositesDemo() {
             'max-h-40 overflow-auto rounded-md bg-muted p-4 text-xs font-mono text-muted-foreground',
           )}
         >
-          {loginMdx}
+          {LOGIN_MDX}
         </pre>
       </div>
 
