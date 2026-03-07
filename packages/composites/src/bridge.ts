@@ -63,7 +63,7 @@ function expandBlocks(
   depth: number,
 ): InstantiatedBlock[] {
   const maxDepth = options.maxDepth ?? 10;
-  if (depth > maxDepth) return [];
+  if (depth >= maxDepth) return [];
 
   // Build old-ID -> new-ID map
   const idMap = new Map<string, string>();
@@ -110,7 +110,7 @@ function expandBlocks(
       }
       // Composite not found -- fall through to create a placeholder
       result.push({
-        id: idMap.get(block.id) as string,
+        id: idMap.get(block.id)!,
         type: 'text',
         content: `Unknown composite: ${compositeId}`,
       });
@@ -118,7 +118,7 @@ function expandBlocks(
     }
 
     const instantiated: InstantiatedBlock = {
-      id: idMap.get(block.id) as string,
+      id: idMap.get(block.id)!,
       type: block.type,
     };
 

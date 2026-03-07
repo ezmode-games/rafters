@@ -182,6 +182,32 @@ describe('instantiateBlocks', () => {
       expect(result[0].content).toBe('Unknown composite: nonexistent');
     });
 
+    it('expands composite inside a parent-child hierarchy', () => {
+      const blocks: CompositeBlock[] = [
+        { id: 'grid', type: 'grid', children: ['comp-placeholder', 'static'] },
+        { id: 'comp-placeholder', type: 'composite:login-fields', parentId: 'grid' },
+        { id: 'static', type: 'text', content: 'Footer', parentId: 'grid' },
+      ];
+      const result = instantiateBlocks(blocks, {
+        resolveComposite: (id) => (id === 'login-fields' ? innerComposite : null),
+      });
+      const grid = result.find((b) => b.type === 'grid');
+      const expanded = result.filter((b) => b.type === 'input');
+      expect(expanded).toHaveLength(2);
+      // Expanded blocks should be parented to the grid
+      for (const eb of expanded) {
+        expect(eb.parentId).toBe(grid?.id);
+      }
+    });
+
+    it('passes through composite: type when no resolveComposite provided', () => {
+      const blocks: CompositeBlock[] = [{ id: 'x', type: 'composite:foo' }];
+      const result = instantiateBlocks(blocks);
+      expect(result).toHaveLength(1);
+      expect(result[0].type).toBe('composite:foo');
+      expect(result[0].id).not.toBe('x');
+    });
+
     it('respects maxDepth to prevent infinite recursion', () => {
       const selfRef: CompositeFile = {
         manifest: {
@@ -200,8 +226,9 @@ describe('instantiateBlocks', () => {
         resolveComposite: () => selfRef,
         maxDepth: 3,
       });
-      // Should stop expanding at depth 3 and return empty for the deepest level
-      expect(result.length).toBeLessThan(100);
+      // All blocks are composite:recursive, so at depth 3 expansion stops
+      // and returns [], making the result empty
+      expect(result).toHaveLength(0);
     });
   });
 
