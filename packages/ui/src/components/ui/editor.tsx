@@ -217,6 +217,8 @@ export interface BlockRenderContext {
 export interface EditorControls {
   /** Insert a block at the given index (or append if omitted) */
   addBlock: (block: EditorBlock, index?: number) => void;
+  /** Insert multiple blocks at the given index as a single history entry (or append if omitted) */
+  addBlocks: (blocks: EditorBlock[], index?: number) => void;
   /** Remove blocks by their IDs */
   removeBlocks: (ids: Set<string>) => void;
   /** Move a block to a new position */
@@ -1235,18 +1237,24 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
     );
 
     // ----- CRUD methods -----
-    const addBlock = React.useCallback(
-      (block: EditorBlock, index?: number) => {
+    const addBlocks = React.useCallback(
+      (newBlocks: EditorBlock[], index?: number) => {
+        if (newBlocks.length === 0) return;
         const current = blocksAtomRef.current.get();
         const next = [...current];
         if (index !== undefined && index >= 0 && index <= next.length) {
-          next.splice(index, 0, block);
+          next.splice(index, 0, ...newBlocks);
         } else {
-          next.push(block);
+          next.push(...newBlocks);
         }
         updateBlocks(next, true);
       },
       [updateBlocks],
+    );
+
+    const addBlock = React.useCallback(
+      (block: EditorBlock, index?: number) => addBlocks([block], index),
+      [addBlocks],
     );
 
     const removeBlocks = React.useCallback(
@@ -1488,6 +1496,7 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
     const controls = React.useMemo<EditorControls>(
       () => ({
         addBlock,
+        addBlocks,
         removeBlocks,
         moveBlock,
         updateBlock,
@@ -1498,7 +1507,7 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
         deselect: () => handlerRef.current?.handleCanvasBackgroundClick(),
         focus: () => canvasRef.current?.focus(),
       }),
-      [addBlock, removeBlocks, moveBlock, updateBlock],
+      [addBlock, addBlocks, removeBlocks, moveBlock, updateBlock],
     );
     // Sync controls into the ref inside an effect to avoid mutating a ref during render
     // (React 19 purity requirement).
