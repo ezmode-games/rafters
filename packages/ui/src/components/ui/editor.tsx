@@ -148,7 +148,7 @@ export interface SlashCommand {
   action: (editor: EditorControls) => void;
 }
 
-/** Composite category values matching CompositeCategory from @rafters/composites. */
+// SYNC:composite-category - must match CompositeCategorySchema in @rafters/composites/src/manifest.ts
 export type CompositeCategory = 'typography' | 'layout' | 'form' | 'widget' | 'media';
 
 /** Metadata for saving the current canvas as a composite. */
@@ -350,13 +350,14 @@ function EditorToolbarSection({ canUndo, canRedo, onUndo, onRedo }: ToolbarSecti
   );
 }
 
-const COMPOSITE_CATEGORIES: CompositeCategory[] = [
+// SYNC:composite-category
+const COMPOSITE_CATEGORIES = [
   'typography',
   'layout',
   'form',
   'widget',
   'media',
-];
+] as const satisfies readonly CompositeCategory[];
 
 interface SaveCompositeDialogProps {
   blocks: EditorBlock[];
@@ -1987,9 +1988,13 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
     );
 
     const handleSaveComposite = React.useCallback(
-      (data: SaveCompositeData) => {
-        setShowSaveDialog(false);
-        onSaveAsComposite?.(data);
+      async (data: SaveCompositeData) => {
+        try {
+          await onSaveAsComposite?.(data);
+          setShowSaveDialog(false);
+        } catch {
+          // Keep dialog open so user knows the save failed
+        }
       },
       [onSaveAsComposite],
     );
