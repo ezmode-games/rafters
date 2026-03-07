@@ -31,6 +31,8 @@
 import { atom } from 'nanostores';
 import * as React from 'react';
 import { createPortal } from 'react-dom';
+import type { BlockContextMenuControls } from '../../primitives/block-context-menu';
+import { createBlockContextMenu } from '../../primitives/block-context-menu';
 import type { BlockHandlerControls, BlockHandlerState } from '../../primitives/block-handler';
 import { createBlockHandler } from '../../primitives/block-handler';
 import type { BlockPaletteItem } from '../../primitives/block-palette';
@@ -167,6 +169,8 @@ export interface EditorProps
   commandPalette?: SlashCommand[];
   /** Show floating inline formatting toolbar on text selection */
   inlineToolbar?: boolean;
+  /** Enable right-click context menu on blocks (rule management, settings, removal) */
+  blockContextMenu?: boolean;
 
   /** Custom block renderer -- receives block + context, returns JSX */
   renderBlock?: (block: EditorBlock, context: BlockRenderContext) => React.ReactNode;
@@ -870,6 +874,111 @@ function RuleConfigDialog({ rule, fields, anchorId, onConfirm, onCancel }: RuleC
   );
 }
 
+// ---------------------------------------------------------------------------
+// Block context menu overlay
+// ---------------------------------------------------------------------------
+
+interface ContextMenuOverlayState {
+  blockId: string;
+  position: { x: number; y: number };
+}
+
+interface ContextMenuOverlayProps {
+  state: ContextMenuOverlayState;
+  block: EditorBlock | undefined;
+  onAction: (actionId: string) => void;
+}
+
+function BlockContextMenuOverlay({ state, block, onAction }: ContextMenuOverlayProps) {
+  const menuRef = React.useRef<HTMLDivElement>(null);
+
+  const portalContainer = getPortalContainer();
+  if (!portalContainer || !block) return null;
+
+  const appliedRules = block.rules ?? [];
+  const hasRules = appliedRules.length > 0;
+
+  return createPortal(
+    <div
+      ref={menuRef}
+      role="menu"
+      aria-label="Block actions"
+      className={classy(
+        'fixed z-depth-popover w-52 rounded-lg border border-border bg-popover py-1 shadow-lg',
+      )}
+      style={{
+        left: `${state.position.x}px`,
+        top: `${state.position.y}px`,
+      }}
+    >
+      {hasRules && (
+        <>
+          <div
+            role="presentation"
+            className={classy(
+              'px-3 py-1 text-xs font-medium text-muted-foreground uppercase tracking-wider',
+            )}
+          >
+            Rules
+          </div>
+          {appliedRules.map((rule, i) => {
+            const ruleName = typeof rule === 'string' ? rule : rule.name;
+            const hasConfig = typeof rule === 'object';
+            return (
+              <React.Fragment key={`${ruleName}-${i}`}>
+                <div
+                  role="menuitem"
+                  tabIndex={-1}
+                  data-menu-item-id={`edit-rule:${ruleName}`}
+                  onPointerDown={() => onAction(`edit-rule:${ruleName}`)}
+                  className={classy(
+                    'flex items-center justify-between px-3 py-1.5 text-sm cursor-pointer',
+                    'hover:bg-accent hover:text-accent-foreground',
+                    'focus-visible:outline-none focus-visible:bg-accent',
+                  )}
+                >
+                  <span>{ruleName}</span>
+                  {hasConfig && (
+                    <span className={classy('text-xs text-muted-foreground')}>configured</span>
+                  )}
+                </div>
+                <div
+                  role="menuitem"
+                  tabIndex={-1}
+                  data-menu-item-id={`remove-rule:${ruleName}`}
+                  onPointerDown={() => onAction(`remove-rule:${ruleName}`)}
+                  className={classy(
+                    'px-3 py-1.5 pl-6 text-xs text-destructive cursor-pointer',
+                    'hover:bg-accent',
+                    'focus-visible:outline-none focus-visible:bg-accent',
+                  )}
+                >
+                  Remove rule
+                </div>
+              </React.Fragment>
+            );
+          })}
+          <hr className={classy('my-1 border-border')} />
+        </>
+      )}
+      <div
+        role="menuitem"
+        tabIndex={-1}
+        data-menu-item-id="remove-block"
+        onPointerDown={() => onAction('remove-block')}
+        className={classy(
+          'px-3 py-1.5 text-sm text-destructive cursor-pointer',
+          'hover:bg-accent',
+          'focus-visible:outline-none focus-visible:bg-accent',
+        )}
+      >
+        Remove block
+      </div>
+    </div>,
+    portalContainer,
+  );
+}
+
 interface CommandPaletteOverlayProps {
   state: CommandPaletteState;
   position: { x: number; y: number };
@@ -1058,6 +1167,7 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
       rulePalette,
       commandPalette,
       inlineToolbar = false,
+      blockContextMenu = false,
       renderBlock,
       emptyState,
       disabled = false,
@@ -1103,6 +1213,12 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
       rule: RulePaletteItem;
       blockId: string;
     } | null>(null);
+
+    // ----- Context menu state -----
+    const [blockContextMenuState, setContextMenuState] = React.useState<ContextMenuOverlayState | null>(
+      null,
+    );
+    const blockContextMenuRef = React.useRef<BlockContextMenuControls | null>(null);
 
     // ----- Stable block mutation function -----
     const updateBlocks = React.useCallback(
@@ -1584,6 +1700,66 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
       };
     }, [disabled, rulePalette, applyRuleToBlock]);
 
+    // ----- Block context menu primitive -----
+    React.useEffect(() => {
+      const canvasEl = canvasRef.current;
+      if (!canvasEl || disabled || !blockContextMenu) return;
+
+      // Create an off-screen menu element for the primitive to manage
+      const menuEl = document.createElement('div');
+      document.body.appendChild(menuEl);
+
+      const ctxMenu = createBlockContextMenu({
+        container: canvasEl,
+        menu: menuEl,
+        onAction: (itemId, blockId) => {
+          if (itemId === 'remove-block') {
+            const current = blocksAtomRef.current.get();
+            const block = current.find((b) => b.id === blockId);
+            if (block) {
+              // Collect children to remove too
+              const idsToRemove = new Set<string>([blockId]);
+              if (block.children) {
+                for (const childId of block.children) idsToRemove.add(childId);
+              }
+              removeBlocks(idsToRemove);
+            }
+          } else if (itemId.startsWith('remove-rule:')) {
+            const ruleName = itemId.slice('remove-rule:'.length);
+            const current = blocksAtomRef.current.get();
+            const block = current.find((b) => b.id === blockId);
+            if (block?.rules) {
+              const updatedRules = block.rules.filter((r) =>
+                typeof r === 'string' ? r !== ruleName : r.name !== ruleName,
+              );
+              updateBlock(blockId, { rules: updatedRules });
+            }
+          } else if (itemId.startsWith('edit-rule:')) {
+            const ruleName = itemId.slice('edit-rule:'.length);
+            const ruleItem = rulePalette?.items.find((r) => r.id === ruleName);
+            if (ruleItem?.requiresConfig) {
+              setRuleDialogState({ rule: ruleItem, blockId });
+            }
+          }
+          setContextMenuState(null);
+        },
+        onOpen: (blockId, position) => {
+          setContextMenuState({ blockId, position });
+        },
+        onClose: () => {
+          setContextMenuState(null);
+        },
+      });
+      blockContextMenuRef.current = ctxMenu;
+
+      return () => {
+        ctxMenu.destroy();
+        menuEl.remove();
+        blockContextMenuRef.current = null;
+        setContextMenuState(null);
+      };
+    }, [disabled, blockContextMenu, removeBlocks, updateBlock, rulePalette]);
+
     // ----- Block click handler -----
     const handleBlockClick = React.useCallback(
       (blockId: string, event: React.MouseEvent) => {
@@ -1765,6 +1941,46 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
               />
             );
           })()}
+        {blockContextMenu && blockContextMenuState && (
+          <BlockContextMenuOverlay
+            state={blockContextMenuState}
+            block={blocks.find((b) => b.id === blockContextMenuState.blockId)}
+            onAction={(actionId) => {
+              const ctxMenu = blockContextMenuRef.current;
+              if (ctxMenu) {
+                // Find the menu element's matching item and trigger action
+                const blockId = blockContextMenuState.blockId;
+                if (actionId === 'remove-block') {
+                  const block = blocks.find((b) => b.id === blockId);
+                  if (block) {
+                    const idsToRemove = new Set<string>([blockId]);
+                    if (block.children) {
+                      for (const childId of block.children) idsToRemove.add(childId);
+                    }
+                    removeBlocks(idsToRemove);
+                  }
+                } else if (actionId.startsWith('remove-rule:')) {
+                  const ruleName = actionId.slice('remove-rule:'.length);
+                  const block = blocks.find((b) => b.id === blockId);
+                  if (block?.rules) {
+                    const updatedRules = block.rules.filter((r) =>
+                      typeof r === 'string' ? r !== ruleName : r.name !== ruleName,
+                    );
+                    updateBlock(blockId, { rules: updatedRules });
+                  }
+                } else if (actionId.startsWith('edit-rule:')) {
+                  const ruleName = actionId.slice('edit-rule:'.length);
+                  const ruleItem = rulePalette?.items.find((r) => r.id === ruleName);
+                  if (ruleItem?.requiresConfig) {
+                    setRuleDialogState({ rule: ruleItem, blockId });
+                  }
+                }
+                setContextMenuState(null);
+                ctxMenu.close();
+              }
+            }}
+          />
+        )}
       </Container>
     );
   },
