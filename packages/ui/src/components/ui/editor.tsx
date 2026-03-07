@@ -153,8 +153,6 @@ export type CompositeCategory = 'typography' | 'layout' | 'form' | 'widget' | 'm
 
 /** Metadata for saving the current canvas as a composite. */
 export interface SaveCompositeData {
-  /** Kebab-case ID derived from name */
-  id: string;
   /** Display name */
   name: string;
   /** Category */
@@ -163,12 +161,6 @@ export interface SaveCompositeData {
   description: string;
   /** Current canvas blocks */
   blocks: EditorBlock[];
-  /** Auto-derived keywords from block types and rule names */
-  keywords: string[];
-  /** Auto-derived input rule names */
-  input: string[];
-  /** Auto-derived output rule names */
-  output: string[];
 }
 
 export interface EditorProps
@@ -366,40 +358,6 @@ const COMPOSITE_CATEGORIES: CompositeCategory[] = [
   'media',
 ];
 
-function toKebabId(name: string): string {
-  return name
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
-function deriveRules(blocks: EditorBlock[]): {
-  input: string[];
-  output: string[];
-  keywords: string[];
-} {
-  const inputSet = new Set<string>();
-  const outputSet = new Set<string>();
-  const keywords = new Set<string>();
-
-  for (const block of blocks) {
-    keywords.add(block.type);
-    if (!block.rules || block.rules.length === 0) continue;
-    const ruleNames = block.rules.map((r) => (typeof r === 'string' ? r : r.name));
-    for (const name of ruleNames) keywords.add(name);
-    if (!block.parentId) for (const name of ruleNames) inputSet.add(name);
-    if (!block.children || block.children.length === 0)
-      for (const name of ruleNames) outputSet.add(name);
-  }
-
-  return {
-    input: [...inputSet].sort(),
-    output: [...outputSet].sort(),
-    keywords: [...keywords].sort(),
-  };
-}
-
 interface SaveCompositeDialogProps {
   blocks: EditorBlock[];
   onSave: (data: SaveCompositeData) => void;
@@ -424,21 +382,11 @@ function SaveCompositeDialog({ blocks, onSave, onCancel }: SaveCompositeDialogPr
       setError('Name is required');
       return;
     }
-    const id = toKebabId(trimmedName);
-    if (!id) {
-      setError('Name must contain at least one alphanumeric character');
-      return;
-    }
-    const { input, output, keywords } = deriveRules(blocks);
     onSave({
-      id,
       name: trimmedName,
       category,
       description: description.trim(),
       blocks,
-      keywords,
-      input,
-      output,
     });
   };
 

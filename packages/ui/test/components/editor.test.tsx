@@ -368,7 +368,7 @@ describe('Editor', () => {
       expect(screen.getByRole('dialog', { name: 'Save as Composite' })).toBeInTheDocument();
     });
 
-    it('calls onSaveAsComposite with derived data on form submit', () => {
+    it('calls onSaveAsComposite with metadata and blocks on form submit', () => {
       const onSave = vi.fn();
       const blocksWithRules = [
         { id: '1', type: 'input', content: '', rules: ['email', 'required'] as const },
@@ -385,13 +385,10 @@ describe('Editor', () => {
 
       expect(onSave).toHaveBeenCalledTimes(1);
       const data = onSave.mock.calls[0][0];
-      expect(data.id).toBe('login-form');
       expect(data.name).toBe('Login Form');
       expect(data.category).toBe('layout');
+      expect(data.description).toBe('A login form');
       expect(data.blocks).toHaveLength(2);
-      expect(data.keywords).toContain('input');
-      expect(data.keywords).toContain('email');
-      expect(data.input).toContain('email');
     });
 
     it('shows validation error for empty name', () => {
