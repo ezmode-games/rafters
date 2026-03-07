@@ -18,7 +18,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Container } from '@/components/ui/container';
-import { Input } from '@/components/ui/input';
 import {
   type BlockRenderContext,
   Editor,
@@ -27,6 +26,7 @@ import {
   type EditorSidebarConfig,
   type SlashCommand,
 } from '@/components/ui/editor';
+import { Input } from '@/components/ui/input';
 import { Kbd } from '@/components/ui/kbd';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
