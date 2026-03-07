@@ -1215,9 +1215,8 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
     } | null>(null);
 
     // ----- Context menu state -----
-    const [blockContextMenuState, setContextMenuState] = React.useState<ContextMenuOverlayState | null>(
-      null,
-    );
+    const [blockContextMenuState, setContextMenuState] =
+      React.useState<ContextMenuOverlayState | null>(null);
     const blockContextMenuRef = React.useRef<BlockContextMenuControls | null>(null);
 
     // ----- Stable block mutation function -----
