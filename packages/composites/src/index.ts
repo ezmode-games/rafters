@@ -26,8 +26,6 @@ export {
   required,
   url,
 } from './built-in-rules/index';
-export type { LoadResult } from './loader';
-export { loadComposites } from './loader';
 export type {
   AppliedRule,
   CompositeBlock,

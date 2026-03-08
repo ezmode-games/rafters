@@ -4,15 +4,17 @@ import {
   credentials,
   email,
   findCompatibleConsumers,
+  instantiateBlocks,
   matchRules,
   password,
   registerComposite,
   required,
   searchComposites,
+  serializeToComposite,
   toBridgeItems,
   toMdx,
   url,
-} from '@rafters/composites/client';
+} from '@rafters/composites';
 import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,7 +25,9 @@ import {
   Editor,
   type EditorBlock,
   type EditorControls,
+  type EditorRulePaletteConfig,
   type EditorSidebarConfig,
+  type SaveCompositeData,
   type SlashCommand,
 } from '@/components/ui/editor';
 import { Input } from '@/components/ui/input';
@@ -94,6 +98,16 @@ const SAMPLE_COMPOSITES: CompositeFile[] = [
 const COMPOSITE_PALETTE_ITEMS = toBridgeItems(SAMPLE_COMPOSITES);
 const COMPOSITE_CATEGORIES = [...new Set(SAMPLE_COMPOSITES.map((c) => c.manifest.category))];
 const COMPOSITE_MAP = new Map(SAMPLE_COMPOSITES.map((c) => [c.manifest.id, c]));
+const resolveComposite = (id: string) => COMPOSITE_MAP.get(id) ?? null;
+
+// Stable references for CompositesDemo (avoids useMemo with constant deps)
+const LOGIN_FORM = SAMPLE_COMPOSITES[0];
+const PROFILE_CARD = SAMPLE_COMPOSITES[2];
+if (!LOGIN_FORM || !PROFILE_CARD) {
+  throw new Error(
+    'EditorPlayground: SAMPLE_COMPOSITES missing entries at indices 0 (login-form) and 2 (profile-card).',
+  );
+}
 
 /** Miniature block preview rendered in sidebar palette */
 function BlockPreview({ block }: { block: CompositeBlock }) {
@@ -153,7 +167,8 @@ function renderPaletteItem(item: BlockPaletteItem): React.ReactNode {
   );
 }
 
-/** Insert all blocks from a composite when a palette item is activated or dropped */
+/** Insert all blocks from a composite when a palette item is activated or dropped.
+ * Uses instantiateBlocks to generate fresh IDs and remap parent/child references. */
 function handleCompositeInsert(
   item: BlockPaletteItem,
   controls: EditorControls,
@@ -164,21 +179,8 @@ function handleCompositeInsert(
     controls.addBlock({ id: crypto.randomUUID(), type: item.id, content: '' }, insertIndex);
     return;
   }
-  for (let i = 0; i < composite.blocks.length; i++) {
-    const block = composite.blocks[i];
-    if (!block) continue;
-    controls.addBlock(
-      {
-        id: crypto.randomUUID(),
-        type: block.type,
-        content: block.content ?? '',
-        children: block.children,
-        parentId: block.parentId,
-        meta: block.meta,
-      },
-      insertIndex !== undefined ? insertIndex + i : undefined,
-    );
-  }
+  const blocks = instantiateBlocks(composite.blocks, { resolveComposite });
+  controls.addBlocks(blocks, insertIndex);
 }
 
 const SIDEBAR_CONFIG: EditorSidebarConfig = {
@@ -187,6 +189,53 @@ const SIDEBAR_CONFIG: EditorSidebarConfig = {
   searchable: true,
   renderItem: renderPaletteItem,
   onItemInsert: handleCompositeInsert,
+};
+
+const RULE_PALETTE_CONFIG: EditorRulePaletteConfig = {
+  items: [
+    { id: 'required', label: 'Required', category: 'Validation', keywords: ['mandatory'] },
+    {
+      id: 'min-length',
+      label: 'Min Length',
+      category: 'Validation',
+      requiresConfig: true,
+      compatibleBlockTypes: ['input'],
+    },
+    {
+      id: 'max-length',
+      label: 'Max Length',
+      category: 'Validation',
+      requiresConfig: true,
+      compatibleBlockTypes: ['input'],
+    },
+    {
+      id: 'email',
+      label: 'Email',
+      category: 'Type',
+      keywords: ['format'],
+      compatibleBlockTypes: ['input'],
+    },
+    {
+      id: 'url',
+      label: 'URL',
+      category: 'Type',
+      keywords: ['link', 'format'],
+      compatibleBlockTypes: ['input'],
+    },
+    {
+      id: 'password',
+      label: 'Password',
+      category: 'Type',
+      keywords: ['secret'],
+      compatibleBlockTypes: ['input'],
+    },
+  ],
+  categories: ['Validation', 'Type'],
+  searchable: true,
+  configFields: {
+    'min-length': [{ name: 'min', label: 'Minimum characters', type: 'number', defaultValue: 1 }],
+    'max-length': [{ name: 'max', label: 'Maximum characters', type: 'number', defaultValue: 255 }],
+  },
 };
 
 // ============================================================================
@@ -578,16 +627,35 @@ function FullDemo() {
   const editorRef = React.useRef<EditorControls>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [blocks, setBlocks] = React.useState<EditorBlock[]>(FULL_BLOCKS);
+  const [savedComposite, setSavedComposite] = React.useState<string | null>(null);
   const slashCommands = React.useMemo(() => makeSlashCommands(), []);
   const renderBlock = useEditableRenderBlock(editorRef);
   useOutsideDeselect(containerRef, editorRef);
+
+  const handleSaveAsComposite = React.useCallback(async (data: SaveCompositeData) => {
+    try {
+      const composite = serializeToComposite(data.blocks, {
+        name: data.name,
+        category: data.category,
+        description: data.description,
+      });
+      registerComposite(composite);
+      setSavedComposite(JSON.stringify(composite, null, 2));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to save composite.';
+      console.error('[EditorPlayground] Save as composite failed:', message);
+      setSavedComposite(`Error: ${message}`);
+    }
+  }, []);
 
   return (
     <div className={classy('space-y-4')}>
       <div>
         <P className={classy('text-sm text-muted-foreground')}>
           All features: <Kbd>toolbar</Kbd>, <Kbd>sidebar</Kbd> (palette), <Kbd>commandPalette</Kbd>{' '}
-          (type <Kbd>/</Kbd>), and <Kbd>inlineToolbar</Kbd> (select text).
+          (type <Kbd>/</Kbd>), <Kbd>inlineToolbar</Kbd> (select text), <Kbd>blockContextMenu</Kbd>{' '}
+          (right-click blocks), <Kbd>rulePalette</Kbd> (drag rules onto blocks), and{' '}
+          <Kbd>onSaveAsComposite</Kbd> (toolbar button).
         </P>
       </div>
       <div ref={containerRef}>
@@ -597,11 +665,31 @@ function FullDemo() {
           onValueChange={setBlocks}
           toolbar
           sidebar={SIDEBAR_CONFIG}
+          rulePalette={RULE_PALETTE_CONFIG}
           commandPalette={slashCommands}
           inlineToolbar
+          blockContextMenu
+          onSaveAsComposite={handleSaveAsComposite}
           renderBlock={renderBlock}
         />
       </div>
+      {savedComposite && (
+        <div className={classy('space-y-2')}>
+          <div className={classy('flex items-center gap-2')}>
+            <Badge variant="default">Saved</Badge>
+            <Button variant="outline" size="sm" onClick={() => setSavedComposite(null)}>
+              Dismiss
+            </Button>
+          </div>
+          <pre
+            className={classy(
+              'max-h-64 overflow-auto rounded-md bg-muted p-4 text-xs font-mono text-muted-foreground',
+            )}
+          >
+            {savedComposite}
+          </pre>
+        </div>
+      )}
       <BlockStatePanel blocks={blocks} />
     </div>
   );
@@ -619,42 +707,37 @@ const RULE_VALIDATORS = {
   credentials,
 } as const;
 
+// Pre-computed values from stable module-level constants
+const PALETTE_ITEMS = toBridgeItems(SAMPLE_COMPOSITES);
+const CONSUMERS = findCompatibleConsumers(LOGIN_FORM, SAMPLE_COMPOSITES);
+const RULE_MATCH = matchRules(LOGIN_FORM, PROFILE_CARD);
+const INSTANTIATED = instantiateBlocks(LOGIN_FORM.blocks, { resolveComposite });
+const ROUNDTRIPPED = serializeToComposite(LOGIN_FORM.blocks, {
+  name: LOGIN_FORM.manifest.name,
+  category: LOGIN_FORM.manifest.category,
+  description: LOGIN_FORM.manifest.description,
+});
+const LOGIN_MDX = toMdx(LOGIN_FORM.blocks);
+
 function CompositesDemo() {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [validationInput, setValidationInput] = React.useState('');
   const [selectedRule, setSelectedRule] = React.useState<keyof typeof RULE_VALIDATORS>('email');
 
   // Register composites on mount
-  React.useMemo(() => {
+  React.useEffect(() => {
     for (const composite of SAMPLE_COMPOSITES) {
       registerComposite(composite);
     }
   }, []);
 
-  // Bridge: convert to palette items
-  const paletteItems = React.useMemo(() => toBridgeItems(SAMPLE_COMPOSITES), []);
-
-  // Registry search
+  // Registry search (depends on user input, must stay reactive)
   const searchResults = React.useMemo(
     () => (searchQuery.length > 0 ? searchComposites(searchQuery) : []),
     [searchQuery],
   );
 
-  // Rule matching: find what consumes login-form's output
-  const loginForm = SAMPLE_COMPOSITES[0];
-  const consumers = React.useMemo(
-    () => findCompatibleConsumers(loginForm, SAMPLE_COMPOSITES),
-    [loginForm],
-  );
-
-  // Rule match detail between login-form and profile-card
-  const profileCard = SAMPLE_COMPOSITES[2];
-  const ruleMatch = React.useMemo(
-    () => matchRules(loginForm, profileCard),
-    [loginForm, profileCard],
-  );
-
-  // Built-in rule validation
+  // Built-in rule validation (depends on user input, must stay reactive)
   const validationResult = React.useMemo(() => {
     const schema = RULE_VALIDATORS[selectedRule];
     const result = schema.safeParse(
@@ -671,9 +754,6 @@ function CompositesDemo() {
     return result;
   }, [selectedRule, validationInput]);
 
-  // MDX from login-form blocks
-  const loginMdx = React.useMemo(() => toMdx(loginForm.blocks), [loginForm]);
-
   return (
     <div className={classy('space-y-8')}>
       <P className={classy('text-sm text-muted-foreground')}>
@@ -688,9 +768,66 @@ function CompositesDemo() {
           <Kbd>toBridgeItems()</Kbd> converts composite manifests into sidebar palette items.
         </P>
         <div className={classy('flex flex-wrap gap-2')}>
-          {paletteItems.map((item) => (
+          {PALETTE_ITEMS.map((item) => (
             <Badge key={item.id} variant="secondary">
               {item.label} ({item.category})
+            </Badge>
+          ))}
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* instantiateBlocks: fresh IDs with remapped references */}
+      <div>
+        <H3 className={classy('mb-3')}>Bridge: instantiateBlocks()</H3>
+        <P className={classy('mb-2 text-sm text-muted-foreground')}>
+          <Kbd>instantiateBlocks()</Kbd> generates fresh UUIDs and remaps parent/child references.
+          Template IDs on the left, instantiated IDs on the right.
+        </P>
+        <div className={classy('grid grid-cols-2 gap-4')}>
+          <div>
+            <Muted className={classy('mb-1 text-xs')}>Template (login-form)</Muted>
+            <pre
+              className={classy(
+                'max-h-32 overflow-auto rounded-md bg-muted p-3 text-xs font-mono text-muted-foreground',
+              )}
+            >
+              {LOGIN_FORM.blocks.map((b) => `${b.id}: ${b.type}`).join('\n')}
+            </pre>
+          </div>
+          <div>
+            <Muted className={classy('mb-1 text-xs')}>Instantiated (fresh UUIDs)</Muted>
+            <pre
+              className={classy(
+                'max-h-32 overflow-auto rounded-md bg-muted p-3 text-xs font-mono text-muted-foreground',
+              )}
+            >
+              {INSTANTIATED.map((b) => `${b.id.slice(0, 8)}...: ${b.type}`).join('\n')}
+            </pre>
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* serializeToComposite roundtrip */}
+      <div>
+        <H3 className={classy('mb-3')}>Serializer: serializeToComposite()</H3>
+        <P className={classy('mb-2 text-sm text-muted-foreground')}>
+          <Kbd>serializeToComposite()</Kbd> derives I/O rules, keywords, and cognitive load from
+          blocks automatically.
+        </P>
+        <div className={classy('flex flex-wrap gap-2 mb-2')}>
+          <Badge variant="outline">ID: {ROUNDTRIPPED.manifest.id}</Badge>
+          <Badge variant="outline">Load: {ROUNDTRIPPED.manifest.cognitiveLoad}/10</Badge>
+          <Badge variant="secondary">input: [{ROUNDTRIPPED.input.join(', ')}]</Badge>
+          <Badge variant="secondary">output: [{ROUNDTRIPPED.output.join(', ')}]</Badge>
+        </div>
+        <div className={classy('flex flex-wrap gap-1')}>
+          {ROUNDTRIPPED.manifest.keywords.map((kw) => (
+            <Badge key={kw} variant="outline" size="sm">
+              {kw}
             </Badge>
           ))}
         </div>
@@ -739,7 +876,7 @@ function CompositesDemo() {
           <div className={classy('flex items-center gap-2')}>
             <Badge>Login Form</Badge>
             <span className={classy('text-sm text-muted-foreground')}>outputs:</span>
-            {loginForm.output.map((o) => (
+            {LOGIN_FORM.output.map((o) => (
               <Badge key={o} variant="secondary">
                 {o}
               </Badge>
@@ -748,7 +885,7 @@ function CompositesDemo() {
           <div className={classy('flex items-center gap-2')}>
             <Badge>Profile Card</Badge>
             <span className={classy('text-sm text-muted-foreground')}>needs:</span>
-            {profileCard.input.map((i) => (
+            {PROFILE_CARD.input.map((i) => (
               <Badge key={i} variant="secondary">
                 {i}
               </Badge>
@@ -756,18 +893,18 @@ function CompositesDemo() {
           </div>
           <div className={classy('flex items-center gap-2')}>
             <span className={classy('text-sm')}>Compatible:</span>
-            <Badge variant={ruleMatch.compatible ? 'default' : 'destructive'}>
-              {ruleMatch.compatible ? 'Yes' : 'No'}
+            <Badge variant={RULE_MATCH.compatible ? 'default' : 'destructive'}>
+              {RULE_MATCH.compatible ? 'Yes' : 'No'}
             </Badge>
             <span className={classy('text-sm text-muted-foreground')}>
-              matched: [{ruleMatch.matched.join(', ')}]
+              matched: [{RULE_MATCH.matched.join(', ')}]
             </span>
           </div>
           <div className={classy('flex items-center gap-2')}>
             <span className={classy('text-sm text-muted-foreground')}>
               All consumers of Login Form output:
             </span>
-            {consumers.map((c) => (
+            {CONSUMERS.map((c) => (
               <Badge key={c.manifest.id} variant="outline">
                 {c.manifest.name}
               </Badge>
@@ -789,7 +926,7 @@ function CompositesDemo() {
             'max-h-40 overflow-auto rounded-md bg-muted p-4 text-xs font-mono text-muted-foreground',
           )}
         >
-          {loginMdx}
+          {LOGIN_MDX}
         </pre>
       </div>
 
@@ -935,7 +1072,8 @@ export default function EditorPlayground() {
             <CardHeader>
               <CardTitle>Full Editor</CardTitle>
               <CardDescription>
-                Kitchen sink: toolbar, palette sidebar, slash commands, and inline formatting.
+                Kitchen sink: toolbar, palette sidebar, slash commands, inline formatting, rule
+                palette, context menu, and save-as-composite.
               </CardDescription>
             </CardHeader>
             <CardContent>

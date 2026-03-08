@@ -148,7 +148,7 @@ export interface SlashCommand {
   action: (editor: EditorControls) => void;
 }
 
-// SYNC:composite-category - must match CompositeCategorySchema in @rafters/composites/src/manifest.ts
+// SYNC:composite-category - must match CompositeCategorySchema in packages/composites/src/manifest.ts
 export type CompositeCategory = 'typography' | 'layout' | 'form' | 'widget' | 'media';
 
 /** Metadata for saving the current canvas as a composite. */
