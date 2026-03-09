@@ -187,6 +187,23 @@ function buildExtensions(token: Token): Record<string, unknown> {
     extensions.requiredForComponents = token.requiredForComponents;
   }
 
+  // AI intelligence metadata
+  if (token.trustLevel) {
+    extensions.trustLevel = token.trustLevel;
+  }
+  if (token.cognitiveLoad !== undefined) {
+    extensions.cognitiveLoad = token.cognitiveLoad;
+  }
+  if (token.consequence) {
+    extensions.consequence = token.consequence;
+  }
+  if (token.accessibilityLevel) {
+    extensions.accessibilityLevel = token.accessibilityLevel;
+  }
+  if (token.appliesWhen && token.appliesWhen.length > 0) {
+    extensions.appliesWhen = token.appliesWhen;
+  }
+
   // Only include extensions if there's data
   return Object.keys(extensions).length > 0 ? { rafters: extensions } : {};
 }
