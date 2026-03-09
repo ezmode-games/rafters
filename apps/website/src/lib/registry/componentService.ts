@@ -550,7 +550,8 @@ function extractDependencies(content: string): {
  */
 export function extractSiblingImports(content: string): string[] {
   const siblings: string[] = [];
-  const importRegex = /import\s+(?:type\s+)?(?:(?:\{[^}]*\}|\*\s+as\s+\w+|\w+)\s+from\s+)?['"]([^'"]+)['"]/g;
+  const importRegex =
+    /import\s+(?:type\s+)?(?:(?:\{[^}]*\}|\*\s+as\s+\w+|\w+)\s+from\s+)?['"]([^'"]+)['"]/g;
   const matches = content.matchAll(importRegex);
 
   for (const match of matches) {

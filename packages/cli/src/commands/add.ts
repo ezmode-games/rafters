@@ -200,10 +200,7 @@ export function transformFileContent(
   // - component files -> componentsPath (siblings are other components)
   // - primitive files -> primitivesPath (siblings are other primitives)
   const siblingPath = fileType === 'primitive' ? primitivesPath : componentsPath;
-  transformed = transformed.replace(
-    /from\s+['"]\.\/([^'"]+)['"]/g,
-    `from '@/${siblingPath}/$1'`,
-  );
+  transformed = transformed.replace(/from\s+['"]\.\/([^'"]+)['"]/g, `from '@/${siblingPath}/$1'`);
 
   // Transform parent lib imports - derive lib path as parent directory of primitivesPath
   const libPath = dirname(primitivesPath);
