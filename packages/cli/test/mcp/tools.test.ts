@@ -725,6 +725,111 @@ export function WrongPlace() { return null; }`,
     });
   });
 
+  describe('error paths', () => {
+    it('should return vocabulary even when token directory is missing', async () => {
+      // Remove the tokens directory to simulate a fresh project
+      await rm(join(testDir, '.rafters', 'tokens'), { recursive: true, force: true });
+
+      const result = await handler.handleToolCall('rafters_vocabulary', {});
+
+      expect(result.isError).toBeFalsy();
+      const data = JSON.parse(result.content[0].text as string);
+      // Static fallbacks still present
+      expect(data.colors.semantic).toContain('primary');
+      expect(Object.keys(data.spacing.scale).length).toBeGreaterThan(0);
+      expect(data.typography.weights.length).toBeGreaterThan(0);
+    });
+
+    it('should return component not-found with suggestion for unknown component', async () => {
+      const result = await handler.handleToolCall('rafters_component', {
+        name: 'nonexistent-widget',
+      });
+
+      expect(result.isError).toBe(true);
+      const data = JSON.parse(result.content[0].text as string);
+      expect(data.error).toContain('not found');
+      expect(data.suggestion).toContain('rafters_vocabulary');
+    });
+
+    it('should return similar component names when partial match exists', async () => {
+      const componentsDir = join(testDir, 'packages/ui/src/components/ui');
+      await mkdir(componentsDir, { recursive: true });
+      await writeFile(
+        join(componentsDir, 'button.tsx'),
+        `/** @cognitive-load 2/10 */
+export function Button() { return null; }`,
+      );
+
+      // Use a substring that triggers the includes() filter
+      const result = await handler.handleToolCall('rafters_component', {
+        name: 'button-large',
+      });
+
+      expect(result.isError).toBe(true);
+      const data = JSON.parse(result.content[0].text as string);
+      expect(data.error).toContain('not found');
+      expect(data.similar).toBeDefined();
+      expect(data.similar).toContain('button');
+    });
+
+    it('should return token not-found when all namespaces are empty', async () => {
+      const result = await handler.handleToolCall('rafters_token', {
+        name: 'nonexistent-token',
+      });
+
+      expect(result.isError).toBe(true);
+      const data = JSON.parse(result.content[0].text as string);
+      expect(data.error).toContain('not found');
+      expect(data.suggestion).toContain('rafters_vocabulary');
+      // No similar tokens since no namespaces have data
+      expect(data.similar).toBeUndefined();
+    });
+
+    it('should return error for invalid cognitive budget tier', async () => {
+      const result = await handler.handleToolCall('rafters_cognitive_budget', {
+        components: ['button'],
+        tier: 'invalid-tier',
+      });
+
+      expect(result.isError).toBe(true);
+      const data = JSON.parse(result.content[0].text as string);
+      expect(data.error).toContain('Invalid tier');
+      expect(data.available).toBeDefined();
+      expect(data.available).toContain('focused');
+      expect(data.available).toContain('page');
+      expect(data.available).toContain('app');
+    });
+
+    it('should handle corrupt token file gracefully', async () => {
+      await writeFile(
+        join(testDir, '.rafters', 'tokens', 'color.rafters.json'),
+        'not valid json at all',
+      );
+
+      // Vocabulary should still work with static fallbacks
+      const result = await handler.handleToolCall('rafters_vocabulary', {});
+      expect(result.isError).toBeFalsy();
+      const data = JSON.parse(result.content[0].text as string);
+      expect(data.colors.semantic).toContain('primary');
+    });
+
+    it('should handle corrupt token file in token lookup gracefully', async () => {
+      await writeFile(
+        join(testDir, '.rafters', 'tokens', 'spacing.rafters.json'),
+        '{corrupt',
+      );
+
+      const result = await handler.handleToolCall('rafters_token', {
+        name: 'spacing-1',
+      });
+
+      // Should return not-found rather than crash
+      expect(result.isError).toBe(true);
+      const data = JSON.parse(result.content[0].text as string);
+      expect(data.error).toContain('not found');
+    });
+  });
+
   describe('unknown tool', () => {
     it('should return error for unknown tool', async () => {
       const result = await handler.handleToolCall('unknown_tool', {});
