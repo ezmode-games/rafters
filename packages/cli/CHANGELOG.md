@@ -1,5 +1,19 @@
 # rafters
 
+## 0.0.11
+
+### Patch Changes
+
+- fix(resizable): correct handleIndex for multi-panel layouts (#930)
+- fix(select): display label text instead of raw value in SelectValue (#931)
+- fix(shared): harden JSDoc intelligence parsing with validateComponentIntelligence() and 21 new tests (#932)
+- refactor(ui): add displayName to 110+ subcomponents, forwardRef to 5 components (#933)
+- refactor(ui): remove dead underscore-prefixed props from 6 components (#934)
+- refactor(ui): standardize asChild on slot primitive's mergeProps (#935)
+- feat(design-tokens): add designer intent and relationship fields to DTCG export (#918)
+- feat(design-tokens): add AI intelligence metadata to DTCG export (#919)
+- feat(ui): add rule-drop-zone leaf primitive (#904)
+
 ## 0.0.10
 
 ### Patch Changes
