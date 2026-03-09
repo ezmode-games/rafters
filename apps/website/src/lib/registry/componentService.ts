@@ -401,18 +401,52 @@ export function loadPrimitive(name: string): RegistryItem | null {
       true,
     );
 
+    const files: RegistryFile[] = [
+      {
+        path: `lib/primitives/${name}${fileExt}`,
+        content,
+        dependencies: allExternalDeps,
+        devDependencies,
+      },
+    ];
+
+    // Detect sibling shared files (e.g., ./types) and include them.
+    // extractPrimitiveDependencies already detects sibling imports -- reuse it
+    // to find shared files that are NOT standalone primitives (like types.ts).
+    const siblingImports = extractSiblingImports(content);
+    for (const sibling of siblingImports) {
+      // Skip siblings that are standalone primitives (they get installed separately)
+      if (primitiveDeps.includes(sibling)) continue;
+
+      // Try to load the shared file (.ts then .tsx)
+      let siblingPath = join(primitivesDir, `${sibling}.ts`);
+      let siblingExt = '.ts';
+      try {
+        readFileSync(siblingPath, 'utf-8');
+      } catch {
+        siblingPath = join(primitivesDir, `${sibling}.tsx`);
+        siblingExt = '.tsx';
+      }
+
+      try {
+        const siblingContent = readFileSync(siblingPath, 'utf-8');
+        const siblingAnalysis = analyzeSource(siblingContent, true);
+        files.push({
+          path: `lib/primitives/${sibling}${siblingExt}`,
+          content: siblingContent,
+          dependencies: siblingAnalysis.allExternalDeps,
+          devDependencies: siblingAnalysis.devDependencies,
+        });
+      } catch {
+        // Shared file not found -- skip silently
+      }
+    }
+
     const result: RegistryItem = {
       name,
       type: 'primitive',
       primitives: primitiveDeps,
-      files: [
-        {
-          path: `lib/primitives/${name}${fileExt}`,
-          content,
-          dependencies: allExternalDeps,
-          devDependencies,
-        },
-      ],
+      files,
     };
 
     if (intelligence) {
@@ -508,6 +542,29 @@ function extractDependencies(content: string): {
   }
 
   return { external, internal };
+}
+
+/**
+ * Extract bare sibling import names from source (e.g., ./types -> "types").
+ * Returns only `./foo` style imports (no nested paths).
+ */
+export function extractSiblingImports(content: string): string[] {
+  const siblings: string[] = [];
+  const importRegex =
+    /import\s+(?:type\s+)?(?:(?:\{[^}]*\}|\*\s+as\s+\w+|\w+)\s+from\s+)?['"]([^'"]+)['"]/g;
+  const matches = content.matchAll(importRegex);
+
+  for (const match of matches) {
+    const pkg = match[1];
+    if (pkg && pkg.startsWith('./') && !pkg.slice(2).includes('/')) {
+      const name = basename(pkg).replace(/\.(tsx?|jsx?)$/, '');
+      if (name && !siblings.includes(name)) {
+        siblings.push(name);
+      }
+    }
+  }
+
+  return siblings;
 }
 
 /**
