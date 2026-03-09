@@ -814,10 +814,7 @@ export function Button() { return null; }`,
     });
 
     it('should handle corrupt token file in token lookup gracefully', async () => {
-      await writeFile(
-        join(testDir, '.rafters', 'tokens', 'spacing.rafters.json'),
-        '{corrupt',
-      );
+      await writeFile(join(testDir, '.rafters', 'tokens', 'spacing.rafters.json'), '{corrupt');
 
       const result = await handler.handleToolCall('rafters_token', {
         name: 'spacing-1',
