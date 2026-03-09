@@ -156,6 +156,53 @@ describe('toDTCG', () => {
       expect(rafters.dependsOn).toEqual(['spacing-base']);
     });
 
+    it('should include AI intelligence metadata in extensions', () => {
+      const tokens: Token[] = [
+        {
+          name: 'color-danger',
+          value: '#ff0000',
+          category: 'color',
+          namespace: 'color',
+          trustLevel: 'critical',
+          cognitiveLoad: 3,
+          consequence: 'destructive',
+          accessibilityLevel: 'AA',
+          appliesWhen: ['destructive actions', 'error states'],
+        },
+      ];
+
+      const result = toDTCG(tokens, { applyTypesToGroup: false });
+      const token = (result.color as Record<string, unknown>).danger as Record<string, unknown>;
+      const rafters = (token.$extensions as Record<string, unknown>).rafters as Record<
+        string,
+        unknown
+      >;
+
+      expect(rafters.trustLevel).toBe('critical');
+      expect(rafters.cognitiveLoad).toBe(3);
+      expect(rafters.consequence).toBe('destructive');
+      expect(rafters.accessibilityLevel).toBe('AA');
+      expect(rafters.appliesWhen).toEqual(['destructive actions', 'error states']);
+    });
+
+    it('should not include empty appliesWhen array in extensions', () => {
+      const tokens: Token[] = [
+        {
+          name: 'color-muted',
+          value: '#999999',
+          category: 'color',
+          namespace: 'color',
+          appliesWhen: [],
+        },
+      ];
+
+      const result = toDTCG(tokens, { applyTypesToGroup: false });
+      const token = (result.color as Record<string, unknown>).muted as Record<string, unknown>;
+
+      // No extensions at all since appliesWhen is empty and no other extension fields
+      expect(token.$extensions).toBeUndefined();
+    });
+
     it('should exclude extensions when includeExtensions=false', () => {
       const tokens: Token[] = [
         {
