@@ -512,7 +512,8 @@ function extractDependencies(content: string): {
   const internal: string[] = [];
 
   // Match import statements
-  const importRegex = /import\s+(?:(?:\{[^}]*\}|\*\s+as\s+\w+|\w+)\s+from\s+)?['"]([^'"]+)['"]/g;
+  const importRegex =
+    /import\s+(?:type\s+)?(?:(?:\{[^}]*\}|\*\s+as\s+\w+|\w+)\s+from\s+)?['"]([^'"]+)['"]/g;
   const matches = content.matchAll(importRegex);
 
   for (const match of matches) {
@@ -575,7 +576,9 @@ export function extractSiblingImports(content: string): string[] {
 function extractPrimitiveDependencies(content: string, isPrimitive = false): string[] {
   const primitives: string[] = [];
 
-  // Match imports from primitives directory
+  // Match imports from primitives directory.
+  // Intentionally omits "import type" to avoid treating type-only shared files
+  // (like types.ts) as standalone primitive dependencies.
   const importRegex = /import\s+(?:(?:\{[^}]*\}|\*\s+as\s+\w+|\w+)\s+from\s+)?['"]([^'"]+)['"]/g;
   const matches = content.matchAll(importRegex);
 
