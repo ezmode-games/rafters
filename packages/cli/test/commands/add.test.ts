@@ -41,6 +41,39 @@ describe('transformFileContent', () => {
     expect(result).toBe(`import { Button } from '@/components/ui/button';`);
   });
 
+  it('transforms ./ imports to @/lib/primitives/ when fileType is primitive', () => {
+    const input = `import type { BlockType } from './types';`;
+    const result = transformFileContent(input, null, 'primitive');
+    expect(result).toBe(`import type { BlockType } from '@/lib/primitives/types';`);
+  });
+
+  it('transforms ./ imports to @/components/ui/ when fileType is component', () => {
+    const input = `import type { BlockType } from './types';`;
+    const result = transformFileContent(input, null, 'component');
+    expect(result).toBe(`import type { BlockType } from '@/components/ui/types';`);
+  });
+
+  it('defaults fileType to component when not specified', () => {
+    const input = `import type { BlockType } from './types';`;
+    const result = transformFileContent(input, null);
+    expect(result).toBe(`import type { BlockType } from '@/components/ui/types';`);
+  });
+
+  it('respects custom primitivesPath for primitive fileType', () => {
+    const config = {
+      framework: 'vite' as const,
+      componentsPath: 'src/components/ui',
+      primitivesPath: 'src/lib/primitives',
+      compositesPath: 'src/composites',
+      cssPath: null,
+      shadcn: false,
+      exports: { tailwind: true, typescript: true, dtcg: false, compiled: false },
+    };
+    const input = `import type { BlockType } from './types';`;
+    const result = transformFileContent(input, config, 'primitive');
+    expect(result).toBe(`import type { BlockType } from '@/src/lib/primitives/types';`);
+  });
+
   it('transforms ../ component imports to @/components/ui/', () => {
     const input = `import { Card } from '../card';`;
     const result = transformFileContent(input, null);

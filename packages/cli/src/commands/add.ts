@@ -165,9 +165,19 @@ function fileExists(cwd: string, relativePath: string): boolean {
 }
 
 /**
- * Transform component file content to update imports for the target project
+ * Transform component file content to update imports for the target project.
+ *
+ * @param content     - Raw source text from the registry file
+ * @param config      - Project rafters config (path mappings)
+ * @param fileType    - Whether this file is a component or a primitive.
+ *                      Controls where bare `./foo` sibling imports resolve:
+ *                      components -> componentsPath, primitives -> primitivesPath.
  */
-export function transformFileContent(content: string, config: RaftersConfig | null): string {
+export function transformFileContent(
+  content: string,
+  config: RaftersConfig | null,
+  fileType: 'component' | 'primitive' = 'component',
+): string {
   let transformed = content;
 
   // Get paths from config or use defaults
@@ -186,10 +196,13 @@ export function transformFileContent(content: string, config: RaftersConfig | nu
     `from '@/${primitivesPath}/$1'`,
   );
 
-  // Transform relative component imports to configured components path
+  // Transform relative sibling imports (./foo) based on file type:
+  // - component files -> componentsPath (siblings are other components)
+  // - primitive files -> primitivesPath (siblings are other primitives)
+  const siblingPath = fileType === 'primitive' ? primitivesPath : componentsPath;
   transformed = transformed.replace(
     /from\s+['"]\.\/([^'"]+)['"]/g,
-    `from '@/${componentsPath}/$1'`,
+    `from '@/${siblingPath}/$1'`,
   );
 
   // Transform parent lib imports - derive lib path as parent directory of primitivesPath
@@ -252,7 +265,8 @@ async function installItem(
     await mkdir(dirname(targetPath), { recursive: true });
 
     // Transform and write the file
-    const transformedContent = transformFileContent(file.content, config);
+    const fileType = item.type === 'primitive' ? 'primitive' : 'component';
+    const transformedContent = transformFileContent(file.content, config, fileType);
     await writeFile(targetPath, transformedContent, 'utf-8');
 
     installedFiles.push(projectPath);

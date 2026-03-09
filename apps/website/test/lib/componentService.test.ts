@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   extractDepsFromSource,
+  extractSiblingImports,
   getRegistryIndex,
   listComponentNames,
   listPrimitiveNames,
@@ -127,6 +128,66 @@ describe('componentService', () => {
     it('returns null for non-existent primitive', () => {
       const primitive = loadPrimitive('nonexistent-primitive');
       expect(primitive).toBeNull();
+    });
+
+    it('includes types.ts when a primitive imports from ./types', () => {
+      // slot is a primitive that imports from ./types
+      const primitive = loadPrimitive('slot');
+      expect(primitive).not.toBeNull();
+      const filePaths = primitive?.files.map((f) => f.path) ?? [];
+      expect(filePaths).toContain('lib/primitives/types.ts');
+    });
+
+    it('does not duplicate types.ts in files array', () => {
+      const primitive = loadPrimitive('slot');
+      expect(primitive).not.toBeNull();
+      const typeFiles = primitive?.files.filter((f) => f.path === 'lib/primitives/types.ts') ?? [];
+      expect(typeFiles.length).toBeLessThanOrEqual(1);
+    });
+  });
+
+  describe('extractSiblingImports', () => {
+    it('extracts ./types as a sibling import', () => {
+      const source = `import type { BlockType } from './types';`;
+      const result = extractSiblingImports(source);
+      expect(result).toContain('types');
+    });
+
+    it('extracts multiple sibling imports', () => {
+      const source = `
+        import type { BlockType } from './types';
+        import { helper } from './utils';
+      `;
+      const result = extractSiblingImports(source);
+      expect(result).toContain('types');
+      expect(result).toContain('utils');
+    });
+
+    it('ignores nested path imports', () => {
+      const source = `import { foo } from './sub/module';`;
+      const result = extractSiblingImports(source);
+      expect(result).toEqual([]);
+    });
+
+    it('ignores parent path imports', () => {
+      const source = `import { foo } from '../bar';`;
+      const result = extractSiblingImports(source);
+      expect(result).toEqual([]);
+    });
+
+    it('ignores external package imports', () => {
+      const source = `import React from 'react';`;
+      const result = extractSiblingImports(source);
+      expect(result).toEqual([]);
+    });
+
+    it('deduplicates sibling imports', () => {
+      const source = `
+        import type { A } from './types';
+        import type { B } from './types';
+      `;
+      const result = extractSiblingImports(source);
+      expect(result.filter((s) => s === 'types')).toHaveLength(1);
     });
   });
 
