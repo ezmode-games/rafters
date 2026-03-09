@@ -173,9 +173,9 @@ describe('tokensToTypeScript', () => {
     const ts = tokensToTypeScript(tokens);
 
     // Should be unquoted - a raw JS object literal, not a string
-    expect(ts).toContain("'scale-data': {\"l\": 0.5, \"c\": 0.1, \"h\": 240}");
+    expect(ts).toContain('\'scale-data\': {"l": 0.5, "c": 0.1, "h": 240}');
     // Should NOT be wrapped in quotes
-    expect(ts).not.toContain("'{\"l\"");
+    expect(ts).not.toContain('\'{"l"');
   });
 
   it('should export JSON array string values as raw array literals', () => {
@@ -191,7 +191,7 @@ describe('tokensToTypeScript', () => {
     const ts = tokensToTypeScript(tokens);
 
     // Should be unquoted - a raw JS array literal
-    expect(ts).toContain("'color-scale': [{\"l\": 0.5, \"c\": 0.1, \"h\": 240}]");
+    expect(ts).toContain('\'color-scale\': [{"l": 0.5, "c": 0.1, "h": 240}]');
   });
 
   it('should handle tokens with special characters in names', () => {
