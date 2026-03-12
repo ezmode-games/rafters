@@ -2,11 +2,14 @@ import type { ColorValue } from '@rafters/shared';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import {
+  ColorCharacter,
   ColorFamily,
   ColorInspector,
   ColorScale,
+  ColorStory,
   ColorWeight,
   ContrastMatrix,
+  ContrastPreview,
   CVDSimulation,
   TokenIntelligence,
 } from '../../src/components/ui/color-inspector';
@@ -93,6 +96,11 @@ function makeColorValue(name: string, token?: string): ColorValue {
       distanceWeight: 0.45,
       temperature: 'warm' as const,
       atmosphericRole: 'midground' as const,
+    },
+    analysis: {
+      temperature: 'cool' as const,
+      isLight: false,
+      name,
     },
     intelligence: {
       reasoning: 'Derived from primary brand color',
@@ -254,6 +262,171 @@ describe('TokenIntelligence', () => {
 });
 
 // ============================================================================
+// ColorStory tests
+// ============================================================================
+
+describe('ColorStory', () => {
+  const intelligence = {
+    reasoning: 'Balanced mid-tone lightness and moderate saturation',
+    emotionalImpact: 'Tranquility and growth',
+    culturalContext: 'Green symbolizes nature and prosperity',
+    accessibilityNotes: 'Passes WCAG AA for normal text on white',
+    usageGuidance: 'Suitable for backgrounds and accents',
+  };
+
+  it('renders reasoning as lead paragraph', () => {
+    const { container } = render(<ColorStory intelligence={intelligence} />);
+    expect(container.querySelector('[data-story-reasoning]')).not.toBeNull();
+    expect(container.textContent).toContain('Balanced mid-tone');
+  });
+
+  it('renders emotion and reasoning visible, deep context collapsed', () => {
+    const { container } = render(<ColorStory intelligence={intelligence} />);
+    expect(container.querySelector('[data-story-emotion]')).not.toBeNull();
+    expect(container.querySelector('[data-story-reasoning]')).not.toBeNull();
+    // Deep context is behind a collapsible trigger
+    expect(container.textContent).toContain('More context');
+  });
+
+  it('renders confidence meter when metadata present', () => {
+    const withMeta = {
+      ...intelligence,
+      metadata: {
+        predictionId: 'test-123',
+        confidence: 0.95,
+        uncertaintyBounds: { lower: 0.85, upper: 1, confidenceInterval: 0.95 },
+        qualityScore: 0.83,
+        method: 'bootstrap' as const,
+      },
+    };
+    const { container } = render(<ColorStory intelligence={withMeta} />);
+    expect(container.querySelector('[data-story-confidence]')).not.toBeNull();
+    expect(container.querySelector('meter')).not.toBeNull();
+  });
+
+  it('omits confidence when no metadata', () => {
+    const { container } = render(<ColorStory intelligence={intelligence} />);
+    expect(container.querySelector('[data-story-confidence]')).toBeNull();
+  });
+
+  it('includes balancing in deep context when present', () => {
+    const withBalancing = { ...intelligence, balancingGuidance: 'Pair with lighter elements' };
+    const { container } = render(<ColorStory intelligence={withBalancing} />);
+    // Balancing is behind the collapsible, but the trigger should exist
+    expect(container.textContent).toContain('More context');
+  });
+});
+
+// ============================================================================
+// ColorCharacter tests
+// ============================================================================
+
+describe('ColorCharacter', () => {
+  const testScale = makeScale();
+
+  it('renders three atmospheric depth bands', () => {
+    const { container } = render(
+      <ColorCharacter
+        analysis={{ temperature: 'cool', isLight: false, name: 'ocean-blue' }}
+        scale={testScale}
+      />,
+    );
+    expect(container.querySelector('[data-tag="background"]')).not.toBeNull();
+    expect(container.querySelector('[data-tag="midground"]')).not.toBeNull();
+    expect(container.querySelector('[data-tag="foreground"]')).not.toBeNull();
+  });
+
+  it('varies band height by density', () => {
+    const { container: heavy } = render(
+      <ColorCharacter
+        analysis={{ temperature: 'warm', isLight: true, name: 'sunset' }}
+        scale={testScale}
+        perceptualWeight={{ weight: 0.8, density: 'heavy', balancingRecommendation: 'Test' }}
+      />,
+    );
+    const { container: light } = render(
+      <ColorCharacter
+        analysis={{ temperature: 'cool', isLight: true, name: 'sky' }}
+        scale={testScale}
+        perceptualWeight={{ weight: 0.3, density: 'light', balancingRecommendation: 'Test' }}
+      />,
+    );
+    const heavyBand = heavy.querySelector('[data-tag="background"]')?.parentElement;
+    const lightBand = light.querySelector('[data-tag="background"]')?.parentElement;
+    expect(heavyBand?.className).toContain('h-10');
+    expect(lightBand?.className).toContain('h-5');
+  });
+
+  it('sets data attributes on container', () => {
+    const { container } = render(
+      <ColorCharacter analysis={{ temperature: 'cool', isLight: true, name: 'test' }} />,
+    );
+    const el = container.firstChild as HTMLElement;
+    expect(el.getAttribute('data-temperature')).toBe('cool');
+    expect(el.getAttribute('data-light')).toBe('true');
+  });
+
+  it('renders without scale (fallback)', () => {
+    const { container } = render(
+      <ColorCharacter analysis={{ temperature: 'neutral', isLight: false, name: 'test' }} />,
+    );
+    expect(container.querySelector('[data-tag="background"]')).not.toBeNull();
+  });
+
+  it('includes aria-label with character summary', () => {
+    const { container } = render(
+      <ColorCharacter
+        analysis={{ temperature: 'cool', isLight: false, name: 'test' }}
+        atmosphericWeight={{
+          distanceWeight: 0.2,
+          temperature: 'cool',
+          atmosphericRole: 'background',
+        }}
+        perceptualWeight={{ weight: 0.5, density: 'medium', balancingRecommendation: 'Test' }}
+      />,
+    );
+    const el = container.firstChild as HTMLElement;
+    expect(el.getAttribute('aria-label')).toContain('cool');
+    expect(el.getAttribute('aria-label')).toContain('dark');
+    expect(el.getAttribute('aria-label')).toContain('background');
+    expect(el.getAttribute('aria-label')).toContain('medium');
+  });
+});
+
+// ============================================================================
+// ContrastPreview tests
+// ============================================================================
+
+describe('ContrastPreview', () => {
+  it('renders list of contrast samples', () => {
+    render(<ContrastPreview scale={makeScale()} />);
+    const items = screen.getAllByRole('listitem');
+    expect(items.length).toBeGreaterThan(0);
+  });
+
+  it('shows pangram text in each sample', () => {
+    render(<ContrastPreview scale={makeScale()} />);
+    const items = screen.getAllByRole('listitem');
+    const first = items[0] as HTMLElement;
+    expect(first.textContent).toContain('The quick brown fox');
+  });
+
+  it('has inline styles for background and text color', () => {
+    const { container } = render(<ContrastPreview scale={makeScale()} />);
+    const items = container.querySelectorAll('[data-bg]');
+    expect(items.length).toBeGreaterThan(0);
+    const first = items[0] as HTMLElement;
+    expect(first.getAttribute('data-bg')).toBeDefined();
+    expect(first.getAttribute('data-fg')).toBeDefined();
+  });
+
+  it('shows scale position labels', () => {
+    const { container } = render(<ContrastPreview scale={makeScale()} />);
+    expect(container.textContent).toContain('50/');
+  });
+});
+
+// ============================================================================
 // ColorFamily tests
 // ============================================================================
 
@@ -327,7 +500,7 @@ describe('ColorFamily', () => {
 // ============================================================================
 
 describe('ColorInspector', () => {
-  it('renders one ColorFamily per color', () => {
+  it('renders chip for each color in left rail', () => {
     const colors = [
       makeColorValue('ocean-blue', 'primary'),
       makeColorValue('sunset-red', 'destructive'),
@@ -335,9 +508,12 @@ describe('ColorInspector', () => {
     ];
     render(<ColorInspector colors={colors} />);
 
-    expect(screen.getByText('ocean-blue')).toBeDefined();
-    expect(screen.getByText('sunset-red')).toBeDefined();
-    expect(screen.getByText('forest-green')).toBeDefined();
+    // Chips hide text by default; verify via aria-label
+    const buttons = screen.getAllByRole('button');
+    expect(buttons).toHaveLength(3);
+    expect(buttons[0]?.getAttribute('aria-label')).toContain('ocean-blue');
+    expect(buttons[1]?.getAttribute('aria-label')).toContain('sunset-red');
+    expect(buttons[2]?.getAttribute('aria-label')).toContain('forest-green');
   });
 
   it('only allows one selection at a time', () => {
@@ -345,24 +521,36 @@ describe('ColorInspector', () => {
       makeColorValue('ocean-blue', 'primary'),
       makeColorValue('sunset-red', 'destructive'),
     ];
-    const { container } = render(<ColorInspector colors={colors} />);
+    render(<ColorInspector colors={colors} />);
 
-    const families = container.querySelectorAll('[data-color-state]');
-    const first = families[0] as HTMLElement;
-    const second = families[1] as HTMLElement;
     const buttons = screen.getAllByRole('button');
     const firstBtn = buttons[0] as HTMLElement;
     const secondBtn = buttons[1] as HTMLElement;
 
     // Select first
     fireEvent.click(firstBtn);
-    expect(first.getAttribute('data-color-state')).toBe('selected');
-    expect(second.getAttribute('data-color-state')).toBe('resting');
+    expect(firstBtn.getAttribute('aria-current')).toBe('true');
+    expect(secondBtn.getAttribute('aria-current')).toBeNull();
 
     // Select second -- first should deselect
     fireEvent.click(secondBtn);
-    expect(first.getAttribute('data-color-state')).toBe('resting');
-    expect(second.getAttribute('data-color-state')).toBe('selected');
+    expect(firstBtn.getAttribute('aria-current')).toBeNull();
+    expect(secondBtn.getAttribute('aria-current')).toBe('true');
+  });
+
+  it('shows detail panel when color selected', () => {
+    const colors = [makeColorValue('ocean-blue', 'primary')];
+    render(<ColorInspector colors={colors} />);
+
+    // Initially shows placeholder
+    expect(screen.getByText('Select a color to inspect')).toBeDefined();
+
+    // Click the chip
+    fireEvent.click(screen.getByRole('button'));
+
+    // Detail panel renders hero with color name
+    expect(screen.getByRole('heading', { level: 2 })).toBeDefined();
+    expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('ocean-blue');
   });
 
   it('renders with region role', () => {
