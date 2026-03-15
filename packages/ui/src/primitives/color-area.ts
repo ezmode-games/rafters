@@ -80,7 +80,7 @@ function renderArea(canvas: HTMLCanvasElement, options: ColorAreaOptions): void 
     for (let y = startY; y < cssHeight; y++) {
       const c = (1 - y / maxY) * maxChroma;
       const distPx = ((mc - c) / maxChroma) * cssHeight;
-      const t = distPx >= FADE_PX ? 1 : distPx / FADE_PX;
+      const t = distPx >= FADE_PX ? 1 : Math.max(0, distPx / FADE_PX);
       ctx.globalAlpha = t * t;
       ctx.fillStyle = `oklch(${l} ${c} ${hue})`;
       ctx.fillRect(x, y, 1, 1);
