@@ -1,14 +1,14 @@
 /**
  * Color Area primitive
  * Renders a 2D canvas showing Lightness (x-axis) vs Chroma (y-axis)
- * at a fixed hue. Each pixel is painted with its actual OKLCH color
- * if within sRGB or Display P3 gamut, or black if outside both.
+ * at a fixed hue. Colors within the sRGB or Display P3 gamut are painted
+ * with a soft fade at the gamut boundary; out-of-gamut regions are transparent.
  *
  * Framework-agnostic, SSR-safe. The caller provides the canvas element;
  * the primitive handles rendering and ARIA attributes.
  */
 
-import { inP3, inSrgb } from './oklch-gamut';
+import { findMaxChroma } from './oklch-gamut';
 import type { CleanupFunction } from './types';
 
 export interface ColorAreaOptions {
@@ -25,6 +25,12 @@ export interface ColorAreaOptions {
   dpr?: number;
 }
 
+/** Number of CSS pixels over which the gamut boundary fades to transparent */
+const FADE_PX = 16;
+
+/** Lightness epsilon -- skip pure black/white columns where chroma is meaningless */
+const L_EPS = 0.001;
+
 /**
  * Render the Lightness x Chroma surface onto a canvas.
  * Gracefully handles getContext('2d') returning null (e.g. happy-dom).
@@ -39,28 +45,50 @@ function renderArea(canvas: HTMLCanvasElement, options: ColorAreaOptions): void 
   const { hue } = options;
   const maxChroma = options.maxChroma ?? 0.4;
   const dpr = options.dpr ?? window.devicePixelRatio;
-  const width = Math.round(canvas.clientWidth * dpr);
-  const height = Math.round(canvas.clientHeight * dpr);
+  const cssWidth = canvas.clientWidth;
+  const cssHeight = canvas.clientHeight;
+  const width = Math.round(cssWidth * dpr);
+  const height = Math.round(cssHeight * dpr);
 
   canvas.width = width;
   canvas.height = height;
 
-  const maxX = width > 1 ? width - 1 : 1;
-  const maxY = height > 1 ? height - 1 : 1;
+  // Scale transform so we iterate CSS pixels while filling device pixels
+  const scaleX = cssWidth > 0 ? width / cssWidth : 1;
+  const scaleY = cssHeight > 0 ? height / cssHeight : 1;
+  ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0);
 
-  for (let x = 0; x < width; x++) {
-    for (let y = 0; y < height; y++) {
-      const l = x / maxX; // 0 (black) at left, 1 (white) at right
-      const c = (1 - y / maxY) * maxChroma; // maxChroma at top, 0 (gray) at bottom
+  const maxX = cssWidth > 1 ? cssWidth - 1 : 1;
+  const maxY = cssHeight > 1 ? cssHeight - 1 : 1;
 
-      if (inSrgb(l, c, hue) || inP3(l, c, hue)) {
-        ctx.fillStyle = `oklch(${l} ${c} ${hue})`;
-      } else {
-        ctx.fillStyle = '#000';
-      }
+  // Precompute gamut boundary chroma per lightness column
+  const gamutBoundary = new Float32Array(cssWidth);
+  for (let x = 0; x < cssWidth; x++) {
+    gamutBoundary[x] = findMaxChroma(x / maxX, hue, maxChroma);
+  }
+
+  for (let x = 0; x < cssWidth; x++) {
+    const l = x / maxX;
+    if (l < L_EPS || l > 1 - L_EPS) continue;
+
+    const mc = gamutBoundary[x] ?? 0;
+
+    // Compute the first y where chroma enters the gamut boundary
+    // c(y) = (1 - y/maxY) * maxChroma, so c <= mc when y >= (1 - mc/maxChroma) * maxY
+    const startY = Math.max(0, Math.ceil((1 - mc / maxChroma) * maxY));
+
+    for (let y = startY; y < cssHeight; y++) {
+      const c = (1 - y / maxY) * maxChroma;
+      const distPx = ((mc - c) / maxChroma) * cssHeight;
+      const t = distPx >= FADE_PX ? 1 : Math.max(0, distPx / FADE_PX);
+      ctx.globalAlpha = t * t;
+      ctx.fillStyle = `oklch(${l} ${c} ${hue})`;
       ctx.fillRect(x, y, 1, 1);
     }
   }
+
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = 1;
 }
 
 /**
