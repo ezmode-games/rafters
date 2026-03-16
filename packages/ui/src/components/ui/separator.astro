@@ -15,12 +15,7 @@ interface Props extends HTMLAttributes<'div'> {
   decorative?: boolean;
 }
 
-const {
-  orientation = 'horizontal',
-  decorative = true,
-  class: className,
-  ...attrs
-} = Astro.props;
+const { orientation = 'horizontal', decorative = true, class: className, ...attrs } = Astro.props;
 
 const orientationClasses: Record<string, string> = {
   horizontal: 'h-px w-full',

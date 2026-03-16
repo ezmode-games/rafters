@@ -20,13 +20,7 @@ interface Props extends HTMLAttributes<'div'> {
   size?: 'default' | 'sm';
 }
 
-const {
-  as: Tag = 'div',
-  interactive,
-  size = 'default',
-  class: className,
-  ...attrs
-} = Astro.props;
+const { as: Tag = 'div', interactive, size = 'default', class: className, ...attrs } = Astro.props;
 
 const base = 'bg-card text-card-foreground border border-card-border rounded-lg shadow-sm';
 const sizeStyles = size === 'sm' ? 'group/card-sm' : '';
