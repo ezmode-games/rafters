@@ -21,6 +21,9 @@ export default defineConfig({
   test: {
     globals: true,
     include: ['test/**/*.test.ts'],
+    // Vitest 4 fails on unhandled rejections (v3 warned). AI binding mock
+    // produces "Cannot read properties of undefined (reading 'run')" during
+    // test teardown. Remove once AI bindings are properly mocked.
     dangerouslyIgnoreUnhandledErrors: true,
   },
 });
