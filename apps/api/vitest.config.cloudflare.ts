@@ -1,8 +1,3 @@
-/**
- * Vitest configuration for Cloudflare Workers API testing
- * Uses actual Workers runtime with KV, R2, D1 bindings
- */
-
 import { cloudflareTest } from '@cloudflare/vitest-pool-workers';
 import { defineConfig } from 'vitest/config';
 
