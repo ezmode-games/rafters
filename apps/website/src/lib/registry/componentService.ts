@@ -70,13 +70,36 @@ function getCompositesPath(): string {
 }
 
 /**
- * List all available component names
+ * Component file extensions to discover.
+ * The .tsx file is the primary; others are framework-specific variants.
+ */
+const COMPONENT_EXTENSIONS = ['.tsx', '.astro', '.vue', '.svelte'];
+
+/**
+ * Shared auxiliary file suffixes bundled with components.
+ * These provide class maps, types, or constants shared across framework variants.
+ */
+const SHARED_SUFFIXES = ['.classes.ts', '.types.ts', '.constants.ts'];
+
+/**
+ * List all available component names.
+ * Deduplicates across extensions so a component with both .tsx and .astro appears once.
  */
 export function listComponentNames(): string[] {
   const componentsDir = getComponentsPath();
-  return readdirSync(componentsDir)
-    .filter((f) => f.endsWith('.tsx'))
-    .map((f) => basename(f, '.tsx'));
+  const allFiles = readdirSync(componentsDir);
+  const names = new Set<string>();
+
+  for (const f of allFiles) {
+    for (const ext of COMPONENT_EXTENSIONS) {
+      if (f.endsWith(ext)) {
+        names.add(basename(f, ext));
+        break;
+      }
+    }
+  }
+
+  return [...names].sort();
 }
 
 /**
@@ -342,39 +365,79 @@ function analyzeSource(
 }
 
 /**
- * Load a single component by name
+ * Load a single component by name.
+ * Discovers all framework variants (.tsx, .astro, .vue, .svelte) and
+ * shared auxiliary files (.classes.ts, etc.) to include in the registry item.
  */
 export function loadComponent(name: string): RegistryItem | null {
-  const filePath = join(getComponentsPath(), `${name}.tsx`);
+  const componentsDir = getComponentsPath();
+  const files: RegistryFile[] = [];
+  let primitivesAll: string[] = [];
+  let internalAll: string[] = [];
+  let intelligence: ReturnType<typeof parseJSDocFromSource> | undefined;
 
-  try {
-    const content = readFileSync(filePath, 'utf-8');
-    const { importDeps, allExternalDeps, devDependencies, primitiveDeps, intelligence } =
-      analyzeSource(content, false);
+  // Load framework-specific variants
+  for (const ext of COMPONENT_EXTENSIONS) {
+    const filePath = join(componentsDir, `${name}${ext}`);
+    try {
+      const content = readFileSync(filePath, 'utf-8');
+      const analysis = analyzeSource(content, false);
 
-    const result: RegistryItem = {
-      name,
-      type: 'ui',
-      primitives: [...importDeps.internal, ...primitiveDeps],
-      files: [
-        {
-          path: `components/ui/${name}.tsx`,
-          content,
-          dependencies: allExternalDeps,
-          devDependencies,
-        },
-      ],
-    };
+      files.push({
+        path: `components/ui/${name}${ext}`,
+        content,
+        dependencies: analysis.allExternalDeps,
+        devDependencies: analysis.devDependencies,
+      });
 
-    if (intelligence) {
-      result.intelligence = intelligence;
+      // Merge primitive/internal deps from all variants
+      primitivesAll = [
+        ...new Set([...primitivesAll, ...analysis.importDeps.internal, ...analysis.primitiveDeps]),
+      ];
+      internalAll = [...new Set([...internalAll, ...analysis.importDeps.internal])];
+
+      // Use intelligence from first variant that has it (typically .tsx)
+      if (!intelligence && analysis.intelligence) {
+        intelligence = analysis.intelligence;
+      }
+    } catch {
+      // Variant doesn't exist for this extension -- skip
     }
+  }
 
-    return result;
-  } catch (err) {
-    console.error(`Failed to load component "${name}":`, err);
+  // No files found at all
+  if (files.length === 0) {
     return null;
   }
+
+  // Load shared auxiliary files
+  for (const suffix of SHARED_SUFFIXES) {
+    const sharedPath = join(componentsDir, `${name}${suffix}`);
+    try {
+      const content = readFileSync(sharedPath, 'utf-8');
+      files.push({
+        path: `components/ui/${name}${suffix}`,
+        content,
+        dependencies: [],
+        devDependencies: [],
+      });
+    } catch {
+      // No shared file with this suffix -- skip
+    }
+  }
+
+  const result: RegistryItem = {
+    name,
+    type: 'ui',
+    primitives: primitivesAll,
+    files,
+  };
+
+  if (intelligence) {
+    result.intelligence = intelligence;
+  }
+
+  return result;
 }
 
 /**
