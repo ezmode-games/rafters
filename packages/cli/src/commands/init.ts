@@ -10,7 +10,7 @@ import { existsSync } from 'node:fs';
 import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { join, relative } from 'node:path';
-import { checkbox, confirm } from '@inquirer/prompts';
+import { checkbox, confirm, select } from '@inquirer/prompts';
 import {
   buildColorSystem,
   NodePersistenceAdapter,
@@ -21,7 +21,10 @@ import {
   toDTCG,
 } from '@rafters/design-tokens';
 import {
+  type ComponentTarget,
   detectProject,
+  frameworkToTarget,
+  hasAstroReact,
   isTailwindV3,
   parseCssVariables,
   type ShadcnColors,
@@ -99,6 +102,8 @@ const COMPONENT_PATHS: Record<
 export interface RaftersConfig {
   /** Detected or selected application framework */
   framework: Framework;
+  /** Which file variant to install: react (.tsx), astro (.astro), vue (.vue), svelte (.svelte) */
+  componentTarget?: ComponentTarget;
   /** Root directory for UI components, e.g. `components/ui` or `app/components/ui` */
   componentsPath: string;
   /** Root directory for primitive components, e.g. `lib/primitives` */
@@ -679,10 +684,33 @@ export async function init(options: InitOptions): Promise<void> {
     detectedCssPath = shadcn.tailwind.css;
   }
 
+  // Determine component target (which file variant to install)
+  let componentTarget: ComponentTarget = frameworkToTarget(framework as Framework);
+
+  if (framework === 'astro' && isInteractive() && !isAgentMode) {
+    const astroHasReact = await hasAstroReact(cwd);
+    if (astroHasReact) {
+      componentTarget = await select({
+        message: 'This Astro project has React integration. Install components as:',
+        choices: [
+          {
+            name: 'Astro components (zero client JS, server-rendered)',
+            value: 'astro' as ComponentTarget,
+          },
+          {
+            name: 'React components (client islands with client:load)',
+            value: 'react' as ComponentTarget,
+          },
+        ],
+      });
+    }
+  }
+
   // Create config file with detected settings and export selections
   const frameworkPaths = COMPONENT_PATHS[framework as Framework] || COMPONENT_PATHS.unknown;
   const config: RaftersConfig = {
     framework: framework as Framework,
+    componentTarget,
     componentsPath: frameworkPaths.components,
     primitivesPath: frameworkPaths.primitives,
     compositesPath: frameworkPaths.composites,

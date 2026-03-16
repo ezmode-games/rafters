@@ -211,6 +211,48 @@ function parseVariablesIntoColors(block: string, colors: ShadcnColors): void {
 }
 
 /**
+ * Component target derived from framework.
+ * Determines which file extension to prefer when installing components.
+ */
+export type ComponentTarget = 'react' | 'astro' | 'vue' | 'svelte';
+
+/**
+ * Map a framework to its default component target.
+ * All React-based frameworks (next, vite, remix, react-router) map to 'react'.
+ */
+export function frameworkToTarget(framework: Framework): ComponentTarget {
+  if (framework === 'astro') return 'astro';
+  return 'react';
+}
+
+/**
+ * Map a component target to its preferred file extension.
+ */
+export function targetToExtension(target: ComponentTarget): string {
+  const map: Record<ComponentTarget, string> = {
+    react: '.tsx',
+    astro: '.astro',
+    vue: '.vue',
+    svelte: '.svelte',
+  };
+  return map[target];
+}
+
+/**
+ * Check if an Astro project has @astrojs/react installed
+ */
+export async function hasAstroReact(cwd: string): Promise<boolean> {
+  try {
+    const content = await readFile(join(cwd, 'package.json'), 'utf-8');
+    const pkg = JSON.parse(content) as PackageJson;
+    const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+    return Boolean(deps['@astrojs/react']);
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Detect all project configuration at once
  * Returns framework, shadcn config, and Tailwind version
  */

@@ -9,7 +9,8 @@ import { existsSync } from 'node:fs';
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { RegistryClient } from '../registry/client.js';
-import type { RegistryItem } from '../registry/types.js';
+import type { RegistryFile, RegistryItem } from '../registry/types.js';
+import { type ComponentTarget, frameworkToTarget, targetToExtension } from '../utils/detect.js';
 import { DEFAULT_EXPORTS } from '../utils/exports.js';
 import {
   type InstallRegistryDepsResult,
@@ -79,6 +80,66 @@ export function getInstalledNames(config: RaftersConfig | null): string[] {
     ...(config.installed.composites ?? []),
   ]);
   return [...names].sort();
+}
+
+/**
+ * Resolve the component target from config, falling back to framework detection.
+ */
+function getComponentTarget(config: RaftersConfig | null): ComponentTarget {
+  if (config?.componentTarget) return config.componentTarget;
+  if (config?.framework) return frameworkToTarget(config.framework);
+  return 'react';
+}
+
+/**
+ * Shared file extensions that should always be included regardless of framework target.
+ * These are auxiliary files (class maps, types, constants) used by framework-specific components.
+ */
+const SHARED_EXTENSIONS = new Set(['.classes.ts', '.types.ts', '.constants.ts']);
+
+/**
+ * Check if a file path is a shared auxiliary file.
+ */
+function isSharedFile(path: string): boolean {
+  for (const ext of SHARED_EXTENSIONS) {
+    if (path.endsWith(ext)) return true;
+  }
+  return false;
+}
+
+/**
+ * Select files matching the target framework from a registry item's file list.
+ * Keeps shared auxiliary files (.classes.ts etc.) regardless of target.
+ * Falls back to .tsx if no framework-matching files exist.
+ *
+ * Returns { files, fallback } where fallback is true if .tsx was used as fallback.
+ */
+export function selectFilesForFramework(
+  files: RegistryFile[],
+  target: ComponentTarget,
+): { files: RegistryFile[]; fallback: boolean } {
+  const preferredExt = targetToExtension(target);
+
+  // Always include shared files
+  const shared = files.filter((f) => isSharedFile(f.path));
+
+  // Find files matching the preferred extension
+  const matched = files.filter((f) => f.path.endsWith(preferredExt));
+
+  if (matched.length > 0) {
+    return { files: [...matched, ...shared], fallback: false };
+  }
+
+  // Fallback: use .tsx files (React is the universal fallback)
+  if (target !== 'react') {
+    const fallbackFiles = files.filter((f) => f.path.endsWith('.tsx'));
+    if (fallbackFiles.length > 0) {
+      return { files: [...fallbackFiles, ...shared], fallback: true };
+    }
+  }
+
+  // No files matched at all -- return everything
+  return { files, fallback: false };
 }
 
 /**
@@ -239,7 +300,24 @@ async function installItem(
   const installedFiles: string[] = [];
   let skipped = false;
 
-  for (const file of item.files) {
+  // Filter files by framework target (only for UI components, not primitives/composites)
+  let filesToInstall = item.files;
+  if (item.type === 'ui') {
+    const target = getComponentTarget(config);
+    const selection = selectFilesForFramework(item.files, target);
+    filesToInstall = selection.files;
+
+    if (selection.fallback) {
+      log({
+        event: 'add:fallback',
+        component: item.name,
+        target,
+        message: `No ${targetToExtension(target)} version available for ${item.name}. Installing React version.`,
+      });
+    }
+  }
+
+  for (const file of filesToInstall) {
     // Transform the path based on project config
     const projectPath = transformPath(file.path, config);
     const targetPath = join(cwd, projectPath);
