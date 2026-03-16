@@ -3,25 +3,25 @@
  * Uses actual Workers runtime with KV, R2, D1 bindings
  */
 
-import { defineWorkersProject } from '@cloudflare/vitest-pool-workers/config';
+import { cloudflareTest } from '@cloudflare/vitest-pool-workers';
+import { defineConfig } from 'vitest/config';
 
-export default defineWorkersProject({
+export default defineConfig({
+  plugins: [
+    cloudflareTest({
+      miniflare: {
+        compatibilityFlags: ['nodejs_compat'],
+        queueConsumers: {
+          COLOR_SEED_QUEUE: { maxBatchTimeout: 0.05 /* 50ms */ },
+        },
+      },
+      wrangler: { configPath: './wrangler.jsonc' },
+    }),
+  ],
   test: {
     globals: true,
     setupFiles: ['./test/setup.ts'],
     include: ['test/**/*.spec.ts', 'test/**/*.test.ts'],
-    poolOptions: {
-      workers: {
-        singleWorker: true,
-        miniflare: {
-          compatibilityFlags: ['nodejs_compat'],
-          queueConsumers: {
-            COLOR_SEED_QUEUE: { maxBatchTimeout: 0.05 /* 50ms */ },
-          },
-        },
-        wrangler: { configPath: './wrangler.jsonc' },
-      },
-    },
   },
   resolve: {
     alias: {
