@@ -11,10 +11,10 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprot
 import { RaftersToolHandler, TOOL_DEFINITIONS } from './tools.js';
 
 /**
- * Create and start the MCP server
+ * Create and start the MCP server.
+ * @param projectRoot - Discovered project root, or null if no .rafters/ found
  */
-export async function startMcpServer(): Promise<void> {
-  const projectRoot = process.cwd();
+export async function startMcpServer(projectRoot: string | null): Promise<void> {
   const toolHandler = new RaftersToolHandler(projectRoot);
 
   // Create MCP server
