@@ -39,7 +39,11 @@ program
   .option('--agent', 'Output JSON for machine consumption')
   .action(withErrorHandler(add));
 
-program.command('mcp').description('Start MCP server for AI agent access (stdio)').action(mcp);
+program
+  .command('mcp')
+  .description('Start MCP server for AI agent access (stdio)')
+  .option('--project-root <path>', 'Explicit project root (skips .rafters/ discovery)')
+  .action(mcp);
 
 program.command('studio').description('Open Studio UI for visual token editing').action(studio);
 

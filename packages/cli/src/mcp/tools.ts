@@ -536,20 +536,25 @@ export const TOOL_DEFINITIONS = [
   },
 ] as const;
 
+const NO_PROJECT_ERROR =
+  'No .rafters/ config found. Run `pnpx rafters init` in your project first. ' +
+  'If the MCP server was launched from a different directory, pass --project-root <path>.';
+
 // Tool handler class - 5 focused design tools
 export class RaftersToolHandler {
-  private readonly adapter: NodePersistenceAdapter;
-  private readonly projectRoot: string;
+  private readonly adapter: NodePersistenceAdapter | null;
+  private readonly projectRoot: string | null;
 
-  constructor(projectRoot: string = process.cwd()) {
+  constructor(projectRoot: string | null) {
     this.projectRoot = projectRoot;
-    this.adapter = new NodePersistenceAdapter(projectRoot);
+    this.adapter = projectRoot ? new NodePersistenceAdapter(projectRoot) : null;
   }
 
   /**
    * Load tokens for a specific namespace
    */
   private async loadNamespace(namespace: string): Promise<Token[]> {
+    if (!this.adapter) return [];
     const allTokens = await this.adapter.load();
     return allTokens.filter((t) => t.namespace === namespace);
   }
@@ -587,6 +592,10 @@ export class RaftersToolHandler {
    * Returns: system rules, consumer quickstart, color tokens, spacing, type scale, components
    */
   private async getVocabulary(): Promise<CallToolResult> {
+    if (!this.projectRoot) {
+      return { content: [{ type: 'text', text: NO_PROJECT_ERROR }], isError: true };
+    }
+
     try {
       const [colors, spacing, typography, components] = await Promise.all([
         this.getColorVocabulary(),
@@ -764,16 +773,13 @@ export class RaftersToolHandler {
    * Returns null when no config exists or when it cannot be parsed.
    */
   private async loadConfig(): Promise<RaftersConfig | null> {
-    try {
-      const paths = getRaftersPaths(this.projectRoot);
-      if (!existsSync(paths.config)) {
-        return null;
-      }
-      const content = await readFile(paths.config, 'utf-8');
-      return JSON.parse(content) as RaftersConfig;
-    } catch {
+    if (!this.projectRoot) return null;
+    const paths = getRaftersPaths(this.projectRoot);
+    if (!existsSync(paths.config)) {
       return null;
     }
+    const content = await readFile(paths.config, 'utf-8');
+    return JSON.parse(content) as RaftersConfig;
   }
 
   /**
@@ -784,26 +790,19 @@ export class RaftersToolHandler {
     available: string[];
   }> {
     // Read installed components from config
-    let installed: string[] = [];
-    try {
-      const config = await this.loadConfig();
-      if (config) {
-        installed = config.installed?.components ?? [];
-      }
-    } catch {
-      // No config or malformed -- installed stays empty
-    }
+    const config = await this.loadConfig();
+    const installed = config?.installed?.components ?? [];
 
     // Fetch available components from registry
-    let available: string[] = [];
+    let available: string[];
     try {
       const client = new RegistryClient();
       const index = await client.fetchIndex();
-      const allComponents = index.components;
       const installedSet = new Set(installed);
-      available = allComponents.filter((name) => !installedSet.has(name));
-    } catch {
-      // Registry unreachable -- available stays empty
+      available = index.components.filter((name) => !installedSet.has(name));
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'unknown error';
+      available = [`(registry unreachable: ${msg})`];
     }
 
     return { installed, available };
@@ -854,7 +853,8 @@ export class RaftersToolHandler {
    * Reads componentsPath from .rafters/config.rafters.json when available,
    * falls back to the monorepo layout for local development.
    */
-  private async getComponentsPath(): Promise<string> {
+  private async getComponentsPath(): Promise<string | null> {
+    if (!this.projectRoot) return null;
     const config = await this.loadConfig();
     if (config?.componentsPath) {
       return join(this.projectRoot, config.componentsPath);
@@ -868,6 +868,7 @@ export class RaftersToolHandler {
    */
   private async loadComponentMetadata(name: string): Promise<ComponentMetadata | null> {
     const componentsPath = await this.getComponentsPath();
+    if (!componentsPath) return null;
     const filePath = join(componentsPath, `${name}.tsx`);
 
     try {
@@ -890,7 +891,7 @@ export class RaftersToolHandler {
         sizes: extractSizes(source),
         dependencies: extractDependencies(source),
         primitives: extractPrimitiveDependencies(source),
-        filePath: relative(this.projectRoot, join(componentsPath, `${name}.tsx`)),
+        filePath: relative(this.projectRoot ?? '', join(componentsPath, `${name}.tsx`)),
       };
 
       if (hasAnyDeps(jsDocDeps)) {
@@ -985,6 +986,10 @@ export class RaftersToolHandler {
    * Get full component intelligence
    */
   private async getComponent(name: string): Promise<CallToolResult> {
+    if (!this.projectRoot) {
+      return { content: [{ type: 'text', text: NO_PROJECT_ERROR }], isError: true };
+    }
+
     try {
       const metadata = await this.loadComponentMetadata(name);
 
@@ -992,15 +997,17 @@ export class RaftersToolHandler {
         // Try to provide helpful suggestions
         const componentsPath = await this.getComponentsPath();
         let available: string[] = [];
-        try {
-          const files = await readdir(componentsPath);
-          available = files
-            .filter((f) => f.endsWith('.tsx'))
-            .map((f) => basename(f, '.tsx'))
-            .filter((n) => n.includes(name) || name.includes(n))
-            .slice(0, 5);
-        } catch {
-          // Ignore
+        if (componentsPath) {
+          try {
+            const files = await readdir(componentsPath);
+            available = files
+              .filter((f) => f.endsWith('.tsx'))
+              .map((f) => basename(f, '.tsx'))
+              .filter((n) => n.includes(name) || name.includes(n))
+              .slice(0, 5);
+          } catch {
+            // Components directory does not exist
+          }
         }
 
         return {
@@ -1085,6 +1092,10 @@ export class RaftersToolHandler {
    * Get full token intelligence including dependency graph and override context
    */
   private async getToken(tokenName: string): Promise<CallToolResult> {
+    if (!this.projectRoot) {
+      return { content: [{ type: 'text', text: NO_PROJECT_ERROR }], isError: true };
+    }
+
     try {
       // Try to load the token from any namespace
       const namespaces = ['color', 'spacing', 'typography'];
@@ -1216,6 +1227,10 @@ export class RaftersToolHandler {
     components: string[],
     tier: BudgetTier,
   ): Promise<CallToolResult> {
+    if (!this.projectRoot) {
+      return { content: [{ type: 'text', text: NO_PROJECT_ERROR }], isError: true };
+    }
+
     try {
       if (!components || components.length === 0) {
         return {
