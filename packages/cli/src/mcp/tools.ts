@@ -39,7 +39,7 @@ import {
   toDisplayName,
 } from '@rafters/shared';
 import type { RaftersConfig } from '../commands/init.js';
-import { RegistryClient } from '../registry/client.js';
+import { registryClient } from '../registry/client.js';
 import { getRaftersPaths } from '../utils/paths.js';
 import {
   BUDGET_TIERS,
@@ -540,10 +540,14 @@ const NO_PROJECT_ERROR =
   'No .rafters/ config found. Run `pnpx rafters init` in your project first. ' +
   'If the MCP server was launched from a different directory, pass --project-root <path>.';
 
+// Tools that work without a project root (static data only)
+const PROJECT_INDEPENDENT_TOOLS = new Set(['rafters_pattern']);
+
 // Tool handler class - 5 focused design tools
 export class RaftersToolHandler {
   private readonly adapter: NodePersistenceAdapter | null;
   private readonly projectRoot: string | null;
+  private cachedConfig: RaftersConfig | null | undefined;
 
   constructor(projectRoot: string | null) {
     this.projectRoot = projectRoot;
@@ -563,6 +567,10 @@ export class RaftersToolHandler {
    * Handle a tool call from MCP
    */
   async handleToolCall(name: string, args: Record<string, unknown>): Promise<CallToolResult> {
+    if (!this.projectRoot && !PROJECT_INDEPENDENT_TOOLS.has(name)) {
+      return { content: [{ type: 'text', text: NO_PROJECT_ERROR }], isError: true };
+    }
+
     switch (name) {
       case 'rafters_vocabulary':
         return this.getVocabulary();
@@ -592,10 +600,6 @@ export class RaftersToolHandler {
    * Returns: system rules, consumer quickstart, color tokens, spacing, type scale, components
    */
   private async getVocabulary(): Promise<CallToolResult> {
-    if (!this.projectRoot) {
-      return { content: [{ type: 'text', text: NO_PROJECT_ERROR }], isError: true };
-    }
-
     try {
       const [colors, spacing, typography, components] = await Promise.all([
         this.getColorVocabulary(),
@@ -773,13 +777,19 @@ export class RaftersToolHandler {
    * Returns null when no config exists or when it cannot be parsed.
    */
   private async loadConfig(): Promise<RaftersConfig | null> {
-    if (!this.projectRoot) return null;
+    if (this.cachedConfig !== undefined) return this.cachedConfig;
+    if (!this.projectRoot) {
+      this.cachedConfig = null;
+      return null;
+    }
     const paths = getRaftersPaths(this.projectRoot);
     if (!existsSync(paths.config)) {
+      this.cachedConfig = null;
       return null;
     }
     const content = await readFile(paths.config, 'utf-8');
-    return JSON.parse(content) as RaftersConfig;
+    this.cachedConfig = JSON.parse(content) as RaftersConfig;
+    return this.cachedConfig;
   }
 
   /**
@@ -796,8 +806,7 @@ export class RaftersToolHandler {
     // Fetch available components from registry
     let available: string[];
     try {
-      const client = new RegistryClient();
-      const index = await client.fetchIndex();
+      const index = await registryClient.fetchIndex();
       const installedSet = new Set(installed);
       available = index.components.filter((name) => !installedSet.has(name));
     } catch (error) {
@@ -891,7 +900,8 @@ export class RaftersToolHandler {
         sizes: extractSizes(source),
         dependencies: extractDependencies(source),
         primitives: extractPrimitiveDependencies(source),
-        filePath: relative(this.projectRoot ?? '', join(componentsPath, `${name}.tsx`)),
+        // projectRoot is guaranteed non-null here: handleToolCall guards it
+        filePath: relative(this.projectRoot as string, join(componentsPath, `${name}.tsx`)),
       };
 
       if (hasAnyDeps(jsDocDeps)) {
@@ -986,10 +996,6 @@ export class RaftersToolHandler {
    * Get full component intelligence
    */
   private async getComponent(name: string): Promise<CallToolResult> {
-    if (!this.projectRoot) {
-      return { content: [{ type: 'text', text: NO_PROJECT_ERROR }], isError: true };
-    }
-
     try {
       const metadata = await this.loadComponentMetadata(name);
 
@@ -1092,10 +1098,6 @@ export class RaftersToolHandler {
    * Get full token intelligence including dependency graph and override context
    */
   private async getToken(tokenName: string): Promise<CallToolResult> {
-    if (!this.projectRoot) {
-      return { content: [{ type: 'text', text: NO_PROJECT_ERROR }], isError: true };
-    }
-
     try {
       // Try to load the token from any namespace
       const namespaces = ['color', 'spacing', 'typography'];
@@ -1227,10 +1229,6 @@ export class RaftersToolHandler {
     components: string[],
     tier: BudgetTier,
   ): Promise<CallToolResult> {
-    if (!this.projectRoot) {
-      return { content: [{ type: 'text', text: NO_PROJECT_ERROR }], isError: true };
-    }
-
     try {
       if (!components || components.length === 0) {
         return {
