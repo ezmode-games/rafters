@@ -42,7 +42,7 @@ export async function execCli(cwd: string, args: string[]): Promise<CommandResul
       resolve({
         exitCode: 1,
         stdout,
-        stderr: stderr + `\nProcess killed after ${EXEC_TIMEOUT_MS}ms timeout`,
+        stderr: `${stderr}\nProcess killed after ${EXEC_TIMEOUT_MS}ms timeout`,
       });
     }, EXEC_TIMEOUT_MS);
 
@@ -77,9 +77,7 @@ export async function createInitializedFixture(
   const result = await execCli(fixturePath, ['init']);
 
   if (result.exitCode !== 0) {
-    throw new Error(
-      `Failed to initialize fixture ${type}: ${result.stderr}\n${result.stdout}`,
-    );
+    throw new Error(`Failed to initialize fixture ${type}: ${result.stderr}\n${result.stdout}`);
   }
 
   return fixturePath;
@@ -104,10 +102,7 @@ export function fixtureFileExists(fixturePath: string, relativePath: string): bo
 /**
  * Read a file relative to a fixture path
  */
-export async function readFixtureFile(
-  fixturePath: string,
-  relativePath: string,
-): Promise<string> {
+export async function readFixtureFile(fixturePath: string, relativePath: string): Promise<string> {
   return readFile(join(fixturePath, relativePath), 'utf-8');
 }
 

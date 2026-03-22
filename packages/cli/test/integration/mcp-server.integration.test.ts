@@ -6,8 +6,8 @@
  */
 
 import { afterEach, describe, expect, it } from 'vitest';
-import { cleanupFixture } from '../fixtures/projects.js';
 import { RaftersToolHandler } from '../../src/mcp/tools.js';
+import { cleanupFixture } from '../fixtures/projects.js';
 import { createInitializedFixture, execCli } from './helpers.js';
 
 let fixturePath = '';
@@ -178,8 +178,6 @@ describe('MCP tools after rebuild', () => {
 
     // Token counts should match
     expect(data2.colors.semantic.length).toBe(data1.colors.semantic.length);
-    expect(Object.keys(data2.spacing.scale).length).toBe(
-      Object.keys(data1.spacing.scale).length,
-    );
+    expect(Object.keys(data2.spacing.scale).length).toBe(Object.keys(data1.spacing.scale).length);
   }, 30000);
 });

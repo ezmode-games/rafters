@@ -8,8 +8,8 @@
 import { mkdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { cleanupFixture, createFixture } from '../fixtures/projects.js';
 import { discoverProjectRoot } from '../../src/utils/discover.js';
+import { cleanupFixture, createFixture } from '../fixtures/projects.js';
 import { createInitializedFixture } from './helpers.js';
 
 let fixturePath = '';

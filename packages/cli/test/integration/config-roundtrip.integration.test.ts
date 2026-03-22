@@ -7,11 +7,7 @@
 
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanupFixture, createFixture } from '../fixtures/projects.js';
-import {
-  execCli,
-  readConfig,
-  writeFixtureFile,
-} from './helpers.js';
+import { execCli, readConfig, writeFixtureFile } from './helpers.js';
 
 let fixturePath = '';
 
@@ -59,13 +55,8 @@ describe('config persistence', () => {
     await execCli(fixturePath, ['init', '--rebuild']);
     const rebuilt = await readConfig(fixturePath);
 
-    expect((rebuilt.installed as Record<string, string[]>).components).toEqual([
-      'button',
-      'card',
-    ]);
-    expect((rebuilt.installed as Record<string, string[]>).primitives).toEqual([
-      'classy',
-    ]);
+    expect((rebuilt.installed as Record<string, string[]>).components).toEqual(['button', 'card']);
+    expect((rebuilt.installed as Record<string, string[]>).primitives).toEqual(['classy']);
   }, 30000);
 
   it('reset preserves framework detection but regenerates tokens', async () => {

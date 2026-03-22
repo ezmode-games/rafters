@@ -10,12 +10,7 @@ import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanupFixture, createFixture, type FixtureType } from '../fixtures/projects.js';
-import {
-  execCli,
-  fixtureFileExists,
-  readConfig,
-  readFixtureFile,
-} from './helpers.js';
+import { execCli, fixtureFileExists, readConfig, readFixtureFile } from './helpers.js';
 
 let fixturePath = '';
 
@@ -204,7 +199,7 @@ describe('rafters init --reset', () => {
 
     // Get initial token count
     const tokensDir = join(fixturePath, '.rafters', 'tokens');
-    const initialFiles = readdirSync(tokensDir);
+    const _initialFiles = readdirSync(tokensDir);
 
     // Reset
     const result = await execCli(fixturePath, ['init', '--reset']);
