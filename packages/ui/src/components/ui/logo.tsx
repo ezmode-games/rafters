@@ -78,10 +78,7 @@ const VIEWBOXES: Record<LogoVariant, string> = {
 
 export const Logo = React.forwardRef<SVGSVGElement, LogoProps>(
   ({ variant = 'full', size = 'md', className, ...props }, ref) => {
-    const cls = classy(
-      SIZE_CLASSES[variant][size],
-      className,
-    );
+    const cls = classy(SIZE_CLASSES[variant][size], className);
 
     return (
       <svg
