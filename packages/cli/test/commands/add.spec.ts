@@ -21,7 +21,12 @@ import { mkdir, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, beforeEach, describe, expect, it } from 'vitest';
-import { fetchComponent, installComponent, transformFileContent } from '../../src/commands/add.js';
+import {
+  fetchComponent,
+  installComponent,
+  selectFilesForFramework,
+  transformFileContent,
+} from '../../src/commands/add.js';
 import { RegistryClient } from '../../src/registry/client.js';
 
 const DEV_REGISTRY_URL = 'http://localhost:4321';
@@ -159,8 +164,9 @@ describe('rafters add - integration', () => {
 
       await installComponent(button, TEST_DIR, { overwrite: true });
 
-      // Verify files were written
-      for (const file of button.files) {
+      // Verify installed files were written (filtered by default react target)
+      const { files: installedFiles } = selectFilesForFramework(button.files, 'react');
+      for (const file of installedFiles) {
         const filePath = join(TEST_DIR, file.path);
         const content = await readFile(filePath, 'utf-8');
         expect(content).toBeTruthy();
@@ -172,8 +178,9 @@ describe('rafters add - integration', () => {
 
       await installComponent(button, TEST_DIR, { overwrite: true });
 
-      // Read installed file and verify import transformation
-      for (const file of button.files) {
+      // Read installed files and verify import transformation (filtered by default react target)
+      const { files: installedFiles } = selectFilesForFramework(button.files, 'react');
+      for (const file of installedFiles) {
         const filePath = join(TEST_DIR, file.path);
         const content = await readFile(filePath, 'utf-8');
 
@@ -222,9 +229,11 @@ describe('rafters add - integration', () => {
         await installComponent(item, TEST_DIR, { overwrite: true });
       }
 
-      // Verify all files exist
+      // Verify installed files exist (filtered by default react target for UI items)
       for (const item of items) {
-        for (const file of item.files) {
+        const filesToCheck =
+          item.type === 'ui' ? selectFilesForFramework(item.files, 'react').files : item.files;
+        for (const file of filesToCheck) {
           const filePath = join(TEST_DIR, file.path);
           const content = await readFile(filePath, 'utf-8');
           expect(content).toBeTruthy();
