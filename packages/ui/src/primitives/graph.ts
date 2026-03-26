@@ -147,7 +147,6 @@ export function polarToCartesian(
  */
 export function linePath(points: { x: number; y: number }[]): string {
   if (points.length === 0) return '';
-  if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
 
   const segments = points.map((p, i) => {
     const cmd = i === 0 ? 'M' : 'L';
@@ -163,18 +162,17 @@ export function linePath(points: { x: number; y: number }[]): string {
  */
 export function smoothPath(points: { x: number; y: number }[]): string {
   if (points.length === 0) return '';
-  if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
-  if (points.length === 2) return linePath(points);
+  if (points.length < 3) return linePath(points);
 
-  let d = `M ${points[0].x} ${points[0].y}`;
+  const first = points[0] as { x: number; y: number };
+  let d = `M ${first.x} ${first.y}`;
 
   for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[Math.max(0, i - 1)];
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    const p3 = points[Math.min(points.length - 1, i + 2)];
+    const p0 = points[Math.max(0, i - 1)] as { x: number; y: number };
+    const p1 = points[i] as { x: number; y: number };
+    const p2 = points[i + 1] as { x: number; y: number };
+    const p3 = points[Math.min(points.length - 1, i + 2)] as { x: number; y: number };
 
-    // Catmull-Rom to cubic bezier control points
     const cp1x = p1.x + (p2.x - p0.x) / 6;
     const cp1y = p1.y + (p2.y - p0.y) / 6;
     const cp2x = p2.x - (p3.x - p1.x) / 6;
