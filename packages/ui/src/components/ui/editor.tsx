@@ -62,10 +62,10 @@ import { getPortalContainer } from '../../primitives/portal';
 import type { RulePaletteItem } from '../../primitives/rule-palette';
 import { createRulePalette } from '../../primitives/rule-palette';
 import type {
+  BaseBlock,
   CleanupFunction,
   Command,
   Direction,
-  InlineContent,
   InlineMark,
 } from '../../primitives/types';
 import { Container } from './container';
@@ -89,13 +89,7 @@ export type AppliedRule = string | { name: string; config: Record<string, unknow
  * import type { EditorBlock } from '@rafters/ui';
  * ```
  */
-export interface EditorBlock {
-  id: string;
-  type: string;
-  content?: string | InlineContent[];
-  children?: string[];
-  parentId?: string;
-  meta?: Record<string, unknown>;
+export interface EditorBlock extends BaseBlock {
   rules?: AppliedRule[];
 }
 

@@ -30,24 +30,19 @@
  * NEVER: Access DOM or browser APIs in serializer implementations
  * NEVER: Assume a specific block type set -- serializers handle unknown types gracefully
  */
-import type { InlineContent } from './types';
+import type { BaseBlock, InlineContent } from './types';
 
 // =============================================================================
 // Types
 // =============================================================================
 
 /**
- * Block representation for serialization. Mirrors EditorBlock from the editor
- * component but defined here to avoid coupling primitives to components.
+ * Block type for serialization. Identical to BaseBlock -- aliased here so
+ * serializer consumers import from one module without reaching into types.ts.
+ * EditorBlock extends BaseBlock with runtime-only fields (rules) that are
+ * intentionally excluded from serialization.
  */
-export interface SerializerBlock {
-  id: string;
-  type: string;
-  content?: string | InlineContent[];
-  children?: string[];
-  parentId?: string;
-  meta?: Record<string, unknown>;
-}
+export type SerializerBlock = BaseBlock;
 
 /**
  * Result of deserializing an external format into blocks.
@@ -118,6 +113,7 @@ function isJsonPayload(value: unknown): value is JsonSerializerPayload {
   return obj.version === 1 && Array.isArray(obj.blocks);
 }
 
+/** Only validates the first element -- assumes trusted input from our own serialize output. */
 function isBlockArray(value: unknown): value is SerializerBlock[] {
   return Array.isArray(value) && (value.length === 0 || isSerializerBlock(value[0]));
 }
@@ -186,3 +182,6 @@ export function createJsonSerializer(): EditorSerializer {
     },
   };
 }
+
+/** Pre-built JSON serializer singleton. Stateless, safe to share across callers. */
+export const jsonSerializer: EditorSerializer = createJsonSerializer();
