@@ -22,6 +22,11 @@ import { mdxjs } from 'micromark-extension-mdxjs';
 import type { DeserializeResult, EditorSerializer, SerializerBlock } from './serializer';
 import type { InlineContent, InlineMark } from './types';
 
+// Hoist extension config objects -- avoids re-allocating on every parse/serialize call
+const MDX_SYNTAX = mdxjs();
+const MDX_FROM = mdxFromMarkdown();
+const MDX_TO = mdxToMarkdown();
+
 // =============================================================================
 // Types for mdast nodes (minimal, avoids importing full mdast types)
 // =============================================================================
@@ -827,8 +832,8 @@ export function createMdxSerializer(): EditorSerializer {
 
       // Parse with micromark + MDX extensions
       const tree = fromMarkdown(content, {
-        extensions: [mdxjs()],
-        mdastExtensions: [mdxFromMarkdown()],
+        extensions: [MDX_SYNTAX],
+        mdastExtensions: [MDX_FROM],
       });
 
       const blocks = mdastToBlocks(tree as MdastNode);
@@ -848,7 +853,7 @@ export function createMdxSerializer(): EditorSerializer {
 
       // Serialize with mdast-util-to-markdown + MDX extensions
       let output = toMarkdown(tree as Parameters<typeof toMarkdown>[0], {
-        extensions: [mdxToMarkdown()],
+        extensions: [MDX_TO],
         rule: '-',
       });
 
@@ -864,5 +869,5 @@ export function createMdxSerializer(): EditorSerializer {
   };
 }
 
-/** Pre-built MDX serializer singleton. Stateless, safe to share across callers. */
+/** Pre-built MDX serializer singleton. Uses a shared block ID counter -- safe for sequential use. */
 export const mdxSerializer: EditorSerializer = createMdxSerializer();
