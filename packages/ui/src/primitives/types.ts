@@ -164,6 +164,20 @@ export interface AriaAttributes {
 // =============================================================================
 
 /**
+ * Base block shape shared by the editor component and serialization primitives.
+ * EditorBlock extends this with runtime-only fields (rules). Serializers work
+ * with this shape so they stay decoupled from the React component layer.
+ */
+export interface BaseBlock {
+  id: string;
+  type: string;
+  content?: string | InlineContent[];
+  children?: string[];
+  parentId?: string;
+  meta?: Record<string, unknown>;
+}
+
+/**
  * Inline formatting mark types for rich text editing
  */
 export type InlineMark = 'bold' | 'italic' | 'code' | 'strikethrough' | 'link';

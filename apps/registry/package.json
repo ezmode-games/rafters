@@ -12,5 +12,8 @@
     "astro": "^6.0.8",
     "comment-parser": "^1.4.1",
     "rafters": "workspace:*"
+  },
+  "devDependencies": {
+    "wrangler": "^4.76.0"
   }
 }

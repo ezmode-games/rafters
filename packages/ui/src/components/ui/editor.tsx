@@ -61,7 +61,13 @@ import { adjustToolbarPosition, getFormatButtons } from '../../primitives/inline
 import { getPortalContainer } from '../../primitives/portal';
 import type { RulePaletteItem } from '../../primitives/rule-palette';
 import { createRulePalette } from '../../primitives/rule-palette';
-import type { CleanupFunction, Command, Direction, InlineMark } from '../../primitives/types';
+import type {
+  BaseBlock,
+  CleanupFunction,
+  Command,
+  Direction,
+  InlineMark,
+} from '../../primitives/types';
 import { Container } from './container';
 
 // ============================================================================
@@ -83,13 +89,7 @@ export type AppliedRule = string | { name: string; config: Record<string, unknow
  * import type { EditorBlock } from '@rafters/ui';
  * ```
  */
-export interface EditorBlock {
-  id: string;
-  type: string;
-  content?: unknown;
-  children?: string[];
-  parentId?: string;
-  meta?: Record<string, unknown>;
+export interface EditorBlock extends BaseBlock {
   rules?: AppliedRule[];
 }
 
