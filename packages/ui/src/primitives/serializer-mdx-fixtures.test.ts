@@ -117,10 +117,7 @@ describe('real-world.mdx fixture', () => {
       const chart = components.find((c) => c.meta?.component === 'Chart');
       expect(chart).toBeTruthy();
 
-      // Badge components (inline -- may appear as text)
-      const badges = components.filter((c) => c.meta?.component === 'Badge');
-      // Inline badges may not be parsed as block components
-      // That's OK -- they'd be in a paragraph's InlineContent
+      // Badge components are inline -- they appear in paragraph InlineContent, not as block components
     });
   });
 
