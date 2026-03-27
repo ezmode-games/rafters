@@ -51,28 +51,6 @@ import type { InlineContent } from '@/lib/primitives/types';
 // Sample data
 // ============================================================================
 
-const MINIMAL_BLOCKS: EditorBlock[] = [
-  { id: 'min-1', type: 'text', content: 'Welcome to the Rafters Editor' },
-  { id: 'min-2', type: 'text', content: 'This is a block-based content editor.' },
-  {
-    id: 'min-3',
-    type: 'text',
-    content: 'Click a block to select it. Use keyboard to navigate.',
-  },
-];
-
-const TOOLBAR_BLOCKS: EditorBlock[] = [
-  { id: 'tb-1', type: 'text', content: 'Editor with toolbar enabled' },
-  { id: 'tb-2', type: 'text', content: 'Try undo/redo after selecting and deleting blocks.' },
-  { id: 'tb-3', type: 'text', content: 'The toolbar shows formatting and history controls.' },
-];
-
-const SIDEBAR_BLOCKS: EditorBlock[] = [
-  { id: 'sb-1', type: 'heading', content: 'Sidebar with block palette' },
-  { id: 'sb-2', type: 'text', content: 'Use the sidebar to add new block types.' },
-  { id: 'sb-3', type: 'text', content: 'Click an item or drag it onto the canvas.' },
-];
-
 const FULL_BLOCKS: EditorBlock[] = [
   { id: 'full-1', type: 'heading', content: 'Full-featured editor' },
   {
@@ -543,92 +521,6 @@ function BlockStatePanel({ blocks }: { blocks: EditorBlock[] }) {
 // ============================================================================
 // Tab demos
 // ============================================================================
-
-function MinimalDemo() {
-  const editorRef = React.useRef<EditorControls>(null);
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const [blocks, setBlocks] = React.useState<EditorBlock[]>(MINIMAL_BLOCKS);
-  const renderBlock = useEditableRenderBlock(editorRef);
-  useOutsideDeselect(containerRef, editorRef);
-
-  return (
-    <div className={classy('space-y-4')}>
-      <div>
-        <P className={classy('text-sm text-muted-foreground')}>
-          Just <Kbd>defaultValue</Kbd> and <Kbd>onValueChange</Kbd>. A textarea replacement with
-          block structure.
-        </P>
-      </div>
-      <div ref={containerRef}>
-        <Editor
-          ref={editorRef}
-          defaultValue={blocks}
-          onValueChange={setBlocks}
-          renderBlock={renderBlock}
-        />
-      </div>
-      <BlockStatePanel blocks={blocks} />
-    </div>
-  );
-}
-
-function ToolbarDemo() {
-  const editorRef = React.useRef<EditorControls>(null);
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const [blocks, setBlocks] = React.useState<EditorBlock[]>(TOOLBAR_BLOCKS);
-  const renderBlock = useEditableRenderBlock(editorRef);
-  useOutsideDeselect(containerRef, editorRef);
-
-  return (
-    <div className={classy('space-y-4')}>
-      <div>
-        <P className={classy('text-sm text-muted-foreground')}>
-          Adds the <Kbd>toolbar</Kbd> prop. Undo/redo and formatting buttons appear above the
-          canvas.
-        </P>
-      </div>
-      <div ref={containerRef}>
-        <Editor
-          ref={editorRef}
-          defaultValue={blocks}
-          onValueChange={setBlocks}
-          toolbar
-          renderBlock={renderBlock}
-        />
-      </div>
-      <BlockStatePanel blocks={blocks} />
-    </div>
-  );
-}
-
-function SidebarDemo() {
-  const editorRef = React.useRef<EditorControls>(null);
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const [blocks, setBlocks] = React.useState<EditorBlock[]>(SIDEBAR_BLOCKS);
-  const renderBlock = useEditableRenderBlock(editorRef);
-  useOutsideDeselect(containerRef, editorRef);
-
-  return (
-    <div className={classy('space-y-4')}>
-      <div>
-        <P className={classy('text-sm text-muted-foreground')}>
-          Adds <Kbd>sidebar</Kbd> with a block palette. Categories: Basic and Media. Click to add,
-          drag to insert at position.
-        </P>
-      </div>
-      <div ref={containerRef}>
-        <Editor
-          ref={editorRef}
-          defaultValue={blocks}
-          onValueChange={setBlocks}
-          sidebar={SIDEBAR_CONFIG}
-          renderBlock={renderBlock}
-        />
-      </div>
-      <BlockStatePanel blocks={blocks} />
-    </div>
-  );
-}
 
 function FullDemo() {
   const editorRef = React.useRef<EditorControls>(null);
@@ -1182,63 +1074,20 @@ export default function EditorPlayground() {
 
       <Separator className={classy('mb-8')} />
 
-      <Tabs defaultValue="minimal">
+      <Tabs defaultValue="editor">
         <TabsList>
-          <TabsTrigger value="minimal">Minimal</TabsTrigger>
-          <TabsTrigger value="toolbar">Toolbar</TabsTrigger>
-          <TabsTrigger value="sidebar">Sidebar</TabsTrigger>
-          <TabsTrigger value="full">Full</TabsTrigger>
+          <TabsTrigger value="editor">Editor</TabsTrigger>
           <TabsTrigger value="composites">Composites</TabsTrigger>
           <TabsTrigger value="serializers">Serializers</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="minimal">
+        <TabsContent value="editor">
           <Card className={classy('mt-4')}>
             <CardHeader>
-              <CardTitle>Minimal Editor</CardTitle>
+              <CardTitle>Block Editor</CardTitle>
               <CardDescription>
-                No chrome. Blocks, selection, keyboard navigation. A structured textarea.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <MinimalDemo />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="toolbar">
-          <Card className={classy('mt-4')}>
-            <CardHeader>
-              <CardTitle>Toolbar Editor</CardTitle>
-              <CardDescription>Top toolbar with undo/redo and formatting controls.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ToolbarDemo />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="sidebar">
-          <Card className={classy('mt-4')}>
-            <CardHeader>
-              <CardTitle>Sidebar Editor</CardTitle>
-              <CardDescription>
-                Block palette sidebar for discovering and inserting block types.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <SidebarDemo />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="full">
-          <Card className={classy('mt-4')}>
-            <CardHeader>
-              <CardTitle>Full Editor</CardTitle>
-              <CardDescription>
-                Kitchen sink: toolbar, palette sidebar, slash commands, inline formatting, rule
-                palette, context menu, and save-as-composite.
+                Toolbar, palette sidebar, slash commands, inline formatting, rule palette, context
+                menu, and save-as-composite.
               </CardDescription>
             </CardHeader>
             <CardContent>
