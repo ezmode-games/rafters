@@ -16,31 +16,16 @@ describe('Editor', () => {
     expect(container.firstChild).toBeInTheDocument();
   });
 
-  it('renders with role="listbox" on the canvas when blocks present', () => {
+  it('renders aria-label on the document surface', () => {
     render(<Editor defaultValue={BLOCKS} />);
-    expect(screen.getByRole('listbox')).toBeInTheDocument();
-  });
-
-  it('does not render role="listbox" when empty (ARIA requires option children)', () => {
-    render(<Editor />);
-    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
-  });
-
-  it('renders aria-multiselectable on the canvas', () => {
-    render(<Editor defaultValue={BLOCKS} />);
-    expect(screen.getByRole('listbox')).toHaveAttribute('aria-multiselectable', 'true');
-  });
-
-  it('renders aria-label on the canvas', () => {
-    render(<Editor defaultValue={BLOCKS} />);
-    expect(screen.getByRole('listbox')).toHaveAttribute('aria-label', 'Editor blocks');
+    expect(screen.getByLabelText('Document editor')).toBeInTheDocument();
   });
 
   describe('Default values', () => {
     it('renders blocks from defaultValue', () => {
-      render(<Editor defaultValue={BLOCKS} />);
-      const options = screen.getAllByRole('option');
-      expect(options).toHaveLength(3);
+      const { container } = render(<Editor defaultValue={BLOCKS} />);
+      const blockEls = container.querySelectorAll('[data-block-id]');
+      expect(blockEls).toHaveLength(3);
     });
 
     it('renders default block content as text', () => {
@@ -50,20 +35,48 @@ describe('Editor', () => {
       expect(screen.getByText('Third block')).toBeInTheDocument();
     });
 
-    it('renders aria-selected=false on unselected blocks', () => {
-      render(<Editor defaultValue={BLOCKS} />);
-      const options = screen.getAllByRole('option');
-      for (const option of options) {
-        expect(option).toHaveAttribute('aria-selected', 'false');
-      }
+    it('renders data-block-id on each block element', () => {
+      const { container } = render(<Editor defaultValue={BLOCKS} />);
+      const blockEls = container.querySelectorAll('[data-block-id]');
+      expect(blockEls[0]).toHaveAttribute('data-block-id', '1');
+      expect(blockEls[1]).toHaveAttribute('data-block-id', '2');
+      expect(blockEls[2]).toHaveAttribute('data-block-id', '3');
     });
 
-    it('renders data-block-id on each block wrapper', () => {
-      render(<Editor defaultValue={BLOCKS} />);
-      const options = screen.getAllByRole('option');
-      expect(options[0]).toHaveAttribute('data-block-id', '1');
-      expect(options[1]).toHaveAttribute('data-block-id', '2');
-      expect(options[2]).toHaveAttribute('data-block-id', '3');
+    it('renders text blocks as <p> elements', () => {
+      const { container } = render(<Editor defaultValue={BLOCKS} />);
+      const paragraphs = container.querySelectorAll('p[data-block-id]');
+      expect(paragraphs).toHaveLength(3);
+    });
+
+    it('renders heading blocks as <h1>-<h6> elements', () => {
+      const headingBlocks: EditorBlock[] = [
+        { id: 'h1', type: 'heading', content: 'Title', meta: { level: 1 } },
+        { id: 'h2', type: 'heading', content: 'Subtitle', meta: { level: 2 } },
+      ];
+      const { container } = render(<Editor defaultValue={headingBlocks} />);
+      expect(container.querySelector('h1[data-block-id="h1"]')).toBeInTheDocument();
+      expect(container.querySelector('h2[data-block-id="h2"]')).toBeInTheDocument();
+    });
+
+    it('renders code blocks as <pre> elements', () => {
+      const codeBlocks: EditorBlock[] = [
+        { id: 'c1', type: 'code', content: 'const x = 1;', meta: { language: 'ts' } },
+      ];
+      const { container } = render(<Editor defaultValue={codeBlocks} />);
+      expect(container.querySelector('pre[data-block-id="c1"]')).toBeInTheDocument();
+    });
+
+    it('renders quote blocks as <blockquote> elements', () => {
+      const quoteBlocks: EditorBlock[] = [{ id: 'q1', type: 'quote', content: 'Wise words' }];
+      const { container } = render(<Editor defaultValue={quoteBlocks} />);
+      expect(container.querySelector('blockquote[data-block-id="q1"]')).toBeInTheDocument();
+    });
+
+    it('renders divider blocks as <hr> elements', () => {
+      const dividerBlocks: EditorBlock[] = [{ id: 'd1', type: 'divider' }];
+      const { container } = render(<Editor defaultValue={dividerBlocks} />);
+      expect(container.querySelector('hr[data-block-id="d1"]')).toBeInTheDocument();
     });
   });
 
@@ -86,9 +99,9 @@ describe('Editor', () => {
 
   describe('Controlled mode', () => {
     it('renders controlled value', () => {
-      render(<Editor value={BLOCKS} />);
-      const options = screen.getAllByRole('option');
-      expect(options).toHaveLength(3);
+      const { container } = render(<Editor value={BLOCKS} />);
+      const blockEls = container.querySelectorAll('[data-block-id]');
+      expect(blockEls).toHaveLength(3);
     });
 
     it('updates when controlled value changes', () => {
@@ -103,37 +116,10 @@ describe('Editor', () => {
           </div>
         );
       }
-      render(<ControlledEditor />);
-      expect(screen.getAllByRole('option')).toHaveLength(3);
+      const { container } = render(<ControlledEditor />);
+      expect(container.querySelectorAll('[data-block-id]')).toHaveLength(3);
       fireEvent.click(screen.getByText('Trim'));
-      expect(screen.getAllByRole('option')).toHaveLength(2);
-    });
-  });
-
-  describe('Custom renderBlock', () => {
-    it('calls renderBlock with correct context', () => {
-      const renderBlock = vi.fn((block: EditorBlock, ctx) => (
-        <div data-testid={`custom-${block.id}`}>{`${ctx.index}/${ctx.total}`}</div>
-      ));
-      render(<Editor defaultValue={BLOCKS} renderBlock={renderBlock} />);
-
-      expect(renderBlock.mock.calls.length).toBeGreaterThanOrEqual(3);
-      expect(screen.getByTestId('custom-1')).toHaveTextContent('0/3');
-      expect(screen.getByTestId('custom-2')).toHaveTextContent('1/3');
-      expect(screen.getByTestId('custom-3')).toHaveTextContent('2/3');
-    });
-
-    it('provides isFirst and isLast in context', () => {
-      const contexts: Array<{ isFirst: boolean; isLast: boolean }> = [];
-      const renderBlock = vi.fn((block: EditorBlock, ctx) => {
-        contexts.push({ isFirst: ctx.isFirst, isLast: ctx.isLast });
-        return <div>{block.id}</div>;
-      });
-      render(<Editor defaultValue={BLOCKS} renderBlock={renderBlock} />);
-
-      expect(contexts[0]).toEqual({ isFirst: true, isLast: false });
-      expect(contexts[1]).toEqual({ isFirst: false, isLast: false });
-      expect(contexts[2]).toEqual({ isFirst: false, isLast: true });
+      expect(container.querySelectorAll('[data-block-id]')).toHaveLength(2);
     });
   });
 
@@ -197,12 +183,12 @@ describe('Editor', () => {
 
     it('sets tabIndex=-1 on canvas when disabled', () => {
       render(<Editor defaultValue={BLOCKS} disabled />);
-      expect(screen.getByRole('listbox')).toHaveAttribute('tabindex', '-1');
+      expect(screen.getByLabelText('Document editor')).toHaveAttribute('tabindex', '-1');
     });
 
     it('sets tabIndex=0 on canvas when enabled', () => {
       render(<Editor defaultValue={BLOCKS} />);
-      expect(screen.getByRole('listbox')).toHaveAttribute('tabindex', '0');
+      expect(screen.getByLabelText('Document editor')).toHaveAttribute('tabindex', '0');
     });
 
     it('applies opacity class when disabled', () => {
@@ -313,7 +299,7 @@ describe('Editor', () => {
       render(<Editor defaultValue={BLOCKS} ref={ref} />);
 
       ref.current?.focus();
-      expect(document.activeElement).toBe(screen.getByRole('listbox'));
+      expect(document.activeElement).toBe(screen.getByLabelText('Document editor'));
     });
   });
 

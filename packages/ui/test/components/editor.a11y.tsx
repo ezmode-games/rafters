@@ -41,33 +41,15 @@ describe('Editor - Accessibility', () => {
     expect(results).toHaveNoViolations();
   });
 
-  it('canvas has role="listbox" when blocks present', () => {
+  it('document surface has aria-label', () => {
     render(<Editor defaultValue={BLOCKS} />);
-    expect(screen.getByRole('listbox')).toBeInTheDocument();
+    expect(screen.getByLabelText('Document editor')).toBeInTheDocument();
   });
 
-  it('canvas omits role="listbox" when empty (ARIA requires option children)', () => {
-    render(<Editor />);
-    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
-  });
-
-  it('canvas has aria-multiselectable="true" when blocks present', () => {
-    render(<Editor defaultValue={BLOCKS} />);
-    expect(screen.getByRole('listbox')).toHaveAttribute('aria-multiselectable', 'true');
-  });
-
-  it('blocks have role="option"', () => {
-    render(<Editor defaultValue={BLOCKS} />);
-    const options = screen.getAllByRole('option');
-    expect(options).toHaveLength(3);
-  });
-
-  it('blocks have aria-selected attribute', () => {
-    render(<Editor defaultValue={BLOCKS} />);
-    const options = screen.getAllByRole('option');
-    for (const option of options) {
-      expect(option).toHaveAttribute('aria-selected');
-    }
+  it('blocks render as semantic HTML with data-block-id', () => {
+    const { container } = render(<Editor defaultValue={BLOCKS} />);
+    const blockEls = container.querySelectorAll('[data-block-id]');
+    expect(blockEls).toHaveLength(3);
   });
 
   it('toolbar has role="toolbar" and aria-label', () => {
@@ -82,14 +64,14 @@ describe('Editor - Accessibility', () => {
     expect(screen.getByRole('button', { name: 'Redo' })).toBeInTheDocument();
   });
 
-  it('canvas is focusable with tabIndex=0 when blocks present', () => {
+  it('canvas is focusable with tabIndex=0', () => {
     render(<Editor defaultValue={BLOCKS} />);
-    expect(screen.getByRole('listbox')).toHaveAttribute('tabindex', '0');
+    expect(screen.getByLabelText('Document editor')).toHaveAttribute('tabindex', '0');
   });
 
   it('canvas has visible focus indicator class', () => {
     render(<Editor defaultValue={BLOCKS} />);
-    expect(screen.getByRole('listbox')).toHaveClass('focus-visible:ring-2');
+    expect(screen.getByLabelText('Document editor')).toHaveClass('focus-visible:ring-2');
   });
 
   it('sidebar navigation has aria-label', () => {
@@ -104,6 +86,6 @@ describe('Editor - Accessibility', () => {
 
   it('disabled canvas is not focusable', () => {
     render(<Editor defaultValue={BLOCKS} disabled />);
-    expect(screen.getByRole('listbox')).toHaveAttribute('tabindex', '-1');
+    expect(screen.getByLabelText('Document editor')).toHaveAttribute('tabindex', '-1');
   });
 });
