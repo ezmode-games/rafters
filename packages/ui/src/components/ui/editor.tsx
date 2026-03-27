@@ -44,6 +44,10 @@ import type {
   CommandPaletteState,
 } from '../../primitives/command-palette';
 import { createCommandPalette } from '../../primitives/command-palette';
+import {
+  createDocumentEditor,
+  type DocumentEditorControls as DocEditorControls,
+} from '../../primitives/document-editor';
 import type { ToolbarButton, ToolbarButtonGroup } from '../../primitives/editor-toolbar';
 import { createEditorToolbar } from '../../primitives/editor-toolbar';
 import { onEscapeKeyDown } from '../../primitives/escape-keydown';
@@ -66,6 +70,7 @@ import type {
   CleanupFunction,
   Command,
   Direction,
+  InlineContent,
   InlineMark,
 } from '../../primitives/types';
 import { Container } from './container';
@@ -275,12 +280,77 @@ const INITIAL_PALETTE_STATE: CommandPaletteState = {
 const INLINE_TOOLBAR_DIMENSIONS = { width: 320, height: 44 };
 
 // ============================================================================
-// Default block renderer
+// Document block renderer -- semantic HTML for contentEditable
 // ============================================================================
 
-function defaultRenderBlock(block: EditorBlock): React.ReactNode {
-  const text = String(block.content ?? '');
-  return <div className={classy('px-3 py-2 text-sm text-foreground')}>{text || '\u00A0'}</div>;
+function renderInlineContent(content: string | InlineContent[] | undefined): React.ReactNode {
+  if (content === undefined) return '\u00A0';
+  if (typeof content === 'string') return content || '\u00A0';
+
+  return content.map((segment, i) => {
+    let node: React.ReactNode = segment.text;
+    const marks = segment.marks ?? [];
+
+    if (marks.includes('code')) {
+      node = <code key={`c${i}`}>{node}</code>;
+    }
+    if (marks.includes('link') && segment.href) {
+      node = (
+        <a key={`l${i}`} href={segment.href}>
+          {node}
+        </a>
+      );
+    }
+    if (marks.includes('strikethrough')) {
+      node = <del key={`s${i}`}>{node}</del>;
+    }
+    if (marks.includes('italic')) {
+      node = <em key={`i${i}`}>{node}</em>;
+    }
+    if (marks.includes('bold')) {
+      node = <strong key={`b${i}`}>{node}</strong>;
+    }
+
+    return node;
+  });
+}
+
+function DocumentBlock({ block }: { block: EditorBlock }) {
+  const content = renderInlineContent(block.content);
+
+  switch (block.type) {
+    case 'heading': {
+      const level = (block.meta?.level as number) ?? 1;
+      const Tag = `h${Math.min(Math.max(level, 1), 6)}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+      return <Tag data-block-id={block.id}>{content}</Tag>;
+    }
+    case 'text':
+      return <p data-block-id={block.id}>{content}</p>;
+    case 'code':
+      return (
+        <pre data-block-id={block.id}>
+          <code>{String(block.content ?? '')}</code>
+        </pre>
+      );
+    case 'quote':
+      return <blockquote data-block-id={block.id}>{content}</blockquote>;
+    case 'divider':
+      return <hr data-block-id={block.id} />;
+    case 'image':
+      return (
+        <figure data-block-id={block.id}>
+          <img src={(block.meta?.src as string) ?? ''} alt={(block.meta?.alt as string) ?? ''} />
+        </figure>
+      );
+    case 'list': {
+      const Tag = block.meta?.ordered ? 'ol' : 'ul';
+      return <Tag data-block-id={block.id} />;
+    }
+    case 'list-item':
+      return <li data-block-id={block.id}>{content}</li>;
+    default:
+      return <p data-block-id={block.id}>{content}</p>;
+  }
 }
 
 // ============================================================================
@@ -1398,6 +1468,7 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
     // ----- Handler + canvas refs -----
     const canvasRef = React.useRef<HTMLDivElement>(null);
     const handlerRef = React.useRef<BlockHandlerControls | null>(null);
+    const docEditorRef = React.useRef<DocEditorControls | null>(null);
 
     // ----- Save composite dialog state -----
     const [showSaveDialog, setShowSaveDialog] = React.useState(false);
@@ -1585,6 +1656,20 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
         handler.destroy();
         handlerRef.current = null;
         $handlerStateRef.current.set({ ...INITIAL_HANDLER_STATE });
+      });
+
+      // Document editor primitive -- contentEditable behavior
+      const docEditor = createDocumentEditor({
+        container: canvasEl,
+        initialBlocks: blocksAtomRef.current.get(),
+        onBlocksChange: (newBlocks) => {
+          updateBlocks(newBlocks as EditorBlock[]);
+        },
+      });
+      docEditorRef.current = docEditor;
+      cleanups.push(() => {
+        docEditor.destroy();
+        docEditorRef.current = null;
       });
 
       // Command palette primitive
@@ -1976,34 +2061,6 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
       };
     }, [disabled, blockContextMenu, removeBlocks, updateBlock, rulePalette]);
 
-    // ----- Block click handler -----
-    const handleBlockClick = React.useCallback(
-      (blockId: string, event: React.MouseEvent) => {
-        if (disabled) return;
-        canvasRef.current?.focus();
-        handlerRef.current?.handleBlockClick(blockId, {
-          meta: event.metaKey || event.ctrlKey,
-          shift: event.shiftKey,
-        });
-      },
-      [disabled],
-    );
-
-    // ----- Build block context -----
-    const buildContext = React.useCallback(
-      (block: EditorBlock, index: number): BlockRenderContext => ({
-        index,
-        total: blocks.length,
-        isFirst: index === 0,
-        isLast: index === blocks.length - 1,
-        isSelected: handlerState.selectedIds.has(block.id),
-        isFocused: handlerState.focusedId === block.id,
-      }),
-      [blocks.length, handlerState.selectedIds, handlerState.focusedId],
-    );
-
-    const render = renderBlock ?? defaultRenderBlock;
-
     // ----- Sidebar focus handler -----
     const handleSidebarFocusBlock = React.useCallback((id: string) => {
       handlerRef.current?.handleBlockClick(id, { meta: false, shift: false });
@@ -2108,52 +2165,22 @@ export const Editor = React.forwardRef<EditorControls, EditorProps>(
               disabled={disabled}
             />
           )}
-          {/* biome-ignore lint/a11y/noStaticElementInteractions: keyboard handled by block-handler primitive on this container */}
-          {/* biome-ignore lint/a11y/useKeyWithClickEvents: keyboard handled by block-handler primitive on this container */}
-          {/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: aria-activedescendant used when listbox role is active */}
+          {/* Document surface: single contentEditable, blocks as semantic HTML */}
           <div
             ref={canvasRef}
-            role={blocks.length > 0 ? 'listbox' : undefined}
-            aria-multiselectable={blocks.length > 0 ? 'true' : undefined}
-            aria-activedescendant={
-              handlerState.focusedId ? `editor-block-${handlerState.focusedId}` : undefined
-            }
-            aria-label="Editor blocks"
+            aria-label="Document editor"
             tabIndex={disabled ? -1 : 0}
+            suppressContentEditableWarning
             className={classy(
-              'flex flex-1 flex-col gap-0.5 p-2 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-ring',
+              'flex-1 p-4 outline-none',
+              'prose prose-sm max-w-none',
+              'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-ring',
             )}
-            onClick={(e) => {
-              // Only clear when clicking canvas background, not blocks
-              if (e.target === e.currentTarget && !disabled) {
-                handlerRef.current?.clearSelection();
-              }
-            }}
           >
             {blocks.length === 0 && (emptyState ?? <DefaultEmptyState />)}
-            {blocks.map((block, index) => {
-              const ctx = buildContext(block, index);
-              return (
-                // biome-ignore lint/a11y/useFocusableInteractive: focus managed by block-handler primitive via aria-activedescendant
-                // biome-ignore lint/a11y/useKeyWithClickEvents: keyboard handled by block-handler primitive on parent container
-                <div
-                  key={block.id}
-                  id={`editor-block-${block.id}`}
-                  role="option"
-                  aria-selected={ctx.isSelected}
-                  data-block-id={block.id}
-                  data-selected={ctx.isSelected || undefined}
-                  data-focused={ctx.isFocused || undefined}
-                  onClick={(e) => handleBlockClick(block.id, e)}
-                  className={classy('rounded-md border border-transparent transition-colors', {
-                    'border-primary bg-primary/5': ctx.isSelected,
-                    'ring-2 ring-primary-ring': ctx.isFocused,
-                  })}
-                >
-                  {render(block, ctx)}
-                </div>
-              );
-            })}
+            {blocks.map((block) => (
+              <DocumentBlock key={block.id} block={block} />
+            ))}
           </div>
         </div>
         {commandPalette && paletteState.isOpen && (

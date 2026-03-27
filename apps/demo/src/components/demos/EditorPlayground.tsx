@@ -470,7 +470,6 @@ const FORMAT_LABELS: Record<SerializerFormat, string> = {
 
 export default function EditorPlayground() {
   const editorRef = React.useRef<EditorControls>(null);
-  const containerRef = React.useRef<HTMLDivElement>(null);
   const [blocks, setBlocks] = React.useState<EditorBlock[]>(FULL_BLOCKS);
   const [savedComposite, setSavedComposite] = React.useState<string | null>(null);
   const [exportFormat, setExportFormat] = React.useState<SerializerFormat>('mdx');
@@ -480,8 +479,6 @@ export default function EditorPlayground() {
   const [showImport, setShowImport] = React.useState(false);
   const [importError, setImportError] = React.useState<string | null>(null);
   const slashCommands = React.useMemo(() => makeSlashCommands(), []);
-  const renderBlock = useEditableRenderBlock(editorRef);
-  useOutsideDeselect(containerRef, editorRef);
 
   const exported = React.useMemo(() => {
     if (!showExport) return '';
@@ -645,21 +642,18 @@ export default function EditorPlayground() {
       )}
 
       {/* The editor */}
-      <div ref={containerRef}>
-        <Editor
-          ref={editorRef}
-          defaultValue={blocks}
-          onValueChange={setBlocks}
-          toolbar
-          sidebar={SIDEBAR_CONFIG}
-          rulePalette={RULE_PALETTE_CONFIG}
-          commandPalette={slashCommands}
-          inlineToolbar
-          blockContextMenu
-          onSaveAsComposite={handleSaveAsComposite}
-          renderBlock={renderBlock}
-        />
-      </div>
+      <Editor
+        ref={editorRef}
+        defaultValue={blocks}
+        onValueChange={setBlocks}
+        toolbar
+        sidebar={SIDEBAR_CONFIG}
+        rulePalette={RULE_PALETTE_CONFIG}
+        commandPalette={slashCommands}
+        inlineToolbar
+        blockContextMenu
+        onSaveAsComposite={handleSaveAsComposite}
+      />
 
       <footer className={classy('mt-16 pb-8 border-t border-border pt-8')}>
         <div className={classy('flex items-center justify-between')}>
