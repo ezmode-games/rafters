@@ -1,25 +1,18 @@
 /**
  * rafters studio
  *
- * Starts an embedded token registry API server.
- * No external dependencies -- runs with Node.js directly.
- * Serves getters, setters (with why-gate), and namespace reset.
+ * Starts the Rafters Studio -- a Vite dev server with the token registry
+ * API embedded as a plugin. HMR pushes token changes to the browser
+ * instantly. CSS output regenerates on every change.
  */
 
 import { existsSync } from 'node:fs';
-import { serve } from '@hono/node-server';
-import {
-  type BaseSystemConfig,
-  NodePersistenceAdapter,
-  TokenRegistry,
-  buildColorSystem,
-  generateNamespaces,
-  getAvailableNamespaces,
-} from '@rafters/design-tokens';
-import { COMPUTED, type Token } from '@rafters/shared';
-import { Hono } from 'hono';
-import { cors } from 'hono/cors';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { execa } from 'execa';
 import { getRaftersPaths } from '../utils/paths.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export async function studio(): Promise<void> {
   const cwd = process.cwd();
@@ -30,130 +23,40 @@ export async function studio(): Promise<void> {
     process.exit(1);
   }
 
-  // Load tokens from project or generate defaults
-  const adapter = new NodePersistenceAdapter(cwd);
-  let tokens: Token[] = [];
-  try {
-    tokens = await adapter.load();
-  } catch {
-    // No tokens yet
+  // Find studio package -- dist/ -> cli/ -> packages/ then peer studio/
+  const studioPath = join(__dirname, '..', '..', 'studio');
+
+  if (!existsSync(studioPath)) {
+    console.error(
+      'Studio package not found. Install @rafters/studio or run from the rafters monorepo.',
+    );
+    process.exit(1);
   }
 
-  let registry: TokenRegistry;
-  if (tokens.length > 0) {
-    registry = new TokenRegistry(tokens);
-    console.log(`Loaded ${tokens.length} tokens from ${paths.tokens}`);
-  } else {
-    const result = buildColorSystem();
-    registry = result.registry;
-    console.log(`Generated ${registry.list().length} default tokens`);
-  }
-
-  registry.setAdapter(adapter);
-
-  const app = new Hono();
-  app.use('*', cors());
-
-  app.get('/tokens/system', (c) => {
-    const all = registry.list();
-    const namespaces = [...new Set(all.map((t) => t.namespace))];
-    return c.json({ namespaces, tokenCount: all.length });
-  });
-
-  app.get('/tokens', (c) => {
-    const all = registry.list();
-    const namespaces = [...new Set(all.map((t) => t.namespace))];
-    const byNs: Record<string, Token[]> = {};
-    for (const ns of namespaces) byNs[ns] = registry.list({ namespace: ns });
-    return c.json({ namespaces, tokenCount: all.length, tokens: byNs });
-  });
-
-  app.get('/tokens/:namespace', (c) => {
-    const ns = c.req.param('namespace');
-    const t = registry.list({ namespace: ns });
-    if (t.length === 0) return c.json({ message: `Namespace "${ns}" not found` }, 404);
-    return c.json({ namespace: ns, tokens: t, count: t.length });
-  });
-
-  app.get('/tokens/:namespace/:name', (c) => {
-    const { namespace, name } = c.req.param();
-    const token = registry.get(name);
-    if (!token || token.namespace !== namespace) {
-      return c.json({ message: `Token "${name}" not found in "${namespace}"` }, 404);
-    }
-    return c.json({
-      token,
-      dependsOn: token.dependsOn ?? [],
-      dependents: registry.getDependents(name),
-      generationRule: token.generationRule,
-      hasOverride: token.userOverride !== undefined,
-    });
-  });
-
-  app.put('/tokens/:namespace/:name', async (c) => {
-    const { namespace, name } = c.req.param();
-    const body = await c.req.json();
-    if (!body.reason || body.reason.trim() === '') {
-      return c.json({ message: 'Reason is required. Every change needs a why.' }, 400);
-    }
-    const existing = registry.get(name);
-    if (!existing || existing.namespace !== namespace) {
-      return c.json({ message: `Token "${name}" not found in "${namespace}"` }, 404);
-    }
-
-    const affected: string[] = [];
-    registry.setChangeCallback((event) => {
-      if (event.type === 'token-changed' && !affected.includes(event.tokenName)) {
-        affected.push(event.tokenName);
-      }
-    });
-
-    await registry.setToken({
-      ...existing,
-      value: body.value,
-      userOverride: { previousValue: existing.value, reason: body.reason, context: body.context },
-    });
-    registry.setChangeCallback(() => {});
-
-    return c.json({ token: registry.get(name), affected });
-  });
-
-  app.delete('/tokens/:namespace/:name/override', async (c) => {
-    const { namespace, name } = c.req.param();
-    const existing = registry.get(name);
-    if (!existing || existing.namespace !== namespace) {
-      return c.json({ message: `Token "${name}" not found in "${namespace}"` }, 404);
-    }
-    if (!existing.userOverride) {
-      return c.json({ message: `Token "${name}" has no override` }, 404);
-    }
-    await registry.set(name, COMPUTED);
-    const restored = registry.get(name);
-    return c.json({ token: restored, restoredValue: restored?.value });
-  });
-
-  app.post('/tokens/:namespace/reset', async (c) => {
-    const ns = c.req.param('namespace');
-    const body = await c.req.json().catch(() => ({}));
-    const available = getAvailableNamespaces();
-    if (!available.includes(ns)) {
-      return c.json({ message: `Invalid namespace "${ns}". Available: ${available.join(', ')}` }, 404);
-    }
-    for (const token of registry.list({ namespace: ns })) registry.remove(token.name);
-    const config = (body.config ?? {}) as Partial<BaseSystemConfig>;
-    const result = generateNamespaces([ns], config);
-    const newTokens = result.byNamespace.get(ns) ?? [];
-    for (const token of newTokens) registry.add(token);
-    return c.json({ namespace: ns, tokenCount: newTokens.length, affected: [] });
-  });
-
-  const port = 8787;
-  console.log('Starting Rafters Studio API...');
+  console.log('Starting Rafters Studio...');
   console.log(`Project: ${cwd}`);
   console.log(`Tokens: ${paths.tokens}`);
   console.log('');
 
-  serve({ fetch: app.fetch, port }, (info) => {
-    console.log(`Rafters Studio API running on http://localhost:${info.port}`);
+  const subprocess = execa('pnpm', ['dev'], {
+    cwd: studioPath,
+    stdio: 'inherit',
+    env: {
+      ...process.env,
+      RAFTERS_PROJECT_PATH: cwd,
+      RAFTERS_TOKENS_PATH: paths.tokens,
+      // tsx/esm resolves .js imports to .ts files in workspace packages
+      NODE_OPTIONS: [process.env.NODE_OPTIONS, '--import tsx/esm'].filter(Boolean).join(' '),
+    },
   });
+
+  process.on('SIGINT', () => {
+    subprocess.kill('SIGINT');
+  });
+
+  process.on('SIGTERM', () => {
+    subprocess.kill('SIGTERM');
+  });
+
+  await subprocess;
 }
