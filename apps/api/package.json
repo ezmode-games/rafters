@@ -28,6 +28,7 @@
     "@types/node": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:",
-    "wrangler": "^4.54.0"
+    "wrangler": "^4.54.0",
+    "zocker": "catalog:"
   }
 }
