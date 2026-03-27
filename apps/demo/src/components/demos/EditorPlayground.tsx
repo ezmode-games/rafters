@@ -28,7 +28,7 @@ import {
   type SlashCommand,
 } from '@/components/ui/editor';
 import { Input } from '@/components/ui/input';
-import { Kbd, Kbd } from '@/components/ui/kbd';
+import { Kbd } from '@/components/ui/kbd';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Blockquote, H1, H2, H3, Muted, P } from '@/components/ui/typography';
