@@ -167,6 +167,9 @@ importers:
       '@rafters/color-utils':
         specifier: workspace:^
         version: link:../../packages/color-utils
+      '@rafters/design-tokens':
+        specifier: workspace:^
+        version: link:../../packages/design-tokens
       '@scalar/hono-api-reference':
         specifier: ^0.9.28
         version: 0.9.28(hono@4.11.0)
