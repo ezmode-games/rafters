@@ -158,6 +158,49 @@ export function createDocumentEditor(options: DocumentEditorOptions): DocumentEd
     container.removeAttribute('aria-label');
   });
 
+  // -- DOM reconciliation: read block elements and sync to model --
+  function reconcileDOM(): void {
+    const blockEls = container.querySelectorAll('[data-block-id]');
+    const blocks = $state.get().blocks;
+    const blockMap = new Map(blocks.map((b) => [b.id, b]));
+
+    // Build new block list from DOM order
+    const reconciled: BaseBlock[] = [];
+    const seen = new Set<string>();
+
+    for (const el of blockEls) {
+      const id = el.getAttribute('data-block-id');
+      if (!id || seen.has(id)) continue;
+      seen.add(id);
+
+      const existing = blockMap.get(id);
+      if (existing) {
+        // Update content from DOM
+        const text = el.textContent ?? '';
+        if (blockContentToText(existing.content) !== text) {
+          reconciled.push({ ...existing, content: text });
+        } else {
+          reconciled.push(existing);
+        }
+      }
+    }
+
+    // Only update if something changed
+    if (
+      reconciled.length !== blocks.length ||
+      reconciled.some((b, i) => {
+        const orig = blocks[i];
+        return (
+          !orig ||
+          b.id !== orig.id ||
+          blockContentToText(b.content) !== blockContentToText(orig.content)
+        );
+      })
+    ) {
+      updateBlocks(reconciled);
+    }
+  }
+
   // -- Input events: sync DOM text changes back to block model --
   const inputHandler = createInputHandler({
     element: container,
@@ -178,17 +221,10 @@ export function createDocumentEditor(options: DocumentEditorOptions): DocumentEd
         return;
       }
 
-      // For regular text input, read the block's DOM content and sync
-      const blockEl = findBlockElement(document.getSelection()?.anchorNode ?? null);
-      if (!blockEl) return;
-
-      const blockId = blockEl.getAttribute('data-block-id');
-      if (!blockId) return;
-
-      const text = blockEl.textContent ?? '';
-      const blocks = $state.get().blocks;
-      const updated = blocks.map((b) => (b.id === blockId ? { ...b, content: text } : b));
-      updateBlocks(updated);
+      // Reconcile DOM with block model after any mutation.
+      // The browser may have deleted blocks (cross-block selection delete),
+      // merged text across blocks, or modified content.
+      reconcileDOM();
     },
     onBeforeInput: (data) => {
       // Detect markdown shortcuts: check if text before cursor + typed char matches
