@@ -1,19 +1,10 @@
 import {
   type CompositeBlock,
   type CompositeFile,
-  credentials,
-  email,
-  findCompatibleConsumers,
   instantiateBlocks,
-  matchRules,
-  password,
   registerComposite,
-  required,
-  searchComposites,
   serializeToComposite,
   toBridgeItems,
-  toMdx,
-  url,
 } from '@rafters/composites';
 import {
   type EditorSerializer,
@@ -25,7 +16,6 @@ import {
 import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Container } from '@/components/ui/container';
 import {
   type BlockRenderContext,
@@ -39,9 +29,7 @@ import {
 } from '@/components/ui/editor';
 import { Input } from '@/components/ui/input';
 import { Kbd } from '@/components/ui/kbd';
-import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Blockquote, H1, H2, H3, Muted, P } from '@/components/ui/typography';
 import type { BlockPaletteItem } from '@/lib/primitives/block-palette';
 import classy from '@/lib/primitives/classy';
@@ -84,15 +72,6 @@ const COMPOSITE_PALETTE_ITEMS = toBridgeItems(SAMPLE_COMPOSITES);
 const COMPOSITE_CATEGORIES = [...new Set(SAMPLE_COMPOSITES.map((c) => c.manifest.category))];
 const COMPOSITE_MAP = new Map(SAMPLE_COMPOSITES.map((c) => [c.manifest.id, c]));
 const resolveComposite = (id: string) => COMPOSITE_MAP.get(id) ?? null;
-
-// Stable references for CompositesDemo (avoids useMemo with constant deps)
-const LOGIN_FORM = SAMPLE_COMPOSITES[0];
-const PROFILE_CARD = SAMPLE_COMPOSITES[2];
-if (!LOGIN_FORM || !PROFILE_CARD) {
-  throw new Error(
-    'EditorPlayground: SAMPLE_COMPOSITES missing entries at indices 0 (login-form) and 2 (profile-card).',
-  );
-}
 
 /** Miniature block preview rendered in sidebar palette */
 function BlockPreview({ block }: { block: CompositeBlock }) {
@@ -474,458 +453,14 @@ function toCompositeBlocks(blocks: EditorBlock[]): CompositeBlock[] {
   }));
 }
 
-function BlockStatePanel({ blocks }: { blocks: EditorBlock[] }) {
-  const [view, setView] = React.useState<'hidden' | 'json' | 'mdx'>('hidden');
-  const mdxOutput = React.useMemo(() => toMdx(toCompositeBlocks(blocks)), [blocks]);
-
-  return (
-    <div className={classy('mt-4')}>
-      <div className={classy('flex gap-2')}>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setView((v) => (v === 'json' ? 'hidden' : 'json'))}
-        >
-          {view === 'json' ? 'Hide' : 'Show'} Block State ({blocks.length} blocks)
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setView((v) => (v === 'mdx' ? 'hidden' : 'mdx'))}
-        >
-          {view === 'mdx' ? 'Hide' : 'Show'} MDX Output
-        </Button>
-      </div>
-      {view === 'json' && (
-        <pre
-          className={classy(
-            'mt-2 max-h-64 overflow-auto rounded-md bg-muted p-4 text-xs font-mono text-muted-foreground',
-          )}
-        >
-          {JSON.stringify(blocks, null, 2)}
-        </pre>
-      )}
-      {view === 'mdx' && (
-        <pre
-          className={classy(
-            'mt-2 max-h-64 overflow-auto rounded-md bg-muted p-4 text-xs font-mono text-muted-foreground',
-          )}
-        >
-          {mdxOutput || '(empty)'}
-        </pre>
-      )}
-    </div>
-  );
-}
-
 // ============================================================================
-// Tab demos
+// ============================================================================
+// Serialization
 // ============================================================================
 
-function FullDemo() {
-  const editorRef = React.useRef<EditorControls>(null);
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const [blocks, setBlocks] = React.useState<EditorBlock[]>(FULL_BLOCKS);
-  const [savedComposite, setSavedComposite] = React.useState<string | null>(null);
-  const slashCommands = React.useMemo(() => makeSlashCommands(), []);
-  const renderBlock = useEditableRenderBlock(editorRef);
-  useOutsideDeselect(containerRef, editorRef);
-
-  const handleSaveAsComposite = React.useCallback(async (data: SaveCompositeData) => {
-    try {
-      const composite = serializeToComposite(data.blocks, {
-        name: data.name,
-        category: data.category,
-        description: data.description,
-      });
-      registerComposite(composite);
-      setSavedComposite(JSON.stringify(composite, null, 2));
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to save composite.';
-      console.error('[EditorPlayground] Save as composite failed:', message);
-      setSavedComposite(`Error: ${message}`);
-    }
-  }, []);
-
-  return (
-    <div className={classy('space-y-4')}>
-      <div>
-        <P className={classy('text-sm text-muted-foreground')}>
-          All features: <Kbd>toolbar</Kbd>, <Kbd>sidebar</Kbd> (palette), <Kbd>commandPalette</Kbd>{' '}
-          (type <Kbd>/</Kbd>), <Kbd>inlineToolbar</Kbd> (select text), <Kbd>blockContextMenu</Kbd>{' '}
-          (right-click blocks), <Kbd>rulePalette</Kbd> (drag rules onto blocks), and{' '}
-          <Kbd>onSaveAsComposite</Kbd> (toolbar button).
-        </P>
-      </div>
-      <div ref={containerRef}>
-        <Editor
-          ref={editorRef}
-          defaultValue={blocks}
-          onValueChange={setBlocks}
-          toolbar
-          sidebar={SIDEBAR_CONFIG}
-          rulePalette={RULE_PALETTE_CONFIG}
-          commandPalette={slashCommands}
-          inlineToolbar
-          blockContextMenu
-          onSaveAsComposite={handleSaveAsComposite}
-          renderBlock={renderBlock}
-        />
-      </div>
-      {savedComposite && (
-        <div className={classy('space-y-2')}>
-          <div className={classy('flex items-center gap-2')}>
-            <Badge variant="default">Saved</Badge>
-            <Button variant="outline" size="sm" onClick={() => setSavedComposite(null)}>
-              Dismiss
-            </Button>
-          </div>
-          <pre
-            className={classy(
-              'max-h-64 overflow-auto rounded-md bg-muted p-4 text-xs font-mono text-muted-foreground',
-            )}
-          >
-            {savedComposite}
-          </pre>
-        </div>
-      )}
-      <BlockStatePanel blocks={blocks} />
-    </div>
-  );
-}
-
 // ============================================================================
-// Composites demo - registry, bridge, rules, validation
+// Serialization
 // ============================================================================
-
-const RULE_VALIDATORS = {
-  email,
-  password,
-  required,
-  url,
-  credentials,
-} as const;
-
-// Pre-computed values from stable module-level constants
-const PALETTE_ITEMS = toBridgeItems(SAMPLE_COMPOSITES);
-const CONSUMERS = findCompatibleConsumers(LOGIN_FORM, SAMPLE_COMPOSITES);
-const RULE_MATCH = matchRules(LOGIN_FORM, PROFILE_CARD);
-const INSTANTIATED = instantiateBlocks(LOGIN_FORM.blocks, { resolveComposite });
-const ROUNDTRIPPED = serializeToComposite(LOGIN_FORM.blocks, {
-  name: LOGIN_FORM.manifest.name,
-  category: LOGIN_FORM.manifest.category,
-  description: LOGIN_FORM.manifest.description,
-});
-const LOGIN_MDX = toMdx(LOGIN_FORM.blocks);
-
-function CompositesDemo() {
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const [validationInput, setValidationInput] = React.useState('');
-  const [selectedRule, setSelectedRule] = React.useState<keyof typeof RULE_VALIDATORS>('email');
-
-  // Register composites on mount
-  React.useEffect(() => {
-    for (const composite of SAMPLE_COMPOSITES) {
-      registerComposite(composite);
-    }
-  }, []);
-
-  // Registry search (depends on user input, must stay reactive)
-  const searchResults = React.useMemo(
-    () => (searchQuery.length > 0 ? searchComposites(searchQuery) : []),
-    [searchQuery],
-  );
-
-  // Built-in rule validation (depends on user input, must stay reactive)
-  const validationResult = React.useMemo(() => {
-    const schema = RULE_VALIDATORS[selectedRule];
-    const result = schema.safeParse(
-      selectedRule === 'credentials'
-        ? (() => {
-            try {
-              return JSON.parse(validationInput);
-            } catch {
-              return validationInput;
-            }
-          })()
-        : validationInput,
-    );
-    return result;
-  }, [selectedRule, validationInput]);
-
-  return (
-    <div className={classy('space-y-8')}>
-      <P className={classy('text-sm text-muted-foreground')}>
-        Composites package in action: registry, bridge, rule matching, serialization, and built-in
-        validation rules.
-      </P>
-
-      {/* Bridge: palette items */}
-      <div>
-        <H3 className={classy('mb-3')}>Bridge: Palette Items</H3>
-        <P className={classy('mb-2 text-sm text-muted-foreground')}>
-          <Kbd>toBridgeItems()</Kbd> converts composite manifests into sidebar palette items.
-        </P>
-        <div className={classy('flex flex-wrap gap-2')}>
-          {PALETTE_ITEMS.map((item) => (
-            <Badge key={item.id} variant="secondary">
-              {item.label} ({item.category})
-            </Badge>
-          ))}
-        </div>
-      </div>
-
-      <Separator />
-
-      {/* instantiateBlocks: fresh IDs with remapped references */}
-      <div>
-        <H3 className={classy('mb-3')}>Bridge: instantiateBlocks()</H3>
-        <P className={classy('mb-2 text-sm text-muted-foreground')}>
-          <Kbd>instantiateBlocks()</Kbd> generates fresh UUIDs and remaps parent/child references.
-          Template IDs on the left, instantiated IDs on the right.
-        </P>
-        <div className={classy('grid grid-cols-2 gap-4')}>
-          <div>
-            <Muted className={classy('mb-1 text-xs')}>Template (login-form)</Muted>
-            <pre
-              className={classy(
-                'max-h-32 overflow-auto rounded-md bg-muted p-3 text-xs font-mono text-muted-foreground',
-              )}
-            >
-              {LOGIN_FORM.blocks.map((b) => `${b.id}: ${b.type}`).join('\n')}
-            </pre>
-          </div>
-          <div>
-            <Muted className={classy('mb-1 text-xs')}>Instantiated (fresh UUIDs)</Muted>
-            <pre
-              className={classy(
-                'max-h-32 overflow-auto rounded-md bg-muted p-3 text-xs font-mono text-muted-foreground',
-              )}
-            >
-              {INSTANTIATED.map((b) => `${b.id.slice(0, 8)}...: ${b.type}`).join('\n')}
-            </pre>
-          </div>
-        </div>
-      </div>
-
-      <Separator />
-
-      {/* serializeToComposite roundtrip */}
-      <div>
-        <H3 className={classy('mb-3')}>Serializer: serializeToComposite()</H3>
-        <P className={classy('mb-2 text-sm text-muted-foreground')}>
-          <Kbd>serializeToComposite()</Kbd> derives I/O rules, keywords, and cognitive load from
-          blocks automatically.
-        </P>
-        <div className={classy('flex flex-wrap gap-2 mb-2')}>
-          <Badge variant="outline">ID: {ROUNDTRIPPED.manifest.id}</Badge>
-          <Badge variant="outline">Load: {ROUNDTRIPPED.manifest.cognitiveLoad}/10</Badge>
-          <Badge variant="secondary">input: [{ROUNDTRIPPED.input.join(', ')}]</Badge>
-          <Badge variant="secondary">output: [{ROUNDTRIPPED.output.join(', ')}]</Badge>
-        </div>
-        <div className={classy('flex flex-wrap gap-1')}>
-          {ROUNDTRIPPED.manifest.keywords.map((kw) => (
-            <Badge key={kw} variant="outline" size="sm">
-              {kw}
-            </Badge>
-          ))}
-        </div>
-      </div>
-
-      <Separator />
-
-      {/* Registry search */}
-      <div>
-        <H3 className={classy('mb-3')}>Registry: Fuzzy Search</H3>
-        <P className={classy('mb-2 text-sm text-muted-foreground')}>
-          Registered {SAMPLE_COMPOSITES.length} composites. Search by name or keyword.
-        </P>
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder='Try "login", "form", or "hero"'
-          className={classy(
-            'w-full max-w-sm rounded-md border border-input bg-background px-3 py-2 text-sm',
-          )}
-        />
-        {searchResults.length > 0 && (
-          <div className={classy('mt-2 flex flex-wrap gap-2')}>
-            {searchResults.map((c) => (
-              <Badge key={c.manifest.id} variant="outline">
-                {c.manifest.name}
-              </Badge>
-            ))}
-          </div>
-        )}
-        {searchQuery.length > 0 && searchResults.length === 0 && (
-          <Muted className={classy('mt-2')}>No results</Muted>
-        )}
-      </div>
-
-      <Separator />
-
-      {/* Rule matching */}
-      <div>
-        <H3 className={classy('mb-3')}>Rules: I/O Compatibility</H3>
-        <P className={classy('mb-2 text-sm text-muted-foreground')}>
-          <Kbd>matchRules()</Kbd> checks if one composite's output satisfies another's input.
-        </P>
-        <div className={classy('space-y-2')}>
-          <div className={classy('flex items-center gap-2')}>
-            <Badge>Login Form</Badge>
-            <span className={classy('text-sm text-muted-foreground')}>outputs:</span>
-            {LOGIN_FORM.output.map((o) => (
-              <Badge key={o} variant="secondary">
-                {o}
-              </Badge>
-            ))}
-          </div>
-          <div className={classy('flex items-center gap-2')}>
-            <Badge>Profile Card</Badge>
-            <span className={classy('text-sm text-muted-foreground')}>needs:</span>
-            {PROFILE_CARD.input.map((i) => (
-              <Badge key={i} variant="secondary">
-                {i}
-              </Badge>
-            ))}
-          </div>
-          <div className={classy('flex items-center gap-2')}>
-            <span className={classy('text-sm')}>Compatible:</span>
-            <Badge variant={RULE_MATCH.compatible ? 'default' : 'destructive'}>
-              {RULE_MATCH.compatible ? 'Yes' : 'No'}
-            </Badge>
-            <span className={classy('text-sm text-muted-foreground')}>
-              matched: [{RULE_MATCH.matched.join(', ')}]
-            </span>
-          </div>
-          <div className={classy('flex items-center gap-2')}>
-            <span className={classy('text-sm text-muted-foreground')}>
-              All consumers of Login Form output:
-            </span>
-            {CONSUMERS.map((c) => (
-              <Badge key={c.manifest.id} variant="outline">
-                {c.manifest.name}
-              </Badge>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <Separator />
-
-      {/* MDX serialization */}
-      <div>
-        <H3 className={classy('mb-3')}>Serializer: toMdx()</H3>
-        <P className={classy('mb-2 text-sm text-muted-foreground')}>
-          Login Form blocks serialized to MDX output.
-        </P>
-        <pre
-          className={classy(
-            'max-h-40 overflow-auto rounded-md bg-muted p-4 text-xs font-mono text-muted-foreground',
-          )}
-        >
-          {LOGIN_MDX}
-        </pre>
-      </div>
-
-      <Separator />
-
-      {/* Built-in rule validation */}
-      <div>
-        <H3 className={classy('mb-3')}>Built-in Rules: Validation</H3>
-        <P className={classy('mb-2 text-sm text-muted-foreground')}>
-          Zod schemas for common I/O rules. Test them live.
-        </P>
-        <div className={classy('flex flex-wrap gap-4')}>
-          <div>
-            <Label className={classy('mb-1 text-sm')}>Rule</Label>
-            <select
-              value={selectedRule}
-              onChange={(e) => {
-                setSelectedRule(e.target.value as keyof typeof RULE_VALIDATORS);
-                setValidationInput('');
-              }}
-              className={classy(
-                'block w-40 rounded-md border border-input bg-background px-3 py-2 text-sm',
-              )}
-            >
-              <option value="email">email</option>
-              <option value="password">password</option>
-              <option value="required">required</option>
-              <option value="url">url</option>
-              <option value="credentials">credentials</option>
-            </select>
-          </div>
-          <div className={classy('flex-1')}>
-            <Label className={classy('mb-1 text-sm')}>Input</Label>
-            <input
-              type="text"
-              value={validationInput}
-              onChange={(e) => setValidationInput(e.target.value)}
-              placeholder={
-                selectedRule === 'credentials'
-                  ? '{"email":"a@b.com","password":"12345678"}'
-                  : selectedRule === 'email'
-                    ? 'user@example.com'
-                    : selectedRule === 'url'
-                      ? 'https://example.com'
-                      : selectedRule === 'password'
-                        ? '8+ characters'
-                        : 'any non-empty string'
-              }
-              className={classy(
-                'block w-full rounded-md border border-input bg-background px-3 py-2 text-sm',
-              )}
-            />
-          </div>
-        </div>
-        {validationInput.length > 0 && (
-          <div className={classy('mt-2')}>
-            <Badge variant={validationResult.success ? 'default' : 'destructive'}>
-              {validationResult.success ? 'Valid' : 'Invalid'}
-            </Badge>
-            {!validationResult.success && (
-              <Muted className={classy('mt-1 text-xs')}>
-                {validationResult.error.issues[0]?.message}
-              </Muted>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ============================================================================
-// Serializers demo
-// ============================================================================
-
-const SERIALIZER_BLOCKS: EditorBlock[] = [
-  { id: 'ser-1', type: 'heading', content: 'Serialization Demo', meta: { level: 1 } },
-  {
-    id: 'ser-2',
-    type: 'text',
-    content: [
-      { text: 'Edit these blocks and watch the ' },
-      { text: 'serialized output', marks: ['bold'] },
-      { text: ' update in real time across four formats.' },
-    ],
-  },
-  {
-    id: 'ser-3',
-    type: 'code',
-    content: 'const hello = "world";',
-    meta: { language: 'typescript' },
-  },
-  {
-    id: 'ser-4',
-    type: 'quote',
-    content: 'The block tree is the universal intermediate representation.',
-  },
-  { id: 'ser-5', type: 'divider' },
-  { id: 'ser-6', type: 'text', content: 'Add, remove, or reorder blocks above.' },
-];
 
 type SerializerFormat = 'json' | 'mdx' | 'html' | 'text';
 
@@ -943,61 +478,149 @@ const FORMAT_LABELS: Record<SerializerFormat, string> = {
   text: 'Plain Text',
 };
 
-function SerializersDemo() {
+// ============================================================================
+// Editor page
+// ============================================================================
+
+export default function EditorPlayground() {
   const editorRef = React.useRef<EditorControls>(null);
-  const [blocks, setBlocks] = React.useState<EditorBlock[]>(SERIALIZER_BLOCKS);
-  const [activeFormat, setActiveFormat] = React.useState<SerializerFormat>('json');
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [blocks, setBlocks] = React.useState<EditorBlock[]>(FULL_BLOCKS);
+  const [savedComposite, setSavedComposite] = React.useState<string | null>(null);
+  const [exportFormat, setExportFormat] = React.useState<SerializerFormat>('mdx');
+  const [showExport, setShowExport] = React.useState(false);
   const [importText, setImportText] = React.useState('');
   const [importFormat, setImportFormat] = React.useState<SerializerFormat>('mdx');
+  const [showImport, setShowImport] = React.useState(false);
   const [importError, setImportError] = React.useState<string | null>(null);
+  const slashCommands = React.useMemo(() => makeSlashCommands(), []);
+  const renderBlock = useEditableRenderBlock(editorRef);
+  useOutsideDeselect(containerRef, editorRef);
 
-  const serialized = React.useMemo(() => {
-    const serializer = SERIALIZERS[activeFormat];
+  const exported = React.useMemo(() => {
+    if (!showExport) return '';
     try {
-      return serializer.serialize(blocks);
+      return SERIALIZERS[exportFormat].serialize(blocks);
     } catch (err) {
       return `Error: ${err instanceof Error ? err.message : String(err)}`;
     }
-  }, [blocks, activeFormat]);
+  }, [blocks, exportFormat, showExport]);
+
+  const handleSaveAsComposite = React.useCallback(async (data: SaveCompositeData) => {
+    try {
+      const composite = serializeToComposite(data.blocks, {
+        name: data.name,
+        category: data.category,
+        description: data.description,
+      });
+      registerComposite(composite);
+      setSavedComposite(JSON.stringify(composite, null, 2));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to save composite.';
+      setSavedComposite(`Error: ${message}`);
+    }
+  }, []);
 
   function handleImport() {
     setImportError(null);
-    const serializer = SERIALIZERS[importFormat];
     try {
-      const result = serializer.deserialize(importText);
+      const result = SERIALIZERS[importFormat].deserialize(importText);
       setBlocks(result.blocks);
       setImportText('');
+      setShowImport(false);
     } catch (err) {
       setImportError(err instanceof Error ? err.message : String(err));
     }
   }
 
   return (
-    <div className={classy('flex flex-col gap-6')}>
-      <div className={classy('grid grid-cols-2 gap-6')}>
-        {/* Editor */}
-        <div className={classy('flex flex-col gap-2')}>
-          <H3>Editor</H3>
-          <Editor
-            ref={editorRef}
-            defaultValue={SERIALIZER_BLOCKS}
-            onValueChange={setBlocks}
-            toolbar
-            blockContextMenu
-          />
+    <Container as="main" size="5xl" padding="6">
+      <header className={classy('flex items-center justify-between py-8')}>
+        <H1>Editor</H1>
+        <div className={classy('flex items-center gap-2')}>
+          <Button
+            variant={showImport ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => {
+              setShowImport(!showImport);
+              setShowExport(false);
+            }}
+          >
+            Import
+          </Button>
+          <Button
+            variant={showExport ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => {
+              setShowExport(!showExport);
+              setShowImport(false);
+            }}
+          >
+            Export
+          </Button>
         </div>
+      </header>
 
-        {/* Serialized output */}
-        <div className={classy('flex flex-col gap-2')}>
-          <div className={classy('flex items-center gap-2')}>
-            <H3>Output</H3>
+      {/* Import panel */}
+      {showImport && (
+        <div className={classy('mb-6 rounded-lg border border-border bg-muted/20 p-4')}>
+          <div className={classy('flex items-center justify-between mb-3')}>
+            <H3>Import content</H3>
             <div className={classy('flex gap-1')}>
               {(Object.keys(SERIALIZERS) as SerializerFormat[]).map((fmt) => (
                 <Button
                   key={fmt}
-                  variant={activeFormat === fmt ? 'default' : 'outline'}
+                  variant={importFormat === fmt ? 'default' : 'outline'}
                   size="xs"
-                  onClick={() => setActiveFormat(fmt)}
+                  onClick={() => setImportFormat(fmt)}
+                >
+                  {FORMAT_LABELS[fmt]}
+                </Button>
+              ))}
+            </div>
+          </div>
+          <textarea
+            className={classy(
+              'min-h-32 w-full rounded-md border border-input bg-background p-3',
+              'font-mono text-sm',
+              'focus:outline-none focus:ring-2 focus:ring-ring',
+            )}
+            placeholder={`Paste ${FORMAT_LABELS[importFormat]} content here...`}
+            value={importText}
+            onChange={(e) => setImportText(e.target.value)}
+          />
+          {importError && <P className={classy('text-destructive text-sm mt-2')}>{importError}</P>}
+          <div className={classy('flex gap-2 mt-3')}>
+            <Button onClick={handleImport} disabled={!importText.trim()} size="sm">
+              Load into editor
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setShowImport(false);
+                setImportText('');
+                setImportError(null);
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Export panel */}
+      {showExport && (
+        <div className={classy('mb-6 rounded-lg border border-border bg-muted/20 p-4')}>
+          <div className={classy('flex items-center justify-between mb-3')}>
+            <H3>Export</H3>
+            <div className={classy('flex gap-1')}>
+              {(Object.keys(SERIALIZERS) as SerializerFormat[]).map((fmt) => (
+                <Button
+                  key={fmt}
+                  variant={exportFormat === fmt ? 'default' : 'outline'}
+                  size="xs"
+                  onClick={() => setExportFormat(fmt)}
                 >
                   {FORMAT_LABELS[fmt]}
                 </Button>
@@ -1006,128 +629,53 @@ function SerializersDemo() {
           </div>
           <pre
             className={classy(
-              'flex-1 overflow-auto rounded-md border border-border bg-muted/30 p-4',
+              'overflow-auto rounded-md border border-border bg-background p-4',
               'font-mono text-sm whitespace-pre-wrap break-all',
               'max-h-96',
             )}
           >
-            {serialized}
+            {exported}
           </pre>
         </div>
-      </div>
+      )}
 
-      {/* Import section */}
-      <Separator />
-      <div className={classy('flex flex-col gap-3')}>
-        <H3>Import</H3>
-        <P className={classy('text-muted-foreground')}>
-          Paste content in any format to deserialize into editor blocks.
-        </P>
-        <div className={classy('flex gap-2')}>
-          {(Object.keys(SERIALIZERS) as SerializerFormat[]).map((fmt) => (
-            <Button
-              key={fmt}
-              variant={importFormat === fmt ? 'default' : 'outline'}
-              size="xs"
-              onClick={() => setImportFormat(fmt)}
-            >
-              {FORMAT_LABELS[fmt]}
+      {/* Composite save notification */}
+      {savedComposite && (
+        <div className={classy('mb-6 rounded-lg border border-border bg-muted/20 p-4')}>
+          <div className={classy('flex items-center gap-2 mb-2')}>
+            <Badge variant="default">Saved as composite</Badge>
+            <Button variant="outline" size="xs" onClick={() => setSavedComposite(null)}>
+              Dismiss
             </Button>
-          ))}
+          </div>
+          <pre
+            className={classy(
+              'max-h-48 overflow-auto rounded-md bg-background p-3 text-xs font-mono text-muted-foreground',
+            )}
+          >
+            {savedComposite}
+          </pre>
         </div>
-        <textarea
-          className={classy(
-            'min-h-32 w-full rounded-md border border-input bg-background p-3',
-            'font-mono text-sm',
-            'focus:outline-none focus:ring-2 focus:ring-ring',
-          )}
-          placeholder={`Paste ${FORMAT_LABELS[importFormat]} content here...`}
-          value={importText}
-          onChange={(e) => setImportText(e.target.value)}
+      )}
+
+      {/* The editor */}
+      <div ref={containerRef}>
+        <Editor
+          ref={editorRef}
+          defaultValue={blocks}
+          onValueChange={setBlocks}
+          toolbar
+          sidebar={SIDEBAR_CONFIG}
+          rulePalette={RULE_PALETTE_CONFIG}
+          commandPalette={slashCommands}
+          inlineToolbar
+          blockContextMenu
+          onSaveAsComposite={handleSaveAsComposite}
+          renderBlock={renderBlock}
         />
-        {importError && <P className={classy('text-destructive text-sm')}>{importError}</P>}
-        <Button onClick={handleImport} disabled={!importText.trim()} size="sm">
-          Deserialize into editor
-        </Button>
       </div>
-    </div>
-  );
-}
 
-// ============================================================================
-// Main playground
-// ============================================================================
-
-export default function EditorPlayground() {
-  return (
-    <Container as="main" size="5xl" padding="6">
-      <header className={classy('py-12')}>
-        <Badge variant="outline" size="sm" className={classy('mb-4')}>
-          Playground
-        </Badge>
-        <H1 className={classy('mb-4')}>Editor</H1>
-        <Muted className={classy('max-w-2xl')}>
-          Block-based content editor with progressive feature disclosure. Start minimal, add
-          toolbar, sidebar, slash commands, and inline formatting as needed.
-        </Muted>
-      </header>
-
-      <Separator className={classy('mb-8')} />
-
-      <Tabs defaultValue="editor">
-        <TabsList>
-          <TabsTrigger value="editor">Editor</TabsTrigger>
-          <TabsTrigger value="composites">Composites</TabsTrigger>
-          <TabsTrigger value="serializers">Serializers</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="editor">
-          <Card className={classy('mt-4')}>
-            <CardHeader>
-              <CardTitle>Block Editor</CardTitle>
-              <CardDescription>
-                Toolbar, palette sidebar, slash commands, inline formatting, rule palette, context
-                menu, and save-as-composite.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <FullDemo />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="composites">
-          <Card className={classy('mt-4')}>
-            <CardHeader>
-              <CardTitle>Composites</CardTitle>
-              <CardDescription>
-                Registry, bridge, rule matching, MDX serialization, and built-in validation.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <CompositesDemo />
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="serializers">
-          <Card className={classy('mt-4')}>
-            <CardHeader>
-              <CardTitle>Serializers</CardTitle>
-              <CardDescription>
-                Live serialize/deserialize between JSON, MDX, HTML, and plain text. Edit blocks on
-                the left, see the output on the right. Import content from any format.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <SerializersDemo />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      <Separator className={classy('mt-16 mb-8')} />
-
-      <footer className={classy('pb-8')}>
+      <footer className={classy('mt-16 pb-8 border-t border-border pt-8')}>
         <div className={classy('flex items-center justify-between')}>
           <div className={classy('flex gap-6')}>
             <a
