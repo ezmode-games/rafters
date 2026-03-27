@@ -1,5 +1,6 @@
 import {
   type BaseSystemConfig,
+  buildColorSystem,
   generateNamespaces,
   getAvailableNamespaces,
   TokenRegistry,
@@ -15,10 +16,11 @@ import type * as routes from './tokens.routes';
 
 let registry: TokenRegistry | null = null;
 
-/** Get or create the registry. On first call, creates an empty registry. */
+/** Get or create the registry. On first call, generates the default 536-token system. */
 function getRegistry(): TokenRegistry {
   if (!registry) {
-    registry = new TokenRegistry();
+    const result = buildColorSystem();
+    registry = result.registry;
   }
   return registry;
 }
@@ -26,11 +28,6 @@ function getRegistry(): TokenRegistry {
 /** Initialize the registry with tokens (called on startup or load). */
 export function initializeRegistry(tokens: Token[]): void {
   registry = new TokenRegistry(tokens);
-}
-
-/** Get the raw registry for direct access (used by reset). */
-export function getRawRegistry(): TokenRegistry {
-  return getRegistry();
 }
 
 // =============================================================================
