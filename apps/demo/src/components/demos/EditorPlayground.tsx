@@ -15,6 +15,13 @@ import {
   toMdx,
   url,
 } from '@rafters/composites';
+import {
+  type EditorSerializer,
+  htmlSerializer,
+  jsonSerializer,
+  mdxSerializer,
+  textSerializer,
+} from '@rafters/ui';
 import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -999,6 +1006,163 @@ function CompositesDemo() {
 }
 
 // ============================================================================
+// Serializers demo
+// ============================================================================
+
+const SERIALIZER_BLOCKS: EditorBlock[] = [
+  { id: 'ser-1', type: 'heading', content: 'Serialization Demo', meta: { level: 1 } },
+  {
+    id: 'ser-2',
+    type: 'text',
+    content: [
+      { text: 'Edit these blocks and watch the ' },
+      { text: 'serialized output', marks: ['bold'] },
+      { text: ' update in real time across four formats.' },
+    ],
+  },
+  {
+    id: 'ser-3',
+    type: 'code',
+    content: 'const hello = "world";',
+    meta: { language: 'typescript' },
+  },
+  {
+    id: 'ser-4',
+    type: 'quote',
+    content: 'The block tree is the universal intermediate representation.',
+  },
+  { id: 'ser-5', type: 'divider' },
+  { id: 'ser-6', type: 'text', content: 'Add, remove, or reorder blocks above.' },
+];
+
+type SerializerFormat = 'json' | 'mdx' | 'html' | 'text';
+
+const SERIALIZERS: Record<SerializerFormat, EditorSerializer> = {
+  json: jsonSerializer,
+  mdx: mdxSerializer,
+  html: htmlSerializer,
+  text: textSerializer,
+};
+
+const FORMAT_LABELS: Record<SerializerFormat, string> = {
+  json: 'JSON',
+  mdx: 'MDX',
+  html: 'HTML',
+  text: 'Plain Text',
+};
+
+function SerializersDemo() {
+  const editorRef = React.useRef<EditorControls>(null);
+  const [blocks, setBlocks] = React.useState<EditorBlock[]>(SERIALIZER_BLOCKS);
+  const [activeFormat, setActiveFormat] = React.useState<SerializerFormat>('json');
+  const [importText, setImportText] = React.useState('');
+  const [importFormat, setImportFormat] = React.useState<SerializerFormat>('mdx');
+  const [importError, setImportError] = React.useState<string | null>(null);
+
+  const serialized = React.useMemo(() => {
+    const serializer = SERIALIZERS[activeFormat];
+    try {
+      return serializer.serialize(blocks);
+    } catch (err) {
+      return `Error: ${err instanceof Error ? err.message : String(err)}`;
+    }
+  }, [blocks, activeFormat]);
+
+  function handleImport() {
+    setImportError(null);
+    const serializer = SERIALIZERS[importFormat];
+    try {
+      const result = serializer.deserialize(importText);
+      setBlocks(result.blocks);
+      setImportText('');
+    } catch (err) {
+      setImportError(err instanceof Error ? err.message : String(err));
+    }
+  }
+
+  return (
+    <div className={classy('flex flex-col gap-6')}>
+      <div className={classy('grid grid-cols-2 gap-6')}>
+        {/* Editor */}
+        <div className={classy('flex flex-col gap-2')}>
+          <H3>Editor</H3>
+          <Editor
+            ref={editorRef}
+            defaultValue={SERIALIZER_BLOCKS}
+            onValueChange={setBlocks}
+            toolbar
+            blockContextMenu
+          />
+        </div>
+
+        {/* Serialized output */}
+        <div className={classy('flex flex-col gap-2')}>
+          <div className={classy('flex items-center gap-2')}>
+            <H3>Output</H3>
+            <div className={classy('flex gap-1')}>
+              {(Object.keys(SERIALIZERS) as SerializerFormat[]).map((fmt) => (
+                <Button
+                  key={fmt}
+                  variant={activeFormat === fmt ? 'default' : 'outline'}
+                  size="xs"
+                  onClick={() => setActiveFormat(fmt)}
+                >
+                  {FORMAT_LABELS[fmt]}
+                </Button>
+              ))}
+            </div>
+          </div>
+          <pre
+            className={classy(
+              'flex-1 overflow-auto rounded-md border border-border bg-muted/30 p-4',
+              'font-mono text-sm whitespace-pre-wrap break-all',
+              'max-h-96',
+            )}
+          >
+            {serialized}
+          </pre>
+        </div>
+      </div>
+
+      {/* Import section */}
+      <Separator />
+      <div className={classy('flex flex-col gap-3')}>
+        <H3>Import</H3>
+        <P className={classy('text-muted-foreground')}>
+          Paste content in any format to deserialize into editor blocks.
+        </P>
+        <div className={classy('flex gap-2')}>
+          {(Object.keys(SERIALIZERS) as SerializerFormat[]).map((fmt) => (
+            <Button
+              key={fmt}
+              variant={importFormat === fmt ? 'default' : 'outline'}
+              size="xs"
+              onClick={() => setImportFormat(fmt)}
+            >
+              {FORMAT_LABELS[fmt]}
+            </Button>
+          ))}
+        </div>
+        <textarea
+          className={classy(
+            'min-h-32 w-full rounded-md border border-input bg-background p-3',
+            'font-mono text-sm',
+            'focus:outline-none focus:ring-2 focus:ring-ring',
+          )}
+          placeholder={`Paste ${FORMAT_LABELS[importFormat]} content here...`}
+          value={importText}
+          onChange={(e) => setImportText(e.target.value)}
+        />
+        {importError && <P className={classy('text-destructive text-sm')}>{importError}</P>}
+        <Button onClick={handleImport} disabled={!importText.trim()} size="sm">
+          Deserialize into editor
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
 // Main playground
 // ============================================================================
 
@@ -1025,6 +1189,7 @@ export default function EditorPlayground() {
           <TabsTrigger value="sidebar">Sidebar</TabsTrigger>
           <TabsTrigger value="full">Full</TabsTrigger>
           <TabsTrigger value="composites">Composites</TabsTrigger>
+          <TabsTrigger value="serializers">Serializers</TabsTrigger>
         </TabsList>
 
         <TabsContent value="minimal">
@@ -1092,6 +1257,20 @@ export default function EditorPlayground() {
             </CardHeader>
             <CardContent>
               <CompositesDemo />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="serializers">
+          <Card className={classy('mt-4')}>
+            <CardHeader>
+              <CardTitle>Serializers</CardTitle>
+              <CardDescription>
+                Live serialize/deserialize between JSON, MDX, HTML, and plain text. Edit blocks on
+                the left, see the output on the right. Import content from any format.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <SerializersDemo />
             </CardContent>
           </Card>
         </TabsContent>
