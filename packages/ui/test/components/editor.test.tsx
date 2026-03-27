@@ -151,30 +151,6 @@ describe('Editor', () => {
     });
   });
 
-  describe('Sidebar', () => {
-    it('does not render sidebar by default', () => {
-      render(<Editor defaultValue={BLOCKS} />);
-      expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
-    });
-
-    it('renders sidebar when sidebar prop is true', () => {
-      render(<Editor defaultValue={BLOCKS} sidebar />);
-      expect(screen.getByRole('navigation')).toBeInTheDocument();
-    });
-
-    it('sidebar has aria-label', () => {
-      render(<Editor defaultValue={BLOCKS} sidebar />);
-      expect(screen.getByRole('navigation')).toHaveAttribute('aria-label', 'Block navigation');
-    });
-
-    it('sidebar lists all blocks', () => {
-      render(<Editor defaultValue={BLOCKS} sidebar />);
-      const nav = screen.getByRole('navigation');
-      const buttons = nav.querySelectorAll('button');
-      expect(buttons).toHaveLength(3);
-    });
-  });
-
   describe('Disabled state', () => {
     it('sets aria-disabled on root', () => {
       const { container } = render(<Editor disabled />);
@@ -329,76 +305,6 @@ describe('Editor', () => {
 
       ref.current?.updateBlock('1', { content: 'Updated' });
       expect(onCommit).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Save as Composite', () => {
-    it('renders save button when onSaveAsComposite is provided with toolbar', () => {
-      render(<Editor defaultValue={BLOCKS} toolbar onSaveAsComposite={vi.fn()} />);
-      expect(screen.getByRole('button', { name: 'Save as Composite' })).toBeInTheDocument();
-    });
-
-    it('does not render save button without onSaveAsComposite', () => {
-      render(<Editor defaultValue={BLOCKS} toolbar />);
-      expect(screen.queryByRole('button', { name: 'Save as Composite' })).not.toBeInTheDocument();
-    });
-
-    it('disables save button when canvas is empty', () => {
-      render(<Editor toolbar onSaveAsComposite={vi.fn()} />);
-      expect(screen.getByRole('button', { name: 'Save as Composite' })).toBeDisabled();
-    });
-
-    it('opens dialog on save button click', () => {
-      render(<Editor defaultValue={BLOCKS} toolbar onSaveAsComposite={vi.fn()} />);
-      fireEvent.click(screen.getByRole('button', { name: 'Save as Composite' }));
-      expect(screen.getByRole('dialog', { name: 'Save as Composite' })).toBeInTheDocument();
-    });
-
-    it('calls onSaveAsComposite with metadata and blocks on form submit', () => {
-      const onSave = vi.fn();
-      const blocksWithRules = [
-        { id: '1', type: 'input', content: '', rules: ['email', 'required'] as const },
-        { id: '2', type: 'button', content: 'Submit' },
-      ];
-      render(<Editor defaultValue={blocksWithRules} toolbar onSaveAsComposite={onSave} />);
-      fireEvent.click(screen.getByRole('button', { name: 'Save as Composite' }));
-
-      fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Login Form' } });
-      fireEvent.change(screen.getByRole('combobox'), { target: { value: 'form' } });
-      fireEvent.change(screen.getByLabelText('Description'), {
-        target: { value: 'A login form' },
-      });
-      fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-
-      expect(onSave).toHaveBeenCalledTimes(1);
-      const data = onSave.mock.calls[0][0];
-      expect(data.name).toBe('Login Form');
-      expect(data.category).toBe('form');
-      expect(data.description).toBe('A login form');
-      expect(data.blocks).toHaveLength(2);
-    });
-
-    it('shows validation error for empty name', () => {
-      render(<Editor defaultValue={BLOCKS} toolbar onSaveAsComposite={vi.fn()} />);
-      fireEvent.click(screen.getByRole('button', { name: 'Save as Composite' }));
-      fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-      expect(screen.getByRole('alert')).toHaveTextContent('Name is required');
-    });
-
-    it('shows validation error for empty category', () => {
-      render(<Editor defaultValue={BLOCKS} toolbar onSaveAsComposite={vi.fn()} />);
-      fireEvent.click(screen.getByRole('button', { name: 'Save as Composite' }));
-      fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'My Composite' } });
-      fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-      expect(screen.getByRole('alert')).toHaveTextContent('Category is required');
-    });
-
-    it('closes dialog on cancel', () => {
-      render(<Editor defaultValue={BLOCKS} toolbar onSaveAsComposite={vi.fn()} />);
-      fireEvent.click(screen.getByRole('button', { name: 'Save as Composite' }));
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
-      fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
   });
 

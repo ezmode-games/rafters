@@ -29,12 +29,6 @@ describe('Editor - Accessibility', () => {
     expect(results).toHaveNoViolations();
   });
 
-  it('has no accessibility violations with sidebar', async () => {
-    const { container } = render(<Editor defaultValue={BLOCKS} sidebar />);
-    const results = await axe(container);
-    expect(results).toHaveNoViolations();
-  });
-
   it('has no accessibility violations when disabled', async () => {
     const { container } = render(<Editor defaultValue={BLOCKS} disabled />);
     const results = await axe(container);
@@ -72,11 +66,6 @@ describe('Editor - Accessibility', () => {
   it('canvas has visible focus indicator class', () => {
     render(<Editor defaultValue={BLOCKS} />);
     expect(screen.getByLabelText('Document editor')).toHaveClass('focus-visible:ring-2');
-  });
-
-  it('sidebar navigation has aria-label', () => {
-    render(<Editor defaultValue={BLOCKS} sidebar />);
-    expect(screen.getByRole('navigation')).toHaveAttribute('aria-label', 'Block navigation');
   });
 
   it('disabled editor sets aria-disabled', () => {

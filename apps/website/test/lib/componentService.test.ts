@@ -94,10 +94,10 @@ describe('componentService', () => {
     });
 
     it('captures sibling ./component imports as internal deps', () => {
-      // editor.tsx imports from ./container -- should be captured
+      // editor.tsx imports from primitives -- should be captured
       const component = loadComponent('editor');
       expect(component).not.toBeNull();
-      expect(component?.primitives).toContain('container');
+      expect(component?.primitives).toContain('document-editor');
     });
 
     it('returns null for non-existent component', () => {
