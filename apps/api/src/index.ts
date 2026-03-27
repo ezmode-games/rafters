@@ -5,12 +5,13 @@ import type { ColorSeedMessage } from '@/lib/queue/publisher';
 import color from '@/routes/color/color.index';
 import index from '@/routes/index.route';
 import queue from '@/routes/queue/queue.index';
+import tokens from '@/routes/tokens/tokens.index';
 
 const app = createApp();
 
 configureOpenAPI(app);
 
-const routes = [index, color, queue] as const;
+const routes = [index, color, queue, tokens] as const;
 
 for (const route of routes) {
   app.route('/', route);
