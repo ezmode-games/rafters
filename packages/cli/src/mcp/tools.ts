@@ -1803,10 +1803,11 @@ export class RaftersToolHandler {
       if (match[1]) imports.push(match[1]);
     }
 
-    // Extract @theme blocks
+    // Extract @theme blocks and their properties
     const themeMatches = content.matchAll(/@theme\s*\{([^}]+)\}/g);
     for (const match of themeMatches) {
       if (match[0]) themeBlocks.push(match[0].trim());
+      if (match[1]) this.extractCustomProperties(match[1], '@theme', customProperties);
     }
 
     // Extract custom properties from :root
