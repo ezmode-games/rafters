@@ -93,9 +93,16 @@ export function generateSpacingTokens(
     }
 
     const remValue = value / 16;
+    // Use calc() with var() so changing spacing-base cascades via CSS
+    const cssValue =
+      multiplier === 0
+        ? '0'
+        : multiplier === 1
+          ? 'var(--rafters-spacing-base)'
+          : `calc(var(--rafters-spacing-base) * ${multiplier})`;
     tokens.push({
       name: `spacing-${scale}`,
-      value: value === 0 ? '0' : `${remValue}rem`,
+      value: cssValue,
       category: 'spacing',
       namespace: 'spacing',
       semanticMeaning: meaning,
