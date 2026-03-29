@@ -1,5 +1,11 @@
 # rafters
 
+## Unreleased
+
+- `rafters init` writes `.claude/skills/rafters-frontend/SKILL.md` to consumer project -- agents see Container, Grid, and typography examples every session
+- `classy` detects layout utilities (`flex`, `gap-*`, `p-*`, `m-*`): strips on components, warns on consumer code
+- Fix `@/` import paths doubling `src/` prefix in Astro/Vite projects
+
 ## 0.0.31
 
 ### Patch Changes

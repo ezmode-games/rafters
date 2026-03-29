@@ -129,10 +129,11 @@ The `@rafters/design-tokens` package implements a sophisticated dependency graph
 
 ### Development Workflow
 1. Make changes
-2. Run tests: `pnpm test`
-3. Run preflight: `pnpm preflight` (MANDATORY)
-4. Commit changes
-5. Lefthook automatically runs pre-commit checks
+2. If the change alters the CLI (feature, fix, behavior change), add a CHANGELOG.md entry in the SAME commit -- not later, not in a batch
+3. Run tests: `pnpm test`
+4. Run preflight: `pnpm preflight` (MANDATORY)
+5. Commit changes
+6. Lefthook automatically runs pre-commit checks
 
 ### Testing Requirements
 - Unit tests: `src/component.test.ts`
