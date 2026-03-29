@@ -68,15 +68,15 @@ export function generateRadiusTokens(
     } else if (def.step === 'full') {
       value = '9999px'; // Full radius stays in px as it's a special case
       mathRelationship = 'infinite (9999px)';
+    } else if (def.step === 0) {
+      // Step 0 = base value, reference the custom property directly
+      value = 'var(--rafters-radius-base)';
+      mathRelationship = `${baseRadiusRem}rem (base)`;
     } else {
-      // Use progression.compute() for step-based calculation
-      const computedPx = Math.round(progression.compute(baseRadius, def.step) * 100) / 100;
-      const computedRem = Math.round((computedPx / 16) * 100) / 100;
-      value = `${computedRem}rem`;
-      mathRelationship =
-        def.step === 0
-          ? `${baseRadiusRem}rem (base)`
-          : `${baseRadiusRem} × ${progression.ratio}^${def.step}`;
+      // Use calc() with var() so changing radius-base cascades via CSS
+      const multiplier = Math.round(progression.ratio ** def.step * 1000) / 1000;
+      value = `calc(var(--rafters-radius-base) * ${multiplier})`;
+      mathRelationship = `base × ${progression.ratio}^${def.step} (×${multiplier})`;
     }
 
     tokens.push({

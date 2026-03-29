@@ -66,7 +66,7 @@ describe('MCP tools against initialized project', () => {
 
     expect(data.name).toBe('spacing-1');
     expect(data.namespace).toBe('spacing');
-    expect(data.value).toBe('0.25rem');
+    expect(data.value).toBe('var(--rafters-spacing-base)');
   }, 30000);
 
   it('rafters_pattern works without project-specific tokens', async () => {

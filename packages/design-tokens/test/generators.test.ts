@@ -228,10 +228,10 @@ describe('Token Structure Validation', () => {
 
     it('calculates correct spacing values', () => {
       const spacing4 = result.tokens.find((t) => t.name === 'spacing-4');
-      expect(spacing4?.value).toBe('1rem'); // 16px = 1rem
+      expect(spacing4?.value).toBe('calc(var(--rafters-spacing-base) * 4)'); // base * 4
 
       const spacing8 = result.tokens.find((t) => t.name === 'spacing-8');
-      expect(spacing8?.value).toBe('2rem'); // 32px = 2rem
+      expect(spacing8?.value).toBe('calc(var(--rafters-spacing-base) * 8)'); // base * 8
     });
 
     it('all tokens have valid structure', () => {
@@ -671,9 +671,9 @@ describe('Orchestration', () => {
 
       expect(result.metadata.config.baseSpacingUnit).toBe(8);
 
-      // Spacing should be doubled
+      // Spacing uses calc() with var() for cascade -- multiplier stays the same
       const spacing4 = result.allTokens.find((t) => t.name === 'spacing-4');
-      expect(spacing4?.value).toBe('2rem'); // 32px = 2rem
+      expect(spacing4?.value).toBe('calc(var(--rafters-spacing-base) * 4)');
     });
 
     it('uses custom colorPaletteBases when provided', () => {
@@ -756,7 +756,7 @@ describe('Orchestration', () => {
       const map = toTokenMap(result);
 
       const spacing4 = map.get('spacing-4');
-      expect(spacing4?.value).toBe('1rem'); // 16px = 1rem
+      expect(spacing4?.value).toBe('calc(var(--rafters-spacing-base) * 4)'); // base * 4
     });
   });
 
@@ -824,8 +824,10 @@ describe('Mathematical Relationships', () => {
       const spacing4_base4 = base4Result.allTokens.find((t) => t.name === 'spacing-4');
       const spacing4_base8 = base8Result.allTokens.find((t) => t.name === 'spacing-4');
 
-      expect(spacing4_base4?.value).toBe('1rem'); // 16px = 1rem
-      expect(spacing4_base8?.value).toBe('2rem'); // 32px = 2rem
+      // Both use calc() -- the base value differs but multiplier is the same
+      // CSS cascade handles the actual computation at runtime
+      expect(spacing4_base4?.value).toBe('calc(var(--rafters-spacing-base) * 4)');
+      expect(spacing4_base8?.value).toBe('calc(var(--rafters-spacing-base) * 4)');
     });
   });
 
