@@ -32,7 +32,8 @@ export function hexToOKLCH(hex: string): OKLCH {
     return {
       l: oklch.coords[0] ?? 0,
       c: oklch.coords[1] ?? 0,
-      h: oklch.coords[2] ?? 0, // Handle undefined hue for achromatic colors
+      // Achromatic colors (grays) get NaN hue from colorjs.io, not undefined
+      h: Number.isNaN(oklch.coords[2]) ? 0 : (oklch.coords[2] ?? 0),
       alpha: oklch.alpha ?? 1,
     };
   } catch (_error) {
@@ -48,9 +49,10 @@ export function hexToOKLCH(hex: string): OKLCH {
  */
 export function roundOKLCH(oklch: OKLCH): OKLCH {
   return {
-    l: Math.round(oklch.l * 1000) / 1000, // 3 decimal places for lightness
-    c: Math.round(oklch.c * 1000) / 1000, // 3 decimal places for chroma
-    h: Math.round(oklch.h), // Whole degrees for hue
-    alpha: oklch.alpha !== undefined ? Math.round(oklch.alpha * 100) / 100 : 1, // 2 decimal places for alpha
+    l: Math.round(oklch.l * 1000) / 1000,
+    c: Math.round(oklch.c * 1000) / 1000,
+    // NaN hue from achromatic colors defaults to 0
+    h: Number.isNaN(oklch.h) ? 0 : Math.round(oklch.h),
+    alpha: oklch.alpha !== undefined ? Math.round(oklch.alpha * 100) / 100 : 1,
   };
 }
