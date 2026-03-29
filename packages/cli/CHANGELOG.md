@@ -1,5 +1,11 @@
 # rafters
 
+## 0.0.31
+
+### Patch Changes
+
+- Radius and spacing tokens now cascade via CSS `calc()` expressions -- changing `radius-base` or `spacing-base` updates all dependent tokens instantly
+
 ## 0.0.30
 
 ### Patch Changes
