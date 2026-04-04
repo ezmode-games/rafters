@@ -104,6 +104,9 @@ importers:
       '@playwright/test':
         specifier: 'catalog:'
         version: 1.56.1
+      '@tailwindcss/cli':
+        specifier: ^4.1.18
+        version: 4.1.18
       '@testing-library/jest-dom':
         specifier: 'catalog:'
         version: 6.9.1
@@ -387,7 +390,7 @@ importers:
         version: 8.2.0(@types/node@24.10.0)
       '@modelcontextprotocol/sdk':
         specifier: ^1.25.1
-        version: 1.25.1(hono@4.11.0)(zod@4.3.6)
+        version: 1.25.1(hono@4.11.0)(zod@4.1.12)
       commander:
         specifier: ^13.0.0
         version: 13.1.0
@@ -436,7 +439,7 @@ importers:
         version: 4.1.0(@types/node@24.10.0)(@vitest/ui@4.1.0)(happy-dom@20.0.10)(jsdom@26.1.0)(msw@2.11.6(@types/node@24.10.0)(typescript@5.9.3))(vite@8.0.0(@types/node@24.10.0)(esbuild@0.27.0)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
       zocker:
         specifier: 'catalog:'
-        version: 3.0.0(zod@4.3.6)
+        version: 3.0.0(zod@4.1.12)
 
   packages/color-utils:
     dependencies:
@@ -652,7 +655,7 @@ importers:
         version: 4.1.0(@types/node@24.10.0)(@vitest/ui@4.1.0)(happy-dom@20.0.10)(jsdom@26.1.0)(msw@2.11.6(@types/node@24.10.0)(typescript@5.9.3))(vite@8.0.0(@types/node@24.10.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
       zocker:
         specifier: 'catalog:'
-        version: 3.0.0(zod@4.3.6)
+        version: 3.0.0(zod@4.1.12)
 
   packages/ui:
     dependencies:
@@ -3786,10 +3789,6 @@ packages:
   encodeurl@2.0.0:
     resolution: {integrity: sha512-Q0n9HRi4m6JuGIV1eFlmvJB7ZEVxu93IrMyiMsGC0lrMJMWzRgx6WGquyfQgZVb31vhGgXnfmPNNXmxnOkRBrg==}
     engines: {node: '>= 0.8'}
-
-  enhanced-resolve@5.18.4:
-    resolution: {integrity: sha512-LgQMM4WXU3QI+SYgEc2liRgznaD5ojbmY3sb8LxyguVkIg5FxdpTkvk72te2R38/TGKxH634oLxXRGY6d7AP+Q==}
-    engines: {node: '>=10.13.0'}
 
   enhanced-resolve@5.20.0:
     resolution: {integrity: sha512-/ce7+jQ1PQ6rVXwe+jKEg5hW5ciicHwIQUagZkp6IufBoY3YDgdTTY1azVs0qoRgVmvsNB+rbjLJxDAeHHtwsQ==}
@@ -7932,7 +7931,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@modelcontextprotocol/sdk@1.25.1(hono@4.11.0)(zod@4.3.6)':
+  '@modelcontextprotocol/sdk@1.25.1(hono@4.11.0)(zod@4.1.12)':
     dependencies:
       '@hono/node-server': 1.19.11(hono@4.11.0)
       ajv: 8.17.1
@@ -7948,8 +7947,8 @@ snapshots:
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
       raw-body: 3.0.2
-      zod: 4.3.6
-      zod-to-json-schema: 3.25.0(zod@4.3.6)
+      zod: 4.1.12
+      zod-to-json-schema: 3.25.0(zod@4.1.12)
     transitivePeerDependencies:
       - hono
       - supports-color
@@ -8309,7 +8308,7 @@ snapshots:
       '@parcel/watcher': 2.5.6
       '@tailwindcss/node': 4.1.18
       '@tailwindcss/oxide': 4.1.18
-      enhanced-resolve: 5.18.4
+      enhanced-resolve: 5.20.0
       mri: 1.2.0
       picocolors: 1.1.1
       tailwindcss: 4.1.18
@@ -8327,7 +8326,7 @@ snapshots:
   '@tailwindcss/node@4.1.18':
     dependencies:
       '@jridgewell/remapping': 2.3.5
-      enhanced-resolve: 5.18.4
+      enhanced-resolve: 5.20.0
       jiti: 2.6.1
       lightningcss: 1.30.2
       magic-string: 0.30.21
@@ -9395,11 +9394,6 @@ snapshots:
   emoji-regex@9.2.2: {}
 
   encodeurl@2.0.0: {}
-
-  enhanced-resolve@5.18.4:
-    dependencies:
-      graceful-fs: 4.2.11
-      tapable: 2.3.0
 
   enhanced-resolve@5.20.0:
     dependencies:
@@ -12685,19 +12679,13 @@ snapshots:
       randexp: 0.5.3
       zod: 4.1.12
 
-  zocker@3.0.0(zod@4.3.6):
-    dependencies:
-      '@faker-js/faker': 10.1.0
-      randexp: 0.5.3
-      zod: 4.3.6
-
   zod-to-json-schema@3.25.0(zod@3.25.76):
     dependencies:
       zod: 3.25.76
 
-  zod-to-json-schema@3.25.0(zod@4.3.6):
+  zod-to-json-schema@3.25.0(zod@4.1.12):
     dependencies:
-      zod: 4.3.6
+      zod: 4.1.12
 
   zod-to-ts@1.2.0(typescript@5.9.3)(zod@3.25.76):
     dependencies:

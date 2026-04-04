@@ -29,6 +29,18 @@ export interface TailwindExportOptions {
   darkMode?: 'class' | 'media';
 }
 
+const SHADOW_PART_SUFFIX = /-(offset-x|offset-y|blur|spread|color)$/;
+
+/** Check if a shadow token name is a decomposed part rather than a composite */
+function isShadowDecomposedPart(name: string): boolean {
+  return SHADOW_PART_SUFFIX.test(name);
+}
+
+/** Check if a breakpoint token is a media query condition, not a dimension */
+function isMediaQueryToken(token: Token): boolean {
+  return typeof token.value === 'string' && token.value.startsWith('(');
+}
+
 /**
  * Group tokens by their namespace
  */
@@ -335,13 +347,20 @@ function generateThemeBlock(groups: GroupedTokens): string {
   }
 
   // Shadow tokens -- Tailwind v4 reads --shadow-* for shadow-*
+  // Decomposed parts are emitted as --rafters-* (not --shadow-*) so composite
+  // tokens can reference them via var(--rafters-shadow-offset-x) etc.
   if (groups.shadow.length > 0) {
     for (const token of groups.shadow) {
       const value = tokenValueToCSS(token);
       if (value === null) continue;
-      // Strip "shadow-" prefix: token "shadow-md" becomes "--shadow-md"
-      const key = token.name.replace(/^shadow-/, '');
-      lines.push(`  --shadow-${key}: ${value};`);
+      if (isShadowDecomposedPart(token.name)) {
+        // Decomposed parts: --rafters-* only, no Tailwind utility
+        lines.push(`  --rafters-${token.name}: ${value};`);
+      } else {
+        // Composites: --shadow-* for Tailwind utility generation
+        const key = token.name.replace(/^shadow-/, '');
+        lines.push(`  --shadow-${key}: ${value};`);
+      }
     }
     lines.push('');
   }
@@ -389,11 +408,14 @@ function generateThemeBlock(groups: GroupedTokens): string {
     lines.push('');
   }
 
-  // Breakpoint tokens
+  // Breakpoint tokens (exclude media query tokens -- their values are
+  // conditions like "(prefers-reduced-motion: reduce)", not dimensions,
+  // and Tailwind would generate invalid CSS like @media (width >= ...))
   if (groups.breakpoint.length > 0) {
     for (const token of groups.breakpoint) {
       const value = tokenValueToCSS(token);
       if (value === null) continue;
+      if (isMediaQueryToken(token)) continue;
       lines.push(`  --${token.name}: ${value};`);
     }
     lines.push('');
@@ -723,8 +745,10 @@ function generateThemeBlockWithVarRefs(groups: GroupedTokens): string {
   }
 
   // Shadow tokens -- strip namespace prefix for Tailwind v4
+  // Skip decomposed parts -- only composites map to Tailwind utilities
   if (groups.shadow.length > 0) {
     for (const token of groups.shadow) {
+      if (isShadowDecomposedPart(token.name)) continue;
       const key = token.name.replace(/^shadow-/, '');
       lines.push(`  --shadow-${key}: var(--rafters-${token.name});`);
     }
@@ -765,9 +789,10 @@ function generateThemeBlockWithVarRefs(groups: GroupedTokens): string {
     lines.push('');
   }
 
-  // Breakpoint tokens
+  // Breakpoint tokens (exclude media query tokens)
   if (groups.breakpoint.length > 0) {
     for (const token of groups.breakpoint) {
+      if (isMediaQueryToken(token)) continue;
       lines.push(`  --${token.name}: var(--rafters-${token.name});`);
     }
     lines.push('');
@@ -866,7 +891,7 @@ function generateVarsRootBlock(groups: GroupedTokens): string {
     for (const token of groups.shadow) {
       const value = tokenValueToCSS(token);
       if (value === null) continue;
-      lines.push(`  --rafters-shadow-${token.name}: ${value};`);
+      lines.push(`  --rafters-${token.name}: ${value};`);
     }
     lines.push('');
   }
@@ -911,11 +936,12 @@ function generateVarsRootBlock(groups: GroupedTokens): string {
     lines.push('');
   }
 
-  // Breakpoint tokens
+  // Breakpoint tokens (exclude media query tokens)
   if (groups.breakpoint.length > 0) {
     for (const token of groups.breakpoint) {
       const value = tokenValueToCSS(token);
       if (value === null) continue;
+      if (isMediaQueryToken(token)) continue;
       lines.push(`  --rafters-${token.name}: ${value};`);
     }
     lines.push('');

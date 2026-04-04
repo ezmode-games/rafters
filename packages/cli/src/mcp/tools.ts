@@ -114,6 +114,7 @@ When onboarding an existing project, do NOT skip the learning step.
 6. The 11 semantic families (primary, secondary, tertiary, accent, neutral, success, warning, destructive, info, highlight, muted) MUST all be mapped. Extra colors are custom families in the color namespace.
 7. If analyze detects color scale patterns (e.g., --color-blaze-50 through --color-blaze-950), map the family using its base color. Do NOT create 11 individual tokens.
 8. Call rafters_onboard map to execute the migration once the designer confirms. Colors are automatically enriched with full OKLCH scales, harmonies, accessibility data, and API intelligence.
+9. AFTER mapping color families, check if semantic surface tokens (background, foreground, card, popover, etc.) need remapping. By default they reference "neutral" family. For dark-themed sites or custom palettes, remap them using the "light" and "dark" fields in the mapping: { source: "--bg", target: "background", light: "neutral-50", dark: "custom-dark-950", reason: "..." }. The light/dark values are "family-position" references to existing color tokens. Map color families FIRST, then remap semantic tokens that reference them.
 
 When in doubt: less code, not more. Rafters has already made the design decision.`;
 
@@ -587,7 +588,7 @@ export const TOOL_DEFINITIONS = [
   {
     name: 'rafters_onboard',
     description:
-      'Analyze an existing project for design decisions and map them into Rafters tokens. Use "analyze" to surface raw findings. Use "map" to execute -- but map REQUIRES the designer to confirm every mapping first. The tool will reject unconfirmed mappings and instruct you to ask the designer. This is an intentional system, not an automatic one.',
+      'Analyze an existing project for design decisions and map them into Rafters tokens. Use "analyze" to surface raw findings. Use "map" to execute -- but map REQUIRES the designer to confirm every mapping first. The tool will reject unconfirmed mappings and instruct you to ask the designer. Supports two mapping types: (1) color family mapping with "value" field (enriches CSS color into full ColorValue), (2) semantic remapping with "light"/"dark" fields (remaps which color family+position a semantic token like "background" or "card" references for light/dark mode). Map color families first, then remap semantic surface tokens.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -617,7 +618,18 @@ export const TOOL_DEFINITIONS = [
               },
               value: {
                 type: 'string',
-                description: 'The value to set (from the original CSS)',
+                description:
+                  'The CSS color value to set (from the original CSS). Required for color family mappings. Omit for semantic remappings that use light/dark instead.',
+              },
+              light: {
+                type: 'string',
+                description:
+                  'Light mode color reference as "family-position" (e.g., "neutral-50"). Used for semantic token remapping -- tells the token which color family+position to use in light mode.',
+              },
+              dark: {
+                type: 'string',
+                description:
+                  'Dark mode color reference as "family-position" (e.g., "neutral-950"). Used for semantic token remapping -- tells the token which color family+position to use in dark mode.',
               },
               reason: {
                 type: 'string',
@@ -633,7 +645,7 @@ export const TOOL_DEFINITIONS = [
                 description: 'Category for new tokens (required if token does not exist)',
               },
             },
-            required: ['source', 'target', 'value', 'reason'],
+            required: ['source', 'target', 'reason'],
           },
           description: 'Array of mappings to execute (required for map action)',
         },
@@ -1880,6 +1892,26 @@ export class RaftersToolHandler {
       ).length;
       const totalFamilies = RaftersToolHandler.SEMANTIC_FAMILIES.length;
 
+      // Detect dark mode properties to guide semantic remapping
+      const hasDarkMode = cssFindings.some((f) =>
+        f.customProperties.some(
+          (p) => p.context === '.dark' || p.context === 'prefers-color-scheme: dark',
+        ),
+      );
+
+      let guidance: string;
+      if (detectedFamilies.length > 0) {
+        guidance = `Found ${detectedFamilies.length} color scale pattern(s): ${detectedFamilies.map((f) => f.family).join(', ')}. Map each family using its base color (position 500/600), not individual scale positions. buildColorValue() will regenerate the full 11-step scale.`;
+      } else {
+        guidance =
+          'Review the custom properties above. Map each to a rafters token using rafters_onboard with action: "map". For ambiguous decisions, ask the designer.';
+      }
+
+      if (hasDarkMode) {
+        guidance +=
+          ' DARK MODE DETECTED: After mapping color families, remap semantic surface tokens (background, foreground, card, popover, etc.) to point at the correct family+position for dark mode. Use the "light" and "dark" fields in the mapping instead of "value". Default semantic tokens reference "neutral" family -- if the project uses a different dark palette, these must be remapped.';
+      }
+
       const result = {
         framework,
         cssFiles: cssFindings,
@@ -1889,10 +1921,8 @@ export class RaftersToolHandler {
         shadcn,
         designDependencies: designDeps,
         existingTokenCount,
-        guidance:
-          detectedFamilies.length > 0
-            ? `Found ${detectedFamilies.length} color scale pattern(s): ${detectedFamilies.map((f) => f.family).join(', ')}. Map each family using its base color (position 500/600), not individual scale positions. buildColorValue() will regenerate the full 11-step scale.`
-            : 'Review the custom properties above. Map each to a rafters token using rafters_onboard with action: "map". For ambiguous decisions, ask the designer.',
+        hasDarkMode,
+        guidance,
       };
 
       return {
@@ -2148,16 +2178,176 @@ export class RaftersToolHandler {
         error?: string;
       }> = [];
 
+      // Parse "family-position" strings (e.g., "neutral-950") into components
+      const parseRef = (ref: string): { family: string; position: string } | null => {
+        const lastDash = ref.lastIndexOf('-');
+        if (lastDash <= 0) return null;
+        const position = ref.slice(lastDash + 1);
+        const family = ref.slice(0, lastDash);
+        if (!/^(50|100|200|300|400|500|600|700|800|900|950)$/.test(position)) return null;
+        return { family, position };
+      };
+
       for (const mapping of mappings) {
         const { source, target, value, reason, namespace, category } = mapping;
+        const lightRef = mapping.light;
+        const darkRef = mapping.dark;
 
-        if (!source || !target || !value || !reason) {
+        if (!source || !target || !reason) {
           results.push({
             source: source ?? '?',
             target: target ?? '?',
             action: 'skipped',
             ok: false,
-            error: 'Missing required fields: source, target, value, reason',
+            error: 'Missing required fields: source, target, reason',
+          });
+          continue;
+        }
+
+        // Semantic remapping: light/dark fields remap a semantic token's color references
+        if (lightRef || darkRef) {
+          const existing = registry.get(target);
+          if (!existing) {
+            results.push({
+              source,
+              target,
+              action: 'skipped',
+              ok: false,
+              error: `Semantic token "${target}" not found. Only existing semantic tokens can be remapped.`,
+            });
+            continue;
+          }
+
+          const currentValue = existing.value;
+          const currentLight =
+            typeof currentValue === 'object' && currentValue !== null && 'family' in currentValue
+              ? (currentValue as { family: string; position: string })
+              : null;
+
+          const newLight = lightRef ? parseRef(lightRef) : currentLight;
+          if (lightRef && !newLight) {
+            results.push({
+              source,
+              target,
+              action: 'skipped',
+              ok: false,
+              error: `Invalid light reference "${lightRef}". Use format "family-position" (e.g., "neutral-50"). Valid positions: 50, 100-900 by 100, 950.`,
+            });
+            continue;
+          }
+          if (!lightRef && !currentLight) {
+            results.push({
+              source,
+              target,
+              action: 'skipped',
+              ok: false,
+              error: `Token "${target}" has no existing ColorReference value. You must supply an explicit "light" field to remap it.`,
+            });
+            continue;
+          }
+
+          const darkFallbackRef = existing.dependsOn?.[1];
+          const newDark = darkRef
+            ? parseRef(darkRef)
+            : darkFallbackRef
+              ? parseRef(darkFallbackRef)
+              : newLight;
+
+          if (darkRef && !newDark) {
+            results.push({
+              source,
+              target,
+              action: 'skipped',
+              ok: false,
+              error: `Invalid dark reference "${darkRef}". Use format "family-position" (e.g., "neutral-950"). Valid positions: 50, 100-900 by 100, 950.`,
+            });
+            continue;
+          }
+          if (!darkRef && darkFallbackRef && !newDark) {
+            results.push({
+              source,
+              target,
+              action: 'skipped',
+              ok: false,
+              error: `Could not infer dark reference from existing dependsOn value "${darkFallbackRef}". Supply an explicit "dark" field.`,
+            });
+            continue;
+          }
+
+          if (!newLight || !newDark) {
+            results.push({
+              source,
+              target,
+              action: 'skipped',
+              ok: false,
+              error: `Could not resolve light/dark references for "${target}". Supply explicit "light" and "dark" fields.`,
+            });
+            continue;
+          }
+
+          // Verify referenced color tokens exist
+          const lightTokenName = `${newLight.family}-${newLight.position}`;
+          const darkTokenName = `${newDark.family}-${newDark.position}`;
+          const missingRefs: string[] = [];
+          if (!registry.has(lightTokenName)) missingRefs.push(lightTokenName);
+          if (!registry.has(darkTokenName)) missingRefs.push(darkTokenName);
+
+          if (missingRefs.length > 0) {
+            results.push({
+              source,
+              target,
+              action: 'skipped',
+              ok: false,
+              error: `Referenced color tokens not found: ${missingRefs.join(', ')}. Map the color family first, then remap the semantic token.`,
+            });
+            continue;
+          }
+
+          // Update the semantic token
+          const previousValue =
+            typeof existing.value === 'string' ? existing.value : JSON.stringify(existing.value);
+          existing.userOverride = {
+            previousValue,
+            reason: `Remapped from ${source}: ${reason}`,
+          };
+
+          // Set value to the light ColorReference
+          const newColorRef = { family: newLight.family, position: newLight.position };
+          await registry.set(target, newColorRef);
+
+          // Update dependsOn with light[0] and dark[1] refs
+          const updated = registry.get(target);
+          if (updated) {
+            updated.dependsOn = [lightTokenName, darkTokenName];
+          } else {
+            results.push({
+              source,
+              target,
+              action: 'skipped',
+              ok: false,
+              error: `Token "${target}" was set but could not be retrieved from registry to update dependencies.`,
+            });
+            continue;
+          }
+
+          results.push({
+            source,
+            target,
+            action: 'remap',
+            ok: true,
+          });
+          continue;
+        }
+
+        // Color family mapping: enrich a CSS color value
+        if (!value) {
+          results.push({
+            source,
+            target,
+            action: 'skipped',
+            ok: false,
+            error:
+              'Missing "value" for color family mapping. Provide a CSS color value, or use "light"/"dark" for semantic remapping.',
           });
           continue;
         }
@@ -2188,6 +2378,14 @@ export class RaftersToolHandler {
             };
             await registry.set(target, tokenValue);
             results.push({ source, target, action: 'set', ok: true, enriched });
+          } else {
+            results.push({
+              source,
+              target,
+              action: 'skipped',
+              ok: false,
+              error: `Token "${target}" exists in registry index but could not be retrieved.`,
+            });
           }
         } else {
           // Create new token
@@ -2215,6 +2413,7 @@ export class RaftersToolHandler {
 
       const setCount = results.filter((r) => r.action === 'set' && r.ok).length;
       const createCount = results.filter((r) => r.action === 'create' && r.ok).length;
+      const remapCount = results.filter((r) => r.action === 'remap' && r.ok).length;
       const enrichedCount = results.filter((r) => r.enriched).length;
       const failCount = results.filter((r) => !r.ok).length;
 
@@ -2228,6 +2427,7 @@ export class RaftersToolHandler {
                 summary: {
                   set: setCount,
                   created: createCount,
+                  remapped: remapCount,
                   enriched: enrichedCount,
                   failed: failCount,
                 },
