@@ -7,8 +7,8 @@
   "exports": {
     "tailwind": true,
     "typescript": true,
-    "dtcg": false,
-    "compiled": false
+    "dtcg": true,
+    "compiled": true
   },
   "installed": {
     "components": [
@@ -43,5 +43,6 @@
       "slot",
       "typeahead"
     ]
-  }
+  },
+  "compositesPath": "src/composites"
 }

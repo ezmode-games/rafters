@@ -32,6 +32,7 @@
     "@biomejs/biome": "catalog:",
     "@cloudflare/vitest-pool-workers": "catalog:",
     "@playwright/test": "catalog:",
+    "@tailwindcss/cli": "^4.1.18",
     "@testing-library/jest-dom": "catalog:",
     "@testing-library/react": "catalog:",
     "@testing-library/user-event": "catalog:",

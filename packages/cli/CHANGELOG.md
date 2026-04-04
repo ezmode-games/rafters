@@ -1,5 +1,19 @@
 # rafters
 
+## 0.0.38
+
+### Minor Changes
+
+- feat(tokens): four-corner radius tokens (#1130). Emits radius-base, radius-tl/tr/bl/br per-corner base tokens, and per-corner per-scale tokens (e.g., radius-lg-tl) that cascade via calc() from the corner base. Override one corner and it propagates through all scale positions.
+- feat(tokens): decomposed shadow tokens (#1130). Each shadow scale emits 5 decomposed tokens (offset-x, offset-y, blur, spread, color) plus a composite that references them via var(). Colored variants (shadow-primary, shadow-destructive) reuse DEFAULT geometry and swap color via color-mix. Inner shadows baked into composite.
+- feat(mcp): semantic token remapping in rafters_onboard (#1130). The map action now accepts "light" and "dark" fields (format: "family-position") to remap which color family a semantic surface token (background, foreground, card, etc.) references for light/dark mode. Fixes the gap where mapping color families didn't update semantic tokens that still pointed at neutral defaults.
+
+### Patch Changes
+
+- fix(tailwind): filter decomposed shadow parts from Tailwind utility generation. Shadow offset-x/y, blur, spread, color tokens are emitted as --rafters-* custom properties only, not as --shadow-* Tailwind utilities.
+- fix(tailwind): skip breakpoint tokens with media query values (e.g., prefers-reduced-motion conditions) that would generate invalid Tailwind CSS.
+- fix(mcp): onboard analyze now detects .dark/prefers-color-scheme CSS and guides agents to remap semantic surface tokens after mapping color families.
+
 ## 0.0.37
 
 ### Patch Changes

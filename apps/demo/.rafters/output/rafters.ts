@@ -67,7 +67,7 @@ export const tokens = {
     /** Media query for forced colors mode (Windows High Contrast) */
     'breakpoint-forced-colors': '(forced-colors: active)',
     /** Breakpoint scale reference */
-    'breakpoint-scale': '{"viewport":{"sm":640,"md":768,"lg":1024,"xl":1280,"2xl":1536},"container":{"3xs":"16rem","2xs":"18rem","xs":"20rem","sm":"24rem","md":"28rem","lg":"32rem","xl":"36rem","2xl":"42rem","3xl":"48rem","4xl":"56rem","5xl":"64rem","6xl":"72rem","7xl":"80rem"},"note":"Container queries use --container-* theme variables with rem values. Use @xs:, @sm:, @md:, etc. variants."}',
+    'breakpoint-scale': {"viewport":{"sm":640,"md":768,"lg":1024,"xl":1280,"2xl":1536},"container":{"3xs":"16rem","2xs":"18rem","xs":"20rem","sm":"24rem","md":"28rem","lg":"32rem","xl":"36rem","2xl":"42rem","3xl":"48rem","4xl":"56rem","5xl":"64rem","6xl":"72rem","7xl":"80rem"},"note":"Container queries use --container-* theme variables with rem values. Use @xs:, @sm:, @md:, etc. variants."},
   },
   color: {
     /** neutral shade at 50 level - light background range */
@@ -263,53 +263,53 @@ export const tokens = {
     /** Maximum layer - emergency overlay (e.g., dev tools) */
     'depth-max': '9999',
     /** Depth scale reference */
-    'depth-scale': '{"gap":10,"note":"Each level has 10-unit gaps for intermediate values","levels":{"base":0,"dropdown":10,"sticky":20,"navigation":25,"fixed":30,"modal":40,"popover":50,"tooltip":60,"overlay":70}}',
+    'depth-scale': {"gap":10,"note":"Each level has 10-unit gaps for intermediate values","levels":{"base":0,"dropdown":10,"sticky":20,"navigation":25,"fixed":30,"modal":40,"popover":50,"tooltip":60,"overlay":70}},
   },
   elevation: {
     /** Surface level - flat, in-flow elements */
-    'elevation-surface': '{"depth":"var(--depth-base)","shadow":"var(--shadow-none)"}',
+    'elevation-surface': {"depth":"var(--depth-base)","shadow":"var(--shadow-none)"},
     /** Z-index component of surface elevation */
     'elevation-surface-z': 'var(--depth-base)',
     /** Shadow component of surface elevation */
     'elevation-surface-shadow': 'var(--shadow-none)',
     /** Slightly raised - subtle depth without z-index change */
-    'elevation-raised': '{"depth":"var(--depth-base)","shadow":"var(--shadow-sm)"}',
+    'elevation-raised': {"depth":"var(--depth-base)","shadow":"var(--shadow-sm)"},
     /** Z-index component of raised elevation */
     'elevation-raised-z': 'var(--depth-base)',
     /** Shadow component of raised elevation */
     'elevation-raised-shadow': 'var(--shadow-sm)',
     /** Overlay level - dropdowns and menus */
-    'elevation-overlay': '{"depth":"var(--depth-dropdown)","shadow":"var(--shadow)"}',
+    'elevation-overlay': {"depth":"var(--depth-dropdown)","shadow":"var(--shadow)"},
     /** Z-index component of overlay elevation */
     'elevation-overlay-z': 'var(--depth-dropdown)',
     /** Shadow component of overlay elevation */
     'elevation-overlay-shadow': 'var(--shadow)',
     /** Sticky level - persistent navigation */
-    'elevation-sticky': '{"depth":"var(--depth-sticky)","shadow":"var(--shadow-md)"}',
+    'elevation-sticky': {"depth":"var(--depth-sticky)","shadow":"var(--shadow-md)"},
     /** Z-index component of sticky elevation */
     'elevation-sticky-z': 'var(--depth-sticky)',
     /** Shadow component of sticky elevation */
     'elevation-sticky-shadow': 'var(--shadow-md)',
     /** Modal level - blocking dialogs */
-    'elevation-modal': '{"depth":"var(--depth-modal)","shadow":"var(--shadow-lg)"}',
+    'elevation-modal': {"depth":"var(--depth-modal)","shadow":"var(--shadow-lg)"},
     /** Z-index component of modal elevation */
     'elevation-modal-z': 'var(--depth-modal)',
     /** Shadow component of modal elevation */
     'elevation-modal-shadow': 'var(--shadow-lg)',
     /** Popover level - above modals */
-    'elevation-popover': '{"depth":"var(--depth-popover)","shadow":"var(--shadow-xl)"}',
+    'elevation-popover': {"depth":"var(--depth-popover)","shadow":"var(--shadow-xl)"},
     /** Z-index component of popover elevation */
     'elevation-popover-z': 'var(--depth-popover)',
     /** Shadow component of popover elevation */
     'elevation-popover-shadow': 'var(--shadow-xl)',
     /** Tooltip level - highest common UI */
-    'elevation-tooltip': '{"depth":"var(--depth-tooltip)","shadow":"var(--shadow-lg)"}',
+    'elevation-tooltip': {"depth":"var(--depth-tooltip)","shadow":"var(--shadow-lg)"},
     /** Z-index component of tooltip elevation */
     'elevation-tooltip-z': 'var(--depth-tooltip)',
     /** Shadow component of tooltip elevation */
     'elevation-tooltip-shadow': 'var(--shadow-lg)',
     /** Elevation scale reference */
-    'elevation-scale': '{"levels":{"surface":{"depth":"depth-base","shadow":"shadow-none"},"raised":{"depth":"depth-base","shadow":"shadow-sm"},"overlay":{"depth":"depth-dropdown","shadow":"shadow"},"sticky":{"depth":"depth-sticky","shadow":"shadow-md"},"modal":{"depth":"depth-modal","shadow":"shadow-lg"},"popover":{"depth":"depth-popover","shadow":"shadow-xl"},"tooltip":{"depth":"depth-tooltip","shadow":"shadow-lg"}},"note":"Each elevation level pairs z-index with appropriate shadow"}',
+    'elevation-scale': {"levels":{"surface":{"depth":"depth-base","shadow":"shadow-none"},"raised":{"depth":"depth-base","shadow":"shadow-sm"},"overlay":{"depth":"depth-dropdown","shadow":"shadow"},"sticky":{"depth":"depth-sticky","shadow":"shadow-md"},"modal":{"depth":"depth-modal","shadow":"shadow-lg"},"popover":{"depth":"depth-popover","shadow":"shadow-xl"},"tooltip":{"depth":"depth-tooltip","shadow":"shadow-lg"}},"note":"Each elevation level pairs z-index with appropriate shadow"},
   },
   focus: {
     /** Default focus ring width - WCAG 2.2 requires minimum 2px */
@@ -317,33 +317,33 @@ export const tokens = {
     /** Focus ring color - inherits from semantic ring token */
     'focus-ring-color': 'var(--ring)',
     /** Default focus ring - suitable for most interactive elements */
-    'focus-ring': '{"width":"0.125rem","offset":"0.125rem","style":"solid","color":"var(--ring)"}',
+    'focus-ring': {"width":"0.125rem","offset":"0.125rem","style":"solid","color":"var(--ring)"},
     /** CSS outline shorthand for default focus ring */
     'focus-outline': '0.125rem solid var(--ring)',
     /** Focus ring offset for default style */
     'focus-offset': '0.125rem',
     /** Inset focus ring - for elements where external ring would be cut off */
-    'focus-ring-inset': '{"width":"0.125rem","offset":"-0.125rem","style":"solid","color":"var(--ring)"}',
+    'focus-ring-inset': {"width":"0.125rem","offset":"-0.125rem","style":"solid","color":"var(--ring)"},
     /** CSS outline shorthand for inset focus ring */
     'focus-outline-inset': '0.125rem solid var(--ring)',
     /** Focus ring offset for inset style */
     'focus-offset-inset': '-0.125rem',
     /** Thick focus ring - for high-visibility needs */
-    'focus-ring-thick': '{"width":"0.188rem","offset":"0.125rem","style":"solid","color":"var(--ring)"}',
+    'focus-ring-thick': {"width":"0.188rem","offset":"0.125rem","style":"solid","color":"var(--ring)"},
     /** CSS outline shorthand for thick focus ring */
     'focus-outline-thick': '0.188rem solid var(--ring)',
     /** Focus ring offset for thick style */
     'focus-offset-thick': '0.125rem',
     /** Subtle focus ring - for dense UIs with many focusable elements */
-    'focus-ring-subtle': '{"width":"0.063rem","offset":"0.125rem","style":"solid","color":"var(--ring)"}',
+    'focus-ring-subtle': {"width":"0.063rem","offset":"0.125rem","style":"solid","color":"var(--ring)"},
     /** CSS outline shorthand for subtle focus ring */
     'focus-outline-subtle': '0.063rem solid var(--ring)',
     /** Focus ring offset for subtle style */
     'focus-offset-subtle': '0.125rem',
     /** Focus ring for containers with focused descendants */
-    'focus-within-ring': '{"width":"0.125rem","offset":"0","style":"solid","color":"var(--ring)"}',
+    'focus-within-ring': {"width":"0.125rem","offset":"0","style":"solid","color":"var(--ring)"},
     /** Focus ring for Windows High Contrast Mode */
-    'focus-high-contrast': '{"width":"0.188rem","offset":"0.125rem","style":"solid","color":"Highlight"}',
+    'focus-high-contrast': {"width":"0.188rem","offset":"0.125rem","style":"solid","color":"Highlight"},
   },
   motion: {
     /** Base transition duration - all motion timing derives from this */
@@ -467,7 +467,7 @@ export const tokens = {
     /** Scale in with spring animation */
     'motion-scale-in': '150ms cubic-bezier(0.175, 0.885, 0.32, 1.275)',
     /** Metadata about the motion progression system */
-    'motion-progression': '{"ratio":"minor-third","ratioValue":1.2,"baseDuration":150,"note":"Motion timing uses step-based progression (base * ratio^step) for unified feel"}',
+    'motion-progression': {"ratio":"minor-third","ratioValue":1.2,"baseDuration":150,"note":"Motion timing uses step-based progression (base * ratio^step) for unified feel"},
   },
   radius: {
     /** Base border radius - all other radii derive from this value */
@@ -913,7 +913,7 @@ export const tokens = {
     /** Destructive colored shadow for warnings */
     'shadow-destructive': '0 0.125rem 0.375rem -0.062rem color-mix(in oklch, var(--destructive) 12%, transparent)',
     /** Metadata about the shadow progression system */
-    'shadow-progression': '{"ratio":"minor-third","ratioValue":1.2,"baseUnit":4,"note":"Shadow values derived from spacing progression for visual harmony"}',
+    'shadow-progression': {"ratio":"minor-third","ratioValue":1.2,"baseUnit":4,"note":"Shadow values derived from spacing progression for visual harmony"},
   },
   spacing: {
     /** Foundation spacing unit - all spacing derives from this value */
@@ -935,7 +935,7 @@ export const tokens = {
     /** Small spacing for component internals and related elements */
     'spacing-3.5': '0.875rem',
     /** Small spacing for component internals and related elements */
-    'spacing-4': '1rem',
+    'spacing-4': '2rem',
     /** Medium spacing for section separation and breathing room */
     'spacing-5': '1.25rem',
     /** Medium spacing for section separation and breathing room */
@@ -987,7 +987,7 @@ export const tokens = {
     /** Extra large spacing for page-level layout and hero sections */
     'spacing-96': '24rem',
     /** Metadata about the spacing progression system */
-    'spacing-progression': '{"ratio":"minor-third","ratioValue":1.2,"baseUnit":4,"sample":[0,4,4.8,5.76,6.91,8.29,9.95,11.94,14.33,17.2]}',
+    'spacing-progression': {"ratio":"minor-third","ratioValue":1.2,"baseUnit":4,"sample":[0,4,4.8,5.76,6.91,8.29,9.95,11.94,14.33,17.2]},
   },
   typography: {
     /** Primary font family for UI text */
@@ -1091,7 +1091,7 @@ export const tokens = {
     /** Black weight */
     'font-weight-black': '900',
     /** Metadata about the typography progression system */
-    'typography-progression': '{"ratio":"minor-third","ratioValue":1.2,"baseFontSize":16,"scale":{"xs":11.11,"sm":13.33,"base":16,"lg":19.2,"xl":23.04,"2xl":27.65,"3xl":33.18,"4xl":39.81,"5xl":47.78,"6xl":57.33,"7xl":68.8,"8xl":82.56,"9xl":99.07}}',
+    'typography-progression': {"ratio":"minor-third","ratioValue":1.2,"baseFontSize":16,"scale":{"xs":11.11,"sm":13.33,"base":16,"lg":19.2,"xl":23.04,"2xl":27.65,"3xl":33.18,"4xl":39.81,"5xl":47.78,"6xl":57.33,"7xl":68.8,"8xl":82.56,"9xl":99.07}},
   },
 } as const;
 

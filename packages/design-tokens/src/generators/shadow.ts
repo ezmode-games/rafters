@@ -22,37 +22,51 @@ function pxToRem(px: number): string {
   return `${rem}rem`;
 }
 
+const SHADOW_PARTS = ['offset-x', 'offset-y', 'blur', 'spread', 'color'] as const;
+
+/** Scale a multiplier by base spacing, rounded to 2 decimal places */
+function scalePx(multiplier: number, baseSpacing: number): number {
+  return Math.round(multiplier * baseSpacing * 100) / 100;
+}
+
 /**
- * Generate shadow CSS value from definition
+ * Compute resolved shadow part values from a definition.
+ * Returns the raw CSS values for each decomposed property.
  */
-function generateShadowValue(def: ShadowDef, baseSpacing: number): string {
-  if (def.opacity === 0) {
-    return 'none';
-  }
+function resolveShadowParts(
+  def: ShadowDef,
+  baseSpacing: number,
+): Record<(typeof SHADOW_PARTS)[number], string> {
+  return {
+    // Shadows are vertical-only by design (material elevation model)
+    'offset-x': '0rem',
+    'offset-y': pxToRem(scalePx(def.yOffset, baseSpacing)),
+    blur: pxToRem(scalePx(def.blur, baseSpacing)),
+    spread: pxToRem(scalePx(def.spread, baseSpacing)),
+    color: `rgb(0 0 0 / ${def.opacity})`,
+  };
+}
 
-  const shadows: string[] = [];
+/**
+ * Generate inner shadow CSS string (not decomposed -- edge case, low override demand)
+ */
+function generateInnerShadowValue(
+  inner: NonNullable<ShadowDef['innerShadow']>,
+  baseSpacing: number,
+): string {
+  const y = pxToRem(scalePx(inner.yOffset, baseSpacing));
+  const blur = pxToRem(scalePx(inner.blur, baseSpacing));
+  const spread = pxToRem(scalePx(inner.spread, baseSpacing));
+  return `0 ${y} ${blur} ${spread} rgb(0 0 0 / ${inner.opacity})`;
+}
 
-  // Primary shadow - use rem for all measurements
-  const yOffsetPx = Math.round(def.yOffset * baseSpacing * 100) / 100;
-  const blurPx = Math.round(def.blur * baseSpacing * 100) / 100;
-  const spreadPx = Math.round(def.spread * baseSpacing * 100) / 100;
-
-  shadows.push(
-    `0 ${pxToRem(yOffsetPx)} ${pxToRem(blurPx)} ${pxToRem(spreadPx)} rgb(0 0 0 / ${def.opacity})`,
-  );
-
-  // Inner shadow for more depth if defined
-  if (def.innerShadow) {
-    const innerYPx = Math.round(def.innerShadow.yOffset * baseSpacing * 100) / 100;
-    const innerBlurPx = Math.round(def.innerShadow.blur * baseSpacing * 100) / 100;
-    const innerSpreadPx = Math.round(def.innerShadow.spread * baseSpacing * 100) / 100;
-
-    shadows.push(
-      `0 ${pxToRem(innerYPx)} ${pxToRem(innerBlurPx)} ${pxToRem(innerSpreadPx)} rgb(0 0 0 / ${def.innerShadow.opacity})`,
-    );
-  }
-
-  return shadows.join(', ');
+/**
+ * Build composite shadow value from var() references to decomposed tokens,
+ * plus an optional baked inner shadow layer.
+ */
+function buildCompositeFromVars(prefix: string, innerValue: string | null): string {
+  const primary = SHADOW_PARTS.map((part) => `var(--rafters-${prefix}-${part})`).join(' ');
+  return innerValue ? `${primary}, ${innerValue}` : primary;
 }
 
 /**
@@ -89,70 +103,123 @@ export function generateShadowTokens(
     const def = shadowDefs[scale];
     if (!def) continue;
     const scaleIndex = SHADOW_SCALE.indexOf(scale);
-    const value = generateShadowValue(def, baseSpacingUnit);
+    const scaleName = scale === 'DEFAULT' ? 'shadow' : `shadow-${scale}`;
+
+    // "none" has no decomposed parts
+    if (def.opacity === 0) {
+      tokens.push({
+        name: scaleName,
+        value: 'none',
+        category: 'shadow',
+        namespace: 'shadow',
+        semanticMeaning: def.meaning,
+        usageContext: def.contexts,
+        scalePosition: scaleIndex,
+        progressionSystem: progressionRatio as 'minor-third',
+        dependsOn: [],
+        description: `Shadow ${scale}: ${def.meaning}`,
+        generatedAt: timestamp,
+        containerQueryAware: false,
+        usagePatterns: {
+          do: ['Use for flat elements', 'Use for disabled states'],
+          never: ['Use on interactive elements that need depth feedback'],
+        },
+      });
+      continue;
+    }
+
+    // Decomposed tokens for this scale
+    const parts = resolveShadowParts(def, baseSpacingUnit);
+    const partDeps: string[] = [];
+
+    for (const part of SHADOW_PARTS) {
+      const partName = `${scaleName}-${part}`;
+      partDeps.push(partName);
+
+      tokens.push({
+        name: partName,
+        value: parts[part],
+        category: 'shadow',
+        namespace: 'shadow',
+        semanticMeaning: `${part} component of ${scale} shadow`,
+        usageContext: ['designer-override'],
+        scalePosition: scaleIndex,
+        dependsOn: ['shadow-base-unit'],
+        description: `Shadow ${scale} ${part}: ${parts[part]}. Override to customize this shadow layer.`,
+        generatedAt: timestamp,
+        containerQueryAware: false,
+      });
+    }
+
+    // Composite token referencing decomposed parts via var()
+    const innerValue =
+      def.innerShadow && def.innerShadow.opacity > 0
+        ? generateInnerShadowValue(def.innerShadow, baseSpacingUnit)
+        : null;
+    const compositeValue = buildCompositeFromVars(scaleName, innerValue);
 
     tokens.push({
-      name: scale === 'DEFAULT' ? 'shadow' : `shadow-${scale}`,
-      value,
+      name: scaleName,
+      value: compositeValue,
       category: 'shadow',
       namespace: 'shadow',
       semanticMeaning: def.meaning,
       usageContext: def.contexts,
       scalePosition: scaleIndex,
       progressionSystem: progressionRatio as 'minor-third',
-      dependsOn: scale === 'none' ? [] : ['shadow-base-unit'],
-      description: `Shadow ${scale}: ${def.meaning}. Y: ${def.yOffset}×base, Blur: ${def.blur}×base`,
+      dependsOn: partDeps,
+      description: `Shadow ${scale}: ${def.meaning}. Composed from var() refs to ${scaleName}-* tokens.`,
       generatedAt: timestamp,
       containerQueryAware: false,
       usagePatterns: {
         do:
-          scale === 'none'
-            ? ['Use for flat elements', 'Use for disabled states']
-            : scaleIndex <= 2
-              ? ['Use for subtle depth', 'Use for cards at rest']
-              : scaleIndex <= 4
-                ? ['Use for hovering elements', 'Use for focus states']
-                : ['Use for floating elements', 'Use for modals'],
-        never:
-          scale === 'none'
-            ? ['Use on interactive elements that need depth feedback']
-            : ["Use shadows that don't match element's semantic depth"],
+          scaleIndex <= 2
+            ? ['Use for subtle depth', 'Use for cards at rest']
+            : scaleIndex <= 4
+              ? ['Use for hovering elements', 'Use for focus states']
+              : ['Use for floating elements', 'Use for modals'],
+        never: ["Use shadows that don't match element's semantic depth"],
       },
     });
   }
 
-  // Add colored shadow variant tokens
-  // Opacity derived from base shadow definition scaled by ratio for emphasis
+  // Colored shadow variants -- reuse decomposed geometry from DEFAULT, swap color
   const baseDef = shadowDefs.DEFAULT;
   if (baseDef) {
-    const coloredOpacity = baseDef.opacity * ratioValue; // Scale by progression ratio for emphasis
+    const coloredOpacity = baseDef.opacity * ratioValue;
     const coloredShadows = [
       {
         name: 'shadow-primary',
         desc: 'Primary colored shadow for emphasis',
         color: 'var(--primary)',
+        colorToken: 'primary',
       },
       {
         name: 'shadow-destructive',
         desc: 'Destructive colored shadow for warnings',
         color: 'var(--destructive)',
+        colorToken: 'destructive',
       },
     ];
 
-    for (const { name, desc, color } of coloredShadows) {
-      const yOffsetPx = Math.round(baseDef.yOffset * baseSpacingUnit * 100) / 100;
-      const blurPx = Math.round(baseDef.blur * baseSpacingUnit * 100) / 100;
-      const spreadPx = Math.round(baseDef.spread * baseSpacingUnit * 100) / 100;
+    for (const { name, desc, color, colorToken } of coloredShadows) {
+      const value = `var(--rafters-shadow-offset-x) var(--rafters-shadow-offset-y) var(--rafters-shadow-blur) var(--rafters-shadow-spread) color-mix(in oklch, ${color} ${coloredOpacity * 100}%, transparent)`;
 
       tokens.push({
         name,
-        value: `0 ${pxToRem(yOffsetPx)} ${pxToRem(blurPx)} ${pxToRem(spreadPx)} color-mix(in oklch, ${color} ${coloredOpacity * 100}%, transparent)`,
+        value,
         category: 'shadow',
         namespace: 'shadow',
         semanticMeaning: desc,
         usageContext: ['branded-elements', 'emphasis'],
-        dependsOn: ['shadow', color.replace('var(--', '').replace(')', '')],
-        description: `${desc}. Uses color-mix for proper OKLCH blending.`,
+        dependsOn: [
+          'shadow-offset-x',
+          'shadow-offset-y',
+          'shadow-blur',
+          'shadow-spread',
+          colorToken,
+        ],
+        description: `${desc}. Reuses DEFAULT shadow geometry, swaps color via color-mix.`,
         generatedAt: timestamp,
         containerQueryAware: false,
       });
