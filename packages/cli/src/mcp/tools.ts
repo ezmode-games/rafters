@@ -1910,12 +1910,15 @@ export class RaftersToolHandler {
         continue;
       }
 
-      // Start with the default positions, swapping the family
       let lightPos = mapping.light.position;
       let darkPos = mapping.dark.position;
 
-      // For fg/bg pairs, verify WCAG compliance using precomputed data
-      if (name.endsWith('-foreground') && colorValue) {
+      // Foreground tokens stay on neutral for contrast -- don't remap them
+      // to the color family. Only adjust their positions for WCAG compliance.
+      const isForeground = name.endsWith('-foreground');
+      const tokenFamily = isForeground ? 'neutral' : colorFamilyName;
+
+      if (isForeground && colorValue) {
         const bgName = name.replace(/-foreground$/, '');
         const bgMapping = DEFAULT_SEMANTIC_COLOR_MAPPINGS[bgName];
         if (bgMapping) {
@@ -1934,9 +1937,9 @@ export class RaftersToolHandler {
         }
       }
 
-      const lightRef = { family: colorFamilyName, position: lightPos };
-      const lightTokenName = `${colorFamilyName}-${lightPos}`;
-      const darkTokenName = `${colorFamilyName}-${darkPos}`;
+      const lightRef = { family: tokenFamily, position: lightPos };
+      const lightTokenName = `${tokenFamily}-${lightPos}`;
+      const darkTokenName = `${tokenFamily}-${darkPos}`;
 
       tokensToUpdate.push({
         ...existing,
@@ -2665,16 +2668,19 @@ export class RaftersToolHandler {
         }
 
         // Collect cascade tokens for semantic families (batched after loop)
-        if (RaftersToolHandler.SEMANTIC_FAMILY_SET.has(target) && enriched) {
-          const colorToken = registry.get(target);
-          const colorFamilyName =
-            colorToken?.value && typeof colorToken.value === 'object' && 'name' in colorToken.value
-              ? (colorToken.value as ColorValue).name
-              : target;
-
-          allCascadeTokens.push(
-            ...this.cascadeSemanticFamily(registry, target, colorFamilyName, results),
-          );
+        if (RaftersToolHandler.SEMANTIC_FAMILY_SET.has(target)) {
+          if (!enriched) {
+            results.push({
+              source,
+              target,
+              action: 'skipped',
+              ok: false,
+              error: `Cascade skipped for "${target}": value was not enriched. Provide a CSS color value so the color family can be created with accessibility data.`,
+            });
+          } else {
+            // Use target as registry key, not ColorValue.name (which is a perceptual name)
+            allCascadeTokens.push(...this.cascadeSemanticFamily(registry, target, target, results));
+          }
         }
       }
 
