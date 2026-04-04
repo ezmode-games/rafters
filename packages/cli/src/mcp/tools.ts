@@ -1544,7 +1544,7 @@ export class RaftersToolHandler {
           await registry.setToken(existing);
 
           const affected = this.getAffectedTokens(registry, name);
-          await this.regenerateOutputs(registry);
+          const outputFiles = await this.regenerateOutputs(registry);
 
           return {
             content: [
@@ -1555,7 +1555,13 @@ export class RaftersToolHandler {
                   action: 'set',
                   name,
                   reason,
+                  persisted: {
+                    value: existing.value,
+                    dependsOn: existing.dependsOn,
+                    namespace: existing.namespace,
+                  },
                   cascaded: affected,
+                  outputFiles,
                 }),
               },
             ],
@@ -1616,7 +1622,7 @@ export class RaftersToolHandler {
 
           registry.add(newToken);
           await this.adapter.save(registry.list());
-          await this.regenerateOutputs(registry);
+          const outputFiles = await this.regenerateOutputs(registry);
 
           return {
             content: [
@@ -1628,6 +1634,7 @@ export class RaftersToolHandler {
                   name,
                   namespace,
                   reason,
+                  outputFiles,
                 }),
               },
             ],
@@ -1648,7 +1655,7 @@ export class RaftersToolHandler {
           await registry.set(name, COMPUTED);
 
           const affected = this.getAffectedTokens(registry, name);
-          await this.regenerateOutputs(registry);
+          const outputFiles = await this.regenerateOutputs(registry);
 
           return {
             content: [
@@ -1660,6 +1667,7 @@ export class RaftersToolHandler {
                   name,
                   reason,
                   cascaded: affected,
+                  outputFiles,
                 }),
               },
             ],
@@ -1698,10 +1706,11 @@ export class RaftersToolHandler {
   }
 
   /**
-   * Regenerate output files (CSS, TS, DTCG) from registry state
+   * Regenerate output files (CSS, TS, DTCG) from registry state.
+   * Returns list of files written so callers can report what changed.
    */
-  private async regenerateOutputs(registry: TokenRegistry): Promise<void> {
-    if (!this.projectRoot) return;
+  private async regenerateOutputs(registry: TokenRegistry): Promise<string[]> {
+    if (!this.projectRoot) return [];
 
     const paths = getRaftersPaths(this.projectRoot);
     const config = await this.loadConfig();
@@ -1712,24 +1721,33 @@ export class RaftersToolHandler {
       compiled: false,
     };
     const shadcn = config?.shadcn ?? false;
+    const written: string[] = [];
 
     await mkdir(paths.output, { recursive: true });
 
     if (exports.tailwind) {
       const darkMode = config?.darkMode ?? 'class';
       const css = registryToTailwind(registry, { includeImport: !shadcn, darkMode });
-      await writeFile(join(paths.output, 'rafters.css'), css);
+      const cssPath = join(paths.output, 'rafters.css');
+      await writeFile(cssPath, css);
+      written.push(cssPath);
     }
 
     if (exports.typescript) {
       const ts = registryToTypeScript(registry, { includeJSDoc: true });
-      await writeFile(join(paths.output, 'rafters.ts'), ts);
+      const tsPath = join(paths.output, 'rafters.ts');
+      await writeFile(tsPath, ts);
+      written.push(tsPath);
     }
 
     if (exports.dtcg) {
       const json = toDTCG(registry.list());
-      await writeFile(join(paths.output, 'rafters.json'), JSON.stringify(json, null, 2));
+      const jsonPath = join(paths.output, 'rafters.json');
+      await writeFile(jsonPath, JSON.stringify(json, null, 2));
+      written.push(jsonPath);
     }
+
+    return written;
   }
 
   // ==================== Tool 6: Onboard ====================
@@ -2258,6 +2276,7 @@ export class RaftersToolHandler {
         ok: boolean;
         enriched?: boolean;
         error?: string;
+        persisted?: { value: unknown; dependsOn?: string[] };
       }> = [];
 
       const parseRef = RaftersToolHandler.parseColorRef;
@@ -2398,6 +2417,10 @@ export class RaftersToolHandler {
             target,
             action: 'remap',
             ok: true,
+            persisted: {
+              value: newColorRef,
+              dependsOn: [lightTokenName, darkTokenName],
+            },
           });
           continue;
         }
@@ -2472,7 +2495,7 @@ export class RaftersToolHandler {
 
       // Persist and regenerate once after all mappings
       await this.adapter.save(registry.list());
-      await this.regenerateOutputs(registry);
+      const outputFiles = await this.regenerateOutputs(registry);
 
       const setCount = results.filter((r) => r.action === 'set' && r.ok).length;
       const createCount = results.filter((r) => r.action === 'create' && r.ok).length;
@@ -2495,6 +2518,7 @@ export class RaftersToolHandler {
                   failed: failCount,
                 },
                 results,
+                outputFiles,
               },
               null,
               2,
