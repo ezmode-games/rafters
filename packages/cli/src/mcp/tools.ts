@@ -1801,6 +1801,169 @@ export class RaftersToolHandler {
     'muted',
   ] as const;
 
+  private static readonly SEMANTIC_FAMILY_SET = new Set<string>(
+    RaftersToolHandler.SEMANTIC_FAMILIES,
+  );
+
+  /** Scale positions indexed 0-10, matching ColorValue.scale array indices */
+  private static readonly SCALE_POSITIONS = [
+    '50',
+    '100',
+    '200',
+    '300',
+    '400',
+    '500',
+    '600',
+    '700',
+    '800',
+    '900',
+    '950',
+  ] as const;
+
+  private static positionToIndex(position: string): number {
+    const idx = RaftersToolHandler.SCALE_POSITIONS.indexOf(
+      position as (typeof RaftersToolHandler.SCALE_POSITIONS)[number],
+    );
+    return idx >= 0 ? idx : 5; // default to 500
+  }
+
+  /**
+   * Find an accessible foreground position against a given background position.
+   * Tries AAA first (7:1), falls back to AA (4.5:1), keeps default if both pass.
+   */
+  private static findAccessibleFgPosition(
+    bgPosition: string,
+    defaultFgPosition: string,
+    aaaPairs: number[][],
+    aaPairs: number[][],
+  ): string {
+    const bgIdx = RaftersToolHandler.positionToIndex(bgPosition);
+    const fgIdx = RaftersToolHandler.positionToIndex(defaultFgPosition);
+
+    const pairValid = (pairs: number[][]) =>
+      pairs.some(([a, b]) => (a === bgIdx && b === fgIdx) || (a === fgIdx && b === bgIdx));
+
+    // Default positions already meet AAA or AA -- keep them
+    if (pairValid(aaaPairs) || pairValid(aaPairs)) return defaultFgPosition;
+
+    // Find best alternative: AAA with same bg first, then AA
+    const bestPair = aaaPairs.find(([a]) => a === bgIdx) ?? aaPairs.find(([a]) => a === bgIdx);
+
+    if (bestPair && bestPair[1] !== undefined) {
+      return RaftersToolHandler.SCALE_POSITIONS[bestPair[1]] ?? defaultFgPosition;
+    }
+
+    return defaultFgPosition;
+  }
+
+  /**
+   * When a semantic family is mapped to a color, cascade to all surface tokens
+   * that reference that family. Uses precomputed accessibility data from the
+   * ColorValue to verify WCAG AAA (fall back to AA) compliance for fg/bg pairs.
+   */
+  private cascadeSemanticFamily(
+    registry: TokenRegistry,
+    familyName: string,
+    colorFamilyName: string,
+    results: Array<{
+      source: string;
+      target: string;
+      action: string;
+      ok: boolean;
+      enriched?: boolean;
+      error?: string;
+      persisted?: { value: unknown; dependsOn?: string[] };
+    }>,
+  ): Token[] {
+    const tokensToUpdate: Token[] = [];
+
+    // Get the color family token to access its accessibility data
+    const colorFamilyToken = registry.get(colorFamilyName);
+    const colorValue =
+      colorFamilyToken?.value &&
+      typeof colorFamilyToken.value === 'object' &&
+      'scale' in colorFamilyToken.value
+        ? (colorFamilyToken.value as ColorValue)
+        : null;
+
+    const aaaPairs = colorValue?.accessibility?.wcagAAA?.normal ?? [];
+    const aaPairs = colorValue?.accessibility?.wcagAA?.normal ?? [];
+
+    for (const [name, mapping] of Object.entries(DEFAULT_SEMANTIC_COLOR_MAPPINGS)) {
+      // For non-neutral: match exact name or "family-*" prefix
+      // For neutral: match all tokens whose defaults reference the neutral family
+      const belongsToFamily =
+        familyName === 'neutral'
+          ? mapping.light.family === 'neutral' && mapping.dark.family === 'neutral'
+          : name === familyName || name.startsWith(`${familyName}-`);
+
+      if (!belongsToFamily) continue;
+
+      const existing = registry.get(name);
+      if (!existing) continue;
+
+      // Preserve human overrides -- designer decisions win
+      if (
+        existing.userOverride?.reason &&
+        !existing.userOverride.reason.startsWith('Auto-cascaded')
+      ) {
+        continue;
+      }
+
+      let lightPos = mapping.light.position;
+      let darkPos = mapping.dark.position;
+
+      // Foreground tokens stay on neutral for contrast -- don't remap them
+      // to the color family. Only adjust their positions for WCAG compliance.
+      const isForeground = name.endsWith('-foreground');
+      const tokenFamily = isForeground ? 'neutral' : colorFamilyName;
+
+      if (isForeground && colorValue) {
+        const bgName = name.replace(/-foreground$/, '');
+        const bgMapping = DEFAULT_SEMANTIC_COLOR_MAPPINGS[bgName];
+        if (bgMapping) {
+          lightPos = RaftersToolHandler.findAccessibleFgPosition(
+            bgMapping.light.position,
+            lightPos,
+            aaaPairs,
+            aaPairs,
+          );
+          darkPos = RaftersToolHandler.findAccessibleFgPosition(
+            bgMapping.dark.position,
+            darkPos,
+            aaaPairs,
+            aaPairs,
+          );
+        }
+      }
+
+      const lightRef = { family: tokenFamily, position: lightPos };
+      const lightTokenName = `${tokenFamily}-${lightPos}`;
+      const darkTokenName = `${tokenFamily}-${darkPos}`;
+
+      tokensToUpdate.push({
+        ...existing,
+        value: lightRef,
+        dependsOn: [lightTokenName, darkTokenName],
+        userOverride: {
+          previousValue:
+            typeof existing.value === 'string' ? existing.value : JSON.stringify(existing.value),
+          reason: `Auto-cascaded from ${familyName} -> ${colorFamilyName}`,
+        },
+      });
+
+      results.push({
+        source: familyName,
+        target: name,
+        action: 'cascade',
+        ok: true,
+        persisted: { value: lightRef, dependsOn: [lightTokenName, darkTokenName] },
+      });
+    }
+
+    return tokensToUpdate;
+  }
+
   /**
    * Handle rafters_onboard tool calls
    */
@@ -2291,6 +2454,7 @@ export class RaftersToolHandler {
       }> = [];
 
       const parseRef = RaftersToolHandler.parseColorRef;
+      const allCascadeTokens: Token[] = [];
 
       for (const mapping of mappings) {
         const { source, target, value, reason, namespace, category } = mapping;
@@ -2502,6 +2666,27 @@ export class RaftersToolHandler {
           registry.add(newToken);
           results.push({ source, target, action: 'create', ok: true, enriched });
         }
+
+        // Collect cascade tokens for semantic families (batched after loop)
+        if (RaftersToolHandler.SEMANTIC_FAMILY_SET.has(target)) {
+          if (!enriched) {
+            results.push({
+              source,
+              target,
+              action: 'skipped',
+              ok: false,
+              error: `Cascade skipped for "${target}": value was not enriched. Provide a CSS color value so the color family can be created with accessibility data.`,
+            });
+          } else {
+            // Use target as registry key, not ColorValue.name (which is a perceptual name)
+            allCascadeTokens.push(...this.cascadeSemanticFamily(registry, target, target, results));
+          }
+        }
+      }
+
+      // Batch cascade update -- single persist for all semantic surface tokens
+      if (allCascadeTokens.length > 0) {
+        await registry.setTokens(allCascadeTokens);
       }
 
       // Persist and regenerate once after all mappings
@@ -2511,6 +2696,7 @@ export class RaftersToolHandler {
       const setCount = results.filter((r) => r.action === 'set' && r.ok).length;
       const createCount = results.filter((r) => r.action === 'create' && r.ok).length;
       const remapCount = results.filter((r) => r.action === 'remap' && r.ok).length;
+      const cascadeCount = results.filter((r) => r.action === 'cascade' && r.ok).length;
       const enrichedCount = results.filter((r) => r.enriched).length;
       const failCount = results.filter((r) => !r.ok).length;
 
@@ -2525,6 +2711,7 @@ export class RaftersToolHandler {
                   set: setCount,
                   created: createCount,
                   remapped: remapCount,
+                  cascaded: cascadeCount,
                   enriched: enrichedCount,
                   failed: failCount,
                 },
