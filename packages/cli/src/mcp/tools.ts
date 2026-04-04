@@ -1659,6 +1659,7 @@ export class RaftersToolHandler {
 
           await registry.set(name, COMPUTED);
 
+          const resolved = registry.get(name);
           const affected = this.getAffectedTokens(registry, name);
           const outputFiles = await this.regenerateOutputs(registry);
 
@@ -1671,6 +1672,11 @@ export class RaftersToolHandler {
                   action: 'reset',
                   name,
                   reason,
+                  persisted: {
+                    value: resolved?.value,
+                    dependsOn: resolved?.dependsOn,
+                    namespace: resolved?.namespace,
+                  },
                   cascaded: affected,
                   outputFiles,
                 }),
