@@ -1452,14 +1452,15 @@ export class RaftersToolHandler {
             };
           }
 
-          // Set with userOverride tracking
+          // Set with userOverride tracking — use setToken() to persist full token including userOverride
           const previousValue = existing.value;
           existing.userOverride = {
             previousValue:
               typeof previousValue === 'string' ? previousValue : JSON.stringify(previousValue),
             reason,
           };
-          await registry.set(name, value);
+          existing.value = value;
+          await registry.setToken(existing);
 
           const affected = this.getAffectedTokens(registry, name);
           await this.regenerateOutputs(registry);
@@ -2311,24 +2312,13 @@ export class RaftersToolHandler {
             reason: `Remapped from ${source}: ${reason}`,
           };
 
-          // Set value to the light ColorReference
+          // Set value AND dependsOn atomically via setToken so both persist
           const newColorRef = { family: newLight.family, position: newLight.position };
-          await registry.set(target, newColorRef);
-
-          // Update dependsOn with light[0] and dark[1] refs
-          const updated = registry.get(target);
-          if (updated) {
-            updated.dependsOn = [lightTokenName, darkTokenName];
-          } else {
-            results.push({
-              source,
-              target,
-              action: 'skipped',
-              ok: false,
-              error: `Token "${target}" was set but could not be retrieved from registry to update dependencies.`,
-            });
-            continue;
-          }
+          await registry.setToken({
+            ...existing,
+            value: newColorRef,
+            dependsOn: [lightTokenName, darkTokenName],
+          });
 
           results.push({
             source,
