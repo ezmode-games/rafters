@@ -1634,6 +1634,11 @@ export class RaftersToolHandler {
                   name,
                   namespace,
                   reason,
+                  persisted: {
+                    value: newToken.value,
+                    dependsOn: newToken.dependsOn,
+                    namespace: newToken.namespace,
+                  },
                   outputFiles,
                 }),
               },
@@ -1730,21 +1735,21 @@ export class RaftersToolHandler {
       const css = registryToTailwind(registry, { includeImport: !shadcn, darkMode });
       const cssPath = join(paths.output, 'rafters.css');
       await writeFile(cssPath, css);
-      written.push(cssPath);
+      written.push(relative(this.projectRoot, cssPath));
     }
 
     if (exports.typescript) {
       const ts = registryToTypeScript(registry, { includeJSDoc: true });
       const tsPath = join(paths.output, 'rafters.ts');
       await writeFile(tsPath, ts);
-      written.push(tsPath);
+      written.push(relative(this.projectRoot, tsPath));
     }
 
     if (exports.dtcg) {
       const json = toDTCG(registry.list());
       const jsonPath = join(paths.output, 'rafters.json');
       await writeFile(jsonPath, JSON.stringify(json, null, 2));
-      written.push(jsonPath);
+      written.push(relative(this.projectRoot, jsonPath));
     }
 
     return written;
