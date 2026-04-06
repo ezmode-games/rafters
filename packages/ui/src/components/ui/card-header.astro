@@ -1,12 +1,21 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 import classy from '../../primitives/classy';
-import { cardHeaderClasses } from './card.classes';
+import {
+  type CardBackground,
+  cardBackgroundClasses,
+  cardHeaderClasses,
+  cardHeaderFlushClasses,
+} from './card.classes';
 
-interface Props extends HTMLAttributes<'div'> {}
+interface Props extends HTMLAttributes<'div'> {
+  background?: CardBackground;
+  flush?: boolean;
+}
 
-const { class: className, ...attrs } = Astro.props;
-const cls = classy(cardHeaderClasses, className);
+const { background, flush, class: className, ...attrs } = Astro.props;
+const bgStyles = background ? cardBackgroundClasses[background] : '';
+const cls = classy(flush ? cardHeaderFlushClasses : cardHeaderClasses, bgStyles, className);
 ---
 
 <div data-slot="card-header" class={cls} {...attrs}>
