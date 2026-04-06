@@ -15,6 +15,8 @@ export const cardEditableClasses =
   'outline-2 outline-dashed outline-muted-foreground/30 outline-offset-2';
 
 export const cardHeaderClasses = 'flex flex-col gap-1.5 p-6';
+export const cardHeaderFlushClasses =
+  'flex flex-col gap-1.5 p-0 [&_img]:w-full [&_img]:object-cover';
 
 export const cardTitleClasses = 'text-title-medium leading-none';
 
