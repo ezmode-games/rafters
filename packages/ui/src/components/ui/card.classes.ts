@@ -28,3 +28,14 @@ export const cardFooterClasses = 'flex items-center p-6 pt-0';
 
 export const cardEditableFocusClasses =
   'outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded';
+
+export type CardBackground = 'none' | 'muted' | 'accent' | 'card' | 'primary' | 'secondary';
+
+export const cardBackgroundClasses: Record<CardBackground, string> = {
+  none: '',
+  muted: 'bg-muted text-muted-foreground',
+  accent: 'bg-accent text-accent-foreground',
+  card: 'bg-card text-card-foreground',
+  primary: 'bg-primary text-primary-foreground',
+  secondary: 'bg-secondary text-secondary-foreground',
+};
