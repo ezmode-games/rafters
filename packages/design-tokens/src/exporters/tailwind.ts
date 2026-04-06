@@ -13,7 +13,7 @@
  * @see https://ui.shadcn.com/docs/theming
  */
 
-import type { ColorReference, ColorValue, Token } from '@rafters/shared';
+import type { ColorReference, ColorValue, Token, TypographyElementOverride } from '@rafters/shared';
 import { DEFAULT_SEMANTIC_COLOR_MAPPINGS } from '../generators/defaults.js';
 import type { TokenRegistry } from '../registry.js';
 
@@ -689,6 +689,61 @@ function generateTypographyCompositeUtilities(compositeTokens: Token[]): string 
 }
 
 /**
+ * Map a typography override property to a Tailwind utility class.
+ */
+function overridePropertyToUtility(property: string, value: string): string {
+  switch (property) {
+    case 'fontFamily':
+      return `font-${value}`;
+    case 'fontWeight':
+      return `font-${value}`;
+    case 'fontSize':
+      return `text-${value}`;
+    case 'lineHeight':
+      return `leading-${value}`;
+    case 'letterSpacing':
+      return `tracking-${value}`;
+    default:
+      return '';
+  }
+}
+
+/**
+ * Generate element-level typography override CSS from registry overrides.
+ * Each override produces a CSS rule with @apply using the base role utility
+ * plus the overridden Tailwind utilities.
+ */
+function generateTypographyOverrideCSS(overrides: TypographyElementOverride[]): string {
+  if (overrides.length === 0) {
+    return '';
+  }
+
+  const lines: string[] = [];
+  lines.push('/* -- Typography Element Overrides -- */');
+
+  for (const override of overrides) {
+    const overrideUtilities: string[] = [];
+    for (const [prop, val] of Object.entries(override.overrides)) {
+      if (val) {
+        const utility = overridePropertyToUtility(prop, val);
+        if (utility) {
+          overrideUtilities.push(utility);
+        }
+      }
+    }
+
+    if (overrideUtilities.length > 0) {
+      lines.push(`/* ${override.element}: diverges from ${override.role} (${override.why}) */`);
+      lines.push(`${override.element} {`);
+      lines.push(`  @apply text-${override.role} ${overrideUtilities.join(' ')};`);
+      lines.push('}');
+    }
+  }
+
+  return lines.join('\n');
+}
+
+/**
  * Export tokens to Tailwind v4 CSS format
  *
  * @param tokens - Array of tokens to export
@@ -707,7 +762,11 @@ function generateTypographyCompositeUtilities(compositeTokens: Token[]): string 
  * fs.writeFileSync('theme.css', css);
  * ```
  */
-export function tokensToTailwind(tokens: Token[], options: TailwindExportOptions = {}): string {
+export function tokensToTailwind(
+  tokens: Token[],
+  options: TailwindExportOptions = {},
+  typographyOverrides: TypographyElementOverride[] = [],
+): string {
   const { includeImport = true } = options;
 
   if (tokens.length === 0) {
@@ -751,6 +810,13 @@ export function tokensToTailwind(tokens: Token[], options: TailwindExportOptions
     sections.push(typographyUtilities);
   }
 
+  // Typography element overrides (if any)
+  const overrideCSS = generateTypographyOverrideCSS(typographyOverrides);
+  if (overrideCSS) {
+    sections.push('');
+    sections.push(overrideCSS);
+  }
+
   // Article type system - @layer base with @apply compositions
   sections.push('');
   sections.push(generateArticleBaseLayer());
@@ -783,7 +849,8 @@ export function registryToTailwind(
   options?: TailwindExportOptions,
 ): string {
   const tokens = registry.list();
-  return tokensToTailwind(tokens, options);
+  const typographyOverrides = registry.getTypographyOverrides();
+  return tokensToTailwind(tokens, options, typographyOverrides);
 }
 
 /**
