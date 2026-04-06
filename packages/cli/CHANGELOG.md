@@ -1,5 +1,11 @@
 # rafters
 
+## 0.0.46
+
+### Patch Changes
+
+- fix(tailwind): radius tokens in @theme block now use var(--radius-base) references instead of hardcoded values. Setting radius-base to 0 now cascades to all derived radius tokens (sm, md, lg, xl, etc.) via CSS custom properties. Run `rafters init --rebuild` to regenerate.
+
 ## 0.0.45
 
 ### Minor Changes

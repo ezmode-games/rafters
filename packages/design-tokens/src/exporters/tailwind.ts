@@ -342,13 +342,19 @@ function generateThemeBlock(groups: GroupedTokens): string {
   }
 
   // Radius tokens -- Tailwind v4 reads --radius-* for rounded-*
+  // Rewrite var(--rafters-radius-base) to var(--radius-base) for @theme context
   if (groups.radius.length > 0) {
     for (const token of groups.radius) {
       const value = tokenValueToCSS(token);
       if (value === null) continue;
-      // Strip "radius-" prefix: token "radius-md" becomes "--radius-md"
       const key = token.name.replace(/^radius-/, '');
-      lines.push(`  --radius-${key}: ${value};`);
+      const themeValue = value
+        .replaceAll('var(--rafters-radius-base)', 'var(--radius-base)')
+        .replaceAll('var(--rafters-radius-tl)', 'var(--radius-tl)')
+        .replaceAll('var(--rafters-radius-tr)', 'var(--radius-tr)')
+        .replaceAll('var(--rafters-radius-bl)', 'var(--radius-bl)')
+        .replaceAll('var(--rafters-radius-br)', 'var(--radius-br)');
+      lines.push(`  --radius-${key}: ${themeValue};`);
     }
     lines.push('');
   }
