@@ -1,12 +1,17 @@
 # rafters
 
+## 0.0.46
+
+### Patch Changes
+
+- fix(tailwind): radius tokens in @theme block now use var(--radius-base) references instead of hardcoded values. Setting radius-base to 0 now cascades to all derived radius tokens (sm, md, lg, xl, etc.) via CSS custom properties. Run `rafters init --rebuild` to regenerate.
+
 ## 0.0.45
 
 ### Minor Changes
 
 - feat(registry): `rafters add typography` now bundles all Astro sub-components (H1-H6, P, Code, etc.) in a single install. Sub-components that import the parent's shared .classes.ts file are automatically detected and included. Standalone components like alert-dialog (which have their own .classes.ts) remain independent.
 - fix(registry): `rafters add typography-h1` resolves shared files from actual imports instead of name matching. typography-h1 now correctly bundles typography.classes.ts.
-- fix(tailwind): radius tokens in @theme block now use var(--radius-base) references instead of hardcoded values. Setting radius-base to 0 now cascades to all derived radius tokens (sm, md, lg, xl, etc.) via CSS custom properties.
 
 ## 0.0.44
 
