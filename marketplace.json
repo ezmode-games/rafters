@@ -1,0 +1,19 @@
+{
+  "name": "rafters",
+  "owner": {
+    "name": "Rafters Studio"
+  },
+  "plugins": [
+    {
+      "name": "rafters",
+      "description": "Design intelligence enforcement for Rafters projects. Prevents guessing at design decisions by enforcing MCP tool usage, Container/Grid layout, classy(), and design token compliance.",
+      "version": "0.1.0",
+      "source": {
+        "source": "git-subdir",
+        "url": "rafters-studio/rafters",
+        "path": "plugin",
+        "ref": "main"
+      }
+    }
+  ]
+}
