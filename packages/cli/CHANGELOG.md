@@ -1,5 +1,11 @@
 # rafters
 
+## 0.0.42
+
+### Minor Changes
+
+- feat(tokens): typography intelligence system -- composite role tokens, @utility generation, element overrides with why-gate, WCAG 2.2 AA enforcement. 14 shared typography roles (display-large through shortcut) replace 78+ hardcoded typographic utility classes across 27 component .classes.ts files. Each role is a composite token storing family, size, weight, line-height, and tracking. The Tailwind exporter generates @utility classes (text-title-medium, text-body-small, etc.) from the composites. Font-family role tokens (font-heading, font-body, font-code) give designers one-place control over all headings, body text, or code font families. Element-level overrides with why-gate allow per-element exceptions stored with provenance. Accessibility validator enforces minimum font sizes, line heights, and weight-contrast coupling at generation and override time.
+
 ## 0.0.41
 
 ### Patch Changes
