@@ -6,7 +6,13 @@
  * Automatically enriches color tokens with intelligence from Color Intelligence API
  */
 
-import { COMPUTED, type ComputedSymbol, type Token } from '@rafters/shared';
+import {
+  COMPUTED,
+  type ComputedSymbol,
+  type Token,
+  type TypographyElementOverride,
+  TypographyElementOverrideSchema,
+} from '@rafters/shared';
 import { TokenDependencyGraph } from './dependencies';
 import { GenerationRuleExecutor, GenerationRuleParser } from './generation-rules';
 import type { PersistenceAdapter } from './persistence/types';
@@ -55,6 +61,7 @@ export class TokenRegistry {
   private changeCallback?: RegistryChangeCallback;
   private adapter?: PersistenceAdapter;
   private dirtyNamespaces = new Set<string>();
+  private typographyOverrides: Map<string, TypographyElementOverride> = new Map();
 
   constructor(initialTokens?: Token[]) {
     if (initialTokens) {
@@ -759,6 +766,48 @@ export class TokenRegistry {
    */
   parseRuleDependencies(rule: string): string[] {
     return this.dependencyGraph.parseRuleDependencies(rule);
+  }
+
+  // ===========================================================================
+  // Typography Element Overrides
+  // ===========================================================================
+
+  /**
+   * Add a typography element override with why-gate enforcement.
+   * Stores an override for a specific HTML element that diverges from its
+   * assigned typography role.
+   *
+   * @throws If why field is empty (why-gate enforcement)
+   * @throws If role references a non-existent typography composite token
+   */
+  addTypographyOverride(override: TypographyElementOverride): void {
+    // Validate with Zod schema (enforces non-empty why)
+    const parsed = TypographyElementOverrideSchema.parse(override);
+
+    // Validate that the role exists as a typography-composite token
+    const roleToken = this.get(parsed.role);
+    if (!roleToken || roleToken.namespace !== 'typography-composite') {
+      throw new Error(
+        `Typography override for "${parsed.element}" references unknown role "${parsed.role}". ` +
+          'Role must be an existing typography-composite token.',
+      );
+    }
+
+    this.typographyOverrides.set(parsed.element, parsed);
+  }
+
+  /**
+   * Get all typography element overrides.
+   */
+  getTypographyOverrides(): TypographyElementOverride[] {
+    return Array.from(this.typographyOverrides.values());
+  }
+
+  /**
+   * Remove a typography element override.
+   */
+  removeTypographyOverride(element: string): boolean {
+    return this.typographyOverrides.delete(element);
   }
 
   /**
