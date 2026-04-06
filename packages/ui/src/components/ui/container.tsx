@@ -32,6 +32,7 @@ import classy from '../../primitives/classy';
 import {
   type ContainerBackground,
   containerArticleTypography,
+  containerAutoEdgePadding,
   containerBackgroundClasses,
   containerGapClasses,
   containerPaddingClasses,
@@ -173,8 +174,8 @@ export const Container = React.forwardRef<HTMLElement, ContainerProps>(
       // Centering for sized containers
       size && size !== 'full' && 'mx-auto',
 
-      // Padding
-      padding && paddingClasses[padding],
+      // Padding -- explicit prop overrides, otherwise CQ-responsive edge padding for sized containers
+      padding ? paddingClasses[padding] : size && size !== 'full' && containerAutoEdgePadding,
 
       // Vertical flow with gap
       resolvedGap && gapClasses[resolvedGap],

@@ -13,6 +13,7 @@ import classy from '../../primitives/classy';
 import {
   type ContainerBackground,
   containerArticleTypography,
+  containerAutoEdgePadding,
   containerBackgroundClasses,
   containerGapClasses,
   containerPaddingClasses,
@@ -55,7 +56,7 @@ const classes = classy(
   query && '@container w-full',
   size && containerSizeClasses[size],
   size && size !== 'full' && 'mx-auto',
-  padding && containerPaddingClasses[padding],
+  padding ? containerPaddingClasses[padding] : size && size !== 'full' && containerAutoEdgePadding,
   resolvedGap && containerGapClasses[resolvedGap],
   background && containerBackgroundClasses[background],
   isArticle && containerArticleTypography,

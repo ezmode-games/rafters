@@ -11,7 +11,9 @@ TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty')
 # Files installed by `rafters add` must never be edited in consumer sites.
 # Fix your consuming code, or file a bug upstream on rafters.
 REGISTRY_VIOLATION=""
+# Skip registry guard in the rafters source repo (packages/ui/src is the source, not a consumer install)
 case "$FILE_PATH" in
+  */packages/ui/src/*|*/packages/cli/src/*|*/apps/registry/*) ;;
   */lib/primitives/*)
     REGISTRY_VIOLATION="REGISTRY FILES ARE READ-ONLY: $(basename "$FILE_PATH") in lib/primitives/ is installed by rafters. Do not edit. Fix your consuming code or file a bug upstream on rafters." ;;
   */components/ui/*.classes.ts)
