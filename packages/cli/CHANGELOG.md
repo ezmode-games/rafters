@@ -4,7 +4,12 @@
 
 ### Minor Changes
 
-- feat(ui): typography tag components with token-level props. Individual HTML element components (H1-H6, P, Code, Blockquote, Small, Mark, Abbr) replace the unified Typography component. Each renders its own HTML element with designer-controlled defaults from typography composite roles. Token-level props (size, weight, color, line, tracking, family) allow surgical override of any dimension while staying within the token system. Removed Lead, Large, Muted as separate components -- they are now P with explicit props. Also includes the typography role migration: 27 component .classes.ts files now use semantic role utilities (text-title-medium, text-body-small, etc.) instead of hardcoded Tailwind classes.
+- feat(tokens): typography intelligence system with composite generator. One composite token per typography role (display-large, title-medium, body-small, etc.) bundles font-family, font-size, font-weight, line-height, and letter-spacing into a single token. Font-family role tokens (font-heading, font-body, font-code) added as first-class token type. Typography composite type definitions integrated into the token registry.
+- feat(ui): typography tag components with token-level props. Individual HTML element components (H1-H6, P, Code, Blockquote, Small, Mark, Abbr) replace the unified Typography component. Each renders its own HTML element with designer-controlled defaults from typography composite roles. Token-level props (size, weight, color, line, tracking, family) allow surgical override of any dimension while staying within the token system. Removed Lead, Large, Muted as separate components -- they are now P with explicit props. 27 component .classes.ts files migrated to semantic role utilities.
+
+### Patch Changes
+
+- fix(tailwind): remove double-prefix on spacing and radius :root custom properties. The exporter was emitting --rafters-spacing-base and --rafters-radius-base in :root but --spacing-base and --radius-base in @theme, breaking the variable chain. Now emits consistent unprefixed names in :root so @theme references resolve correctly.
 
 ## 0.0.41
 
