@@ -8,11 +8,12 @@
 
 import type { ColorValue } from '@rafters/shared';
 import type { TokenRegistry } from '../registry';
+import { INDEX_TO_POSITION } from '../scale-positions';
 
 // Extended ColorValue with optional plugin-specific properties
 type ExtendedColorValue = ColorValue & {
   foregroundReferences?: {
-    auto?: { family: string; position: string | number };
+    auto?: { family: string; position: string };
   };
 };
 
@@ -20,7 +21,7 @@ export default function contrast(
   registry: TokenRegistry,
   tokenName: string,
   dependencies: string[],
-): { family: string; position: string | number } {
+): { family: string; position: string } {
   // Get the base family from dependencies
   if (dependencies.length === 0) {
     throw new Error(`No dependencies found for contrast rule on token: ${tokenName}`);
@@ -108,7 +109,7 @@ export default function contrast(
       // Use the same family but different position for contrast
       return {
         family: familyTokenName,
-        position: (contrastPosition * 100).toString(),
+        position: INDEX_TO_POSITION[contrastPosition] ?? '500',
       };
     }
   }
@@ -130,7 +131,7 @@ export default function contrast(
           if (bestPosition !== undefined) {
             return {
               family: neutralFamily,
-              position: (bestPosition * 100).toString(),
+              position: INDEX_TO_POSITION[bestPosition] ?? '500',
             };
           }
         }
@@ -140,7 +141,7 @@ export default function contrast(
           if (bestPosition !== undefined) {
             return {
               family: neutralFamily,
-              position: (bestPosition * 100).toString(),
+              position: INDEX_TO_POSITION[bestPosition] ?? '500',
             };
           }
         }

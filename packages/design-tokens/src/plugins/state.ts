@@ -2,23 +2,30 @@
  * State Rule Plugin
  *
  * Generates state variants (hover, active, focus, disabled) using pre-computed
- * state references from ColorValue intelligence data.
+ * state references from ColorValue intelligence data, or positional offsets
+ * from the base token's actual position.
  */
 
 import type { ColorValue } from '@rafters/shared';
 import type { TokenRegistry } from '../registry';
+import { INDEX_TO_POSITION, POSITION_TO_INDEX } from '../scale-positions';
 
-// Extended ColorValue with optional plugin-specific properties
 type ExtendedColorValue = ColorValue & {
-  stateReferences?: Record<string, { family: string; position: string | number }>;
+  stateReferences?: Record<string, { family: string; position: string }>;
+};
+
+const STATE_OFFSETS: Record<string, number> = {
+  hover: 1,
+  active: 2,
+  focus: 1,
+  disabled: -2,
 };
 
 export default function state(
   registry: TokenRegistry,
   tokenName: string,
   dependencies: string[],
-): { family: string; position: string | number } {
-  // Extract state from token name (e.g., "primary-hover" -> "hover")
+): { family: string; position: string } {
   const stateMatch = tokenName.match(/(hover|active|focus|disabled)$/);
   if (!stateMatch) {
     throw new Error(`Cannot extract state from token name: ${tokenName}`);
@@ -26,7 +33,6 @@ export default function state(
 
   const stateName = stateMatch[1] as 'hover' | 'active' | 'focus' | 'disabled';
 
-  // Get the base family from dependencies
   if (dependencies.length === 0) {
     throw new Error(`No dependencies found for state rule on token: ${tokenName}`);
   }
@@ -43,39 +49,28 @@ export default function state(
 
   const colorValue = familyToken.value as ExtendedColorValue;
 
-  // Check if pre-computed state references exist
+  // Use pre-computed state references if available
   if (colorValue.stateReferences?.[stateName]) {
     const reference = colorValue.stateReferences[stateName];
-    return {
-      family: reference.family,
-      position: reference.position,
-    };
+    return { family: reference.family, position: String(reference.position) };
   }
 
-  // Fallback: use same family with adjusted position
-  // This is a simple fallback - the real logic should be in the ColorValue
-  const basePosition = 500; // Default middle position
-  let adjustedPosition: number;
+  // Derive from the base token's actual position
+  const baseTokenName = tokenName.replace(/-(hover|active|focus|disabled)$/, '');
+  const baseToken = registry.get(baseTokenName);
+  let baseIndex = 5; // Default to 500 if base token not found
 
-  switch (stateName) {
-    case 'hover':
-      adjustedPosition = basePosition + 100; // Slightly darker
-      break;
-    case 'active':
-      adjustedPosition = basePosition + 200; // Darker
-      break;
-    case 'focus':
-      adjustedPosition = basePosition + 50; // Slightly darker
-      break;
-    case 'disabled':
-      adjustedPosition = basePosition - 200; // Much lighter
-      break;
-    default:
-      adjustedPosition = basePosition;
+  if (baseToken && typeof baseToken.value === 'object' && 'position' in baseToken.value) {
+    const baseRef = baseToken.value as { position?: string };
+    if (baseRef.position) {
+      const idx = POSITION_TO_INDEX[baseRef.position];
+      if (idx !== undefined) baseIndex = idx;
+    }
   }
 
-  return {
-    family: familyTokenName ?? 'neutral',
-    position: Math.min(900, Math.max(100, adjustedPosition)).toString(),
-  };
+  const offset = STATE_OFFSETS[stateName] ?? 0;
+  const adjustedIndex = Math.max(0, Math.min(10, baseIndex + offset));
+  const position = INDEX_TO_POSITION[adjustedIndex] ?? '500';
+
+  return { family: familyTokenName, position };
 }

@@ -11,7 +11,7 @@ export default function scale(
   registry: TokenRegistry,
   tokenName: string,
   dependencies: string[],
-): { family: string; position: string | number } {
+): { family: string; position: string } {
   // Extract scale position from token name
   // Assumes token name like "primary-600" or similar pattern
   const match = tokenName.match(/(\d+)$/);
