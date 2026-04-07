@@ -17,7 +17,17 @@ import {
   VALID_SCALE_POSITIONS,
 } from './scale-positions';
 
-export type RuleResult = string | ColorReference;
+export type CssResult = { readonly kind: 'css'; readonly value: string };
+export type RefResult = { readonly kind: 'ref'; readonly ref: ColorReference };
+export type RuleResult = CssResult | RefResult;
+
+export function cssResult(value: string): CssResult {
+  return { kind: 'css', value };
+}
+
+export function refResult(family: string, position: string): RefResult {
+  return { kind: 'ref', ref: { family, position } };
+}
 
 export interface ParsedRule {
   type: string;
@@ -256,14 +266,13 @@ export class GenerationRuleExecutor {
     }
   }
 
-  private executeCalcRule(rule: ParsedRule): string {
+  private executeCalcRule(rule: ParsedRule): CssResult {
     if (!rule.expression) {
       throw new Error('Calc rule missing expression');
     }
 
     let expression = rule.expression;
 
-    // Replace token references with actual values
     if (rule.tokens) {
       for (const tokenName of rule.tokens) {
         const token = this.registry.get(tokenName);
@@ -276,11 +285,10 @@ export class GenerationRuleExecutor {
       }
     }
 
-    // Return the CSS calc expression
-    return `calc(${expression})`;
+    return cssResult(`calc(${expression})`);
   }
 
-  private executeScaleRule(rule: ParsedRule): string {
+  private executeScaleRule(rule: ParsedRule): CssResult {
     if (!rule.baseToken) {
       throw new Error('Scale rule missing base token');
     }
@@ -293,16 +301,14 @@ export class GenerationRuleExecutor {
     const baseValue = String(baseToken.value);
     const ratio = rule.ratio || 1.5;
 
-    // For numeric values, multiply by ratio
     const numericMatch = baseValue.match(/^([0-9.]+)(.*)$/);
     if (numericMatch?.[1]) {
       const value = parseFloat(numericMatch[1]);
       const unit = numericMatch[2] || '';
-      return `${value * ratio}${unit}`;
+      return cssResult(`${value * ratio}${unit}`);
     }
 
-    // For non-numeric values, return calc expression
-    return `calc(${baseValue} * ${ratio})`;
+    return cssResult(`calc(${baseValue} * ${ratio})`);
   }
 
   /**
@@ -318,7 +324,7 @@ export class GenerationRuleExecutor {
     const existingToken = this.registry.get(tokenName);
     const existingValue = existingToken?.value;
 
-    // Semantic token path: value is a ColorReference, return a ColorReference
+    // Semantic token path: value is a ColorReference, return a RefResult
     if (existingValue && typeof existingValue === 'object' && 'family' in existingValue) {
       const dependencies = this.registry.getDependencies(tokenName);
       const familyName = dependencies[0];
@@ -335,20 +341,20 @@ export class GenerationRuleExecutor {
         throw new Error(`Cannot resolve scale position for token: ${tokenName}`);
       }
 
-      return { family: familyName, position: String(position) } as ColorReference;
+      return refResult(familyName, String(position));
     }
 
     // Position token path: resolve to CSS string
     const dependencies = this.registry.getDependencies(tokenName);
     const reference = scalePlugin(this.registry, tokenName, dependencies);
-    return this.resolveColorReference(reference);
+    return cssResult(this.resolveColorReference(reference));
   }
 
   /**
    * Resolve a color reference {family, position} to a CSS value.
    * This is the bridge between lazy plugin references and immediate CSS values.
    */
-  resolveColorReference(reference: { family: string; position: string | number }): string {
+  resolveColorReference(reference: { family: string; position: string }): string {
     const familyToken = this.registry.get(reference.family);
     if (!familyToken) {
       throw new Error(`Family token not found: ${reference.family}`);
@@ -399,21 +405,21 @@ export class GenerationRuleExecutor {
     return `oklch(${l} ${c} ${h})`;
   }
 
-  private executeStateRule(_rule: ParsedRule, tokenName: string): ColorReference {
+  private executeStateRule(_rule: ParsedRule, tokenName: string): RefResult {
     const dependencies = this.registry.getDependencies(tokenName);
     const ref = statePlugin(this.registry, tokenName, dependencies);
-    return { family: ref.family, position: String(ref.position) };
+    return refResult(ref.family, ref.position);
   }
 
-  private executeContrastRule(_rule: ParsedRule, tokenName: string): ColorReference {
+  private executeContrastRule(_rule: ParsedRule, tokenName: string): RefResult {
     const dependencies = this.registry.getDependencies(tokenName);
     const ref = contrastPlugin(this.registry, tokenName, dependencies);
-    return { family: ref.family, position: String(ref.position) };
+    return refResult(ref.family, ref.position);
   }
 
-  private executeInvertRule(_rule: ParsedRule, tokenName: string): ColorReference {
+  private executeInvertRule(_rule: ParsedRule, tokenName: string): RefResult {
     const dependencies = this.registry.getDependencies(tokenName);
     const ref = invertPlugin(this.registry, tokenName, dependencies);
-    return { family: ref.family, position: String(ref.position) };
+    return refResult(ref.family, ref.position);
   }
 }

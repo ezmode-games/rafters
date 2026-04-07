@@ -146,7 +146,7 @@ describe('GenerationRuleExecutor', () => {
       const parsedRule = parser.parse('scale:500');
       const result = executor.execute(parsedRule, 'primary-500');
 
-      expect(result).toBe(oklchToCSS(colorValue.scale[5]));
+      expect(result).toEqual({ kind: 'css', value: oklchToCSS(colorValue.scale[5]) });
     });
 
     it('extracts color at different scale positions', () => {
@@ -180,7 +180,7 @@ describe('GenerationRuleExecutor', () => {
         const parsedRule = parser.parse(rule);
         const result = executor.execute(parsedRule, name);
 
-        expect(result).toBe(oklchToCSS(colorValue.scale[index]));
+        expect(result).toEqual({ kind: 'css', value: oklchToCSS(colorValue.scale[index]) });
       }
     });
 

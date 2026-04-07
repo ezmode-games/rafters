@@ -577,22 +577,27 @@ export class TokenRegistry {
     try {
       // Parse and execute the rule
       const parsedRule = this.ruleParser.parse(rule);
-      const newComputedValue = this.ruleExecutor.execute(parsedRule, tokenName);
+      const ruleResult = this.ruleExecutor.execute(parsedRule, tokenName);
 
       // Mark namespace dirty since we're changing this token
       this.markDirty(existingToken.namespace);
 
-      // For ColorReference results, update dependsOn for dark mode.
-      // dependsOn[0] = family token (plugins need ColorValue for WCAG data)
-      // dependsOn[1] = dark mode position token (Tailwind exporter reads this)
+      // Extract the token value and update dependsOn for RefResults
       let updatedDependsOn = existingToken.dependsOn;
-      if (
-        typeof newComputedValue === 'object' &&
-        'family' in newComputedValue &&
-        'position' in newComputedValue
-      ) {
-        const darkTokenName = this.findDarkCounterpart(newComputedValue, existingToken.dependsOn);
-        updatedDependsOn = [newComputedValue.family, darkTokenName];
+      let newValue: string | ColorReference;
+
+      switch (ruleResult.kind) {
+        case 'ref': {
+          newValue = ruleResult.ref;
+          // dependsOn[0] = family token (plugins need ColorValue for WCAG data)
+          // dependsOn[1] = dark mode position token (Tailwind exporter reads this)
+          const darkTokenName = this.findDarkCounterpart(ruleResult.ref, existingToken.dependsOn);
+          updatedDependsOn = [ruleResult.ref.family, darkTokenName];
+          break;
+        }
+        case 'css':
+          newValue = ruleResult.value;
+          break;
       }
 
       if (existingToken.userOverride) {
@@ -600,21 +605,19 @@ export class TokenRegistry {
         // Agent intelligence: can see what system would produce vs what human chose
         this.tokens.set(tokenName, {
           ...existingToken,
-          computedValue: newComputedValue,
+          computedValue: newValue,
           dependsOn: updatedDependsOn,
-          // value stays as-is (the human's choice)
         });
       } else {
-        // No override - update the actual value
         this.tokens.set(tokenName, {
           ...existingToken,
-          value: newComputedValue,
-          computedValue: newComputedValue,
+          value: newValue,
+          computedValue: newValue,
           dependsOn: updatedDependsOn,
         });
       }
     } catch (error) {
-      throw new Error(`Failed to regenerate token ${tokenName}: ${error}`);
+      throw new Error(`Failed to regenerate token ${tokenName}: ${error}`, { cause: error });
     }
   }
 
@@ -623,19 +626,22 @@ export class TokenRegistry {
    * Uses the WCAG accessibility matrix from the color family's ColorValue.
    * Falls back to mathematical inversion if no WCAG data available.
    */
-  private findDarkCounterpart(lightRef: ColorReference, existingDependsOn?: string[]): string {
+  private findDarkCounterpart(lightRef: ColorReference, _existingDependsOn?: string[]): string {
     const lightIdx = POSITION_TO_INDEX[lightRef.position];
     if (lightIdx === undefined) {
-      return existingDependsOn?.[1] ?? `${lightRef.family}-${lightRef.position}`;
+      throw new Error(
+        `Invalid position "${lightRef.position}" in ColorReference for family "${lightRef.family}". ` +
+          `Expected one of: ${Object.keys(POSITION_TO_INDEX).join(', ')}`,
+      );
     }
 
     const familyToken = this.tokens.get(lightRef.family);
-    const colorValue = familyToken?.value as ColorValue | undefined;
-    if (!colorValue) {
+    if (!familyToken || typeof familyToken.value !== 'object' || !('scale' in familyToken.value)) {
       const fallbackIdx = Math.max(0, Math.min(10, 10 - lightIdx));
       return `${lightRef.family}-${INDEX_TO_POSITION[fallbackIdx] ?? '500'}`;
     }
 
+    const colorValue = familyToken.value as ColorValue;
     const darkIdx = findDarkCounterpartIndex(lightIdx, colorValue);
     const darkPos = INDEX_TO_POSITION[darkIdx] ?? '500';
     return `${lightRef.family}-${darkPos}`;

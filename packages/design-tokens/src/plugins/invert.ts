@@ -60,5 +60,8 @@ function extractLightIndex(tokenName: string, dependencies: string[]): number {
     if (idx !== undefined) return idx;
   }
 
-  return 5;
+  throw new Error(
+    `Cannot determine light mode scale position for invert rule on token: ${tokenName}. ` +
+      `Neither dependency[1] (${dependencies[1] ?? 'none'}) nor token name suffix contain a valid position.`,
+  );
 }

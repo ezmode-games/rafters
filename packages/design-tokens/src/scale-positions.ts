@@ -56,6 +56,11 @@ export const SCALE_POSITION_MAP: Record<number, number> = {
 
 export const SCALE_POSITION_MAP_REVERSE: Record<number, string> = {};
 for (const [pos, idx] of Object.entries(SCALE_POSITION_MAP)) {
+  if (SCALE_POSITION_MAP_REVERSE[idx] !== undefined) {
+    throw new Error(
+      `Duplicate index ${idx} in SCALE_POSITION_MAP: "${SCALE_POSITION_MAP_REVERSE[idx]}" and "${pos}"`,
+    );
+  }
   SCALE_POSITION_MAP_REVERSE[idx] = pos;
 }
 
@@ -107,6 +112,14 @@ export function findBestWcagPair(
 export function findDarkCounterpartIndex(lightIndex: number, colorValue: ColorValue): number {
   const aaaPairs = colorValue.accessibility?.wcagAAA?.normal ?? [];
   const aaPairs = colorValue.accessibility?.wcagAA?.normal ?? [];
+
+  if (aaaPairs.length === 0 && aaPairs.length === 0) {
+    throw new Error(
+      `No WCAG accessibility data available for dark mode counterpart of index ${lightIndex}. ` +
+        `ColorValue must include accessibility.wcagAAA or wcagAA pair matrices.`,
+    );
+  }
+
   const wantHigher = lightIndex <= 5;
 
   for (const pairs of [aaaPairs, aaPairs]) {
@@ -116,5 +129,10 @@ export function findDarkCounterpartIndex(lightIndex: number, colorValue: ColorVa
     }
   }
 
+  // All WCAG pairs too close -- fall back to mathematical inversion (not guaranteed WCAG-safe)
+  console.warn(
+    `[design-tokens] No WCAG pair with sufficient distance (>=${MIN_WCAG_PAIR_DISTANCE}) ` +
+      `found for index ${lightIndex}. Falling back to mathematical inversion.`,
+  );
   return Math.max(0, Math.min(10, 10 - lightIndex));
 }
