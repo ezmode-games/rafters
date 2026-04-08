@@ -4,8 +4,15 @@
 
 ### Minor Changes
 
+- feat(tokens): wire semantic tokens into dependency graph for auto-cascade. Semantic tokens had dependsOn but no generationRule, making them invisible to the DAG. Now every semantic token has a generationRule (contrast:auto for foregrounds, state:hover/active/focus/disabled for states, scale:N for direct positions). State/contrast/invert executors connect to real plugins instead of returning stubs. Invert plugin rewritten to use WCAG AAA/AA pair matrix. Shared scale-positions module extracted from 3 duplicate maps.
 - feat(tokens): fill token namespace -- composite visual recipes (color + opacity + backdrop-blur + gradients) as designer-configurable tokens. Fills resolve differently based on context: surface components get background classes, typography gets text color or gradient text via bg-clip-text. Seven default fills: surface, panel, overlay, glass, primary, muted, hero. Use `fill="surface"` on Container/Card or `color="hero"` on Typography for gradient text.
 - feat(tokens): fill token CSS export -- fill tokens appear in generated CSS as custom properties with JSON metadata for runtime resolution by the fill-resolver primitive.
+
+### Patch Changes
+
+- fix: onboard family name collision. When onboarding a color to a semantic family like "primary", the enriched ColorValue was stored under "primary" -- overwriting the semantic token and breaking the CSS exporter. Now the ColorValue is stored under its perceptual name (e.g., "dim-honest-plum") and the semantic token keeps its ColorReference pointing at the new family.
+- fix(tokens): preserve family token in dependsOn[0]. regenerateToken was overwriting dependsOn[0] from the family token to a position token, breaking subsequent cascades. dependsOn[0] must stay as the family name so plugins can access ColorValue WCAG data on every cascade.
+- fix(tokens): tagged RuleResult union (CssResult | RefResult) for exhaustive switch. State plugin reads base token's actual position instead of hardcoded 500. Contrast plugin uses INDEX_TO_POSITION. Silent fallbacks replaced with proper errors. 24 new tests added.
 
 ## 0.0.46
 
