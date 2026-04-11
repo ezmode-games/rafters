@@ -63,6 +63,7 @@ async function createCascadeFixture(name: string): Promise<string> {
  */
 async function enrichFamily(
   handler: RaftersToolHandler,
+  projectRoot: string,
   semanticTarget: string,
   oklchValue: string,
 ): Promise<string> {
@@ -81,9 +82,7 @@ async function enrichFamily(
   expect(result.isError).toBeFalsy();
 
   // Read back the semantic token to discover the perceptual family name
-  const adapter = new NodePersistenceAdapter(
-    (handler as unknown as { projectRoot: string }).projectRoot,
-  );
+  const adapter = new NodePersistenceAdapter(projectRoot);
   const tokens = await adapter.load();
   const semanticToken = tokens.find((t) => t.name === semanticTarget);
   const ref = semanticToken?.value as { family?: string } | undefined;
@@ -105,7 +104,7 @@ describe('rafters_token set semantic family cascade', () => {
     const handler = new RaftersToolHandler(fixturePath);
 
     // Step 1: enrich a new perceptual family under the accent slot
-    const familyName = await enrichFamily(handler, 'accent', 'oklch(0.65 0.2 40)');
+    const familyName = await enrichFamily(handler, fixturePath, 'accent', 'oklch(0.65 0.2 40)');
 
     // Step 2: re-target accent to a specific position of that family
     const result = await handler.handleToolCall('rafters_token', {
@@ -137,7 +136,7 @@ describe('rafters_token set semantic family cascade', () => {
     fixturePath = await createCascadeFixture('depson-shape');
     const handler = new RaftersToolHandler(fixturePath);
 
-    const familyName = await enrichFamily(handler, 'accent', 'oklch(0.65 0.2 40)');
+    const familyName = await enrichFamily(handler, fixturePath, 'accent', 'oklch(0.65 0.2 40)');
 
     await handler.handleToolCall('rafters_token', {
       action: 'set',
@@ -158,7 +157,7 @@ describe('rafters_token set semantic family cascade', () => {
     fixturePath = await createCascadeFixture('derivative-no-cascade');
     const handler = new RaftersToolHandler(fixturePath);
 
-    const familyName = await enrichFamily(handler, 'accent', 'oklch(0.65 0.2 40)');
+    const familyName = await enrichFamily(handler, fixturePath, 'accent', 'oklch(0.65 0.2 40)');
 
     const result = await handler.handleToolCall('rafters_token', {
       action: 'set',
@@ -177,7 +176,7 @@ describe('rafters_token set semantic family cascade', () => {
     fixturePath = await createCascadeFixture('preserve-overrides');
     const handler = new RaftersToolHandler(fixturePath);
 
-    const familyName = await enrichFamily(handler, 'accent', 'oklch(0.65 0.2 40)');
+    const familyName = await enrichFamily(handler, fixturePath, 'accent', 'oklch(0.65 0.2 40)');
 
     // First, manually pin accent-hover with a non-auto-cascade reason
     await handler.handleToolCall('rafters_token', {
