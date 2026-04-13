@@ -96,23 +96,20 @@ export function generateSemanticColorSuggestions(baseColor: OKLCH): {
   warning: OKLCH[];
   info: OKLCH[];
 } {
-  // Danger colors - Red region (0-30 and 330-360) - Keep them vibrant, not dark
+  // danger: hue 0-30 and 330-360
   const danger: OKLCH[] = [
-    // Bright red
     roundOKLCH({
       l: Math.max(0.55, Math.min(0.7, baseColor.l + 0.1)),
       c: Math.min(0.25, baseColor.c * 1.2),
       h: 15,
       alpha: 1,
     }),
-    // Warmer red
     roundOKLCH({
       l: Math.max(0.6, Math.min(0.75, baseColor.l + 0.15)),
       c: Math.min(0.22, baseColor.c * 1.1),
       h: 25,
       alpha: 1,
     }),
-    // Cooler red
     roundOKLCH({
       l: Math.max(0.5, Math.min(0.65, baseColor.l + 0.05)),
       c: Math.min(0.23, baseColor.c * 1.15),
@@ -121,23 +118,20 @@ export function generateSemanticColorSuggestions(baseColor: OKLCH): {
     }),
   ];
 
-  // Success colors - Green region (120-150) - Make them brighter and more optimistic
+  // success: hue 120-150
   const success: OKLCH[] = [
-    // Fresh green
     roundOKLCH({
       l: Math.max(0.6, Math.min(0.75, baseColor.l + 0.15)),
       c: Math.min(0.2, baseColor.c * 0.9),
       h: 135,
       alpha: 1,
     }),
-    // Vibrant green
     roundOKLCH({
       l: Math.max(0.55, Math.min(0.7, baseColor.l + 0.1)),
       c: Math.min(0.22, baseColor.c * 1.0),
       h: 145,
       alpha: 1,
     }),
-    // Bright green
     roundOKLCH({
       l: Math.max(0.65, Math.min(0.8, baseColor.l + 0.2)),
       c: Math.min(0.24, baseColor.c * 1.1),
@@ -146,23 +140,20 @@ export function generateSemanticColorSuggestions(baseColor: OKLCH): {
     }),
   ];
 
-  // Warning colors - Orange/Yellow region (30-70) - Keep these bright
+  // warning: hue 30-70
   const warning: OKLCH[] = [
-    // Orange
     roundOKLCH({
       l: Math.max(0.7, Math.min(0.8, baseColor.l + 0.15)),
       c: Math.min(0.2, baseColor.c * 0.95),
       h: 45,
       alpha: 1,
     }),
-    // Amber
     roundOKLCH({
       l: Math.max(0.75, Math.min(0.85, baseColor.l + 0.2)),
       c: Math.min(0.18, baseColor.c * 0.9),
       h: 55,
       alpha: 1,
     }),
-    // Yellow-orange
     roundOKLCH({
       l: Math.max(0.72, Math.min(0.82, baseColor.l + 0.17)),
       c: Math.min(0.19, baseColor.c * 0.92),
@@ -171,23 +162,20 @@ export function generateSemanticColorSuggestions(baseColor: OKLCH): {
     }),
   ];
 
-  // Info colors - Blue region (200-240) - Make them more vibrant, less muddy
+  // info: hue 200-240
   const info: OKLCH[] = [
-    // Sky blue
     roundOKLCH({
       l: Math.max(0.6, Math.min(0.75, baseColor.l + 0.1)),
       c: Math.min(0.2, baseColor.c * 0.9),
       h: 220,
       alpha: 1,
     }),
-    // Ocean blue
     roundOKLCH({
       l: Math.max(0.55, Math.min(0.7, baseColor.l + 0.05)),
       c: Math.min(0.22, baseColor.c * 1.0),
       h: 230,
       alpha: 1,
     }),
-    // Electric blue
     roundOKLCH({
       l: Math.max(0.5, Math.min(0.65, baseColor.l)),
       c: Math.min(0.25, baseColor.c * 1.1),
@@ -196,14 +184,11 @@ export function generateSemanticColorSuggestions(baseColor: OKLCH): {
     }),
   ];
 
-  // Gamut-clamp every suggestion to sRGB so badges report gold, not fail.
-  const clamp = (c: OKLCH): OKLCH => toNearestGamut(c).color;
-
   return {
-    danger: danger.map(clamp),
-    success: success.map(clamp),
-    warning: warning.map(clamp),
-    info: info.map(clamp),
+    danger: danger.map(clampColor),
+    success: success.map(clampColor),
+    warning: warning.map(clampColor),
+    info: info.map(clampColor),
   };
 }
 

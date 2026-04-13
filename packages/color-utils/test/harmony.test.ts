@@ -27,9 +27,6 @@ const red: OKLCH = { l: 0.5, c: 0.05, h: 0, alpha: 1 };
 /** Edge hue: 359 degrees */
 const nearRed: OKLCH = { l: 0.5, c: 0.05, h: 359, alpha: 1 };
 
-/** Tolerance for gamut-clamped values (low-chroma colors barely move) */
-const GAMUT_TOLERANCE = 0.01;
-
 describe('generateHarmony', () => {
   describe('return shape', () => {
     it('returns all required harmony keys', () => {
@@ -137,31 +134,33 @@ describe('generateHarmony', () => {
   });
 
   describe('hue rotation angles', () => {
+    const result = generateHarmony(blue);
+
     it('complementary is base +180', () => {
-      const { complementary } = generateHarmony(blue);
+      const { complementary } = result;
       const expected = (blue.h + 180) % 360;
       expect(complementary.h).toBeCloseTo(expected, 0);
     });
 
     it('triadic[0] is base hue', () => {
-      const { triadic } = generateHarmony(blue);
+      const { triadic } = result;
       expect(triadic[0]?.h).toBeCloseTo(blue.h, 0);
     });
 
     it('triadic[1] is base +120', () => {
-      const { triadic } = generateHarmony(blue);
+      const { triadic } = result;
       const expected = (blue.h + 120) % 360;
       expect(triadic[1]?.h).toBeCloseTo(expected, 0);
     });
 
     it('triadic[2] is base +240', () => {
-      const { triadic } = generateHarmony(blue);
+      const { triadic } = result;
       const expected = (blue.h + 240) % 360;
       expect(triadic[2]?.h).toBeCloseTo(expected, 0);
     });
 
     it('analogous hues are -45/-30/-15/+15/+30/+45', () => {
-      const { analogous } = generateHarmony(blue);
+      const { analogous } = result;
       const offsets = [-45, -30, -15, 15, 30, 45];
       for (let i = 0; i < offsets.length; i++) {
         const offset = offsets[i];
@@ -172,12 +171,12 @@ describe('generateHarmony', () => {
     });
 
     it('tetradic[0] is base hue', () => {
-      const { tetradic } = generateHarmony(blue);
+      const { tetradic } = result;
       expect(tetradic[0]?.h).toBeCloseTo(blue.h, 0);
     });
 
     it('tetradic hues are base/+90/+180/+270', () => {
-      const { tetradic } = generateHarmony(blue);
+      const { tetradic } = result;
       const offsets = [0, 90, 180, 270];
       for (let i = 0; i < offsets.length; i++) {
         const offset = offsets[i];
@@ -188,12 +187,12 @@ describe('generateHarmony', () => {
     });
 
     it('splitComplementary[0] is base hue', () => {
-      const { splitComplementary } = generateHarmony(blue);
+      const { splitComplementary } = result;
       expect(splitComplementary[0]?.h).toBeCloseTo(blue.h, 0);
     });
 
     it('splitComplementary hues are base/+150/+210', () => {
-      const { splitComplementary } = generateHarmony(blue);
+      const { splitComplementary } = result;
       const offsets = [0, 150, 210];
       for (let i = 0; i < offsets.length; i++) {
         const offset = offsets[i];
@@ -231,8 +230,8 @@ describe('generateHarmony', () => {
       const extremeStart = monochromatic[0]?.c ?? 0;
       const extremeEnd = monochromatic[5]?.c ?? 0;
       const midChroma = monochromatic[2]?.c ?? 0;
-      expect(extremeStart).toBeLessThanOrEqual(midChroma + GAMUT_TOLERANCE);
-      expect(extremeEnd).toBeLessThanOrEqual(midChroma + GAMUT_TOLERANCE);
+      expect(extremeStart).toBeLessThanOrEqual(midChroma + 0.01);
+      expect(extremeEnd).toBeLessThanOrEqual(midChroma + 0.01);
     });
   });
 
