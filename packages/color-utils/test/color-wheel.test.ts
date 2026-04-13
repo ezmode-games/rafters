@@ -4,6 +4,7 @@
 
 import type { OKLCH } from '@rafters/shared';
 import { describe, expect, it } from 'vitest';
+import { calculateWCAGContrast } from '../src/accessibility.js';
 import type { HarmonyType, SemanticColorSystem } from '../src/color-wheel.js';
 import { colorWheel } from '../src/color-wheel.js';
 
@@ -222,21 +223,17 @@ describe('colorWheel', () => {
   });
 
   describe('gaussian vs flat chroma distribution', () => {
-    it('gaussian (default) reduces secondary chroma versus flat', () => {
+    it('gaussian produces lower secondary chroma than flat', () => {
       const gaussian = colorWheel(blue, 'complementary', { chromaDistribution: 'gaussian' });
       const flat = colorWheel(blue, 'complementary', { chromaDistribution: 'flat' });
 
-      // Secondary is built from seed.c * 0.33, then gaussian applied at secondaryL
-      // Flat skips the gaussian step so chroma is only the raw 0.33x value
-      // The gaussian at L=0.5 (seed.l) gives gaussian = exp(0) = 1.0 exactly
-      // so at secondaryL the effect depends on how far from 0.6 it is
-      // We just verify the system returns distinct values
+      // Secondary resolves to a light scale position (high L, far from seed L=0.5).
+      // At L~0.95, gaussian ≈ 0.38 -- so gaussian chroma is ~38% of flat.
+      // This is the main perceptual benefit of the gaussian distribution.
       const gaussianSecondaryC = gaussian.secondary.scale[6]?.c ?? 0;
       const flatSecondaryC = flat.secondary.scale[6]?.c ?? 0;
 
-      // Both should be valid numbers greater than 0
-      expect(gaussianSecondaryC).toBeGreaterThan(0);
-      expect(flatSecondaryC).toBeGreaterThan(0);
+      expect(gaussianSecondaryC).toBeLessThan(flatSecondaryC);
     });
 
     it('flat distribution skips gaussian on secondary', () => {
@@ -309,6 +306,27 @@ describe('colorWheel', () => {
 
       expect(system.destructive.accessibility).toBeDefined();
     });
+
+    it('primary and secondary together span high contrast range within each scale', () => {
+      // resolveSecondaryLightness picks a lightness from primary's AAA accessibility
+      // matrix that is far from the seed. The secondary scale then spans its own full
+      // lightness range from that anchor. Together they provide complementary
+      // light/dark regions for readable text/background combinations.
+      const system = colorWheel(blue, 'complementary');
+
+      // Primary scale dark end (scale[10]) vs secondary scale light end (scale[0])
+      // should provide strong contrast -- these are the typical text/bg pairing regions.
+      const primaryDark = system.primary.scale[10];
+      const secondaryLight = system.secondary.scale[0];
+
+      if (!primaryDark || !secondaryLight) {
+        throw new Error('Scale positions missing');
+      }
+
+      const contrast = calculateWCAGContrast(primaryDark, secondaryLight);
+      // Meaningful contrast between scale extremes (AA threshold for large text)
+      expect(contrast).toBeGreaterThanOrEqual(3);
+    });
   });
 
   describe('edge cases', () => {
@@ -342,6 +360,20 @@ describe('colorWheel', () => {
 
       const accentAnchor = system.accent.scale[6];
       expect(accentAnchor?.h).toBeCloseTo(180, 0);
+    });
+
+    it('achromatic seed (c=0) triggers fallback lightness path without error', () => {
+      // An achromatic seed produces a gray scale with no WCAG AAA pairs,
+      // causing resolveSecondaryLightness to fall back to the opposite-end heuristic.
+      const achromatic: OKLCH = { l: 0.6, c: 0, h: 0, alpha: 1 };
+      expect(() => colorWheel(achromatic, 'complementary')).not.toThrow();
+
+      const system = colorWheel(achromatic, 'complementary');
+      // seed.l = 0.6 > 0.5, so fallback returns 0.25 (dark secondary)
+      const secondaryAnchor = system.secondary.scale[6];
+      expect(secondaryAnchor).toBeDefined();
+      // secondary should be darker than seed (L < 0.6)
+      expect(secondaryAnchor?.l).toBeLessThan(0.6);
     });
   });
 

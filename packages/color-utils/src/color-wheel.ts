@@ -109,7 +109,7 @@ function resolveSecondaryLightness(primaryColorValue: ColorValue, primaryOklch: 
  *   muted       - seed hue, chroma * 0.05, L = 0.85
  *   success     - hue 145, L 0.55, C = min(0.18, seed.c * 0.9)
  *   warning     - hue 85,  L 0.75, C = min(0.18, seed.c * 0.9)
- *   destructive - hue 25,  L 0.55, C = min(0.20, seed.c * 1.0)
+ *   destructive - hue 25,  L 0.55, C = min(0.20, seed.c)
  *   info        - hue 230, L 0.58, C = min(0.15, seed.c * 0.85)
  */
 function complementaryWheel(seed: OKLCH, options: ColorWheelOptions): SemanticColorSystem {
