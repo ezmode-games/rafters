@@ -399,6 +399,92 @@ describe('componentService', () => {
       expect(intel?.usagePatterns?.dos).toContain('Use sparingly for main actions');
       expect(intel?.usagePatterns?.nevers).toContain('Use multiple primary buttons in one view');
     });
+
+    // Issue #1213: hyphenated tag form is what every component in packages/ui actually uses
+    it('parses hyphenated tag form (@cognitive-load, @attention-economics, etc)', () => {
+      const source = `
+        /**
+         * @cognitive-load 3
+         * @attention-economics Size hierarchy: sm=tertiary, default=secondary
+         * @accessibility WCAG AAA compliant
+         * @trust-building Destructive actions require confirmation
+         * @semantic-meaning Variant mapping: default=main actions
+         */
+        export function Button() {}
+      `;
+      const intel = parseJSDocFromSource(source);
+      expect(intel).toBeDefined();
+      expect(intel?.cognitiveLoad).toBe(3);
+      expect(intel?.attentionEconomics).toContain('Size hierarchy');
+      expect(intel?.accessibility).toContain('WCAG AAA');
+      expect(intel?.trustBuilding).toContain('Destructive');
+      expect(intel?.semanticMeaning).toContain('Variant mapping');
+    });
+
+    it('parses @usage-patterns block with DO: and NEVER: lines', () => {
+      const source = `
+        /**
+         * @usage-patterns
+         * DO: Primary: Main user goal, maximum 1 per section
+         * DO: Secondary: Alternative paths, supporting actions
+         * NEVER: Mix more than 2-3 variants in one composition
+         * NEVER: Use destructive without confirmation
+         */
+        export function Button() {}
+      `;
+      const intel = parseJSDocFromSource(source);
+      expect(intel).toBeDefined();
+      expect(intel?.usagePatterns?.dos).toHaveLength(2);
+      expect(intel?.usagePatterns?.dos[0]).toContain('Primary: Main user goal');
+      expect(intel?.usagePatterns?.dos[1]).toContain('Secondary: Alternative paths');
+      expect(intel?.usagePatterns?.nevers).toHaveLength(2);
+      expect(intel?.usagePatterns?.nevers[0]).toContain('Mix more than 2-3 variants');
+      expect(intel?.usagePatterns?.nevers[1]).toContain('Use destructive without confirmation');
+    });
+
+    it('parses real button.tsx source -- all 6 intelligence fields populated', async () => {
+      const fs = await import('node:fs/promises');
+      const path = await import('node:path');
+      const { fileURLToPath } = await import('node:url');
+      const here = path.dirname(fileURLToPath(import.meta.url));
+      const buttonPath = path.resolve(here, '../../../../packages/ui/src/components/ui/button.tsx');
+      const source = await fs.readFile(buttonPath, 'utf-8');
+      const intel = parseJSDocFromSource(source);
+      expect(intel).toBeDefined();
+      expect(intel?.cognitiveLoad).toBeDefined();
+      expect(intel?.attentionEconomics).toBeDefined();
+      expect(intel?.accessibility).toBeDefined();
+      expect(intel?.trustBuilding).toBeDefined();
+      expect(intel?.semanticMeaning).toBeDefined();
+      expect(intel?.usagePatterns).toBeDefined();
+      expect(intel?.usagePatterns?.dos.length).toBeGreaterThan(0);
+      expect(intel?.usagePatterns?.nevers.length).toBeGreaterThan(0);
+    });
+
+    it('strict mode throws when no intelligence fields are found', () => {
+      const source = 'export function Empty() {}';
+      expect(() => parseJSDocFromSource(source, { strict: true, componentName: 'Empty' })).toThrow(
+        /No JSDoc blocks found in Empty/,
+      );
+    });
+
+    it('strict mode throws when JSDoc has no intelligence tags', () => {
+      const source = `
+        /**
+         * Just a description, no intelligence tags
+         * @param x The input
+         */
+        export function NoIntel(x: number) {}
+      `;
+      expect(() =>
+        parseJSDocFromSource(source, { strict: true, componentName: 'NoIntel' }),
+      ).toThrow(/No intelligence fields found in NoIntel/);
+    });
+
+    it('non-strict mode returns undefined silently when no intelligence tags', () => {
+      const source = 'export function Empty() {}';
+      expect(parseJSDocFromSource(source)).toBeUndefined();
+    });
   });
 
   describe('extractDepsFromSource', () => {
