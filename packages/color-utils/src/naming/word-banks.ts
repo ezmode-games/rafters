@@ -52,7 +52,7 @@ export const INTENSITY_WORDS: Record<'light' | 'medium' | 'heavy', readonly stri
     'faded', // 0.03-0.06
     'quiet', // 0.06-0.10
     'true', // 0.10-0.15
-    'solid', // 0.15-0.20
+    'firm', // 0.15-0.20
     'bold', // 0.20-0.25
     'sharp', // 0.25-0.30
     'neon', // 0.30+

@@ -218,36 +218,11 @@ function versionDeps(deps: string[]): string[] {
 }
 
 /**
- * Parse JSDoc comments from source to extract intelligence metadata.
- *
- * Accepts both hyphenated (`@cognitive-load`) and camelCase (`@cognitiveLoad`)
- * tag forms. The hyphen-stripping happens before switch matching, so
- * `@cognitive-load` and `@cognitiveLoad` both route to the same case.
- *
- * Also parses the `@usage-patterns` block format, which holds `DO:` and `NEVER:`
- * lines in the description, in addition to the legacy `@do` / `@never` separate-tag
- * form.
- *
- * @param source - The source code containing JSDoc comments
- * @param options - `strict: true` throws when no intelligence fields are found,
- *                  with the component name in the error message. Default false
- *                  preserves the silent-undefined behavior used by dev workflows.
+ * Parse JSDoc comments from source to extract intelligence metadata
  */
-export function parseJSDocFromSource(
-  source: string,
-  options?: { strict?: boolean; componentName?: string },
-): ComponentIntelligence | undefined {
+export function parseJSDocFromSource(source: string): ComponentIntelligence | undefined {
   const blocks = parse(source);
-  if (blocks.length === 0) {
-    if (options?.strict) {
-      throw new Error(
-        `[parseJSDocFromSource] No JSDoc blocks found in ${options.componentName ?? 'component'}. ` +
-          `Expected at least one of: @cognitive-load, @attention-economics, @accessibility, ` +
-          `@trust-building, @semantic-meaning, @usage-patterns.`,
-      );
-    }
-    return undefined;
-  }
+  if (blocks.length === 0) return undefined;
 
   const intelligence: ComponentIntelligence = {};
   let hasAnyField = false;
@@ -255,9 +230,7 @@ export function parseJSDocFromSource(
   // Process all JSDoc blocks
   for (const block of blocks) {
     for (const tag of block.tags) {
-      // Strip hyphens and lowercase so `cognitive-load` and `cognitiveLoad`
-      // both normalize to `cognitiveload`. Source files use the hyphenated form.
-      const tagName = tag.tag.toLowerCase().replace(/-/g, '');
+      const tagName = tag.tag.toLowerCase();
       const value = getTagValue(tag);
 
       switch (tagName) {
@@ -300,48 +273,8 @@ export function parseJSDocFromSource(
           intelligence.usagePatterns.nevers.push(value);
           hasAnyField = true;
           break;
-        case 'usagepatterns': {
-          // Source format: `@usage-patterns` block with `DO:` and `NEVER:` lines
-          // in the description body. Parse each line and route to dos/nevers.
-          if (!intelligence.usagePatterns) {
-            intelligence.usagePatterns = { dos: [], nevers: [] };
-          }
-          // Pull every text line out of the tag's source -- comment-parser stores
-          // the raw lines on tag.source, with each line's `tokens.description` holding
-          // the text after the leading `*`. The description string also has the same
-          // content but flattened, so we use either as available.
-          const linesFromSource = tag.source
-            .map((s) => (s.tokens.description ?? '').trim())
-            .filter((line) => line.length > 0);
-          const lines = linesFromSource.length > 0 ? linesFromSource : value.split('\n');
-          for (const rawLine of lines) {
-            const line = rawLine.trim();
-            if (line.startsWith('DO:')) {
-              const item = line.slice(3).trim();
-              if (item) {
-                intelligence.usagePatterns.dos.push(item);
-                hasAnyField = true;
-              }
-            } else if (line.startsWith('NEVER:')) {
-              const item = line.slice(6).trim();
-              if (item) {
-                intelligence.usagePatterns.nevers.push(item);
-                hasAnyField = true;
-              }
-            }
-          }
-          break;
-        }
       }
     }
-  }
-
-  if (options?.strict && !hasAnyField) {
-    throw new Error(
-      `[parseJSDocFromSource] No intelligence fields found in ${options.componentName ?? 'component'}. ` +
-        `Expected at least one of: @cognitive-load, @attention-economics, @accessibility, ` +
-        `@trust-building, @semantic-meaning, @usage-patterns.`,
-    );
   }
 
   return hasAnyField ? intelligence : undefined;
@@ -415,17 +348,9 @@ export function extractDepsFromSource(content: string): {
  * Analyze source content to extract merged dependencies and intelligence metadata.
  * Shared by loadComponent and loadPrimitive.
  */
-/**
- * When set, parseJSDocFromSource throws if a component has no intelligence fields.
- * The build script for production registry deploys should set this so missing
- * intel fails the build instead of silently shipping empty JSON.
- */
-const STRICT_INTEL = process.env.RAFTERS_STRICT_INTEL === '1';
-
 function analyzeSource(
   content: string,
   isPrimitive: boolean,
-  componentName?: string,
 ): {
   importDeps: ReturnType<typeof extractDependencies>;
   allExternalDeps: string[];
@@ -436,13 +361,7 @@ function analyzeSource(
   const importDeps = extractDependencies(content);
   const jsDocDeps = extractDepsFromSource(content);
   const primitiveDeps = extractPrimitiveDependencies(content, isPrimitive);
-  // Only enforce strict intel on the .tsx primary; primitives and shared files
-  // are exempt because they don't carry intelligence metadata.
-  const enforceStrict = STRICT_INTEL && !isPrimitive && componentName !== undefined;
-  const intelligence = parseJSDocFromSource(content, {
-    strict: enforceStrict,
-    componentName,
-  });
+  const intelligence = parseJSDocFromSource(content);
 
   // Merge import-extracted and JSDoc-declared deps, deduplicated
   const allExternalDeps = [
@@ -470,14 +389,11 @@ export function loadComponent(name: string): RegistryItem | null {
   let intelligence: ReturnType<typeof parseJSDocFromSource> | undefined;
 
   // Load framework-specific variants
-  // Strict intel is enforced only on the primary .tsx file. Other extensions
-  // (.astro, .vue, .svelte) are framework variants that may not carry their
-  // own JSDoc -- they inherit the .tsx intelligence in the merge below.
   for (const ext of COMPONENT_EXTENSIONS) {
     const filePath = join(componentsDir, `${name}${ext}`);
     try {
       const content = readFileSync(filePath, 'utf-8');
-      const analysis = analyzeSource(content, false, ext === '.tsx' ? name : undefined);
+      const analysis = analyzeSource(content, false);
 
       files.push({
         path: `components/ui/${name}${ext}`,

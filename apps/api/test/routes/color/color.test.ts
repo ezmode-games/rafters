@@ -153,10 +153,10 @@ describe('Color Routes', () => {
       });
 
       it('generates deterministic three-word color names', async () => {
-        // Test violet (hue 260) - pale (L=0.7), solid (C=0.15, medium density), violet (H=260, no expanded hub)
+        // Test violet (hue 260) - pale (L=0.7), firm (C=0.15, medium density), violet (H=260, no expanded hub)
         const violetRes = await SELF.fetch('http://localhost/color/0.700-0.150-260?adhoc=true');
         const violetJson = await violetRes.json();
-        expect(violetJson.color.name).toBe('pale-solid-violet');
+        expect(violetJson.color.name).toBe('pale-firm-violet');
 
         // Test red (hue 10) - uses expanded hub with semantic sub-selection
         const redRes = await SELF.fetch('http://localhost/color/0.500-0.200-10?adhoc=true');
@@ -170,15 +170,15 @@ describe('Color Routes', () => {
       });
 
       it('varies luminosity word by lightness', async () => {
-        // Test light (lightness 0.85) - faint (L=0.85), solid (C=0.15), violet (H=260)
+        // Test light (lightness 0.85) - faint (L=0.85), firm (C=0.15), violet (H=260)
         const lightRes = await SELF.fetch('http://localhost/color/0.850-0.150-260?adhoc=true');
         const lightJson = await lightRes.json();
-        expect(lightJson.color.name).toBe('faint-solid-violet');
+        expect(lightJson.color.name).toBe('faint-firm-violet');
 
-        // Test dark (lightness 0.20) - deep (L=0.2), solid (C=0.15), violet (H=260)
+        // Test dark (lightness 0.20) - deep (L=0.2), firm (C=0.15), violet (H=260)
         const darkRes = await SELF.fetch('http://localhost/color/0.200-0.150-260?adhoc=true');
         const darkJson = await darkRes.json();
-        expect(darkJson.color.name).toBe('deep-solid-violet');
+        expect(darkJson.color.name).toBe('deep-firm-violet');
       });
     });
   });
