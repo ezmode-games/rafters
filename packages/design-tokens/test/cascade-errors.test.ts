@@ -20,10 +20,12 @@ import { CascadeAggregateError, TokenRegistry } from '../src/registry.js';
 
 /**
  * Create a minimal two-token registry: a base token and a dependent token
- * whose generationRule is intentionally bad so regenerateToken throws.
+ * whose generationRule reliably throws during cascade.
  *
- * The rule "scale:bad_rule_that_will_fail" is not a valid rule that the
- * executor knows, causing it to throw during cascade.
+ * The derived token uses "state:ring" which requires a ColorValue dependency.
+ * base-color holds a plain OKLCH string, so the executor throws when it
+ * cannot resolve the ColorValue input -- producing the cascade failure needed
+ * to exercise CascadeAggregateError collection and throw behavior.
  */
 function makeBrokenCascadeRegistry(): TokenRegistry {
   const base: Token = {
@@ -33,16 +35,10 @@ function makeBrokenCascadeRegistry(): TokenRegistry {
     namespace: 'color',
   };
 
-  // A valid generationRule is required for addDependency to register the
-  // token in the graph. We use a calc rule but then manually point it at
-  // base-color so the executor is called. The key is that when base-color
-  // changes and the executor tries to run on 'derived-bad', it will fail
-  // because the referenced token name doesn't exist as a proper scale token.
-  //
-  // To reliably produce a throw, we register a token with a rule that the
-  // GenerationRuleExecutor will fail on: "state:ring" requires a ColorValue
-  // with a scale, but base-color has a plain string value, so the executor
-  // throws "cannot extract position from string token".
+  // To reliably produce a throw during cascade: "state:ring" requires a
+  // ColorValue dependency (an object with a `scale` array), but base-color
+  // has a plain OKLCH string value. The GenerationRuleExecutor throws when
+  // it cannot resolve the ColorValue input for the state plugin.
   const derived: Token = {
     name: 'derived-bad',
     value: 'oklch(0.6 0.1 200)',
