@@ -375,9 +375,15 @@ function generateThemeBlock(groups: GroupedTokens): string {
         // Decomposed parts: --rafters-* only, no Tailwind utility
         lines.push(`  --rafters-${token.name}: ${value};`);
       } else {
-        // Composites: --shadow-* for Tailwind utility generation
-        const key = token.name.replace(/^shadow-/, '');
-        lines.push(`  --shadow-${key}: ${value};`);
+        // Composites: --shadow-* for Tailwind utility generation.
+        // The DEFAULT scale emits a token named 'shadow' (no suffix) which maps
+        // to Tailwind's --shadow (bare). Other scales emit --shadow-sm, --shadow-md, etc.
+        if (token.name === 'shadow') {
+          lines.push(`  --shadow: ${value};`);
+        } else {
+          const key = token.name.replace(/^shadow-/, '');
+          lines.push(`  --shadow-${key}: ${value};`);
+        }
       }
     }
     lines.push('');
@@ -923,8 +929,14 @@ function generateThemeBlockWithVarRefs(groups: GroupedTokens): string {
   if (groups.shadow.length > 0) {
     for (const token of groups.shadow) {
       if (isShadowDecomposedPart(token.name)) continue;
-      const key = token.name.replace(/^shadow-/, '');
-      lines.push(`  --shadow-${key}: var(--rafters-${token.name});`);
+      // The DEFAULT scale emits a token named 'shadow' (no suffix) which maps
+      // to Tailwind's --shadow (bare). Other scales emit --shadow-sm, --shadow-md, etc.
+      if (token.name === 'shadow') {
+        lines.push(`  --shadow: var(--rafters-${token.name});`);
+      } else {
+        const key = token.name.replace(/^shadow-/, '');
+        lines.push(`  --shadow-${key}: var(--rafters-${token.name});`);
+      }
     }
     lines.push('');
   }

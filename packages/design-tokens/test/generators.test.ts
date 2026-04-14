@@ -534,8 +534,11 @@ describe('Token Structure Validation', () => {
 
     it('animation tokens reference duration and easing tokens via var()', () => {
       const fadeIn = result.tokens.find((t) => t.name === 'motion-animation-fade-in');
-      expect(fadeIn?.value).toContain('var(--motion-duration-');
-      expect(fadeIn?.value).toContain('var(--motion-easing-');
+      // Animation shorthands use Tailwind-native names (--duration-*, --ease-*) so they
+      // resolve against the same custom properties that the Tailwind exporter defines.
+      // See: packages/design-tokens/src/exporters/tailwind.ts motion duration/easing blocks.
+      expect(fadeIn?.value).toContain('var(--duration-');
+      expect(fadeIn?.value).toContain('var(--ease-');
     });
 
     it('animation tokens with fixed durations use literal values', () => {

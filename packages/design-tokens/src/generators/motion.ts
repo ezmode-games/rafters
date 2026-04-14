@@ -519,13 +519,17 @@ export function generateMotionTokens(
           ? 0
           : Math.round(progression.compute(baseTransitionDuration, durationDef.step));
       durationValue = `${durationMs}ms`;
-      durationRef = `var(--motion-duration-${anim.duration})`;
+      // Use Tailwind-native --duration-* names (canonical emission in tailwind.ts).
+      // motion-duration-fast -> --duration-fast, matching what the exporter defines.
+      durationRef = `var(--duration-${anim.duration})`;
     }
 
     // Get easing
     const easingDef = easingDefs[anim.easing];
     if (!easingDef) continue;
-    const easingRef = `var(--motion-easing-${anim.easing})`;
+    // Use Tailwind-native --ease-* names (canonical emission in tailwind.ts).
+    // motion-easing-ease-out -> --ease-ease-out, matching what the exporter defines.
+    const easingRef = `var(--ease-${anim.easing})`;
 
     // Build animation value
     const iterations = anim.iterations || '';

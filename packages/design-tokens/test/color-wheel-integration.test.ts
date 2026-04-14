@@ -309,10 +309,23 @@ describe('colorWheel -> TokenRegistry integration', () => {
       const registry = await buildRegistry(TAILWIND_BLUE_500);
       const css = registryToTailwind(registry, { darkMode: 'class' });
 
+      // External runtime variables set by third-party libraries at runtime.
+      // These are intentionally undefined in generated CSS -- they are injected
+      // by the library (e.g. Radix UI) during DOM rendering, not by the token system.
+      const EXTERNAL_RUNTIME_VARS = new Set([
+        'radix-accordion-content-height',
+        'radix-collapsible-content-height',
+        'radix-dialog-content-height',
+        'radix-popover-content-available-height',
+      ]);
+
       const varRefMatches = [...css.matchAll(/var\(--([\w-]+)\)/g)];
       const varDefMatches = [...css.matchAll(/--([\w-]+)\s*:/g)];
 
-      const varRefs = varRefMatches.map((m) => m[1]).filter((r): r is string => r !== undefined);
+      const varRefs = varRefMatches
+        .map((m) => m[1])
+        .filter((r): r is string => r !== undefined)
+        .filter((r) => !EXTERNAL_RUNTIME_VARS.has(r));
       const varDefs = new Set(
         varDefMatches.map((m) => m[1]).filter((d): d is string => d !== undefined),
       );
