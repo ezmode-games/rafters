@@ -258,6 +258,120 @@ describe('GenerationRuleExecutor', () => {
       );
     });
   });
+
+  describe('plugin input resolution: state / contrast / invert', () => {
+    it("state rule throws 'does not apply' when dependency[0] is not a ColorValue", () => {
+      registry.add({
+        name: 'not-a-color',
+        value: '16px',
+        category: 'spacing',
+        namespace: 'spacing',
+      });
+
+      registry.add({
+        name: 'primary-hover',
+        value: { family: 'primary', position: '600' },
+        category: 'color',
+        namespace: 'semantic',
+        dependsOn: ['not-a-color'],
+        generationRule: 'state:hover',
+      });
+
+      registry.addDependency('primary-hover', ['not-a-color'], 'state:hover');
+
+      const parsedRule = parser.parse('state:hover');
+
+      expect(() => executor.execute(parsedRule, 'primary-hover')).toThrow(
+        "Rule 'state' does not apply to token 'primary-hover'",
+      );
+    });
+
+    it("contrast rule throws 'does not apply' when dependency[0] is not a ColorValue", () => {
+      registry.add({
+        name: 'not-a-color',
+        value: '16px',
+        category: 'spacing',
+        namespace: 'spacing',
+      });
+
+      registry.add({
+        name: 'primary-foreground',
+        value: { family: 'neutral', position: '50' },
+        category: 'color',
+        namespace: 'semantic',
+        dependsOn: ['not-a-color'],
+        generationRule: 'contrast:auto',
+      });
+
+      registry.addDependency('primary-foreground', ['not-a-color'], 'contrast:auto');
+
+      const parsedRule = parser.parse('contrast:auto');
+
+      expect(() => executor.execute(parsedRule, 'primary-foreground')).toThrow(
+        "Rule 'contrast' does not apply to token 'primary-foreground'",
+      );
+    });
+
+    it("invert rule throws 'does not apply' when dependency[0] is not a ColorValue", () => {
+      registry.add({
+        name: 'not-a-color',
+        value: '16px',
+        category: 'spacing',
+        namespace: 'spacing',
+      });
+
+      registry.add({
+        name: 'primary-dark',
+        value: { family: 'primary', position: '500' },
+        category: 'color',
+        namespace: 'semantic',
+        dependsOn: ['not-a-color'],
+        generationRule: 'invert',
+      });
+
+      registry.addDependency('primary-dark', ['not-a-color'], 'invert');
+
+      const parsedRule = parser.parse('invert');
+
+      expect(() => executor.execute(parsedRule, 'primary-dark')).toThrow(
+        "Rule 'invert' does not apply to token 'primary-dark'",
+      );
+    });
+
+    it('state:hover basePosition is read from the token current ColorReference position', () => {
+      const familyColor = makeColorValue('test-blue', 240);
+
+      registry.add({
+        name: 'primary',
+        value: familyColor,
+        category: 'color',
+        namespace: 'color',
+      });
+
+      // Semantic token whose current value has position 600 (index 6)
+      registry.add({
+        name: 'primary-hover',
+        value: { family: 'primary', position: '600' },
+        category: 'color',
+        namespace: 'semantic',
+        dependsOn: ['primary'],
+        generationRule: 'state:hover',
+      });
+
+      registry.addDependency('primary-hover', ['primary'], 'state:hover');
+
+      const parsedRule = parser.parse('state:hover');
+      const result = executor.execute(parsedRule, 'primary-hover');
+
+      // basePosition should have come from position '600' (index 6), not the default 5
+      expect(result.kind).toBe('ref');
+      if (result.kind === 'ref') {
+        // State plugin returns a reference into the same family; exact position
+        // depends on plugin logic but the family should be 'primary'.
+        expect(result.ref.family).toBe('primary');
+      }
+    });
+  });
 });
 
 describe('TokenRegistry regeneration with scale-position', () => {

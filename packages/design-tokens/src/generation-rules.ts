@@ -10,14 +10,17 @@
  *   or parses token names with regex.
  *
  * "Rule does not apply" detection:
- *   The executor checks whether the token's dependency[0] resolves to a ColorValue before
- *   calling any color plugin. If dependency[0] is missing or its value is not a ColorValue
+ *   Before calling any color plugin, the executor checks whether the token's dependency[0]
+ *   resolves to a ColorValue. If dependency[0] is missing or its value is not a ColorValue
  *   (i.e., not an object with a `scale` array), the executor throws:
  *     "Rule '<type>' does not apply to token '<name>': dependency '<dep>' is not a ColorValue"
  *   Additionally, for scale-position rules, if the token's OWN value is a ColorValue
  *   (i.e., it is a family token, not a position token), the executor throws before calling
  *   the plugin to prevent overwriting the ColorValue with a CSS string.
  *   This surfaces the #1223 silent-throw case before the plugin is ever invoked.
+ *   Note: the Shape 1 path of `executeScalePositionRule` (semantic ColorReference value)
+ *   short-circuits before this check because it returns a RefResult from the token's own
+ *   `{family, position}`, so no plugin is called and no ColorValue validation is needed.
  */
 
 import type { ColorReference, ColorValue, OKLCH } from '@rafters/shared';
@@ -33,7 +36,7 @@ import {
   VALID_SCALE_POSITIONS,
 } from './scale-positions';
 
-/** Type guard: true when `v` is a ColorValue (has a non-empty `scale` array). */
+/** Type guard: true when `v` is an object with a `scale` array (ColorValue shape). */
 function isColorValue(v: unknown): v is ColorValue {
   return (
     v !== null &&
@@ -427,7 +430,8 @@ export class GenerationRuleExecutor {
    * basePosition lookup order:
    *   1. Token's current value if it is a ColorReference (has `position` field)
    *   2. Second dependency (dependencies[1]) if it encodes a position token name
-   *      with a numeric suffix (e.g., "primary-600" -> index 6)
+   *      with a numeric suffix (e.g., "primary-600" -> position string "600"
+   *      -> index 6 via POSITION_TO_INDEX)
    *   3. Default: 5 (midpoint, position 500)
    */
   private resolvePluginInputs(
