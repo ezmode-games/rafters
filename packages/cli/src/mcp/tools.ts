@@ -2686,6 +2686,7 @@ export class RaftersToolHandler {
                 semanticMeaning: `Color family for ${target}`,
                 description: `Enriched color family "${familyName}" mapped to semantic role "${target}"`,
                 containerQueryAware: true,
+                userOverride: null,
               });
             } else {
               await registry.set(familyName, colorValue);
@@ -2700,7 +2701,7 @@ export class RaftersToolHandler {
               description: `Enriched color family "${familyName}" mapped to semantic role "${target}"`,
               containerQueryAware: true,
               userOverride: isSemantic
-                ? undefined
+                ? null
                 : {
                     previousValue: '',
                     reason: `Onboarded from ${source}: ${reason}`,
@@ -2739,6 +2740,7 @@ export class RaftersToolHandler {
                 scalePosition: i,
                 description: `${familyName} color at ${pos} position`,
                 containerQueryAware: true,
+                userOverride: null,
               });
             }
           }
