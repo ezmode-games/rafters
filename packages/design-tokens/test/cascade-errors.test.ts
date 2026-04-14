@@ -104,7 +104,6 @@ describe('registry.set - cascade error handling', () => {
   });
 
   it('throws CascadeAggregateError by default when a dependent regeneration fails', async () => {
-    // Default behavior: loud fail
     await expect(registry.set('base-color', 'oklch(0.7 0.15 210)')).rejects.toThrow(
       CascadeAggregateError,
     );
@@ -124,7 +123,6 @@ describe('registry.set - cascade error handling', () => {
   });
 
   it('does NOT throw when continueOnCascadeErrors is true', async () => {
-    // Opt-in graceful degrade: errors are collected and warned, not thrown
     await expect(
       registry.set('base-color', 'oklch(0.7 0.15 210)', { continueOnCascadeErrors: true }),
     ).resolves.toBeUndefined();
