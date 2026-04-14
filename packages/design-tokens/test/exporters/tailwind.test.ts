@@ -126,6 +126,24 @@ describe('tokensToTailwind', () => {
     expect(css).toContain('--shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);');
   });
 
+  it('should export the DEFAULT shadow token as --shadow (not --shadow-shadow)', () => {
+    // Regression: the old replace(/^shadow-/, '') on a token named 'shadow' produced
+    // '--shadow-shadow'. The DEFAULT scale must map to bare '--shadow'.
+    const tokens: Token[] = [
+      {
+        name: 'shadow',
+        value: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+        category: 'shadow',
+        namespace: 'shadow',
+      },
+    ];
+
+    const css = tokensToTailwind(tokens);
+
+    expect(css).toContain('--shadow:');
+    expect(css).not.toContain('--shadow-shadow');
+  });
+
   it('should export depth tokens', () => {
     const tokens: Token[] = [
       { name: 'depth-dropdown', value: '10', category: 'depth', namespace: 'depth' },
