@@ -4,11 +4,17 @@
  * Generates state variants (hover, active, focus, disabled) using pre-computed
  * state references from ColorValue intelligence data, or positional offsets
  * from the base token's actual position.
+ *
+ * New contract (issue #1232):
+ *   Input: { familyColorValue, familyName, basePosition, stateType }
+ *   Output: ColorReference { family, position }
+ *
+ * The executor resolves familyColorValue, basePosition, and stateType from the
+ * ParsedRule BEFORE calling this function -- no token-name regex inside the plugin.
  */
 
 import type { ColorValue } from '@rafters/shared';
-import type { TokenRegistry } from '../registry';
-import { INDEX_TO_POSITION, POSITION_TO_INDEX } from '../scale-positions';
+import { INDEX_TO_POSITION } from '../scale-positions';
 
 type ExtendedColorValue = ColorValue & {
   stateReferences?: Record<string, { family: string; position: string }>;
@@ -21,56 +27,37 @@ const STATE_OFFSETS: Record<string, number> = {
   disabled: -2,
 };
 
-export default function state(
-  registry: TokenRegistry,
-  tokenName: string,
-  dependencies: string[],
-): { family: string; position: string } {
-  const stateMatch = tokenName.match(/(hover|active|focus|disabled)$/);
-  if (!stateMatch) {
-    throw new Error(`Cannot extract state from token name: ${tokenName}`);
-  }
+export interface StatePluginInput {
+  /** The ColorValue object for the color family (resolved by the executor). */
+  familyColorValue: ColorValue;
+  /** The family token name, used to build the ColorReference. */
+  familyName: string;
+  /**
+   * The base scale array index (0-10) from which state offsets are computed.
+   * Resolved by the executor from the base token's ColorReference.
+   */
+  basePosition: number;
+  /**
+   * The state variant to generate (hover | active | focus | disabled).
+   * Resolved from ParsedRule.stateType by the executor -- never from the token name.
+   */
+  stateType: 'hover' | 'active' | 'focus' | 'disabled';
+}
 
-  const stateName = stateMatch[1] as 'hover' | 'active' | 'focus' | 'disabled';
+export default function state(input: StatePluginInput): { family: string; position: string } {
+  const { familyColorValue, familyName, basePosition, stateType } = input;
+  const colorValue = familyColorValue as ExtendedColorValue;
 
-  if (dependencies.length === 0) {
-    throw new Error(`No dependencies found for state rule on token: ${tokenName}`);
-  }
-
-  const familyTokenName = dependencies[0];
-  if (!familyTokenName) {
-    throw new Error(`No dependency token name for state rule on token: ${tokenName}`);
-  }
-  const familyToken = registry.get(familyTokenName);
-
-  if (!familyToken || typeof familyToken.value !== 'object') {
-    throw new Error(`ColorValue family token ${familyTokenName} not found for state rule`);
-  }
-
-  const colorValue = familyToken.value as ExtendedColorValue;
-
-  // Use pre-computed state references if available
-  if (colorValue.stateReferences?.[stateName]) {
-    const reference = colorValue.stateReferences[stateName];
+  // First priority: Use pre-computed state references if available
+  if (colorValue.stateReferences?.[stateType]) {
+    const reference = colorValue.stateReferences[stateType];
     return { family: reference.family, position: String(reference.position) };
   }
 
-  // Derive from the base token's actual position
-  const baseTokenName = tokenName.replace(/-(hover|active|focus|disabled)$/, '');
-  const baseToken = registry.get(baseTokenName);
-  let baseIndex = 5; // Default to 500 if base token not found
-
-  if (baseToken && typeof baseToken.value === 'object' && 'position' in baseToken.value) {
-    const baseRef = baseToken.value as { position?: string };
-    if (baseRef.position) {
-      const idx = POSITION_TO_INDEX[baseRef.position];
-      if (idx !== undefined) baseIndex = idx;
-    }
-  }
-
-  const offset = STATE_OFFSETS[stateName] ?? 0;
-  const adjustedIndex = Math.max(0, Math.min(10, baseIndex + offset));
+  // Second priority: Apply positional offset from the resolved base position
+  const offset = STATE_OFFSETS[stateType] ?? 0;
+  const adjustedIndex = Math.max(0, Math.min(10, basePosition + offset));
   const position = INDEX_TO_POSITION[adjustedIndex] ?? '500';
 
-  return { family: familyTokenName, position };
+  return { family: familyName, position };
 }

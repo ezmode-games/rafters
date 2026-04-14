@@ -4,10 +4,16 @@
  * Finds the best contrast color using sophisticated WCAG accessibility data
  * and pre-computed intelligence from ColorValue objects. This leverages the
  * AI-powered accessibility analysis to find optimal contrast pairs.
+ *
+ * New contract (issue #1232):
+ *   Input: { familyColorValue, familyName, basePosition }
+ *   Output: ColorReference { family, position }
+ *
+ * The executor resolves familyColorValue and basePosition BEFORE calling
+ * this function -- no token-name regex and no registry access inside the plugin.
  */
 
 import type { ColorValue } from '@rafters/shared';
-import type { TokenRegistry } from '../registry';
 import { INDEX_TO_POSITION } from '../scale-positions';
 
 // Extended ColorValue with optional plugin-specific properties
@@ -17,27 +23,21 @@ type ExtendedColorValue = ColorValue & {
   };
 };
 
-export default function contrast(
-  registry: TokenRegistry,
-  tokenName: string,
-  dependencies: string[],
-): { family: string; position: string } {
-  // Get the base family from dependencies
-  if (dependencies.length === 0) {
-    throw new Error(`No dependencies found for contrast rule on token: ${tokenName}`);
-  }
+export interface ContrastPluginInput {
+  /** The ColorValue object for the color family (resolved by the executor). */
+  familyColorValue: ColorValue;
+  /** The family token name, used to build the ColorReference. */
+  familyName: string;
+  /**
+   * The base scale array index (0-10) from which contrast is computed.
+   * Resolved by the executor from the base token's ColorReference -- never from the token name.
+   */
+  basePosition: number;
+}
 
-  const familyTokenName = dependencies[0];
-  if (!familyTokenName) {
-    throw new Error(`No dependency token name for contrast rule on token: ${tokenName}`);
-  }
-  const familyToken = registry.get(familyTokenName);
-
-  if (!familyToken || typeof familyToken.value !== 'object') {
-    throw new Error(`ColorValue family token ${familyTokenName} not found for contrast rule`);
-  }
-
-  const colorValue = familyToken.value as ExtendedColorValue;
+export default function contrast(input: ContrastPluginInput): { family: string; position: string } {
+  const { familyColorValue, familyName, basePosition } = input;
+  const colorValue = familyColorValue as ExtendedColorValue;
 
   // First priority: Use pre-computed foreground references if available
   if (colorValue.foregroundReferences?.auto) {
@@ -48,35 +48,13 @@ export default function contrast(
     };
   }
 
-  // Second priority: Extract base position from the semantic token name
-  // e.g., "primary-foreground" -> look for "primary" to get base position
-  const baseTokenMatch = tokenName.match(/^(.+)-(?:foreground|text|contrast)$/);
-  let basePosition = 5; // Default middle position
-
-  if (baseTokenMatch?.[1]) {
-    const baseTokenName = baseTokenMatch[1];
-    const baseToken = registry.get(baseTokenName);
-    if (baseToken && typeof baseToken.value === 'object') {
-      const baseRef = baseToken.value as { position?: string | number };
-      if (baseRef.position) {
-        basePosition =
-          typeof baseRef.position === 'string'
-            ? Math.floor(parseInt(baseRef.position, 10) / 100)
-            : Math.floor(baseRef.position / 100);
-      }
-    }
-  }
-
-  // Third priority: Use WCAG accessibility data to find optimal contrast
+  // Second priority: Use WCAG accessibility data to find optimal contrast
   if (colorValue.accessibility) {
     const accessibility = colorValue.accessibility;
 
-    // Try to find a contrast pair for the base position
-    // Look in WCAG AAA first (higher standard), then AA
     const wcagAAA = accessibility.wcagAAA?.normal || [];
     const wcagAA = accessibility.wcagAA?.normal || [];
 
-    // Find pairs where the first position matches our base
     let contrastPosition: number | undefined;
 
     // Try AAA first for highest quality
@@ -106,58 +84,40 @@ export default function contrast(
     }
 
     if (contrastPosition !== undefined) {
-      // Use the same family but different position for contrast
       return {
-        family: familyTokenName,
+        family: familyName,
         position: INDEX_TO_POSITION[contrastPosition] ?? '500',
       };
     }
   }
 
-  // Fourth priority: Look for a neutral family in the registry
-  const neutralFamilies = ['neutral-grayscale', 'neutral', 'gray', 'grey'];
-  for (const neutralFamily of neutralFamilies) {
-    const neutralToken = registry.get(neutralFamily);
-    if (neutralToken && typeof neutralToken.value === 'object') {
-      const neutralValue = neutralToken.value as ColorValue;
-
-      // Use the neutral family's accessibility data if available
-      if (neutralValue.accessibility) {
-        const neutralAccessibility = neutralValue.accessibility;
-
-        // For neutral families, prefer high contrast positions
-        if (neutralAccessibility.onWhite?.aaa && neutralAccessibility.onWhite.aaa.length > 0) {
-          const bestPosition = neutralAccessibility.onWhite.aaa[0]; // First AAA position
-          if (bestPosition !== undefined) {
-            return {
-              family: neutralFamily,
-              position: INDEX_TO_POSITION[bestPosition] ?? '500',
-            };
-          }
-        }
-
-        if (neutralAccessibility.onWhite?.aa && neutralAccessibility.onWhite.aa.length > 0) {
-          const bestPosition = neutralAccessibility.onWhite.aa[0]; // First AA position
-          if (bestPosition !== undefined) {
-            return {
-              family: neutralFamily,
-              position: INDEX_TO_POSITION[bestPosition] ?? '500',
-            };
-          }
-        }
-      }
-
-      // Fallback to standard positions
+  // Third priority: neutral fallback using onWhite accessibility data.
+  // NOTE: intentionally preserved -- see issue #1231 for context.
+  // The neutral family name is a fixed convention, not read from the registry.
+  const neutralFamilyName = 'neutral';
+  if (colorValue.accessibility?.onWhite?.aaa && colorValue.accessibility.onWhite.aaa.length > 0) {
+    const bestPosition = colorValue.accessibility.onWhite.aaa[0];
+    if (bestPosition !== undefined) {
       return {
-        family: neutralFamily,
-        position: basePosition <= 5 ? '900' : '100', // Dark text for light backgrounds, light text for dark
+        family: neutralFamilyName,
+        position: INDEX_TO_POSITION[bestPosition] ?? '500',
+      };
+    }
+  }
+
+  if (colorValue.accessibility?.onWhite?.aa && colorValue.accessibility.onWhite.aa.length > 0) {
+    const bestPosition = colorValue.accessibility.onWhite.aa[0];
+    if (bestPosition !== undefined) {
+      return {
+        family: neutralFamilyName,
+        position: INDEX_TO_POSITION[bestPosition] ?? '500',
       };
     }
   }
 
   // Last resort: Use same family with high contrast position
   return {
-    family: familyTokenName ?? 'neutral',
+    family: familyName,
     position: basePosition <= 5 ? '900' : '100',
   };
 }

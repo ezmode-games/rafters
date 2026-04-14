@@ -4,64 +4,41 @@
  * Finds the WCAG-safe dark mode counterpart for a light mode scale position.
  * Uses the ColorValue accessibility matrix -- AAA first, falls back to AA
  * if the AAA match is too close (< 3 positions apart).
+ *
+ * New contract (issue #1232):
+ *   Input: { familyColorValue, familyName, basePosition }
+ *   Output: ColorReference { family, position }
+ *
+ * The executor resolves familyColorValue and basePosition BEFORE calling
+ * this function -- no token-name regex and no registry access inside the plugin.
  */
 
 import type { ColorValue } from '@rafters/shared';
-import type { TokenRegistry } from '../registry';
-import { findDarkCounterpartIndex, INDEX_TO_POSITION, POSITION_TO_INDEX } from '../scale-positions';
+import { findDarkCounterpartIndex, INDEX_TO_POSITION } from '../scale-positions';
 
-export default function invert(
-  registry: TokenRegistry,
-  tokenName: string,
-  dependencies: string[],
-): { family: string; position: string } {
-  if (dependencies.length === 0) {
-    throw new Error(`No dependencies found for invert rule on token: ${tokenName}`);
-  }
+export interface InvertPluginInput {
+  /** The ColorValue object for the color family (resolved by the executor). */
+  familyColorValue: ColorValue;
+  /** The family token name, used to build the ColorReference. */
+  familyName: string;
+  /**
+   * The light mode scale array index (0-10) to find the dark counterpart for.
+   * Resolved by the executor from the base token's ColorReference -- never from the token name.
+   */
+  basePosition: number;
+}
 
-  const familyTokenName = dependencies[0];
-  if (!familyTokenName) {
-    throw new Error(`No dependency token name for invert rule on token: ${tokenName}`);
-  }
+export default function invert(input: InvertPluginInput): { family: string; position: string } {
+  const { familyColorValue, familyName, basePosition } = input;
 
-  const familyToken = registry.get(familyTokenName);
-  if (!familyToken || typeof familyToken.value !== 'object') {
-    throw new Error(`ColorValue family token ${familyTokenName} not found for invert rule`);
-  }
-
-  const colorValue = familyToken.value as ColorValue;
-  const lightIndex = extractLightIndex(tokenName, dependencies);
-  const darkIndex = findDarkCounterpartIndex(lightIndex, colorValue);
+  const darkIndex = findDarkCounterpartIndex(basePosition, familyColorValue);
 
   const darkPosition = INDEX_TO_POSITION[darkIndex];
   if (!darkPosition) {
-    throw new Error(`Invalid dark index ${darkIndex} for token: ${tokenName}`);
+    throw new Error(
+      `Invalid dark index ${darkIndex} for family "${familyName}" at light position ${basePosition}`,
+    );
   }
 
-  return { family: familyTokenName, position: darkPosition };
-}
-
-/**
- * Extract the light mode scale index from token context.
- * Checks the second dependency first, then the token name suffix.
- */
-function extractLightIndex(tokenName: string, dependencies: string[]): number {
-  if (dependencies.length > 1 && dependencies[1]) {
-    const posMatch = dependencies[1].match(/-(\d+)$/);
-    if (posMatch?.[1]) {
-      const idx = POSITION_TO_INDEX[posMatch[1]];
-      if (idx !== undefined) return idx;
-    }
-  }
-
-  const nameMatch = tokenName.match(/-(\d+)$/);
-  if (nameMatch?.[1]) {
-    const idx = POSITION_TO_INDEX[nameMatch[1]];
-    if (idx !== undefined) return idx;
-  }
-
-  throw new Error(
-    `Cannot determine light mode scale position for invert rule on token: ${tokenName}. ` +
-      `Neither dependency[1] (${dependencies[1] ?? 'none'}) nor token name suffix contain a valid position.`,
-  );
+  return { family: familyName, position: darkPosition };
 }

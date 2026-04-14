@@ -1,20 +1,15 @@
 /**
  * Example Rule Plugin
  *
- * Shows the plugin pattern - simple function with full registry access
+ * Shows the plugin pattern -- pure function over typed inputs, no registry access.
+ * The executor resolves all necessary data and passes it as a typed input object.
  */
 
-import type { TokenRegistry } from '../registry';
+export interface ExamplePluginInput {
+  /** The token name being processed, provided by the executor for debugging. */
+  tokenName: string;
+}
 
-export default function example(
-  registry: TokenRegistry,
-  tokenName: string,
-  dependencies: string[],
-): string {
-  // Full registry access - can read any token, check dependencies, etc.
-  for (const dep of dependencies) {
-    registry.get(dep);
-  }
-
-  return `example-result-for-${tokenName}`;
+export default function example(input: ExamplePluginInput): string {
+  return `example-result-for-${input.tokenName}`;
 }

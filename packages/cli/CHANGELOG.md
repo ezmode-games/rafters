@@ -1,5 +1,11 @@
 # rafters
 
+## Unreleased
+
+### Patch Changes
+
+- refactor(plugins): migrate scale, contrast, state, and invert plugins from `(registry, tokenName, deps)` signature to typed input objects (`{ familyColorValue, familyName, ... }`). The executor now resolves all inputs before calling any plugin -- no plugin imports TokenRegistry or parses token names with regex. Adds "rule does not apply" detection in `executeScalePositionRule`: throws a clear error when a token's own value is a ColorValue (family token shape) rather than silently corrupting it with a CSS string. Closes #1232.
+
 ## 0.0.48
 
 ### Patch Changes

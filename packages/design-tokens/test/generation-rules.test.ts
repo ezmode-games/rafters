@@ -195,12 +195,13 @@ describe('GenerationRuleExecutor', () => {
 
       const parsedRule = parser.parse('scale:500');
 
+      // New contract: error message includes 'scale-position' (the resolved rule type)
       expect(() => executor.execute(parsedRule, 'orphan-500')).toThrow(
-        'No dependencies found for scale rule on token',
+        'No dependencies found for scale-position rule on token',
       );
     });
 
-    it('throws error when base token is not a ColorValue', () => {
+    it('throws a "does not apply" error when dependency is not a ColorValue', () => {
       registry.add({
         name: 'not-a-color',
         value: '16px',
@@ -221,7 +222,40 @@ describe('GenerationRuleExecutor', () => {
 
       const parsedRule = parser.parse('scale:500');
 
-      expect(() => executor.execute(parsedRule, 'test-500')).toThrow('not found for scale rule');
+      // New contract: executor detects non-ColorValue dependency BEFORE calling the plugin
+      expect(() => executor.execute(parsedRule, 'test-500')).toThrow(
+        "Rule 'scale-position' does not apply to token 'test-500'",
+      );
+    });
+
+    it('throws a "does not apply" error when the token itself holds a ColorValue (family token shape)', () => {
+      const familyColorValue = makeColorValue('test-blue', 240);
+
+      registry.add({
+        name: 'family-color',
+        value: familyColorValue,
+        category: 'color',
+        namespace: 'color',
+      });
+
+      // A "family" token whose value is a ColorValue but has a scale-position rule --
+      // this is the #1223 case: the rule does not apply to this token shape.
+      registry.add({
+        name: 'primary',
+        value: familyColorValue,
+        category: 'color',
+        namespace: 'color',
+        dependsOn: ['family-color'],
+        generationRule: 'scale:500',
+      });
+
+      registry.addDependency('primary', ['family-color'], 'scale:500');
+
+      const parsedRule = parser.parse('scale:500');
+
+      expect(() => executor.execute(parsedRule, 'primary')).toThrow(
+        "Rule 'scale-position' does not apply to token 'primary'",
+      );
     });
   });
 });
