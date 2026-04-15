@@ -8,7 +8,13 @@
  */
 
 import type { BlockPaletteItem } from '@rafters/ui/primitives/block-palette';
-import type { AppliedRule, CompositeBlock, CompositeCategory, CompositeFile } from './manifest';
+import type {
+  AppliedRule,
+  CompositeBlock,
+  CompositeCategory,
+  CompositeFile,
+  UsagePatterns,
+} from './manifest';
 
 /** A block ready for insertion into the editor canvas (same shape as CompositeBlock). */
 export type InstantiatedBlock = CompositeBlock;
@@ -38,6 +44,10 @@ export interface SaveCompositeMetadata {
   category: CompositeCategory;
   description: string;
   cognitiveLoad?: number;
+  // Designer intent (optional)
+  solves?: string;
+  appliesWhen?: string[];
+  usagePatterns?: UsagePatterns;
 }
 
 /**
@@ -244,15 +254,22 @@ export function serializeToComposite(
   const rawLoad = metadata.cognitiveLoad ?? blocks.length;
   const cognitiveLoad = Math.min(10, Math.max(1, rawLoad));
 
+  const manifest: CompositeFile['manifest'] = {
+    id,
+    name: metadata.name,
+    category: metadata.category,
+    description: metadata.description,
+    keywords,
+    cognitiveLoad,
+  };
+
+  // Add optional intent fields if provided
+  if (metadata.solves) manifest.solves = metadata.solves;
+  if (metadata.appliesWhen) manifest.appliesWhen = metadata.appliesWhen;
+  if (metadata.usagePatterns) manifest.usagePatterns = metadata.usagePatterns;
+
   return {
-    manifest: {
-      id,
-      name: metadata.name,
-      category: metadata.category,
-      description: metadata.description,
-      keywords,
-      cognitiveLoad,
-    },
+    manifest,
     input,
     output,
     blocks: blocks.map((b) => {

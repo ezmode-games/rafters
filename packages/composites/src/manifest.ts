@@ -37,6 +37,14 @@ export const CompositeBlockSchema = z.object({
 
 export type CompositeBlock = z.infer<typeof CompositeBlockSchema>;
 
+/** Designer intent - captures WHY and WHEN to use this composite */
+export const UsagePatternsSchema = z.object({
+  do: z.array(z.string()),
+  never: z.array(z.string()),
+});
+
+export type UsagePatterns = z.infer<typeof UsagePatternsSchema>;
+
 /** Zod schema for a composite's manifest metadata */
 export const CompositeManifestSchema = z.object({
   id: z
@@ -48,6 +56,11 @@ export const CompositeManifestSchema = z.object({
   description: z.string(),
   keywords: z.array(z.string()),
   cognitiveLoad: z.number().int().min(1).max(10),
+
+  // Designer intent fields (optional for backwards compatibility)
+  solves: z.string().optional(),
+  appliesWhen: z.array(z.string()).optional(),
+  usagePatterns: UsagePatternsSchema.optional(),
 });
 
 export type CompositeManifest = z.infer<typeof CompositeManifestSchema>;
