@@ -6,11 +6,19 @@
  * but the exports reflect the updated underlying color values.
  */
 
+import { colorPlugins } from '@rafters/color-utils/plugins';
 import { COMPUTED, type ColorReference, type Token } from '@rafters/shared';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { tokensToTailwind } from '../src/exporters/tailwind.js';
-import { generateBaseSystem } from '../src/index.js';
+import { generateBaseSystem, registerPlugin } from '../src/index.js';
 import { TokenRegistry } from '../src/registry.js';
+
+// Register color plugins once before all tests
+beforeAll(() => {
+  for (const plugin of colorPlugins) {
+    registerPlugin(plugin);
+  }
+});
 
 describe('Registry Regeneration', () => {
   describe('Semantic Token Dependencies', () => {

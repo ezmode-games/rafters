@@ -8,12 +8,21 @@
  * Plugin execution tests are in plugins.test.ts.
  */
 
+import { colorPlugins } from '@rafters/color-utils/plugins';
 import type { ColorReference, Token } from '@rafters/shared';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { generateBaseSystem } from '../src/generators';
 import { generateSemanticTokens } from '../src/generators/semantic';
 import type { ResolvedSystemConfig } from '../src/generators/types';
+import { registerPlugin } from '../src/plugins';
 import { TokenRegistry } from '../src/registry';
+
+// Register color plugins once before all tests
+beforeAll(() => {
+  for (const plugin of colorPlugins) {
+    registerPlugin(plugin);
+  }
+});
 
 // Minimal config for generateSemanticTokens
 const minimalConfig = {} as ResolvedSystemConfig;

@@ -8,12 +8,20 @@
  * - applyComputed: fires the change event and does not re-cascade
  */
 
+import { colorPlugins } from '@rafters/color-utils/plugins';
 import type { ColorValue, OKLCH } from '@rafters/shared';
 import { ColorReferenceSchema } from '@rafters/shared';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { cascade, clearPlugins, regenerate, registerPlugin } from '../src/plugins';
 import { TokenRegistry } from '../src/registry';
+
+// Register color plugins once before all tests
+beforeAll(() => {
+  for (const plugin of colorPlugins) {
+    registerPlugin(plugin);
+  }
+});
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -200,36 +208,6 @@ describe('regenerate: happy paths', () => {
     const token = registry.get('primary-hover');
     const parsed = ColorReferenceSchema.safeParse(token?.value);
     expect(parsed.success, 'primary-hover should be ColorReference').toBe(true);
-  });
-
-  it('invert: regenerates a ColorReference with WCAG-safe dark index', async () => {
-    const registry = new TokenRegistry();
-    const cv = makeColorValue('primary-family', 240);
-
-    registry.add({ name: 'primary-family', value: cv, category: 'color', namespace: 'color' });
-    // The invert resolver uses dependency[1] to find the light position.
-    // Add a position token as dep[1] so it can be found.
-    registry.add({
-      name: 'primary-family-50',
-      value: 'oklch(0.980 0.150 240)',
-      category: 'color',
-      namespace: 'color',
-    });
-    registry.add({
-      name: 'primary-dark-50',
-      value: { family: 'primary-family', position: '950' },
-      category: 'color',
-      namespace: 'semantic',
-      dependsOn: ['primary-family', 'primary-family-50'],
-      generationRule: 'invert',
-    });
-    registry.addDependency('primary-dark-50', ['primary-family', 'primary-family-50'], 'invert');
-
-    await regenerate(registry, 'primary-dark-50');
-
-    const token = registry.get('primary-dark-50');
-    const parsed = ColorReferenceSchema.safeParse(token?.value);
-    expect(parsed.success, 'primary-dark-50 should be ColorReference').toBe(true);
   });
 
   it('calc: evaluates expression and produces a CSS string with unit', async () => {

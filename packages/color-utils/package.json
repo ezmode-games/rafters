@@ -19,6 +19,7 @@
     "clean": "rm -rf .turbo coverage"
   },
   "dependencies": {
+    "@rafters/design-tokens": "workspace:*",
     "@rafters/shared": "workspace:*",
     "apca-w3": "^0.1.9",
     "colorjs.io": "^0.5.2",

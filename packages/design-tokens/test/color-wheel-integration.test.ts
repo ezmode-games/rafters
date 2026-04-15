@@ -18,15 +18,24 @@
  */
 
 import { colorWheel, oklchToCSS } from '@rafters/color-utils';
+import { colorPlugins } from '@rafters/color-utils/plugins';
 import type { ColorValue, OKLCH } from '@rafters/shared';
 import { ColorValueSchema } from '@rafters/shared';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import {
   generateBaseSystem,
+  registerPlugin,
   registryToTailwind,
   registryToTypeScript,
   TokenRegistry,
 } from '../src/index.js';
+
+// Register color plugins once before all tests
+beforeAll(() => {
+  for (const plugin of colorPlugins) {
+    registerPlugin(plugin);
+  }
+});
 
 // ---------------------------------------------------------------------------
 // Seeds

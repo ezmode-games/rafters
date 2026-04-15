@@ -6,10 +6,19 @@
  * are now in plugins.test.ts.
  */
 
+import { colorPlugins } from '@rafters/color-utils/plugins';
 import type { ColorValue, OKLCH } from '@rafters/shared';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { GenerationRuleParser } from '../src/generation-rules';
+import { registerPlugin } from '../src/plugins';
 import { TokenRegistry } from '../src/registry';
+
+// Register color plugins once before all tests
+beforeAll(() => {
+  for (const plugin of colorPlugins) {
+    registerPlugin(plugin);
+  }
+});
 
 function makeOKLCH(l: number, c: number, h: number): OKLCH {
   return { l, c, h, alpha: 1 };
