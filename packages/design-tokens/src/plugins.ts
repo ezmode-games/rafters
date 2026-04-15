@@ -22,7 +22,11 @@ import {
 import { z } from 'zod';
 import { GenerationRuleParser } from './generation-rules';
 import type { TokenRegistry } from './registry';
-import { POSITION_TO_INDEX } from './scale-positions';
+import { POSITION_TO_INDEX, SCALE_POSITION_MAP } from './scale-positions';
+
+function hasPosition(v: unknown): v is { family?: string; position: string | number } {
+  return typeof v === 'object' && v !== null && 'position' in v;
+}
 
 // ---------------------------------------------------------------------------
 // Plugin type and schema
@@ -107,9 +111,14 @@ async function loadPluginsFromDir(dir: string): Promise<void> {
       const parsed = PluginSpecSchema.safeParse(candidate);
       if (parsed.success) {
         pluginMap.set(candidate.id, candidate as Plugin<unknown, unknown>);
+      } else {
+        console.warn(
+          `[design-tokens] Skipping ${pluginPath}: default export does not match Plugin shape`,
+        );
       }
-    } catch {
-      // Skip unloadable files silently
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.warn(`[design-tokens] Failed to load plugin ${pluginPath}: ${message}`);
     }
   }
 }
@@ -148,12 +157,7 @@ export function resolveInput(
 
       // Semantic token path: current value is a ColorReference -> preserve the
       // family reference but allow parsedRule.scalePosition to override position
-      if (
-        existingValue &&
-        typeof existingValue === 'object' &&
-        'family' in existingValue &&
-        'position' in existingValue
-      ) {
+      if (hasPosition(existingValue) && 'family' in (existingValue as object)) {
         const ref = existingValue as ColorReference;
         const scalePosition =
           parsedRule.scalePosition !== undefined
@@ -182,20 +186,7 @@ export function resolveInput(
         throw new Error(`Cannot extract scale position from token name: ${tokenName}`);
       }
       const posNum = parseInt(posMatch[1] ?? '500', 10);
-      const SCALE_POS_TO_INDEX: Record<number, number> = {
-        50: 0,
-        100: 1,
-        200: 2,
-        300: 3,
-        400: 4,
-        500: 5,
-        600: 6,
-        700: 7,
-        800: 8,
-        900: 9,
-        950: 10,
-      };
-      const scalePosition = SCALE_POS_TO_INDEX[posNum] ?? 5;
+      const scalePosition = SCALE_POSITION_MAP[posNum] ?? 5;
 
       return {
         familyColorValue: familyToken.value,
@@ -227,15 +218,10 @@ export function resolveInput(
       const baseToken = registry.get(baseTokenName);
       let basePosition = 5;
 
-      if (
-        baseToken &&
-        typeof baseToken.value === 'object' &&
-        baseToken.value !== null &&
-        'position' in baseToken.value
-      ) {
-        const ref = baseToken.value as { position?: string };
-        if (ref.position) {
-          const idx = POSITION_TO_INDEX[ref.position];
+      if (baseToken && hasPosition(baseToken.value)) {
+        const pos = baseToken.value.position;
+        if (typeof pos === 'string') {
+          const idx = POSITION_TO_INDEX[pos];
           if (idx !== undefined) basePosition = idx;
         }
       }
@@ -262,19 +248,11 @@ export function resolveInput(
       let basePosition = 5;
       if (baseTokenMatch?.[1]) {
         const baseToken = registry.get(baseTokenMatch[1]);
-        if (
-          baseToken &&
-          typeof baseToken.value === 'object' &&
-          baseToken.value !== null &&
-          'position' in baseToken.value
-        ) {
-          const ref = baseToken.value as { position?: string | number };
-          if (ref.position !== undefined) {
-            basePosition =
-              typeof ref.position === 'string'
-                ? Math.floor(parseInt(ref.position, 10) / 100)
-                : Math.floor(ref.position / 100);
-          }
+        if (baseToken && hasPosition(baseToken.value)) {
+          const pos = baseToken.value.position;
+          const posStr = typeof pos === 'string' ? pos : String(pos);
+          const idx = POSITION_TO_INDEX[posStr];
+          if (idx !== undefined) basePosition = idx;
         }
       }
 

@@ -24,7 +24,7 @@ type ExtendedColorValue = StateInput['familyColorValue'] & {
   stateReferences?: Record<string, { family: string; position: string }>;
 };
 
-const STATE_OFFSETS: Record<string, number> = {
+const STATE_OFFSETS: Record<StateInput['stateType'], number> = {
   hover: 1,
   active: 2,
   focus: 1,
@@ -48,7 +48,7 @@ export default definePlugin({
     }
 
     // Derive from base position with offset
-    const offset = STATE_OFFSETS[input.stateType] ?? 0;
+    const offset = STATE_OFFSETS[input.stateType];
     const adjustedIndex = Math.max(0, Math.min(10, input.basePosition + offset));
     const position = INDEX_TO_POSITION[adjustedIndex] ?? '500';
 

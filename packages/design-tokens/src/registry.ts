@@ -49,14 +49,6 @@ export type TokenChangeEvent =
 
 export type RegistryChangeCallback = (event: TokenChangeEvent) => void | Promise<void>;
 
-// Helper function to convert token values to CSS (simple inline implementation)
-
-// Generate a unique token ID for colors based on OKLCH values
-
-// Extract OKLCH from ColorValue or Token
-
-// Fetch color intelligence from the API
-
 export class TokenRegistry {
   private tokens: Map<string, Token> = new Map();
   public dependencyGraph: TokenDependencyGraph = new TokenDependencyGraph();

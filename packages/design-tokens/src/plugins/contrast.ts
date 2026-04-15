@@ -29,6 +29,14 @@ type ExtendedColorValue = ContrastInput['familyColorValue'] & {
   };
 };
 
+function findPartnerInPairs(pairs: number[][], basePosition: number): number | undefined {
+  for (const [p1, p2] of pairs) {
+    if (p1 === basePosition) return p2;
+    if (p2 === basePosition) return p1;
+  }
+  return undefined;
+}
+
 export default definePlugin({
   id: 'contrast',
   input: ContrastInputSchema,
@@ -49,31 +57,8 @@ export default definePlugin({
       const wcagAAA = colorValue.accessibility.wcagAAA?.normal ?? [];
       const wcagAA = colorValue.accessibility.wcagAA?.normal ?? [];
 
-      let contrastPosition: number | undefined;
-
-      for (const [pos1, pos2] of wcagAAA) {
-        if (pos1 === basePosition) {
-          contrastPosition = pos2;
-          break;
-        }
-        if (pos2 === basePosition) {
-          contrastPosition = pos1;
-          break;
-        }
-      }
-
-      if (contrastPosition === undefined) {
-        for (const [pos1, pos2] of wcagAA) {
-          if (pos1 === basePosition) {
-            contrastPosition = pos2;
-            break;
-          }
-          if (pos2 === basePosition) {
-            contrastPosition = pos1;
-            break;
-          }
-        }
-      }
+      const contrastPosition =
+        findPartnerInPairs(wcagAAA, basePosition) ?? findPartnerInPairs(wcagAA, basePosition);
 
       if (contrastPosition !== undefined) {
         return {
