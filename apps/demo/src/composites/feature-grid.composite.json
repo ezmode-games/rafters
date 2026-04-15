@@ -5,7 +5,21 @@
     "category": "layout",
     "description": "Three-column feature showcase with icons and descriptions",
     "keywords": ["features", "grid", "showcase", "columns"],
-    "cognitiveLoad": 3
+    "cognitiveLoad": 3,
+    "solves": "Showcasing multiple features with equal visual weight",
+    "appliesWhen": ["product pages", "landing pages", "comparison views", "capability overviews"],
+    "usagePatterns": {
+      "do": [
+        "Limit to 3-6 features for scannability",
+        "Use consistent icon style across items",
+        "Keep feature descriptions under 20 words"
+      ],
+      "never": [
+        "Mix different levels of detail across items",
+        "Use more than 9 items in a single grid",
+        "Vary column widths for emphasis"
+      ]
+    }
   },
   "input": [],
   "output": [],

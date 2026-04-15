@@ -5,7 +5,21 @@
     "category": "form",
     "description": "Email and password login with validation",
     "keywords": ["auth", "login", "credentials", "sign-in"],
-    "cognitiveLoad": 4
+    "cognitiveLoad": 4,
+    "solves": "Authenticating users with minimal friction",
+    "appliesWhen": ["sign-in flows", "session restoration", "gated content", "account access"],
+    "usagePatterns": {
+      "do": [
+        "Show password toggle for visibility",
+        "Support password managers with proper autocomplete",
+        "Provide forgot password link near password field"
+      ],
+      "never": [
+        "Disable paste in password fields",
+        "Clear password field on validation error",
+        "Require arbitrary password complexity rules"
+      ]
+    }
   },
   "input": ["email", "password"],
   "output": ["credentials"],
