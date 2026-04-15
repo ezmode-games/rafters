@@ -1,8 +1,6 @@
 /**
- * OKLCH to CSS conversion and ColorReference resolution.
- *
- * Extracted from GenerationRuleExecutor so that applyComputed and plugins
- * can use it without importing from generation-rules.ts.
+ * Pure ColorReference -> CSS oklch() resolver. No registry access;
+ * caller passes a token lookup function.
  */
 
 import type { ColorReference, ColorValue, OKLCH } from '@rafters/shared';

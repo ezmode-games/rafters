@@ -2,7 +2,8 @@
  * Contrast Plugin
  *
  * Finds the best contrast color using WCAG accessibility data from ColorValue.
- * Fallback to neutral family on no-WCAG-pair is preserved (issue #1231).
+ * Falls back to a neutral family when the source family has no WCAG-safe pair
+ * for the base position.
  *
  * The neutral family lookup is performed in resolveInput (registry context)
  * and passed as neutralFamilyName + neutralColorValue in the input struct.

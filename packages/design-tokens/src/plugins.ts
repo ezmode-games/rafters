@@ -376,7 +376,8 @@ export function resolveInput(
 
 /**
  * Infer a calc expression from token naming patterns.
- * Moved from calc.ts (it's input resolution, not transform logic).
+ * Lives here rather than in the calc plugin because it reads token names --
+ * that's input resolution, not transform logic.
  */
 function inferExpressionFromTokenName(tokenName: string): string {
   const patterns: [RegExp, (m: RegExpMatchArray) => string][] = [
@@ -474,7 +475,6 @@ export const ColorFamilyInputBaseSchema = z.object({
 
 export type ColorFamilyInputBase = z.infer<typeof ColorFamilyInputBaseSchema>;
 
-// Verify OKLCHSchema is available for plugins that need it
 export { ColorValueSchema, OKLCHSchema };
 
 // ---------------------------------------------------------------------------

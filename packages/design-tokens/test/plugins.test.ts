@@ -137,6 +137,43 @@ describe('regenerate: happy paths', () => {
     expect(parsed.success, 'primary-foreground should be ColorReference').toBe(true);
   });
 
+  it('contrast: uses POSITION_TO_INDEX for base position 950 (regression: floor-division bug)', async () => {
+    // Regression for a70afe0: resolveInput previously computed
+    // basePosition = Math.floor(parseInt(pos) / 100), which maps "950" to 9
+    // instead of 10. That caused the contrast partner for position 950 to be
+    // the AAA pair for index 9 (partner 1 -> "100") instead of index 10
+    // (partner 0 -> "50"). makeColorValue pins wcagAAA.normal = [[0,10],[1,9],[2,8]].
+    const registry = new TokenRegistry();
+    const cv = makeColorValue('primary-family', 240);
+
+    registry.add({ name: 'primary-family', value: cv, category: 'color', namespace: 'color' });
+    registry.add({
+      name: 'primary',
+      value: { family: 'primary-family', position: '950' },
+      category: 'color',
+      namespace: 'semantic',
+    });
+    registry.add({
+      name: 'primary-foreground',
+      value: { family: 'primary-family', position: '50' },
+      category: 'color',
+      namespace: 'semantic',
+      dependsOn: ['primary-family'],
+      generationRule: 'contrast:auto',
+    });
+    registry.addDependency('primary-foreground', ['primary-family'], 'contrast:auto');
+
+    await regenerate(registry, 'primary-foreground');
+
+    const token = registry.get('primary-foreground');
+    const parsed = ColorReferenceSchema.safeParse(token?.value);
+    expect(parsed.success, 'primary-foreground should be ColorReference').toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.family).toBe('primary-family');
+      expect(parsed.data.position).toBe('50');
+    }
+  });
+
   it('state: regenerates a ColorReference for a hover token', async () => {
     const registry = new TokenRegistry();
     const cv = makeColorValue('primary-family', 240);
