@@ -32,6 +32,7 @@ export type {
   CompositeCategory,
   CompositeFile,
   CompositeManifest,
+  UsagePatterns,
 } from './manifest';
 export {
   AppliedRuleSchema,
@@ -39,6 +40,7 @@ export {
   CompositeCategorySchema,
   CompositeFileSchema,
   CompositeManifestSchema,
+  UsagePatternsSchema,
 } from './manifest';
 export {
   clear as clearRegistry,
