@@ -8,6 +8,7 @@ export default defineConfig([
     bundle: true,
     noExternal: [
       '@rafters/color-utils',
+      '@rafters/composites',
       '@rafters/design-tokens',
       '@rafters/shared',
       '@rafters/studio',
