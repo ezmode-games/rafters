@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { RaftersToolHandler, TOOL_DEFINITIONS } from '../../src/mcp/tools.js';
 
 describe('TOOL_DEFINITIONS', () => {
-  it('should define 5 tools', () => {
-    expect(TOOL_DEFINITIONS).toHaveLength(5);
+  it('should define 6 tools', () => {
+    expect(TOOL_DEFINITIONS).toHaveLength(6);
   });
 
   it('should have correct tool names', () => {
@@ -13,6 +13,7 @@ describe('TOOL_DEFINITIONS', () => {
     expect(names).toContain('rafters_pattern');
     expect(names).toContain('rafters_component');
     expect(names).toContain('rafters_onboard');
+    expect(names).toContain('rafters_vocabulary');
   });
 
   it('should have descriptions for all tools', () => {
@@ -125,6 +126,32 @@ describe('RaftersToolHandler', () => {
 
       const data = JSON.parse(result.content[0].text as string);
       expect(data.error).toContain('Unknown action');
+    });
+  });
+
+  describe('rafters_vocabulary', () => {
+    it('should return error when no project root configured', async () => {
+      const handler = new RaftersToolHandler(null);
+      const result = await handler.handleToolCall('rafters_vocabulary', {});
+
+      const data = JSON.parse(result.content[0].text as string);
+      expect(data.error).toContain('No project root');
+    });
+
+    it('should return error when project has no tokens', async () => {
+      const { mkdtemp, rm, mkdir } = await import('node:fs/promises');
+      const { join } = await import('node:path');
+      const testDir = await mkdtemp(join(process.cwd(), '.test-mcp-vocab-'));
+      await mkdir(join(testDir, '.rafters', 'tokens'), { recursive: true });
+      try {
+        const handler = new RaftersToolHandler(testDir);
+        const result = await handler.handleToolCall('rafters_vocabulary', {});
+
+        const data = JSON.parse(result.content[0].text as string);
+        expect(data.error).toContain('No tokens found');
+      } finally {
+        await rm(testDir, { recursive: true, force: true });
+      }
     });
   });
 

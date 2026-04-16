@@ -1,13 +1,14 @@
 /**
  * MCP Tools for Rafters Design System
  *
- * 5 focused tools for agent composition:
+ * 6 focused tools for agent composition:
  *
  * 1. rafters_composite - Query composites with designer intent
  * 2. rafters_rule - Query or create validation rules
  * 3. rafters_pattern - Design pattern guidance (do/never)
  * 4. rafters_component - Component intelligence
  * 5. rafters_onboard - Import design tokens from CSS files
+ * 6. rafters_vocabulary - Query design tokens with intent-based filtering
  */
 
 import { readdir } from 'node:fs/promises';
@@ -22,6 +23,8 @@ import {
   registerComposite,
   searchComposites,
 } from '@rafters/composites';
+import { NodePersistenceAdapter } from '@rafters/design-tokens';
+import type { Token } from '@rafters/shared';
 import { onboard, previewOnboard } from '../onboard/orchestrator.js';
 import { registryClient } from '../registry/client.js';
 import { getRaftersPaths } from '../utils/paths.js';
@@ -125,6 +128,46 @@ export const TOOL_DEFINITIONS = [
       required: ['action'],
     },
   },
+  {
+    name: 'rafters_vocabulary',
+    description:
+      'Query design tokens with intent-based filtering. Without filters, returns a compact index with suggested queries. Use category/intent/family filters to get specific tokens instead of the full dump.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        category: {
+          type: 'string',
+          enum: [
+            'color',
+            'spacing',
+            'typography',
+            'radius',
+            'shadow',
+            'motion',
+            'fill',
+            'focus',
+            'elevation',
+            'breakpoint',
+            'depth',
+          ],
+          description: 'Filter by token category',
+        },
+        intent: {
+          type: 'string',
+          description: 'Semantic intent search (e.g., "warnings", "form validation", "navigation")',
+        },
+        family: {
+          type: 'string',
+          description: 'Filter by color family (e.g., "primary", "destructive", "accent")',
+        },
+        include_values: {
+          type: 'boolean',
+          description: 'Include full token values in response (default: false for compact output)',
+        },
+      },
+      required: [],
+    },
+  },
 ] as const;
 
 // ==================== Tool Handler ====================
@@ -149,6 +192,10 @@ export class RaftersToolHandler {
         return this.handleComponent(args.name as string);
       case 'rafters_onboard':
         return this.handleOnboard(args as { action: string; path?: string; importer?: string });
+      case 'rafters_vocabulary':
+        return this.handleVocabulary(
+          args as { category?: string; intent?: string; family?: string; include_values?: boolean },
+        );
       default:
         return {
           content: [{ type: 'text', text: JSON.stringify({ error: `Unknown tool: ${name}` }) }],
@@ -500,5 +547,201 @@ export class RaftersToolHandler {
         ],
       };
     }
+  }
+
+  private async handleVocabulary(args: {
+    category?: string;
+    intent?: string;
+    family?: string;
+    include_values?: boolean;
+  }): Promise<CallToolResult> {
+    const { category, intent, family, include_values } = args;
+
+    // Load tokens from project
+    if (!this.projectRoot) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              error: 'No project root configured',
+              suggestion: 'Run rafters init first or specify --project-root',
+            }),
+          },
+        ],
+      };
+    }
+
+    try {
+      const adapter = new NodePersistenceAdapter(this.projectRoot);
+      let tokens = await adapter.load();
+
+      if (tokens.length === 0) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: 'No tokens found in project',
+                suggestion:
+                  'Run rafters init to generate tokens, or rafters_onboard to import from CSS',
+              }),
+            },
+          ],
+        };
+      }
+
+      // No filters? Return compact index with suggested queries
+      if (!category && !intent && !family) {
+        const categories = [...new Set(tokens.map((t) => t.category))].sort();
+        const namespaces = [...new Set(tokens.map((t) => t.namespace))].sort();
+        const families = this.extractFamilies(tokens);
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(
+                {
+                  totalTokens: tokens.length,
+                  categories,
+                  namespaces,
+                  colorFamilies: families,
+                  suggestedQueries: [
+                    { query: 'category: "color"', description: 'All color tokens' },
+                    { query: 'category: "spacing"', description: 'Spacing scale tokens' },
+                    { query: 'family: "primary"', description: 'Primary color family' },
+                    { query: 'family: "destructive"', description: 'Destructive/error colors' },
+                    { query: 'intent: "warnings"', description: 'Tokens for warning states' },
+                    { query: 'intent: "form validation"', description: 'Form feedback colors' },
+                  ],
+                  tip: 'Use filters to get specific tokens instead of the full dump',
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+        };
+      }
+
+      // Apply category filter
+      if (category) {
+        tokens = tokens.filter((t) => t.category === category);
+      }
+
+      // Apply family filter (for color tokens)
+      if (family) {
+        tokens = tokens.filter((t) => {
+          // Check if value is a ColorReference with matching family
+          if (typeof t.value === 'object' && t.value !== null && 'family' in t.value) {
+            return t.value.family.toLowerCase().includes(family.toLowerCase());
+          }
+          // Check token name for family
+          return t.name.toLowerCase().includes(family.toLowerCase());
+        });
+      }
+
+      // Apply intent filter (semantic search across multiple fields)
+      if (intent) {
+        const intentLower = intent.toLowerCase();
+        tokens = tokens.filter((t) => {
+          // Search in semantic meaning
+          if (t.semanticMeaning?.toLowerCase().includes(intentLower)) return true;
+          // Search in usage context
+          if (t.usageContext?.some((ctx) => ctx.toLowerCase().includes(intentLower))) return true;
+          // Search in token name
+          if (t.name.toLowerCase().includes(intentLower)) return true;
+          // Search in appliesWhen
+          if (t.appliesWhen?.some((aw) => aw.toLowerCase().includes(intentLower))) return true;
+          return false;
+        });
+      }
+
+      // Format response
+      const response = include_values
+        ? tokens.map((t) => ({
+            name: t.name,
+            value: t.value,
+            category: t.category,
+            namespace: t.namespace,
+            semanticMeaning: t.semanticMeaning,
+            usageContext: t.usageContext,
+            usagePatterns: t.usagePatterns,
+          }))
+        : tokens.map((t) => ({
+            name: t.name,
+            category: t.category,
+            tailwindClass: this.toTailwindClass(t),
+          }));
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                count: tokens.length,
+                filters: { category, intent, family },
+                tokens: response,
+              },
+              null,
+              2,
+            ),
+          },
+        ],
+      };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      if (process.env.DEBUG || process.env.RAFTERS_DEBUG) {
+        console.error('[rafters_vocabulary] failed:', err);
+      }
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({ error: message }),
+          },
+        ],
+      };
+    }
+  }
+
+  /** Extract color family names from tokens */
+  private extractFamilies(tokens: Token[]): string[] {
+    const families = new Set<string>();
+    for (const t of tokens) {
+      if (typeof t.value === 'object' && t.value !== null && 'family' in t.value) {
+        families.add(t.value.family);
+      }
+    }
+    return [...families].sort();
+  }
+
+  /** Convert token to Tailwind class hint */
+  private toTailwindClass(token: Token): string | null {
+    const { name, category, namespace } = token;
+
+    // Color tokens -> text-{name}, bg-{name}, border-{name}
+    if (category === 'color' || namespace === 'color') {
+      return `text-${name} / bg-${name} / border-${name}`;
+    }
+
+    // Spacing tokens -> p-{name}, m-{name}, gap-{name}
+    if (category === 'spacing') {
+      return `p-${name} / m-${name} / gap-${name}`;
+    }
+
+    // Radius tokens -> rounded-{name}
+    if (category === 'radius') {
+      return `rounded-${name}`;
+    }
+
+    // Shadow tokens -> shadow-{name}
+    if (category === 'shadow') {
+      return `shadow-${name}`;
+    }
+
+    return null;
   }
 }

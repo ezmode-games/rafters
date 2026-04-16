@@ -5,6 +5,7 @@
 ### Minor Changes
 
 - feat(onboard): orchestrator coordinates the import pipeline. `onboard()` detects the best importer (shadcn or generic-css), checks confidence thresholds, and runs the import. `previewOnboard()` returns all compatible importers sorted by confidence for analysis without importing. New MCP tool `rafters_onboard` exposes this to agents: `action: "analyze"` previews what would be imported, `action: "import"` runs the import. Forceimporter option allows bypassing auto-detection. Closes #1270.
+- feat(mcp): `rafters_vocabulary` tool for intent-based token queries. Without filters, returns a compact index with suggested queries instead of dumping all tokens. Supports `category` (color, spacing, typography, etc.), `intent` (semantic search across token metadata), and `family` (color family filter). Tailwind class hints included in compact output. Addresses consumer feedback from shingle about vocabulary being a firehose. Closes #1250.
 
 ### Patch Changes
 
