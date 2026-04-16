@@ -103,6 +103,34 @@ describe('PendingTokenSchema', () => {
     expect(() => PendingTokenSchema.parse({ ...validPending, confidence: 1.5 })).toThrow();
     expect(() => PendingTokenSchema.parse({ ...validPending, confidence: -0.1 })).toThrow();
   });
+
+  it('rejects modifications when decision is not modified', () => {
+    const bad = {
+      ...validPending,
+      decision: 'accepted' as const,
+      modifications: { name: 'brand-500' },
+    };
+    expect(() => PendingTokenSchema.parse(bad)).toThrow(/only allowed when decision is 'modified'/);
+  });
+
+  it('rejects decision modified without modifications', () => {
+    const bad = { ...validPending, decision: 'modified' as const };
+    expect(() => PendingTokenSchema.parse(bad)).toThrow(/modifications are missing/);
+  });
+
+  it('rejects empty modifications object', () => {
+    const bad = {
+      ...validPending,
+      decision: 'modified' as const,
+      modifications: {},
+    };
+    expect(() => PendingTokenSchema.parse(bad)).toThrow(/must change at least one field/);
+  });
+
+  it('rejects unknown keys (strict mode)', () => {
+    const bad = { ...validPending, unknownField: 'oops' };
+    expect(() => PendingTokenSchema.parse(bad)).toThrow();
+  });
 });
 
 describe('ImportPendingSchema', () => {
@@ -167,5 +195,11 @@ describe('ImportPendingSchema', () => {
 
   it('rejects systemConfidence outside 0-1', () => {
     expect(() => ImportPendingSchema.parse({ ...validDocument, systemConfidence: 1.5 })).toThrow();
+    expect(() => ImportPendingSchema.parse({ ...validDocument, systemConfidence: -0.1 })).toThrow();
+  });
+
+  it('rejects unknown top-level keys (strict mode)', () => {
+    const bad = { ...validDocument, typoKey: 'oops' };
+    expect(() => ImportPendingSchema.parse(bad)).toThrow();
   });
 });

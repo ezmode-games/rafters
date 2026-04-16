@@ -24,88 +24,121 @@ export const ImportDecisionSchema = z.enum(['pending', 'accepted', 'rejected', '
 /**
  * Original source variable as parsed from the user's project
  */
-export const ImportOriginalSchema = z.object({
-  /** Original variable name (e.g., "--color-primary") */
-  name: z.string(),
-  /** Original value as written in source (e.g., "oklch(0.7 0.15 250)") */
-  value: z.string(),
-  /** Source file path relative to project root */
-  source: z.string(),
-  /** Line number where the variable was declared */
-  line: z.number().optional(),
-  /** Column number where the variable was declared */
-  column: z.number().optional(),
-});
+export const ImportOriginalSchema = z
+  .object({
+    /** Original variable name (e.g., "--color-primary") */
+    name: z.string(),
+    /** Original value as written in source (e.g., "oklch(0.7 0.15 250)") */
+    value: z.string(),
+    /** Source file path relative to project root */
+    source: z.string(),
+    /** Line number where the variable was declared */
+    line: z.number().int().positive().optional(),
+    /** Column number where the variable was declared */
+    column: z.number().int().positive().optional(),
+  })
+  .strict();
 
 /**
  * User modifications to a proposed token.
- * Only populated when decision is "modified".
+ * Must change at least one field -- empty modifications are rejected.
  */
-export const ImportModificationsSchema = z.object({
-  name: z.string().optional(),
-  value: z.string().optional(),
-  category: z.string().optional(),
-  namespace: z.string().optional(),
-});
+export const ImportModificationsSchema = z
+  .object({
+    name: z.string().optional(),
+    value: z.string().optional(),
+    category: z.string().optional(),
+    namespace: z.string().optional(),
+  })
+  .strict()
+  .refine((m) => Object.values(m).some((v) => v !== undefined), {
+    message: 'modifications must change at least one field',
+  });
 
 /**
  * A single token pending user review.
+ *
+ * Invariants enforced:
+ *   - decision === 'modified' <=> modifications is present
+ *   - modifications must change at least one field (see ImportModificationsSchema)
  */
-export const PendingTokenSchema = z.object({
-  /** Original token from source */
-  original: ImportOriginalSchema,
+export const PendingTokenSchema = z
+  .object({
+    /** Original token from source */
+    original: ImportOriginalSchema,
 
-  /** Proposed Rafters token (full Token schema) */
-  proposed: TokenSchema,
+    /** Proposed Rafters token (full Token schema) */
+    proposed: TokenSchema,
 
-  /** User decision -- pending until reviewed */
-  decision: ImportDecisionSchema.default('pending'),
+    /** User decision -- pending until reviewed */
+    decision: ImportDecisionSchema.default('pending'),
 
-  /** User edits when decision is "modified" */
-  modifications: ImportModificationsSchema.optional(),
+    /** User edits when decision is "modified" */
+    modifications: ImportModificationsSchema.optional(),
 
-  /** Detection confidence 0-1 */
-  confidence: z.number().min(0).max(1),
+    /** Detection confidence 0-1 */
+    confidence: z.number().min(0).max(1),
 
-  /** Why this mapping was proposed (e.g., "Tailwind --color-primary maps to primary-500") */
-  rationale: z.string().optional(),
-});
+    /** Why this mapping was proposed (e.g., "Tailwind --color-primary maps to primary-500") */
+    rationale: z.string().optional(),
+  })
+  .strict()
+  .superRefine((t, ctx) => {
+    if (t.decision === 'modified' && !t.modifications) {
+      ctx.addIssue({
+        code: 'custom',
+        message: "decision is 'modified' but modifications are missing",
+        path: ['modifications'],
+      });
+    }
+    if (t.decision !== 'modified' && t.modifications) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `modifications only allowed when decision is 'modified' (got '${t.decision}')`,
+        path: ['modifications'],
+      });
+    }
+  });
 
 /**
  * Import-pending document written to `.rafters/import-pending.json`
  */
-export const ImportPendingSchema = z.object({
-  /** Schema version for future migrations */
-  version: z.literal('1.0'),
+export const ImportPendingSchema = z
+  .object({
+    /** Schema version for future migrations */
+    version: z.literal('1.0'),
 
-  /** ISO-8601 timestamp when the import was detected */
-  createdAt: z.string().datetime(),
+    /** ISO-8601 timestamp when the import was detected */
+    createdAt: z.string().datetime(),
 
-  /** Which importer produced this pending list (e.g., "tailwind-v4", "shadcn") */
-  detectedSystem: z.string(),
+    /** Which importer produced this pending list (e.g., "tailwind-v4", "shadcn") */
+    detectedSystem: z.string(),
 
-  /** Confidence that the detected system is correct */
-  systemConfidence: z.number().min(0).max(1),
+    /** Confidence that the detected system is correct */
+    systemConfidence: z.number().min(0).max(1),
 
-  /** Source file path(s) -- first entry is primary */
-  source: z.string(),
+    /** Primary source file path (relative to project root) */
+    source: z.string(),
 
-  /** Additional source paths if more than one file was imported */
-  additionalSources: z.array(z.string()).optional(),
+    /** Additional source paths if more than one file was imported */
+    additionalSources: z.array(z.string()).optional(),
 
-  /** Warnings from the import process (parse issues, dedup skips, etc.) */
-  warnings: z
-    .array(
-      z.object({
-        level: z.enum(['info', 'warning', 'error']),
-        message: z.string(),
-      }),
-    )
-    .optional(),
+    /** Warnings from the import process (parse issues, dedup skips, etc.) */
+    warnings: z
+      .array(
+        z
+          .object({
+            level: z.enum(['info', 'warning', 'error']),
+            message: z.string(),
+          })
+          .strict(),
+      )
+      .optional(),
 
-  /** Tokens awaiting review */
-  tokens: z.array(PendingTokenSchema),
-});
+    /** Tokens awaiting review */
+    tokens: z.array(PendingTokenSchema),
+  })
+  .strict();
 
 export type ImportDecision = z.infer<typeof ImportDecisionSchema>;
 export type ImportOriginal = z.infer<typeof ImportOriginalSchema>;
