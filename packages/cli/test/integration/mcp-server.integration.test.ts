@@ -22,7 +22,10 @@ afterEach(async () => {
 describe('MCP tools against initialized project', () => {
   it('rafters_pattern returns patterns from composites', async () => {
     fixturePath = await createInitializedFixture('nextjs-shadcn-v4');
-    const handler = new RaftersToolHandler(fixturePath);
+    const handler = new RaftersToolHandler([{ name: 'fixture', root: fixturePath }], {
+      name: 'fixture',
+      root: fixturePath,
+    });
 
     const result = await handler.handleToolCall('rafters_pattern', {
       solves: 'hierarchy',
@@ -37,7 +40,10 @@ describe('MCP tools against initialized project', () => {
 
   it('rafters_pattern searches by query', async () => {
     fixturePath = await createInitializedFixture('vite-no-shadcn');
-    const handler = new RaftersToolHandler(fixturePath);
+    const handler = new RaftersToolHandler([{ name: 'fixture', root: fixturePath }], {
+      name: 'fixture',
+      root: fixturePath,
+    });
 
     const result = await handler.handleToolCall('rafters_pattern', {
       query: 'heading',
@@ -50,7 +56,10 @@ describe('MCP tools against initialized project', () => {
 
   it('rafters_rule lists built-in rules', async () => {
     fixturePath = await createInitializedFixture('nextjs-shadcn-v4');
-    const handler = new RaftersToolHandler(fixturePath);
+    const handler = new RaftersToolHandler([{ name: 'fixture', root: fixturePath }], {
+      name: 'fixture',
+      root: fixturePath,
+    });
 
     const result = await handler.handleToolCall('rafters_rule', {});
 
@@ -65,7 +74,10 @@ describe('MCP tools against initialized project', () => {
 
   it('rafters_rule filters by name', async () => {
     fixturePath = await createInitializedFixture('vite-no-shadcn');
-    const handler = new RaftersToolHandler(fixturePath);
+    const handler = new RaftersToolHandler([{ name: 'fixture', root: fixturePath }], {
+      name: 'fixture',
+      root: fixturePath,
+    });
 
     const result = await handler.handleToolCall('rafters_rule', { name: 'email' });
 
@@ -76,7 +88,10 @@ describe('MCP tools against initialized project', () => {
 
   it('rafters_composite returns composites list', async () => {
     fixturePath = await createInitializedFixture('nextjs-shadcn-v4');
-    const handler = new RaftersToolHandler(fixturePath);
+    const handler = new RaftersToolHandler([{ name: 'fixture', root: fixturePath }], {
+      name: 'fixture',
+      root: fixturePath,
+    });
 
     const result = await handler.handleToolCall('rafters_composite', {});
 
@@ -89,7 +104,10 @@ describe('MCP tools against initialized project', () => {
 
   it('rafters_component fetches component details', async () => {
     fixturePath = await createInitializedFixture('nextjs-shadcn-v4');
-    const handler = new RaftersToolHandler(fixturePath);
+    const handler = new RaftersToolHandler([{ name: 'fixture', root: fixturePath }], {
+      name: 'fixture',
+      root: fixturePath,
+    });
 
     const result = await handler.handleToolCall('rafters_component', {
       name: 'button',
@@ -103,7 +121,7 @@ describe('MCP tools against initialized project', () => {
 
 describe('MCP tools with null project root', () => {
   it('rafters_pattern works without a project root', async () => {
-    const handler = new RaftersToolHandler(null);
+    const handler = new RaftersToolHandler([], null);
 
     const result = await handler.handleToolCall('rafters_pattern', {});
 
@@ -114,7 +132,7 @@ describe('MCP tools with null project root', () => {
   });
 
   it('rafters_rule works without a project root', async () => {
-    const handler = new RaftersToolHandler(null);
+    const handler = new RaftersToolHandler([], null);
 
     const result = await handler.handleToolCall('rafters_rule', {});
 
@@ -124,7 +142,7 @@ describe('MCP tools with null project root', () => {
   });
 
   it('rafters_composite returns empty array without a project root', async () => {
-    const handler = new RaftersToolHandler(null);
+    const handler = new RaftersToolHandler([], null);
 
     const result = await handler.handleToolCall('rafters_composite', {});
 
@@ -137,7 +155,7 @@ describe('MCP tools with null project root', () => {
 
 describe('unknown tool', () => {
   it('returns error for unknown tool', async () => {
-    const handler = new RaftersToolHandler(null);
+    const handler = new RaftersToolHandler([], null);
     const result = await handler.handleToolCall('unknown_tool', {});
 
     const data = JSON.parse(result.content[0].text as string);

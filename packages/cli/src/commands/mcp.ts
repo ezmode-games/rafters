@@ -2,21 +2,29 @@
  * rafters mcp
  *
  * Starts MCP server for AI agent access (stdio transport).
- * Discovers the project root by walking up from cwd to find .rafters/,
- * or uses --project-root if provided.
+ *
+ * Discovery:
+ *   - With no `--project-root`, walks up from cwd looking for a monorepo
+ *     manifest (pnpm-workspace.yaml or package.json#workspaces). Each
+ *     workspace package with a `.rafters/config.rafters.json` becomes an
+ *     addressable workspace; the agent picks one per tool call via the
+ *     `workspace` parameter.
+ *   - Falls back to single-root mode when no monorepo manifest is found.
+ *   - With `--project-root`, scopes the server to that one workspace.
  */
 
 import { existsSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { basename, join, resolve } from 'node:path';
 import { startMcpServer } from '../mcp/server.js';
-import { discoverProjectRoot } from '../utils/discover.js';
+import { discoverWorkspaces, pickDefaultWorkspace, type Workspace } from '../utils/workspaces.js';
 
 interface McpOptions {
   projectRoot?: string;
 }
 
 export async function mcp(options: McpOptions): Promise<void> {
-  let projectRoot: string | null;
+  let workspaces: Workspace[];
+  let defaultWorkspace: Workspace | null;
 
   if (options.projectRoot) {
     const explicit = resolve(options.projectRoot);
@@ -25,13 +33,17 @@ export async function mcp(options: McpOptions): Promise<void> {
       process.stderr.write(
         `--project-root ${explicit} does not contain .rafters/config.rafters.json\n`,
       );
-      projectRoot = null;
+      workspaces = [];
+      defaultWorkspace = null;
     } else {
-      projectRoot = explicit;
+      const ws: Workspace = { name: basename(explicit), root: explicit };
+      workspaces = [ws];
+      defaultWorkspace = ws;
     }
   } else {
-    projectRoot = discoverProjectRoot(process.cwd());
+    workspaces = discoverWorkspaces(process.cwd());
+    defaultWorkspace = pickDefaultWorkspace(workspaces, process.cwd());
   }
 
-  await startMcpServer(projectRoot);
+  await startMcpServer(workspaces, defaultWorkspace);
 }
