@@ -6,6 +6,17 @@ afterEach(() => {
   while (document.body.firstChild) document.body.removeChild(document.body.firstChild);
 });
 
+function adoptedCss(el: HTMLElement): string {
+  const sheets = el.shadowRoot?.adoptedStyleSheets ?? [];
+  return sheets
+    .map((s) =>
+      Array.from(s.cssRules)
+        .map((r) => r.cssText)
+        .join('\n'),
+    )
+    .join('\n');
+}
+
 describe('rafters-card', () => {
   it('registers as a custom element', () => {
     expect(customElements.get('rafters-card')).toBe(RaftersCard);
@@ -41,8 +52,7 @@ describe('rafters-card', () => {
     const el = document.createElement('rafters-card');
     el.setAttribute('background', 'not-a-real-value');
     document.body.appendChild(el);
-    const styles = (RaftersCard as unknown as { styles: string }).styles;
-    expect(styles).toContain('.card');
+    expect(adoptedCss(el)).toContain('.card');
   });
 
   it('accepts each CardBackground value without throwing', () => {
@@ -55,27 +65,35 @@ describe('rafters-card', () => {
     }
   });
 
-  it('re-resolves stylesheet when background attribute changes', () => {
+  it('re-resolves adopted stylesheet when background attribute changes', () => {
     const el = document.createElement('rafters-card');
     el.setAttribute('background', 'card');
     document.body.appendChild(el);
     el.setAttribute('background', 'muted');
-    const styles = (RaftersCard as unknown as { styles: string }).styles;
-    expect(styles).toContain('color-muted');
+    expect(adoptedCss(el)).toContain('color-muted');
   });
 
-  it('emits hover and focus-visible rules only when interactive', () => {
+  it('emits hover and focus-visible rules in the adopted sheet only when interactive', () => {
     const plain = document.createElement('rafters-card');
     document.body.appendChild(plain);
-    const plainStyles = (RaftersCard as unknown as { styles: string }).styles;
-    expect(plainStyles).not.toContain(':hover');
+    expect(adoptedCss(plain)).not.toContain(':hover');
 
     const interactive = document.createElement('rafters-card');
     interactive.setAttribute('interactive', '');
     document.body.appendChild(interactive);
-    const interactiveStyles = (RaftersCard as unknown as { styles: string }).styles;
-    expect(interactiveStyles).toContain(':hover');
-    expect(interactiveStyles).toContain(':focus-visible');
+    const css = adoptedCss(interactive);
+    expect(css).toContain(':hover');
+    expect(css).toContain(':focus-visible');
+  });
+
+  it('adopted sheet picks up interactive toggles after connect', () => {
+    const el = document.createElement('rafters-card');
+    document.body.appendChild(el);
+    expect(adoptedCss(el)).not.toContain(':hover');
+    el.setAttribute('interactive', '');
+    expect(adoptedCss(el)).toContain(':hover');
+    el.removeAttribute('interactive');
+    expect(adoptedCss(el)).not.toContain(':hover');
   });
 
   it('sets tabindex="0" and role="button" when interactive is added', () => {

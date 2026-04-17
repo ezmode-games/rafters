@@ -41,34 +41,44 @@ function parseBackground(value: string | null): CardBackground {
 export class RaftersCard extends RaftersElement {
   static observedAttributes = ['interactive', 'background'];
 
+  /** Per-instance stylesheet rebuilt on every observed attribute change. */
+  private _instanceSheet: CSSStyleSheet | null = null;
+
   constructor() {
     super();
     this.addEventListener('keydown', this.handleKeydown);
   }
 
   override connectedCallback(): void {
-    this.applyStyles();
+    if (!this.shadowRoot) return;
+    this._instanceSheet = new CSSStyleSheet();
+    this._instanceSheet.replaceSync(this.composeCss());
+    this.shadowRoot.adoptedStyleSheets = [this._instanceSheet];
     this.applyInteractiveDom();
-    super.connectedCallback();
+    this.update();
   }
 
   override attributeChangedCallback(
-    name: string,
+    _name: string,
     oldValue: string | null,
     newValue: string | null,
   ): void {
     if (oldValue === newValue) return;
-    this.applyStyles();
+    if (this._instanceSheet) {
+      this._instanceSheet.replaceSync(this.composeCss());
+    }
     this.applyInteractiveDom();
-    super.attributeChangedCallback(name, oldValue, newValue);
+    this.update();
   }
 
-  private applyStyles(): void {
-    const interactive = this.hasAttribute('interactive');
-    const background = parseBackground(this.getAttribute('background'));
-    (this.constructor as typeof RaftersElement).styles = cardStylesheet({
-      interactive,
-      background,
+  override disconnectedCallback(): void {
+    this._instanceSheet = null;
+  }
+
+  private composeCss(): string {
+    return cardStylesheet({
+      interactive: this.hasAttribute('interactive'),
+      background: parseBackground(this.getAttribute('background')),
     });
   }
 
