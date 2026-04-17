@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createResolver, TokenResolver } from './resolve-tokens';
+import { createResolver, MAX_REFERENCE_DEPTH, TokenResolver } from './resolve-tokens';
 
 const sampleDTCG = {
   'font-size-sm': { $value: '0.875rem', $type: 'dimension' },
@@ -183,5 +183,225 @@ describe('createResolver', () => {
     const resolver = createResolver({});
     expect(resolver.names()).toEqual([]);
     expect(resolver.get('anything')).toBeUndefined();
+  });
+});
+
+describe('MAX_REFERENCE_DEPTH', () => {
+  it('is exported as 16', () => {
+    expect(MAX_REFERENCE_DEPTH).toBe(16);
+  });
+});
+
+describe('resolveComposite', () => {
+  it('resolves a typography composite to a CSS property map', () => {
+    const dtcg = {
+      'typography-h1': {
+        $type: 'typography',
+        $value: JSON.stringify({
+          fontFamily: 'sans',
+          fontSize: 'lg',
+          fontWeight: 'bold',
+          lineHeight: 'tight',
+          letterSpacing: 'wide',
+        }),
+      },
+      'font-sans': { $value: 'Inter, system-ui, sans-serif', $type: 'fontFamily' },
+      'font-size-lg': { $value: '1.125rem', $type: 'dimension' },
+      'font-weight-bold': { $value: '700', $type: 'fontWeight' },
+      'line-height-tight': { $value: '1.25', $type: 'number' },
+      'letter-spacing-wide': { $value: '0.025em', $type: 'dimension' },
+    };
+    const resolver = createResolver(dtcg);
+    expect(resolver.resolveComposite('typography-h1')).toEqual({
+      'font-family': 'Inter, system-ui, sans-serif',
+      'font-size': '1.125rem',
+      'font-weight': '700',
+      'line-height': '1.25',
+      'letter-spacing': '0.025em',
+    });
+  });
+
+  it('omits members whose target token is missing', () => {
+    const dtcg = {
+      'typography-h2': {
+        $type: 'typography',
+        $value: JSON.stringify({
+          fontFamily: 'sans',
+          fontSize: 'lg',
+          fontWeight: 'bold',
+          lineHeight: 'tight',
+          letterSpacing: 'wide',
+        }),
+      },
+      'font-size-lg': { $value: '1.125rem', $type: 'dimension' },
+    };
+    const resolver = createResolver(dtcg);
+    expect(resolver.resolveComposite('typography-h2')).toEqual({
+      'font-size': '1.125rem',
+    });
+  });
+
+  it('returns null when the composite root is missing', () => {
+    const resolver = createResolver({});
+    expect(resolver.resolveComposite('typography-h1')).toBeNull();
+  });
+
+  it('returns null when the target token is not a typography composite', () => {
+    const resolver = createResolver({
+      'font-size-sm': { $value: '0.875rem', $type: 'dimension' },
+    });
+    expect(resolver.resolveComposite('font-size-sm')).toBeNull();
+  });
+
+  it('walks DTCG references inside composite members', () => {
+    const dtcg = {
+      'typography-body': {
+        $type: 'typography',
+        $value: JSON.stringify({
+          fontFamily: 'sans',
+          fontSize: 'base',
+          fontWeight: 'normal',
+          lineHeight: 'normal',
+          letterSpacing: 'normal',
+        }),
+      },
+      'font-sans': { $value: '{font.family.inter}', $type: 'fontFamily' },
+      'font-family-inter': { $value: 'Inter, system-ui, sans-serif', $type: 'fontFamily' },
+      'font-size-base': { $value: '1rem', $type: 'dimension' },
+      'font-weight-normal': { $value: '400', $type: 'fontWeight' },
+      'line-height-normal': { $value: '1.5', $type: 'number' },
+      'letter-spacing-normal': { $value: '0em', $type: 'dimension' },
+    };
+    const resolver = createResolver(dtcg);
+    expect(resolver.resolveComposite('typography-body')).toEqual({
+      'font-family': 'Inter, system-ui, sans-serif',
+      'font-size': '1rem',
+      'font-weight': '400',
+      'line-height': '1.5',
+      'letter-spacing': '0em',
+    });
+  });
+
+  it('throws structured invalid-composite error on bad JSON', () => {
+    const dtcg = { 'typography-broken': { $type: 'typography', $value: 'not-json' } };
+    const resolver = createResolver(dtcg);
+    expect(() => resolver.resolveComposite('typography-broken')).toThrow(
+      expect.objectContaining({ kind: 'invalid-composite', name: 'typography-broken' }),
+    );
+  });
+
+  it('throws structured invalid-composite error when required keys missing', () => {
+    const dtcg = {
+      'typography-partial': {
+        $type: 'typography',
+        $value: JSON.stringify({ fontFamily: 'sans', fontSize: 'lg' }),
+      },
+    };
+    const resolver = createResolver(dtcg);
+    expect(() => resolver.resolveComposite('typography-partial')).toThrow(
+      expect.objectContaining({ kind: 'invalid-composite', name: 'typography-partial' }),
+    );
+  });
+
+  it('routing: resolve() returns null for a typography composite', () => {
+    const dtcg = {
+      'typography-h1': {
+        $type: 'typography',
+        $value: JSON.stringify({
+          fontFamily: 'sans',
+          fontSize: 'lg',
+          fontWeight: 'bold',
+          lineHeight: 'tight',
+          letterSpacing: 'wide',
+        }),
+      },
+    };
+    const resolver = createResolver(dtcg);
+    expect(resolver.resolve('typography-h1')).toBeNull();
+  });
+});
+
+describe('resolveReference', () => {
+  it('walks a DTCG reference to its leaf value', () => {
+    const dtcg = {
+      'color-primary-500': { $value: 'oklch(0.6 0.2 250)', $type: 'color' },
+      'color-button-bg': { $value: '{color.primary.500}', $type: 'color' },
+    };
+    const resolver = createResolver(dtcg);
+    expect(resolver.resolveReference('{color.button.bg}')).toBe('oklch(0.6 0.2 250)');
+  });
+
+  it('returns null for a non-reference value', () => {
+    const resolver = createResolver({});
+    expect(resolver.resolveReference('plain string')).toBeNull();
+    expect(resolver.resolveReference(42)).toBeNull();
+  });
+
+  it('returns null when the reference target is missing', () => {
+    const resolver = createResolver({});
+    expect(resolver.resolveReference('{color.missing.500}')).toBeNull();
+  });
+
+  it('throws structured cycle error on a reference cycle', () => {
+    const dtcg = {
+      'a-x': { $value: '{b.x}' },
+      'b-x': { $value: '{a.x}' },
+    };
+    const resolver = createResolver(dtcg);
+    expect(() => resolver.resolveReference('{a.x}')).toThrow(
+      expect.objectContaining({ kind: 'cycle', chain: expect.arrayContaining(['a-x', 'b-x']) }),
+    );
+  });
+
+  it('throws structured max-depth error past MAX_REFERENCE_DEPTH', () => {
+    const dtcg: Record<string, { $value: string }> = { leaf: { $value: 'final' } };
+    for (let i = 0; i < 20; i++) {
+      dtcg[`chain-${i}`] = { $value: i === 19 ? '{leaf}' : `{chain.${i + 1}}` };
+    }
+    const resolver = createResolver(dtcg);
+    expect(() => resolver.resolveReference('{chain.0}')).toThrow(
+      expect.objectContaining({ kind: 'max-depth', depth: 16 }),
+    );
+  });
+
+  it('returns the leaf when a short chain terminates before MAX_REFERENCE_DEPTH', () => {
+    const dtcg = {
+      leaf: { $value: 'done' },
+      'hop-2': { $value: '{leaf}' },
+      'hop-1': { $value: '{hop.2}' },
+      'hop-0': { $value: '{hop.1}' },
+    };
+    const resolver = createResolver(dtcg);
+    expect(resolver.resolveReference('{hop.0}')).toBe('done');
+  });
+});
+
+describe('resolve with references', () => {
+  it('walks references when resolving a single property token', () => {
+    const dtcg = {
+      'spacing-base': { $value: '1rem', $type: 'dimension' },
+      'spacing-page': { $value: '{spacing.base}', $type: 'dimension' },
+    };
+    const resolver = createResolver(dtcg);
+    expect(resolver.resolve('spacing-page')).toEqual({ property: 'gap', value: '1rem' });
+  });
+
+  it('returns null when the reference target is missing', () => {
+    const dtcg = {
+      'spacing-page': { $value: '{spacing.base}', $type: 'dimension' },
+    };
+    const resolver = createResolver(dtcg);
+    expect(resolver.resolve('spacing-page')).toBeNull();
+  });
+});
+
+describe('resolveColor with references', () => {
+  it('walks references when resolving a color token', () => {
+    const dtcg = {
+      'color-primary-500': { $value: 'oklch(0.6 0.2 250)', $type: 'color' },
+      'color-button-bg': { $value: '{color.primary.500}', $type: 'color' },
+    };
+    const resolver = createResolver(dtcg);
+    expect(resolver.resolveColor('color-button-bg')).toBe('oklch(0.6 0.2 250)');
   });
 });
