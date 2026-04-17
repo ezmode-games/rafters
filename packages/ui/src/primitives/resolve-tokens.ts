@@ -20,6 +20,47 @@ interface FlatDTCGMap {
 }
 
 /**
+ * Structured error data shape for resolver failures.
+ * Attached to plain Error instances via Object.assign -- no OOP error class hierarchies.
+ */
+export type ResolveTokenError =
+  | { kind: 'cycle'; chain: string[] }
+  | { kind: 'max-depth'; chain: string[]; depth: number }
+  | { kind: 'invalid-composite'; name: string; reason: string };
+
+/**
+ * Map of CSS property names to their resolved values.
+ * Produced by resolveComposite() for typography composite tokens.
+ */
+export type CSSPropertyMap = Record<string, string>;
+
+/**
+ * Maximum depth for walking chained DTCG references.
+ * Guards against runaway recursion on pathological reference chains.
+ */
+export const MAX_REFERENCE_DEPTH = 16;
+
+/**
+ * DTCG reference syntax: "{group.token}" or "{group.sub.token}".
+ * Braces wrap a dot-path into the nested token tree.
+ */
+const DTCG_REFERENCE_PATTERN = /^\{[^{}]+\}$/;
+
+/**
+ * Shape of the JSON payload stored in a typography composite token's $value.
+ * Matches the payload written by `generateTypographyCompositeUtilities` in
+ * packages/design-tokens/src/exporters/tailwind.ts.
+ */
+interface TypographyCompositePayload {
+  fontFamily: string;
+  fontSize: string;
+  fontWeight: string;
+  lineHeight: string;
+  letterSpacing: string;
+  responsive?: Record<string, { fontSize?: string }>;
+}
+
+/**
  * CSS property mappings for token categories.
  * Maps token name prefixes to the CSS properties they control.
  */
@@ -52,6 +93,25 @@ function tokenToProperty(name: string): string | undefined {
 }
 
 /**
+ * Convert a DTCG reference string like "{color.primary.500}" to a flat map key
+ * like "color-primary-500". Returns null if the input is not a reference.
+ */
+function referenceToFlatKey(value: unknown): string | null {
+  if (typeof value !== 'string' || !DTCG_REFERENCE_PATTERN.test(value)) {
+    return null;
+  }
+  return value.slice(1, -1).replaceAll('.', '-');
+}
+
+/**
+ * Build a plain Error with structured ResolveTokenError fields attached.
+ * Per convention (feedback_no_error_classes) we never create error subclasses.
+ */
+function raiseResolveTokenError(message: string, data: ResolveTokenError): never {
+  throw Object.assign(new Error(message), data);
+}
+
+/**
  * Token resolver that maps design token names to CSS values.
  */
 export class TokenResolver {
@@ -77,32 +137,52 @@ export class TokenResolver {
 
   /**
    * Resolve a token name to a CSS property-value pair.
-   * Returns null if the token doesn't exist or can't be resolved.
+   * Walks DTCG references (e.g. "{spacing.base}") to their leaf scalar.
+   * Returns null if the token doesn't exist, is a typography composite
+   * (callers use resolveComposite), or can't be mapped to a CSS property.
    */
   resolve(name: string): { property: string; value: string } | null {
     const token = this.tokens[name];
     if (!token) return null;
 
-    const value = token.$value;
-    if (typeof value !== 'string' && typeof value !== 'number') return null;
+    // Typography composites have object/JSON payloads that don't map to a
+    // single CSS property -- callers must invoke resolveComposite directly.
+    if (token.$type === 'typography') return null;
 
     const property = tokenToProperty(name);
     if (!property) return null;
 
-    return { property, value: String(value) };
+    const raw = token.$value;
+
+    // Reference value: walk to leaf then use that scalar.
+    if (typeof raw === 'string' && DTCG_REFERENCE_PATTERN.test(raw)) {
+      const resolved = this.resolveReference(raw);
+      if (resolved === null) return null;
+      return { property, value: resolved };
+    }
+
+    if (typeof raw !== 'string' && typeof raw !== 'number') return null;
+
+    return { property, value: String(raw) };
   }
 
   /**
    * Resolve a semantic color token to its CSS value.
-   * Handles both direct values and DTCG references.
+   * Walks DTCG references so `color-button-bg` whose $value is
+   * `{color.primary.500}` yields the leaf OKLCH string.
    */
   resolveColor(name: string): string | null {
     const token = this.tokens[name];
     if (!token) return null;
 
     const value = token.$value;
-    if (typeof value === 'string') return value;
-    return null;
+    if (typeof value !== 'string') return null;
+
+    if (DTCG_REFERENCE_PATTERN.test(value)) {
+      return this.resolveReference(value);
+    }
+
+    return value;
   }
 
   /**
@@ -121,6 +201,160 @@ export class TokenResolver {
     const fullName = name.startsWith('radius-') ? name : `radius-${name}`;
     const value = this.get(fullName);
     return typeof value === 'string' ? value : null;
+  }
+
+  /**
+   * Walk a DTCG reference (e.g. "{color.primary.500}") to its leaf $value.
+   *
+   * Returns null when:
+   * - `value` is not a string
+   * - `value` is not a DTCG reference shape
+   * - the referenced token is not registered
+   *
+   * Throws a plain Error with {@link ResolveTokenError} fields on cycles or
+   * when depth exceeds {@link MAX_REFERENCE_DEPTH}.
+   */
+  resolveReference(value: unknown): string | null {
+    const firstKey = referenceToFlatKey(value);
+    if (firstKey === null) return null;
+
+    const chain: string[] = [];
+    const seen = new Set<string>();
+    let currentKey = firstKey;
+
+    for (let depth = 0; depth <= MAX_REFERENCE_DEPTH; depth++) {
+      chain.push(currentKey);
+
+      if (seen.has(currentKey)) {
+        raiseResolveTokenError(`reference cycle: ${chain.join(' -> ')}`, {
+          kind: 'cycle',
+          chain: [...chain],
+        });
+      }
+      seen.add(currentKey);
+
+      const token = this.tokens[currentKey];
+      if (!token) {
+        // Missing target -- first-hop returns null per spec; mid-chain also returns null.
+        return null;
+      }
+
+      const nextKey = referenceToFlatKey(token.$value);
+      if (nextKey === null) {
+        // Reached a non-reference leaf: coerce to string and return.
+        const raw = token.$value;
+        if (raw === undefined || raw === null) return null;
+        if (typeof raw !== 'string' && typeof raw !== 'number') return null;
+        return String(raw);
+      }
+
+      currentKey = nextKey;
+    }
+
+    // Loop exited without returning a leaf -- depth budget exhausted.
+    raiseResolveTokenError(
+      `reference depth exceeded (${MAX_REFERENCE_DEPTH}): ${chain.join(' -> ')}`,
+      {
+        kind: 'max-depth',
+        chain: [...chain],
+        depth: MAX_REFERENCE_DEPTH,
+      },
+    );
+  }
+
+  /**
+   * Resolve a typography composite token to a CSS property map.
+   *
+   * The composite's $value is a JSON string with shape
+   * `{ fontFamily, fontSize, fontWeight, lineHeight, letterSpacing, responsive? }`.
+   * Each member is looked up via its flat DTCG key (e.g. `font-size-${fontSize}`)
+   * and reference-walked via {@link resolveReference}. Missing member tokens are
+   * omitted from the output. A missing composite root returns null.
+   *
+   * The `responsive` substructure is out of scope for this pass.
+   *
+   * @throws a plain Error with {@link ResolveTokenError} (kind: 'invalid-composite')
+   * when the payload fails to parse or lacks required keys.
+   */
+  resolveComposite(name: string): CSSPropertyMap | null {
+    const token = this.tokens[name];
+    if (!token) return null;
+    if (token.$type !== 'typography') return null;
+
+    const raw = token.$value;
+    if (typeof raw !== 'string') {
+      raiseResolveTokenError(`typography composite "${name}" has non-string $value`, {
+        kind: 'invalid-composite',
+        name,
+        reason: 'non-string $value',
+      });
+    }
+
+    let payload: TypographyCompositePayload;
+    try {
+      payload = JSON.parse(raw) as TypographyCompositePayload;
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : 'unknown parse error';
+      raiseResolveTokenError(`typography composite "${name}" $value is not valid JSON: ${reason}`, {
+        kind: 'invalid-composite',
+        name,
+        reason: `invalid JSON (${reason})`,
+      });
+    }
+
+    if (typeof payload !== 'object' || payload === null) {
+      raiseResolveTokenError(`typography composite "${name}" payload is not an object`, {
+        kind: 'invalid-composite',
+        name,
+        reason: 'payload is not an object',
+      });
+    }
+
+    const requiredKeys = [
+      'fontFamily',
+      'fontSize',
+      'fontWeight',
+      'lineHeight',
+      'letterSpacing',
+    ] as const;
+    for (const key of requiredKeys) {
+      if (typeof payload[key] !== 'string') {
+        raiseResolveTokenError(`typography composite "${name}" missing required key "${key}"`, {
+          kind: 'invalid-composite',
+          name,
+          reason: `missing required key "${key}"`,
+        });
+      }
+    }
+
+    const members: Array<[string, string]> = [
+      ['font-family', `font-${payload.fontFamily}`],
+      ['font-size', `font-size-${payload.fontSize}`],
+      ['font-weight', `font-weight-${payload.fontWeight}`],
+      ['line-height', `line-height-${payload.lineHeight}`],
+      ['letter-spacing', `letter-spacing-${payload.letterSpacing}`],
+    ];
+
+    const out: CSSPropertyMap = {};
+    for (const [cssProperty, memberKey] of members) {
+      const memberToken = this.tokens[memberKey];
+      if (!memberToken) continue;
+
+      const memberValue = memberToken.$value;
+      let resolved: string | null = null;
+
+      if (typeof memberValue === 'string' && DTCG_REFERENCE_PATTERN.test(memberValue)) {
+        resolved = this.resolveReference(memberValue);
+      } else if (typeof memberValue === 'string' || typeof memberValue === 'number') {
+        resolved = String(memberValue);
+      }
+
+      if (resolved !== null) {
+        out[cssProperty] = resolved;
+      }
+    }
+
+    return out;
   }
 
   /**
