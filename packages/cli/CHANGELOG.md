@@ -1,5 +1,11 @@
 # rafters
 
+## 0.0.52
+
+### Minor Changes
+
+- feat(mcp): monorepo workspace support. `rafters mcp` now reads `pnpm-workspace.yaml` (and `package.json#workspaces` for npm/yarn/bun) when started from a monorepo root, discovers every workspace package containing `.rafters/config.rafters.json`, and addresses them by directory name. Every existing tool (`rafters_composite`, `rafters_rule`, `rafters_pattern`, `rafters_component`) accepts an optional `workspace` parameter. New `rafters_workspaces` tool lists what's available and which one is the default for unscoped calls. Falls back to single-root mode when no monorepo manifest is present, preserving existing behavior.
+
 ## 0.0.51
 
 ### Patch Changes

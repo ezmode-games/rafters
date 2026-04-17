@@ -26,10 +26,29 @@ import {
 } from '@rafters/composites';
 import { registryClient } from '../registry/client.js';
 import { getRaftersPaths } from '../utils/paths.js';
+import { resolveWorkspace, type Workspace } from '../utils/workspaces.js';
+
+const WORKSPACE_PARAM = {
+  workspace: {
+    type: 'string',
+    description:
+      'Workspace name (directory basename). Required when the MCP session has multiple workspaces and none matches cwd. Call rafters_workspaces to list options.',
+  },
+} as const;
 
 // ==================== Tool Definitions ====================
 
 export const TOOL_DEFINITIONS = [
+  {
+    name: 'rafters_workspaces',
+    description:
+      'List rafters workspaces visible to this MCP session. Returns name, path, and which one is the default for unscoped tool calls. Call this first when the project might be a monorepo.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {},
+      required: [],
+    },
+  },
   {
     name: 'rafters_composite',
     description:
@@ -37,6 +56,7 @@ export const TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        ...WORKSPACE_PARAM,
         id: { type: 'string', description: 'Get a specific composite by ID' },
         query: { type: 'string', description: 'Fuzzy search by name/keywords' },
         category: { type: 'string', description: 'Filter by category' },
@@ -51,6 +71,7 @@ export const TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        ...WORKSPACE_PARAM,
         name: { type: 'string', description: 'Get a specific rule by name' },
         query: { type: 'string', description: 'Search rules by name/description' },
         create: {
@@ -74,6 +95,7 @@ export const TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        ...WORKSPACE_PARAM,
         solves: {
           type: 'string',
           description: 'What problem the pattern solves (searches composite solves field)',
@@ -93,6 +115,7 @@ export const TOOL_DEFINITIONS = [
     inputSchema: {
       type: 'object' as const,
       properties: {
+        ...WORKSPACE_PARAM,
         name: {
           type: 'string',
           description: 'Component name (e.g., "button", "dialog", "card")',
@@ -106,28 +129,35 @@ export const TOOL_DEFINITIONS = [
 // ==================== Tool Handler ====================
 
 export class RaftersToolHandler {
-  private projectRoot: string | null;
-  private compositesLoaded = false;
+  private workspaces: Workspace[];
+  private defaultWorkspace: Workspace | null;
+  /** Tracks per-workspace composite loading so we only read from disk once. */
+  private compositesLoadedFor = new Set<string>();
+  /** Tracks built-in composite loading separately (loaded once globally). */
+  private builtInCompositesLoaded = false;
 
-  constructor(projectRoot: string | null) {
-    this.projectRoot = projectRoot;
+  constructor(workspaces: Workspace[], defaultWorkspace: Workspace | null) {
+    this.workspaces = workspaces;
+    this.defaultWorkspace = defaultWorkspace;
   }
 
   async handleToolCall(name: string, args: Record<string, unknown>): Promise<CallToolResult> {
     switch (name) {
+      case 'rafters_workspaces':
+        return this.handleWorkspaces();
       case 'rafters_composite':
         return this.handleComposite(args);
       case 'rafters_rule':
         return this.handleRule(args);
       case 'rafters_pattern':
-        return this.handlePattern(args as { solves?: string; query?: string });
+        return this.handlePattern(args as { solves?: string; query?: string; workspace?: string });
       case 'rafters_component':
         return this.handleComponent(args.name as string);
       default: {
         const suggestion =
           name === 'rafters_onboard'
             ? 'rafters_onboard was removed. Token import is now a CLI operation: run `rafters init` (auto-detects and prompts) or `rafters import` (standalone).'
-            : 'Available tools: rafters_composite, rafters_rule, rafters_pattern, rafters_component.';
+            : 'Available tools: rafters_workspaces, rafters_composite, rafters_rule, rafters_pattern, rafters_component.';
         return {
           content: [
             { type: 'text', text: JSON.stringify({ error: `Unknown tool: ${name}`, suggestion }) },
@@ -135,6 +165,58 @@ export class RaftersToolHandler {
         };
       }
     }
+  }
+
+  /**
+   * Resolve the requested workspace, returning a structured error result when
+   * the agent didn't pick one and there's no default. Returns the default
+   * workspace (which may itself be null when no `.rafters/` exists at all)
+   * for tools that read agent-shipped data and can degrade gracefully.
+   */
+  private resolve(name: string | undefined): Workspace | null {
+    return resolveWorkspace(this.workspaces, this.defaultWorkspace, name);
+  }
+
+  /**
+   * Build a structured error response listing the available workspaces.
+   * Use this when a tool requires a workspace and the agent didn't pick one.
+   */
+  private workspaceRequiredError(): CallToolResult {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify({
+            error: 'workspace parameter required',
+            suggestion:
+              'Multiple workspaces are available. Pass `workspace` with one of the names below.',
+            workspaces: this.workspaces.map((w) => ({ name: w.name, root: w.root })),
+          }),
+        },
+      ],
+    };
+  }
+
+  private async handleWorkspaces(): Promise<CallToolResult> {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(
+            {
+              workspaces: this.workspaces.map((w) => ({
+                name: w.name,
+                root: w.root,
+                isDefault: w.name === this.defaultWorkspace?.name,
+              })),
+              defaultWorkspace: this.defaultWorkspace?.name ?? null,
+            },
+            null,
+            2,
+          ),
+        },
+      ],
+    };
   }
 
   private async loadCompositesFromDir(dir: string): Promise<void> {
@@ -164,30 +246,38 @@ export class RaftersToolHandler {
     }
   }
 
-  private async ensureCompositesLoaded(): Promise<void> {
-    if (this.compositesLoaded) return;
-
-    // Load built-in composites from @rafters/composites
-    const builtInDirs = ['typography'];
-    for (const dir of builtInDirs) {
-      await this.loadCompositesFromDir(
-        join(process.cwd(), 'node_modules/@rafters/composites/src', dir),
-      );
+  private async ensureCompositesLoaded(workspace: Workspace | null): Promise<void> {
+    if (!this.builtInCompositesLoaded) {
+      const builtInDirs = ['typography'];
+      for (const dir of builtInDirs) {
+        await this.loadCompositesFromDir(
+          join(process.cwd(), 'node_modules/@rafters/composites/src', dir),
+        );
+      }
+      this.builtInCompositesLoaded = true;
     }
 
-    // Load project composites if available
-    if (this.projectRoot) {
-      const paths = getRaftersPaths(this.projectRoot);
+    if (workspace && !this.compositesLoadedFor.has(workspace.root)) {
+      const paths = getRaftersPaths(workspace.root);
       await this.loadCompositesFromDir(join(paths.root, 'composites'));
+      this.compositesLoadedFor.add(workspace.root);
     }
-
-    this.compositesLoaded = true;
   }
 
   private async handleComposite(args: Record<string, unknown>): Promise<CallToolResult> {
-    await this.ensureCompositesLoaded();
+    const { id, query, category, workspace } = args as {
+      id?: string;
+      query?: string;
+      category?: string;
+      workspace?: string;
+    };
 
-    const { id, query, category } = args as { id?: string; query?: string; category?: string };
+    const resolved = this.resolve(workspace);
+    if (workspace && !resolved) {
+      return this.workspaceRequiredError();
+    }
+
+    await this.ensureCompositesLoaded(resolved);
 
     let composites: CompositeFile[];
 
@@ -270,10 +360,19 @@ export class RaftersToolHandler {
     return { content: [{ type: 'text', text: JSON.stringify({ rules }, null, 2) }] };
   }
 
-  private async handlePattern(args: { solves?: string; query?: string }): Promise<CallToolResult> {
-    await this.ensureCompositesLoaded();
+  private async handlePattern(args: {
+    solves?: string;
+    query?: string;
+    workspace?: string;
+  }): Promise<CallToolResult> {
+    const { solves, query, workspace } = args;
 
-    const { solves, query } = args;
+    const resolved = this.resolve(workspace);
+    if (workspace && !resolved) {
+      return this.workspaceRequiredError();
+    }
+
+    await this.ensureCompositesLoaded(resolved);
     let composites: CompositeFile[];
 
     if (solves) {

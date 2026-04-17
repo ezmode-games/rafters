@@ -8,14 +8,24 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+import type { Workspace } from '../utils/workspaces.js';
 import { RaftersToolHandler, TOOL_DEFINITIONS } from './tools.js';
 
 /**
  * Create and start the MCP server.
- * @param projectRoot - Discovered project root, or null if no .rafters/ found
+ *
+ * @param workspaces - Every rafters-initialised workspace reachable from cwd.
+ *                     Empty when no monorepo manifest and no `.rafters/` is found.
+ * @param defaultWorkspace - The workspace used when a tool call omits the
+ *                           `workspace` parameter. Null when there are zero
+ *                           workspaces, or when there are multiple and none
+ *                           contains the cwd.
  */
-export async function startMcpServer(projectRoot: string | null): Promise<void> {
-  const toolHandler = new RaftersToolHandler(projectRoot);
+export async function startMcpServer(
+  workspaces: Workspace[],
+  defaultWorkspace: Workspace | null,
+): Promise<void> {
+  const toolHandler = new RaftersToolHandler(workspaces, defaultWorkspace);
 
   // Create MCP server
   const server = new Server(
