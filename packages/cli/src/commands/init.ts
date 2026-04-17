@@ -27,7 +27,9 @@ import {
   detectProject,
   frameworkToTarget,
   hasAstroReact,
+  isSelectableFramework,
   isTailwindV3,
+  SELECTABLE_FRAMEWORKS,
   type ShadcnConfig,
 } from '../utils/detect.js';
 import {
@@ -45,6 +47,12 @@ interface InitOptions {
   rebuild?: boolean;
   reset?: boolean;
   agent?: boolean;
+  /**
+   * Override detected framework. When set, skips the auto-detect + prompt
+   * fallback. Valid values: next | vite | remix | react-router | astro |
+   * wc | vanilla.
+   */
+  framework?: string;
 }
 
 async function backupCss(cssPath: string): Promise<string> {
@@ -53,7 +61,15 @@ async function backupCss(cssPath: string): Promise<string> {
   return backupPath;
 }
 
-type Framework = 'next' | 'vite' | 'remix' | 'react-router' | 'astro' | 'unknown';
+type Framework =
+  | 'next'
+  | 'vite'
+  | 'remix'
+  | 'react-router'
+  | 'astro'
+  | 'wc'
+  | 'vanilla'
+  | 'unknown';
 
 const CSS_LOCATIONS: Record<Framework, string[]> = {
   astro: ['src/styles/global.css', 'src/styles/globals.css', 'src/global.css'],
@@ -61,6 +77,8 @@ const CSS_LOCATIONS: Record<Framework, string[]> = {
   vite: ['src/index.css', 'src/main.css', 'src/styles.css', 'src/app.css'],
   remix: ['app/styles/global.css', 'app/globals.css', 'app/root.css'],
   'react-router': ['app/app.css', 'app/root.css', 'app/styles.css', 'app/globals.css'],
+  wc: ['src/index.css', 'src/main.css', 'src/styles.css', 'styles/global.css'],
+  vanilla: ['src/index.css', 'src/main.css', 'src/styles.css', 'styles/global.css'],
   unknown: ['src/styles/global.css', 'src/index.css', 'styles/globals.css'],
 };
 
@@ -90,7 +108,30 @@ const COMPONENT_PATHS: Record<
     primitives: 'app/lib/primitives',
     composites: 'app/composites',
   },
+  wc: {
+    components: 'src/components/ui',
+    primitives: 'src/lib/primitives',
+    composites: 'src/composites',
+  },
+  vanilla: {
+    components: 'src/components/ui',
+    primitives: 'src/lib/primitives',
+    composites: 'src/composites',
+  },
   unknown: { components: 'components/ui', primitives: 'lib/primitives', composites: 'composites' },
+};
+
+/**
+ * Human-facing labels for the interactive framework prompt.
+ */
+const FRAMEWORK_PROMPT_LABELS: Record<Exclude<Framework, 'unknown'>, string> = {
+  next: 'Next.js',
+  vite: 'Vite',
+  remix: 'Remix',
+  'react-router': 'React Router v7',
+  astro: 'Astro',
+  wc: 'Web Components (custom elements, shadow DOM)',
+  vanilla: 'Vanilla (plain HTML/TS, no framework)',
 };
 
 /**
@@ -182,6 +223,41 @@ async function updateMainCss(cwd: string, cssPath: string, themePath: string): P
  */
 function isInteractive(): boolean {
   return Boolean(process.stdin.isTTY && process.stdout.isTTY);
+}
+
+/**
+ * Resolve the framework to use, in priority order:
+ *   1. explicit `--framework` flag (validated against SELECTABLE_FRAMEWORKS)
+ *   2. auto-detection
+ *   3. interactive prompt when detection returns `unknown` and we have a TTY
+ *   4. fallback to `unknown` (non-interactive + undetectable)
+ */
+async function resolveFramework(
+  detected: Framework,
+  flag: string | undefined,
+  agentMode: boolean,
+): Promise<Framework> {
+  if (flag) {
+    if (!isSelectableFramework(flag)) {
+      throw new Error(
+        `Unknown --framework "${flag}". Valid values: ${SELECTABLE_FRAMEWORKS.join(', ')}.`,
+      );
+    }
+    return flag;
+  }
+
+  if (detected !== 'unknown') return detected;
+
+  if (agentMode || !isInteractive()) return 'unknown';
+
+  const picked = await select({
+    message: "Couldn't auto-detect your framework. Which one is this?",
+    choices: SELECTABLE_FRAMEWORKS.map((value) => ({
+      name: FRAMEWORK_PROMPT_LABELS[value],
+      value,
+    })),
+  });
+  return picked;
 }
 
 /**
@@ -639,14 +715,30 @@ export async function init(options: InitOptions): Promise<void> {
   log({ event: 'init:start', cwd });
 
   // Detect project configuration
-  const { framework, shadcn, tailwindVersion } = await detectProject(cwd);
+  const { framework: detectedFramework, shadcn, tailwindVersion } = await detectProject(cwd);
 
   log({
     event: 'init:detected',
-    framework,
+    framework: detectedFramework,
     tailwindVersion,
     hasShadcn: !!shadcn,
   });
+
+  // Resolve final framework: --framework flag > detected > interactive prompt > unknown
+  const framework = await resolveFramework(
+    detectedFramework as Framework,
+    options.framework,
+    isAgentMode,
+  );
+
+  if (framework !== detectedFramework) {
+    log({
+      event: 'init:framework_resolved',
+      detected: detectedFramework,
+      resolved: framework,
+      source: options.framework ? 'flag' : 'prompt',
+    });
+  }
 
   // Error if Tailwind v3 is detected
   if (isTailwindV3(tailwindVersion)) {

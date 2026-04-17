@@ -8,7 +8,30 @@ import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-export type Framework = 'next' | 'vite' | 'remix' | 'react-router' | 'astro' | 'unknown';
+export type Framework =
+  | 'next'
+  | 'vite'
+  | 'remix'
+  | 'react-router'
+  | 'astro'
+  | 'wc'
+  | 'vanilla'
+  | 'unknown';
+
+/** Frameworks a user can pick with `--framework` or via the interactive prompt. */
+export const SELECTABLE_FRAMEWORKS: ReadonlyArray<Exclude<Framework, 'unknown'>> = [
+  'next',
+  'vite',
+  'remix',
+  'react-router',
+  'astro',
+  'wc',
+  'vanilla',
+];
+
+export function isSelectableFramework(value: string): value is Exclude<Framework, 'unknown'> {
+  return (SELECTABLE_FRAMEWORKS as ReadonlyArray<string>).includes(value);
+}
 
 export interface ShadcnConfig {
   tailwind?: {
@@ -140,21 +163,24 @@ export async function detectShadcn(cwd: string): Promise<ShadcnConfig | null> {
  * Component target derived from framework.
  * Determines which file extension to prefer when installing components.
  */
-export type ComponentTarget = 'react' | 'astro' | 'vue' | 'svelte';
+export type ComponentTarget = 'react' | 'astro' | 'vue' | 'svelte' | 'wc';
 
 /**
  * Map a framework to its default component target.
  * All React-based frameworks (next, vite, remix, react-router) map to 'react'.
+ * `wc` projects get Web Component files; `vanilla` defaults to 'react' since
+ * the React file is the shadcn drop-in form most plain-TS projects still use.
  */
 export function frameworkToTarget(framework: Framework): ComponentTarget {
   if (framework === 'astro') return 'astro';
+  if (framework === 'wc') return 'wc';
   return 'react';
 }
 
 /**
  * All supported component file extensions, derived from ComponentTarget values.
  */
-export const COMPONENT_EXTENSIONS = ['.tsx', '.astro', '.vue', '.svelte'] as const;
+export const COMPONENT_EXTENSIONS = ['.tsx', '.astro', '.vue', '.svelte', '.element.ts'] as const;
 
 /**
  * Map a component target to its preferred file extension.
@@ -165,6 +191,7 @@ export function targetToExtension(target: ComponentTarget): string {
     astro: '.astro',
     vue: '.vue',
     svelte: '.svelte',
+    wc: '.element.ts',
   };
   return map[target];
 }

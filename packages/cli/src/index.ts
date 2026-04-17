@@ -25,6 +25,10 @@ program
   .description('Initialize .rafters/ with default tokens and config')
   .option('-r, --rebuild', 'Regenerate output files from existing tokens')
   .option('--reset', 'Re-run generators fresh, replacing persisted tokens')
+  .option(
+    '--framework <name>',
+    'Override framework detection (next|vite|remix|react-router|astro|wc|vanilla)',
+  )
   .option('--agent', 'Output JSON for machine consumption')
   .action(withErrorHandler(init));
 
