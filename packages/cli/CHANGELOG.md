@@ -1,6 +1,6 @@
 # rafters
 
-## Unreleased
+## 0.0.49
 
 ### Minor Changes
 
@@ -16,11 +16,6 @@
 
 - fix(mcp): `rafters_pattern` no longer returns hardcoded patterns. Now queries composites by their `solves` and `appliesWhen` fields. Patterns are design intelligence captured in composite manifests, not static data in the MCP server. Search by what the pattern solves (e.g., "hierarchy", "authentication") or use `query` for fuzzy search. Closes #1280.
 - refactor(plugins): schema-first plugin protocol replaces the class-based `GenerationRuleExecutor`. Each plugin is now a `Plugin<I,O>` with a Zod input schema, a Zod output schema, and a pure `transform` function -- no registry access, no name regex, no implicit side effects. `resolveInput` is the single registry-aware layer that builds the typed input struct from token state; `regenerate` calls it per-node; `cascade` does the topological walk and collects all failures into one aggregate error (`cause.code === 'cascade-aggregate'`). `GenerationRuleExecutor`, `rule-engine.ts`, and `validators/typography-a11y.ts` are deleted. All six built-in plugins (scale, state, contrast, invert, calc, example) are rewritten as `definePlugin` default exports. Closes #1232, #1243.
-
-## 0.0.49
-
-### Patch Changes
-
 - fix(schema): `TokenSchema.userOverride` is now required + nullable instead of optional. `null` is the explicit signal that no designer override exists (generated baseline); a populated object signals a documented designer override. Every generator emits `userOverride: null` explicitly -- the field can no longer be accidentally omitted. Patch schemas (`TokenPatchSchema`) keep `userOverride` optional so PATCH payloads do not have to include it. The `onboard.test.ts` sentinel updated from `!== undefined` to `!== null` to match the new contract. Closes #1227.
 
 ## 0.0.48
