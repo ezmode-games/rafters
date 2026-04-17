@@ -1,5 +1,11 @@
 # rafters
 
+## 0.0.50
+
+### Patch Changes
+
+- fix(cli): move `@rafters/composites` from `dependencies` to `devDependencies` so it is no longer listed as a runtime dep in the published tarball. The package is private to the workspace and is bundled into `dist/index.js` by tsup (`noExternal`), matching how `@rafters/color-utils`, `@rafters/design-tokens`, `@rafters/shared`, and `@rafters/studio` are already handled. Fixes `ERR_PNPM_WORKSPACE_PKG_NOT_FOUND: "@rafters/composites@workspace:*" is in the dependencies but no package named "@rafters/composites" is present in the workspace` when running `pnpm dlx rafters@0.0.49`. Regression from #1252.
+
 ## 0.0.49
 
 ### Minor Changes
