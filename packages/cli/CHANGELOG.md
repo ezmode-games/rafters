@@ -1,5 +1,12 @@
 # rafters
 
+## 0.0.54
+
+### Minor Changes
+
+- feat(ui): Tier 1 Web Component framework target. Fourteen presentational components now ship a `.element.ts` custom-element variant alongside their existing `.tsx` and `.astro` targets. Each auto-registers on import (idempotent), composes its shadow stylesheet from a sibling `.styles.ts` via `tokenVar()` (no raw `var()`, no Tailwind utilities), uses the per-instance `CSSStyleSheet` + `replaceSync` + `adoptedStyleSheets` pattern so attribute changes reflect to the live shadow root, and falls back silently on unknown attribute values. Components shipped: `<rafters-alert>` (#1320 / #1371), `<rafters-avatar>` (#1321 / #1374), `<rafters-breadcrumb>` (#1322 / #1372), `<rafters-empty>` (#1323 / #1373), `<rafters-item>` (#1324 / #1377), `<rafters-kbd>` (#1325 / #1375), `<rafters-label>` (#1326 / #1376), `<rafters-progress>` (#1327 / #1378), `<rafters-skeleton>` (#1328 / #1379), `<rafters-spinner>` (#1329 / #1380), `<rafters-aspect-ratio>` (#1330 / #1382), `<rafters-embed>` (#1331 / #1381), `<rafters-image>` (#1332 / #1384), `<rafters-separator>` (#1333 / #1383). Four of those (aspect-ratio, embed, image, separator) also ship new `.classes.ts` files since the React surface had not previously externalised one.
+- feat(ui): Tier 2 form-associated and layout-composition Web Components. Ten components: seven form-associated CEs (`static formAssociated = true`, `attachInternals()`, `setFormValue`, `setValidity`, all four form lifecycle callbacks) and three layout-composition wrappers. Components shipped: `<rafters-checkbox>` (#1340 / #1385), `<rafters-radio-group>` (#1341 / #1386), `<rafters-switch>` (#1342 / #1388), `<rafters-toggle>` (#1343 / #1387), `<rafters-toggle-group>` (#1344 / #1389), `<rafters-slider>` (#1345 / #1391), `<rafters-input-otp>` (#1349 / #1397) -- all form-associated; `<rafters-button-group>` (#1346 / #1390), `<rafters-field>` (#1347 / #1392), `<rafters-input-group>` (#1348 / #1396) -- layout composition. Form-associated members submit with `name=value`, propagate `validity` through `ElementInternals`, reset with the enclosing `<form>`, and re-fire input/change events from the host with `bubbles: true, composed: true`. Four of these (button-group, field, input-group, input-otp) ship new `.classes.ts` files since the React surface had not previously externalised one.
+
 ## 0.0.53
 
 ### Minor Changes
