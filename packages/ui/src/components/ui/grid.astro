@@ -12,19 +12,21 @@ import type { HTMLAttributes } from 'astro/types';
 import classy from '../../primitives/classy';
 import {
   type BentoPattern,
+  columnsResolvesToAuto,
   type GridPreset,
   gridAutoSpacingClasses,
   gridBentoPatterns,
-  gridColumnClasses,
   gridGapClasses,
   gridGoldenClasses,
   gridPaddingClasses,
+  type ResponsiveColumns,
+  resolveColumnsClasses,
 } from './grid.classes';
 
 interface Props extends HTMLAttributes<'div'> {
   preset?: GridPreset;
   pattern?: BentoPattern;
-  columns?: 1 | 2 | 3 | 4 | 5 | 6 | 'auto';
+  columns?: ResponsiveColumns;
   gap?: '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12';
   padding?: '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12';
   role?: 'presentation' | 'grid';
@@ -48,10 +50,10 @@ const classes = classy(
   useAutoSpacing && gridAutoSpacingClasses,
   !useAutoSpacing && gap !== undefined && gridGapClasses[gap],
   !useAutoSpacing && padding !== undefined && gridPaddingClasses[padding],
-  preset === 'linear' && gridColumnClasses[columns],
+  preset === 'linear' && resolveColumnsClasses(columns),
   preset === 'golden' && gridGoldenClasses,
   preset === 'bento' && pattern && gridBentoPatterns[pattern],
-  preset === 'linear' && columns === 'auto' && 'sm:grid-cols-2 lg:grid-cols-3',
+  preset === 'linear' && columnsResolvesToAuto(columns) && 'sm:grid-cols-2 lg:grid-cols-3',
   className,
 );
 ---
