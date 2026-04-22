@@ -35,15 +35,17 @@ import * as React from 'react';
 import classy from '../../primitives/classy';
 import {
   type BentoPattern,
+  columnsResolvesToAuto,
   type GridPreset,
   gridAutoSpacingClasses,
   gridBentoPatterns,
   gridColSpanClasses,
-  gridColumnClasses,
   gridGapClasses,
   gridGoldenClasses,
   gridPaddingClasses,
   gridRowSpanClasses,
+  type ResponsiveColumns,
+  resolveColumnsClasses,
 } from './grid.classes';
 
 // ==================== Types ====================
@@ -69,7 +71,7 @@ function useGridContext() {
 
 /** Grid configuration for onConfigChange callback */
 export interface GridConfig {
-  columns?: 1 | 2 | 3 | 4 | 5 | 6 | 'auto';
+  columns?: ResponsiveColumns;
   gap?: '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12';
   padding?: '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12';
   preset?: GridPreset;
@@ -95,11 +97,15 @@ export interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
   pattern?: BentoPattern;
 
   /**
-   * Column count for linear preset
-   * Responsive object or single value
-   * @default auto-fit based on content
+   * Column count for linear preset.
+   *
+   * Single value: a number 1-12 or 'auto' for the responsive auto-fit default.
+   * Responsive object: `{ base, sm, md, lg, xl, '2xl' }` resolves to per-
+   * breakpoint `grid-cols-N` classes. Example: `{ base: 2, md: 4 }`.
+   *
+   * @default 'auto'
    */
-  columns?: 1 | 2 | 3 | 4 | 5 | 6 | 'auto';
+  columns?: ResponsiveColumns;
 
   /**
    * Gap between items. Omit for auto-scaling via container queries.
@@ -147,7 +153,6 @@ export interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
   onConfigChange?: ((config: GridConfig) => void) | undefined;
 }
 
-const columnClasses = gridColumnClasses;
 const bentoPatterns = gridBentoPatterns;
 const goldenClasses = gridGoldenClasses;
 
@@ -181,12 +186,12 @@ function GridRoot({
     !useAutoSpacing && padding !== undefined && gridPaddingClasses[padding],
 
     // Preset-specific layouts
-    preset === 'linear' && columnClasses[columns],
+    preset === 'linear' && resolveColumnsClasses(columns),
     preset === 'golden' && goldenClasses,
     preset === 'bento' && pattern && bentoPatterns[pattern],
 
     // Responsive defaults for linear
-    preset === 'linear' && columns === 'auto' && 'sm:grid-cols-2 lg:grid-cols-3',
+    preset === 'linear' && columnsResolvesToAuto(columns) && 'sm:grid-cols-2 lg:grid-cols-3',
 
     // Editable mode styling (R-202)
     editable && 'outline-2 outline-dashed outline-muted-foreground/30 outline-offset-2 rounded p-2',
@@ -204,6 +209,7 @@ function GridRoot({
         data-editable={editable || undefined}
         data-preset={preset}
         data-columns={typeof columns === 'number' ? columns : undefined}
+        data-responsive={typeof columns === 'object' ? '' : undefined}
         {...props}
       >
         {children}
@@ -222,9 +228,9 @@ export interface GridItemProps extends React.HTMLAttributes<HTMLDivElement> {
   priority?: ContentPriority;
 
   /**
-   * Explicit column span override
+   * Explicit column span override (1-12).
    */
-  colSpan?: 1 | 2 | 3 | 4;
+  colSpan?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
   /**
    * Explicit row span override
