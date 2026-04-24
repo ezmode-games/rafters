@@ -1,35 +1,35 @@
 /**
- * Shared class definitions for Typography components
- * Used by both typography.tsx (React) and typography .astro files (Astro)
+ * Shared class resolution for Typography components.
+ *
+ * Variant defaults are stored dimensionally (size, weight, color, line, tracking,
+ * family, align, transform) rather than as flat utility strings. Token prop
+ * overrides replace the matching dimension at emit time, so defaults never fight
+ * overrides in the Tailwind cascade (which orders utilities alphabetically and
+ * thus cannot be trusted for overrides: `text-accent` would lose to
+ * `text-foreground` on 'a' < 'f').
  */
 
 import { getFillMetadata, resolveFillClasses } from '../../primitives/fill-resolver';
 
-export const typographyClasses = {
-  h1: 'scroll-m-20 text-4xl font-bold tracking-tight @lg:text-5xl text-foreground',
-  h2: 'scroll-m-20 text-3xl font-semibold tracking-tight text-foreground',
-  h3: 'scroll-m-20 text-2xl font-semibold tracking-tight text-foreground',
-  h4: 'scroll-m-20 text-xl font-semibold tracking-tight text-foreground',
-  p: 'leading-7 text-foreground',
-  lead: 'text-xl text-muted-foreground',
-  large: 'text-lg font-semibold text-foreground',
-  small: 'text-sm font-medium leading-none text-foreground',
-  muted: 'text-sm text-muted-foreground',
-  code: 'rounded bg-muted px-1 py-0.5 font-mono text-sm text-foreground',
-  blockquote: 'mt-6 border-l-2 border-border pl-6 italic text-foreground',
-  ul: 'my-6 ml-6 list-disc [&>li]:mt-2 text-foreground',
-  ol: 'my-6 ml-6 list-decimal [&>li]:mt-2 text-foreground',
-  li: 'leading-7',
-  codeblock:
-    'relative rounded-lg bg-muted p-4 font-mono text-sm overflow-x-auto text-foreground [&_code]:bg-transparent [&_code]:p-0',
-  mark: 'bg-accent text-accent-foreground px-1 rounded',
-  abbr: 'cursor-help underline decoration-dotted underline-offset-4',
-} as const;
+export type TypographyVariant =
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'h4'
+  | 'p'
+  | 'lead'
+  | 'large'
+  | 'small'
+  | 'muted'
+  | 'code'
+  | 'codeblock'
+  | 'blockquote'
+  | 'mark'
+  | 'abbr'
+  | 'ul'
+  | 'ol'
+  | 'li';
 
-/**
- * Token-level typography props for surgical override of any dimension.
- * Shared between React (.tsx) and Astro (.astro) tag components.
- */
 export interface TypographyTokenProps {
   size?: string | undefined;
   weight?: string | undefined;
@@ -41,35 +41,152 @@ export interface TypographyTokenProps {
   transform?: string | undefined;
 }
 
+interface CqOverrides {
+  size?: string;
+  weight?: string;
+  line?: string;
+  tracking?: string;
+}
+
+interface VariantDefaults extends TypographyTokenProps {
+  layout?: string;
+  cq?: Record<string, CqOverrides>;
+}
+
+const VARIANTS: Record<TypographyVariant, VariantDefaults> = {
+  h1: {
+    size: '4xl',
+    weight: 'bold',
+    tracking: 'tight',
+    color: 'foreground',
+    layout: 'scroll-m-20',
+    cq: { lg: { size: '5xl' } },
+  },
+  h2: {
+    size: '3xl',
+    weight: 'semibold',
+    tracking: 'tight',
+    color: 'foreground',
+    layout: 'scroll-m-20',
+  },
+  h3: {
+    size: '2xl',
+    weight: 'semibold',
+    tracking: 'tight',
+    color: 'foreground',
+    layout: 'scroll-m-20',
+  },
+  h4: {
+    size: 'xl',
+    weight: 'semibold',
+    tracking: 'tight',
+    color: 'foreground',
+    layout: 'scroll-m-20',
+  },
+  p: { line: '7', color: 'foreground' },
+  lead: { size: 'xl', color: 'muted-foreground' },
+  large: { size: 'lg', weight: 'semibold', color: 'foreground' },
+  small: { size: 'sm', weight: 'medium', line: 'none', color: 'foreground' },
+  muted: { size: 'sm', color: 'muted-foreground' },
+  code: {
+    size: 'sm',
+    family: 'mono',
+    color: 'foreground',
+    layout: 'rounded bg-muted px-1 py-0.5',
+  },
+  codeblock: {
+    size: 'sm',
+    family: 'mono',
+    color: 'foreground',
+    layout: 'relative rounded-lg bg-muted p-4 overflow-x-auto [&_code]:bg-transparent [&_code]:p-0',
+  },
+  blockquote: { color: 'foreground', layout: 'mt-6 border-l-2 border-border pl-6 italic' },
+  mark: { color: 'accent-foreground', layout: 'bg-accent px-1 rounded' },
+  abbr: { layout: 'cursor-help underline decoration-dotted underline-offset-4' },
+  ul: { color: 'foreground', layout: 'my-6 ml-6 list-disc [&>li]:mt-2' },
+  ol: { color: 'foreground', layout: 'my-6 ml-6 list-decimal [&>li]:mt-2' },
+  li: { line: '7' },
+};
+
+const DIM_TO_UTIL: Record<keyof TypographyTokenProps, (v: string) => string> = {
+  size: (v) => `text-${v}`,
+  weight: (v) => `font-${v}`,
+  line: (v) => `leading-${v}`,
+  tracking: (v) => `tracking-${v}`,
+  family: (v) => `font-${v}`,
+  align: (v) => `text-${v}`,
+  transform: (v) => v,
+  color: (v) => {
+    const fill = getFillMetadata(v);
+    return fill ? resolveFillClasses(fill, 'text') : `text-${v}`;
+  },
+};
+
+function emitDim(dim: keyof TypographyTokenProps, value: string, prefix = ''): string {
+  const util = DIM_TO_UTIL[dim](value);
+  if (!prefix) return util;
+  return util
+    .split(/\s+/)
+    .map((u) => `${prefix}${u}`)
+    .join(' ');
+}
+
+function pickDefined<T extends object>(obj: T): Partial<T> {
+  const out: Partial<T> = {};
+  for (const key of Object.keys(obj) as (keyof T)[]) {
+    if (obj[key] != null) out[key] = obj[key];
+  }
+  return out;
+}
+
+export function resolveTypography(
+  variant: TypographyVariant,
+  overrides: TypographyTokenProps = {},
+): string {
+  const defaults = VARIANTS[variant];
+  const dims: TypographyTokenProps = { ...defaults, ...pickDefined(overrides) };
+  delete (dims as VariantDefaults).layout;
+  delete (dims as VariantDefaults).cq;
+
+  const classes: string[] = [];
+  if (defaults.layout) classes.push(defaults.layout);
+
+  for (const key of Object.keys(DIM_TO_UTIL) as (keyof TypographyTokenProps)[]) {
+    const value = dims[key];
+    if (value != null) classes.push(emitDim(key, value));
+  }
+
+  // CQ defaults survive only where the prop didn't override the same dimension.
+  if (defaults.cq) {
+    for (const [breakpoint, cqOverrides] of Object.entries(defaults.cq)) {
+      for (const key of Object.keys(cqOverrides) as (keyof CqOverrides)[]) {
+        if (overrides[key] != null) continue;
+        const value = cqOverrides[key];
+        if (value != null) classes.push(emitDim(key, value, `@${breakpoint}:`));
+      }
+    }
+  }
+
+  return classes.join(' ');
+}
+
 /**
- * Build Tailwind utility classes from token props.
- * Returns a string of override classes or empty string if no overrides.
- *
- * Color resolution (in order):
- *   1. If the value names a registered fill token, resolve in text context.
- *      Solid fills -> text-{color} (+ opacity). Gradients -> bg-clip-text.
- *      e.g. color="hero" -> "bg-gradient-to-r from-primary to-primary/0 bg-clip-text text-transparent"
- *   2. Otherwise pass through as text-{value}:
- *      color="accent"            -> text-accent
- *      color="accent-foreground" -> text-accent-foreground
- *      color="muted-foreground"  -> text-muted-foreground
+ * Back-compat flat string map. Computed from the dimensional defaults.
+ * Prefer `resolveTypography(variant, props)` when overrides are in play.
+ */
+export const typographyClasses = Object.fromEntries(
+  (Object.keys(VARIANTS) as TypographyVariant[]).map((v) => [v, resolveTypography(v)]),
+) as Record<TypographyVariant, string>;
+
+/**
+ * @deprecated Use `resolveTypography(variant, props)` so overrides replace
+ * defaults instead of appending. Kept so existing consumers don't break.
  */
 export function tokenPropsToClasses(props: TypographyTokenProps): string {
   const classes: string[] = [];
-  if (props.size) classes.push(`text-${props.size}`);
-  if (props.weight) classes.push(`font-${props.weight}`);
-  if (props.color) {
-    const fillMeta = getFillMetadata(props.color);
-    if (fillMeta) {
-      classes.push(resolveFillClasses(fillMeta, 'text'));
-    } else {
-      classes.push(`text-${props.color}`);
-    }
+  for (const key of Object.keys(DIM_TO_UTIL) as (keyof TypographyTokenProps)[]) {
+    const value = props[key];
+    if (value != null) classes.push(emitDim(key, value));
   }
-  if (props.line) classes.push(`leading-${props.line}`);
-  if (props.tracking) classes.push(`tracking-${props.tracking}`);
-  if (props.family) classes.push(`font-${props.family}`);
-  if (props.align) classes.push(`text-${props.align}`);
-  if (props.transform) classes.push(props.transform);
   return classes.join(' ');
 }
