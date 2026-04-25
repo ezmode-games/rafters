@@ -2,7 +2,7 @@
  * Path utilities for .rafters/ directory structure
  */
 
-import { existsSync, realpathSync } from 'node:fs';
+import { realpathSync } from 'node:fs';
 import { isAbsolute, join, relative, resolve } from 'node:path';
 import { z } from 'zod';
 
@@ -113,12 +113,7 @@ export function resolveRoot(field: PathField, cwd: string, fallback: string): st
   for (const entry of field) {
     const p = entryPath(entry);
     const abs = isAbsolute(p) ? p : resolve(cwdReal, p);
-    if (existsSync(abs) && isInsideCwd(tryRealpath(abs), cwdReal)) {
-      return p;
-    }
-    if (!existsSync(abs) && isInsideCwd(resolve(cwdReal, p), cwdReal)) {
-      return p;
-    }
+    if (isInsideCwd(tryRealpath(abs), cwdReal)) return p;
   }
 
   return fallback;
