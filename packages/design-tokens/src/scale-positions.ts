@@ -66,6 +66,15 @@ for (const [pos, idx] of Object.entries(SCALE_POSITION_MAP)) {
 
 export const VALID_SCALE_POSITIONS = Object.keys(SCALE_POSITION_MAP).map(Number);
 
+/**
+ * Extract the numeric scale position suffix from a token name.
+ * "silver-true-sky-200" -> "200", "neutral" -> null.
+ */
+export function parseTokenPosition(tokenName: string): string | null {
+  const match = tokenName.match(/-(\d+)$/);
+  return match?.[1] ?? null;
+}
+
 /** Minimum index distance for a WCAG pair to be considered usable. */
 export const MIN_WCAG_PAIR_DISTANCE = 3;
 

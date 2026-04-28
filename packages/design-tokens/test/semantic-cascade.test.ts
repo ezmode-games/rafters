@@ -283,3 +283,39 @@ describe('applyComputed cascade behavior', () => {
     expect(afterVal.position).toBe(beforeVal.position);
   });
 });
+
+describe('legacy semantic token backfill', () => {
+  it('cascades semantic tokens loaded without generationRule', async () => {
+    const result = generateBaseSystem();
+    const legacyTokens: Token[] = result.allTokens.map((t) =>
+      t.namespace === 'semantic' ? { ...t, generationRule: undefined } : t,
+    );
+
+    const registry = new TokenRegistry(legacyTokens);
+
+    const { buildColorValue } = await import('@rafters/color-utils');
+    const teal = buildColorValue({ l: 0.5, c: 0.1, h: 180 }, { token: 'neutral' });
+    await registry.set('neutral', teal);
+
+    const primary = registry.get('primary') as Token;
+    expect(primary.dependsOn?.[0]).toBe('neutral');
+    expect((primary.value as ColorReference).family).toBe('neutral');
+
+    const primaryHover = registry.get('primary-hover') as Token;
+    expect((primaryHover.value as ColorReference).family).toBe('neutral');
+
+    const primaryForeground = registry.get('primary-foreground') as Token;
+    expect((primaryForeground.value as ColorReference).family).toBe('neutral');
+  });
+
+  it('preserves explicit generationRule when present (no double-write)', () => {
+    const result = generateBaseSystem();
+    const registry = new TokenRegistry(result.allTokens);
+
+    const primary = registry.get('primary') as Token;
+    expect(primary.generationRule).toBeDefined();
+
+    const primaryFg = registry.get('primary-foreground') as Token;
+    expect(primaryFg.generationRule).toBe('contrast:auto');
+  });
+});
