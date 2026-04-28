@@ -19,7 +19,12 @@ import { TokenDependencyGraph } from './dependencies';
 import { resolveColorReference } from './oklch-to-css';
 import type { PersistenceAdapter } from './persistence/types';
 import { cascade, regenerate } from './plugins';
-import { findDarkCounterpartIndex, INDEX_TO_POSITION, POSITION_TO_INDEX } from './scale-positions';
+import {
+  findDarkCounterpartIndex,
+  INDEX_TO_POSITION,
+  POSITION_TO_INDEX,
+  parseTokenPosition,
+} from './scale-positions';
 
 // Event types (inline to replace deleted types/events.js)
 export type TokenChangeEvent =
@@ -69,8 +74,8 @@ function inferSemanticGenerationRule(
   if (value && typeof value === 'object' && 'position' in value) {
     return `scale:${(value as ColorReference).position}`;
   }
-  const positionMatch = dependsOn[0]?.match(/-(\d+)$/);
-  return positionMatch ? `scale:${positionMatch[1]}` : null;
+  const position = dependsOn[0] ? parseTokenPosition(dependsOn[0]) : null;
+  return position ? `scale:${position}` : null;
 }
 
 export class TokenRegistry {

@@ -22,7 +22,7 @@ import {
 import { z } from 'zod';
 import { GenerationRuleParser } from './generation-rules';
 import type { TokenRegistry } from './registry';
-import { POSITION_TO_INDEX, SCALE_POSITION_MAP } from './scale-positions';
+import { POSITION_TO_INDEX, parseTokenPosition, SCALE_POSITION_MAP } from './scale-positions';
 
 function hasPosition(v: unknown): v is { family?: string; position: string | number } {
   return typeof v === 'object' && v !== null && 'position' in v;
@@ -297,19 +297,10 @@ export function resolveInput(
 
       // Extract light index from dependency[1] (dark position token) or token name
       let basePosition = 5;
-      const darkDepName = dependencies[1];
-      if (darkDepName) {
-        const posMatch = darkDepName.match(/-(\d+)$/);
-        if (posMatch?.[1]) {
-          const idx = POSITION_TO_INDEX[posMatch[1]];
-          if (idx !== undefined) basePosition = idx;
-        }
-      } else {
-        const nameMatch = tokenName.match(/-(\d+)$/);
-        if (nameMatch?.[1]) {
-          const idx = POSITION_TO_INDEX[nameMatch[1]];
-          if (idx !== undefined) basePosition = idx;
-        }
+      const positionString = parseTokenPosition(dependencies[1] ?? tokenName);
+      if (positionString) {
+        const idx = POSITION_TO_INDEX[positionString];
+        if (idx !== undefined) basePosition = idx;
       }
 
       return {
