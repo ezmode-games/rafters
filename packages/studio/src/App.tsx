@@ -1,146 +1,146 @@
-import { Badge } from '@rafters/ui/components/ui/badge';
 import { Button } from '@rafters/ui/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@rafters/ui/components/ui/card';
 import { Container } from '@rafters/ui/components/ui/container';
-import { Dialog } from '@rafters/ui/components/ui/dialog';
-import { Field } from '@rafters/ui/components/ui/field';
-import { Input } from '@rafters/ui/components/ui/input';
-import { Separator } from '@rafters/ui/components/ui/separator';
-import { Tabs } from '@rafters/ui/components/ui/tabs';
-import { Tooltip } from '@rafters/ui/components/ui/tooltip';
 import { P, Small } from '@rafters/ui/components/ui/typography';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { onCssUpdated, setToken } from './api';
 
-const NAMESPACES = [
-  { key: 'color', label: 'Color', letter: 'C' },
-  { key: 'spacing', label: 'Spacing', letter: 'S' },
-  { key: 'typography', label: 'Typography', letter: 'T' },
-  { key: 'radius', label: 'Radius', letter: 'R' },
-  { key: 'shadow', label: 'Shadow', letter: 'Sh' },
-  { key: 'depth', label: 'Depth', letter: 'D' },
-  { key: 'motion', label: 'Motion', letter: 'M' },
-  { key: 'focus', label: 'Focus', letter: 'F' },
+const ACCENT_VARIANTS = [
+  'accent',
+  'accent-foreground',
+  'accent-hover',
+  'accent-hover-foreground',
+  'accent-active',
+  'accent-active-foreground',
+  'accent-border',
+  'accent-ring',
 ] as const;
 
-type NamespaceKey = (typeof NAMESPACES)[number]['key'];
+const HIGHLIGHT_VARIANTS = [
+  'highlight',
+  'highlight-foreground',
+  'highlight-hover',
+  'highlight-hover-foreground',
+  'highlight-active',
+  'highlight-active-foreground',
+] as const;
 
-interface NamespaceButtonProps {
-  label: string;
-  letter: string;
-  active?: boolean;
-  onClick?: () => void;
-}
+const REFERENCE_TOKENS = ['background', 'foreground', 'primary', 'primary-foreground'] as const;
 
-function NamespaceButton({ label, letter, active, onClick }: NamespaceButtonProps) {
+type Status =
+  | { kind: 'idle' }
+  | { kind: 'pending' }
+  | { kind: 'ok'; at: number }
+  | { kind: 'error'; message: string };
+
+function Swatch({ name, version }: { name: string; version: number }) {
+  const [resolved, setResolved] = useState('');
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const value = getComputedStyle(root).getPropertyValue(`--rafters-${name}`).trim();
+    setResolved(value);
+  }, [name, version]);
+
   return (
-    <Tooltip>
-      <Tooltip.Trigger asChild>
-        <Button variant="ghost" size="icon" onClick={onClick}>
-          <span className={active ? 'text-primary' : 'text-muted-foreground'}>{letter}</span>
-        </Button>
-      </Tooltip.Trigger>
-      <Tooltip.Content side="right">{label}</Tooltip.Content>
-    </Tooltip>
+    <div className="flex flex-col gap-1">
+      <div
+        role="img"
+        aria-label={`${name} swatch`}
+        className="h-12 w-full rounded border border-border"
+        style={{ background: `var(--rafters-${name})` }}
+      />
+      <Small className="font-mono">{name}</Small>
+      <Small color="muted" className="font-mono text-[10px]">
+        {resolved || '(unresolved)'}
+      </Small>
+    </div>
   );
 }
 
 export default function App() {
-  const [activeNamespace, setActiveNamespace] = useState<NamespaceKey>('color');
+  const [status, setStatus] = useState<Status>({ kind: 'idle' });
+  const [version, setVersion] = useState(0);
 
-  const currentNamespace = NAMESPACES.find((ns) => ns.key === activeNamespace);
+  useEffect(() => {
+    return onCssUpdated(() => setVersion((v) => v + 1));
+  }, []);
+
+  async function applyEaster() {
+    setStatus({ kind: 'pending' });
+    const accent = await setToken({
+      name: 'accent',
+      value: { family: 'silver-true-honey', position: '500' },
+    });
+    if (!accent.ok) {
+      setStatus({ kind: 'error', message: `accent: ${accent.error}` });
+      return;
+    }
+    const highlight = await setToken({
+      name: 'highlight',
+      value: { family: 'silver-true-sky', position: '200' },
+    });
+    if (!highlight.ok) {
+      setStatus({ kind: 'error', message: `highlight: ${highlight.error}` });
+      return;
+    }
+    setStatus({ kind: 'ok', at: Date.now() });
+  }
 
   return (
-    <Tooltip.Provider>
-      <Container as="main" className="grid min-h-svh grid-cols-12 grid-rows-12">
-        <Container as="nav" className="col-span-12 flex items-center gap-4" padding="2">
-          <Small>Rafters Studio</Small>
-          <Badge variant="muted" size="sm">
-            {currentNamespace?.label}
-          </Badge>
-        </Container>
+    <Container as="main" className="flex min-h-svh flex-col gap-6" padding="6">
+      <header className="flex items-center justify-between">
+        <div className="flex flex-col gap-1">
+          <P className="font-medium">Cascade verification</P>
+          <Small color="muted">
+            One setToken per family. The full -hover/-active/-foreground/-border/-ring variant
+            fan-out should update in place.
+          </Small>
+        </div>
+        <div className="flex items-center gap-3">
+          <StatusPill status={status} />
+          <Button onClick={applyEaster} disabled={status.kind === 'pending'}>
+            Apply Easter palette
+          </Button>
+        </div>
+      </header>
 
-        <Container as="aside" className="col-span-1 row-span-11 flex flex-col" padding="2">
-          {NAMESPACES.map((ns) => (
-            <NamespaceButton
-              key={ns.key}
-              label={ns.label}
-              letter={ns.letter}
-              active={ns.key === activeNamespace}
-              onClick={() => setActiveNamespace(ns.key)}
-            />
-          ))}
-
-          <Separator className="my-2" />
-
-          <P size="sm" color="muted">
-            {NAMESPACES.length} ns
-          </P>
-        </Container>
-
-        <Container as="section" className="col-span-11 row-span-11" padding="4">
-          <Tabs defaultValue="tokens">
-            <Tabs.List>
-              <Tabs.Trigger value="tokens">Tokens</Tabs.Trigger>
-              <Tabs.Trigger value="preview">Preview</Tabs.Trigger>
-              <Tabs.Trigger value="code">Code</Tabs.Trigger>
-            </Tabs.List>
-
-            <Tabs.Content value="tokens">
-              <Dialog>
-                <Dialog.Trigger asChild>
-                  <Card interactive className="max-w-sm">
-                    <CardHeader>
-                      <CardTitle as="h4">primary-500</CardTitle>
-                      <CardDescription>Base primary color</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <P size="sm" color="muted">
-                        oklch(0.6 0.15 250)
-                      </P>
-                    </CardContent>
-                  </Card>
-                </Dialog.Trigger>
-
-                <Dialog.Content>
-                  <Dialog.Header>
-                    <Dialog.Title>Edit primary-500</Dialog.Title>
-                    <Dialog.Description>Modify the base primary color token</Dialog.Description>
-                  </Dialog.Header>
-
-                  <Field label="OKLCH Value" description="Lightness, Chroma, Hue">
-                    <Input defaultValue="oklch(0.6 0.15 250)" />
-                  </Field>
-
-                  <Dialog.Footer className="mt-4">
-                    <Dialog.Close asChild>
-                      <Button variant="outline">Cancel</Button>
-                    </Dialog.Close>
-                    <Button>Save</Button>
-                  </Dialog.Footer>
-                </Dialog.Content>
-              </Dialog>
-            </Tabs.Content>
-
-            <Tabs.Content value="preview">
-              <P size="sm" color="muted">
-                Live preview of {currentNamespace?.label} changes
-              </P>
-            </Tabs.Content>
-
-            <Tabs.Content value="code">
-              <P size="sm" color="muted">
-                Generated CSS/Tailwind for {currentNamespace?.label}
-              </P>
-            </Tabs.Content>
-          </Tabs>
-        </Container>
-      </Container>
-    </Tooltip.Provider>
+      <Section title="Accent (-> silver-true-honey)" tokens={ACCENT_VARIANTS} version={version} />
+      <Section
+        title="Highlight (-> silver-true-sky)"
+        tokens={HIGHLIGHT_VARIANTS}
+        version={version}
+      />
+      <Section title="Reference (should not change)" tokens={REFERENCE_TOKENS} version={version} />
+    </Container>
   );
+}
+
+function Section({
+  title,
+  tokens,
+  version,
+}: {
+  title: string;
+  tokens: readonly string[];
+  version: number;
+}) {
+  return (
+    <section className="flex flex-col gap-3">
+      <Small className="font-medium">{title}</Small>
+      <div className="grid grid-cols-4 gap-3 md:grid-cols-6 lg:grid-cols-8">
+        {tokens.map((name) => (
+          <Swatch key={name} name={name} version={version} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function StatusPill({ status }: { status: Status }) {
+  if (status.kind === 'idle') return null;
+  if (status.kind === 'pending') return <Small color="muted">applying...</Small>;
+  if (status.kind === 'ok') {
+    return <Small color="muted">applied at {new Date(status.at).toLocaleTimeString()}</Small>;
+  }
+  return <Small className="text-destructive">{status.message}</Small>;
 }
