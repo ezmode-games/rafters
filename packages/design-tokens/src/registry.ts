@@ -49,6 +49,30 @@ export type TokenChangeEvent =
 
 export type RegistryChangeCallback = (event: TokenChangeEvent) => void | Promise<void>;
 
+/**
+ * Mirrors deriveGenerationRule in generators/semantic.ts. Kept local to avoid
+ * registry → generators import direction. If the rule patterns change, update both.
+ */
+function inferSemanticGenerationRule(
+  name: string,
+  value: Token['value'],
+  dependsOn: string[],
+): string | null {
+  if (name.endsWith('-foreground') || name.endsWith('-text') || name.endsWith('-contrast')) {
+    return 'contrast:auto';
+  }
+  if (name.endsWith('-hover')) return 'state:hover';
+  if (name.endsWith('-active')) return 'state:active';
+  if (name.endsWith('-focus')) return 'state:focus';
+  if (name.endsWith('-disabled')) return 'state:disabled';
+
+  if (value && typeof value === 'object' && 'position' in value) {
+    return `scale:${(value as ColorReference).position}`;
+  }
+  const positionMatch = dependsOn[0]?.match(/-(\d+)$/);
+  return positionMatch ? `scale:${positionMatch[1]}` : null;
+}
+
 export class TokenRegistry {
   private tokens: Map<string, Token> = new Map();
   public dependencyGraph: TokenDependencyGraph = new TokenDependencyGraph();
@@ -71,20 +95,32 @@ export class TokenRegistry {
   /**
    * Populate dependency graph from tokens that have dependsOn/generationRule.
    * Called after bulk loading to ensure all dependency targets exist.
+   *
+   * Self-healing backfill: semantic tokens persisted by older rafters versions
+   * may have dependsOn but no generationRule. Without it, populateDependencyGraph
+   * skips them and the cascade silently breaks. Infer the rule from name + dependsOn
+   * shape so existing projects cascade correctly without an on-disk migration.
    */
   private populateDependencyGraph(): void {
     for (const token of this.tokens.values()) {
-      if (token.dependsOn && token.dependsOn.length > 0 && token.generationRule) {
-        const missingDeps = token.dependsOn.filter((dep) => !this.tokens.has(dep));
-        if (missingDeps.length > 0) {
-          console.warn(
-            `[TokenRegistry] Token "${token.name}" skipped in dependency graph: ` +
-              `missing dependencies [${missingDeps.join(', ')}]`,
-          );
-          continue;
-        }
-        this.dependencyGraph.addDependency(token.name, token.dependsOn, token.generationRule);
+      if (!token.dependsOn || token.dependsOn.length === 0) continue;
+
+      if (!token.generationRule && token.namespace === 'semantic') {
+        const inferred = inferSemanticGenerationRule(token.name, token.value, token.dependsOn);
+        if (inferred) token.generationRule = inferred;
       }
+
+      if (!token.generationRule) continue;
+
+      const missingDeps = token.dependsOn.filter((dep) => !this.tokens.has(dep));
+      if (missingDeps.length > 0) {
+        console.warn(
+          `[TokenRegistry] Token "${token.name}" skipped in dependency graph: ` +
+            `missing dependencies [${missingDeps.join(', ')}]`,
+        );
+        continue;
+      }
+      this.dependencyGraph.addDependency(token.name, token.dependsOn, token.generationRule);
     }
   }
 
