@@ -50,22 +50,30 @@ const SCALE_POSITIONS = [
   '950',
 ] as const;
 
+/**
+ * Palette identifiers returned by colorWheel(). Distinct from the bare semantic
+ * role names so the colorWheel ColorValues do not collide with semantic tokens
+ * owned by DEFAULT_SEMANTIC_COLOR_MAPPINGS. See rafters #1440.
+ */
 const FAMILY_NAMES = [
-  'primary',
-  'secondary',
-  'tertiary',
-  'accent',
-  'highlight',
-  'neutral',
-  'muted',
-  'success',
-  'warning',
-  'destructive',
-  'info',
+  'primary-family',
+  'secondary-family',
+  'tertiary-family',
+  'accent-family',
+  'highlight-family',
+  'neutral-family',
+  'muted-family',
+  'success-family',
+  'warning-family',
+  'destructive-family',
+  'info-family',
 ] as const;
 
 /**
- * Families that have semantic token mappings in DEFAULT_SEMANTIC_COLOR_MAPPINGS.
+ * Bare semantic role names. These are owned by DEFAULT_SEMANTIC_COLOR_MAPPINGS
+ * and emitted by the semantic generator as ColorReferences (rendered as
+ * `--primary:` etc. in the Tailwind exporter). Distinct from FAMILY_NAMES.
+ *
  * tertiary and neutral are excluded:
  * - tertiary: not defined as a semantic token
  * - neutral: used indirectly via background, foreground, card tokens, not as --neutral:
@@ -182,10 +190,10 @@ describe('colorWheel -> TokenRegistry integration', () => {
       }
     });
 
-    it('every ColorValue has the token field set to its semantic role name', () => {
+    it('every ColorValue has the token field set to its palette name', () => {
       const system = colorWheel(TAILWIND_BLUE_500, 'complementary');
-      for (const [roleName, cv] of Object.entries(system)) {
-        expect(cv.token, `${roleName} missing token field`).toBe(roleName);
+      for (const [paletteName, cv] of Object.entries(system)) {
+        expect(cv.token, `${paletteName} missing token field`).toBe(paletteName);
       }
     });
   });
@@ -212,18 +220,18 @@ describe('colorWheel -> TokenRegistry integration', () => {
     });
 
     it('ingested family token value is a ColorValue with a 11-step scale', async () => {
-      // Known fixture gap (#1229/#1230): the DEFAULT_TOKENS set includes a semantic
-      // "primary" token with generationRule: "scale:900" depending on "neutral".
-      // When buildRegistry sets neutral (a later iteration), the cascade regenerates
-      // "primary" from its rule, overwriting the ColorValue with a ColorReference.
-      // The fix is to use a separate namespace for colorWheel families vs. semantic tokens.
-      // For now, assert the value is defined and skip the ColorValue shape check.
+      // After #1440 (palette-namespaced colorWheel keys), the family ColorValue
+      // lives at `${role}-family`, distinct from the semantic role token at the
+      // bare role name. No cascade clobber path: primary-family has no semantic
+      // dependents, so its ColorValue persists across the buildRegistry pass.
       const registry = await buildRegistry(TAILWIND_BLUE_500);
-      const value = registry.get('primary')?.value;
+      const value = registry.get('primary-family')?.value;
       expect(value).toBeDefined();
       expect(value).not.toBeNull();
-      // After cascade, primary may hold a ColorReference (fixture gap #1229/#1230).
-      // Either shape (ColorValue or ColorReference) is acceptable until #1229 is resolved.
+      expect(value && typeof value === 'object' && 'scale' in value).toBe(true);
+      if (value && typeof value === 'object' && 'scale' in value) {
+        expect((value as ColorValue).scale).toHaveLength(11);
+      }
     });
   });
 
@@ -240,37 +248,23 @@ describe('colorWheel -> TokenRegistry integration', () => {
       expect(fg?.value, 'primary-foreground value is undefined').toBeDefined();
     });
 
-    it('accent-foreground cascades to a new value after accent colorWheel update', async () => {
-      // Known cascade gap (#1223): when the contrast plugin has no WCAG pair data
-      // for the accent family, it falls back to the neutral family. If both the
-      // original and updated accent families produce the same neutral fallback,
-      // the before/after values appear identical even though cascade fired.
-      // Full fix tracked in #1231. For now, verify cascade does not throw.
+    it('accent-foreground cascade after accent-family colorWheel update does not throw', async () => {
+      // After #1440 (palette rename), accent-family has no semantic dependents
+      // -- DEFAULT_SEMANTIC_COLOR_MAPPINGS still points accent-foreground at the
+      // pre-rename family names. The cascade rewiring (semantic dependsOn[0]
+      // points at the implied family) lands in #1441 / #1442. For now the
+      // assertion is just that set on a colorWheel-managed family does not
+      // throw a cascade-aggregate error. #1441 will tighten this to assert the
+      // value actually changes.
       const registry = await buildRegistry(TAILWIND_BLUE_500);
       const fgBefore = JSON.stringify(registry.get('accent-foreground')?.value);
 
       const newSystem = colorWheel(BRAND_MAGENTA, 'complementary');
-      // Cascade should fire without throwing a cascade-aggregate error
-      let caughtError: unknown;
-      try {
-        await registry.set('accent', newSystem.accent);
-      } catch (e) {
-        caughtError = e;
-      }
+      await registry.set('accent-family', newSystem['accent-family']);
 
-      if (caughtError) {
-        // If cascade threw, it must be a cascade-aggregate error (not a crash)
-        expect((caughtError as Error).message).toBe('cascade failed');
-        const cause = (caughtError as Error & { cause: unknown }).cause as { code: string };
-        expect(cause.code).toBe('cascade-aggregate');
-      } else {
-        // Cascade succeeded. Value may or may not have changed depending on
-        // WCAG data availability (fixture gap #1223/#1231).
-        const fgAfter = JSON.stringify(registry.get('accent-foreground')?.value);
-        // Just verify it's still a defined value
-        expect(fgAfter).toBeDefined();
-        void fgBefore; // referenced above
-      }
+      const fgAfter = JSON.stringify(registry.get('accent-foreground')?.value);
+      expect(fgAfter).toBeDefined();
+      void fgBefore;
     });
 
     it('destructive-foreground exists and has a value', async () => {
@@ -316,10 +310,11 @@ describe('colorWheel -> TokenRegistry integration', () => {
       const token = registry.get('primary');
       const value = token?.value;
       expect(value).toBeDefined();
-      // After replacing with ColorValue, value should be a ColorValue
-      if (value && typeof value === 'object' && 'scale' in value) {
-        expect((value as ColorValue).scale.length).toBeGreaterThan(0);
-      }
+      // primary is a semantic ColorReference (rule scale:N pointing at the lightRef family).
+      // colorWheel pushes its ColorValue under primary-family; the bare primary slot stays a ref.
+      expect(value && typeof value === 'object' && 'family' in value && 'position' in value).toBe(
+        true,
+      );
     });
   });
 
@@ -409,13 +404,13 @@ describe('colorWheel -> TokenRegistry integration', () => {
   });
 
   describe('real-world seeds', () => {
-    it('Tailwind blue-500 seed: primary scale mid-tone hue stays near 259', () => {
+    it('Tailwind blue-500 seed: primary-family scale mid-tone hue stays near 259', () => {
       const system = colorWheel(TAILWIND_BLUE_500, 'complementary');
-      const primaryMid = system.primary.scale[5];
+      const primaryMid = system['primary-family'].scale[5];
       if (primaryMid) {
         expect(
           Math.abs(primaryMid.h - 259),
-          `primary mid-tone hue drifted: got ${primaryMid.h}`,
+          `primary-family mid-tone hue drifted: got ${primaryMid.h}`,
         ).toBeLessThan(15);
       }
     });

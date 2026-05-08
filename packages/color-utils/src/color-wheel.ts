@@ -22,18 +22,25 @@ export interface ColorWheelOptions {
   chromaDistribution?: 'gaussian' | 'flat';
 }
 
+/**
+ * Keys are palette identifiers (`${role}-family`), distinct from the bare
+ * semantic role names (`primary`, `accent`, etc.) owned by
+ * `DEFAULT_SEMANTIC_COLOR_MAPPINGS`. The suffix prevents a name collision when
+ * the system is pushed into a `TokenRegistry` that also has semantic role
+ * tokens. See rafters issue #1440.
+ */
 export interface SemanticColorSystem {
-  primary: ColorValue;
-  secondary: ColorValue;
-  tertiary: ColorValue;
-  accent: ColorValue;
-  highlight: ColorValue;
-  neutral: ColorValue;
-  muted: ColorValue;
-  success: ColorValue;
-  warning: ColorValue;
-  destructive: ColorValue;
-  info: ColorValue;
+  'primary-family': ColorValue;
+  'secondary-family': ColorValue;
+  'tertiary-family': ColorValue;
+  'accent-family': ColorValue;
+  'highlight-family': ColorValue;
+  'neutral-family': ColorValue;
+  'muted-family': ColorValue;
+  'success-family': ColorValue;
+  'warning-family': ColorValue;
+  'destructive-family': ColorValue;
+  'info-family': ColorValue;
 }
 
 /**
@@ -99,37 +106,39 @@ function resolveSecondaryLightness(primaryColorValue: ColorValue, primaryOklch: 
 /**
  * Full complementary color wheel.
  *
- * Roles:
- *   primary     - the seed as-is
- *   secondary   - same hue, opposite lightness end (AAA against primary), chroma * 0.33
- *   accent      - complement (+180), full chroma
- *   tertiary    - CTA from complement hue, chroma * 1.2 (max 0.30), L clamped 0.45-0.65
- *   highlight   - secondary math applied to tertiary hue
- *   neutral     - seed hue, chroma * 0.02, L = 0.50
- *   muted       - seed hue, chroma * 0.05, L = 0.85
- *   success     - hue 145, L 0.55, C = min(0.18, seed.c * 0.9)
- *   warning     - hue 85,  L 0.75, C = min(0.18, seed.c * 0.9)
- *   destructive - hue 25,  L 0.55, C = min(0.20, seed.c)
- *   info        - hue 230, L 0.58, C = min(0.15, seed.c * 0.85)
+ * Palettes (returned under `${role}-family` keys):
+ *   primary-family     - the seed as-is
+ *   secondary-family   - same hue, opposite lightness end (AAA against primary), chroma * 0.33
+ *   accent-family      - complement (+180), full chroma
+ *   tertiary-family    - CTA from complement hue, chroma * 1.2 (max 0.30), L clamped 0.45-0.65
+ *   highlight-family   - secondary math applied to tertiary hue
+ *   neutral-family     - seed hue, chroma * 0.02, L = 0.50
+ *   muted-family       - seed hue, chroma * 0.05, L = 0.85
+ *   success-family     - hue 145, L 0.55, C = min(0.18, seed.c * 0.9)
+ *   warning-family     - hue 85,  L 0.75, C = min(0.18, seed.c * 0.9)
+ *   destructive-family - hue 25,  L 0.55, C = min(0.20, seed.c)
+ *   info-family        - hue 230, L 0.58, C = min(0.15, seed.c * 0.85)
  */
 function complementaryWheel(seed: OKLCH, options: ColorWheelOptions): SemanticColorSystem {
   const useGaussian = (options.chromaDistribution ?? 'gaussian') === 'gaussian';
   const alpha = seed.alpha ?? 1;
 
-  // primary: exact designer seed
-  const primaryColorValue = buildColorValue(seed, { token: 'primary' });
+  // primary-family: exact designer seed
+  const primaryColorValue = buildColorValue(seed, { token: 'primary-family' });
 
-  // secondary: same hue, AAA-verified lightness from primary matrix, chroma * 0.33
+  // secondary-family: same hue, AAA-verified lightness from primary matrix, chroma * 0.33
   const secondaryL = resolveSecondaryLightness(primaryColorValue, seed);
   const secondaryOklch: OKLCH = { l: secondaryL, c: seed.c * 0.33, h: seed.h, alpha };
   const secondaryFinal = useGaussian ? applyGaussianChroma(secondaryOklch) : secondaryOklch;
-  const secondaryColorValue = buildColorValue(roundOKLCH(secondaryFinal), { token: 'secondary' });
+  const secondaryColorValue = buildColorValue(roundOKLCH(secondaryFinal), {
+    token: 'secondary-family',
+  });
 
-  // accent: pure complement, full chroma -- no gaussian (needs full chroma)
+  // accent-family: pure complement, full chroma -- no gaussian (needs full chroma)
   const accentOklch = adjustHue(seed, 180);
-  const accentColorValue = buildColorValue(accentOklch, { token: 'accent' });
+  const accentColorValue = buildColorValue(accentOklch, { token: 'accent-family' });
 
-  // tertiary: CTA from complement hue, chroma boosted but capped, mid lightness
+  // tertiary-family: CTA from complement hue, chroma boosted but capped, mid lightness
   const tertiaryRaw: OKLCH = {
     l: Math.max(0.45, Math.min(0.65, seed.l)),
     c: Math.min(0.3, seed.c * 1.2),
@@ -137,9 +146,11 @@ function complementaryWheel(seed: OKLCH, options: ColorWheelOptions): SemanticCo
     alpha,
   };
   const tertiaryFinal = useGaussian ? applyGaussianChroma(tertiaryRaw) : tertiaryRaw;
-  const tertiaryColorValue = buildColorValue(roundOKLCH(tertiaryFinal), { token: 'tertiary' });
+  const tertiaryColorValue = buildColorValue(roundOKLCH(tertiaryFinal), {
+    token: 'tertiary-family',
+  });
 
-  // highlight: secondary math applied to tertiary hue
+  // highlight-family: secondary math applied to tertiary hue
   // AAA lightness from the tertiary's accessibility matrix, same desaturation as secondary.
   const highlightL = resolveSecondaryLightness(tertiaryColorValue, tertiaryFinal);
   const highlightOklch: OKLCH = {
@@ -149,48 +160,50 @@ function complementaryWheel(seed: OKLCH, options: ColorWheelOptions): SemanticCo
     alpha,
   };
   const highlightFinal = useGaussian ? applyGaussianChroma(highlightOklch) : highlightOklch;
-  const highlightColorValue = buildColorValue(roundOKLCH(highlightFinal), { token: 'highlight' });
+  const highlightColorValue = buildColorValue(roundOKLCH(highlightFinal), {
+    token: 'highlight-family',
+  });
 
-  // neutral: seed hue, very low chroma, mid lightness
+  // neutral-family: seed hue, very low chroma, mid lightness
   const neutralOklch: OKLCH = { l: 0.5, c: seed.c * 0.02, h: seed.h, alpha };
   const neutralFinal = useGaussian ? applyGaussianChroma(neutralOklch) : neutralOklch;
-  const neutralColorValue = buildColorValue(roundOKLCH(neutralFinal), { token: 'neutral' });
+  const neutralColorValue = buildColorValue(roundOKLCH(neutralFinal), { token: 'neutral-family' });
 
-  // muted: seed hue, slightly more chroma than neutral, high lightness
+  // muted-family: seed hue, slightly more chroma than neutral, high lightness
   const mutedOklch: OKLCH = { l: 0.85, c: seed.c * 0.05, h: seed.h, alpha };
   const mutedFinal = useGaussian ? applyGaussianChroma(mutedOklch) : mutedOklch;
-  const mutedColorValue = buildColorValue(roundOKLCH(mutedFinal), { token: 'muted' });
+  const mutedColorValue = buildColorValue(roundOKLCH(mutedFinal), { token: 'muted-family' });
 
-  // status colors -- no gaussian, must stay recognizable
+  // status families -- no gaussian, must stay recognizable
   const successColorValue = buildColorValue(
     roundOKLCH({ l: 0.55, c: Math.min(0.18, seed.c * 0.9), h: 145, alpha }),
-    { token: 'success' },
+    { token: 'success-family' },
   );
   const warningColorValue = buildColorValue(
     roundOKLCH({ l: 0.75, c: Math.min(0.18, seed.c * 0.9), h: 85, alpha }),
-    { token: 'warning' },
+    { token: 'warning-family' },
   );
   const destructiveColorValue = buildColorValue(
     roundOKLCH({ l: 0.55, c: Math.min(0.2, seed.c), h: 25, alpha }),
-    { token: 'destructive' },
+    { token: 'destructive-family' },
   );
   const infoColorValue = buildColorValue(
     roundOKLCH({ l: 0.58, c: Math.min(0.15, seed.c * 0.85), h: 230, alpha }),
-    { token: 'info' },
+    { token: 'info-family' },
   );
 
   return {
-    primary: primaryColorValue,
-    secondary: secondaryColorValue,
-    tertiary: tertiaryColorValue,
-    accent: accentColorValue,
-    highlight: highlightColorValue,
-    neutral: neutralColorValue,
-    muted: mutedColorValue,
-    success: successColorValue,
-    warning: warningColorValue,
-    destructive: destructiveColorValue,
-    info: infoColorValue,
+    'primary-family': primaryColorValue,
+    'secondary-family': secondaryColorValue,
+    'tertiary-family': tertiaryColorValue,
+    'accent-family': accentColorValue,
+    'highlight-family': highlightColorValue,
+    'neutral-family': neutralColorValue,
+    'muted-family': mutedColorValue,
+    'success-family': successColorValue,
+    'warning-family': warningColorValue,
+    'destructive-family': destructiveColorValue,
+    'info-family': infoColorValue,
   };
 }
 
@@ -215,8 +228,8 @@ function complementaryWheel(seed: OKLCH, options: ColorWheelOptions): SemanticCo
  *   'complementary'
  * );
  *
- * console.log(system.primary.name);   // e.g. "slate-bold-sapphire"
- * console.log(system.destructive.accessibility?.onWhite.wcagAAA); // true/false
+ * console.log(system['primary-family'].name);   // e.g. "slate-bold-sapphire"
+ * console.log(system['destructive-family'].accessibility?.onWhite.wcagAAA); // true/false
  * ```
  */
 export function colorWheel(
