@@ -441,27 +441,30 @@ export async function regenerate(registry: TokenRegistry, tokenName: string): Pr
 // ---------------------------------------------------------------------------
 
 /**
- * Walk the dependents of changedTokenName in topological order, regenerating
- * each one. Collects per-node failures. Throws a structured aggregate error
- * if any node failed.
+ * Walk the transitive dependents of changedTokenName in topological order,
+ * regenerating each. Fail-fast: the first node that throws propagates as a
+ * structured error. No collect-and-continue (April 13 doctrine; #1242
+ * invariant: no per-dependent aggregate; the previous cascade-aggregate
+ * collection was itself a #1242 violation per audit severity 5).
  *
- * Never swallows errors with console.warn.
+ * The thrown Error carries `cause: { code: 'cascade-failure', tokenName,
+ * trigger, original }` so callers can read the failed node and the originating
+ * trigger without losing the underlying cause.
  */
 export async function cascade(registry: TokenRegistry, changedTokenName: string): Promise<void> {
-  const failures: Array<{ tokenName: string; cause: unknown }> = [];
-
   for (const dep of registry.topologicalDependents(changedTokenName)) {
     try {
       await regenerate(registry, dep);
     } catch (e) {
-      failures.push({ tokenName: dep, cause: e });
+      throw new Error(`cascade failed at ${dep} (trigger: ${changedTokenName})`, {
+        cause: {
+          code: 'cascade-failure',
+          tokenName: dep,
+          trigger: changedTokenName,
+          original: e,
+        },
+      });
     }
-  }
-
-  if (failures.length > 0) {
-    throw new Error('cascade failed', {
-      cause: { code: 'cascade-aggregate', failures },
-    });
   }
 }
 

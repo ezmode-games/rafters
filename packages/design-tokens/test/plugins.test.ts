@@ -339,8 +339,8 @@ describe('regenerate: input.parse failure = rule does not apply', () => {
 // cascade: aggregate error
 // ---------------------------------------------------------------------------
 
-describe('cascade: aggregate error', () => {
-  it('throws aggregate error when any dependent fails to regenerate', async () => {
+describe('cascade: fail-fast on first dependent failure', () => {
+  it('throws structured error pointing at the failing node', async () => {
     const registry = new TokenRegistry();
     const cv = makeColorValue('test-blue', 240);
 
@@ -384,21 +384,21 @@ describe('cascade: aggregate error', () => {
 
     const err = await cascade(registry, 'test-family').catch((e: unknown) => e);
     expect(err).toBeInstanceOf(Error);
-    expect((err as Error).message).toBe('cascade failed');
+    expect((err as Error).message).toMatch(/^cascade failed at /);
     const cause = (err as Error & { cause: unknown }).cause as {
       code: string;
-      failures: Array<{ tokenName: string; cause: unknown }>;
+      tokenName: string;
+      trigger: string;
+      original: unknown;
     };
-    expect(cause.code).toBe('cascade-aggregate');
-    expect(Array.isArray(cause.failures)).toBe(true);
-    expect(cause.failures.length).toBeGreaterThan(0);
-    for (const failure of cause.failures) {
-      expect(typeof failure.tokenName).toBe('string');
-      expect(failure.cause).toBeDefined();
-    }
+    expect(cause.code).toBe('cascade-failure');
+    expect(typeof cause.tokenName).toBe('string');
+    expect(cause.tokenName.length).toBeGreaterThan(0);
+    expect(cause.trigger).toBe('test-family');
+    expect(cause.original).toBeDefined();
   });
 
-  it('includes all failed tokens in cause.failures', async () => {
+  it('reports the first failing dependent in topological order', async () => {
     const registry = new TokenRegistry();
     registry.add({ name: 'root', value: '1', category: 'spacing', namespace: 'spacing' });
     registry.add({
@@ -434,12 +434,16 @@ describe('cascade: aggregate error', () => {
     expect(err).toBeInstanceOf(Error);
     const cause = (err as Error & { cause: unknown }).cause as {
       code: string;
-      failures: Array<{ tokenName: string; cause: unknown }>;
+      tokenName: string;
+      trigger: string;
+      original: unknown;
     };
-    expect(cause.code).toBe('cascade-aggregate');
-    const failedNames = cause.failures.map((f) => f.tokenName);
-    expect(failedNames).toContain('dep-a');
-    expect(failedNames).toContain('dep-b');
+    expect(cause.code).toBe('cascade-failure');
+    // First failing dependent in topo order; either dep-a or dep-b is acceptable
+    // since they are at the same depth -- the point is that cascade did not
+    // collect both into an aggregate.
+    expect(['dep-a', 'dep-b']).toContain(cause.tokenName);
+    expect(cause.trigger).toBe('root');
   });
 });
 

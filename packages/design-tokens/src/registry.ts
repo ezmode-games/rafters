@@ -483,14 +483,18 @@ export class TokenRegistry {
   }
 
   /**
-   * Return the dependents of changedTokenName in topological order.
-   * Used by plugins.cascade to walk the graph without skipping levels.
+   * Transitive dependents of changedTokenName in topological order. Walks the
+   * full descendant subgraph by inverting forward edges, then orders the reach
+   * set by the global topo sort so cascade visits parents before children.
+   *
+   * The previous one-hop implementation (filtered direct dependents only) was
+   * the audit-severity-5 cascade gap reported in #1242 / reflection 019e03a2.
    */
   topologicalDependents(changedTokenName: string): string[] {
-    const dependents = this.dependencyGraph.getDependents(changedTokenName);
-    if (dependents.length === 0) return [];
+    const reach = this.dependencyGraph.getTransitiveDependents(changedTokenName);
+    if (reach.size === 0) return [];
     const sortedAll = this.dependencyGraph.topologicalSort();
-    return sortedAll.filter((name) => dependents.includes(name));
+    return sortedAll.filter((name) => reach.has(name));
   }
 
   /**

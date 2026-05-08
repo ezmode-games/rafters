@@ -1,17 +1,20 @@
 /**
- * Token Dependency Tracking System for Smart Regeneration
+ * Token Dependency Graph.
  *
- * Implements intelligent dependency tracking that automatically identifies which tokens
- * depend on other tokens, enabling smart regeneration when base tokens change.
- * Includes integrated rule engine for automatic token value computation.
+ * Stores forward edges only. `dependsOn` is truth; `dependents` is derived
+ * on-read by inverting the forward edges. The previous shape stored both as
+ * peers (rafters #1441 / #1242 / reflection 019e03a2 -- the original sin from
+ * Sept 2025 commit c58c1f84) which let the inverse drift out of sync with the
+ * forward edges and produced the audit-severity-5 cascade-one-hop bug.
  */
 
 import { GenerationRuleParser } from './generation-rules';
 
 export interface TokenDependency {
-  dependsOn: string[]; // Tokens this token depends on
-  dependents: string[]; // Tokens that depend on this token
-  generationRule: string; // How this token is generated from dependencies
+  /** Forward edge -- the parent tokens this token derives from. Truth. */
+  dependsOn: string[];
+  /** How the token is generated from its dependencies (plugin rule string). */
+  generationRule: string;
 }
 
 export class TokenDependencyGraph {
@@ -20,72 +23,70 @@ export class TokenDependencyGraph {
   private ruleParser = new GenerationRuleParser();
 
   /**
-   * Add dependency relationship with generation rule
+   * Add a dependency relationship with a generation rule. Replaces any
+   * previous edges for `tokenName`.
    */
   addDependency(tokenName: string, dependsOn: string[], rule: string): void {
-    // Clear sort cache since we're modifying the graph
     this._sortCache = null;
 
-    // Deduplicate dependencies
     const uniqueDependsOn = [...new Set(dependsOn)];
 
-    // Check for circular dependencies before adding
     if (this.wouldCreateCircularDependency(tokenName, uniqueDependsOn)) {
       throw new Error('Circular dependency detected');
     }
 
-    // Get or create dependency entry for this token
-    const existing = this.dependencies.get(tokenName) || {
-      dependsOn: [],
-      dependents: [],
+    this.dependencies.set(tokenName, {
+      dependsOn: uniqueDependsOn,
       generationRule: rule,
-    };
+    });
 
-    // Store old dependencies for cleanup
-    const oldDependsOn = [...existing.dependsOn];
-
-    // Update the token's dependencies
-    existing.dependsOn = [...uniqueDependsOn];
-    existing.generationRule = rule;
-    this.dependencies.set(tokenName, existing);
-
-    // Update dependent relationships for all tokens this token depends on
+    // Ensure every dependency target has at least an empty entry so the graph
+    // tracks it (even if the dep itself has no upstream).
     for (const depToken of uniqueDependsOn) {
-      const depEntry = this.dependencies.get(depToken) || {
-        dependsOn: [],
-        dependents: [],
-        generationRule: '',
-      };
-
-      // Add this token as a dependent if not already present
-      if (!depEntry.dependents.includes(tokenName)) {
-        depEntry.dependents.push(tokenName);
+      if (!this.dependencies.has(depToken)) {
+        this.dependencies.set(depToken, { dependsOn: [], generationRule: '' });
       }
-
-      this.dependencies.set(depToken, depEntry);
     }
+  }
 
-    // Remove this token from dependents of tokens it no longer depends on
-    for (const oldDep of oldDependsOn) {
-      if (!uniqueDependsOn.includes(oldDep)) {
-        const depEntry = this.dependencies.get(oldDep);
-        if (depEntry) {
-          depEntry.dependents = depEntry.dependents.filter((dep) => dep !== tokenName);
+  /**
+   * Direct (one-hop) dependents. Derived by scanning forward edges; not stored.
+   * For transitive descendants (full cascade reach) call `getTransitiveDependents`.
+   */
+  getDependents(tokenName: string): string[] {
+    const dependents: string[] = [];
+    for (const [name, entry] of this.dependencies.entries()) {
+      if (entry.dependsOn.includes(tokenName)) {
+        dependents.push(name);
+      }
+    }
+    return dependents;
+  }
+
+  /**
+   * All transitive descendants of `tokenName` -- every token whose evaluation
+   * depends, directly or indirectly, on `tokenName`. Walked via repeated
+   * forward-edge inversion. Used by cascade so a single `set` propagates
+   * through the entire downstream subgraph rather than stopping at depth 1.
+   */
+  getTransitiveDependents(tokenName: string): Set<string> {
+    const reach = new Set<string>();
+    const queue: string[] = [tokenName];
+    while (queue.length > 0) {
+      const cur = queue.shift();
+      if (cur === undefined) break;
+      for (const direct of this.getDependents(cur)) {
+        if (!reach.has(direct)) {
+          reach.add(direct);
+          queue.push(direct);
         }
       }
     }
+    return reach;
   }
 
   /**
-   * Get all tokens that depend on this token
-   */
-  getDependents(tokenName: string): string[] {
-    const entry = this.dependencies.get(tokenName);
-    return entry ? [...entry.dependents] : [];
-  }
-
-  /**
-   * Get all tokens this token depends on
+   * Tokens this token depends on (direct upstream).
    */
   getDependencies(tokenName: string): string[] {
     const entry = this.dependencies.get(tokenName);
@@ -93,19 +94,18 @@ export class TokenDependencyGraph {
   }
 
   /**
-   * Get how this token is generated
+   * Generation rule string for `tokenName`, or undefined if none.
    */
   getGenerationRule(tokenName: string): string | undefined {
     const entry = this.dependencies.get(tokenName);
-    return entry?.generationRule;
+    if (!entry || !entry.generationRule) return undefined;
+    return entry.generationRule;
   }
 
   /**
-   * Return tokens in dependency order for regeneration
-   * Uses depth-first search for topological sorting with caching
+   * Topological sort over the entire graph. Dependencies come before dependents.
    */
   topologicalSort(): string[] {
-    // Return cached result if available
     if (this._sortCache !== null) {
       return [...this._sortCache];
     }
@@ -114,19 +114,14 @@ export class TokenDependencyGraph {
     const visited = new Set<string>();
     const visiting = new Set<string>();
 
-    // Get all tokens in the dependency graph
     const allTokens = new Set<string>();
     for (const [token, dep] of this.dependencies.entries()) {
       allTokens.add(token);
       for (const t of dep.dependsOn) {
         allTokens.add(t);
       }
-      for (const t of dep.dependents) {
-        allTokens.add(t);
-      }
     }
 
-    // Depth-first search with cycle detection
     const visit = (token: string): void => {
       if (visiting.has(token)) {
         throw new Error('Circular dependency detected during topological sort');
@@ -137,9 +132,7 @@ export class TokenDependencyGraph {
 
       visiting.add(token);
 
-      // Visit all dependencies first
-      const dependencies = this.getDependencies(token);
-      for (const dep of dependencies) {
+      for (const dep of this.getDependencies(token)) {
         visit(dep);
       }
 
@@ -148,171 +141,86 @@ export class TokenDependencyGraph {
       result.push(token);
     };
 
-    // Visit all tokens
     for (const token of allTokens) {
       if (!visited.has(token)) {
         visit(token);
       }
     }
 
-    // Cache the result
     this._sortCache = [...result];
     return result;
   }
 
   /**
-   * Check if adding dependencies would create a circular dependency
+   * Detects whether adding the proposed edges would introduce a cycle.
    */
   private wouldCreateCircularDependency(tokenName: string, dependsOn: string[]): boolean {
-    // Create a temporary graph with the new dependency
     const tempDependencies = new Map(this.dependencies);
-
-    // Add the new dependency temporarily
-    const existing = tempDependencies.get(tokenName) || {
-      dependsOn: [],
-      dependents: [],
-      generationRule: '',
-    };
-
-    const newEntry = {
+    const existing = tempDependencies.get(tokenName) ?? { dependsOn: [], generationRule: '' };
+    tempDependencies.set(tokenName, {
       ...existing,
-      dependsOn: [...new Set(dependsOn)], // Deduplicate here too
-    };
-    tempDependencies.set(tokenName, newEntry);
+      dependsOn: [...new Set(dependsOn)],
+    });
 
-    // Check for cycles using DFS
-    const visited = new Set<string>();
-    const visiting = new Set<string>();
-
-    const hasCycle = (token: string): boolean => {
-      if (visiting.has(token)) {
-        return true; // Found a back edge, cycle detected
-      }
-      if (visited.has(token)) {
-        return false;
-      }
-
-      visiting.add(token);
-
-      const deps = tempDependencies.get(token)?.dependsOn || [];
-      for (const dep of deps) {
-        if (hasCycle(dep)) {
-          return true;
-        }
-      }
-
-      visiting.delete(token);
-      visited.add(token);
-      return false;
-    };
-
-    // Check all tokens for cycles
-    for (const token of tempDependencies.keys()) {
-      visited.clear();
-      visiting.clear();
-      if (hasCycle(token)) {
-        return true;
-      }
-    }
-
-    return false;
+    return this.detectCycle(tempDependencies);
   }
 
-  /**
-   * Check if adding a batch of dependencies would create circular dependencies
-   */
   private wouldCreateCircularDependencyBatch(
     dependencies: Array<{ tokenName: string; dependsOn: string[]; rule: string }>,
   ): boolean {
-    // Create a temporary graph with all the new dependencies
     const tempDependencies = new Map(this.dependencies);
-
-    // Add all new dependencies to the temporary graph
     for (const { tokenName, dependsOn } of dependencies) {
-      const uniqueDependsOn = [...new Set(dependsOn)];
-      const existing = tempDependencies.get(tokenName) || {
-        dependsOn: [],
-        dependents: [],
-        generationRule: '',
-      };
-
+      const existing = tempDependencies.get(tokenName) ?? { dependsOn: [], generationRule: '' };
       tempDependencies.set(tokenName, {
         ...existing,
-        dependsOn: uniqueDependsOn,
+        dependsOn: [...new Set(dependsOn)],
       });
     }
+    return this.detectCycle(tempDependencies);
+  }
 
-    // Check for cycles using DFS
+  private detectCycle(graph: Map<string, TokenDependency>): boolean {
     const visited = new Set<string>();
     const visiting = new Set<string>();
 
     const hasCycle = (token: string): boolean => {
-      if (visiting.has(token)) {
-        return true; // Found a back edge, cycle detected
-      }
-      if (visited.has(token)) {
-        return false;
-      }
+      if (visiting.has(token)) return true;
+      if (visited.has(token)) return false;
 
       visiting.add(token);
-
-      const deps = tempDependencies.get(token)?.dependsOn || [];
+      const deps = graph.get(token)?.dependsOn ?? [];
       for (const dep of deps) {
-        if (hasCycle(dep)) {
-          return true;
-        }
+        if (hasCycle(dep)) return true;
       }
-
       visiting.delete(token);
       visited.add(token);
       return false;
     };
 
-    // Check all tokens for cycles
-    for (const token of tempDependencies.keys()) {
+    for (const token of graph.keys()) {
       visited.clear();
       visiting.clear();
-      if (hasCycle(token)) {
-        return true;
-      }
+      if (hasCycle(token)) return true;
     }
-
     return false;
   }
 
   /**
-   * Remove a token and all its dependency relationships
+   * Remove a token. Forward edges from the token are dropped; tokens that
+   * formerly depended on it now have a stale `dependsOn` reference, which
+   * `validate()` will surface.
    */
   removeToken(tokenName: string): void {
     this._sortCache = null;
-
-    const entry = this.dependencies.get(tokenName);
-    if (!entry) {
-      return; // Token doesn't exist
+    if (!this.dependencies.has(tokenName)) {
+      return;
     }
-
-    // Remove this token from all its dependencies' dependents lists
-    for (const depToken of entry.dependsOn) {
-      const depEntry = this.dependencies.get(depToken);
-      if (depEntry) {
-        depEntry.dependents = depEntry.dependents.filter((dep) => dep !== tokenName);
-      }
-    }
-
-    // Remove this token from all its dependents' dependencies lists
-    for (const dependentToken of entry.dependents) {
-      const dependentEntry = this.dependencies.get(dependentToken);
-      if (dependentEntry) {
-        dependentEntry.dependsOn = dependentEntry.dependsOn.filter((dep) => dep !== tokenName);
-      }
-    }
-
-    // Remove the token itself
     this.dependencies.delete(tokenName);
   }
 
   /**
-   * Get all tokens in the dependency graph
+   * All tokens registered in the graph, including ones that appear only as
+   * dependency targets.
    */
   getAllTokens(): string[] {
     const allTokens = new Set<string>();
@@ -321,15 +229,12 @@ export class TokenDependencyGraph {
       for (const t of dep.dependsOn) {
         allTokens.add(t);
       }
-      for (const t of dep.dependents) {
-        allTokens.add(t);
-      }
     }
     return Array.from(allTokens);
   }
 
   /**
-   * Get dependency graph size metrics
+   * Graph size metrics for diagnostics.
    */
   getMetrics(): {
     totalTokens: number;
@@ -347,12 +252,10 @@ export class TokenDependencyGraph {
     for (const token of allTokens) {
       const deps = this.getDependencies(token);
       const dependents = this.getDependents(token);
-      const tokenDeps = deps.length;
 
-      totalDependencies += tokenDeps;
-      maxDependencies = Math.max(maxDependencies, tokenDeps);
+      totalDependencies += deps.length;
+      maxDependencies = Math.max(maxDependencies, deps.length);
 
-      // Token is isolated if it has no dependencies and no dependents
       if (deps.length === 0 && dependents.length === 0) {
         isolated.push(token);
       }
@@ -368,7 +271,7 @@ export class TokenDependencyGraph {
   }
 
   /**
-   * Clear all dependencies (for testing/reset purposes)
+   * Clear the entire graph (test/reset only).
    */
   clear(): void {
     this._sortCache = null;
@@ -376,91 +279,48 @@ export class TokenDependencyGraph {
   }
 
   /**
-   * Add multiple dependencies in bulk for better performance
+   * Add multiple dependencies in a single batch. Validates the entire batch
+   * for cycles before applying any of them.
    */
   addDependencies(
     dependencies: Array<{ tokenName: string; dependsOn: string[]; rule: string }>,
   ): void {
     this._sortCache = null;
 
-    // Check for circular dependencies that would be created by the entire batch
     if (this.wouldCreateCircularDependencyBatch(dependencies)) {
       throw new Error('Circular dependency detected in bulk operation');
     }
 
-    // Add all dependencies
     for (const { tokenName, dependsOn, rule } of dependencies) {
-      // Use internal logic without the circular dependency check since we already checked
       const uniqueDependsOn = [...new Set(dependsOn)];
-
-      const existing = this.dependencies.get(tokenName) || {
-        dependsOn: [],
-        dependents: [],
+      this.dependencies.set(tokenName, {
+        dependsOn: uniqueDependsOn,
         generationRule: rule,
-      };
-
-      const oldDependsOn = [...existing.dependsOn];
-      existing.dependsOn = [...uniqueDependsOn];
-      existing.generationRule = rule;
-      this.dependencies.set(tokenName, existing);
-
-      // Update dependent relationships
+      });
       for (const depToken of uniqueDependsOn) {
-        const depEntry = this.dependencies.get(depToken) || {
-          dependsOn: [],
-          dependents: [],
-          generationRule: '',
-        };
-
-        if (!depEntry.dependents.includes(tokenName)) {
-          depEntry.dependents.push(tokenName);
-        }
-
-        this.dependencies.set(depToken, depEntry);
-      }
-
-      // Clean up old dependencies
-      for (const oldDep of oldDependsOn) {
-        if (!uniqueDependsOn.includes(oldDep)) {
-          const depEntry = this.dependencies.get(oldDep);
-          if (depEntry) {
-            depEntry.dependents = depEntry.dependents.filter((dep) => dep !== tokenName);
-          }
+        if (!this.dependencies.has(depToken)) {
+          this.dependencies.set(depToken, { dependsOn: [], generationRule: '' });
         }
       }
     }
   }
 
   /**
-   * Validate the integrity of the dependency graph
+   * Validate the graph: every token's `dependsOn` references resolve, no cycles.
+   * Bidirectional consistency is structurally guaranteed once dependents are
+   * derived (no separate field that can drift).
    */
   validate(): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
 
-    // Check for orphaned references
     for (const [tokenName, entry] of this.dependencies.entries()) {
-      // Check if all dependencies exist in some form
       for (const dep of entry.dependsOn) {
-        const depEntry = this.dependencies.get(dep);
-        if (!depEntry || !depEntry.dependents.includes(tokenName)) {
-          errors.push(
-            `Token ${tokenName} depends on ${dep} but ${dep} doesn't list ${tokenName} as dependent`,
-          );
-        }
-      }
-
-      // Check if all dependents exist in some form
-      for (const dependent of entry.dependents) {
-        const dependentEntry = this.dependencies.get(dependent);
-        if (!dependentEntry || !dependentEntry.dependsOn.includes(tokenName)) {
-          errors.push(
-            `Token ${tokenName} lists ${dependent} as dependent but ${dependent} doesn't depend on ${tokenName}`,
-          );
+        if (!this.dependencies.has(dep)) {
+          errors.push(`Token ${tokenName} depends on ${dep}, which is not in the graph`);
         }
       }
     }
 
-    // Check for cycles (this should never happen if our cycle detection works)
     try {
       this.topologicalSort();
     } catch (error) {
@@ -474,7 +334,7 @@ export class TokenDependencyGraph {
   }
 
   /**
-   * Validate a generation rule syntax
+   * Validate a generation rule string syntax.
    */
   validateRule(rule: string): { isValid: boolean; error?: string } {
     try {
@@ -486,7 +346,7 @@ export class TokenDependencyGraph {
   }
 
   /**
-   * Parse a generation rule to extract its dependencies
+   * Parse a generation rule and extract dependencies referenced in `calc()`.
    */
   parseRuleDependencies(rule: string): string[] {
     try {
@@ -496,8 +356,6 @@ export class TokenDependencyGraph {
         return parsedRule.tokens ?? [];
       }
 
-      // For other rule types, we need to infer dependencies from context
-      // These typically depend on a base token that will be determined when the rule is executed
       return [];
     } catch (error) {
       throw new Error(`Failed to parse rule dependencies: ${error}`);
@@ -505,31 +363,26 @@ export class TokenDependencyGraph {
   }
 
   /**
-   * Add dependency with automatic dependency extraction from generation rule
+   * Add a dependency where the dependsOn list is partly inferred from the
+   * rule expression.
    */
   addDependencyWithRuleParsing(
     tokenName: string,
     rule: string,
     explicitDependsOn: string[] = [],
   ): void {
-    // Validate the rule first
     const validation = this.validateRule(rule);
     if (!validation.isValid) {
       throw new Error(`Invalid generation rule: ${validation.error}`);
     }
 
-    // Extract dependencies from the rule
     const ruleDependencies = this.parseRuleDependencies(rule);
-
-    // Combine explicit dependencies with rule-extracted dependencies
     const allDependencies = [...new Set([...explicitDependsOn, ...ruleDependencies])];
-
-    // Add the dependency using the existing method
     this.addDependency(tokenName, allDependencies, rule);
   }
 
   /**
-   * Update a token's rule and automatically update its dependencies
+   * Update a token's rule, re-extracting any rule-implied dependencies.
    */
   updateTokenRule(tokenName: string, newRule: string): void {
     const existing = this.dependencies.get(tokenName);
@@ -537,25 +390,20 @@ export class TokenDependencyGraph {
       throw new Error(`Token ${tokenName} does not exist in dependency graph`);
     }
 
-    // Validate the new rule
     const validation = this.validateRule(newRule);
     if (!validation.isValid) {
       throw new Error(`Invalid generation rule: ${validation.error}`);
     }
 
-    // Extract new dependencies from the rule
     const newRuleDependencies = this.parseRuleDependencies(newRule);
-
-    // Update the dependency with the new rule and dependencies
     this.addDependency(tokenName, newRuleDependencies, newRule);
   }
 
   /**
-   * Get all tokens with generation rules
+   * All tokens that have a non-empty generation rule, with their dependencies.
    */
   getTokensWithRules(): Array<{ tokenName: string; rule: string; dependencies: string[] }> {
     const tokensWithRules: Array<{ tokenName: string; rule: string; dependencies: string[] }> = [];
-
     for (const [tokenName, dependency] of this.dependencies.entries()) {
       if (dependency.generationRule) {
         tokensWithRules.push({
@@ -565,60 +413,51 @@ export class TokenDependencyGraph {
         });
       }
     }
-
     return tokensWithRules;
   }
 
   /**
-   * Validate all generation rules in the dependency graph
+   * Validate every rule in the graph.
    */
   validateAllRules(): { isValid: boolean; errors: Array<{ tokenName: string; error: string }> } {
     const errors: Array<{ tokenName: string; error: string }> = [];
-
     for (const [tokenName, dependency] of this.dependencies.entries()) {
       if (dependency.generationRule) {
         const validation = this.validateRule(dependency.generationRule);
         if (!validation.isValid) {
           errors.push({
             tokenName,
-            error: validation.error || 'Unknown rule validation error',
+            error: validation.error ?? 'Unknown rule validation error',
           });
         }
       }
     }
-
-    return {
-      isValid: errors.length === 0,
-      errors,
-    };
+    return { isValid: errors.length === 0, errors };
   }
 
   /**
-   * Get rule types used in the dependency graph
+   * Counts of each rule type in the graph (for diagnostics).
    */
   getRuleTypeStats(): { [ruleType: string]: number } {
     const ruleTypeStats: { [ruleType: string]: number } = {};
-
     for (const dependency of this.dependencies.values()) {
       if (dependency.generationRule) {
         try {
           const parsedRule = this.ruleParser.parse(dependency.generationRule);
-          ruleTypeStats[parsedRule.type] = (ruleTypeStats[parsedRule.type] || 0) + 1;
+          ruleTypeStats[parsedRule.type] = (ruleTypeStats[parsedRule.type] ?? 0) + 1;
         } catch {
-          ruleTypeStats.invalid = (ruleTypeStats.invalid || 0) + 1;
+          ruleTypeStats.invalid = (ruleTypeStats.invalid ?? 0) + 1;
         }
       }
     }
-
     return ruleTypeStats;
   }
 
   /**
-   * Find tokens that use a specific rule type
+   * Names of tokens whose generation rule has the given type.
    */
   getTokensByRuleType(ruleType: string): string[] {
     const tokens: string[] = [];
-
     for (const [tokenName, dependency] of this.dependencies.entries()) {
       if (dependency.generationRule) {
         try {
@@ -627,11 +466,10 @@ export class TokenDependencyGraph {
             tokens.push(tokenName);
           }
         } catch {
-          // Skip invalid rules
+          // skip invalid rules
         }
       }
     }
-
     return tokens;
   }
 }
