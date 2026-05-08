@@ -3,6 +3,7 @@
  * Revolutionary dependency-aware design token system with W3C DTCG compliance
  */
 
+export * from './bootstrap.js';
 export * from './dependencies.js';
 // Exporters - convert tokens to various output formats
 export * from './exporters/index.js';
