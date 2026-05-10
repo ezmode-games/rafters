@@ -28,24 +28,13 @@ export const ALL_RATIOS = {
 
 import { z } from 'zod';
 
-export const RatioNameSchema = z.enum([
-  'golden',
-  'major-third',
-  'minor-third',
-  'perfect-fourth',
-  'perfect-fifth',
-  'augmented-fourth',
-  'major-second',
-  'minor-second',
-]);
-export type RatioName = z.infer<typeof RatioNameSchema>;
+// Projection of ALL_RATIOS keys; the const is the generator and source of truth.
+const RATIO_NAME_KEYS = Object.keys(ALL_RATIOS) as Array<keyof typeof ALL_RATIOS>;
 
-// Compile-time guard: keys in ALL_RATIOS must match RatioNameSchema.
-type _RatioNameFromConst = keyof typeof ALL_RATIOS;
-type _AssertRatioNameExhaustive = _RatioNameFromConst extends RatioName
-  ? RatioName extends _RatioNameFromConst
-    ? true
-    : never
-  : never;
-const _ratioNameExhaustive: _AssertRatioNameExhaustive = true;
-void _ratioNameExhaustive;
+export const RatioNameSchema = z.enum(
+  RATIO_NAME_KEYS as unknown as [
+    (typeof RATIO_NAME_KEYS)[number],
+    ...Array<(typeof RATIO_NAME_KEYS)[number]>,
+  ],
+);
+export type RatioName = z.infer<typeof RatioNameSchema>;

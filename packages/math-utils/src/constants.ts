@@ -50,41 +50,22 @@ export const ALL_RATIOS = {
   ...MATHEMATICAL_CONSTANTS,
 } as const;
 
-export const ProgressionTypeSchema = z.enum([
+// Projection of MUSICAL_RATIOS + MATHEMATICAL_CONSTANTS keys. Generators are the
+// source of truth; this schema follows whatever they declare.
+const PROGRESSION_TYPE_KEYS = [
   'linear',
   'exponential',
-  'minor-second',
-  'major-second',
-  'minor-third',
-  'major-third',
-  'perfect-fourth',
-  'augmented-fourth',
-  'perfect-fifth',
-  'golden',
-  'golden-ratio',
-  'sqrt2',
-  'sqrt3',
-  'sqrt5',
-  'e',
-  'pi',
-  'silver',
-]);
-export type ProgressionType = z.infer<typeof ProgressionTypeSchema>;
+  ...(Object.keys(MUSICAL_RATIOS) as Array<keyof typeof MUSICAL_RATIOS>),
+  ...(Object.keys(MATHEMATICAL_CONSTANTS) as Array<keyof typeof MATHEMATICAL_CONSTANTS>),
+] as const;
 
-// Compile-time guard: if a ratio is added to MUSICAL_RATIOS or MATHEMATICAL_CONSTANTS
-// without updating ProgressionTypeSchema above, this assertion fails.
-type _ProgressionTypeFromConsts =
-  | 'linear'
-  | 'exponential'
-  | keyof typeof MUSICAL_RATIOS
-  | keyof typeof MATHEMATICAL_CONSTANTS;
-type _AssertProgressionTypeExhaustive = _ProgressionTypeFromConsts extends ProgressionType
-  ? ProgressionType extends _ProgressionTypeFromConsts
-    ? true
-    : never
-  : never;
-const _progressionTypeExhaustive: _AssertProgressionTypeExhaustive = true;
-void _progressionTypeExhaustive;
+export const ProgressionTypeSchema = z.enum(
+  PROGRESSION_TYPE_KEYS as unknown as [
+    (typeof PROGRESSION_TYPE_KEYS)[number],
+    ...Array<(typeof PROGRESSION_TYPE_KEYS)[number]>,
+  ],
+);
+export type ProgressionType = z.infer<typeof ProgressionTypeSchema>;
 
 // Pre-compute available ratios string to avoid repeated computation
 const AVAILABLE_RATIOS_STRING = Object.keys(ALL_RATIOS).join(', ');

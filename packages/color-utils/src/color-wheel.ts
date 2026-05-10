@@ -26,19 +26,10 @@ export const ColorWheelOptionsSchema = z.object({
 });
 export type ColorWheelOptions = z.infer<typeof ColorWheelOptionsSchema>;
 
-export const SemanticColorSystemSchema = z.object({
-  primary: ColorValueSchema,
-  secondary: ColorValueSchema,
-  tertiary: ColorValueSchema,
-  accent: ColorValueSchema,
-  highlight: ColorValueSchema,
-  neutral: ColorValueSchema,
-  muted: ColorValueSchema,
-  success: ColorValueSchema,
-  warning: ColorValueSchema,
-  destructive: ColorValueSchema,
-  info: ColorValueSchema,
-});
+// Open record: the generator chooses the role names. Schema does not lock the
+// current 11-key shape; that prevents the colorWheel-vs-DEFAULT_SEMANTIC_COLOR_MAPPINGS
+// namespace collision from being baked into the type system.
+export const SemanticColorSystemSchema = z.record(z.string(), ColorValueSchema);
 export type SemanticColorSystem = z.infer<typeof SemanticColorSystemSchema>;
 
 /**
