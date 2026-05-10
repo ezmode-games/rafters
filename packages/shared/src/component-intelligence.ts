@@ -44,6 +44,7 @@
  */
 
 import { parse, type Spec } from 'comment-parser';
+import { z } from 'zod';
 
 // ==================== Types ====================
 
@@ -70,16 +71,31 @@ export interface JSDocIntelligence {
 }
 
 /**
- * Component category for organization
+ * A component category is a label + description. The library ships a default
+ * registry covering the rafters component taxonomy; consumers may use, extend,
+ * or replace it. Built-in and user-defined categories are structurally identical.
  */
-export type ComponentCategory =
-  | 'layout'
-  | 'form'
-  | 'feedback'
-  | 'navigation'
-  | 'overlay'
-  | 'data-display'
-  | 'utility';
+export const ComponentCategorySchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+});
+export type ComponentCategory = z.infer<typeof ComponentCategorySchema>;
+
+export const DEFAULT_COMPONENT_CATEGORIES: ComponentCategory[] = [
+  { name: 'layout', description: 'Components for structuring and organizing content' },
+  { name: 'form', description: 'Input controls and form elements' },
+  { name: 'feedback', description: 'Status indicators and user feedback' },
+  { name: 'navigation', description: 'Wayfinding and navigation components' },
+  { name: 'overlay', description: 'Modals, dialogs, and overlay components' },
+  { name: 'data-display', description: 'Components for displaying data and content' },
+  { name: 'utility', description: 'Helper and utility components' },
+];
+
+/** Look up a category by name in a registry. Returns undefined if not found. */
+export const findComponentCategory = (
+  registry: readonly ComponentCategory[],
+  name: string,
+): ComponentCategory | undefined => registry.find((c) => c.name === name);
 
 /**
  * Structured dependency information extracted from JSDoc tags
@@ -103,8 +119,8 @@ export interface ComponentMetadata {
   displayName: string;
   /** Brief description from JSDoc */
   description?: string;
-  /** Component category */
-  category: ComponentCategory;
+  /** Category name -- reference into a ComponentCategory registry */
+  category: string;
   /** Intelligence metadata */
   intelligence?: JSDocIntelligence;
   /** Available variants */
