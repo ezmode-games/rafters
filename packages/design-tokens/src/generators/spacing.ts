@@ -8,7 +8,7 @@
  * Default spacing values are provided by the orchestrator from defaults.ts.
  */
 
-import { generateProgression, getRatio } from '@rafters/math-utils';
+import { generateSequence, ratioValue, resolveRatio } from '@rafters/math-utils';
 import type { Token } from '@rafters/shared';
 import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
 import { SPACING_SCALE } from './types.js';
@@ -24,15 +24,9 @@ export function generateSpacingTokens(
   const timestamp = new Date().toISOString();
   const { baseSpacingUnit, progressionRatio } = config;
 
-  // Get the actual ratio value for reference
-  const ratioValue = getRatio(progressionRatio);
-
-  // Generate the progression for reference (used in documentation)
-  const progression = generateProgression(progressionRatio as 'minor-third', {
-    baseValue: baseSpacingUnit,
-    steps: 10,
-    includeZero: true,
-  });
+  const ratio = resolveRatio(progressionRatio);
+  const ratioVal = ratioValue(ratio);
+  const progression = generateSequence(ratio, baseSpacingUnit, 10, { includeZero: true });
 
   // Base unit token - the foundation everything else derives from
   // Convert px to rem (assuming 16px root font size)
@@ -125,14 +119,14 @@ export function generateSpacingTokens(
     name: 'spacing-progression',
     value: JSON.stringify({
       ratio: progressionRatio,
-      ratioValue,
+      ratioValue: ratioVal,
       baseUnit: baseSpacingUnit,
       sample: progression.map((v) => Math.round(v * 100) / 100),
     }),
     category: 'spacing',
     namespace: 'spacing',
     semanticMeaning: 'Metadata about the spacing progression system',
-    description: `Spacing uses ${progressionRatio} progression (ratio ${ratioValue}) from base ${baseRem}rem. Sample values: ${progression
+    description: `Spacing uses ${progressionRatio} progression (ratio ${ratioVal}) from base ${baseRem}rem. Sample values: ${progression
       .slice(0, 5)
       .map((v) => Math.round(v))
       .join(', ')}...`,

@@ -8,7 +8,7 @@
  * Default typography values are provided by the orchestrator from defaults.ts.
  */
 
-import { generateModularScale, getRatio } from '@rafters/math-utils';
+import { generateModularScale, ratioValue, resolveRatio } from '@rafters/math-utils';
 import type { Token } from '@rafters/shared';
 import type { FontWeightDef, TypographyScaleDef } from './defaults.js';
 import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
@@ -26,10 +26,11 @@ export function generateTypographyTokens(
   const timestamp = new Date().toISOString();
   const { baseFontSize, fontFamily, monoFontFamily, progressionRatio } = config;
 
-  const ratioValue = getRatio(progressionRatio);
+  const ratio = resolveRatio(progressionRatio);
+  const ratioVal = ratioValue(ratio);
 
   // Generate modular scale for font sizes
-  const modularScale = generateModularScale(progressionRatio as 'minor-third', baseFontSize, 6);
+  const modularScale = generateModularScale(ratio, baseFontSize, 6);
 
   // Map scale positions to computed sizes using the typography scale definitions
   const fontSizes: Record<string, number> = {};
@@ -41,11 +42,11 @@ export function generateTypographyTokens(
     } else if (step < 0) {
       // Smaller sizes
       const idx = modularScale.smaller.length - Math.abs(step);
-      fontSizes[scale] = modularScale.smaller[idx] ?? baseFontSize * ratioValue ** step;
+      fontSizes[scale] = modularScale.smaller[idx] ?? baseFontSize * ratioVal ** step;
     } else {
       // Larger sizes
       const idx = step - 1;
-      fontSizes[scale] = modularScale.larger[idx] ?? baseFontSize * ratioValue ** step;
+      fontSizes[scale] = modularScale.larger[idx] ?? baseFontSize * ratioVal ** step;
     }
   }
 
@@ -172,7 +173,7 @@ export function generateTypographyTokens(
     semanticMeaning: 'Base font size - all other sizes derive from this',
     usageContext: ['body-text', 'calculation-reference'],
     progressionSystem: progressionRatio as 'minor-third',
-    description: `Base font size (${baseFontSizeRem}rem). Typography scale uses ${progressionRatio} ratio (${ratioValue}).`,
+    description: `Base font size (${baseFontSizeRem}rem). Typography scale uses ${progressionRatio} ratio (${ratioVal}).`,
     generatedAt: timestamp,
     containerQueryAware: true,
     userOverride: null,
@@ -220,7 +221,7 @@ export function generateTypographyTokens(
       usageContext,
       scalePosition: scaleIndex,
       progressionSystem: progressionRatio as 'minor-third',
-      mathRelationship: scaleIndex === 2 ? 'base' : `base × ${ratioValue}^${scaleIndex - 2}`,
+      mathRelationship: scaleIndex === 2 ? 'base' : `base × ${ratioVal}^${scaleIndex - 2}`,
       dependsOn: ['font-size-base'],
       description: `Font size ${scale} = ${roundedSize}px (${remSize}rem). Line height: ${lineHeight}, letter spacing: ${letterSpacing}`,
       generatedAt: timestamp,
@@ -278,7 +279,7 @@ export function generateTypographyTokens(
     name: 'typography-progression',
     value: JSON.stringify({
       ratio: progressionRatio,
-      ratioValue,
+      ratioValue: ratioVal,
       baseFontSize,
       scale: Object.fromEntries(
         Object.entries(fontSizes).map(([k, v]) => [k, Math.round(v * 100) / 100]),
@@ -287,7 +288,7 @@ export function generateTypographyTokens(
     category: 'typography',
     namespace: 'typography',
     semanticMeaning: 'Metadata about the typography progression system',
-    description: `Typography uses ${progressionRatio} progression (ratio ${ratioValue}) from base ${baseFontSize}px.`,
+    description: `Typography uses ${progressionRatio} progression (ratio ${ratioVal}) from base ${baseFontSize}px.`,
     generatedAt: timestamp,
     containerQueryAware: false,
     userOverride: null,
