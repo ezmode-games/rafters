@@ -3,6 +3,9 @@
  * Based on musical intervals and the golden ratio
  */
 
+import type { z } from 'zod';
+import { enumOf } from './zod-keys.js';
+
 export const GOLDEN_RATIO = 1.618;
 export const MAJOR_THIRD = 1.25; // 5:4
 export const MINOR_THIRD = 1.2; // 6:5
@@ -26,15 +29,6 @@ export const ALL_RATIOS = {
   'minor-second': MINOR_SECOND,
 } as const;
 
-import { z } from 'zod';
-
 // Projection of ALL_RATIOS keys; the const is the generator and source of truth.
-const RATIO_NAME_KEYS = Object.keys(ALL_RATIOS) as Array<keyof typeof ALL_RATIOS>;
-
-export const RatioNameSchema = z.enum(
-  RATIO_NAME_KEYS as unknown as [
-    (typeof RATIO_NAME_KEYS)[number],
-    ...Array<(typeof RATIO_NAME_KEYS)[number]>,
-  ],
-);
+export const RatioNameSchema = enumOf(Object.keys(ALL_RATIOS) as Array<keyof typeof ALL_RATIOS>);
 export type RatioName = z.infer<typeof RatioNameSchema>;

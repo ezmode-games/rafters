@@ -5,7 +5,8 @@
  * Based on musical intervals, mathematical constants, and harmonic proportions.
  */
 
-import { z } from 'zod';
+import type { z } from 'zod';
+import { enumOf } from './zod-keys.js';
 
 /**
  * Musical Intervals - Based on mathematical ratios from music theory
@@ -52,19 +53,12 @@ export const ALL_RATIOS = {
 
 // Projection of MUSICAL_RATIOS + MATHEMATICAL_CONSTANTS keys. Generators are the
 // source of truth; this schema follows whatever they declare.
-const PROGRESSION_TYPE_KEYS = [
+export const ProgressionTypeSchema = enumOf([
   'linear',
   'exponential',
   ...(Object.keys(MUSICAL_RATIOS) as Array<keyof typeof MUSICAL_RATIOS>),
   ...(Object.keys(MATHEMATICAL_CONSTANTS) as Array<keyof typeof MATHEMATICAL_CONSTANTS>),
-] as const;
-
-export const ProgressionTypeSchema = z.enum(
-  PROGRESSION_TYPE_KEYS as unknown as [
-    (typeof PROGRESSION_TYPE_KEYS)[number],
-    ...Array<(typeof PROGRESSION_TYPE_KEYS)[number]>,
-  ],
-);
+]);
 export type ProgressionType = z.infer<typeof ProgressionTypeSchema>;
 
 // Pre-compute available ratios string to avoid repeated computation
