@@ -45,14 +45,14 @@ describe('createSwatch', () => {
   });
 
   it('includes tier in aria-label when provided', () => {
-    const cleanup = createSwatch(el, { l: 0.6, c: 0.15, h: 250, tier: 'gold' });
-    expect(el.getAttribute('aria-label')).toBe('Color: oklch(0.6 0.15 250), gamut: gold');
+    const cleanup = createSwatch(el, { l: 0.6, c: 0.15, h: 250, tier: 'srgb' });
+    expect(el.getAttribute('aria-label')).toBe('Color: oklch(0.6 0.15 250), gamut: srgb');
     cleanup();
   });
 
   it('sets data-gamut-tier when tier provided', () => {
-    const cleanup = createSwatch(el, { l: 0.6, c: 0.15, h: 250, tier: 'silver' });
-    expect(el.getAttribute('data-gamut-tier')).toBe('silver');
+    const cleanup = createSwatch(el, { l: 0.6, c: 0.15, h: 250, tier: 'p3' });
+    expect(el.getAttribute('data-gamut-tier')).toBe('p3');
     cleanup();
   });
 
@@ -78,7 +78,7 @@ describe('createSwatch', () => {
     el.setAttribute('role', 'button');
     el.setAttribute('aria-label', 'original');
 
-    const cleanup = createSwatch(el, { l: 0.6, c: 0.15, h: 250, tier: 'fail', selected: true });
+    const cleanup = createSwatch(el, { l: 0.6, c: 0.15, h: 250, tier: 'out', selected: true });
 
     expect(el.getAttribute('role')).toBe('img');
     expect(el.hasAttribute('data-gamut-tier')).toBe(true);
@@ -126,8 +126,8 @@ describe('updateSwatch', () => {
   it('adds and removes tier on update', () => {
     createSwatch(el, { l: 0.6, c: 0.15, h: 250 });
 
-    updateSwatch(el, { l: 0.6, c: 0.15, h: 250, tier: 'gold' });
-    expect(el.getAttribute('data-gamut-tier')).toBe('gold');
+    updateSwatch(el, { l: 0.6, c: 0.15, h: 250, tier: 'srgb' });
+    expect(el.getAttribute('data-gamut-tier')).toBe('srgb');
 
     updateSwatch(el, { l: 0.6, c: 0.15, h: 250 });
     expect(el.hasAttribute('data-gamut-tier')).toBe(false);

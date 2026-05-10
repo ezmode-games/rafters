@@ -129,9 +129,9 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 export function getGamutTier(l: number, c: number, h: number): GamutTier {
-  if (inSrgb(l, c, h)) return 'gold';
-  if (inP3(l, c, h)) return 'silver';
-  return 'fail';
+  if (inSrgb(l, c, h)) return 'srgb';
+  if (inP3(l, c, h)) return 'p3';
+  return 'out';
 }
 
 function resolveKeyDelta(current: number, delta: number, scale: number, max: number): number {

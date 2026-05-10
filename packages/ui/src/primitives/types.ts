@@ -4,10 +4,12 @@
 export type CleanupFunction = () => void;
 
 /**
- * Gamut tier for color swatch display
- * Caller-provided label indicating how well a color maps to a target gamut.
+ * Gamut tier: which CSS color space the color fits in.
+ * - srgb: in sRGB (safe on every screen)
+ * - p3:   in Display P3 but outside sRGB (wide-gamut displays only)
+ * - out:  outside both gamuts (not displayable)
  */
-export type GamutTier = 'gold' | 'silver' | 'fail';
+export type GamutTier = 'srgb' | 'p3' | 'out';
 
 export type OutsideClickHandler = (event: MouseEvent | TouchEvent | PointerEvent) => void;
 

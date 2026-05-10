@@ -53,9 +53,9 @@ const INPUT_CLASS =
   'w-full min-w-0 rounded-md border border-border bg-background px-2 py-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-ring';
 
 const GAMUT_LABELS: Record<GamutTier, string> = {
-  gold: 'sRGB',
-  silver: 'P3',
-  fail: 'Out of gamut',
+  srgb: 'sRGB',
+  p3: 'P3',
+  out: 'Out of gamut',
 };
 
 function colorChanged(a: OklchColor | undefined, b: OklchColor | undefined): boolean {
