@@ -412,7 +412,10 @@ export const ColorReferenceSchema = z.object({
 
 export type ColorReference = z.infer<typeof ColorReferenceSchema>;
 
-// Progression System Types - exported for consistency across the codebase
+// Progression system labels stamped on tokens to record which math system
+// produced them. Used only by TokenSchema below; the math-utils package
+// carries the actual ratio definitions in DEFAULT_RATIOS. This array will be
+// reshaped when the design-tokens package is refactored.
 export const PROGRESSION_SYSTEMS = [
   'linear',
   'golden',
@@ -425,8 +428,6 @@ export const PROGRESSION_SYSTEMS = [
   'minor-second',
   'custom',
 ] as const;
-
-export type ProgressionSystem = (typeof PROGRESSION_SYSTEMS)[number];
 
 // Comprehensive Design Token Schema - Single Source of Truth
 export const TokenSchema = z.object({
