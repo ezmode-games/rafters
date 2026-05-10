@@ -8,7 +8,7 @@
  * Default typography values are provided by the orchestrator from defaults.ts.
  */
 
-import { DEFAULT_RATIOS, findRatio, generateModularScale, ratioValue } from '@rafters/math-utils';
+import { generateModularScale, ratioValue, resolveRatio } from '@rafters/math-utils';
 import type { Token } from '@rafters/shared';
 import type { FontWeightDef, TypographyScaleDef } from './defaults.js';
 import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
@@ -26,10 +26,7 @@ export function generateTypographyTokens(
   const timestamp = new Date().toISOString();
   const { baseFontSize, fontFamily, monoFontFamily, progressionRatio } = config;
 
-  const ratio = findRatio(DEFAULT_RATIOS, progressionRatio);
-  if (!ratio) {
-    throw new Error(`Unknown progression ratio: ${progressionRatio}`);
-  }
+  const ratio = resolveRatio(progressionRatio);
   const ratioVal = ratioValue(ratio);
 
   // Generate modular scale for font sizes

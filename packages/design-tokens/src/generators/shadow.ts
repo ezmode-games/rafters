@@ -8,7 +8,7 @@
  * Default shadow values are provided by the orchestrator from defaults.ts.
  */
 
-import { DEFAULT_RATIOS, findRatio, ratioValue } from '@rafters/math-utils';
+import { ratioValue, resolveRatio } from '@rafters/math-utils';
 import type { Token } from '@rafters/shared';
 import type { ShadowDef } from './defaults.js';
 import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
@@ -79,11 +79,7 @@ export function generateShadowTokens(
   const tokens: Token[] = [];
   const timestamp = new Date().toISOString();
   const { baseSpacingUnit, progressionRatio } = config;
-  const ratio = findRatio(DEFAULT_RATIOS, progressionRatio);
-  if (!ratio) {
-    throw new Error(`Unknown progression ratio: ${progressionRatio}`);
-  }
-  const ratioVal = ratioValue(ratio);
+  const ratioVal = ratioValue(resolveRatio(progressionRatio));
 
   // Shadow reference token - use rem
   const baseSpacingRem = baseSpacingUnit / 16;

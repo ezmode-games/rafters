@@ -26,6 +26,16 @@ export const findRatio = (registry: readonly Ratio[], name: string): Ratio | und
   registry.find((r) => r.name === name);
 
 /**
+ * Look up a ratio by name. Throws if not found. Defaults to DEFAULT_RATIOS;
+ * pass a registry to look up in a different set.
+ */
+export function resolveRatio(name: string, registry: readonly Ratio[] = DEFAULT_RATIOS): Ratio {
+  const r = findRatio(registry, name);
+  if (!r) throw new Error(`Unknown ratio: ${name}`);
+  return r;
+}
+
+/**
  * Default ratio registry. Starter data, not authoritative -- pass your own
  * `Ratio[]` into operations that accept a registry to override or extend.
  */

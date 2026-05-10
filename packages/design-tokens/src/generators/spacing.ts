@@ -8,7 +8,7 @@
  * Default spacing values are provided by the orchestrator from defaults.ts.
  */
 
-import { DEFAULT_RATIOS, findRatio, generateSequence, ratioValue } from '@rafters/math-utils';
+import { generateSequence, ratioValue, resolveRatio } from '@rafters/math-utils';
 import type { Token } from '@rafters/shared';
 import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
 import { SPACING_SCALE } from './types.js';
@@ -24,14 +24,8 @@ export function generateSpacingTokens(
   const timestamp = new Date().toISOString();
   const { baseSpacingUnit, progressionRatio } = config;
 
-  // Get the actual ratio value for reference
-  const ratio = findRatio(DEFAULT_RATIOS, progressionRatio);
-  if (!ratio) {
-    throw new Error(`Unknown progression ratio: ${progressionRatio}`);
-  }
+  const ratio = resolveRatio(progressionRatio);
   const ratioVal = ratioValue(ratio);
-
-  // Generate the progression for reference (used in documentation)
   const progression = generateSequence(ratio, baseSpacingUnit, 10, { includeZero: true });
 
   // Base unit token - the foundation everything else derives from

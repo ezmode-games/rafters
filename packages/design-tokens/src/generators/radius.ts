@@ -13,7 +13,7 @@
  * Default radius values are provided by the orchestrator from defaults.ts.
  */
 
-import { DEFAULT_RATIOS, findRatio, ratioValue } from '@rafters/math-utils';
+import { ratioValue, resolveRatio } from '@rafters/math-utils';
 import type { Token } from '@rafters/shared';
 import type { RadiusDef } from './defaults.js';
 import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
@@ -41,12 +41,7 @@ export function generateRadiusTokens(
   const timestamp = new Date().toISOString();
   const { baseRadius, progressionRatio } = config;
 
-  // Look up the ratio for computing values
-  const ratio = findRatio(DEFAULT_RATIOS, progressionRatio);
-  if (!ratio) {
-    throw new Error(`Unknown progression ratio: ${progressionRatio}`);
-  }
-  const ratioVal = ratioValue(ratio);
+  const ratioVal = ratioValue(resolveRatio(progressionRatio));
 
   // Convert px to rem (assuming 16px root font size)
   const baseRadiusRem = baseRadius / 16;

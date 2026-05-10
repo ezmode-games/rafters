@@ -16,9 +16,8 @@
 
 import {
   ratioValue as computeRatioValue,
-  DEFAULT_RATIOS,
-  findRatio,
   progression as ratioStep,
+  resolveRatio,
 } from '@rafters/math-utils';
 import type { Token } from '@rafters/shared';
 import type { DelayDef, DurationDef, EasingDef } from './defaults.js';
@@ -38,11 +37,7 @@ export function generateMotionTokens(
   const timestamp = new Date().toISOString();
   const { baseTransitionDuration, progressionRatio } = config;
 
-  // Look up the ratio for computing values
-  const ratio = findRatio(DEFAULT_RATIOS, progressionRatio);
-  if (!ratio) {
-    throw new Error(`Unknown progression ratio: ${progressionRatio}`);
-  }
+  const ratio = resolveRatio(progressionRatio);
   const ratioVal = computeRatioValue(ratio);
   const computeStep = (base: number, step: number) => ratioStep(ratio, base, step);
 
