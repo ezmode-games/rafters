@@ -71,6 +71,21 @@ export const ProgressionTypeSchema = z.enum([
 ]);
 export type ProgressionType = z.infer<typeof ProgressionTypeSchema>;
 
+// Compile-time guard: if a ratio is added to MUSICAL_RATIOS or MATHEMATICAL_CONSTANTS
+// without updating ProgressionTypeSchema above, this assertion fails.
+type _ProgressionTypeFromConsts =
+  | 'linear'
+  | 'exponential'
+  | keyof typeof MUSICAL_RATIOS
+  | keyof typeof MATHEMATICAL_CONSTANTS;
+type _AssertProgressionTypeExhaustive = _ProgressionTypeFromConsts extends ProgressionType
+  ? ProgressionType extends _ProgressionTypeFromConsts
+    ? true
+    : never
+  : never;
+const _progressionTypeExhaustive: _AssertProgressionTypeExhaustive = true;
+void _progressionTypeExhaustive;
+
 // Pre-compute available ratios string to avoid repeated computation
 const AVAILABLE_RATIOS_STRING = Object.keys(ALL_RATIOS).join(', ');
 

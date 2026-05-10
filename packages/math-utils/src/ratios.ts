@@ -39,3 +39,13 @@ export const RatioNameSchema = z.enum([
   'minor-second',
 ]);
 export type RatioName = z.infer<typeof RatioNameSchema>;
+
+// Compile-time guard: keys in ALL_RATIOS must match RatioNameSchema.
+type _RatioNameFromConst = keyof typeof ALL_RATIOS;
+type _AssertRatioNameExhaustive = _RatioNameFromConst extends RatioName
+  ? RatioName extends _RatioNameFromConst
+    ? true
+    : never
+  : never;
+const _ratioNameExhaustive: _AssertRatioNameExhaustive = true;
+void _ratioNameExhaustive;
