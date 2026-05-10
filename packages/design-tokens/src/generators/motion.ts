@@ -14,7 +14,12 @@
  * Default motion values are provided by the orchestrator from defaults.ts.
  */
 
-import { createProgression } from '@rafters/math-utils';
+import {
+  ratioValue as computeRatioValue,
+  DEFAULT_RATIOS,
+  findRatio,
+  progression as ratioStep,
+} from '@rafters/math-utils';
 import type { Token } from '@rafters/shared';
 import type { DelayDef, DurationDef, EasingDef } from './defaults.js';
 import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
@@ -33,8 +38,13 @@ export function generateMotionTokens(
   const timestamp = new Date().toISOString();
   const { baseTransitionDuration, progressionRatio } = config;
 
-  // Create progression for computing values
-  const progression = createProgression(progressionRatio as 'minor-third');
+  // Look up the ratio for computing values
+  const ratio = findRatio(DEFAULT_RATIOS, progressionRatio);
+  if (!ratio) {
+    throw new Error(`Unknown progression ratio: ${progressionRatio}`);
+  }
+  const ratioVal = computeRatioValue(ratio);
+  const computeStep = (base: number, step: number) => ratioStep(ratio, base, step);
 
   // Base duration token
   tokens.push({
@@ -45,7 +55,7 @@ export function generateMotionTokens(
     semanticMeaning: 'Base transition duration - all motion timing derives from this',
     usageContext: ['calculation-reference'],
     progressionSystem: progressionRatio as 'minor-third',
-    description: `Base duration (${baseTransitionDuration}ms). Motion uses ${progressionRatio} progression (ratio ${progression.ratio}).`,
+    description: `Base duration (${baseTransitionDuration}ms). Motion uses ${progressionRatio} progression (ratio ${ratioVal}).`,
     generatedAt: timestamp,
     containerQueryAware: false,
     reducedMotionAware: true,
@@ -69,12 +79,12 @@ export function generateMotionTokens(
       durationMs = 0;
       mathRelationship = '0';
     } else {
-      // Use progression.compute() for step-based calculation
-      durationMs = Math.round(progression.compute(baseTransitionDuration, def.step));
+      // Use computeStep() for step-based calculation
+      durationMs = Math.round(computeStep(baseTransitionDuration, def.step));
       mathRelationship =
         def.step === 0
           ? `${baseTransitionDuration}ms (base)`
-          : `${baseTransitionDuration} × ${progression.ratio}^${def.step}`;
+          : `${baseTransitionDuration} × ${ratioVal}^${def.step}`;
     }
 
     tokens.push({
@@ -154,12 +164,12 @@ export function generateMotionTokens(
       delayMs = 0;
       mathRelationship = '0';
     } else {
-      // Use progression.compute() for step-based calculation
-      delayMs = Math.round(progression.compute(baseTransitionDuration, def.step));
+      // Use computeStep() for step-based calculation
+      delayMs = Math.round(computeStep(baseTransitionDuration, def.step));
       mathRelationship =
         def.step === 0
           ? `${baseTransitionDuration}ms (base)`
-          : `${baseTransitionDuration} × ${progression.ratio}^${def.step}`;
+          : `${baseTransitionDuration} × ${ratioVal}^${def.step}`;
     }
 
     tokens.push({
@@ -193,7 +203,7 @@ export function generateMotionTokens(
   // - pingScale: ratio^3 ≈ 1.73 for expanding effect (rounded to 2 for simplicity)
   // - pulseOpacity: 1/ratio^4 ≈ 0.48 for gentle pulse midpoint
   // - bounceTranslate: 100/ratio^6 ≈ 33% for bounce height
-  const ratioValue = progression.ratio;
+  const ratioValue = ratioVal;
   const scaleStart = Math.round((1 / ratioValue ** 0.25) * 100) / 100; // ~0.95 for 1.2 ratio
   const pingScale = Math.round(ratioValue ** 3 * 10) / 10; // ~1.7 for 1.2 ratio, round to nearest 0.1
   const pulseOpacity = Math.round((1 / ratioValue ** 4) * 100) / 100; // ~0.48 for 1.2 ratio
@@ -522,7 +532,7 @@ export function generateMotionTokens(
       const durationMs =
         durationDef.step === 'instant'
           ? 0
-          : Math.round(progression.compute(baseTransitionDuration, durationDef.step));
+          : Math.round(computeStep(baseTransitionDuration, durationDef.step));
       durationValue = `${durationMs}ms`;
       durationRef = `var(--motion-duration-${anim.duration})`;
     }
@@ -613,7 +623,7 @@ export function generateMotionTokens(
     if (durationDef.step === 'instant') {
       durationMs = 0;
     } else {
-      durationMs = Math.round(progression.compute(baseTransitionDuration, durationDef.step));
+      durationMs = Math.round(computeStep(baseTransitionDuration, durationDef.step));
     }
 
     tokens.push({
@@ -640,7 +650,7 @@ export function generateMotionTokens(
     name: 'motion-progression',
     value: JSON.stringify({
       ratio: progressionRatio,
-      ratioValue: progression.ratio,
+      ratioValue: ratioVal,
       baseDuration: baseTransitionDuration,
       note: 'Motion timing uses step-based progression (base * ratio^step) for unified feel',
     }),

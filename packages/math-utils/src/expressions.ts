@@ -1,12 +1,13 @@
 /**
  * Expression Evaluation for calc() Rules
- * Evaluates mathematical expressions like "calc({base} * 2)" or "calc({base} + 4px)"
  *
- * Uses a safe recursive descent parser instead of eval() or Function() constructor
- * to prevent arbitrary code execution vulnerabilities.
+ * Lightweight expression evaluator that substitutes ratio names from a
+ * registry, strips trailing units, and evaluates via a safe recursive
+ * descent parser. For full variable + ratio substitution use
+ * `evaluateExpression` from `./calculations.js`.
  */
 
-import { ALL_RATIOS } from './ratios.js';
+import { DEFAULT_RATIOS, type Ratio, ratioValue } from './ratios.js';
 
 /**
  * Tokenize an expression into numbers and operators
@@ -49,10 +50,6 @@ function tokenize(expr: string): Array<string | number> {
 
 /**
  * Recursive descent parser for mathematical expressions
- * Grammar:
- *   expression := term (('+' | '-') term)*
- *   term       := factor (('*' | '/') factor)*
- *   factor     := number | '(' expression ')'
  */
 class ExpressionParser {
   private tokens: Array<string | number>;
@@ -125,17 +122,17 @@ class ExpressionParser {
     }
 
     if (token === '(') {
-      this.consume(); // consume '('
+      this.consume();
       const result = this.expression();
       if (this.current() !== ')') {
         throw new Error('Missing closing parenthesis');
       }
-      this.consume(); // consume ')'
+      this.consume();
       return result;
     }
 
     if (token === '-') {
-      this.consume(); // consume '-'
+      this.consume();
       return -this.factor();
     }
 
@@ -144,28 +141,26 @@ class ExpressionParser {
 }
 
 /**
- * Evaluate a mathematical expression with variable substitution
- * Supports: +, -, *, /, (), and named ratio constants
- *
- * @example
- * evaluateExpression("2 * 3 + 4") // 10
- * evaluateExpression("golden * 16") // 25.888 (1.618 * 16)
- * evaluateExpression("(10 + 5) * 2") // 30
+ * Evaluate a mathematical expression with named-ratio substitution.
+ * Strips trailing CSS-unit suffixes (px, rem, em, %) before evaluation
+ * so an expression like `"16px * 1.5"` returns `24`. Returns `NaN` on
+ * any parse failure.
  */
-export function evaluateExpression(expression: string): number {
-  // Replace named ratios with their numeric values
-  let normalizedExpr = expression;
-  for (const [name, value] of Object.entries(ALL_RATIOS)) {
-    const regex = new RegExp(`\\b${name}\\b`, 'g');
-    normalizedExpr = normalizedExpr.replace(regex, String(value));
+export function evaluateExpression(
+  expression: string,
+  ratios: readonly Ratio[] = DEFAULT_RATIOS,
+): number {
+  let normalized = expression;
+  for (const r of ratios) {
+    const re = new RegExp(`\\b${r.name.replace('-', '\\-')}\\b`, 'g');
+    normalized = normalized.replace(re, String(ratioValue(r)));
   }
 
-  // Remove units (px, rem, em, etc) for calculation
-  normalizedExpr = normalizedExpr.replace(/(\d+(?:\.\d+)?)(px|rem|em|%)/g, '$1');
+  // Strip simple unit suffixes for the calc() use case.
+  normalized = normalized.replace(/(\d+(?:\.\d+)?)(px|rem|em|%)/g, '$1');
 
-  // Safe expression evaluation using recursive descent parser
   try {
-    const tokens = tokenize(normalizedExpr.trim());
+    const tokens = tokenize(normalized.trim());
     const parser = new ExpressionParser(tokens);
     const result = parser.parse();
     return typeof result === 'number' && Number.isFinite(result) ? result : Number.NaN;
@@ -175,8 +170,11 @@ export function evaluateExpression(expression: string): number {
 }
 
 /**
- * Check if an expression is valid (can be evaluated without errors)
+ * Check if an expression evaluates to a finite number.
  */
-export function isValidExpression(expression: string): boolean {
-  return !Number.isNaN(evaluateExpression(expression));
+export function isValidExpression(
+  expression: string,
+  ratios: readonly Ratio[] = DEFAULT_RATIOS,
+): boolean {
+  return !Number.isNaN(evaluateExpression(expression, ratios));
 }

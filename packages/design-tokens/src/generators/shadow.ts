@@ -8,7 +8,7 @@
  * Default shadow values are provided by the orchestrator from defaults.ts.
  */
 
-import { getRatio } from '@rafters/math-utils';
+import { DEFAULT_RATIOS, findRatio, ratioValue } from '@rafters/math-utils';
 import type { Token } from '@rafters/shared';
 import type { ShadowDef } from './defaults.js';
 import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
@@ -79,7 +79,11 @@ export function generateShadowTokens(
   const tokens: Token[] = [];
   const timestamp = new Date().toISOString();
   const { baseSpacingUnit, progressionRatio } = config;
-  const ratioValue = getRatio(progressionRatio);
+  const ratio = findRatio(DEFAULT_RATIOS, progressionRatio);
+  if (!ratio) {
+    throw new Error(`Unknown progression ratio: ${progressionRatio}`);
+  }
+  const ratioVal = ratioValue(ratio);
 
   // Shadow reference token - use rem
   const baseSpacingRem = baseSpacingUnit / 16;
@@ -190,7 +194,7 @@ export function generateShadowTokens(
   // Colored shadow variants -- reuse decomposed geometry from DEFAULT, swap color
   const baseDef = shadowDefs.DEFAULT;
   if (baseDef) {
-    const coloredOpacity = baseDef.opacity * ratioValue;
+    const coloredOpacity = baseDef.opacity * ratioVal;
     const coloredShadows = [
       {
         name: 'shadow-primary',
@@ -236,7 +240,7 @@ export function generateShadowTokens(
     name: 'shadow-progression',
     value: JSON.stringify({
       ratio: progressionRatio,
-      ratioValue,
+      ratioValue: ratioVal,
       baseUnit: baseSpacingUnit,
       note: 'Shadow values derived from spacing progression for visual harmony',
     }),

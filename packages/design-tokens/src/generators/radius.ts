@@ -13,7 +13,7 @@
  * Default radius values are provided by the orchestrator from defaults.ts.
  */
 
-import { createProgression } from '@rafters/math-utils';
+import { DEFAULT_RATIOS, findRatio, ratioValue } from '@rafters/math-utils';
 import type { Token } from '@rafters/shared';
 import type { RadiusDef } from './defaults.js';
 import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
@@ -41,8 +41,12 @@ export function generateRadiusTokens(
   const timestamp = new Date().toISOString();
   const { baseRadius, progressionRatio } = config;
 
-  // Create progression for computing values
-  const progression = createProgression(progressionRatio as 'minor-third');
+  // Look up the ratio for computing values
+  const ratio = findRatio(DEFAULT_RATIOS, progressionRatio);
+  if (!ratio) {
+    throw new Error(`Unknown progression ratio: ${progressionRatio}`);
+  }
+  const ratioVal = ratioValue(ratio);
 
   // Convert px to rem (assuming 16px root font size)
   const baseRadiusRem = baseRadius / 16;
@@ -56,7 +60,7 @@ export function generateRadiusTokens(
     semanticMeaning: 'Base border radius - all other radii derive from this value',
     usageContext: ['calculation-reference'],
     progressionSystem: progressionRatio as 'minor-third',
-    description: `Base radius (${baseRadiusRem}rem / ${baseRadius}px). Scale uses ${progressionRatio} progression (ratio ${progression.ratio}).`,
+    description: `Base radius (${baseRadiusRem}rem / ${baseRadius}px). Scale uses ${progressionRatio} progression (ratio ${ratioVal}).`,
     generatedAt: timestamp,
     containerQueryAware: false,
     userOverride: null,
@@ -103,9 +107,9 @@ export function generateRadiusTokens(
       mathRelationship = `${baseRadiusRem}rem (base)`;
     } else {
       // Use calc() with var() so changing radius-base cascades via CSS
-      const multiplier = Math.round(progression.ratio ** def.step * 1000) / 1000;
+      const multiplier = Math.round(ratioVal ** def.step * 1000) / 1000;
       value = `calc(var(--rafters-radius-base) * ${multiplier})`;
-      mathRelationship = `base × ${progression.ratio}^${def.step} (×${multiplier})`;
+      mathRelationship = `base × ${ratioVal}^${def.step} (×${multiplier})`;
     }
 
     const scaleName = scale === 'DEFAULT' ? 'radius' : `radius-${scale}`;
@@ -131,7 +135,7 @@ export function generateRadiusTokens(
     // Per-corner tokens at this scale position (skip none, full, and DEFAULT)
     if (def.step !== 'none' && def.step !== 'full' && scale !== 'DEFAULT') {
       const cornerMultiplier =
-        def.step === 0 ? null : Math.round(progression.ratio ** def.step * 1000) / 1000;
+        def.step === 0 ? null : Math.round(ratioVal ** def.step * 1000) / 1000;
 
       for (const corner of CORNERS) {
         const cornerValue =
