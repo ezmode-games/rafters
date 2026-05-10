@@ -14,17 +14,13 @@
  * - Fractional L/C values sub-select within the word list
  */
 
-/**
- * Lightness bands (5 levels)
- * Maps to L bucket ranges for semantic compatibility
- */
-export type LightnessBand = 'veryDark' | 'dark' | 'mid' | 'light' | 'veryLight';
+import { z } from 'zod';
 
-/**
- * Chroma bands (4 levels)
- * Maps to C bucket ranges for semantic compatibility
- */
-export type ChromaBand = 'muted' | 'moderate' | 'saturated' | 'vivid';
+export const LightnessBandSchema = z.enum(['veryDark', 'dark', 'mid', 'light', 'veryLight']);
+export type LightnessBand = z.infer<typeof LightnessBandSchema>;
+
+export const ChromaBandSchema = z.enum(['muted', 'moderate', 'saturated', 'vivid']);
+export type ChromaBand = z.infer<typeof ChromaBandSchema>;
 
 /**
  * A cell in the L×C matrix containing semantically-appropriate words

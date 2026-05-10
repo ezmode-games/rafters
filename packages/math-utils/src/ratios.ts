@@ -26,4 +26,16 @@ export const ALL_RATIOS = {
   'minor-second': MINOR_SECOND,
 } as const;
 
-export type RatioName = keyof typeof ALL_RATIOS;
+import { z } from 'zod';
+
+export const RatioNameSchema = z.enum([
+  'golden',
+  'major-third',
+  'minor-third',
+  'perfect-fourth',
+  'perfect-fifth',
+  'augmented-fourth',
+  'major-second',
+  'minor-second',
+]);
+export type RatioName = z.infer<typeof RatioNameSchema>;

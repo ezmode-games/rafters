@@ -5,6 +5,7 @@
 import type { OKLCH } from '@rafters/shared';
 import { APCAcontrast, sRGBtoY } from 'apca-w3';
 import Color from 'colorjs.io';
+import { z } from 'zod';
 import { roundOKLCH } from './conversion';
 
 /**
@@ -110,31 +111,23 @@ export function meetsAPCAStandard(foreground: OKLCH, background: OKLCH, textSize
   return contrast >= threshold;
 }
 
-/**
- * Pre-computed accessibility contrast matrix interface
- * Stores WCAG AA/AAA compliance pairs as indices into color scales
- */
-export interface AccessibilityMetadata {
-  // Pre-computed contrast matrices (indices into scale array)
-  wcagAA: {
-    normal: number[][]; // [[0, 5], [0, 6], [1, 7], ...] - pairs that meet AA
-    large: number[][]; // [[0, 4], [0, 5], [1, 5], ...] - more pairs for large text
-  };
-  wcagAAA: {
-    normal: number[][]; // [[0, 7], [0, 8], [0, 9], ...] - fewer pairs meet AAA
-    large: number[][]; // [[0, 6], [0, 7], [1, 7], ...]
-  };
+const ContrastPairsSchema = z.object({
+  normal: z.array(z.array(z.number())),
+  large: z.array(z.array(z.number())),
+});
 
-  // Pre-calculated for common backgrounds
-  onWhite: {
-    aa: number[]; // [5, 6, 7, 8, 9] - shades that pass AA on white
-    aaa: number[]; // [7, 8, 9] - shades that pass AAA on white
-  };
-  onBlack: {
-    aa: number[]; // [0, 1, 2, 3, 4] - shades that pass AA on black
-    aaa: number[]; // [0, 1, 2] - shades that pass AAA on black
-  };
-}
+const BackgroundComplianceSchema = z.object({
+  aa: z.array(z.number()),
+  aaa: z.array(z.number()),
+});
+
+export const AccessibilityMetadataSchema = z.object({
+  wcagAA: ContrastPairsSchema,
+  wcagAAA: ContrastPairsSchema,
+  onWhite: BackgroundComplianceSchema,
+  onBlack: BackgroundComplianceSchema,
+});
+export type AccessibilityMetadata = z.infer<typeof AccessibilityMetadataSchema>;
 
 /**
  * Generate pre-computed accessibility metadata for a color scale

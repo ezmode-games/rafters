@@ -9,24 +9,17 @@
 
 import type { OKLCH } from '@rafters/shared';
 import Color from 'colorjs.io';
+import { z } from 'zod';
 
-/**
- * Display support tier for a color.
- * - gold: in sRGB + P3, safe everywhere
- * - silver: in P3 only, clamped on older screens
- * - fail: outside both gamuts
- */
-export type GamutTier = 'gold' | 'silver' | 'fail';
+export const GamutTierSchema = z.enum(['gold', 'silver', 'fail']);
+export type GamutTier = z.infer<typeof GamutTierSchema>;
 
-/** Gamut boundary data at a single lightness level */
-export interface GamutBoundaryPoint {
-  /** Lightness value (0-1) */
-  l: number;
-  /** Maximum chroma within sRGB gamut (gold boundary) */
-  maxC_srgb: number;
-  /** Maximum chroma within P3 gamut (silver boundary) */
-  maxC_p3: number;
-}
+export const GamutBoundaryPointSchema = z.object({
+  l: z.number(),
+  maxC_srgb: z.number(),
+  maxC_p3: z.number(),
+});
+export type GamutBoundaryPoint = z.infer<typeof GamutBoundaryPointSchema>;
 
 /**
  * Check whether an OKLCH color is within the sRGB gamut.

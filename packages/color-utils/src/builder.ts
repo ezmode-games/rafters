@@ -9,6 +9,7 @@
  */
 
 import type { ColorValue, OKLCH } from '@rafters/shared';
+import { z } from 'zod';
 import {
   calculateAPCAContrast,
   calculateWCAGContrast,
@@ -45,30 +46,13 @@ const WHITE: OKLCH = { l: 1, c: 0, h: 0, alpha: 1 };
 /** Black reference color for contrast calculations */
 const BLACK: OKLCH = { l: 0, c: 0, h: 0, alpha: 1 };
 
-/**
- * Options for building a ColorValue
- */
-export interface BuildColorValueOptions {
-  /**
-   * Semantic token assignment (e.g., "primary", "destructive")
-   */
-  token?: string;
-
-  /**
-   * Scale position reference (e.g., "500", "400")
-   */
-  value?: string;
-
-  /**
-   * Human notes about the color choice
-   */
-  use?: string;
-
-  /**
-   * State mappings (e.g., { hover: "blue-900", focus: "blue-700" })
-   */
-  states?: Record<string, string>;
-}
+export const BuildColorValueOptionsSchema = z.object({
+  token: z.string().optional(),
+  value: z.string().optional(),
+  use: z.string().optional(),
+  states: z.record(z.string(), z.string()).optional(),
+});
+export type BuildColorValueOptions = z.infer<typeof BuildColorValueOptionsSchema>;
 
 /**
  * Build a complete ColorValue from OKLCH using pure math calculations.

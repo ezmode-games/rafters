@@ -5,13 +5,11 @@
  * Supports linear, exponential, musical intervals, and mathematical constants.
  */
 
+import { z } from 'zod';
 import { getRatio, type ProgressionType } from './constants.js';
 
-/**
- * A progression object that can compute values at any step from a base value.
- * This is the preferred interface for generators to use as it allows computing
- * values on-demand without pre-generating entire sequences.
- */
+// Progression carries methods (compute, generateSequence) — behavior type, not data.
+// Zod schemas describe data shape; runtime callable contracts stay as TypeScript types.
 export interface Progression {
   /** The ratio type used for this progression */
   readonly type: ProgressionType;
@@ -165,19 +163,13 @@ export function createProgression(type: ProgressionType): Progression {
   };
 }
 
-/**
- * Options for generating mathematical progressions
- */
-export interface ProgressionOptions {
-  /** Starting value for the progression */
-  baseValue: number;
-  /** Number of steps to generate */
-  steps: number;
-  /** Custom multiplier for exponential progressions */
-  multiplier?: number;
-  /** Whether to include zero as first step */
-  includeZero?: boolean;
-}
+export const ProgressionOptionsSchema = z.object({
+  baseValue: z.number(),
+  steps: z.number().int().nonnegative(),
+  multiplier: z.number().optional(),
+  includeZero: z.boolean().optional(),
+});
+export type ProgressionOptions = z.infer<typeof ProgressionOptionsSchema>;
 
 /**
  * Generate a mathematical progression sequence

@@ -5,6 +5,8 @@
  * Based on musical intervals, mathematical constants, and harmonic proportions.
  */
 
+import { z } from 'zod';
+
 /**
  * Musical Intervals - Based on mathematical ratios from music theory
  * These create harmonious visual progressions similar to musical harmony
@@ -48,14 +50,26 @@ export const ALL_RATIOS = {
   ...MATHEMATICAL_CONSTANTS,
 } as const;
 
-/**
- * Progression Types for different mathematical systems
- */
-export type ProgressionType =
-  | 'linear' // Simple arithmetic progression: 1, 2, 3, 4...
-  | 'exponential' // Custom exponential: base^n
-  | keyof typeof MUSICAL_RATIOS // Musical intervals
-  | keyof typeof MATHEMATICAL_CONSTANTS; // Mathematical constants
+export const ProgressionTypeSchema = z.enum([
+  'linear',
+  'exponential',
+  'minor-second',
+  'major-second',
+  'minor-third',
+  'major-third',
+  'perfect-fourth',
+  'augmented-fourth',
+  'perfect-fifth',
+  'golden',
+  'golden-ratio',
+  'sqrt2',
+  'sqrt3',
+  'sqrt5',
+  'e',
+  'pi',
+  'silver',
+]);
+export type ProgressionType = z.infer<typeof ProgressionTypeSchema>;
 
 // Pre-compute available ratios string to avoid repeated computation
 const AVAILABLE_RATIOS_STRING = Object.keys(ALL_RATIOS).join(', ');

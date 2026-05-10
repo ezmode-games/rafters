@@ -5,18 +5,27 @@
  * unit information and enabling unit conversions.
  */
 
-/**
- * Supported CSS units
- */
-export type CSSUnit = 'px' | 'rem' | 'em' | '%' | 'vw' | 'vh' | 'vmin' | 'vmax' | 'ch' | 'ex';
+import { z } from 'zod';
 
-/**
- * Value with unit information
- */
-export interface UnitValue {
-  value: number;
-  unit: CSSUnit | '';
-}
+export const CSSUnitSchema = z.enum([
+  'px',
+  'rem',
+  'em',
+  '%',
+  'vw',
+  'vh',
+  'vmin',
+  'vmax',
+  'ch',
+  'ex',
+]);
+export type CSSUnit = z.infer<typeof CSSUnitSchema>;
+
+export const UnitValueSchema = z.object({
+  value: z.number(),
+  unit: z.union([CSSUnitSchema, z.literal('')]),
+});
+export type UnitValue = z.infer<typeof UnitValueSchema>;
 
 /**
  * Parse a CSS value string into value and unit components

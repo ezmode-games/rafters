@@ -44,82 +44,53 @@
  */
 
 import { parse, type Spec } from 'comment-parser';
+import { z } from 'zod';
+import { UsagePatternsSchema } from './types';
 
-// ==================== Types ====================
+// ==================== Schemas ====================
 
-/**
- * Intelligence metadata extracted from component JSDoc comments
- * Named JSDocIntelligence to avoid conflict with ComponentIntelligence in types.ts
- */
-export interface JSDocIntelligence {
-  /** Cognitive load score (0-10 scale) */
-  cognitiveLoad?: number;
-  /** Attention economics guidance */
-  attentionEconomics?: string;
-  /** Accessibility requirements and guidance */
-  accessibility?: string;
-  /** Trust-building patterns */
-  trustBuilding?: string;
-  /** Semantic meaning and purpose */
-  semanticMeaning?: string;
-  /** Usage patterns with dos and nevers */
-  usagePatterns?: {
-    dos: string[];
-    nevers: string[];
-  };
-}
+export const JSDocIntelligenceSchema = z.object({
+  cognitiveLoad: z.number().min(0).max(10).optional(),
+  attentionEconomics: z.string().optional(),
+  accessibility: z.string().optional(),
+  trustBuilding: z.string().optional(),
+  semanticMeaning: z.string().optional(),
+  usagePatterns: UsagePatternsSchema.optional(),
+});
+export type JSDocIntelligence = z.infer<typeof JSDocIntelligenceSchema>;
 
-/**
- * Component category for organization
- */
-export type ComponentCategory =
-  | 'layout'
-  | 'form'
-  | 'feedback'
-  | 'navigation'
-  | 'overlay'
-  | 'data-display'
-  | 'utility';
+export const ComponentCategorySchema = z.enum([
+  'layout',
+  'form',
+  'feedback',
+  'navigation',
+  'overlay',
+  'data-display',
+  'utility',
+]);
+export type ComponentCategory = z.infer<typeof ComponentCategorySchema>;
 
-/**
- * Structured dependency information extracted from JSDoc tags
- */
-export interface JSDocDependencies {
-  /** Runtime dependencies from @dependencies tag */
-  runtime: string[];
-  /** Dev dependencies from @devDependencies tag */
-  dev: string[];
-  /** Internal workspace dependencies from @internal-dependencies tag */
-  internal: string[];
-}
+export const JSDocDependenciesSchema = z.object({
+  runtime: z.array(z.string()),
+  dev: z.array(z.string()),
+  internal: z.array(z.string()),
+});
+export type JSDocDependencies = z.infer<typeof JSDocDependenciesSchema>;
 
-/**
- * Full component metadata including intelligence
- */
-export interface ComponentMetadata {
-  /** Component file name (without extension) */
-  name: string;
-  /** Human-readable display name */
-  displayName: string;
-  /** Brief description from JSDoc */
-  description?: string;
-  /** Component category */
-  category: ComponentCategory;
-  /** Intelligence metadata */
-  intelligence?: JSDocIntelligence;
-  /** Available variants */
-  variants: string[];
-  /** Available sizes */
-  sizes: string[];
-  /** External dependencies */
-  dependencies: string[];
-  /** Primitive dependencies */
-  primitives: string[];
-  /** Structured dependency information from JSDoc tags */
-  jsDocDependencies?: JSDocDependencies;
-  /** Relative file path */
-  filePath: string;
-}
+export const ComponentMetadataSchema = z.object({
+  name: z.string(),
+  displayName: z.string(),
+  description: z.string().optional(),
+  category: ComponentCategorySchema,
+  intelligence: JSDocIntelligenceSchema.optional(),
+  variants: z.array(z.string()),
+  sizes: z.array(z.string()),
+  dependencies: z.array(z.string()),
+  primitives: z.array(z.string()),
+  jsDocDependencies: JSDocDependenciesSchema.optional(),
+  filePath: z.string(),
+});
+export type ComponentMetadata = z.infer<typeof ComponentMetadataSchema>;
 
 // ==================== Parser ====================
 
@@ -402,15 +373,11 @@ const REQUIRED_TAGS = [
   'usagePatterns',
 ] as const;
 
-/**
- * A warning produced when component intelligence metadata is incomplete or suspect
- */
-export interface IntelligenceWarning {
-  /** Warning severity: "missing" for absent data, "empty" for present but hollow data */
-  level: 'missing' | 'empty';
-  /** Human-readable warning message */
-  message: string;
-}
+export const IntelligenceWarningSchema = z.object({
+  level: z.enum(['missing', 'empty']),
+  message: z.string(),
+});
+export type IntelligenceWarning = z.infer<typeof IntelligenceWarningSchema>;
 
 /**
  * Validate component intelligence metadata for completeness.

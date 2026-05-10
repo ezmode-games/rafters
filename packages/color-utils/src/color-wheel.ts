@@ -6,35 +6,40 @@
  * semantic role mappings are designed.
  */
 
-import type { ColorValue, OKLCH } from '@rafters/shared';
+import { type ColorValue, ColorValueSchema, type OKLCH } from '@rafters/shared';
+import { z } from 'zod';
 import { buildColorValue } from './builder.js';
 import { roundOKLCH } from './conversion.js';
 import { adjustHue } from './manipulation.js';
 
-export type HarmonyType =
-  | 'complementary'
-  | 'triadic'
-  | 'tetradic'
-  | 'analogous'
-  | 'split-complementary';
+export const HarmonyTypeSchema = z.enum([
+  'complementary',
+  'triadic',
+  'tetradic',
+  'analogous',
+  'split-complementary',
+]);
+export type HarmonyType = z.infer<typeof HarmonyTypeSchema>;
 
-export interface ColorWheelOptions {
-  chromaDistribution?: 'gaussian' | 'flat';
-}
+export const ColorWheelOptionsSchema = z.object({
+  chromaDistribution: z.enum(['gaussian', 'flat']).optional(),
+});
+export type ColorWheelOptions = z.infer<typeof ColorWheelOptionsSchema>;
 
-export interface SemanticColorSystem {
-  primary: ColorValue;
-  secondary: ColorValue;
-  tertiary: ColorValue;
-  accent: ColorValue;
-  highlight: ColorValue;
-  neutral: ColorValue;
-  muted: ColorValue;
-  success: ColorValue;
-  warning: ColorValue;
-  destructive: ColorValue;
-  info: ColorValue;
-}
+export const SemanticColorSystemSchema = z.object({
+  primary: ColorValueSchema,
+  secondary: ColorValueSchema,
+  tertiary: ColorValueSchema,
+  accent: ColorValueSchema,
+  highlight: ColorValueSchema,
+  neutral: ColorValueSchema,
+  muted: ColorValueSchema,
+  success: ColorValueSchema,
+  warning: ColorValueSchema,
+  destructive: ColorValueSchema,
+  info: ColorValueSchema,
+});
+export type SemanticColorSystem = z.infer<typeof SemanticColorSystemSchema>;
 
 /**
  * Apply gaussian chroma distribution centered at L=0.6 with sigma=0.25.
