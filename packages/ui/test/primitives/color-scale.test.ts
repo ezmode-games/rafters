@@ -128,15 +128,15 @@ describe('color-scale primitive', () => {
   });
 
   it('sets data-gamut-tier when tiers provided', () => {
-    const tiers = SCALE_KEYS.map(() => 'gold' as const);
-    tiers[10] = 'silver';
+    const tiers = SCALE_KEYS.map(() => 'srgb' as const);
+    tiers[10] = 'p3';
     cleanup = createColorScale(container, {
       scale: makeScale(),
       name: 'ocean-blue',
       tiers,
     });
     const last = container.querySelectorAll('[role="option"]')[10] as HTMLElement;
-    expect(last.getAttribute('data-gamut-tier')).toBe('silver');
+    expect(last.getAttribute('data-gamut-tier')).toBe('p3');
   });
 
   it('cleanup removes all swatch elements and restores container', () => {

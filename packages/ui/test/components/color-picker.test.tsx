@@ -145,7 +145,7 @@ describe('ColorPicker', () => {
       const preview = container.querySelector('[data-gamut-tier]');
       expect(preview).toBeInTheDocument();
       // Low chroma should be sRGB (gold)
-      expect(preview).toHaveAttribute('data-gamut-tier', 'gold');
+      expect(preview).toHaveAttribute('data-gamut-tier', 'srgb');
     });
 
     it('shows gamut label text', () => {

@@ -5,36 +5,43 @@
  * No AI needed - uses WCAG standards, color theory, and UX principles
  */
 
-import type { OKLCH } from '@rafters/shared';
+import { type OKLCH, OKLCHSchema } from '@rafters/shared';
+import { z } from 'zod';
 import { calculateWCAGContrast } from './accessibility';
 
-/**
- * Accessibility alert severity and types
- */
-export interface AccessibilityAlert {
-  severity: 'error' | 'warning' | 'caution';
-  type: 'contrast' | 'cognitive-load' | 'color-vision' | 'cultural' | 'usability';
-  message: string;
-  suggestion: string;
-  affectedTokens: string[];
-  autoFix?: {
-    token: string;
-    newValue: string; // Color family + scale position
-    reason: string;
-  };
-}
+export const AccessibilityAlertSeveritySchema = z.enum(['error', 'warning', 'caution']);
+export const AccessibilityAlertTypeSchema = z.enum([
+  'contrast',
+  'cognitive-load',
+  'color-vision',
+  'cultural',
+  'usability',
+]);
 
-/**
- * User's semantic assignments from Studio right-click
- */
-export interface SemanticMapping {
-  [semanticToken: string]: {
-    colorFamily: string; // "ocean-storm"
-    scalePosition: number; // 800 (index in 50-950 scale)
-    fullReference: string; // "ocean-storm-800"
-    oklch: OKLCH; // Actual color value
-  };
-}
+export const AccessibilityAlertSchema = z.object({
+  severity: AccessibilityAlertSeveritySchema,
+  type: AccessibilityAlertTypeSchema,
+  message: z.string(),
+  suggestion: z.string(),
+  affectedTokens: z.array(z.string()),
+  autoFix: z
+    .object({
+      token: z.string(),
+      newValue: z.string(),
+      reason: z.string(),
+    })
+    .optional(),
+});
+export type AccessibilityAlert = z.infer<typeof AccessibilityAlertSchema>;
+
+export const SemanticMappingEntrySchema = z.object({
+  colorFamily: z.string(),
+  scalePosition: z.number(),
+  fullReference: z.string(),
+  oklch: OKLCHSchema,
+});
+export const SemanticMappingSchema = z.record(z.string(), SemanticMappingEntrySchema);
+export type SemanticMapping = z.infer<typeof SemanticMappingSchema>;
 
 /**
  * Validate semantic mappings with mathematical precision

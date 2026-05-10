@@ -12,7 +12,7 @@
  * const cleanup = createSwatch(el, { l: 0.6, c: 0.15, h: 250 });
  *
  * // later, on pointer move:
- * updateSwatch(el, { l: 0.7, c: 0.12, h: 260, tier: 'gold' });
+ * updateSwatch(el, { l: 0.7, c: 0.12, h: 260, tier: 'srgb' });
  *
  * // teardown
  * cleanup();

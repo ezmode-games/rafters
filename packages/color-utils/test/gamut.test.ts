@@ -57,23 +57,23 @@ describe('isInP3Gamut', () => {
 
 describe('getGamutTier', () => {
   it('classifies sRGB colors as gold', () => {
-    expect(getGamutTier(midGray)).toBe('gold');
-    expect(getGamutTier(srgbBlue)).toBe('gold');
+    expect(getGamutTier(midGray)).toBe('srgb');
+    expect(getGamutTier(srgbBlue)).toBe('srgb');
   });
 
   it('classifies P3-only colors as silver', () => {
-    expect(getGamutTier(p3Green)).toBe('silver');
+    expect(getGamutTier(p3Green)).toBe('p3');
   });
 
   it('classifies out-of-gamut colors as fail', () => {
-    expect(getGamutTier(extremeColor)).toBe('fail');
+    expect(getGamutTier(extremeColor)).toBe('out');
   });
 });
 
 describe('toNearestGamut', () => {
   it('returns the same color for in-gamut sRGB colors', () => {
     const result = toNearestGamut(srgbBlue);
-    expect(result.tier).toBe('gold');
+    expect(result.tier).toBe('srgb');
     expect(result.color.l).toBe(srgbBlue.l);
     expect(result.color.c).toBe(srgbBlue.c);
     expect(result.color.h).toBe(srgbBlue.h);
@@ -81,7 +81,7 @@ describe('toNearestGamut', () => {
 
   it('snaps out-of-gamut colors to gold tier', () => {
     const result = toNearestGamut(p3Green);
-    expect(result.tier).toBe('gold');
+    expect(result.tier).toBe('srgb');
     expect(isInSRGBGamut(result.color)).toBe(true);
   });
 
