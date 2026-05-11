@@ -1,6 +1,6 @@
 import { generateBaseSystem } from '@rafters/design-tokens-v1';
 import { describe, expect, it } from 'vitest';
-import { TokenRegistry, TokenSetManifestSchema, validateTokenSet } from '../../src/index.js';
+import { setTokens, TokenSetManifestSchema, validateTokenSet } from '../../src/index.js';
 import { projectAll } from './project.js';
 
 describe('v1 → v2 parity', () => {
@@ -22,15 +22,14 @@ describe('v1 → v2 parity', () => {
     expect(projected).toBeGreaterThan(0);
   });
 
-  it('projects every v1 token to a token whose value passes the v2 ColorValue/Number/String/Reference/Composite schemas', () => {
+  it('projects every v1 token to a token whose value matches a v2 value kind', () => {
     const sample = projection.tokens.slice(0, 50);
     for (const t of sample) {
-      const v = t.value;
-      expect(['color', 'number', 'string', 'reference', 'composite']).toContain(v.kind);
+      expect(['color', 'number', 'string', 'reference', 'composite']).toContain(t.value.kind);
     }
   });
 
-  it('produces a manifest that loads cleanly into the v2 registry', () => {
+  it('projection produces a manifest that parses and loads as a v2 manifest', () => {
     const manifestData = {
       version: '2' as const,
       id: 'parity-default',
@@ -49,16 +48,10 @@ describe('v1 → v2 parity', () => {
       overrides: [],
     };
 
-    // Manifest parses
     const parsed = TokenSetManifestSchema.safeParse(manifestData);
-    if (!parsed.success) {
-      const sampled = parsed.error.issues.slice(0, 5);
-      console.log('manifest parse failures sample:', JSON.stringify(sampled, null, 2));
-    }
     expect(parsed.success).toBe(true);
     if (!parsed.success) return;
 
-    // Install-time validation gate runs (will surface unknown-dependency-source for cross-namespace refs)
     const result = validateTokenSet(manifestData);
     if (!result.ok) {
       const byCode: Record<string, number> = {};
@@ -66,30 +59,12 @@ describe('v1 → v2 parity', () => {
       console.log('validateTokenSet issue counts:', byCode);
     }
 
-    // Registry round-trip — even if validation surfaces issues, the data structures load
-    const registry = new TokenRegistry();
-    registry.setMany(parsed.data.tokens);
+    const empty = {
+      ...parsed.data,
+      tokens: [],
+    };
+    const loaded = setTokens(empty, parsed.data.tokens);
     const uniqueIds = new Set(parsed.data.tokens.map((t) => t.id));
-    expect(registry.size()).toBe(uniqueIds.size);
-    if (uniqueIds.size !== parsed.data.tokens.length) {
-      const counts = new Map<string, number>();
-      for (const t of parsed.data.tokens) counts.set(t.id, (counts.get(t.id) ?? 0) + 1);
-      const collisions = [...counts.entries()].filter(([, n]) => n > 1);
-      console.log('id collisions in projection:', collisions);
-    }
-  });
-
-  it('snapshot round-trips losslessly', () => {
-    const r1 = new TokenRegistry();
-    r1.setMany(projection.tokens);
-    const snap = r1.snapshot([]);
-
-    const r2 = new TokenRegistry();
-    r2.loadSnapshot(snap);
-
-    expect(r2.size()).toBe(r1.size());
-    const r1Ids = new Set(r1.all().map((t) => t.id));
-    const r2Ids = new Set(r2.all().map((t) => t.id));
-    expect(r2Ids).toEqual(r1Ids);
+    expect(loaded.tokens.length).toBe(uniqueIds.size);
   });
 });

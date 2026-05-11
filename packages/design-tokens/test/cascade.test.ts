@@ -1,9 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { CascadeEngine } from '../src/cascade/index.js';
-import { type Plugin, PluginRegistry } from '../src/plugins/index.js';
-import { NumberValueSchema, type Token } from '../src/schemas/index.js';
-import { TokenRegistry } from '../src/storage/index.js';
+import {
+  fullRun,
+  getToken,
+  NumberValueSchema,
+  type Plugin,
+  PluginRegistry,
+  propagate,
+  recompute,
+  setToken,
+  setTokens,
+  type Token,
+  type TokenSetManifest,
+} from '../src/index.js';
 
 const scalePlugin: Plugin<{ factor: number }, z.infer<typeof NumberValueSchema>> = {
   id: 'scale',
@@ -34,122 +43,140 @@ const makeNumber = (
   source: deps.length === 0 ? 'default' : 'plugin',
 });
 
+const empty = (): TokenSetManifest => ({
+  version: '2',
+  id: 'test',
+  name: 'Test',
+  tokens: [],
+  depends: [],
+  plugins: [],
+  overrides: [],
+});
+
 const setup = () => {
-  const registry = new TokenRegistry();
   const plugins = new PluginRegistry();
   plugins.register(scalePlugin);
-  const engine = new CascadeEngine(registry, plugins);
-  return { registry, plugins, engine };
+  return { plugins };
 };
 
-describe('CascadeEngine', () => {
+describe('cascade (functional)', () => {
   it('returns unchanged for a root token', () => {
-    const { registry, engine } = setup();
-    registry.set(makeNumber('spacing.base', 1));
-    const step = engine.recompute('spacing.base');
+    const { plugins } = setup();
+    const m = setToken(empty(), makeNumber('spacing.base', 1));
+    const { manifest, step } = recompute(m, 'spacing.base', plugins);
     expect(step.ok).toBe(true);
     if (step.ok) expect(step.changed).toBe(false);
+    expect(manifest).toBe(m);
   });
 
-  it('recomputes a single derived token', () => {
-    const { registry, engine } = setup();
-    registry.set(makeNumber('spacing.base', 1));
-    registry.set(
+  it('recomputes a single derived token, returning a new manifest', () => {
+    const { plugins } = setup();
+    const m = setTokens(empty(), [
+      makeNumber('spacing.base', 1),
       makeNumber('spacing.lg', 99, [
         { source: 'spacing.base', plugin: 'scale', args: { factor: 1.5 } },
       ]),
-    );
-    const step = engine.recompute('spacing.lg');
+    ]);
+    const { manifest, step } = recompute(m, 'spacing.lg', plugins);
     expect(step.ok).toBe(true);
-    if (step.ok) {
-      expect(step.changed).toBe(true);
-      expect(step.after).toEqual({ kind: 'number', value: 1.5, unit: 'rem' });
-    }
-    expect(registry.get('spacing.lg')?.value).toEqual({ kind: 'number', value: 1.5, unit: 'rem' });
+    if (step.ok) expect(step.changed).toBe(true);
+    expect(getToken(manifest, 'spacing.lg')?.value).toEqual({
+      kind: 'number',
+      value: 1.5,
+      unit: 'rem',
+    });
+    expect(manifest).not.toBe(m);
   });
 
   it('fullRun processes the graph in topo order', () => {
-    const { registry, engine } = setup();
-    registry.set(makeNumber('spacing.base', 1));
-    registry.set(
+    const { plugins } = setup();
+    const m = setTokens(empty(), [
+      makeNumber('spacing.base', 1),
       makeNumber('spacing.md', 0, [
         { source: 'spacing.base', plugin: 'scale', args: { factor: 2 } },
       ]),
-    );
-    registry.set(
       makeNumber('spacing.lg', 0, [
         { source: 'spacing.md', plugin: 'scale', args: { factor: 1.5 } },
       ]),
-    );
-    const result = engine.fullRun();
+    ]);
+    const result = fullRun(m, plugins);
     expect(result.recomputed).toEqual(['spacing.md', 'spacing.lg']);
     expect(result.changed).toEqual(['spacing.md', 'spacing.lg']);
-    expect(registry.get('spacing.lg')?.value).toEqual({ kind: 'number', value: 3, unit: 'rem' });
+    expect(getToken(result.manifest, 'spacing.lg')?.value).toEqual({
+      kind: 'number',
+      value: 3,
+      unit: 'rem',
+    });
   });
 
   it('propagate recomputes only the affected subgraph', () => {
-    const { registry, engine } = setup();
-    registry.set(makeNumber('spacing.base', 1));
-    registry.set(makeNumber('color.base', 7));
-    registry.set(
+    const { plugins } = setup();
+    const m1 = setTokens(empty(), [
+      makeNumber('spacing.base', 1),
+      makeNumber('color.base', 7),
       makeNumber('spacing.md', 0, [
         { source: 'spacing.base', plugin: 'scale', args: { factor: 2 } },
       ]),
-    );
-    engine.fullRun(); // settle
-    registry.set(makeNumber('spacing.base', 4)); // root change
-    const result = engine.propagate(['spacing.base']);
+    ]);
+    const settled = fullRun(m1, plugins).manifest;
+    const m2 = setToken(settled, makeNumber('spacing.base', 4));
+    const result = propagate(m2, ['spacing.base'], plugins);
     expect(result.recomputed).toEqual(['spacing.md']);
-    expect(registry.get('spacing.md')?.value).toEqual({ kind: 'number', value: 8, unit: 'rem' });
+    expect(getToken(result.manifest, 'spacing.md')?.value).toEqual({
+      kind: 'number',
+      value: 8,
+      unit: 'rem',
+    });
   });
 
   it('reports unknown-plugin without aborting other recomputes', () => {
-    const { registry, engine } = setup();
-    registry.set(makeNumber('spacing.base', 1));
-    registry.set(
+    const { plugins } = setup();
+    const m = setTokens(empty(), [
+      makeNumber('spacing.base', 1),
       makeNumber('spacing.lg', 0, [{ source: 'spacing.base', plugin: 'missing', args: {} }]),
-    );
-    const result = engine.fullRun();
+    ]);
+    const result = fullRun(m, plugins);
     expect(result.issues.some((i) => i.code === 'unknown-plugin')).toBe(true);
   });
 
   it('reports multi-source-not-supported when a token has multiple edges', () => {
-    const { registry, engine } = setup();
-    registry.set(makeNumber('spacing.base', 1));
-    registry.set(makeNumber('color.base', 7));
-    registry.set(
+    const { plugins } = setup();
+    const m = setTokens(empty(), [
+      makeNumber('spacing.base', 1),
+      makeNumber('color.base', 7),
       makeNumber('spacing.combo', 0, [
         { source: 'spacing.base', plugin: 'scale', args: { factor: 2 } },
         { source: 'color.base', plugin: 'scale', args: { factor: 3 } },
       ]),
-    );
-    const step = engine.recompute('spacing.combo');
+    ]);
+    const { step } = recompute(m, 'spacing.combo', plugins);
     expect(step.ok).toBe(false);
     if (!step.ok) expect(step.issues[0]?.code).toBe('multi-source-not-supported');
   });
 
-  it('reports missing-source when the dependency is not in the registry', () => {
-    const { registry, engine } = setup();
-    registry.set(
+  it('reports missing-source when the dependency is not in the manifest', () => {
+    const { plugins } = setup();
+    const m = setToken(
+      empty(),
       makeNumber('spacing.lg', 0, [
         { source: 'spacing.nope', plugin: 'scale', args: { factor: 1 } },
       ]),
     );
-    const step = engine.recompute('spacing.lg');
+    const { step } = recompute(m, 'spacing.lg', plugins);
     expect(step.ok).toBe(false);
     if (!step.ok) expect(step.issues[0]?.code).toBe('missing-source');
   });
 
-  it('is idempotent — running fullRun twice produces the same state', () => {
-    const { registry, engine } = setup();
-    registry.set(makeNumber('spacing.base', 1));
-    registry.set(
+  it('is idempotent — running fullRun twice produces zero changes the second time', () => {
+    const { plugins } = setup();
+    const m = setTokens(empty(), [
+      makeNumber('spacing.base', 1),
       makeNumber('spacing.lg', 0, [
         { source: 'spacing.base', plugin: 'scale', args: { factor: 1.5 } },
       ]),
-    );
-    const first = engine.fullRun();
-    const second = engine.fullRun();
+    ]);
+    const first = fullRun(m, plugins);
+    const second = fullRun(first.manifest, plugins);
     expect(first.changed).toEqual(['spacing.lg']);
     expect(second.changed).toEqual([]);
   });

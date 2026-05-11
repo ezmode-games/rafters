@@ -1,8 +1,9 @@
 import { derive } from '../plugins/derive.js';
 import type { PluginRegistry } from '../plugins/registry.js';
+import type { TokenSetManifest } from '../schemas/manifest.js';
 import type { TokenId } from '../schemas/token.js';
 import type { TokenValue } from '../schemas/value.js';
-import type { TokenRegistry } from '../storage/registry.js';
+import { dependents, getToken, setToken, topological } from '../storage/index.js';
 
 export type CascadeIssueCode =
   | 'unknown-token'
@@ -37,39 +38,41 @@ export interface CascadeStepFail {
 export type CascadeStepResult = CascadeStepOk | CascadeStepFail;
 
 export interface CascadeRunResult {
+  manifest: TokenSetManifest;
   recomputed: TokenId[];
   changed: TokenId[];
   issues: CascadeIssue[];
 }
 
-/**
- * Read the registry's dependency graph, recompute derived tokens via plugins,
- * persist results back. Pure with respect to the registry — every effect
- * routes through TokenRegistry.set(). No registry handle leaves this engine.
- */
-export class CascadeEngine {
-  constructor(
-    private readonly registry: TokenRegistry,
-    private readonly plugins: PluginRegistry,
-  ) {}
-
-  /** Recompute exactly one token from its dependsOn edges. Root tokens (no deps) are no-ops. */
-  recompute(id: TokenId): CascadeStepResult {
-    const token = this.registry.get(id);
-    if (!token) {
-      return {
+/** Recompute exactly one token. Returns the next manifest (possibly === input if unchanged) and the step result. */
+export function recompute(
+  manifest: TokenSetManifest,
+  id: TokenId,
+  plugins: PluginRegistry,
+): { manifest: TokenSetManifest; step: CascadeStepResult } {
+  const token = getToken(manifest, id);
+  if (!token) {
+    return {
+      manifest,
+      step: {
         ok: false,
         id,
-        issues: [{ id, code: 'unknown-token', message: `Token "${id}" is not in the registry.` }],
-      };
-    }
+        issues: [{ id, code: 'unknown-token', message: `Token "${id}" is not in the manifest.` }],
+      },
+    };
+  }
 
-    if (token.dependsOn.length === 0) {
-      return { ok: true, id, before: token.value, after: token.value, changed: false };
-    }
+  if (token.dependsOn.length === 0) {
+    return {
+      manifest,
+      step: { ok: true, id, before: token.value, after: token.value, changed: false },
+    };
+  }
 
-    if (token.dependsOn.length > 1) {
-      return {
+  if (token.dependsOn.length > 1) {
+    return {
+      manifest,
+      step: {
         ok: false,
         id,
         issues: [
@@ -79,31 +82,40 @@ export class CascadeEngine {
             message: `Token "${id}" has ${token.dependsOn.length} dependsOn edges. v2 cascade supports single-edge derivations only.`,
           },
         ],
-      };
-    }
+      },
+    };
+  }
 
-    const dep = token.dependsOn[0];
-    if (!dep) {
-      return { ok: true, id, before: token.value, after: token.value, changed: false };
-    }
-    const source = this.registry.get(dep.source);
-    if (!source) {
-      return {
+  const dep = token.dependsOn[0];
+  if (!dep) {
+    return {
+      manifest,
+      step: { ok: true, id, before: token.value, after: token.value, changed: false },
+    };
+  }
+  const source = getToken(manifest, dep.source);
+  if (!source) {
+    return {
+      manifest,
+      step: {
         ok: false,
         id,
         issues: [
           {
             id,
             code: 'missing-source',
-            message: `Token "${id}" depends on "${dep.source}" which is not in the registry.`,
+            message: `Token "${id}" depends on "${dep.source}" which is not in the manifest.`,
           },
         ],
-      };
-    }
+      },
+    };
+  }
 
-    const plugin = this.plugins.get(dep.plugin);
-    if (!plugin) {
-      return {
+  const plugin = plugins.get(dep.plugin);
+  if (!plugin) {
+    return {
+      manifest,
+      step: {
         ok: false,
         id,
         issues: [
@@ -113,73 +125,79 @@ export class CascadeEngine {
             message: `Token "${id}" requires plugin "${dep.plugin}" which is not registered.`,
           },
         ],
-      };
-    }
+      },
+    };
+  }
 
-    const result = derive(plugin, source.value, dep.args, id);
-    if (!result.ok) {
-      return {
+  const result = derive(plugin, source.value, dep.args, id);
+  if (!result.ok) {
+    return {
+      manifest,
+      step: {
         ok: false,
         id,
         issues: [{ id, code: result.code, message: result.message, cause: result.cause }],
-      };
-    }
-
-    const before = token.value;
-    const after = result.value;
-    const changed = !valuesEqual(before, after);
-    if (changed) {
-      this.registry.set({ ...token, value: after });
-    }
-    return { ok: true, id, before, after, changed };
+      },
+    };
   }
 
-  /** Walk every non-root token in topological order, recompute each. */
-  fullRun(): CascadeRunResult {
-    const order = this.registry.topological();
-    return this.run(order);
-  }
+  const before = token.value;
+  const after = result.value;
+  const changed = !valuesEqual(before, after);
+  const nextManifest = changed ? setToken(manifest, { ...token, value: after }) : manifest;
+  return { manifest: nextManifest, step: { ok: true, id, before, after, changed } };
+}
 
-  /** Recompute the transitive dependents of `changedIds` in topo order. */
-  propagate(changedIds: readonly TokenId[]): CascadeRunResult {
-    const visited = new Set<TokenId>();
-    const frontier: TokenId[] = [];
-    const queue = [...changedIds];
-    while (queue.length > 0) {
-      const next = queue.shift();
-      if (next === undefined) break;
-      for (const dependent of this.registry.dependents(next)) {
-        if (visited.has(dependent)) continue;
-        visited.add(dependent);
-        frontier.push(dependent);
-        queue.push(dependent);
-      }
+/** Recompute every non-root token in topological order. */
+export function fullRun(manifest: TokenSetManifest, plugins: PluginRegistry): CascadeRunResult {
+  return runOrder(manifest, topological(manifest), plugins);
+}
+
+/** Recompute the transitive dependents of `changedIds` in topological order. */
+export function propagate(
+  manifest: TokenSetManifest,
+  changedIds: readonly TokenId[],
+  plugins: PluginRegistry,
+): CascadeRunResult {
+  const affected = new Set<TokenId>();
+  const queue = [...changedIds];
+  while (queue.length > 0) {
+    const next = queue.shift();
+    if (next === undefined) break;
+    for (const dep of dependents(manifest, next)) {
+      if (affected.has(dep)) continue;
+      affected.add(dep);
+      queue.push(dep);
     }
-
-    const topoOrder = this.registry.topological();
-    const order = topoOrder.filter((id) => visited.has(id));
-    return this.run(order);
   }
+  const order = topological(manifest).filter((id) => affected.has(id));
+  return runOrder(manifest, order, plugins);
+}
 
-  private run(order: readonly TokenId[]): CascadeRunResult {
-    const recomputed: TokenId[] = [];
-    const changed: TokenId[] = [];
-    const issues: CascadeIssue[] = [];
+function runOrder(
+  manifest: TokenSetManifest,
+  order: readonly TokenId[],
+  plugins: PluginRegistry,
+): CascadeRunResult {
+  let current = manifest;
+  const recomputed: TokenId[] = [];
+  const changed: TokenId[] = [];
+  const issues: CascadeIssue[] = [];
 
-    for (const id of order) {
-      const token = this.registry.get(id);
-      if (!token || token.dependsOn.length === 0) continue;
-      const step = this.recompute(id);
-      recomputed.push(id);
-      if (step.ok) {
-        if (step.changed) changed.push(id);
-      } else {
-        issues.push(...step.issues);
-      }
+  for (const id of order) {
+    const token = getToken(current, id);
+    if (!token || token.dependsOn.length === 0) continue;
+    const { manifest: next, step } = recompute(current, id, plugins);
+    current = next;
+    recomputed.push(id);
+    if (step.ok) {
+      if (step.changed) changed.push(id);
+    } else {
+      issues.push(...step.issues);
     }
-
-    return { recomputed, changed, issues };
   }
+
+  return { manifest: current, recomputed, changed, issues };
 }
 
 function valuesEqual(a: TokenValue, b: TokenValue): boolean {

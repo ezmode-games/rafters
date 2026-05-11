@@ -1,9 +1,8 @@
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import type { TokenSetManifest } from '../src/schemas/index.js';
-import { loadManifest, loadSnapshot, saveManifest, saveSnapshot } from '../src/storage/index.js';
+import { loadManifest, saveManifest, type TokenSetManifest } from '../src/index.js';
 
 const fixture: TokenSetManifest = {
   version: '2',
@@ -53,23 +52,8 @@ describe('persistence', () => {
   it('loadManifest rejects malformed JSON', async () => {
     const path = join(dir, 'broken.json');
     await saveManifest(path, fixture);
-    const bad = (await readFile(path, 'utf8')).replace('"version": "2"', '"version": "1"');
-    const { writeFile } = await import('node:fs/promises');
-    await writeFile(path, bad, 'utf8');
+    const raw = await readFile(path, 'utf8');
+    await writeFile(path, raw.replace('"version": "2"', '"version": "1"'), 'utf8');
     await expect(loadManifest(path)).rejects.toThrow();
-  });
-
-  it('round-trips a snapshot', async () => {
-    const path = join(dir, 'snap.json');
-    const snapshot = {
-      version: '2' as const,
-      takenAt: '2026-05-10T20:00:00.000Z',
-      tokens: fixture.tokens,
-      overrides: [],
-      pluginIds: ['state-hover'],
-    };
-    await saveSnapshot(path, snapshot);
-    const loaded = await loadSnapshot(path);
-    expect(loaded).toEqual(snapshot);
   });
 });

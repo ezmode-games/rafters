@@ -1,7 +1,15 @@
+export { deleteToken, setToken, setTokens } from './mutations.js';
+export { loadManifest, saveManifest } from './persistence.js';
 export {
-  loadManifest,
-  loadSnapshot,
-  saveManifest,
-  saveSnapshot,
-} from './persistence.js';
-export { TokenRegistry } from './registry.js';
+  dependencies,
+  dependents,
+  getToken,
+  roots,
+  tokensInNamespace,
+  topological,
+} from './queries.js';
+export {
+  type MutationEvent,
+  type MutationHook,
+  TokenStore,
+} from './store.js';

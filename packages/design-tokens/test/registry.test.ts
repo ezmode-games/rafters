@@ -1,6 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import type { Token } from '../src/schemas/index.js';
-import { TokenRegistry } from '../src/storage/index.js';
+import {
+  deleteToken,
+  dependencies,
+  dependents,
+  getToken,
+  roots,
+  setToken,
+  setTokens,
+  type Token,
+  type TokenSetManifest,
+  tokensInNamespace,
+  topological,
+} from '../src/index.js';
 
 const token = (id: string, dependsOn: { source: string; plugin: string }[] = []): Token => ({
   id,
@@ -11,98 +22,79 @@ const token = (id: string, dependsOn: { source: string; plugin: string }[] = [])
   source: 'default',
 });
 
-describe('TokenRegistry', () => {
-  it('stores and retrieves tokens', () => {
-    const r = new TokenRegistry();
-    const t = token('color.primary.500');
-    r.set(t);
-    expect(r.get('color.primary.500')?.id).toBe('color.primary.500');
-    expect(r.has('color.primary.500')).toBe(true);
-    expect(r.size()).toBe(1);
+const empty = (): TokenSetManifest => ({
+  version: '2',
+  id: 'test',
+  name: 'Test',
+  tokens: [],
+  depends: [],
+  plugins: [],
+  overrides: [],
+});
+
+describe('manifest queries', () => {
+  it('finds tokens by id', () => {
+    const m = setToken(empty(), token('color.primary.500'));
+    expect(getToken(m, 'color.primary.500')?.id).toBe('color.primary.500');
+    expect(getToken(m, 'color.nope')).toBeUndefined();
   });
 
-  it('replaces a token in place and reindexes edges', () => {
-    const r = new TokenRegistry();
-    r.set(token('color.a.500'));
-    r.set(token('color.b.500', [{ source: 'color.a.500', plugin: 'p' }]));
-    expect(r.dependents('color.a.500')).toEqual(['color.b.500']);
-
-    r.set(token('color.b.500')); // remove edge
-    expect(r.dependents('color.a.500')).toEqual([]);
+  it('filters by namespace', () => {
+    const m = setTokens(empty(), [token('color.a.500'), token('spacing.lg')]);
+    expect(tokensInNamespace(m, 'color')).toHaveLength(1);
+    expect(tokensInNamespace(m, 'spacing')).toHaveLength(1);
   });
 
-  it('exposes dependencies and dependents in both directions', () => {
-    const r = new TokenRegistry();
-    r.set(token('color.a.500'));
-    r.set(token('color.b.500', [{ source: 'color.a.500', plugin: 'p' }]));
-    r.set(token('color.c.500', [{ source: 'color.b.500', plugin: 'p' }]));
-
-    expect(r.dependencies('color.b.500')).toEqual(['color.a.500']);
-    expect(r.dependents('color.a.500')).toEqual(['color.b.500']);
-    expect(r.dependents('color.b.500')).toEqual(['color.c.500']);
-    expect(r.dependents('color.c.500')).toEqual([]);
+  it('lists dependencies and dependents', () => {
+    const m = setTokens(empty(), [
+      token('color.a.500'),
+      token('color.b.500', [{ source: 'color.a.500', plugin: 'p' }]),
+      token('color.c.500', [{ source: 'color.b.500', plugin: 'p' }]),
+    ]);
+    expect(dependencies(m, 'color.b.500')).toEqual(['color.a.500']);
+    expect(dependents(m, 'color.a.500')).toEqual(['color.b.500']);
+    expect(dependents(m, 'color.b.500')).toEqual(['color.c.500']);
   });
 
   it('lists roots', () => {
-    const r = new TokenRegistry();
-    r.set(token('color.a.500'));
-    r.set(token('color.b.500', [{ source: 'color.a.500', plugin: 'p' }]));
-    expect(r.roots()).toEqual(['color.a.500']);
+    const m = setTokens(empty(), [
+      token('color.a.500'),
+      token('color.b.500', [{ source: 'color.a.500', plugin: 'p' }]),
+    ]);
+    expect(roots(m)).toEqual(['color.a.500']);
   });
 
-  it('groups by namespace', () => {
-    const r = new TokenRegistry();
-    r.set(token('color.a.500'));
-    r.set(token('spacing.lg'));
-    expect(r.byNamespace('color')).toHaveLength(1);
-    expect(r.byNamespace('spacing')).toHaveLength(1);
-  });
-
-  it('topologically sorts dependencies before dependents', () => {
-    const r = new TokenRegistry();
-    r.set(token('color.a.500'));
-    r.set(token('color.b.500', [{ source: 'color.a.500', plugin: 'p' }]));
-    r.set(token('color.c.500', [{ source: 'color.b.500', plugin: 'p' }]));
-    const order = r.topological();
+  it('topologically orders dependencies before dependents', () => {
+    const m = setTokens(empty(), [
+      token('color.a.500'),
+      token('color.b.500', [{ source: 'color.a.500', plugin: 'p' }]),
+      token('color.c.500', [{ source: 'color.b.500', plugin: 'p' }]),
+    ]);
+    const order = topological(m);
     expect(order.indexOf('color.a.500')).toBeLessThan(order.indexOf('color.b.500'));
     expect(order.indexOf('color.b.500')).toBeLessThan(order.indexOf('color.c.500'));
   });
 
   it('throws on cycle during topological sort', () => {
-    const r = new TokenRegistry();
-    r.set(token('color.a.500', [{ source: 'color.b.500', plugin: 'p' }]));
-    r.set(token('color.b.500', [{ source: 'color.a.500', plugin: 'p' }]));
-    expect(() => r.topological()).toThrow(/cycle/);
+    const m = setTokens(empty(), [
+      token('color.a.500', [{ source: 'color.b.500', plugin: 'p' }]),
+      token('color.b.500', [{ source: 'color.a.500', plugin: 'p' }]),
+    ]);
+    expect(() => topological(m)).toThrow(/cycle/);
   });
 
-  it('delete unindexes edges', () => {
-    const r = new TokenRegistry();
-    r.set(token('color.a.500'));
-    r.set(token('color.b.500', [{ source: 'color.a.500', plugin: 'p' }]));
-    r.delete('color.b.500');
-    expect(r.dependents('color.a.500')).toEqual([]);
-    expect(r.has('color.b.500')).toBe(false);
+  it('setToken is pure — original manifest is not mutated', () => {
+    const m1 = empty();
+    const m2 = setToken(m1, token('color.a.500'));
+    expect(m1.tokens).toHaveLength(0);
+    expect(m2.tokens).toHaveLength(1);
   });
 
-  it('snapshot serializes the full state', () => {
-    const r = new TokenRegistry();
-    r.set(token('color.a.500'));
-    r.set(token('color.b.500', [{ source: 'color.a.500', plugin: 'state-hover' }]));
-    const snap = r.snapshot(['state-hover']);
-    expect(snap.version).toBe('2');
-    expect(snap.tokens).toHaveLength(2);
-    expect(snap.pluginIds).toEqual(['state-hover']);
-  });
-
-  it('loadSnapshot replays into an empty registry', () => {
-    const r1 = new TokenRegistry();
-    r1.set(token('color.a.500'));
-    r1.set(token('color.b.500', [{ source: 'color.a.500', plugin: 'p' }]));
-    const snap = r1.snapshot([]);
-
-    const r2 = new TokenRegistry();
-    r2.loadSnapshot(snap);
-    expect(r2.size()).toBe(2);
-    expect(r2.dependents('color.a.500')).toEqual(['color.b.500']);
+  it('deleteToken removes by id and returns same reference when absent', () => {
+    const m = setToken(empty(), token('color.a.500'));
+    const next = deleteToken(m, 'color.a.500');
+    expect(next.tokens).toHaveLength(0);
+    const same = deleteToken(m, 'color.nope');
+    expect(same).toBe(m);
   });
 });

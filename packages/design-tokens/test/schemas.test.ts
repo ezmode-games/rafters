@@ -6,7 +6,6 @@ import {
   NumberValueSchema,
   PluginManifestSchema,
   ReferenceValueSchema,
-  RegistrySnapshotSchema,
   StringValueSchema,
   TokenDependencySchema,
   TokenIdSchema,
@@ -206,19 +205,5 @@ describe('TokenSetManifestSchema', () => {
         tokens: [],
       }).success,
     ).toBe(false);
-  });
-});
-
-describe('RegistrySnapshotSchema', () => {
-  it('parses an empty snapshot', () => {
-    expect(
-      RegistrySnapshotSchema.parse({
-        version: '2',
-        takenAt: '2026-05-10T20:00:00.000Z',
-        tokens: [],
-        overrides: [],
-        pluginIds: [],
-      }),
-    ).toBeDefined();
   });
 });

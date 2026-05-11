@@ -22,10 +22,6 @@ export {
   PluginManifestSchema,
 } from './plugin.js';
 export {
-  type RegistrySnapshot,
-  RegistrySnapshotSchema,
-} from './snapshot.js';
-export {
   type Token,
   type TokenId,
   TokenIdSchema,
