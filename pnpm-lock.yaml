@@ -456,16 +456,13 @@ importers:
 
   packages/design-tokens:
     dependencies:
+      '@rafters/shared':
+        specifier: workspace:*
+        version: link:../shared
       zod:
         specifier: 'catalog:'
         version: 4.1.12
     devDependencies:
-      '@rafters/design-tokens-v1':
-        specifier: workspace:*
-        version: link:../design-tokens-v1
-      '@rafters/shared':
-        specifier: workspace:*
-        version: link:../shared
       '@types/node':
         specifier: 'catalog:'
         version: 24.10.0
