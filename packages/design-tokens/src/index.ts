@@ -3,3 +3,4 @@
 // Consumers on v1 import from @rafters/design-tokens-v1 until parity.
 
 export * from './schemas/index.js';
+export * from './validation/index.js';
