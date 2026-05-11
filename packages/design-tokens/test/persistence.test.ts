@@ -1,187 +1,75 @@
-import { mkdir, readFile, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { Token } from '@rafters/shared';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { NodePersistenceAdapter } from '../src/persistence/node-adapter.js';
+import type { TokenSetManifest } from '../src/schemas/index.js';
+import { loadManifest, loadSnapshot, saveManifest, saveSnapshot } from '../src/storage/index.js';
 
-describe('NodePersistenceAdapter', () => {
-  const testDir = '/tmp/rafters-test-persistence';
-  let adapter: NodePersistenceAdapter;
+const fixture: TokenSetManifest = {
+  version: '2',
+  id: 'fixture',
+  name: 'Fixture',
+  tokens: [
+    {
+      id: 'color.primary.500',
+      namespace: 'color',
+      value: { kind: 'color', l: 0.5, c: 0.2, h: 180 },
+      dependsOn: [],
+      metadata: {},
+      source: 'default',
+    },
+  ],
+  depends: [],
+  plugins: [],
+  overrides: [],
+};
+
+describe('persistence', () => {
+  let dir: string;
 
   beforeEach(async () => {
-    await mkdir(testDir, { recursive: true });
-    adapter = new NodePersistenceAdapter(testDir);
+    dir = await mkdtemp(join(tmpdir(), 'rafters-design-tokens-'));
   });
 
   afterEach(async () => {
-    await rm(testDir, { recursive: true, force: true });
+    await rm(dir, { recursive: true, force: true });
   });
 
-  it('should save and load tokens', async () => {
-    const tokens: Token[] = [
-      {
-        name: 'test-token',
-        value: '1rem',
-        category: 'spacing',
-        namespace: 'spacing',
-        userOverride: null,
-      },
-    ];
-
-    await adapter.save(tokens);
-    const loaded = await adapter.load();
-
-    expect(loaded).toHaveLength(1);
-    expect(loaded[0]).toMatchObject({
-      name: 'test-token',
-      value: '1rem',
-      category: 'spacing',
-      namespace: 'spacing',
-    });
+  it('round-trips a manifest', async () => {
+    const path = join(dir, 'set.rafters.json');
+    await saveManifest(path, fixture);
+    const loaded = await loadManifest(path);
+    expect(loaded).toEqual(fixture);
   });
 
-  it('should create directory structure on save', async () => {
-    const tokens: Token[] = [
-      {
-        name: 'test',
-        value: '1',
-        category: 'test',
-        namespace: 'test',
-        userOverride: null,
-      },
-    ];
-
-    await adapter.save(tokens);
-
-    const content = await readFile(
-      join(testDir, '.rafters', 'tokens', 'test.rafters.json'),
-      'utf-8',
-    );
-    const data = JSON.parse(content);
-    expect(data.namespace).toBe('test');
-    expect(data.tokens).toEqual(tokens);
+  it('saveManifest writes pretty JSON ending with a newline', async () => {
+    const path = join(dir, 'set.rafters.json');
+    await saveManifest(path, fixture);
+    const raw = await readFile(path, 'utf8');
+    expect(raw.endsWith('\n')).toBe(true);
+    expect(raw).toContain('\n  ');
   });
 
-  it('should include schema and version in saved files', async () => {
-    const tokens: Token[] = [
-      { name: 'color-1', value: '#fff', category: 'color', namespace: 'color', userOverride: null },
-    ];
-    await adapter.save(tokens);
-
-    const content = await readFile(
-      join(testDir, '.rafters', 'tokens', 'color.rafters.json'),
-      'utf-8',
-    );
-    const data = JSON.parse(content);
-
-    expect(data.$schema).toBe('https://rafters.studio/schemas/namespace-tokens.json');
-    expect(data.version).toBe('1.0.0');
-    expect(data.generatedAt).toBeDefined();
+  it('loadManifest rejects malformed JSON', async () => {
+    const path = join(dir, 'broken.json');
+    await saveManifest(path, fixture);
+    const bad = (await readFile(path, 'utf8')).replace('"version": "2"', '"version": "1"');
+    const { writeFile } = await import('node:fs/promises');
+    await writeFile(path, bad, 'utf8');
+    await expect(loadManifest(path)).rejects.toThrow();
   });
 
-  it('should return empty array if tokens directory does not exist', async () => {
-    const loaded = await adapter.load();
-    expect(loaded).toEqual([]);
-  });
-
-  it('should group tokens by namespace into separate files', async () => {
-    const tokens: Token[] = [
-      { name: 'color-1', value: '#fff', category: 'color', namespace: 'color', userOverride: null },
-      {
-        name: 'spacing-1',
-        value: '1rem',
-        category: 'spacing',
-        namespace: 'spacing',
-        userOverride: null,
-      },
-    ];
-
-    await adapter.save(tokens);
-
-    // Check color file
-    const colorContent = await readFile(
-      join(testDir, '.rafters', 'tokens', 'color.rafters.json'),
-      'utf-8',
-    );
-    const colorData = JSON.parse(colorContent);
-    expect(colorData.tokens).toHaveLength(1);
-    expect(colorData.tokens[0].name).toBe('color-1');
-
-    // Check spacing file
-    const spacingContent = await readFile(
-      join(testDir, '.rafters', 'tokens', 'spacing.rafters.json'),
-      'utf-8',
-    );
-    const spacingData = JSON.parse(spacingContent);
-    expect(spacingData.tokens).toHaveLength(1);
-    expect(spacingData.tokens[0].name).toBe('spacing-1');
-  });
-
-  it('should load tokens from multiple namespace files', async () => {
-    const tokens: Token[] = [
-      { name: 'color-1', value: '#fff', category: 'color', namespace: 'color', userOverride: null },
-      { name: 'color-2', value: '#000', category: 'color', namespace: 'color', userOverride: null },
-      {
-        name: 'spacing-1',
-        value: '1rem',
-        category: 'spacing',
-        namespace: 'spacing',
-        userOverride: null,
-      },
-    ];
-
-    await adapter.save(tokens);
-    const loaded = await adapter.load();
-
-    expect(loaded).toHaveLength(3);
-    expect(loaded.map((t) => t.name).sort()).toEqual(['color-1', 'color-2', 'spacing-1']);
-  });
-
-  it('should overwrite existing namespace on save', async () => {
-    const tokens1: Token[] = [
-      { name: 'old', value: '1', category: 'test', namespace: 'test', userOverride: null },
-    ];
-    const tokens2: Token[] = [
-      { name: 'new', value: '2', category: 'test', namespace: 'test', userOverride: null },
-    ];
-
-    await adapter.save(tokens1);
-    await adapter.save(tokens2);
-
-    const loaded = await adapter.load();
-
-    expect(loaded).toHaveLength(1);
-    expect(loaded[0]?.name).toBe('new');
-  });
-
-  it('should handle multiple tokens in same namespace', async () => {
-    const tokens: Token[] = [
-      {
-        name: 'spacing-1',
-        value: '0.25rem',
-        category: 'spacing',
-        namespace: 'spacing',
-        userOverride: null,
-      },
-      {
-        name: 'spacing-2',
-        value: '0.5rem',
-        category: 'spacing',
-        namespace: 'spacing',
-        userOverride: null,
-      },
-      {
-        name: 'spacing-4',
-        value: '1rem',
-        category: 'spacing',
-        namespace: 'spacing',
-        userOverride: null,
-      },
-    ];
-
-    await adapter.save(tokens);
-    const loaded = await adapter.load();
-
-    expect(loaded).toHaveLength(3);
+  it('round-trips a snapshot', async () => {
+    const path = join(dir, 'snap.json');
+    const snapshot = {
+      version: '2' as const,
+      takenAt: '2026-05-10T20:00:00.000Z',
+      tokens: fixture.tokens,
+      overrides: [],
+      pluginIds: ['state-hover'],
+    };
+    await saveSnapshot(path, snapshot);
+    const loaded = await loadSnapshot(path);
+    expect(loaded).toEqual(snapshot);
   });
 });

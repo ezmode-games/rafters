@@ -1,8 +1,8 @@
 {
   "name": "@rafters/design-tokens",
   "private": true,
-  "version": "0.0.1",
-  "description": "Revolutionary dependency-aware design token system with W3C DTCG compliance",
+  "version": "0.0.0",
+  "description": "Design token system. Zod-schema-first. Pure infrastructure: storage, DAG, cascade, plugin protocol, persistence. Domain code (color, motion, typography) lives in dedicated packages.",
   "type": "module",
   "exports": {
     ".": "./src/index.ts"
@@ -18,18 +18,14 @@
     "clean": "rm -rf .turbo coverage"
   },
   "dependencies": {
-    "@rafters/color-utils": "workspace:*",
-    "@rafters/math-utils": "workspace:*",
-    "@rafters/shared": "workspace:*",
-    "@tailwindcss/cli": "^4.1.18",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@rafters/design-tokens-v1": "workspace:*",
+    "@rafters/shared": "workspace:*",
     "@types/node": "catalog:",
-    "style-dictionary": "^5.1.1",
     "typescript": "catalog:",
-    "vitest": "catalog:",
-    "zocker": "catalog:"
+    "vitest": "catalog:"
   },
   "publishConfig": {
     "access": "public"

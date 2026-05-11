@@ -16,7 +16,7 @@
     "@astrojs/cloudflare": "^12.6.12",
     "@astrojs/mdx": "^4.3.13",
     "@astrojs/react": "^4.4.2",
-    "@rafters/design-tokens": "workspace:*",
+    "@rafters/design-tokens-v1": "workspace:*",
     "@tailwindcss/vite": "^4.1.18",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
