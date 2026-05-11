@@ -87,14 +87,15 @@ pnpm --filter=@rafters/shared test
 
 - **Packages**: 6 core packages
   - `packages/cli/` - AI-first design intelligence CLI with MCP server
-  - `packages/design-tokens/` - Dependency-aware design token system
+  - `packages/design-tokens/` - v2 clean-start, zod-schema-first (in progress, empty until parity)
+  - `packages/design-tokens-v1/` - frozen v1, consumed by all apps until parity harness passes
   - `packages/ui/` - React components (55 total, 52 shadcn-compatible, 17 primitives)
   - `packages/shared/` - Consolidated utilities, types, and schemas
   - `packages/color-utils/` - OKLCH color intelligence
   - `packages/math-utils/` - Mathematical progressions and scales
 
 ### Design Token System Architecture
-The `@rafters/design-tokens` package implements a sophisticated dependency graph system:
+The `@rafters/design-tokens-v1` package (frozen) implements a sophisticated dependency graph system. v2 (`@rafters/design-tokens`) is a clean-start rewrite, zod-schema-first, with parity-test gate before consumer migration:
 
 - **Archive-Based Distribution**: Design systems distributed as ZIP archives (SQIDs)
 - **Dependency Engine**: 5 rule types for automatic token transformations

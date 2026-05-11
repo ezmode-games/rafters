@@ -6,7 +6,7 @@
  */
 
 import { EventEmitter } from 'node:events';
-import { TokenRegistry } from '@rafters/design-tokens';
+import { TokenRegistry } from '@rafters/design-tokens-v1';
 import type { Token } from '@rafters/shared';
 import { ColorReferenceSchema, ColorValueSchema, TokenSchema } from '@rafters/shared';
 import { describe, expect, it } from 'vitest';

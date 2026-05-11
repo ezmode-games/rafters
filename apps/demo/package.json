@@ -17,7 +17,7 @@
     "@astrojs/react": "^4.4.2",
     "@rafters/color-utils": "workspace:*",
     "@rafters/composites": "workspace:*",
-    "@rafters/design-tokens": "workspace:*",
+    "@rafters/design-tokens-v1": "workspace:*",
     "@rafters/ui": "workspace:*",
     "@tailwindcss/vite": "^4.1.18",
     "@types/react": "catalog:",

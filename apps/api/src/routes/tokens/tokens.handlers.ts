@@ -5,7 +5,7 @@ import {
   generateNamespaces,
   getAvailableNamespaces,
   TokenRegistry,
-} from '@rafters/design-tokens';
+} from '@rafters/design-tokens-v1';
 import { COMPUTED, type Token } from '@rafters/shared';
 import * as HttpStatusCodes from 'stoker/http-status-codes';
 import type { AppRouteHandler } from '@/lib/types';

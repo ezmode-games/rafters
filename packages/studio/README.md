@@ -181,7 +181,7 @@ packages/studio/
 
 **THIN UI Pattern**: Studio is just a UI layer. All intelligence lives in:
 - `@rafters/color-utils` - Color calculations
-- `@rafters/design-tokens` - TokenRegistry, persistence
+- `@rafters/design-tokens-v1` - TokenRegistry, persistence
 - `@rafters/shared` - Zod schemas, types
 
 ## Development

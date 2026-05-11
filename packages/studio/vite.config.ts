@@ -18,12 +18,12 @@ export default defineConfig({
     extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
   },
   optimizeDeps: {
-    include: ['@rafters/color-utils', '@rafters/design-tokens', '@rafters/shared'],
+    include: ['@rafters/color-utils', '@rafters/design-tokens-v1', '@rafters/shared'],
   },
   ssr: {
     noExternal: [
       '@rafters/color-utils',
-      '@rafters/design-tokens',
+      '@rafters/design-tokens-v1',
       '@rafters/shared',
       '@rafters/math-utils',
     ],
