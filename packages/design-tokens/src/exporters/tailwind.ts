@@ -1,5 +1,5 @@
 import type { ColorReference, ColorValue, OKLCH, Token } from '@rafters/shared';
-import { COLOR_SCALE_POSITIONS, type ColorScalePosition } from '../generators/color.js';
+import { COLOR_SCALE_POSITIONS } from '../generators/color.js';
 import type { TokenRegistry } from '../registry.js';
 import { computeDarkScale } from './dark-mode.js';
 
@@ -8,7 +8,7 @@ const POSITION_TO_INDEX: Record<string, number> = Object.fromEntries(
 );
 
 /**
- * Emit the color slice of a Tailwind v4 @theme block plus a dark-mode section.
+ * Emit a Tailwind v4 @theme block plus a dark-mode section.
  *
  * Color-namespace tokens:
  *   - Family token (value is a ColorValue with scale): emit `--color-{family}: oklch(...)`
@@ -16,17 +16,21 @@ const POSITION_TO_INDEX: Record<string, number> = Object.fromEntries(
  *   - Per-position token (value is a ColorReference): resolve through the family's
  *     scale and emit literal `--color-{name}: oklch(...)`. If the family or position
  *     can't be resolved, emit a CSS comment and continue.
- *   - Per-position token with a userOverride or a non-reference value: emit the
- *     literal value verbatim (override wins; the designer pinned it for a reason).
+ *   - userOverride with string value wins.
  *
- * Semantic-namespace tokens with ColorReference values: emit as `var(--color-{family}-{position})`
- * so the redirection survives into the CSS and dark-mode swaps work at runtime.
+ * Semantic-namespace tokens with ColorReference values: emit as
+ * `var(--color-{family}-{position})` so the redirection survives into the CSS and
+ * dark-mode swaps work at runtime.
  *
- * Dark mode: walks each family a second time inside `@media (prefers-color-scheme: dark)`,
- * uses `computeDarkScale(family.scale)` for the dark OKLCH at each position, and respects
- * per-position userOverrides that pin dark values explicitly.
+ * Other namespaces (spacing, radius, shadow, motion, typography, breakpoint, depth,
+ * focus, fill, elevation, typography-composite): emit `--{token.name}: {value}` for
+ * string values. Stringified-JSON composites (typography-composite, fill, etc.) are
+ * skipped for now — utility generation for composites is a follow-up.
+ *
+ * Dark mode: walks each family inside `@media (prefers-color-scheme: dark)`, emits
+ * per-position dark vars from `computeDarkScale(family.scale)`.
  */
-export function exportTailwindColor(registry: TokenRegistry): string {
+export function exportTailwind(registry: TokenRegistry): string {
   const lines: string[] = [];
   lines.push('@theme {');
 
@@ -42,29 +46,27 @@ export function exportTailwindColor(registry: TokenRegistry): string {
     if (line) lines.push(`  ${line}`);
   }
 
+  const otherNamespaces = uniqueNamespaces(registry).filter(
+    (ns) => ns !== 'color' && ns !== 'semantic',
+  );
+  for (const ns of otherNamespaces) {
+    for (const token of registry.list({ namespace: ns })) {
+      const line = emitOtherToken(token);
+      if (line) lines.push(`  ${line}`);
+    }
+  }
+
   lines.push('}', '', '@media (prefers-color-scheme: dark) {');
   lines.push('  :root {');
 
-  const familyTokens = colorTokens.filter((t) => isColorValue(t.value));
-  for (const family of familyTokens) {
+  for (const family of colorTokens.filter((t) => isColorValue(t.value))) {
     if (!isColorValue(family.value)) continue;
     const darkScale = computeDarkScale(family.value.scale);
     for (let i = 0; i < COLOR_SCALE_POSITIONS.length; i++) {
       const position = COLOR_SCALE_POSITIONS[i];
       const dark = darkScale[i];
       if (!position || !dark) continue;
-
-      const tokenName = `${family.name}-${position}`;
-      const positionToken = colorTokens.find((t) => t.name === tokenName);
-      const darkOverride = positionToken?.userOverride;
-
-      if (darkOverride && typeof darkOverride.previousValue === 'string') {
-        // Override on the position token — caller's responsibility to encode dark in the override.
-        // For now, light-mode override wins everywhere; dedicated dark-mode overrides are a follow-up.
-        lines.push(`    --color-${tokenName}: ${oklchToCss(dark)};`);
-      } else {
-        lines.push(`    --color-${tokenName}: ${oklchToCss(dark)};`);
-      }
+      lines.push(`    --color-${family.name}-${position}: ${oklchToCss(dark)};`);
     }
   }
 
@@ -76,19 +78,16 @@ export function exportTailwindColor(registry: TokenRegistry): string {
 function emitColorToken(token: Token, registry: TokenRegistry): string | null {
   const value = token.value;
 
-  // Family token — emit position-500 OKLCH as the family base.
   if (isColorValue(value)) {
     const base = value.scale[POSITION_TO_INDEX['500'] ?? 5];
     if (!base) return null;
     return `--color-${token.name}: ${oklchToCss(base)};`;
   }
 
-  // userOverride on a per-position token wins.
   if (token.userOverride && typeof value === 'string') {
     return `--color-${token.name}: ${value};`;
   }
 
-  // Per-position token with ColorReference value → resolve through the family.
   if (isColorReference(value)) {
     const family = registry.get(value.family);
     if (!family || !isColorValue(family.value)) {
@@ -105,7 +104,6 @@ function emitColorToken(token: Token, registry: TokenRegistry): string | null {
     return `--color-${token.name}: ${oklchToCss(oklch)};`;
   }
 
-  // Override wrote a non-string literal value, or some other case — pass through.
   if (typeof value === 'string') {
     return `--color-${token.name}: ${value};`;
   }
@@ -121,6 +119,21 @@ function emitSemanticToken(token: Token): string | null {
     return `--${token.name}: ${value};`;
   }
   return null;
+}
+
+function emitOtherToken(token: Token): string | null {
+  const value = token.value;
+  if (typeof value !== 'string') return null;
+  // Skip stringified-JSON composites (typography-composite, fill, etc.); utility
+  // generation for those is a follow-up.
+  if (value.startsWith('{') || value.startsWith('[')) return null;
+  return `--${token.name}: ${value};`;
+}
+
+function uniqueNamespaces(registry: TokenRegistry): string[] {
+  const seen = new Set<string>();
+  for (const token of registry.list()) seen.add(token.namespace);
+  return [...seen];
 }
 
 function isColorValue(value: Token['value']): value is ColorValue {
@@ -152,6 +165,3 @@ function oklchToCss(oklch: OKLCH): string {
 function formatNumber(value: number, decimals = 3): string {
   return Number(value.toFixed(decimals)).toString();
 }
-
-// Re-export ColorScalePosition for downstream typed access without circular imports.
-export type { ColorScalePosition };
