@@ -459,9 +459,6 @@ importers:
       '@rafters/color-utils':
         specifier: workspace:*
         version: link:../color-utils
-      '@rafters/math-utils':
-        specifier: workspace:*
-        version: link:../math-utils
       '@rafters/shared':
         specifier: workspace:*
         version: link:../shared

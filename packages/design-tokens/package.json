@@ -17,7 +17,6 @@
   },
   "dependencies": {
     "@rafters/color-utils": "workspace:*",
-    "@rafters/math-utils": "workspace:*",
     "@rafters/shared": "workspace:*",
     "zod": "catalog:"
   },
