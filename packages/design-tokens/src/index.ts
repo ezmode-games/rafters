@@ -1,7 +1,19 @@
+export {
+  type BuildColorSystemOptions,
+  type BuildColorSystemResult,
+  buildColorSystem,
+} from './build-color-system.js';
 export { type TokenDependency, TokenDependencyGraph } from './dependencies.js';
 export { computeDarkScale } from './exporters/dark-mode.js';
 export { toDTCG, toDTCGByNamespace } from './exporters/dtcg.js';
-export { exportTailwind } from './exporters/tailwind.js';
+export {
+  type CompiledCssOptions,
+  exportTailwind,
+  registryToCompiled,
+  registryToTailwind,
+  registryToVars,
+  type TailwindExportOptions,
+} from './exporters/tailwind.js';
 export { registryToTypeScript, tokensToTypeScript } from './exporters/typescript.js';
 export * from './generators/index.js';
 export {

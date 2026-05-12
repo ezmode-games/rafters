@@ -13,7 +13,7 @@ import {
   buildColorSystem,
   NodePersistenceAdapter,
   registryToTailwind,
-} from '@rafters/design-tokens-v1';
+} from '@rafters/design-tokens';
 
 const STUDIO_ROOT = join(import.meta.dirname, '..');
 const RAFTERS_ROOT = join(STUDIO_ROOT, '.rafters');

@@ -165,3 +165,108 @@ function oklchToCss(oklch: OKLCH): string {
 function formatNumber(value: number, decimals = 3): string {
   return Number(value.toFixed(decimals)).toString();
 }
+
+/** Options accepted by v1's `registryToTailwind`. Honored for surface compatibility; the new exporter currently ignores `includeImport` (does not emit a Tailwind import line). */
+export interface TailwindExportOptions {
+  includeImport?: boolean;
+  darkMode?: 'class' | 'media';
+}
+
+/**
+ * Compatibility shim for v1 consumers. Delegates to `exportTailwind`; the options
+ * are accepted for backward compat but currently ignored (the new exporter emits a
+ * `@theme` block + `@media (prefers-color-scheme: dark)`, no `@import`, no `.dark`
+ * class machinery). When init/studio surface gaps that need v1 behavior restored,
+ * they land as separate PRs.
+ */
+export function registryToTailwind(
+  registry: TokenRegistry,
+  _options?: TailwindExportOptions,
+): string {
+  return exportTailwind(registry);
+}
+
+/**
+ * Emit only the `:root` block with token values (no `@theme`).
+ * Used by Studio's vite-plugin to inject token values into a dev server.
+ * Walks every namespace and emits `--{name}: {value}` for each token, mirroring
+ * `exportTailwind`'s rules: color refs resolve through the family scale, semantic
+ * refs emit as var() pointers, composite JSON values are skipped.
+ */
+export function registryToVars(registry: TokenRegistry): string {
+  if (registry.list().length === 0) {
+    throw new Error('Registry is empty');
+  }
+  const lines: string[] = [':root {'];
+
+  for (const token of registry.list({ namespace: 'color' })) {
+    const line = emitColorToken(token, registry);
+    if (line) lines.push(`  ${line}`);
+  }
+  for (const token of registry.list({ namespace: 'semantic' })) {
+    const line = emitSemanticToken(token);
+    if (line) lines.push(`  ${line}`);
+  }
+  for (const ns of uniqueNamespaces(registry).filter((n) => n !== 'color' && n !== 'semantic')) {
+    for (const token of registry.list({ namespace: ns })) {
+      const line = emitOtherToken(token);
+      if (line) lines.push(`  ${line}`);
+    }
+  }
+
+  lines.push('}');
+  return lines.join('\n');
+}
+
+/** Options for `registryToCompiled`. */
+export interface CompiledCssOptions {
+  /** Minify the output (default: true) */
+  minify?: boolean;
+  /** Include `@import "tailwindcss"` in the source (default: true). Currently advisory — the new exporter does not emit the import line. */
+  includeImport?: boolean;
+}
+
+/**
+ * Generate Tailwind theme CSS and compile it through the Tailwind CLI into
+ * fully-resolved standalone CSS. No Tailwind installation required by the
+ * consumer. Ported from v1; uses `@tailwindcss/cli` as a workspace dep.
+ */
+export async function registryToCompiled(
+  registry: TokenRegistry,
+  options: CompiledCssOptions = {},
+): Promise<string> {
+  const { minify = true } = options;
+  const themeCss = exportTailwind(registry);
+
+  const { execFileSync } = await import('node:child_process');
+  const { mkdtempSync, writeFileSync, readFileSync, rmSync } = await import('node:fs');
+  const { join, dirname } = await import('node:path');
+  const { createRequire } = await import('node:module');
+
+  const require = createRequire(import.meta.url);
+  let pkgDir: string;
+  try {
+    const pkgJsonPath = require.resolve('@tailwindcss/cli/package.json');
+    pkgDir = dirname(pkgJsonPath);
+  } catch {
+    throw new Error('Failed to resolve @tailwindcss/cli');
+  }
+
+  const binPath = join(pkgDir, 'dist', 'index.mjs');
+  const tempDir = mkdtempSync(join(pkgDir, '.tmp-compile-'));
+  const tempInput = join(tempDir, 'input.css');
+  const tempOutput = join(tempDir, 'output.css');
+
+  try {
+    writeFileSync(tempInput, themeCss);
+    const args = [binPath, '-i', tempInput, '-o', tempOutput];
+    if (minify) args.push('--minify');
+    execFileSync('node', args, { stdio: 'pipe', timeout: 30_000 });
+    return readFileSync(tempOutput, 'utf-8');
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to compile CSS: ${message}`);
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+}

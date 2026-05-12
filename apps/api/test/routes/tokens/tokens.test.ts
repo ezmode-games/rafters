@@ -1,5 +1,5 @@
 import { SELF } from 'cloudflare:test';
-import { buildColorSystem } from '@rafters/design-tokens-v1';
+import { buildColorSystem } from '@rafters/design-tokens';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { initializeRegistry } from '../../../src/routes/tokens/tokens.handlers';
 

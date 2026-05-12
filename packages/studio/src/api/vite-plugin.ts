@@ -12,7 +12,7 @@
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { buildColorValue } from '@rafters/color-utils';
-import { NodePersistenceAdapter, registryToVars, TokenRegistry } from '@rafters/design-tokens-v1';
+import { NodePersistenceAdapter, registryToVars, TokenRegistry } from '@rafters/design-tokens';
 import { ColorReferenceSchema, ColorValueSchema, OKLCHSchema, TokenSchema } from '@rafters/shared';
 import type { Plugin, ViteDevServer } from 'vite';
 import { z } from 'zod';

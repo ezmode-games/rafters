@@ -3,7 +3,7 @@
  * Generates the init payload for `rafters init`
  */
 
-import { buildColorSystem } from '@rafters/design-tokens-v1';
+import { buildColorSystem } from '@rafters/design-tokens';
 
 export interface InitPayload {
   version: string;

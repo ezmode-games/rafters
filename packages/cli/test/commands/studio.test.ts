@@ -13,7 +13,7 @@ import {
   NodePersistenceAdapter,
   registryToVars,
   TokenRegistry,
-} from '@rafters/design-tokens-v1';
+} from '@rafters/design-tokens';
 import { describe, expect, it } from 'vitest';
 import { cleanupFixture, createFixture } from '../fixtures/projects';
 

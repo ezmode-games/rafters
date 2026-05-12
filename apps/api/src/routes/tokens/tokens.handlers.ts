@@ -5,8 +5,8 @@ import {
   generateNamespaces,
   getAvailableNamespaces,
   TokenRegistry,
-} from '@rafters/design-tokens-v1';
-import { COMPUTED, type Token } from '@rafters/shared';
+} from '@rafters/design-tokens';
+import type { Token } from '@rafters/shared';
 import * as HttpStatusCodes from 'stoker/http-status-codes';
 import type { AppRouteHandler } from '@/lib/types';
 import type * as routes from './tokens.routes';
@@ -144,7 +144,7 @@ export const clearOverride: AppRouteHandler<typeof routes.clearOverride> = async
     return c.json({ message: `Token "${name}" has no override` }, HttpStatusCodes.NOT_FOUND);
   }
 
-  await reg.set(name, COMPUTED);
+  await reg.clearOverride(name);
   return c.json({ ok: true as const }, HttpStatusCodes.OK);
 };
 

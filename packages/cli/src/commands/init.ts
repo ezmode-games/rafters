@@ -19,7 +19,7 @@ import {
   registryToTypeScript,
   TokenRegistry,
   toDTCG,
-} from '@rafters/design-tokens-v1';
+} from '@rafters/design-tokens';
 import { onboard, previewOnboard } from '../onboard/orchestrator.js';
 import { toImportPending, writeImportPending } from '../onboard/writer.js';
 import {

@@ -81,6 +81,43 @@ export class TokenRegistry {
     });
   }
 
+  /**
+   * Compatibility shim for v1's `setToken`. Replaces the full token (add semantics)
+   * and auto-persists if an adapter is set. Prefer `add` + explicit `persist` for new code.
+   */
+  async setToken(token: Token): Promise<void> {
+    this.add(token);
+    if (this.adapter) await this.persist();
+  }
+
+  /**
+   * Compatibility shim for v1's `setTokens`. Batch full-token replacement, single persist.
+   * Prefer iterating `add` + explicit `persist` for new code.
+   */
+  async setTokens(tokens: readonly Token[]): Promise<void> {
+    for (const token of tokens) this.add(token);
+    if (this.adapter) await this.persist();
+  }
+
+  /**
+   * Compatibility shim for v1's `updateToken`. Sync value update — no auto-persist,
+   * matching v1's `updateToken` behavior. Prefer `set` for new code.
+   */
+  updateToken(name: string, value: Token['value']): void {
+    this.set(name, value);
+  }
+
+  /**
+   * Compatibility shim for v1's `setChangeCallback`. Wires the callback through
+   * `onMutation`. Note: event shapes differ — v1 emitted `TokenChangeEvent` with a
+   * `type` field; this calls the callback with a `MutationEvent` carrying `kind`.
+   * Studio's callback consumer is being rearchitected; this shim unblocks the
+   * migration until that lands.
+   */
+  setChangeCallback(callback: MutationHook): void {
+    this.onMutation = callback;
+  }
+
   /** Map write. Updates value, preserves metadata. No cascade, no persist. */
   set(name: string, value: Token['value']): void {
     const existing = this.tokens.get(name);
@@ -167,6 +204,21 @@ export class TokenRegistry {
 
   dependents(name: string): string[] {
     return this.graph.getDependents(name);
+  }
+
+  /** Compatibility shim for v1 consumers. Alias for `dependents`. */
+  getDependents(name: string): string[] {
+    return this.dependents(name);
+  }
+
+  /** Compatibility shim for v1 consumers. Alias for `dependencies`. */
+  getDependencies(name: string): string[] {
+    return this.dependencies(name);
+  }
+
+  /** Compatibility shim for v1 consumers. Reads the generationRule edge from the graph. */
+  getGenerationRule(name: string): string | undefined {
+    return this.graph.getGenerationRule(name);
   }
 
   addDependency(name: string, dependsOn: readonly string[], rule: string): void {

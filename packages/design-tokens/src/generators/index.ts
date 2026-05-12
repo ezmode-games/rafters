@@ -231,6 +231,25 @@ export function buildSystem(config: Partial<BaseSystemConfig> = {}): BuildSystem
  * Generate tokens for specific namespaces only. Useful for re-running a slice
  * after a config change without paying for the whole graph.
  */
+/** Names of every namespace the generators support. */
+export function getAvailableNamespaces(): readonly string[] {
+  return [
+    'color',
+    'spacing',
+    'typography',
+    'breakpoint',
+    'semantic',
+    'typography-composite',
+    'radius',
+    'shadow',
+    'depth',
+    'motion',
+    'fill',
+    'elevation',
+    'focus',
+  ];
+}
+
 export function generateNamespaces(
   namespaces: readonly string[],
   config: Partial<BaseSystemConfig> = {},
