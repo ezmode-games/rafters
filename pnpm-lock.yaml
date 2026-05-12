@@ -456,6 +456,9 @@ importers:
 
   packages/design-tokens:
     dependencies:
+      '@rafters/color-utils':
+        specifier: workspace:*
+        version: link:../color-utils
       '@rafters/shared':
         specifier: workspace:*
         version: link:../shared
