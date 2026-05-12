@@ -39,7 +39,11 @@ export function buildColorSystem(options: BuildColorSystemOptions = {}): BuildCo
   const system = buildSystem(options.config);
   const registry = new TokenRegistry(system.allTokens);
   const exportsOut: BuildColorSystemResult['exports'] = {};
-  if (options.exports?.tailwind) exportsOut.tailwind = exportTailwind(registry);
+  if (options.exports?.tailwind) {
+    const tw = options.exports.tailwind;
+    const includeImport = typeof tw === 'object' ? (tw.includeImport ?? true) : true;
+    exportsOut.tailwind = exportTailwind(registry, { includeImport });
+  }
   if (options.exports?.typescript) exportsOut.typescript = registryToTypeScript(registry);
   if (options.exports?.dtcg) exportsOut.dtcg = toDTCG(system.allTokens);
   return { system, registry, exports: exportsOut };

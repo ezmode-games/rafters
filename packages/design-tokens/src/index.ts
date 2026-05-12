@@ -8,6 +8,7 @@ export { computeDarkScale } from './exporters/dark-mode.js';
 export { toDTCG, toDTCGByNamespace } from './exporters/dtcg.js';
 export {
   type CompiledCssOptions,
+  type ExportTailwindOptions,
   exportTailwind,
   registryToCompiled,
   registryToTailwind,

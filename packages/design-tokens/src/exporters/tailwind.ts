@@ -30,8 +30,20 @@ const POSITION_TO_INDEX: Record<string, number> = Object.fromEntries(
  * Dark mode: walks each family inside `@media (prefers-color-scheme: dark)`, emits
  * per-position dark vars from `computeDarkScale(family.scale)`.
  */
-export function exportTailwind(registry: TokenRegistry): string {
+export interface ExportTailwindOptions {
+  /** Emit `@import "tailwindcss";` at the top so the output is a complete entry CSS file. Default: true. */
+  includeImport?: boolean | undefined;
+}
+
+export function exportTailwind(
+  registry: TokenRegistry,
+  options: ExportTailwindOptions = {},
+): string {
+  const { includeImport = true } = options;
   const lines: string[] = [];
+  if (includeImport) {
+    lines.push('@import "tailwindcss";', '');
+  }
   lines.push('@theme {');
 
   const colorTokens = registry.list({ namespace: 'color' });
@@ -173,17 +185,16 @@ export interface TailwindExportOptions {
 }
 
 /**
- * Compatibility shim for v1 consumers. Delegates to `exportTailwind`; the options
- * are accepted for backward compat but currently ignored (the new exporter emits a
- * `@theme` block + `@media (prefers-color-scheme: dark)`, no `@import`, no `.dark`
- * class machinery). When init/studio surface gaps that need v1 behavior restored,
- * they land as separate PRs.
+ * Compatibility shim for v1 consumers. Delegates to `exportTailwind`, passing
+ * `includeImport` through. v1's `darkMode` option is currently a no-op — the new
+ * exporter emits `@media (prefers-color-scheme: dark)` regardless. When init/studio
+ * surface gaps that need `.dark` class machinery, that lands as a separate PR.
  */
 export function registryToTailwind(
   registry: TokenRegistry,
-  _options?: TailwindExportOptions,
+  options?: TailwindExportOptions,
 ): string {
-  return exportTailwind(registry);
+  return exportTailwind(registry, { includeImport: options?.includeImport });
 }
 
 /**
