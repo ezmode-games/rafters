@@ -72,26 +72,6 @@ describe('loadRegistryFromDir', () => {
     expect(r.size()).toBe(0);
   });
 
-  it('loads tokens that omit userOverride; the registry treats missing as null', () => {
-    const legacyFile = {
-      namespace: 'motion',
-      tokens: [
-        {
-          name: 'motion-duration-base',
-          namespace: 'motion',
-          category: 'motion',
-          value: '150ms',
-          // userOverride deliberately omitted to simulate v1-shape on disk
-          description: 'Base duration written before the schema tightened',
-        },
-      ],
-    };
-    writeFileSync(join(tmpDir, 'motion.rafters.json'), JSON.stringify(legacyFile));
-    const r = loadRegistryFromDir(tmpDir);
-    expect(r.has('motion-duration-base')).toBe(true);
-    expect(r.get('motion-duration-base')?.userOverride).toBeNull();
-  });
-
   it('loads tokens with arbitrary extra metadata (description, generatedAt) without rejecting them', () => {
     const fileWithExtras = {
       namespace: 'spacing',
@@ -101,6 +81,7 @@ describe('loadRegistryFromDir', () => {
           namespace: 'spacing',
           category: 'spacing',
           value: '4px',
+          userOverride: null,
           description: 'arbitrary metadata',
           generatedAt: '2026-01-01T00:00:00Z',
           someUnknownField: { nested: true },
@@ -112,20 +93,13 @@ describe('loadRegistryFromDir', () => {
     expect(r.get('spacing-base')?.value).toBe('4px');
   });
 
-  it('skips token entries that are not objects or have no name', () => {
+  it('throws TokenParseError when a token entry does not satisfy TokenSchema', () => {
     const messyFile = {
       namespace: 'mixed',
-      tokens: [
-        null,
-        'not an object',
-        { value: 'no-name-field' },
-        { name: 'good', namespace: 'mixed', category: 'mixed', value: 'ok' },
-      ],
+      tokens: [{ name: 'incomplete' }], // missing namespace, category, value, userOverride
     };
     writeFileSync(join(tmpDir, 'mixed.rafters.json'), JSON.stringify(messyFile));
-    const r = loadRegistryFromDir(tmpDir);
-    expect(r.size()).toBe(1);
-    expect(r.has('good')).toBe(true);
+    expect(() => loadRegistryFromDir(tmpDir)).toThrow(/TokenSchema validation/);
   });
 });
 

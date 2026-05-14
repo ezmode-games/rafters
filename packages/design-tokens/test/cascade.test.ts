@@ -45,6 +45,24 @@ function buildAccentFamily(name = 'accent'): ColorValue {
         large: [],
       },
       wcagAA: { normal: [], large: [] },
+      onWhite: {
+        wcagAA: false,
+        wcagAAA: false,
+        contrastRatio: 1,
+        aa: [],
+        aaa: [],
+        normal: [],
+        large: [],
+      },
+      onBlack: {
+        wcagAA: false,
+        wcagAAA: false,
+        contrastRatio: 1,
+        aa: [],
+        aaa: [],
+        normal: [],
+        large: [],
+      },
     },
   };
 }

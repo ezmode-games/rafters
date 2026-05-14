@@ -22,4 +22,9 @@ export {
   scalePlugin,
   statePlugin,
 } from './plugins/index.js';
-export { type RegistryFilter, TokenRegistry, UnknownTokenError } from './registry.js';
+export {
+  type RegistryFilter,
+  TokenParseError,
+  TokenRegistry,
+  UnknownTokenError,
+} from './registry.js';

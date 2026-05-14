@@ -1,4 +1,4 @@
-import type { Token, TokenSchema } from '@rafters/shared';
+import { type Token, TokenSchema } from '@rafters/shared';
 import type { z } from 'zod';
 import { type Node, type Plugin, type SetOptions, TokenGraph } from './graph.js';
 
@@ -19,15 +19,17 @@ export class TokenRegistry {
     this.graph = new TokenGraph(plugins);
     for (const plugin of plugins) this.plugins.set(plugin.name, plugin);
     // Two passes so bindings can reference family tokens regardless of source order.
-    const normalized: Token[] = [];
+    const parsed: Token[] = [];
     for (const raw of initialTokens) {
-      const t = normalizeIncomingToken(raw);
-      if (!t) continue;
-      this.metadata.set(t.name, t);
-      normalized.push(t);
+      const result = TokenSchema.safeParse(raw);
+      if (!result.success) {
+        throw new TokenParseError(raw, result.error.issues);
+      }
+      this.metadata.set(result.data.name, result.data);
+      parsed.push(result.data);
     }
     // Pass 1: leaves and overrides.
-    for (const t of normalized) {
+    for (const t of parsed) {
       if (t.binding) continue;
       if (t.userOverride) {
         this.graph.set(t.name, t.value, {
@@ -40,15 +42,9 @@ export class TokenRegistry {
       }
     }
     // Pass 2: bindings (dependents now resolve against leaves).
-    for (const t of normalized) {
+    for (const t of parsed) {
       if (!t.binding) continue;
-      try {
-        this.graph.bind(t.name, t.binding.plugin, t.binding.input);
-      } catch (_err) {
-        // Plugin may not be registered yet, or input may not satisfy schema for current upstream.
-        // Fall back to leaf with the persisted value so the token is still readable.
-        this.graph.set(t.name, t.value);
-      }
+      this.graph.bind(t.name, t.binding.plugin, t.binding.input);
     }
   }
 
@@ -58,21 +54,22 @@ export class TokenRegistry {
   }
 
   define(token: unknown): void {
-    const normalized = normalizeIncomingToken(token);
-    if (!normalized) {
-      throw new Error(
-        'define(token) requires an object with string name, namespace, category, and a defined value',
-      );
+    const result = TokenSchema.safeParse(token);
+    if (!result.success) {
+      throw new TokenParseError(token, result.error.issues);
     }
-    this.metadata.set(normalized.name, normalized);
-    if (normalized.userOverride) {
-      this.graph.set(normalized.name, normalized.value, {
+    const t = result.data;
+    this.metadata.set(t.name, t);
+    if (t.binding) {
+      this.graph.bind(t.name, t.binding.plugin, t.binding.input);
+    } else if (t.userOverride) {
+      this.graph.set(t.name, t.value, {
         cascade: false,
-        reason: normalized.userOverride.reason,
-        ...(normalized.userOverride.context ? { context: normalized.userOverride.context } : {}),
+        reason: t.userOverride.reason,
+        ...(t.userOverride.context ? { context: t.userOverride.context } : {}),
       });
     } else {
-      this.graph.set(normalized.name, normalized.value);
+      this.graph.set(t.name, t.value);
     }
   }
 
@@ -142,27 +139,20 @@ export class UnknownTokenError extends Error {
   }
 }
 
-function normalizeIncomingToken(raw: unknown): Token | undefined {
-  if (!raw || typeof raw !== 'object') return undefined;
-  const obj = raw as Record<string, unknown>;
-  if (typeof obj.name !== 'string') return undefined;
-  if (typeof obj.namespace !== 'string') return undefined;
-  if (typeof obj.category !== 'string') return undefined;
-  if (obj.value === undefined) return undefined;
-  const userOverride =
-    obj.userOverride && typeof obj.userOverride === 'object'
-      ? (obj.userOverride as Token['userOverride'])
-      : null;
-  const binding =
-    obj.binding &&
-    typeof obj.binding === 'object' &&
-    typeof (obj.binding as { plugin?: unknown }).plugin === 'string'
-      ? (obj.binding as Token['binding'])
-      : undefined;
-  const result: Token = { ...obj, userOverride } as Token;
-  if (binding) result.binding = binding;
-  else delete (result as { binding?: Token['binding'] }).binding;
-  return result;
+export class TokenParseError extends Error {
+  constructor(
+    public readonly raw: unknown,
+    public readonly issues: readonly z.core.$ZodIssue[],
+  ) {
+    const first = issues[0];
+    const detail = first ? `${first.path.join('.')}: ${first.message}` : 'unknown';
+    const name =
+      raw && typeof raw === 'object' && typeof (raw as { name?: unknown }).name === 'string'
+        ? (raw as { name: string }).name
+        : '<unnamed>';
+    super(`Token "${name}" failed TokenSchema validation: ${detail}`);
+    this.name = 'TokenParseError';
+  }
 }
 
 function toUserOverrideField(

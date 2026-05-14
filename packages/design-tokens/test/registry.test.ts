@@ -55,7 +55,12 @@ describe('TokenRegistry', () => {
       expect(r.size()).toBe(1);
       expect(r.has('accent')).toBe(true);
       expect(r.get('accent')?.namespace).toBe('color');
-      expect(r.get('accent')?.value).toEqual(accentToken.value);
+      // Zod fills OKLCH.alpha default 1; compare structure, not deep object identity.
+      const v = r.get('accent')?.value;
+      expect(v && typeof v === 'object' && 'name' in v && v.name).toBe('accent');
+      expect(
+        v && typeof v === 'object' && 'scale' in v && Array.isArray(v.scale) && v.scale.length,
+      ).toBe(11);
     });
 
     it('seeds plugins via constructor', () => {
