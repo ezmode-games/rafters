@@ -1,0 +1,204 @@
+import type { ColorValue, Token } from '@rafters/shared';
+import { describe, expect, it } from 'vitest';
+import { contrastPlugin, scalePlugin, statePlugin, TokenRegistry } from '../src/index.js';
+
+const minimalScale = [
+  { l: 0.97, c: 0.02, h: 240 },
+  { l: 0.93, c: 0.05, h: 240 },
+  { l: 0.85, c: 0.1, h: 240 },
+  { l: 0.75, c: 0.14, h: 240 },
+  { l: 0.65, c: 0.16, h: 240 },
+  { l: 0.55, c: 0.18, h: 240 },
+  { l: 0.45, c: 0.18, h: 240 },
+  { l: 0.35, c: 0.16, h: 240 },
+  { l: 0.25, c: 0.14, h: 240 },
+  { l: 0.18, c: 0.1, h: 240 },
+  { l: 0.12, c: 0.07, h: 240 },
+];
+
+const accentToken: Token = {
+  name: 'accent',
+  namespace: 'color',
+  category: 'color',
+  value: { name: 'accent', scale: minimalScale } as ColorValue,
+  userOverride: null,
+};
+
+const spacingBaseToken: Token = {
+  name: 'spacing-base',
+  namespace: 'spacing',
+  category: 'spacing',
+  value: '4px',
+  userOverride: null,
+};
+
+describe('TokenRegistry', () => {
+  describe('construction', () => {
+    it('seeds initial tokens with metadata and value', () => {
+      const r = new TokenRegistry([accentToken]);
+      expect(r.size()).toBe(1);
+      expect(r.has('accent')).toBe(true);
+      expect(r.get('accent')?.namespace).toBe('color');
+      expect(r.get('accent')?.value).toEqual(accentToken.value);
+    });
+
+    it('seeds plugins via constructor', () => {
+      const r = new TokenRegistry([accentToken], [scalePlugin]);
+      r.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
+      expect(r.get('accent-500')?.value).toEqual({ family: 'accent', position: '500' });
+    });
+  });
+
+  describe('set', () => {
+    it('writes value on existing token', () => {
+      const r = new TokenRegistry([spacingBaseToken]);
+      r.set('spacing-base', '8px');
+      expect(r.get('spacing-base')?.value).toBe('8px');
+    });
+
+    it('creates token with inferred namespace if name unknown', () => {
+      const r = new TokenRegistry();
+      r.set('color-mystery', '#fff');
+      const token = r.get('color-mystery');
+      expect(token?.namespace).toBe('color');
+      expect(token?.category).toBe('color');
+      expect(token?.value).toBe('#fff');
+    });
+
+    it('records userOverride when cascade: false', () => {
+      const r = new TokenRegistry([spacingBaseToken]);
+      r.set('spacing-base', '20px', { cascade: false, reason: 'designer override' });
+      const token = r.get('spacing-base');
+      expect(token?.userOverride?.reason).toBe('designer override');
+      expect(token?.userOverride?.previousValue).toBe('4px');
+    });
+
+    it('clears userOverride on subsequent normal set', () => {
+      const r = new TokenRegistry([spacingBaseToken]);
+      r.set('spacing-base', '20px', { cascade: false, reason: 'override' });
+      expect(r.get('spacing-base')?.userOverride).not.toBeNull();
+      r.set('spacing-base', '24px');
+      expect(r.get('spacing-base')?.userOverride).toBeNull();
+    });
+  });
+
+  describe('bind + cascade', () => {
+    it('cascades family changes through scale + contrast chain', () => {
+      const r = new TokenRegistry([accentToken], [scalePlugin, contrastPlugin]);
+      r.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
+      r.bind('accent-fg', 'contrast', { familyName: 'accent', basePosition: 5 });
+      expect(r.get('accent-500')?.value).toEqual({ family: 'accent', position: '500' });
+      expect(r.get('accent-fg')?.value).toBeDefined();
+    });
+
+    it('cascades through state variants on family change', () => {
+      const r = new TokenRegistry([accentToken], [scalePlugin, statePlugin]);
+      r.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
+      r.bind('accent-hover', 'state', {
+        familyName: 'accent',
+        basePosition: 5,
+        stateType: 'hover',
+      });
+      const newAccent = { ...accentToken.value, name: 'mutated' } as ColorValue;
+      r.set('accent', newAccent);
+      expect(r.get('accent')?.value).toEqual(newAccent);
+      expect(r.get('accent-hover')?.value).toBeDefined();
+    });
+
+    it('projects dependsOn from binding via plugin.dependsOn', () => {
+      const r = new TokenRegistry([accentToken], [scalePlugin]);
+      r.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
+      expect(r.get('accent-500')?.dependsOn).toEqual(['accent']);
+      expect(r.get('accent-500')?.generationRule).toBe('scale');
+    });
+
+    it('strips dependsOn / generationRule when token converted from binding to leaf', () => {
+      const r = new TokenRegistry([accentToken], [scalePlugin]);
+      r.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
+      expect(r.get('accent-500')?.dependsOn).toEqual(['accent']);
+      r.set('accent-500', '#ff0000');
+      expect(r.get('accent-500')?.dependsOn).toBeUndefined();
+      expect(r.get('accent-500')?.generationRule).toBeUndefined();
+    });
+  });
+
+  describe('userOverride anchors block recompute', () => {
+    it('blocks recompute on anchored node when upstream changes', () => {
+      const r = new TokenRegistry([accentToken], [scalePlugin]);
+      r.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
+      r.set(
+        'accent-500',
+        { family: 'override', position: 'manual' },
+        {
+          cascade: false,
+          reason: 'manual',
+        },
+      );
+      const newAccent = { ...accentToken.value, name: 'mutated' } as ColorValue;
+      r.set('accent', newAccent);
+      expect(r.get('accent-500')?.value).toEqual({ family: 'override', position: 'manual' });
+    });
+  });
+
+  describe('list + filter', () => {
+    it('lists all tokens', () => {
+      const r = new TokenRegistry([accentToken, spacingBaseToken]);
+      expect(r.list().length).toBe(2);
+    });
+
+    it('filters by namespace', () => {
+      const r = new TokenRegistry([accentToken, spacingBaseToken]);
+      const colors = r.list({ namespace: 'color' });
+      expect(colors.length).toBe(1);
+      expect(colors[0]?.name).toBe('accent');
+    });
+
+    it('filters by category', () => {
+      const r = new TokenRegistry([accentToken, spacingBaseToken]);
+      const spacings = r.list({ category: 'spacing' });
+      expect(spacings.length).toBe(1);
+      expect(spacings[0]?.name).toBe('spacing-base');
+    });
+  });
+
+  describe('plugin registration', () => {
+    it('accepts plugins added after construction', () => {
+      const r = new TokenRegistry([accentToken]);
+      r.registerPlugin(scalePlugin);
+      r.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
+      expect(r.get('accent-500')?.value).toEqual({ family: 'accent', position: '500' });
+    });
+  });
+
+  describe('undo', () => {
+    it('reverses the most recent operation', () => {
+      const r = new TokenRegistry([spacingBaseToken]);
+      r.set('spacing-base', '16px');
+      r.undo();
+      expect(r.get('spacing-base')?.value).toBe('4px');
+    });
+  });
+
+  describe('get', () => {
+    it('returns undefined for unknown name', () => {
+      const r = new TokenRegistry();
+      expect(r.get('nope')).toBeUndefined();
+    });
+
+    it('preserves all metadata fields from the initial Token', () => {
+      const richToken: Token = {
+        ...accentToken,
+        semanticMeaning: 'primary brand color',
+        cognitiveLoad: 4,
+        accessibilityLevel: 'AAA',
+        appliesWhen: ['hero sections'],
+      };
+      const r = new TokenRegistry([richToken]);
+      const t = r.get('accent');
+      expect(t?.semanticMeaning).toBe('primary brand color');
+      expect(t?.cognitiveLoad).toBe(4);
+      expect(t?.accessibilityLevel).toBe('AAA');
+      expect(t?.appliesWhen).toEqual(['hero sections']);
+    });
+  });
+});
