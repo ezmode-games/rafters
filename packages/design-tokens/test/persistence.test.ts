@@ -1,5 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Token } from '@rafters/shared';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -11,10 +10,13 @@ import {
   TokenRegistry,
 } from '../src/index.js';
 
+const TEST_TMP_ROOT = join(import.meta.dirname, '..', 'node_modules', '.test-tmp');
+
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(tmpdir(), 'rafters-persistence-'));
+  mkdirSync(TEST_TMP_ROOT, { recursive: true });
+  tmpDir = mkdtempSync(join(TEST_TMP_ROOT, 'persistence-'));
 });
 
 afterEach(() => {

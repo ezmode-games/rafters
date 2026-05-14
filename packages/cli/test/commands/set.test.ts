@@ -1,5 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { set } from '../../src/commands/set.js';
@@ -8,10 +7,13 @@ vi.mock('@inquirer/prompts', () => ({
   input: vi.fn(),
 }));
 
+const TEST_TMP_ROOT = join(import.meta.dirname, '..', '..', 'node_modules', '.test-tmp');
+
 let tmpDir: string;
 
 beforeEach(() => {
-  tmpDir = mkdtempSync(join(tmpdir(), 'rafters-cli-set-'));
+  mkdirSync(TEST_TMP_ROOT, { recursive: true });
+  tmpDir = mkdtempSync(join(TEST_TMP_ROOT, 'cli-set-'));
   writeFileSync(
     join(tmpDir, 'spacing.rafters.json'),
     JSON.stringify({
