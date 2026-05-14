@@ -11,6 +11,7 @@ export {
   findTokenFile,
   loadRegistryFromDir,
   type NamespaceFile,
+  NamespaceFileParseError,
   saveRegistryToDir,
 } from './persistence.js';
 export type { PluginSpec } from './plugin.js';

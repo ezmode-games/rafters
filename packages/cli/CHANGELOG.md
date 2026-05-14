@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Patch Changes
+
+- fix(set): the `--no-cascade` flag was silently ignored. Commander populates the long-form derived from `--no-cascade` as `options.cascade = false`, but the action handler was reading `options.noCascade`, which is never set. The flag now wires through correctly. Added a Commander integration test so the wiring is locked.
+
 ### Minor Changes
 
 - feat(set): new `rafters set <name> <value>` command for updating a token's value in `.rafters/tokens/*.rafters.json`. Default behaviour cascades to dependent tokens via the `@rafters/design-tokens` registry. The `--no-cascade` flag records the value as a `userOverride` anchor — the token is marked as a designer deviation from the mathematical scale and is skipped by future cascades; downstream propagation still flows from the new value. `--no-cascade` requires `--reason "..."` (or an interactive prompt in non-agent mode). String values are stored as-is; JSON-shaped values (e.g. `'{"family":"accent","position":"500"}'` for a `ColorReference`) are parsed and validated against the union of `string | ColorValue | ColorReference` from `@rafters/shared`. `--rafters-dir <path>` overrides the default `.rafters/tokens` location. `--agent` switches output to JSON (`{event, name, previous, next, cascade, reason?}`) for machine consumption.

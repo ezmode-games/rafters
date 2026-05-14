@@ -6,6 +6,7 @@ import {
   findTokenFile,
   loadRegistryFromDir,
   type NamespaceFile,
+  NamespaceFileParseError,
   saveRegistryToDir,
   TokenRegistry,
 } from '../src/index.js';
@@ -66,10 +67,47 @@ describe('loadRegistryFromDir', () => {
     expect(r.size()).toBe(1);
   });
 
-  it('skips files that do not match NamespaceFile schema', () => {
+  it('throws NamespaceFileParseError on a file that is not a valid NamespaceFile', () => {
     writeFileSync(join(tmpDir, 'broken.rafters.json'), '{"not": "valid"}');
+    expect(() => loadRegistryFromDir(tmpDir)).toThrow(NamespaceFileParseError);
+  });
+
+  it('coerces legacy tokens that omit the userOverride field, treating them as null', () => {
+    const legacyFile = {
+      namespace: 'motion',
+      tokens: [
+        {
+          name: 'motion-duration-base',
+          namespace: 'motion',
+          category: 'motion',
+          value: '150ms',
+          // userOverride deliberately omitted to simulate v1-shape on disk
+          description: 'Base duration written before the schema tightened',
+        },
+      ],
+    };
+    writeFileSync(join(tmpDir, 'motion.rafters.json'), JSON.stringify(legacyFile));
     const r = loadRegistryFromDir(tmpDir);
-    expect(r.size()).toBe(0);
+    expect(r.has('motion-duration-base')).toBe(true);
+    expect(r.get('motion-duration-base')?.userOverride).toBeNull();
+  });
+
+  it('parse error includes file path and first issue path for diagnosis', () => {
+    writeFileSync(
+      join(tmpDir, 'bad.rafters.json'),
+      JSON.stringify({
+        namespace: 'color',
+        tokens: [{ name: 'color-x' }], // missing required namespace, category, value
+      }),
+    );
+    try {
+      loadRegistryFromDir(tmpDir);
+      expect.fail('should have thrown');
+    } catch (e) {
+      if (!(e instanceof NamespaceFileParseError)) throw e;
+      expect(e.path).toContain('bad.rafters.json');
+      expect(e.issues.length).toBeGreaterThan(0);
+    }
   });
 });
 
