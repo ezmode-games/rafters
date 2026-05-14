@@ -10,6 +10,7 @@ import { add } from './commands/add.js';
 import { importCommand } from './commands/import.js';
 import { init } from './commands/init.js';
 import { mcp } from './commands/mcp.js';
+import { set } from './commands/set.js';
 import { studio } from './commands/studio.js';
 import { withErrorHandler } from './utils/ui.js';
 
@@ -57,6 +58,17 @@ program
   .description('Start MCP server for AI agent access (stdio)')
   .option('--project-root <path>', 'Explicit project root (skips .rafters/ discovery)')
   .action(mcp);
+
+program
+  .command('set')
+  .description('Set a token value (cascades to dependents by default)')
+  .argument('<name>', 'Token name')
+  .argument('<value>', 'New value (string, or JSON for ColorValue/ColorReference)')
+  .option('--no-cascade', 'Record as userOverride anchor; skip cascade on this node')
+  .option('--reason <text>', 'Reason for the override (required with --no-cascade)')
+  .option('--rafters-dir <path>', 'Directory of .rafters.json files', '.rafters/tokens')
+  .option('--agent', 'Output JSON for machine consumption')
+  .action(withErrorHandler(set));
 
 program.command('studio').description('Open Studio UI for visual token editing').action(studio);
 
