@@ -39,20 +39,44 @@ export class TokenRegistry {
     this.plugins.set(plugin.name, plugin);
   }
 
+  define(token: unknown): void {
+    const normalized = normalizeIncomingToken(token);
+    if (!normalized) {
+      throw new Error(
+        'define(token) requires an object with string name, namespace, category, and a defined value',
+      );
+    }
+    this.metadata.set(normalized.name, normalized);
+    if (normalized.userOverride) {
+      this.graph.set(normalized.name, normalized.value, {
+        cascade: false,
+        reason: normalized.userOverride.reason,
+        ...(normalized.userOverride.context ? { context: normalized.userOverride.context } : {}),
+      });
+    } else {
+      this.graph.set(normalized.name, normalized.value);
+    }
+  }
+
   set(name: string, value: TokenValue, options?: SetOptions): void {
-    this.ensureMetadata(name);
+    if (!this.metadata.has(name)) {
+      throw new UnknownTokenError(name);
+    }
     this.graph.set(name, value, options);
   }
 
   bind(name: string, pluginName: string, input: unknown): void {
-    this.ensureMetadata(name);
+    if (!this.metadata.has(name)) {
+      throw new UnknownTokenError(name);
+    }
     this.graph.bind(name, pluginName, input);
   }
 
   get(name: string): Token | undefined {
     const node = this.graph.node(name);
-    if (!node) return undefined;
-    return this.toToken(node);
+    const meta = this.metadata.get(name);
+    if (!node || !meta) return undefined;
+    return this.toToken(node, meta);
   }
 
   undo(): void {
@@ -70,7 +94,9 @@ export class TokenRegistry {
   list(filter?: RegistryFilter): readonly Token[] {
     const out: Token[] = [];
     for (const node of this.graph.list()) {
-      const token = this.toToken(node);
+      const meta = this.metadata.get(node.name);
+      if (!meta) continue;
+      const token = this.toToken(node, meta);
       if (filter?.namespace && token.namespace !== filter.namespace) continue;
       if (filter?.category && token.category !== filter.category) continue;
       out.push(token);
@@ -78,13 +104,7 @@ export class TokenRegistry {
     return out;
   }
 
-  private ensureMetadata(name: string): void {
-    if (this.metadata.has(name)) return;
-    this.metadata.set(name, defaultTokenFor(name));
-  }
-
-  private toToken(node: Node): Token {
-    const meta = this.metadata.get(node.name) ?? defaultTokenFor(node.name);
+  private toToken(node: Node, meta: Token): Token {
     const projected: Token = {
       ...meta,
       name: node.name,
@@ -104,39 +124,25 @@ export class TokenRegistry {
   }
 }
 
-function defaultTokenFor(name: string): Token {
-  const namespace = inferNamespace(name);
-  return {
-    name,
-    namespace,
-    category: namespace,
-    value: '',
-    userOverride: null,
-    containerQueryAware: true,
-  };
+export class UnknownTokenError extends Error {
+  constructor(public readonly tokenName: string) {
+    super(`Token not registered: ${tokenName}`);
+    this.name = 'UnknownTokenError';
+  }
 }
 
 function normalizeIncomingToken(raw: unknown): Token | undefined {
   if (!raw || typeof raw !== 'object') return undefined;
   const obj = raw as Record<string, unknown>;
-  const name = typeof obj.name === 'string' ? obj.name : undefined;
-  if (!name) return undefined;
-  const namespace = typeof obj.namespace === 'string' ? obj.namespace : inferNamespace(name);
-  const category = typeof obj.category === 'string' ? obj.category : namespace;
-  const value = (obj.value as Token['value']) ?? '';
+  if (typeof obj.name !== 'string') return undefined;
+  if (typeof obj.namespace !== 'string') return undefined;
+  if (typeof obj.category !== 'string') return undefined;
+  if (obj.value === undefined) return undefined;
   const userOverride =
     obj.userOverride && typeof obj.userOverride === 'object'
       ? (obj.userOverride as Token['userOverride'])
       : null;
-  return { ...obj, name, namespace, category, value, userOverride } as Token;
-}
-
-function inferNamespace(name: string): string {
-  const dashIdx = name.indexOf('-');
-  const dotIdx = name.indexOf('.');
-  const candidates = [dashIdx, dotIdx].filter((i) => i >= 0);
-  if (candidates.length === 0) return name;
-  return name.slice(0, Math.min(...candidates));
+  return { ...obj, userOverride } as Token;
 }
 
 function toUserOverrideField(

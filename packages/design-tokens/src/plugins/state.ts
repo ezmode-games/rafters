@@ -1,7 +1,7 @@
+import { SCALE_POSITIONS } from '@rafters/color-utils';
 import { type ColorReference, ColorReferenceSchema, type ColorValue } from '@rafters/shared';
 import { z } from 'zod';
 import { definePlugin } from '../plugin.js';
-import { INDEX_TO_POSITION } from '../scale-positions.js';
 
 const StateTypeSchema = z.enum(['hover', 'active', 'focus', 'disabled']);
 
@@ -42,7 +42,7 @@ export const statePlugin = definePlugin<StateInput, ColorReference>({
 
     const offset = STATE_OFFSETS[input.stateType];
     const adjustedIndex = Math.max(0, Math.min(10, input.basePosition + offset));
-    const position = INDEX_TO_POSITION[adjustedIndex] ?? '500';
+    const position = SCALE_POSITIONS[adjustedIndex] ?? '500';
     return { family: input.familyName, position };
   },
 });

@@ -1,7 +1,7 @@
+import { SCALE_POSITIONS } from '@rafters/color-utils';
 import { type ColorReference, ColorReferenceSchema, type ColorValue } from '@rafters/shared';
 import { z } from 'zod';
 import { definePlugin } from '../plugin.js';
-import { INDEX_TO_POSITION } from '../scale-positions.js';
 
 const ContrastInputSchema = z.object({
   familyName: z.string(),
@@ -52,7 +52,7 @@ export const contrastPlugin = definePlugin<ContrastInput, ColorReference>({
       if (contrastPosition !== undefined) {
         return {
           family: input.familyName,
-          position: INDEX_TO_POSITION[contrastPosition] ?? '500',
+          position: SCALE_POSITIONS[contrastPosition] ?? '500',
         };
       }
     }
@@ -64,7 +64,7 @@ export const contrastPlugin = definePlugin<ContrastInput, ColorReference>({
         if (best !== undefined) {
           return {
             family: input.neutralFamilyName,
-            position: INDEX_TO_POSITION[best] ?? '500',
+            position: SCALE_POSITIONS[best] ?? '500',
           };
         }
       }
@@ -73,7 +73,7 @@ export const contrastPlugin = definePlugin<ContrastInput, ColorReference>({
         if (best !== undefined) {
           return {
             family: input.neutralFamilyName,
-            position: INDEX_TO_POSITION[best] ?? '500',
+            position: SCALE_POSITIONS[best] ?? '500',
           };
         }
       }

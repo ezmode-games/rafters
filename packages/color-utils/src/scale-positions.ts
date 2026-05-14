@@ -1,6 +1,21 @@
+/**
+ * Standard 11-position color scale conventions.
+ *
+ * SCALE_POSITIONS maps array indices 0-10 to the canonical Tailwind-style
+ * position labels (50, 100, 200, ..., 950). POSITION_TO_INDEX is the inverse.
+ *
+ * WCAG-pair helpers operate on the pair matrices that ColorValue carries
+ * under accessibility.wcagAA / wcagAAA — pairs are [sourceIndex, partnerIndex]
+ * tuples that satisfy the contrast standard. The "find" helpers walk a pair
+ * matrix to return the partner with the greatest distance from the source on
+ * a given side; "findDarkCounterpartIndex" picks a pair partner suitable for
+ * dark-mode pairing (AAA preferred, AA fallback if AAA is too close,
+ * mathematical inversion as last resort).
+ */
+
 import type { ColorValue } from '@rafters/shared';
 
-export const INDEX_TO_POSITION = [
+export const SCALE_POSITIONS = [
   '50',
   '100',
   '200',
@@ -14,19 +29,13 @@ export const INDEX_TO_POSITION = [
   '950',
 ] as const;
 
-export const POSITION_TO_INDEX: Record<string, number> = {
-  '50': 0,
-  '100': 1,
-  '200': 2,
-  '300': 3,
-  '400': 4,
-  '500': 5,
-  '600': 6,
-  '700': 7,
-  '800': 8,
-  '900': 9,
-  '950': 10,
-};
+export const POSITION_TO_INDEX: Record<string, number> = SCALE_POSITIONS.reduce(
+  (acc, position, index) => {
+    acc[position] = index;
+    return acc;
+  },
+  {} as Record<string, number>,
+);
 
 export const MIN_WCAG_PAIR_DISTANCE = 3;
 

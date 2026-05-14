@@ -59,9 +59,24 @@ function buildAccentToken(value: ColorValue): Token {
   };
 }
 
+function semanticToken(name: string): Token {
+  return { name, namespace: 'semantic', category: 'color', value: '', userOverride: null };
+}
+
+function familyTokenSlot(name: string): Token {
+  return { name, namespace: 'color', category: 'color', value: '', userOverride: null };
+}
+
 function setupSemanticChain(): TokenRegistry {
   const r = new TokenRegistry(
-    [buildAccentToken(buildAccentFamily())],
+    [
+      buildAccentToken(buildAccentFamily()),
+      semanticToken('primary'),
+      semanticToken('primary-foreground'),
+      semanticToken('primary-hover'),
+      semanticToken('primary-active'),
+      semanticToken('primary-dark'),
+    ],
     [scalePlugin, contrastPlugin, statePlugin, invertPlugin],
   );
   // accent family → semantic primary (position 5) → primary-foreground, primary-hover, primary-hover-foreground
@@ -120,7 +135,11 @@ describe('cascade integration', () => {
 
     it('downstream of an anchor still flows from the anchor value (chained binding)', () => {
       const r = new TokenRegistry(
-        [buildAccentToken(buildAccentFamily())],
+        [
+          buildAccentToken(buildAccentFamily()),
+          semanticToken('primary'),
+          semanticToken('primary-fg'),
+        ],
         [scalePlugin, contrastPlugin],
       );
       r.bind('primary', 'scale', { familyName: 'accent', scalePosition: 5 });
@@ -140,7 +159,7 @@ describe('cascade integration', () => {
 
   describe('cycle detection at bind time', () => {
     it('rejects a binding that creates a direct cycle', () => {
-      const r = new TokenRegistry([], [scalePlugin]);
+      const r = new TokenRegistry([familyTokenSlot('a'), familyTokenSlot('b')], [scalePlugin]);
       const family = buildAccentFamily();
       r.set('a', family);
       r.set('b', family);
@@ -151,7 +170,10 @@ describe('cascade integration', () => {
     });
 
     it('rejects a binding that creates a transitive cycle', () => {
-      const r = new TokenRegistry([], [scalePlugin]);
+      const r = new TokenRegistry(
+        [familyTokenSlot('a'), familyTokenSlot('b'), familyTokenSlot('c')],
+        [scalePlugin],
+      );
       const family = buildAccentFamily();
       r.set('a', family);
       r.set('b', family);
@@ -167,7 +189,11 @@ describe('cascade integration', () => {
   describe('topological ordering during cascade', () => {
     it('recomputes upstream nodes before downstream when both are dependents', () => {
       const r = new TokenRegistry(
-        [buildAccentToken(buildAccentFamily())],
+        [
+          buildAccentToken(buildAccentFamily()),
+          semanticToken('primary'),
+          semanticToken('primary-hover'),
+        ],
         [scalePlugin, statePlugin],
       );
       r.bind('primary', 'scale', { familyName: 'accent', scalePosition: 5 });

@@ -64,7 +64,6 @@ export {
   generateSurfaceColor,
   lighten,
 } from './manipulation.js';
-
 // Naming
 export {
   BLUE_HUB,
@@ -98,6 +97,14 @@ export {
   RED_HUB,
   TOTAL_COMBINATIONS,
 } from './naming/index.js';
+// Scale positions and WCAG-pair helpers
+export {
+  findBestWcagPair,
+  findDarkCounterpartIndex,
+  MIN_WCAG_PAIR_DISTANCE,
+  POSITION_TO_INDEX,
+  SCALE_POSITIONS,
+} from './scale-positions.js';
 
 // Validation
 export {

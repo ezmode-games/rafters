@@ -10,7 +10,7 @@ export {
 export {
   findTokenFile,
   loadRegistryFromDir,
-  type NamespaceFile,
+  type NamespaceFileEnvelope,
   saveRegistryToDir,
 } from './persistence.js';
 export type { PluginSpec } from './plugin.js';
@@ -22,11 +22,4 @@ export {
   scalePlugin,
   statePlugin,
 } from './plugins/index.js';
-export { type RegistryFilter, TokenRegistry } from './registry.js';
-export {
-  findBestWcagPair,
-  findDarkCounterpartIndex,
-  INDEX_TO_POSITION,
-  MIN_WCAG_PAIR_DISTANCE,
-  POSITION_TO_INDEX,
-} from './scale-positions.js';
+export { type RegistryFilter, TokenRegistry, UnknownTokenError } from './registry.js';
