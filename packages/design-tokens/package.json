@@ -1,0 +1,30 @@
+{
+  "name": "@rafters/design-tokens",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf .turbo coverage"
+  },
+  "dependencies": {
+    "@rafters/math-utils": "workspace:*",
+    "@rafters/shared": "workspace:*",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@rafters/design-tokens-v1": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
