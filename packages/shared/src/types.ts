@@ -429,6 +429,16 @@ export const PROGRESSION_SYSTEMS = [
   'custom',
 ] as const;
 
+// Binding: typed reference to the plugin + input that produces a token's value.
+// When present on a Token, the registry resolves the value via the named plugin
+// instead of treating the token as a leaf. The plugin name is opaque to the
+// schema; the registry resolves it against its plugin map.
+export const BindingSchema = z.object({
+  plugin: z.string(),
+  input: z.unknown(),
+});
+export type Binding = z.infer<typeof BindingSchema>;
+
 // Comprehensive Design Token Schema - Single Source of Truth
 export const TokenSchema = z.object({
   // Core token data
@@ -436,6 +446,7 @@ export const TokenSchema = z.object({
   value: z.union([z.string(), ColorValueSchema, ColorReferenceSchema]), // String, ColorValue for families, or ColorReference for semantic
   category: z.string(),
   namespace: z.string(),
+  binding: BindingSchema.optional(), // Plugin binding for cascade-driven values
 
   // Typography-specific properties
   lineHeight: z.string().optional(),

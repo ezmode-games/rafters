@@ -18,18 +18,36 @@ export class TokenRegistry {
   constructor(initialTokens: readonly unknown[] = [], plugins: readonly Plugin[] = []) {
     this.graph = new TokenGraph(plugins);
     for (const plugin of plugins) this.plugins.set(plugin.name, plugin);
+    // Two passes so bindings can reference family tokens regardless of source order.
+    const normalized: Token[] = [];
     for (const raw of initialTokens) {
-      const normalized = normalizeIncomingToken(raw);
-      if (!normalized) continue;
-      this.metadata.set(normalized.name, normalized);
-      if (normalized.userOverride) {
-        this.graph.set(normalized.name, normalized.value, {
+      const t = normalizeIncomingToken(raw);
+      if (!t) continue;
+      this.metadata.set(t.name, t);
+      normalized.push(t);
+    }
+    // Pass 1: leaves and overrides.
+    for (const t of normalized) {
+      if (t.binding) continue;
+      if (t.userOverride) {
+        this.graph.set(t.name, t.value, {
           cascade: false,
-          reason: normalized.userOverride.reason,
-          ...(normalized.userOverride.context ? { context: normalized.userOverride.context } : {}),
+          reason: t.userOverride.reason,
+          ...(t.userOverride.context ? { context: t.userOverride.context } : {}),
         });
       } else {
-        this.graph.set(normalized.name, normalized.value);
+        this.graph.set(t.name, t.value);
+      }
+    }
+    // Pass 2: bindings (dependents now resolve against leaves).
+    for (const t of normalized) {
+      if (!t.binding) continue;
+      try {
+        this.graph.bind(t.name, t.binding.plugin, t.binding.input);
+      } catch (_err) {
+        // Plugin may not be registered yet, or input may not satisfy schema for current upstream.
+        // Fall back to leaf with the persisted value so the token is still readable.
+        this.graph.set(t.name, t.value);
       }
     }
   }
@@ -105,22 +123,15 @@ export class TokenRegistry {
   }
 
   private toToken(node: Node, meta: Token): Token {
-    const projected: Token = {
+    // Preserve metadata's dependsOn (it carries the dependsOn[1] dark counterpart
+    // typed convention the exporter relies on); the runtime binding edges live
+    // on node.binding and are derivable via plugin.dependsOn at cascade time.
+    return {
       ...meta,
       name: node.name,
       value: node.value as TokenValue,
       userOverride: node.userOverride ? toUserOverrideField(node.userOverride, meta.value) : null,
     };
-    if (node.binding) {
-      const plugin = this.plugins.get(node.binding.plugin);
-      const deps = plugin ? plugin.dependsOn(node.binding.input) : [];
-      if (deps.length > 0) projected.dependsOn = [...deps];
-      projected.generationRule = node.binding.plugin;
-    } else {
-      delete (projected as { dependsOn?: string[] }).dependsOn;
-      delete (projected as { generationRule?: string }).generationRule;
-    }
-    return projected;
   }
 }
 
@@ -142,7 +153,16 @@ function normalizeIncomingToken(raw: unknown): Token | undefined {
     obj.userOverride && typeof obj.userOverride === 'object'
       ? (obj.userOverride as Token['userOverride'])
       : null;
-  return { ...obj, userOverride } as Token;
+  const binding =
+    obj.binding &&
+    typeof obj.binding === 'object' &&
+    typeof (obj.binding as { plugin?: unknown }).plugin === 'string'
+      ? (obj.binding as Token['binding'])
+      : undefined;
+  const result: Token = { ...obj, userOverride } as Token;
+  if (binding) result.binding = binding;
+  else delete (result as { binding?: Token['binding'] }).binding;
+  return result;
 }
 
 function toUserOverrideField(

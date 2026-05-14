@@ -137,20 +137,19 @@ describe('TokenRegistry', () => {
       expect(r.get('accent-hover')?.value).toBeDefined();
     });
 
-    it('projects dependsOn from binding via plugin.dependsOn', () => {
-      const r = new TokenRegistry([accentToken, semanticTokenFor('accent-500')], [scalePlugin]);
-      r.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
-      expect(r.get('accent-500')?.dependsOn).toEqual(['accent']);
-      expect(r.get('accent-500')?.generationRule).toBe('scale');
-    });
-
-    it('strips dependsOn / generationRule when token converted from binding to leaf', () => {
-      const r = new TokenRegistry([accentToken, semanticTokenFor('accent-500')], [scalePlugin]);
-      r.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
-      expect(r.get('accent-500')?.dependsOn).toEqual(['accent']);
-      r.set('accent-500', '#ff0000');
-      expect(r.get('accent-500')?.dependsOn).toBeUndefined();
-      expect(r.get('accent-500')?.generationRule).toBeUndefined();
+    it('preserves metadata dependsOn (carries the dark-counterpart convention untouched by binding)', () => {
+      const semanticWithDeps: Token = {
+        name: 'primary',
+        namespace: 'semantic',
+        category: 'color',
+        value: '',
+        userOverride: null,
+        // dependsOn[0] = family token, dependsOn[1] = dark counterpart
+        dependsOn: ['accent', 'accent-50'],
+      };
+      const r = new TokenRegistry([accentToken, semanticWithDeps], [scalePlugin]);
+      r.bind('primary', 'scale', { familyName: 'accent', scalePosition: 5 });
+      expect(r.get('primary')?.dependsOn).toEqual(['accent', 'accent-50']);
     });
   });
 
