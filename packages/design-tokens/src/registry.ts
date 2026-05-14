@@ -15,19 +15,21 @@ export class TokenRegistry {
   private plugins = new Map<string, Plugin>();
   private metadata = new Map<string, Token>();
 
-  constructor(initialTokens: readonly Token[] = [], plugins: readonly Plugin[] = []) {
+  constructor(initialTokens: readonly unknown[] = [], plugins: readonly Plugin[] = []) {
     this.graph = new TokenGraph(plugins);
     for (const plugin of plugins) this.plugins.set(plugin.name, plugin);
-    for (const token of initialTokens) {
-      this.metadata.set(token.name, token);
-      if (token.userOverride) {
-        this.graph.set(token.name, token.value, {
+    for (const raw of initialTokens) {
+      const normalized = normalizeIncomingToken(raw);
+      if (!normalized) continue;
+      this.metadata.set(normalized.name, normalized);
+      if (normalized.userOverride) {
+        this.graph.set(normalized.name, normalized.value, {
           cascade: false,
-          reason: token.userOverride.reason,
-          ...(token.userOverride.context ? { context: token.userOverride.context } : {}),
+          reason: normalized.userOverride.reason,
+          ...(normalized.userOverride.context ? { context: normalized.userOverride.context } : {}),
         });
       } else {
-        this.graph.set(token.name, token.value);
+        this.graph.set(normalized.name, normalized.value);
       }
     }
   }
@@ -112,6 +114,21 @@ function defaultTokenFor(name: string): Token {
     userOverride: null,
     containerQueryAware: true,
   };
+}
+
+function normalizeIncomingToken(raw: unknown): Token | undefined {
+  if (!raw || typeof raw !== 'object') return undefined;
+  const obj = raw as Record<string, unknown>;
+  const name = typeof obj.name === 'string' ? obj.name : undefined;
+  if (!name) return undefined;
+  const namespace = typeof obj.namespace === 'string' ? obj.namespace : inferNamespace(name);
+  const category = typeof obj.category === 'string' ? obj.category : namespace;
+  const value = (obj.value as Token['value']) ?? '';
+  const userOverride =
+    obj.userOverride && typeof obj.userOverride === 'object'
+      ? (obj.userOverride as Token['userOverride'])
+      : null;
+  return { ...obj, name, namespace, category, value, userOverride } as Token;
 }
 
 function inferNamespace(name: string): string {

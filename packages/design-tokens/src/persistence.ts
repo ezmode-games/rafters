@@ -1,49 +1,26 @@
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { type Token, TokenSchema } from '@rafters/shared';
-import { z } from 'zod';
+import type { Token } from '@rafters/shared';
 import type { Plugin } from './graph.js';
 import { TokenRegistry } from './registry.js';
 
-const RawTokenObject = z.looseObject({});
-const RawNamespaceFileSchema = z.object({
-  $schema: z.string().optional(),
-  namespace: z.string(),
-  version: z.string().optional(),
-  generatedAt: z.string().optional(),
-  tokens: z.array(RawTokenObject),
-});
-
-const NamespaceFileSchema = z.object({
-  $schema: z.string().optional(),
-  namespace: z.string(),
-  version: z.string().optional(),
-  generatedAt: z.string().optional(),
-  tokens: z.array(TokenSchema),
-});
-
-export type NamespaceFile = z.infer<typeof NamespaceFileSchema>;
-
-export class NamespaceFileParseError extends Error {
-  constructor(
-    public readonly path: string,
-    public readonly issues: readonly z.core.$ZodIssue[],
-  ) {
-    const first = issues[0];
-    const detail = first ? `${first.path.join('.')}: ${first.message}` : 'unknown';
-    super(
-      `Failed to parse ${path} as a NamespaceFile (${issues.length} issue(s); first: ${detail})`,
-    );
-    this.name = 'NamespaceFileParseError';
-  }
-}
+export type NamespaceFile = {
+  $schema?: string;
+  namespace?: string;
+  version?: string;
+  generatedAt?: string;
+  tokens: unknown[];
+};
 
 export function loadRegistryFromDir(dir: string, plugins: readonly Plugin[] = []): TokenRegistry {
-  const tokens: Token[] = [];
+  const tokens: unknown[] = [];
   for (const entry of readdirSync(dir)) {
     if (!entry.endsWith('.rafters.json')) continue;
     const path = join(dir, entry);
-    tokens.push(...readNamespaceFile(path).tokens);
+    const raw = JSON.parse(readFileSync(path, 'utf8'));
+    if (raw && Array.isArray(raw.tokens)) {
+      tokens.push(...raw.tokens);
+    }
   }
   return new TokenRegistry(tokens, plugins);
 }
@@ -73,28 +50,18 @@ export function findTokenFile(dir: string, tokenName: string): string | undefine
     if (!entry.endsWith('.rafters.json')) continue;
     const path = join(dir, entry);
     if (!statSync(path).isFile()) continue;
-    if (readNamespaceFile(path).tokens.some((t) => t.name === tokenName)) return path;
+    const raw = JSON.parse(readFileSync(path, 'utf8'));
+    if (raw && Array.isArray(raw.tokens)) {
+      for (const token of raw.tokens) {
+        if (
+          token &&
+          typeof token === 'object' &&
+          (token as { name?: unknown }).name === tokenName
+        ) {
+          return path;
+        }
+      }
+    }
   }
   return undefined;
-}
-
-function readNamespaceFile(path: string): NamespaceFile {
-  const raw = readFileSync(path, 'utf8');
-  const rawParsed = RawNamespaceFileSchema.safeParse(JSON.parse(raw));
-  if (!rawParsed.success) {
-    throw new NamespaceFileParseError(path, rawParsed.error.issues);
-  }
-  const tokens = rawParsed.data.tokens.map(coerceLegacyToken);
-  const result = NamespaceFileSchema.safeParse({ ...rawParsed.data, tokens });
-  if (!result.success) {
-    throw new NamespaceFileParseError(path, result.error.issues);
-  }
-  return result.data;
-}
-
-function coerceLegacyToken(raw: Record<string, unknown>): Record<string, unknown> {
-  if (!('userOverride' in raw)) {
-    return { ...raw, userOverride: null };
-  }
-  return raw;
 }

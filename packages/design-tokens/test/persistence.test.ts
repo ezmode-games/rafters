@@ -6,7 +6,6 @@ import {
   findTokenFile,
   loadRegistryFromDir,
   type NamespaceFile,
-  NamespaceFileParseError,
   saveRegistryToDir,
   TokenRegistry,
 } from '../src/index.js';
@@ -67,12 +66,13 @@ describe('loadRegistryFromDir', () => {
     expect(r.size()).toBe(1);
   });
 
-  it('throws NamespaceFileParseError on a file that is not a valid NamespaceFile', () => {
+  it('skips a file with no tokens array (just reads what it can)', () => {
     writeFileSync(join(tmpDir, 'broken.rafters.json'), '{"not": "valid"}');
-    expect(() => loadRegistryFromDir(tmpDir)).toThrow(NamespaceFileParseError);
+    const r = loadRegistryFromDir(tmpDir);
+    expect(r.size()).toBe(0);
   });
 
-  it('coerces legacy tokens that omit the userOverride field, treating them as null', () => {
+  it('loads tokens that omit userOverride; the registry treats missing as null', () => {
     const legacyFile = {
       namespace: 'motion',
       tokens: [
@@ -92,22 +92,40 @@ describe('loadRegistryFromDir', () => {
     expect(r.get('motion-duration-base')?.userOverride).toBeNull();
   });
 
-  it('parse error includes file path and first issue path for diagnosis', () => {
-    writeFileSync(
-      join(tmpDir, 'bad.rafters.json'),
-      JSON.stringify({
-        namespace: 'color',
-        tokens: [{ name: 'color-x' }], // missing required namespace, category, value
-      }),
-    );
-    try {
-      loadRegistryFromDir(tmpDir);
-      expect.fail('should have thrown');
-    } catch (e) {
-      if (!(e instanceof NamespaceFileParseError)) throw e;
-      expect(e.path).toContain('bad.rafters.json');
-      expect(e.issues.length).toBeGreaterThan(0);
-    }
+  it('loads tokens with arbitrary extra metadata (description, generatedAt) without rejecting them', () => {
+    const fileWithExtras = {
+      namespace: 'spacing',
+      tokens: [
+        {
+          name: 'spacing-base',
+          namespace: 'spacing',
+          category: 'spacing',
+          value: '4px',
+          description: 'arbitrary metadata',
+          generatedAt: '2026-01-01T00:00:00Z',
+          someUnknownField: { nested: true },
+        },
+      ],
+    };
+    writeFileSync(join(tmpDir, 'spacing.rafters.json'), JSON.stringify(fileWithExtras));
+    const r = loadRegistryFromDir(tmpDir);
+    expect(r.get('spacing-base')?.value).toBe('4px');
+  });
+
+  it('skips token entries that are not objects or have no name', () => {
+    const messyFile = {
+      namespace: 'mixed',
+      tokens: [
+        null,
+        'not an object',
+        { value: 'no-name-field' },
+        { name: 'good', namespace: 'mixed', category: 'mixed', value: 'ok' },
+      ],
+    };
+    writeFileSync(join(tmpDir, 'mixed.rafters.json'), JSON.stringify(messyFile));
+    const r = loadRegistryFromDir(tmpDir);
+    expect(r.size()).toBe(1);
+    expect(r.has('good')).toBe(true);
   });
 });
 
