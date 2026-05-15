@@ -1,4 +1,4 @@
-import type { Token, TokenSchema } from '@rafters/shared';
+import { type Token, TokenSchema } from '@rafters/shared';
 import type { z } from 'zod';
 import { type Node, type Plugin, type SetOptions, TokenGraph } from './graph.js';
 
@@ -15,20 +15,36 @@ export class TokenRegistry {
   private plugins = new Map<string, Plugin>();
   private metadata = new Map<string, Token>();
 
-  constructor(initialTokens: readonly Token[] = [], plugins: readonly Plugin[] = []) {
+  constructor(initialTokens: readonly unknown[] = [], plugins: readonly Plugin[] = []) {
     this.graph = new TokenGraph(plugins);
     for (const plugin of plugins) this.plugins.set(plugin.name, plugin);
-    for (const token of initialTokens) {
-      this.metadata.set(token.name, token);
-      if (token.userOverride) {
-        this.graph.set(token.name, token.value, {
+    // Two passes so bindings can reference family tokens regardless of source order.
+    const parsed: Token[] = [];
+    for (const raw of initialTokens) {
+      const result = TokenSchema.safeParse(raw);
+      if (!result.success) {
+        throw new TokenParseError(raw, result.error.issues);
+      }
+      this.metadata.set(result.data.name, result.data);
+      parsed.push(result.data);
+    }
+    // Pass 1: leaves and overrides.
+    for (const t of parsed) {
+      if (t.binding) continue;
+      if (t.userOverride) {
+        this.graph.set(t.name, t.value, {
           cascade: false,
-          reason: token.userOverride.reason,
-          ...(token.userOverride.context ? { context: token.userOverride.context } : {}),
+          reason: t.userOverride.reason,
+          ...(t.userOverride.context ? { context: t.userOverride.context } : {}),
         });
       } else {
-        this.graph.set(token.name, token.value);
+        this.graph.set(t.name, t.value);
       }
+    }
+    // Pass 2: bindings (dependents now resolve against leaves).
+    for (const t of parsed) {
+      if (!t.binding) continue;
+      this.graph.bind(t.name, t.binding.plugin, t.binding.input);
     }
   }
 
@@ -37,20 +53,45 @@ export class TokenRegistry {
     this.plugins.set(plugin.name, plugin);
   }
 
+  define(token: unknown): void {
+    const result = TokenSchema.safeParse(token);
+    if (!result.success) {
+      throw new TokenParseError(token, result.error.issues);
+    }
+    const t = result.data;
+    this.metadata.set(t.name, t);
+    if (t.binding) {
+      this.graph.bind(t.name, t.binding.plugin, t.binding.input);
+    } else if (t.userOverride) {
+      this.graph.set(t.name, t.value, {
+        cascade: false,
+        reason: t.userOverride.reason,
+        ...(t.userOverride.context ? { context: t.userOverride.context } : {}),
+      });
+    } else {
+      this.graph.set(t.name, t.value);
+    }
+  }
+
   set(name: string, value: TokenValue, options?: SetOptions): void {
-    this.ensureMetadata(name);
+    if (!this.metadata.has(name)) {
+      throw new UnknownTokenError(name);
+    }
     this.graph.set(name, value, options);
   }
 
   bind(name: string, pluginName: string, input: unknown): void {
-    this.ensureMetadata(name);
+    if (!this.metadata.has(name)) {
+      throw new UnknownTokenError(name);
+    }
     this.graph.bind(name, pluginName, input);
   }
 
   get(name: string): Token | undefined {
     const node = this.graph.node(name);
-    if (!node) return undefined;
-    return this.toToken(node);
+    const meta = this.metadata.get(name);
+    if (!node || !meta) return undefined;
+    return this.toToken(node, meta);
   }
 
   undo(): void {
@@ -68,7 +109,9 @@ export class TokenRegistry {
   list(filter?: RegistryFilter): readonly Token[] {
     const out: Token[] = [];
     for (const node of this.graph.list()) {
-      const token = this.toToken(node);
+      const meta = this.metadata.get(node.name);
+      if (!meta) continue;
+      const token = this.toToken(node, meta);
       if (filter?.namespace && token.namespace !== filter.namespace) continue;
       if (filter?.category && token.category !== filter.category) continue;
       out.push(token);
@@ -76,50 +119,40 @@ export class TokenRegistry {
     return out;
   }
 
-  private ensureMetadata(name: string): void {
-    if (this.metadata.has(name)) return;
-    this.metadata.set(name, defaultTokenFor(name));
-  }
-
-  private toToken(node: Node): Token {
-    const meta = this.metadata.get(node.name) ?? defaultTokenFor(node.name);
-    const projected: Token = {
+  private toToken(node: Node, meta: Token): Token {
+    // Preserve metadata's dependsOn (it carries the dependsOn[1] dark counterpart
+    // typed convention the exporter relies on); the runtime binding edges live
+    // on node.binding and are derivable via plugin.dependsOn at cascade time.
+    return {
       ...meta,
       name: node.name,
       value: node.value as TokenValue,
       userOverride: node.userOverride ? toUserOverrideField(node.userOverride, meta.value) : null,
     };
-    if (node.binding) {
-      const plugin = this.plugins.get(node.binding.plugin);
-      const deps = plugin ? plugin.dependsOn(node.binding.input) : [];
-      if (deps.length > 0) projected.dependsOn = [...deps];
-      projected.generationRule = node.binding.plugin;
-    } else {
-      delete (projected as { dependsOn?: string[] }).dependsOn;
-      delete (projected as { generationRule?: string }).generationRule;
-    }
-    return projected;
   }
 }
 
-function defaultTokenFor(name: string): Token {
-  const namespace = inferNamespace(name);
-  return {
-    name,
-    namespace,
-    category: namespace,
-    value: '',
-    userOverride: null,
-    containerQueryAware: true,
-  };
+export class UnknownTokenError extends Error {
+  constructor(public readonly tokenName: string) {
+    super(`Token not registered: ${tokenName}`);
+    this.name = 'UnknownTokenError';
+  }
 }
 
-function inferNamespace(name: string): string {
-  const dashIdx = name.indexOf('-');
-  const dotIdx = name.indexOf('.');
-  const candidates = [dashIdx, dotIdx].filter((i) => i >= 0);
-  if (candidates.length === 0) return name;
-  return name.slice(0, Math.min(...candidates));
+export class TokenParseError extends Error {
+  constructor(
+    public readonly raw: unknown,
+    public readonly issues: readonly z.core.$ZodIssue[],
+  ) {
+    const first = issues[0];
+    const detail = first ? `${first.path.join('.')}: ${first.message}` : 'unknown';
+    const name =
+      raw && typeof raw === 'object' && typeof (raw as { name?: unknown }).name === 'string'
+        ? (raw as { name: string }).name
+        : '<unnamed>';
+    super(`Token "${name}" failed TokenSchema validation: ${detail}`);
+    this.name = 'TokenParseError';
+  }
 }
 
 function toUserOverrideField(

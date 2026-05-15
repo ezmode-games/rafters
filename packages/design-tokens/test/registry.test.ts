@@ -1,6 +1,12 @@
 import type { ColorValue, Token } from '@rafters/shared';
 import { describe, expect, it } from 'vitest';
-import { contrastPlugin, scalePlugin, statePlugin, TokenRegistry } from '../src/index.js';
+import {
+  contrastPlugin,
+  scalePlugin,
+  statePlugin,
+  TokenRegistry,
+  UnknownTokenError,
+} from '../src/index.js';
 
 const minimalScale = [
   { l: 0.97, c: 0.02, h: 240 },
@@ -32,6 +38,16 @@ const spacingBaseToken: Token = {
   userOverride: null,
 };
 
+function semanticTokenFor(name: string): Token {
+  return {
+    name,
+    namespace: 'semantic',
+    category: 'color',
+    value: '',
+    userOverride: null,
+  };
+}
+
 describe('TokenRegistry', () => {
   describe('construction', () => {
     it('seeds initial tokens with metadata and value', () => {
@@ -39,11 +55,16 @@ describe('TokenRegistry', () => {
       expect(r.size()).toBe(1);
       expect(r.has('accent')).toBe(true);
       expect(r.get('accent')?.namespace).toBe('color');
-      expect(r.get('accent')?.value).toEqual(accentToken.value);
+      // Zod fills OKLCH.alpha default 1; compare structure, not deep object identity.
+      const v = r.get('accent')?.value;
+      expect(v && typeof v === 'object' && 'name' in v && v.name).toBe('accent');
+      expect(
+        v && typeof v === 'object' && 'scale' in v && Array.isArray(v.scale) && v.scale.length,
+      ).toBe(11);
     });
 
     it('seeds plugins via constructor', () => {
-      const r = new TokenRegistry([accentToken], [scalePlugin]);
+      const r = new TokenRegistry([accentToken, semanticTokenFor('accent-500')], [scalePlugin]);
       r.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
       expect(r.get('accent-500')?.value).toEqual({ family: 'accent', position: '500' });
     });
@@ -56,13 +77,9 @@ describe('TokenRegistry', () => {
       expect(r.get('spacing-base')?.value).toBe('8px');
     });
 
-    it('creates token with inferred namespace if name unknown', () => {
+    it('throws UnknownTokenError when set is called on a name with no registered metadata', () => {
       const r = new TokenRegistry();
-      r.set('color-mystery', '#fff');
-      const token = r.get('color-mystery');
-      expect(token?.namespace).toBe('color');
-      expect(token?.category).toBe('color');
-      expect(token?.value).toBe('#fff');
+      expect(() => r.set('color-mystery', '#fff')).toThrow(UnknownTokenError);
     });
 
     it('records userOverride when cascade: false', () => {
@@ -82,9 +99,26 @@ describe('TokenRegistry', () => {
     });
   });
 
+  describe('define', () => {
+    it('registers a new token with full metadata after construction', () => {
+      const r = new TokenRegistry();
+      r.define(spacingBaseToken);
+      expect(r.has('spacing-base')).toBe(true);
+      expect(r.get('spacing-base')?.value).toBe('4px');
+    });
+
+    it('rejects input missing required fields', () => {
+      const r = new TokenRegistry();
+      expect(() => r.define({ name: 'incomplete' })).toThrow();
+    });
+  });
+
   describe('bind + cascade', () => {
     it('cascades family changes through scale + contrast chain', () => {
-      const r = new TokenRegistry([accentToken], [scalePlugin, contrastPlugin]);
+      const r = new TokenRegistry(
+        [accentToken, semanticTokenFor('accent-500'), semanticTokenFor('accent-fg')],
+        [scalePlugin, contrastPlugin],
+      );
       r.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
       r.bind('accent-fg', 'contrast', { familyName: 'accent', basePosition: 5 });
       expect(r.get('accent-500')?.value).toEqual({ family: 'accent', position: '500' });
@@ -92,7 +126,10 @@ describe('TokenRegistry', () => {
     });
 
     it('cascades through state variants on family change', () => {
-      const r = new TokenRegistry([accentToken], [scalePlugin, statePlugin]);
+      const r = new TokenRegistry(
+        [accentToken, semanticTokenFor('accent-500'), semanticTokenFor('accent-hover')],
+        [scalePlugin, statePlugin],
+      );
       r.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
       r.bind('accent-hover', 'state', {
         familyName: 'accent',
@@ -105,26 +142,25 @@ describe('TokenRegistry', () => {
       expect(r.get('accent-hover')?.value).toBeDefined();
     });
 
-    it('projects dependsOn from binding via plugin.dependsOn', () => {
-      const r = new TokenRegistry([accentToken], [scalePlugin]);
-      r.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
-      expect(r.get('accent-500')?.dependsOn).toEqual(['accent']);
-      expect(r.get('accent-500')?.generationRule).toBe('scale');
-    });
-
-    it('strips dependsOn / generationRule when token converted from binding to leaf', () => {
-      const r = new TokenRegistry([accentToken], [scalePlugin]);
-      r.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
-      expect(r.get('accent-500')?.dependsOn).toEqual(['accent']);
-      r.set('accent-500', '#ff0000');
-      expect(r.get('accent-500')?.dependsOn).toBeUndefined();
-      expect(r.get('accent-500')?.generationRule).toBeUndefined();
+    it('preserves metadata dependsOn (carries the dark-counterpart convention untouched by binding)', () => {
+      const semanticWithDeps: Token = {
+        name: 'primary',
+        namespace: 'semantic',
+        category: 'color',
+        value: '',
+        userOverride: null,
+        // dependsOn[0] = family token, dependsOn[1] = dark counterpart
+        dependsOn: ['accent', 'accent-50'],
+      };
+      const r = new TokenRegistry([accentToken, semanticWithDeps], [scalePlugin]);
+      r.bind('primary', 'scale', { familyName: 'accent', scalePosition: 5 });
+      expect(r.get('primary')?.dependsOn).toEqual(['accent', 'accent-50']);
     });
   });
 
   describe('userOverride anchors block recompute', () => {
     it('blocks recompute on anchored node when upstream changes', () => {
-      const r = new TokenRegistry([accentToken], [scalePlugin]);
+      const r = new TokenRegistry([accentToken, semanticTokenFor('accent-500')], [scalePlugin]);
       r.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
       r.set(
         'accent-500',
@@ -163,7 +199,7 @@ describe('TokenRegistry', () => {
 
   describe('plugin registration', () => {
     it('accepts plugins added after construction', () => {
-      const r = new TokenRegistry([accentToken]);
+      const r = new TokenRegistry([accentToken, semanticTokenFor('accent-500')]);
       r.registerPlugin(scalePlugin);
       r.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
       expect(r.get('accent-500')?.value).toEqual({ family: 'accent', position: '500' });

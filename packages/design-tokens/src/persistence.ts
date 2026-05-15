@@ -1,34 +1,31 @@
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { type Token, TokenSchema } from '@rafters/shared';
-import { z } from 'zod';
+import type { Token } from '@rafters/shared';
 import type { Plugin } from './graph.js';
 import { TokenRegistry } from './registry.js';
 
-const NamespaceFileSchema = z.object({
-  $schema: z.string().optional(),
-  namespace: z.string(),
-  version: z.string().optional(),
-  generatedAt: z.string().optional(),
-  tokens: z.array(TokenSchema),
-});
-
-export type NamespaceFile = z.infer<typeof NamespaceFileSchema>;
+export type NamespaceFileEnvelope = {
+  $schema?: string;
+  namespace?: string;
+  version?: string;
+  generatedAt?: string;
+  tokens: unknown[];
+};
 
 export function loadRegistryFromDir(dir: string, plugins: readonly Plugin[] = []): TokenRegistry {
-  const tokens: Token[] = [];
+  const tokens: unknown[] = [];
   for (const entry of readdirSync(dir)) {
     if (!entry.endsWith('.rafters.json')) continue;
-    const path = join(dir, entry);
-    const raw = readFileSync(path, 'utf8');
-    const parsed = NamespaceFileSchema.safeParse(JSON.parse(raw));
-    if (!parsed.success) continue;
-    tokens.push(...parsed.data.tokens);
+    const raw = JSON.parse(readFileSync(join(dir, entry), 'utf8'));
+    if (raw && Array.isArray(raw.tokens)) {
+      tokens.push(...raw.tokens);
+    }
   }
   return new TokenRegistry(tokens, plugins);
 }
 
 export function saveRegistryToDir(dir: string, registry: TokenRegistry): void {
+  const envelopes = readEnvelopes(dir);
   const byNamespace = new Map<string, Token[]>();
   for (const token of registry.list()) {
     const list = byNamespace.get(token.namespace) ?? [];
@@ -36,15 +33,18 @@ export function saveRegistryToDir(dir: string, registry: TokenRegistry): void {
     byNamespace.set(token.namespace, list);
   }
   for (const [namespace, tokens] of byNamespace) {
-    const file: NamespaceFile = {
-      $schema: 'https://rafters.studio/schemas/namespace-tokens.json',
+    const previous = envelopes.get(namespace) ?? {};
+    const file: NamespaceFileEnvelope = {
+      ...previous,
       namespace,
-      version: '1.0.0',
       generatedAt: new Date().toISOString(),
       tokens,
     };
-    const path = join(dir, `${namespace}.rafters.json`);
-    writeFileSync(path, `${JSON.stringify(file, null, 2)}\n`, 'utf8');
+    writeFileSync(
+      join(dir, `${namespace}.rafters.json`),
+      `${JSON.stringify(file, null, 2)}\n`,
+      'utf8',
+    );
   }
 }
 
@@ -53,10 +53,32 @@ export function findTokenFile(dir: string, tokenName: string): string | undefine
     if (!entry.endsWith('.rafters.json')) continue;
     const path = join(dir, entry);
     if (!statSync(path).isFile()) continue;
-    const raw = readFileSync(path, 'utf8');
-    const parsed = NamespaceFileSchema.safeParse(JSON.parse(raw));
-    if (!parsed.success) continue;
-    if (parsed.data.tokens.some((t) => t.name === tokenName)) return path;
+    const raw = JSON.parse(readFileSync(path, 'utf8'));
+    if (!raw || !Array.isArray(raw.tokens)) continue;
+    for (const token of raw.tokens) {
+      if (token && typeof token === 'object' && (token as { name?: unknown }).name === tokenName) {
+        return path;
+      }
+    }
   }
   return undefined;
+}
+
+function readEnvelopes(dir: string): Map<string, Omit<NamespaceFileEnvelope, 'tokens'>> {
+  const out = new Map<string, Omit<NamespaceFileEnvelope, 'tokens'>>();
+  let entries: string[];
+  try {
+    entries = readdirSync(dir);
+  } catch {
+    return out;
+  }
+  for (const entry of entries) {
+    if (!entry.endsWith('.rafters.json')) continue;
+    const raw = JSON.parse(readFileSync(join(dir, entry), 'utf8'));
+    if (raw && typeof raw === 'object' && typeof raw.namespace === 'string') {
+      const { tokens: _tokens, ...envelope } = raw as NamespaceFileEnvelope;
+      out.set(raw.namespace, envelope);
+    }
+  }
+  return out;
 }

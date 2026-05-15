@@ -17,8 +17,13 @@ import { isAgentMode, log, setAgentMode } from '../utils/ui.js';
 const TokenValueSchema = z.union([z.string(), ColorValueSchema, ColorReferenceSchema]);
 type TokenValue = z.infer<typeof TokenValueSchema>;
 
+/**
+ * Commander populates the long-form key derived from --no-cascade as `cascade`
+ * (defaulting to true; `--no-cascade` flips it to false). Don't read `noCascade` --
+ * it's never set by Commander.
+ */
 export interface SetOptions {
-  noCascade?: boolean;
+  cascade?: boolean;
   reason?: string;
   raftersDir?: string;
   agent?: boolean;
@@ -32,7 +37,7 @@ export async function set(name: string, value: string, options: SetOptions): Pro
     throw new Error(`tokens directory not found: ${dir}`);
   }
 
-  const cascade = !options.noCascade;
+  const cascade = options.cascade !== false;
   let reason = options.reason;
   if (!cascade && !reason) {
     if (isAgentMode()) {

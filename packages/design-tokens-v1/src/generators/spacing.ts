@@ -100,6 +100,9 @@ export function generateSpacingTokens(
       value: cssValue,
       category: 'spacing',
       namespace: 'spacing',
+      // Intentionally no binding: spacing tokens use CSS calc(var(--spacing-base) * N)
+      // and the BROWSER resolves the cascade at render time. A registry-side binding
+      // would compute eagerly and emit a static value, defeating the runtime cascade.
       semanticMeaning: meaning,
       usageContext,
       scalePosition: scaleIndex,

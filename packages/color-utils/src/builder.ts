@@ -23,21 +23,7 @@ import {
   generateSemanticColorSuggestions,
 } from './harmony.js';
 import { generateColorName } from './naming/index.js';
-
-/** Standard scale positions used in design systems */
-const SCALE_POSITIONS = [
-  '50',
-  '100',
-  '200',
-  '300',
-  '400',
-  '500',
-  '600',
-  '700',
-  '800',
-  '900',
-  '950',
-];
+import { SCALE_POSITIONS } from './scale-positions.js';
 
 /** White reference color for contrast calculations */
 const WHITE: OKLCH = { l: 1, c: 0, h: 0, alpha: 1 };

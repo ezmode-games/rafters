@@ -66,10 +66,40 @@ describe('loadRegistryFromDir', () => {
     expect(r.size()).toBe(1);
   });
 
-  it('skips files that do not match NamespaceFile schema', () => {
+  it('skips a file with no tokens array (just reads what it can)', () => {
     writeFileSync(join(tmpDir, 'broken.rafters.json'), '{"not": "valid"}');
     const r = loadRegistryFromDir(tmpDir);
     expect(r.size()).toBe(0);
+  });
+
+  it('loads tokens with arbitrary extra metadata (description, generatedAt) without rejecting them', () => {
+    const fileWithExtras = {
+      namespace: 'spacing',
+      tokens: [
+        {
+          name: 'spacing-base',
+          namespace: 'spacing',
+          category: 'spacing',
+          value: '4px',
+          userOverride: null,
+          description: 'arbitrary metadata',
+          generatedAt: '2026-01-01T00:00:00Z',
+          someUnknownField: { nested: true },
+        },
+      ],
+    };
+    writeFileSync(join(tmpDir, 'spacing.rafters.json'), JSON.stringify(fileWithExtras));
+    const r = loadRegistryFromDir(tmpDir);
+    expect(r.get('spacing-base')?.value).toBe('4px');
+  });
+
+  it('throws TokenParseError when a token entry does not satisfy TokenSchema', () => {
+    const messyFile = {
+      namespace: 'mixed',
+      tokens: [{ name: 'incomplete' }], // missing namespace, category, value, userOverride
+    };
+    writeFileSync(join(tmpDir, 'mixed.rafters.json'), JSON.stringify(messyFile));
+    expect(() => loadRegistryFromDir(tmpDir)).toThrow(/TokenSchema validation/);
   });
 });
 

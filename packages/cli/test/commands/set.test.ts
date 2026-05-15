@@ -1,5 +1,6 @@
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { Command } from 'commander';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { set } from '../../src/commands/set.js';
 
@@ -48,9 +49,9 @@ describe('set command', () => {
     expect(token?.userOverride).toBeNull();
   });
 
-  it('records userOverride when --no-cascade with --reason', async () => {
+  it('records userOverride when cascade=false with reason', async () => {
     await set('spacing-base', '20px', {
-      noCascade: true,
+      cascade: false,
       reason: 'Q1 brand campaign',
       raftersDir: tmpDir,
       agent: true,
@@ -64,10 +65,45 @@ describe('set command', () => {
     });
   });
 
-  it('throws in agent mode when --no-cascade missing --reason', async () => {
+  it('throws in agent mode when cascade=false missing reason', async () => {
     await expect(
-      set('spacing-base', '20px', { noCascade: true, raftersDir: tmpDir, agent: true }),
+      set('spacing-base', '20px', { cascade: false, raftersDir: tmpDir, agent: true }),
     ).rejects.toThrow(/--no-cascade requires --reason/);
+  });
+
+  it('integration: --no-cascade flag through Commander populates options.cascade=false', async () => {
+    const program = new Command()
+      .exitOverride()
+      .name('set')
+      .argument('<name>')
+      .argument('<value>')
+      .option('--no-cascade')
+      .option('--reason <text>')
+      .option('--rafters-dir <path>')
+      .option('--agent')
+      .action(async (name: string, value: string, options) => {
+        await set(name, value, options);
+      });
+    await program.parseAsync(
+      [
+        'spacing-base',
+        '12px',
+        '--no-cascade',
+        '--reason',
+        'flag round-trip',
+        '--rafters-dir',
+        tmpDir,
+        '--agent',
+      ],
+      { from: 'user' },
+    );
+    const file = readNamespace('spacing');
+    const token = file.tokens.find((t) => t.name === 'spacing-base');
+    expect(token?.value).toBe('12px');
+    expect(token?.userOverride).toMatchObject({
+      reason: 'flag round-trip',
+      previousValue: '4px',
+    });
   });
 
   it('throws when token does not exist', async () => {
