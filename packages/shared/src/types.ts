@@ -439,6 +439,22 @@ export const BindingSchema = z.object({
 });
 export type Binding = z.infer<typeof BindingSchema>;
 
+// State plugin offsets vs. the base color position.
+// Hover/focus shift one step toward the dark counterpart; active shifts two
+// steps; disabled shifts two steps the other way. Versioned constant so
+// downstream plugins reference one source of truth.
+//
+// Snooze 019e2981 OPEN ITEM: Sean wants this redesigned to a WCAG-AAA-pair
+// lookup (like invert/contrast). Until that design lands, the offset matrix
+// is the documented fallback. Track follow-up before changing the values.
+export const DEFAULT_STATE_OFFSETS = {
+  hover: 1,
+  active: 2,
+  focus: 1,
+  disabled: -2,
+} as const;
+export type StateType = keyof typeof DEFAULT_STATE_OFFSETS;
+
 // Comprehensive Design Token Schema - Single Source of Truth
 export const TokenSchema = z.object({
   // Core token data
