@@ -1,3 +1,4 @@
+export * from './exporters/index.js';
 export * from './generators/index.js';
 export type { Binding, Node, Plugin, SetOptions, UserOverride } from './graph.js';
 export {
