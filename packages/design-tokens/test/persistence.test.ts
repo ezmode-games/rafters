@@ -116,7 +116,7 @@ describe('saveRegistryToDir', () => {
 
   it('round-trips tokens through save+load preserving values', () => {
     const r = new TokenRegistry([colorFile.tokens[0] as Token]);
-    r.set('color-accent', '#ff0000');
+    r.set('color-accent', '#ff0000', { reason: 'test' });
     saveRegistryToDir(tmpDir, r);
     const reloaded = loadRegistryFromDir(tmpDir);
     expect(reloaded.get('color-accent')?.value).toBe('#ff0000');
@@ -124,7 +124,7 @@ describe('saveRegistryToDir', () => {
 
   it('round-trips userOverride records', () => {
     const r = new TokenRegistry([colorFile.tokens[0] as Token]);
-    r.set('color-accent', '#ff0000', { cascade: false, reason: 'Q1 brand campaign' });
+    r.set('color-accent', '#ff0000', { reason: 'Q1 brand campaign' });
     saveRegistryToDir(tmpDir, r);
     const reloaded = loadRegistryFromDir(tmpDir);
     expect(reloaded.get('color-accent')?.userOverride?.reason).toBe('Q1 brand campaign');

@@ -28,22 +28,30 @@ export class TokenRegistry {
       this.metadata.set(result.data.name, result.data);
       parsed.push(result.data);
     }
-    // Pass 1: leaves and overrides.
+    // Pass 1: leaves (no binding) plus any token carrying a userOverride.
+    // An overridden token is seeded with its on-disk value AND its binding
+    // metadata -- the binding stays as a re-derivation hook for future
+    // rebinds, but the override anchor blocks pass 2 from re-running the
+    // transform now.
     for (const t of parsed) {
-      if (t.binding) continue;
-      if (t.userOverride) {
-        this.graph.set(t.name, t.value, {
-          cascade: false,
-          reason: t.userOverride.reason,
-          ...(t.userOverride.context ? { context: t.userOverride.context } : {}),
-        });
-      } else {
-        this.graph.set(t.name, t.value);
-      }
+      const override = t.userOverride
+        ? {
+            previousValue: t.userOverride.previousValue,
+            reason: t.userOverride.reason,
+            ...(t.userOverride.context ? { context: t.userOverride.context } : {}),
+          }
+        : undefined;
+      if (t.binding && !override) continue;
+      this.graph.seed(t.name, t.value, {
+        ...(override ? { userOverride: override } : {}),
+        ...(t.binding ? { binding: t.binding } : {}),
+      });
     }
-    // Pass 2: bindings (dependents now resolve against leaves).
+    // Pass 2: bound tokens without a userOverride re-derive against the
+    // leaves seeded in pass 1.
     for (const t of parsed) {
       if (!t.binding) continue;
+      if (t.userOverride) continue;
       this.graph.bind(t.name, t.binding.plugin, t.binding.input);
     }
   }
@@ -60,20 +68,24 @@ export class TokenRegistry {
     }
     const t = result.data;
     this.metadata.set(t.name, t);
-    if (t.binding) {
+    const override = t.userOverride
+      ? {
+          previousValue: t.userOverride.previousValue,
+          reason: t.userOverride.reason,
+          ...(t.userOverride.context ? { context: t.userOverride.context } : {}),
+        }
+      : undefined;
+    if (t.binding && !override) {
       this.graph.bind(t.name, t.binding.plugin, t.binding.input);
-    } else if (t.userOverride) {
-      this.graph.set(t.name, t.value, {
-        cascade: false,
-        reason: t.userOverride.reason,
-        ...(t.userOverride.context ? { context: t.userOverride.context } : {}),
-      });
     } else {
-      this.graph.set(t.name, t.value);
+      this.graph.seed(t.name, t.value, {
+        ...(override ? { userOverride: override } : {}),
+        ...(t.binding ? { binding: t.binding } : {}),
+      });
     }
   }
 
-  set(name: string, value: TokenValue, options?: SetOptions): void {
+  set(name: string, value: TokenValue, options: SetOptions): void {
     if (!this.metadata.has(name)) {
       throw new UnknownTokenError(name);
     }

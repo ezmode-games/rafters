@@ -80,31 +80,27 @@ describe('TokenRegistry', () => {
   });
 
   describe('set', () => {
-    it('writes value on existing token', () => {
+    it('writes value on existing token and records userOverride', () => {
       const r = new TokenRegistry([spacingBaseToken]);
-      r.set('spacing-base', '8px');
+      r.set('spacing-base', '8px', { reason: 'designer choice' });
       expect(r.get('spacing-base')?.value).toBe('8px');
+      expect(r.get('spacing-base')?.userOverride?.reason).toBe('designer choice');
+      expect(r.get('spacing-base')?.userOverride?.previousValue).toBe('4px');
     });
 
     it('throws UnknownTokenError when set is called on a name with no registered metadata', () => {
       const r = new TokenRegistry();
-      expect(() => r.set('color-mystery', '#fff')).toThrow(UnknownTokenError);
+      expect(() => r.set('color-mystery', '#fff', { reason: 'test' })).toThrow(UnknownTokenError);
     });
 
-    it('records userOverride when cascade: false', () => {
+    it('replaces userOverride on subsequent set (latest reason wins)', () => {
       const r = new TokenRegistry([spacingBaseToken]);
-      r.set('spacing-base', '20px', { cascade: false, reason: 'designer override' });
+      r.set('spacing-base', '20px', { reason: 'first change' });
+      r.set('spacing-base', '24px', { reason: 'second change' });
       const token = r.get('spacing-base');
-      expect(token?.userOverride?.reason).toBe('designer override');
-      expect(token?.userOverride?.previousValue).toBe('4px');
-    });
-
-    it('clears userOverride on subsequent normal set', () => {
-      const r = new TokenRegistry([spacingBaseToken]);
-      r.set('spacing-base', '20px', { cascade: false, reason: 'override' });
-      expect(r.get('spacing-base')?.userOverride).not.toBeNull();
-      r.set('spacing-base', '24px');
-      expect(r.get('spacing-base')?.userOverride).toBeNull();
+      expect(token?.value).toBe('24px');
+      expect(token?.userOverride?.reason).toBe('second change');
+      expect(token?.userOverride?.previousValue).toBe('20px');
     });
   });
 
@@ -146,7 +142,7 @@ describe('TokenRegistry', () => {
         stateType: 'hover',
       });
       const newAccent = { ...accentToken.value, name: 'mutated' } as ColorValue;
-      r.set('accent', newAccent);
+      r.set('accent', newAccent, { reason: 'test mutation' });
       expect(r.get('accent')?.value).toEqual(newAccent);
       expect(r.get('accent-hover')?.value).toBeDefined();
     });
@@ -171,16 +167,9 @@ describe('TokenRegistry', () => {
     it('blocks recompute on anchored node when upstream changes', () => {
       const r = new TokenRegistry([accentToken, semanticTokenFor('accent-500')], [scalePlugin]);
       r.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
-      r.set(
-        'accent-500',
-        { family: 'override', position: 'manual' },
-        {
-          cascade: false,
-          reason: 'manual',
-        },
-      );
+      r.set('accent-500', { family: 'override', position: 'manual' }, { reason: 'manual' });
       const newAccent = { ...accentToken.value, name: 'mutated' } as ColorValue;
-      r.set('accent', newAccent);
+      r.set('accent', newAccent, { reason: 'family remap' });
       expect(r.get('accent-500')?.value).toEqual({ family: 'override', position: 'manual' });
     });
   });
@@ -218,7 +207,7 @@ describe('TokenRegistry', () => {
   describe('undo', () => {
     it('reverses the most recent operation', () => {
       const r = new TokenRegistry([spacingBaseToken]);
-      r.set('spacing-base', '16px');
+      r.set('spacing-base', '16px', { reason: 'test undo' });
       r.undo();
       expect(r.get('spacing-base')?.value).toBe('4px');
     });

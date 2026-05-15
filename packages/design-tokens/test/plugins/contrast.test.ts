@@ -25,7 +25,7 @@ describe('contrastPlugin', () => {
       foregroundReferences: { auto: { family: 'gray', position: '50' } },
     } as ColorValue;
     const g = new TokenGraph([contrastPlugin]);
-    g.set('accent', family);
+    g.seed('accent', family);
     g.bind('accent-fg', 'contrast', { familyName: 'accent', basePosition: 5 });
     expect(g.get('accent-fg')).toEqual({ family: 'gray', position: '50' });
   });
@@ -40,7 +40,7 @@ describe('contrastPlugin', () => {
       },
     };
     const g = new TokenGraph([contrastPlugin]);
-    g.set('accent', family);
+    g.seed('accent', family);
     g.bind('accent-fg', 'contrast', { familyName: 'accent', basePosition: 5 });
     expect(g.get('accent-fg')).toEqual({ family: 'accent', position: '50' });
   });
@@ -55,7 +55,7 @@ describe('contrastPlugin', () => {
       },
     };
     const g = new TokenGraph([contrastPlugin]);
-    g.set('accent', family);
+    g.seed('accent', family);
     g.bind('accent-fg', 'contrast', { familyName: 'accent', basePosition: 5 });
     expect(g.get('accent-fg')).toEqual({ family: 'accent', position: '950' });
   });
@@ -72,8 +72,8 @@ describe('contrastPlugin', () => {
       },
     };
     const g = new TokenGraph([contrastPlugin]);
-    g.set('accent', family);
-    g.set('gray', neutral);
+    g.seed('accent', family);
+    g.seed('gray', neutral);
     g.bind('accent-fg', 'contrast', {
       familyName: 'accent',
       basePosition: 5,
@@ -86,8 +86,8 @@ describe('contrastPlugin', () => {
     const family: ColorValue = { name: 'accent', scale: minimalScale };
     const neutral: ColorValue = { name: 'gray', scale: minimalScale };
     const g = new TokenGraph([contrastPlugin]);
-    g.set('accent', family);
-    g.set('gray', neutral);
+    g.seed('accent', family);
+    g.seed('gray', neutral);
     expect(() =>
       g.bind('light-fg', 'contrast', {
         familyName: 'accent',
@@ -100,7 +100,7 @@ describe('contrastPlugin', () => {
   it('throws when family has no foregroundReferences and no WCAG pairs', () => {
     const family: ColorValue = { name: 'accent', scale: minimalScale };
     const g = new TokenGraph([contrastPlugin]);
-    g.set('accent', family);
+    g.seed('accent', family);
     expect(() => g.bind('fg-light', 'contrast', { familyName: 'accent', basePosition: 2 })).toThrow(
       /no foregroundReferences and no accessibility WCAG pairs/,
     );

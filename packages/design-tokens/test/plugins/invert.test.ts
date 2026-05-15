@@ -18,7 +18,7 @@ describe('invertPlugin', () => {
       },
     };
     const g = new TokenGraph([invertPlugin]);
-    g.set('accent', family);
+    g.seed('accent', family);
     g.bind('accent-dark', 'invert', { familyName: 'accent', basePosition: 2 });
     expect(g.get('accent-dark')).toEqual({ family: 'accent', position: '900' });
   });
@@ -33,7 +33,7 @@ describe('invertPlugin', () => {
       },
     };
     const g = new TokenGraph([invertPlugin]);
-    g.set('accent', family);
+    g.seed('accent', family);
     g.bind('accent-dark', 'invert', { familyName: 'accent', basePosition: 2 });
     expect(g.get('accent-dark')).toEqual({ family: 'accent', position: '800' });
   });
@@ -48,7 +48,7 @@ describe('invertPlugin', () => {
       },
     };
     const g = new TokenGraph([invertPlugin]);
-    g.set('accent', family);
+    g.seed('accent', family);
     g.bind('accent-dark', 'invert', { familyName: 'accent', basePosition: 2 });
     expect(g.get('accent-dark')).toEqual({ family: 'accent', position: '800' });
   });
@@ -56,7 +56,7 @@ describe('invertPlugin', () => {
   it('throws when family has no accessibility data at all', () => {
     const family: ColorValue = { name: 'accent', scale: minimalScale };
     const g = new TokenGraph([invertPlugin]);
-    g.set('accent', family);
+    g.seed('accent', family);
     expect(() =>
       g.bind('accent-dark', 'invert', { familyName: 'accent', basePosition: 5 }),
     ).toThrow(/No WCAG accessibility data/);

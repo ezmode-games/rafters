@@ -41,43 +41,33 @@ function readNamespace(name: string): { tokens: Array<Record<string, unknown>> }
 }
 
 describe('set command', () => {
-  it('updates a leaf token value with cascade (default)', async () => {
-    await set('spacing-base', '8px', { raftersDir: tmpDir, agent: true });
-    const file = readNamespace('spacing');
-    const token = file.tokens.find((t) => t.name === 'spacing-base');
-    expect(token?.value).toBe('8px');
-    expect(token?.userOverride).toBeNull();
-  });
-
-  it('records userOverride when cascade=false with reason', async () => {
-    await set('spacing-base', '20px', {
-      cascade: false,
-      reason: 'Q1 brand campaign',
+  it('updates a leaf token value and records userOverride', async () => {
+    await set('spacing-base', '8px', {
+      reason: 'designer choice',
       raftersDir: tmpDir,
       agent: true,
     });
     const file = readNamespace('spacing');
     const token = file.tokens.find((t) => t.name === 'spacing-base');
-    expect(token?.value).toBe('20px');
+    expect(token?.value).toBe('8px');
     expect(token?.userOverride).toMatchObject({
-      reason: 'Q1 brand campaign',
+      reason: 'designer choice',
       previousValue: '4px',
     });
   });
 
-  it('throws in agent mode when cascade=false missing reason', async () => {
-    await expect(
-      set('spacing-base', '20px', { cascade: false, raftersDir: tmpDir, agent: true }),
-    ).rejects.toThrow(/--no-cascade requires --reason/);
+  it('throws in agent mode when reason is missing', async () => {
+    await expect(set('spacing-base', '20px', { raftersDir: tmpDir, agent: true })).rejects.toThrow(
+      /requires --reason in agent mode/,
+    );
   });
 
-  it('integration: --no-cascade flag through Commander populates options.cascade=false', async () => {
+  it('integration: --reason flag through Commander wires through to userOverride', async () => {
     const program = new Command()
       .exitOverride()
       .name('set')
       .argument('<name>')
       .argument('<value>')
-      .option('--no-cascade')
       .option('--reason <text>')
       .option('--rafters-dir <path>')
       .option('--agent')
@@ -85,16 +75,7 @@ describe('set command', () => {
         await set(name, value, options);
       });
     await program.parseAsync(
-      [
-        'spacing-base',
-        '12px',
-        '--no-cascade',
-        '--reason',
-        'flag round-trip',
-        '--rafters-dir',
-        tmpDir,
-        '--agent',
-      ],
+      ['spacing-base', '12px', '--reason', 'flag round-trip', '--rafters-dir', tmpDir, '--agent'],
       { from: 'user' },
     );
     const file = readNamespace('spacing');
@@ -107,14 +88,18 @@ describe('set command', () => {
   });
 
   it('throws when token does not exist', async () => {
-    await expect(set('does-not-exist', '4px', { raftersDir: tmpDir, agent: true })).rejects.toThrow(
-      /not found/,
-    );
+    await expect(
+      set('does-not-exist', '4px', { reason: 'test', raftersDir: tmpDir, agent: true }),
+    ).rejects.toThrow(/not found/);
   });
 
   it('throws when tokens directory does not exist', async () => {
     await expect(
-      set('spacing-base', '4px', { raftersDir: '/nonexistent/path', agent: true }),
+      set('spacing-base', '4px', {
+        reason: 'test',
+        raftersDir: '/nonexistent/path',
+        agent: true,
+      }),
     ).rejects.toThrow(/tokens directory not found/);
   });
 
@@ -135,6 +120,7 @@ describe('set command', () => {
       }),
     );
     await set('color-primary', '{"family":"warning","position":"700"}', {
+      reason: 'remap to warning',
       raftersDir: tmpDir,
       agent: true,
     });
