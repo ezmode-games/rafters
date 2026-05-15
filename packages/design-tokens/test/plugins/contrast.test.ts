@@ -82,33 +82,27 @@ describe('contrastPlugin', () => {
     expect(g.get('accent-fg')).toEqual({ family: 'gray', position: '900' });
   });
 
-  it('falls back to neutral positional heuristic when neutral has no accessibility data', () => {
+  it('throws when neutral family has no accessibility.onWhite data', () => {
     const family: ColorValue = { name: 'accent', scale: minimalScale };
     const neutral: ColorValue = { name: 'gray', scale: minimalScale };
     const g = new TokenGraph([contrastPlugin]);
     g.set('accent', family);
     g.set('gray', neutral);
-    g.bind('light-fg', 'contrast', {
-      familyName: 'accent',
-      basePosition: 3,
-      neutralFamilyName: 'gray',
-    });
-    g.bind('dark-fg', 'contrast', {
-      familyName: 'accent',
-      basePosition: 8,
-      neutralFamilyName: 'gray',
-    });
-    expect(g.get('light-fg')).toEqual({ family: 'gray', position: '900' });
-    expect(g.get('dark-fg')).toEqual({ family: 'gray', position: '100' });
+    expect(() =>
+      g.bind('light-fg', 'contrast', {
+        familyName: 'accent',
+        basePosition: 3,
+        neutralFamilyName: 'gray',
+      }),
+    ).toThrow(/no accessibility\.onWhite data/);
   });
 
-  it('last resort: same family with high-contrast position', () => {
+  it('throws when family has no foregroundReferences and no WCAG pairs', () => {
     const family: ColorValue = { name: 'accent', scale: minimalScale };
     const g = new TokenGraph([contrastPlugin]);
     g.set('accent', family);
-    g.bind('fg-light', 'contrast', { familyName: 'accent', basePosition: 2 });
-    g.bind('fg-dark', 'contrast', { familyName: 'accent', basePosition: 8 });
-    expect(g.get('fg-light')).toEqual({ family: 'accent', position: '900' });
-    expect(g.get('fg-dark')).toEqual({ family: 'accent', position: '100' });
+    expect(() => g.bind('fg-light', 'contrast', { familyName: 'accent', basePosition: 2 })).toThrow(
+      /no foregroundReferences and no accessibility WCAG pairs/,
+    );
   });
 });

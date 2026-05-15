@@ -26,7 +26,16 @@ const accentToken: Token = {
   name: 'accent',
   namespace: 'color',
   category: 'color',
-  value: { name: 'accent', scale: minimalScale } as ColorValue,
+  value: {
+    name: 'accent',
+    scale: minimalScale,
+    accessibility: {
+      wcagAAA: { normal: [[5, 0]], large: [] },
+      wcagAA: { normal: [], large: [] },
+      onWhite: { wcagAA: true, wcagAAA: true, contrastRatio: 7, aa: [5], aaa: [9] },
+      onBlack: { wcagAA: true, wcagAAA: true, contrastRatio: 7, aa: [5], aaa: [0] },
+    },
+  } as ColorValue,
   userOverride: null,
 };
 

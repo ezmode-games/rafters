@@ -1,5 +1,11 @@
 import { SCALE_POSITIONS } from '@rafters/color-utils';
-import { type ColorReference, ColorReferenceSchema, type ColorValue } from '@rafters/shared';
+import {
+  type ColorReference,
+  ColorReferenceSchema,
+  type ColorValue,
+  DEFAULT_STATE_OFFSETS,
+  type StateType,
+} from '@rafters/shared';
 import { z } from 'zod';
 import { definePlugin } from '../plugin.js';
 
@@ -15,13 +21,6 @@ type StateInput = z.infer<typeof StateInputSchema>;
 
 type ColorValueWithStateRefs = ColorValue & {
   stateReferences?: Record<string, { family: string; position: string }>;
-};
-
-const STATE_OFFSETS: Record<z.infer<typeof StateTypeSchema>, number> = {
-  hover: 1,
-  active: 2,
-  focus: 1,
-  disabled: -2,
 };
 
 export const statePlugin = definePlugin<StateInput, ColorReference>({
@@ -40,9 +39,14 @@ export const statePlugin = definePlugin<StateInput, ColorReference>({
       return { family: precomputed.family, position: String(precomputed.position) };
     }
 
-    const offset = STATE_OFFSETS[input.stateType];
+    const offset = DEFAULT_STATE_OFFSETS[input.stateType as StateType];
     const adjustedIndex = Math.max(0, Math.min(10, input.basePosition + offset));
-    const position = SCALE_POSITIONS[adjustedIndex] ?? '500';
+    const position = SCALE_POSITIONS[adjustedIndex];
+    if (!position) {
+      throw new Error(
+        `state plugin: invalid scale index ${adjustedIndex} for base ${input.basePosition} + ${input.stateType}`,
+      );
+    }
     return { family: input.familyName, position };
   },
 });

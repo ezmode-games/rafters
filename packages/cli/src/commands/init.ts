@@ -12,14 +12,16 @@ import { createRequire } from 'node:module';
 import { join, relative } from 'node:path';
 import { checkbox, confirm, select } from '@inquirer/prompts';
 import {
-  buildColorSystem,
-  NodePersistenceAdapter,
+  generateBaseSystem,
+  loadRegistryFromDir,
   registryToCompiled,
   registryToTailwind,
   registryToTypeScript,
+  saveRegistryToDir,
+  scalePlugin,
   TokenRegistry,
   toDTCG,
-} from '@rafters/design-tokens-v1';
+} from '@rafters/design-tokens';
 import { onboard, previewOnboard } from '../onboard/orchestrator.js';
 import { toImportPending, writeImportPending } from '../onboard/writer.js';
 import {
@@ -382,7 +384,7 @@ async function generateOutputs(
 
   // DTCG JSON (W3C Design Tokens)
   if (exports.dtcg) {
-    const dtcgJson = toDTCG(registry.list());
+    const dtcgJson = toDTCG([...registry.list()]);
     await writeFile(join(paths.output, 'rafters.json'), JSON.stringify(dtcgJson, null, 2));
     outputs.push('rafters.json');
   }
@@ -431,24 +433,20 @@ async function regenerateFromExisting(
   }
 
   // Load all tokens from .rafters/tokens/
-  const adapter = new NodePersistenceAdapter(cwd);
-  const allTokens = await adapter.load();
+  const registry = loadRegistryFromDir(paths.tokens, [scalePlugin]);
 
-  if (allTokens.length === 0) {
+  if (registry.size() === 0) {
     throw new Error('No tokens found. Cannot regenerate without existing tokens.');
   }
 
   // Get unique namespaces for logging
-  const namespaces = [...new Set(allTokens.map((t) => t.namespace))];
+  const namespaces = [...new Set(registry.list().map((t) => t.namespace))];
 
   log({
     event: 'init:loaded',
-    tokenCount: allTokens.length,
+    tokenCount: registry.size(),
     namespaces,
   });
-
-  // Create registry
-  const registry = new TokenRegistry(allTokens);
 
   // Prompt for exports (or use existing config in agent mode / non-interactive)
   let exports: ExportConfig;
@@ -526,8 +524,12 @@ async function resetToDefaults(
   }
 
   // Load existing tokens to check for userOverride backups
-  const adapter = new NodePersistenceAdapter(cwd);
-  const existingTokens = await adapter.load();
+  let existingTokens: ReturnType<TokenRegistry['list']> = [];
+  try {
+    existingTokens = loadRegistryFromDir(paths.tokens, [scalePlugin]).list();
+  } catch {
+    // No existing tokens directory; nothing to back up.
+  }
 
   // Back up any tokens with userOverride before replacing
   const overriddenTokens = existingTokens.filter((t) => t.userOverride);
@@ -567,15 +569,8 @@ async function resetToDefaults(
   }
 
   // Re-run generators fresh
-  const result = buildColorSystem({
-    exports: {
-      tailwind: { includeImport: !shadcn },
-      typescript: { includeJSDoc: true },
-      dtcg: true,
-    },
-  });
-
-  const { registry } = result;
+  const system = generateBaseSystem();
+  const registry = new TokenRegistry(system.allTokens, [scalePlugin]);
 
   log({
     event: 'init:reset_generated',
@@ -585,9 +580,9 @@ async function resetToDefaults(
   // Clear stale namespace files before saving fresh registry
   await rm(paths.tokens, { recursive: true, force: true });
   await mkdir(paths.tokens, { recursive: true });
-  const allTokensToSave = registry.list();
-  await adapter.save(allTokensToSave);
+  saveRegistryToDir(paths.tokens, registry);
 
+  const allTokensToSave = registry.list();
   const namespaceCount = new Set(allTokensToSave.map((t) => t.namespace)).size;
   log({
     event: 'init:registry_saved',
@@ -803,15 +798,8 @@ export async function init(options: InitOptions): Promise<void> {
   }
 
   // Generate default token system - registry is the source of truth
-  const result = buildColorSystem({
-    exports: {
-      tailwind: { includeImport: !shadcn },
-      typescript: { includeJSDoc: true },
-      dtcg: true,
-    },
-  });
-
-  const { registry } = result;
+  const system = generateBaseSystem();
+  const registry = new TokenRegistry(system.allTokens, [scalePlugin]);
 
   log({
     event: 'init:generated',
@@ -823,9 +811,8 @@ export async function init(options: InitOptions): Promise<void> {
   await mkdir(paths.output, { recursive: true });
 
   // Save registry to .rafters/tokens/
-  const adapter = new NodePersistenceAdapter(cwd);
+  saveRegistryToDir(paths.tokens, registry);
   const allTokensToSave = registry.list();
-  await adapter.save(allTokensToSave);
 
   const namespaceCount = new Set(allTokensToSave.map((t) => t.namespace)).size;
   log({
