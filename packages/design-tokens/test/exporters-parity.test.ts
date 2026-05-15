@@ -7,14 +7,18 @@ import {
 import { describe, expect, it } from 'vitest';
 import { registryToTailwind, registryToTypeScript, toDTCG } from '../src/exporters/index.js';
 import { generateBaseSystem as generateNew } from '../src/generators/index.js';
-import { scalePlugin } from '../src/plugins/index.js';
+import { contrastPlugin, scalePlugin, statePlugin } from '../src/plugins/index.js';
 import { TokenRegistry } from '../src/registry.js';
 
 describe('exporters parity vs v1', () => {
   it('Tailwind exporter produces output of comparable shape', () => {
     const next = generateNew();
     const v1Registry = new V1TokenRegistry(next.allTokens);
-    const newRegistry = new TokenRegistry(next.allTokens, [scalePlugin]);
+    const newRegistry = new TokenRegistry(next.allTokens, [
+      scalePlugin,
+      contrastPlugin,
+      statePlugin,
+    ]);
 
     const v1Output = v1RegistryToTailwind(v1Registry);
     const newOutput = registryToTailwind(newRegistry);
@@ -32,7 +36,11 @@ describe('exporters parity vs v1', () => {
   it('TypeScript exporter produces output of comparable shape', () => {
     const next = generateNew();
     const v1Registry = new V1TokenRegistry(next.allTokens);
-    const newRegistry = new TokenRegistry(next.allTokens, [scalePlugin]);
+    const newRegistry = new TokenRegistry(next.allTokens, [
+      scalePlugin,
+      contrastPlugin,
+      statePlugin,
+    ]);
 
     const v1Output = v1RegistryToTypeScript(v1Registry);
     const newOutput = registryToTypeScript(newRegistry);

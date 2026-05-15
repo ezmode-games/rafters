@@ -8,12 +8,26 @@ function stripVolatile(t: AnyToken): AnyToken {
   const {
     generatedAt: _generatedAt,
     binding: _binding,
+    dependsOn: _dependsOn,
+    generationRule: _generationRule,
     value,
     ...rest
-  } = t as AnyToken & { generatedAt?: string; binding?: unknown; value?: unknown };
-  // Color family values now carry `accessibility` (new package only, see #1496).
-  // Strip it from the parity comparison so the rest of the token contract
-  // stays comparable to v1's output.
+  } = t as AnyToken & {
+    generatedAt?: string;
+    binding?: unknown;
+    dependsOn?: unknown;
+    generationRule?: unknown;
+    value?: unknown;
+  };
+  // Two legitimate divergences from v1 (PR #1495 / #1496):
+  // - new package emits binding (state@parent, contrast@parent, scale@family)
+  //   where v1 emitted a generationRule string. Different graph encoding,
+  //   same observable cascade behaviour. Both fields stripped.
+  // - new package emits dependsOn=[parent] for derived semantics where v1
+  //   emitted [family, dark-counterpart]. Real graph relationship in the new
+  //   package; cosmetic typed convention in v1. Strip from comparison.
+  // - color family values now carry `accessibility` in the new package only.
+  //   Strip from the inner value object.
   if (value && typeof value === 'object' && 'accessibility' in value) {
     const { accessibility: _accessibility, ...valueRest } = value as Record<string, unknown>;
     return { ...rest, value: valueRest };

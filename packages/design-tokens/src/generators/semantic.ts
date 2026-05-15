@@ -1,20 +1,26 @@
 /**
  * Semantic Color Generator
  *
- * Generates semantic color tokens using the single source of truth from defaults.ts.
- * All semantic mappings (primary, secondary, destructive, success, warning, info,
- * highlight, sidebar tokens, chart colors, etc.) are defined in DEFAULT_SEMANTIC_COLOR_MAPPINGS.
+ * Emits semantic color tokens with a real derivation tree: dependsOn[0] points
+ * at the parent semantic (or family for top-of-tree tokens), and the binding
+ * encodes the same derivation as a runtime hook for the cascade.
  *
- * Uses ColorReference to point to color families + positions, allowing
- * the underlying colors to change while semantic meaning stays consistent.
+ *   primary             dependsOn=[family]                binding: scale@family@N
+ *   primary-foreground  dependsOn=[primary]               binding: contrast@primary,AAA
+ *   primary-ring        dependsOn=[family]                binding: scale@family@N   (sibling of primary)
+ *   primary-hover       dependsOn=[primary]               binding: state@primary,hover
+ *   primary-active      dependsOn=[primary]               binding: state@primary,active
+ *   primary-focus       dependsOn=[primary]               binding: state@primary,focus
+ *   primary-disabled    dependsOn=[primary]               binding: state@primary,disabled
+ *   primary-hover-fg    dependsOn=[primary-hover]         binding: contrast@primary-hover,AAA
  *
- * Supports both light and dark mode references.
+ * When the user runs `rafters set primary-hover {family:yellow,position:500}`,
+ * cascadeFrom(primary-hover) walks dependents -- primary-hover-foreground
+ * recomputes via contrast against yellow's accessibility ladder; primary-hover
+ * itself anchors because the override is recorded as userOverride.
  *
- * Each token gets a generationRule so the dependency graph can auto-cascade
- * when the underlying color family changes:
- * - contrast:auto for foreground tokens (WCAG-safe pairing)
- * - state:hover/active/focus/disabled for state variants
- * - scale:N for direct position references (base, border, ring, subtle)
+ * dependsOn[1] keeps the dark-counterpart token name for the Tailwind exporter
+ * convention (typed: dependsOn[1] is the dark-mode position token).
  */
 
 import type { Binding, ColorReference, Token } from '@rafters/shared';
@@ -35,116 +41,137 @@ const POSITION_TO_INDEX: Record<string, number> = {
   '950': 10,
 };
 
-/**
- * Helper to convert SemanticColorMapping to ColorReference for light mode
- */
+const FOREGROUND_SUFFIXES = ['-foreground', '-text', '-contrast'] as const;
+const STATE_SUFFIXES = ['-hover', '-active', '-focus', '-disabled'] as const;
+type StateSuffix = (typeof STATE_SUFFIXES)[number];
+
+type Derivation =
+  | { kind: 'scale'; family: string; scalePosition: number }
+  | { kind: 'state'; from: string; stateType: 'hover' | 'active' | 'focus' | 'disabled' }
+  | { kind: 'contrast'; against: string; level: 'AAA' };
+
 function toColorRef(mapping: SemanticColorMapping): ColorReference {
   return { family: mapping.light.family, position: mapping.light.position };
 }
 
-/**
- * Get dark mode color reference from mapping
- */
 function toDarkColorRef(mapping: SemanticColorMapping): ColorReference {
   return { family: mapping.dark.family, position: mapping.dark.position };
 }
 
 /**
- * Determine the generation rule for a semantic token based on its name and role.
+ * Pick the derivation for a semantic token from its name. The suffix wins
+ * over the literal scale position in the mapping -- the mapping is the
+ * designer's chosen position for top-of-tree tokens; suffixed variants
+ * derive from their parent semantic instead.
  *
- * Pattern matching:
- * - *-foreground, *-text, *-contrast -> contrast:auto (WCAG pair lookup)
- * - *-hover -> state:hover
- * - *-active -> state:active
- * - *-focus -> state:focus
- * - *-disabled -> state:disabled
- * - everything else -> scale:position (direct reference)
+ * Pattern matching order matters: -hover-foreground must hit the foreground
+ * branch and use 'primary-hover' as the parent, not the state branch.
  */
-function deriveGenerationRule(name: string, lightRef: ColorReference): string {
-  // Foreground/text tokens need WCAG contrast pairing
-  if (name.endsWith('-foreground') || name.endsWith('-text') || name.endsWith('-contrast')) {
-    return 'contrast:auto';
+function deriveDerivation(
+  name: string,
+  lightRef: ColorReference,
+  knownTokens: ReadonlySet<string>,
+): Derivation {
+  // Foreground branch first so `-hover-foreground` resolves to contrast
+  // against `primary-hover` rather than as a state variant.
+  for (const suffix of FOREGROUND_SUFFIXES) {
+    if (name.endsWith(suffix)) {
+      const parent = name.slice(0, -suffix.length);
+      if (knownTokens.has(parent)) {
+        return { kind: 'contrast', against: parent, level: 'AAA' };
+      }
+    }
   }
 
-  // State variant tokens
-  if (name.endsWith('-hover') && !name.endsWith('-hover-foreground')) {
-    return 'state:hover';
-  }
-  if (name.endsWith('-active') && !name.endsWith('-active-foreground')) {
-    return 'state:active';
-  }
-  if (name.endsWith('-focus') && !name.endsWith('-focus-foreground')) {
-    return 'state:focus';
-  }
-  if (name.endsWith('-disabled') && !name.endsWith('-disabled-foreground')) {
-    return 'state:disabled';
+  for (const suffix of STATE_SUFFIXES) {
+    if (name.endsWith(suffix)) {
+      const parent = name.slice(0, -suffix.length);
+      if (knownTokens.has(parent)) {
+        return {
+          kind: 'state',
+          from: parent,
+          stateType: suffix.slice(1) as StateSuffix extends `-${infer S}` ? S : never,
+        };
+      }
+    }
   }
 
-  // Everything else: direct scale position reference
-  return `scale:${lightRef.position}`;
-}
-
-/**
- * Build a Binding for a semantic token from its light-mode reference.
- *
- * The mapping in DEFAULT_SEMANTIC_COLOR_MAPPINGS already encodes the
- * designer's chosen position for each semantic role. The binding's job on
- * family remap is to keep that chosen position and just swap the family --
- * so every semantic token binds to the scale plugin at its mapped position,
- * regardless of -foreground / -hover / -active / -focus / -disabled suffix.
- *
- * Suffix-driven plugins (contrast, state) exist for users to opt into
- * explicitly via registry.bind(); the generator does not auto-apply them
- * because doing so overrides the designer's mapped position with the
- * plugin's computed answer (the v1 cascade bug).
- */
-function deriveBinding(lightRef: ColorReference): Binding | undefined {
+  // No matching parent -- this is a top-of-tree token. Bind to the family
+  // scale at the designer-chosen position.
   const scalePosition = POSITION_TO_INDEX[lightRef.position];
-  if (scalePosition === undefined) return undefined;
-  return { plugin: 'scale', input: { familyName: lightRef.family, scalePosition } };
+  if (scalePosition === undefined) {
+    throw new Error(
+      `semantic generator: token "${name}" has unknown scale position "${lightRef.position}"`,
+    );
+  }
+  return { kind: 'scale', family: lightRef.family, scalePosition };
 }
 
-/**
- * Generate semantic color tokens from the single source of truth.
- *
- * Uses DEFAULT_SEMANTIC_COLOR_MAPPINGS from defaults.ts which contains
- * all semantic color definitions with proper color family references.
- *
- * Each token includes a generationRule so the registry's dependency graph
- * can automatically cascade changes when color families are updated.
- */
+function derivationToBinding(derivation: Derivation): Binding {
+  switch (derivation.kind) {
+    case 'scale':
+      return {
+        plugin: 'scale',
+        input: { familyName: derivation.family, scalePosition: derivation.scalePosition },
+      };
+    case 'state':
+      return {
+        plugin: 'state',
+        input: { from: derivation.from, stateType: derivation.stateType },
+      };
+    case 'contrast':
+      return {
+        plugin: 'contrast',
+        input: { against: derivation.against, level: derivation.level },
+      };
+  }
+}
+
+function derivationParent(derivation: Derivation): string {
+  switch (derivation.kind) {
+    case 'scale':
+      return derivation.family;
+    case 'state':
+      return derivation.from;
+    case 'contrast':
+      return derivation.against;
+  }
+}
+
 export function generateSemanticTokens(_config: ResolvedSystemConfig): GeneratorResult {
   const tokens: Token[] = [];
   const timestamp = new Date().toISOString();
+  const knownTokens = new Set(Object.keys(DEFAULT_SEMANTIC_COLOR_MAPPINGS));
 
   for (const [name, mapping] of Object.entries(DEFAULT_SEMANTIC_COLOR_MAPPINGS)) {
     const lightRef = toColorRef(mapping);
     const darkRef = toDarkColorRef(mapping);
 
-    // dependsOn[0] = the color family token (for ColorValue/WCAG data access)
-    // dependsOn[1] = dark mode position token (for Tailwind exporter)
-    const familyDep = lightRef.family;
+    const derivation = deriveDerivation(name, lightRef, knownTokens);
+    const binding = derivationToBinding(derivation);
+    const parent = derivationParent(derivation);
+
+    // dependsOn[0] = the actual upstream node in the cascade graph (parent
+    // semantic or family).
+    // dependsOn[1] = dark-mode position token for the Tailwind exporter's
+    // typed convention. Preserved verbatim from the v1 generator.
     const darkTokenName = `${darkRef.family}-${darkRef.position}`;
-    const dependsOn: string[] = [familyDep];
-    if (darkTokenName !== familyDep) {
+    const dependsOn: string[] = [parent];
+    if (darkTokenName !== parent) {
       dependsOn.push(darkTokenName);
     }
 
-    const generationRule = deriveGenerationRule(name, lightRef);
-    const binding = deriveBinding(lightRef);
-
     tokens.push({
       name,
-      value: lightRef, // Light mode is default value; dark mode lookup via dependsOn[1]
+      value: lightRef,
       category: 'color',
       namespace: 'semantic',
-      ...(binding ? { binding } : {}),
+      binding,
       semanticMeaning: mapping.meaning,
       usageContext: mapping.contexts,
       trustLevel: mapping.trustLevel,
       consequence: mapping.consequence,
       dependsOn,
-      generationRule,
       description: `${mapping.meaning}. Light: ${lightRef.family}-${lightRef.position}, Dark: ${darkRef.family}-${darkRef.position}.`,
       generatedAt: timestamp,
       containerQueryAware: true,

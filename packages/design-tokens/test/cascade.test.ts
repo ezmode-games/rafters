@@ -100,9 +100,9 @@ function setupSemanticChain(): TokenRegistry {
   // accent family → semantic primary (position 5) → primary-foreground, primary-hover, primary-hover-foreground
   // and dark counterparts via invert
   r.bind('primary', 'scale', { familyName: 'accent', scalePosition: 5 });
-  r.bind('primary-foreground', 'contrast', { familyName: 'accent', basePosition: 5 });
-  r.bind('primary-hover', 'state', { familyName: 'accent', basePosition: 5, stateType: 'hover' });
-  r.bind('primary-active', 'state', { familyName: 'accent', basePosition: 5, stateType: 'active' });
+  r.bind('primary-foreground', 'contrast', { against: 'primary', level: 'AAA' });
+  r.bind('primary-hover', 'state', { from: 'primary', stateType: 'hover' });
+  r.bind('primary-active', 'state', { from: 'primary', stateType: 'active' });
   r.bind('primary-dark', 'invert', { familyName: 'accent', basePosition: 5 });
   return r;
 }
@@ -148,7 +148,11 @@ describe('cascade integration', () => {
       expect(r.get('primary-hover')?.value).toEqual(manualHover);
     });
 
-    it('downstream of an anchor still flows from the anchor value (chained binding)', () => {
+    it('downstream of an anchor recomputes from the anchor value (chained binding)', () => {
+      // The override on primary remaps to a different position; primary-fg
+      // re-derives via contrast against the new position. The anchor on
+      // primary blocks scale@accent@5 from clobbering it; primary-fg's
+      // contrast binding still re-runs because primary changed.
       const r = new TokenRegistry(
         [
           buildAccentToken(buildAccentFamily()),
@@ -158,12 +162,16 @@ describe('cascade integration', () => {
         [scalePlugin, contrastPlugin],
       );
       r.bind('primary', 'scale', { familyName: 'accent', scalePosition: 5 });
-      r.bind('primary-fg', 'contrast', { familyName: 'accent', basePosition: 5 });
+      r.bind('primary-fg', 'contrast', { against: 'primary', level: 'AAA' });
 
       const downstreamBefore = r.get('primary-fg')?.value;
-      r.set('primary', { family: 'override', position: 'manual' }, { reason: 'manual' });
+      // Override primary to a valid position; the WCAG pair list has [5,0]
+      // so contrast partner of position 5 is position 0. Move primary to
+      // position 8 (which the family's pair list also covers: [8, 0]).
+      r.set('primary', { family: 'accent', position: '800' }, { reason: 'manual' });
       expect(r.get('primary')?.userOverride?.reason).toBe('manual');
       const downstreamAfter = r.get('primary-fg')?.value;
+      // Both positions 5 and 8 pair with position 0 in the test family.
       expect(downstreamAfter).toEqual(downstreamBefore);
     });
   });
@@ -209,11 +217,7 @@ describe('cascade integration', () => {
       );
       r.bind('primary', 'scale', { familyName: 'accent', scalePosition: 5 });
       // primary-hover depends on accent (basePosition + offset → '600' position)
-      r.bind('primary-hover', 'state', {
-        familyName: 'accent',
-        basePosition: 5,
-        stateType: 'hover',
-      });
+      r.bind('primary-hover', 'state', { from: 'primary', stateType: 'hover' });
       r.set('accent', buildAccentFamily('mutated'), { reason: 'test' });
       expect(r.get('primary')?.value).toEqual({ family: 'accent', position: '500' });
       expect(r.get('primary-hover')?.value).toEqual({ family: 'accent', position: '600' });

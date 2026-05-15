@@ -3,22 +3,17 @@ import { describe, expect, it } from 'vitest';
 import { contrastPlugin, TokenGraph } from '../../src/index.js';
 import { MINIMAL_SCALE as minimalScale } from './_fixtures.js';
 
+const ACCENT_AAA_PAIR = {
+  wcagAAA: { normal: [[5, 0]] as number[][], large: [] as number[][] },
+  wcagAA: { normal: [] as number[][], large: [] as number[][] },
+};
+
 describe('contrastPlugin', () => {
-  it('declares dependency on the family name', () => {
-    expect(contrastPlugin.dependsOn({ familyName: 'accent', basePosition: 5 })).toEqual(['accent']);
+  it('declares dependency on the parent token (against)', () => {
+    expect(contrastPlugin.dependsOn({ against: 'primary', level: 'AAA' })).toEqual(['primary']);
   });
 
-  it('declares dependency on neutral family when present', () => {
-    expect(
-      contrastPlugin.dependsOn({
-        familyName: 'accent',
-        basePosition: 5,
-        neutralFamilyName: 'gray',
-      }),
-    ).toEqual(['accent', 'gray']);
-  });
-
-  it('uses pre-computed foregroundReferences.auto when present', () => {
+  it('uses pre-computed foregroundReferences.auto when present on the parent family', () => {
     const family = {
       name: 'accent',
       scale: minimalScale,
@@ -26,26 +21,25 @@ describe('contrastPlugin', () => {
     } as ColorValue;
     const g = new TokenGraph([contrastPlugin]);
     g.seed('accent', family);
-    g.bind('accent-fg', 'contrast', { familyName: 'accent', basePosition: 5 });
-    expect(g.get('accent-fg')).toEqual({ family: 'gray', position: '50' });
+    g.seed('primary', { family: 'accent', position: '500' });
+    g.bind('primary-fg', 'contrast', { against: 'primary', level: 'AAA' });
+    expect(g.get('primary-fg')).toEqual({ family: 'gray', position: '50' });
   });
 
-  it('uses WCAG AAA pair from family accessibility data', () => {
+  it('uses WCAG AAA pair from the parent family accessibility data', () => {
     const family: ColorValue = {
       name: 'accent',
       scale: minimalScale,
-      accessibility: {
-        wcagAAA: { normal: [[5, 0]], large: [] },
-        wcagAA: { normal: [], large: [] },
-      },
+      accessibility: ACCENT_AAA_PAIR,
     };
     const g = new TokenGraph([contrastPlugin]);
     g.seed('accent', family);
-    g.bind('accent-fg', 'contrast', { familyName: 'accent', basePosition: 5 });
-    expect(g.get('accent-fg')).toEqual({ family: 'accent', position: '50' });
+    g.seed('primary', { family: 'accent', position: '500' });
+    g.bind('primary-fg', 'contrast', { against: 'primary', level: 'AAA' });
+    expect(g.get('primary-fg')).toEqual({ family: 'accent', position: '50' });
   });
 
-  it('falls back to WCAG AA when no AAA pair', () => {
+  it('falls back to WCAG AA when no AAA pair (level=AAA tries AAA then AA)', () => {
     const family: ColorValue = {
       name: 'accent',
       scale: minimalScale,
@@ -56,53 +50,50 @@ describe('contrastPlugin', () => {
     };
     const g = new TokenGraph([contrastPlugin]);
     g.seed('accent', family);
-    g.bind('accent-fg', 'contrast', { familyName: 'accent', basePosition: 5 });
-    expect(g.get('accent-fg')).toEqual({ family: 'accent', position: '950' });
+    g.seed('primary', { family: 'accent', position: '500' });
+    g.bind('primary-fg', 'contrast', { against: 'primary', level: 'AAA' });
+    expect(g.get('primary-fg')).toEqual({ family: 'accent', position: '950' });
   });
 
-  it('falls back to neutral family AAA when source has no usable contrast', () => {
-    const family: ColorValue = { name: 'accent', scale: minimalScale };
-    const neutral: ColorValue = {
-      name: 'gray',
+  it('cascade: foreground recomputes when parent value remaps to a different family', () => {
+    const accent: ColorValue = {
+      name: 'accent',
+      scale: minimalScale,
+      accessibility: ACCENT_AAA_PAIR,
+    };
+    const yellow: ColorValue = {
+      name: 'yellow',
       scale: minimalScale,
       accessibility: {
-        wcagAAA: { normal: [], large: [] },
+        wcagAAA: { normal: [[5, 10]], large: [] },
         wcagAA: { normal: [], large: [] },
-        onWhite: { aaa: [9], aa: [], normal: [], large: [] },
       },
     };
     const g = new TokenGraph([contrastPlugin]);
-    g.seed('accent', family);
-    g.seed('gray', neutral);
-    g.bind('accent-fg', 'contrast', {
-      familyName: 'accent',
-      basePosition: 5,
-      neutralFamilyName: 'gray',
-    });
-    expect(g.get('accent-fg')).toEqual({ family: 'gray', position: '900' });
+    g.seed('accent', accent);
+    g.seed('yellow', yellow);
+    g.seed('primary', { family: 'accent', position: '500' });
+    g.bind('primary-fg', 'contrast', { against: 'primary', level: 'AAA' });
+    expect(g.get('primary-fg')).toEqual({ family: 'accent', position: '50' });
+    g.set('primary', { family: 'yellow', position: '500' }, { reason: 'remap' });
+    expect(g.get('primary-fg')).toEqual({ family: 'yellow', position: '950' });
   });
 
-  it('throws when neutral family has no accessibility.onWhite data', () => {
-    const family: ColorValue = { name: 'accent', scale: minimalScale };
-    const neutral: ColorValue = { name: 'gray', scale: minimalScale };
+  it('throws when the parent token did not resolve to a ColorReference', () => {
     const g = new TokenGraph([contrastPlugin]);
-    g.seed('accent', family);
-    g.seed('gray', neutral);
-    expect(() =>
-      g.bind('light-fg', 'contrast', {
-        familyName: 'accent',
-        basePosition: 3,
-        neutralFamilyName: 'gray',
-      }),
-    ).toThrow(/no accessibility\.onWhite data/);
+    g.seed('not-a-color-ref', 'some-string');
+    expect(() => g.bind('fg', 'contrast', { against: 'not-a-color-ref', level: 'AAA' })).toThrow(
+      /did not resolve to a ColorReference/,
+    );
   });
 
-  it('throws when family has no foregroundReferences and no WCAG pairs', () => {
+  it('throws when the parent family has neither foregroundReferences nor WCAG pairs', () => {
     const family: ColorValue = { name: 'accent', scale: minimalScale };
     const g = new TokenGraph([contrastPlugin]);
     g.seed('accent', family);
-    expect(() => g.bind('fg-light', 'contrast', { familyName: 'accent', basePosition: 2 })).toThrow(
-      /no foregroundReferences and no accessibility WCAG pairs/,
+    g.seed('primary', { family: 'accent', position: '500' });
+    expect(() => g.bind('primary-fg', 'contrast', { against: 'primary', level: 'AAA' })).toThrow(
+      /no foregroundReferences and no accessibility/,
     );
   });
 });
