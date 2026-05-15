@@ -5,6 +5,7 @@
 ### Patch Changes
 
 - fix(set): the `--no-cascade` flag was silently ignored. Commander populates the long-form derived from `--no-cascade` as `options.cascade = false`, but the action handler was reading `options.noCascade`, which is never set. The flag now wires through correctly. Added a Commander integration test so the wiring is locked.
+- chore(init): `rafters init` (and `--reset` / `--rebuild`) now consume `@rafters/design-tokens` for generation, persistence, and export instead of `@rafters/design-tokens-v1`. Output byte-shape (`rafters.css`, `rafters.ts`, `rafters.json`) is unchanged; this is purely an internal swap. Init flows pass `scalePlugin` to `TokenRegistry` so semantic tokens with cascade bindings re-derive correctly on family remap.
 
 ### Minor Changes
 
