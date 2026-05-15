@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- breaking(set): every `rafters set <name> <value>` records a `userOverride` diary entry (previousValue + reason) on the token, and the resulting node becomes a cascade anchor -- future upstream changes do not clobber it. Downstream dependents still re-derive against the anchor's new value. The `--no-cascade` flag is removed; the only meaningful flag is now `--reason "..."` (required in `--agent` mode; interactive prompt otherwise). This fixes a silent-clobber bug where cascade-mode sets saved a value, left the binding pointing at the old upstream, and got reverted the next time the upstream changed. Matches the registry's new `set(name, value, { reason })` signature -- the `cascade` option is gone from the public API.
+- chore(set): `loadRegistryFromDir` calls now register the four built-in plugins (`scalePlugin`, `contrastPlugin`, `invertPlugin`, `statePlugin`), so any semantic token carrying a `binding` resolves at load time rather than throwing `Unknown plugin: scale`.
+
 ### Patch Changes
 
 - fix(set): the `--no-cascade` flag was silently ignored. Commander populates the long-form derived from `--no-cascade` as `options.cascade = false`, but the action handler was reading `options.noCascade`, which is never set. The flag now wires through correctly. Added a Commander integration test so the wiring is locked.

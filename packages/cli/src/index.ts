@@ -61,11 +61,13 @@ program
 
 program
   .command('set')
-  .description('Set a token value (cascades to dependents by default)')
+  .description('Set a token value. Records userOverride and cascades to dependents.')
   .argument('<name>', 'Token name')
   .argument('<value>', 'New value (string, or JSON for ColorValue/ColorReference)')
-  .option('--no-cascade', 'Record as userOverride anchor; skip cascade on this node')
-  .option('--reason <text>', 'Reason for the override (required with --no-cascade)')
+  .option(
+    '--reason <text>',
+    'Reason for the change (recorded with userOverride; prompted if missing in non-agent mode)',
+  )
   .option('--rafters-dir <path>', 'Directory of .rafters.json files', '.rafters/tokens')
   .option('--agent', 'Output JSON for machine consumption')
   .action(withErrorHandler(set));

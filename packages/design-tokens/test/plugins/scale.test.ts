@@ -12,14 +12,14 @@ describe('scalePlugin', () => {
 
   it('returns ColorReference with mapped position string', () => {
     const g = new TokenGraph([scalePlugin]);
-    g.set('accent', minimalAccent);
+    g.seed('accent', minimalAccent);
     g.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
     expect(g.get('accent-500')).toEqual({ family: 'accent', position: '500' });
   });
 
   it('maps all 11 positions correctly', () => {
     const g = new TokenGraph([scalePlugin]);
-    g.set('accent', minimalAccent);
+    g.seed('accent', minimalAccent);
     const expected = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '950'];
     for (let i = 0; i < 11; i++) {
       g.bind(`accent-${expected[i]}`, 'scale', { familyName: 'accent', scalePosition: i });
@@ -36,7 +36,7 @@ describe('scalePlugin', () => {
 
   it('rejects out-of-range scalePosition via Zod', () => {
     const g = new TokenGraph([scalePlugin]);
-    g.set('accent', minimalAccent);
+    g.seed('accent', minimalAccent);
     expect(() => g.bind('x', 'scale', { familyName: 'accent', scalePosition: 11 })).toThrow();
     expect(() => g.bind('x', 'scale', { familyName: 'accent', scalePosition: -1 })).toThrow();
   });

@@ -124,7 +124,7 @@ describe('cascade integration', () => {
       expect(initial.primaryActive).toEqual({ family: 'accent', position: '700' });
 
       const remapped = buildAccentFamily('remapped');
-      r.set('accent', remapped);
+      r.set('accent', remapped, { reason: 'test' });
 
       expect(r.get('accent')?.value).toEqual(remapped);
       expect(r.get('primary')?.value).toEqual({ family: 'accent', position: '500' });
@@ -139,15 +139,12 @@ describe('cascade integration', () => {
     it('anchored hover keeps its value when family changes', () => {
       const r = setupSemanticChain();
       const manualHover = { family: 'override', position: 'manual' };
-      r.set('primary-hover', manualHover, {
-        cascade: false,
-        reason: 'designer chose specific tone',
-      });
+      r.set('primary-hover', manualHover, { reason: 'designer chose specific tone' });
 
       expect(r.get('primary-hover')?.value).toEqual(manualHover);
       expect(r.get('primary-hover')?.userOverride?.reason).toBe('designer chose specific tone');
 
-      r.set('accent', buildAccentFamily('changed'));
+      r.set('accent', buildAccentFamily('changed'), { reason: 'test' });
       expect(r.get('primary-hover')?.value).toEqual(manualHover);
     });
 
@@ -164,11 +161,7 @@ describe('cascade integration', () => {
       r.bind('primary-fg', 'contrast', { familyName: 'accent', basePosition: 5 });
 
       const downstreamBefore = r.get('primary-fg')?.value;
-      r.set(
-        'primary',
-        { family: 'override', position: 'manual' },
-        { cascade: false, reason: 'manual' },
-      );
+      r.set('primary', { family: 'override', position: 'manual' }, { reason: 'manual' });
       expect(r.get('primary')?.userOverride?.reason).toBe('manual');
       const downstreamAfter = r.get('primary-fg')?.value;
       expect(downstreamAfter).toEqual(downstreamBefore);
@@ -179,8 +172,8 @@ describe('cascade integration', () => {
     it('rejects a binding that creates a direct cycle', () => {
       const r = new TokenRegistry([familyTokenSlot('a'), familyTokenSlot('b')], [scalePlugin]);
       const family = buildAccentFamily();
-      r.set('a', family);
-      r.set('b', family);
+      r.set('a', family, { reason: 'test' });
+      r.set('b', family, { reason: 'test' });
       r.bind('a', 'scale', { familyName: 'b', scalePosition: 5 });
       expect(() => r.bind('b', 'scale', { familyName: 'a', scalePosition: 5 })).toThrow(
         CircularDependencyError,
@@ -193,9 +186,9 @@ describe('cascade integration', () => {
         [scalePlugin],
       );
       const family = buildAccentFamily();
-      r.set('a', family);
-      r.set('b', family);
-      r.set('c', family);
+      r.set('a', family, { reason: 'test' });
+      r.set('b', family, { reason: 'test' });
+      r.set('c', family, { reason: 'test' });
       r.bind('b', 'scale', { familyName: 'a', scalePosition: 5 });
       r.bind('c', 'scale', { familyName: 'b', scalePosition: 5 });
       expect(() => r.bind('a', 'scale', { familyName: 'c', scalePosition: 5 })).toThrow(
@@ -221,7 +214,7 @@ describe('cascade integration', () => {
         basePosition: 5,
         stateType: 'hover',
       });
-      r.set('accent', buildAccentFamily('mutated'));
+      r.set('accent', buildAccentFamily('mutated'), { reason: 'test' });
       expect(r.get('primary')?.value).toEqual({ family: 'accent', position: '500' });
       expect(r.get('primary-hover')?.value).toEqual({ family: 'accent', position: '600' });
     });
@@ -235,7 +228,7 @@ describe('cascade integration', () => {
         primary: r.get('primary')?.value,
         primaryHover: r.get('primary-hover')?.value,
       };
-      r.set('accent', buildAccentFamily('different'));
+      r.set('accent', buildAccentFamily('different'), { reason: 'test' });
       r.undo();
       expect(r.get('accent')?.value).toEqual(before.accent);
       expect(r.get('primary')?.value).toEqual(before.primary);

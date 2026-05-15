@@ -33,8 +33,7 @@ export const NodeSchema = z.object({
 export type Node = z.infer<typeof NodeSchema>;
 
 export type SetOptions = {
-  cascade?: boolean;
-  reason?: string;
+  reason: string;
   context?: string;
 };
 
@@ -65,22 +64,38 @@ export class TokenGraph {
     this.plugins.set(plugin.name, plugin);
   }
 
-  set(name: string, value: unknown, options?: SetOptions): void {
+  set(name: string, value: unknown, options: SetOptions): void {
     this.takeSnapshot();
     const existing = this.nodes.get(name);
-    const next: Node = { name, value };
-
-    if (options?.cascade === false) {
-      next.userOverride = {
+    const next: Node = {
+      name,
+      value,
+      userOverride: {
         previousValue: existing?.value,
-        reason: options.reason ?? '',
+        reason: options.reason,
         ...(options.context ? { context: options.context } : {}),
-      };
-      if (existing?.binding) next.binding = existing.binding;
-    }
-
+      },
+      ...(existing?.binding ? { binding: existing.binding } : {}),
+    };
     this.nodes.set(name, next);
     this.cascadeFrom(name);
+  }
+
+  // Hydrate a node from persisted state. No cascade fires; the caller
+  // (registry constructor) is responsible for ordering: leaves first, then
+  // bindings. userOverride / binding are preserved verbatim from the persisted
+  // token so that the anchor + re-derivation hook both survive reload.
+  seed(
+    name: string,
+    value: unknown,
+    extras?: { userOverride?: UserOverride; binding?: Binding },
+  ): void {
+    this.nodes.set(name, {
+      name,
+      value,
+      ...(extras?.userOverride ? { userOverride: extras.userOverride } : {}),
+      ...(extras?.binding ? { binding: extras.binding } : {}),
+    });
   }
 
   bind(name: string, pluginName: string, input: unknown): void {

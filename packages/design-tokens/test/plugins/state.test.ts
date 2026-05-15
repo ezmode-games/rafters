@@ -20,7 +20,7 @@ describe('statePlugin', () => {
       },
     } as ColorValue;
     const g = new TokenGraph([statePlugin]);
-    g.set('accent', family);
+    g.seed('accent', family);
     g.bind('hover', 'state', { familyName: 'accent', basePosition: 5, stateType: 'hover' });
     g.bind('active', 'state', { familyName: 'accent', basePosition: 5, stateType: 'active' });
     expect(g.get('hover')).toEqual({ family: 'accent', position: '700' });
@@ -30,7 +30,7 @@ describe('statePlugin', () => {
   it('applies positional offsets when no stateReferences', () => {
     const family: ColorValue = { name: 'accent', scale: minimalScale };
     const g = new TokenGraph([statePlugin]);
-    g.set('accent', family);
+    g.seed('accent', family);
     g.bind('hover', 'state', { familyName: 'accent', basePosition: 5, stateType: 'hover' });
     g.bind('active', 'state', { familyName: 'accent', basePosition: 5, stateType: 'active' });
     g.bind('focus', 'state', { familyName: 'accent', basePosition: 5, stateType: 'focus' });
@@ -44,7 +44,7 @@ describe('statePlugin', () => {
   it('clamps offsets at scale boundaries', () => {
     const family: ColorValue = { name: 'accent', scale: minimalScale };
     const g = new TokenGraph([statePlugin]);
-    g.set('accent', family);
+    g.seed('accent', family);
     g.bind('top-hover', 'state', { familyName: 'accent', basePosition: 10, stateType: 'hover' });
     g.bind('bottom-disabled', 'state', {
       familyName: 'accent',
@@ -57,7 +57,7 @@ describe('statePlugin', () => {
 
   it('rejects invalid stateType via Zod', () => {
     const g = new TokenGraph([statePlugin]);
-    g.set('accent', { name: 'accent', scale: minimalScale });
+    g.seed('accent', { name: 'accent', scale: minimalScale });
     expect(() =>
       g.bind('x', 'state', { familyName: 'accent', basePosition: 5, stateType: 'pressed' }),
     ).toThrow();
