@@ -13,6 +13,7 @@
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { input } from '@inquirer/prompts';
+import { calculateWCAGContrast, generateAccessibilityMetadata } from '@rafters/color-utils';
 import {
   contrastPlugin,
   invertPlugin,
@@ -21,7 +22,13 @@ import {
   scalePlugin,
   statePlugin,
 } from '@rafters/design-tokens';
-import { ColorReferenceSchema, ColorValueSchema } from '@rafters/shared';
+import {
+  type ColorAccessibility,
+  ColorReferenceSchema,
+  type ColorValue,
+  ColorValueSchema,
+  type OKLCH,
+} from '@rafters/shared';
 import { z } from 'zod';
 import { isAgentMode, log, setAgentMode } from '../utils/ui.js';
 
@@ -53,7 +60,7 @@ export async function set(name: string, value: string, options: SetOptions): Pro
     });
   }
 
-  const parsedValue = parseValue(value);
+  const parsedValue = bakeAccessibility(parseValue(value));
   const registry = loadRegistryFromDir(dir, [
     scalePlugin,
     contrastPlugin,
@@ -75,6 +82,52 @@ export async function set(name: string, value: string, options: SetOptions): Pro
     next: parsedValue,
     reason,
   });
+}
+
+const WHITE: OKLCH = { l: 1, c: 0, h: 0, alpha: 1 };
+const BLACK: OKLCH = { l: 0, c: 0, h: 0, alpha: 1 };
+const WCAG_AA_NORMAL = 4.5;
+const WCAG_AAA_NORMAL = 7;
+
+/**
+ * Rebake accessibility metadata when the user sets a ColorValue family. The
+ * incoming JSON typically supplies only `{name, scale}`, so without this the
+ * cascade's contrast/state plugins would lose the WCAG pair list that the
+ * color generator populated at init time. Same algorithm as the color
+ * generator -- generateAccessibilityMetadata over the scale, ratios from
+ * position 5 vs white/black.
+ *
+ * No-op for string values and ColorReference values (those don't carry a
+ * scale to derive accessibility from).
+ */
+function bakeAccessibility(value: TokenValue): TokenValue {
+  if (typeof value !== 'object' || value === null) return value;
+  if (!('scale' in value) || !Array.isArray(value.scale)) return value;
+  const colorValue = value as ColorValue;
+  const meta = generateAccessibilityMetadata(colorValue.scale);
+  const reference = colorValue.scale[5] ?? colorValue.scale[0];
+  if (!reference) return value;
+  const onWhiteRatio = calculateWCAGContrast(reference, WHITE);
+  const onBlackRatio = calculateWCAGContrast(reference, BLACK);
+  const accessibility: ColorAccessibility = {
+    wcagAA: meta.wcagAA,
+    wcagAAA: meta.wcagAAA,
+    onWhite: {
+      wcagAA: onWhiteRatio >= WCAG_AA_NORMAL,
+      wcagAAA: onWhiteRatio >= WCAG_AAA_NORMAL,
+      contrastRatio: onWhiteRatio,
+      aa: meta.onWhite.aa,
+      aaa: meta.onWhite.aaa,
+    },
+    onBlack: {
+      wcagAA: onBlackRatio >= WCAG_AA_NORMAL,
+      wcagAAA: onBlackRatio >= WCAG_AAA_NORMAL,
+      contrastRatio: onBlackRatio,
+      aa: meta.onBlack.aa,
+      aaa: meta.onBlack.aaa,
+    },
+  };
+  return { ...colorValue, accessibility };
 }
 
 function parseValue(raw: string): TokenValue {

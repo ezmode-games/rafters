@@ -4,9 +4,8 @@ import { z } from 'zod';
 import { definePlugin } from '../plugin.js';
 
 const ContrastInputSchema = z.object({
-  familyName: z.string(),
-  basePosition: z.number().int().min(0).max(10),
-  neutralFamilyName: z.string().optional(),
+  against: z.string(),
+  level: z.enum(['AA', 'AAA']).default('AAA'),
 });
 
 type ContrastInput = z.infer<typeof ContrastInputSchema>;
@@ -27,6 +26,35 @@ function partnerForBase(
   return undefined;
 }
 
+/**
+ * If no pair contains the exact base position, walk outward to find the
+ * nearest position that does. Returns the partner of that nearest position.
+ * This lets contrast pick a valid foreground even when the designer's
+ * chosen position isn't itself a WCAG pair anchor.
+ */
+function nearestPartner(
+  pairs: readonly (readonly number[])[] | undefined,
+  basePosition: number,
+): number | undefined {
+  if (!pairs || pairs.length === 0) return undefined;
+  const anchors = new Set<number>();
+  for (const pair of pairs) {
+    for (const position of pair) anchors.add(position);
+  }
+  if (anchors.size === 0) return undefined;
+  let nearest = -1;
+  let bestDistance = Number.POSITIVE_INFINITY;
+  for (const anchor of anchors) {
+    const distance = Math.abs(anchor - basePosition);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      nearest = anchor;
+    }
+  }
+  if (nearest === -1) return undefined;
+  return partnerForBase(pairs, nearest);
+}
+
 function requireScalePosition(index: number, label: string): string {
   const position = SCALE_POSITIONS[index];
   if (!position) {
@@ -35,16 +63,66 @@ function requireScalePosition(index: number, label: string): string {
   return position;
 }
 
+function isPositionString(value: unknown): value is string {
+  return typeof value === 'string';
+}
+
+function resolveBasePosition(position: string): number {
+  const map: Record<string, number> = {
+    '50': 0,
+    '100': 1,
+    '200': 2,
+    '300': 3,
+    '400': 4,
+    '500': 5,
+    '600': 6,
+    '700': 7,
+    '800': 8,
+    '900': 9,
+    '950': 10,
+  };
+  const index = map[position];
+  if (index === undefined) {
+    throw new Error(`contrast plugin: unknown scale position "${position}"`);
+  }
+  return index;
+}
+
+/**
+ * Find a WCAG-compliant foreground for a parent token's current value.
+ *
+ * Reads parent's ColorReference via `get`, resolves the family's accessibility
+ * metadata, and walks the WCAG-AAA pair list (falling back to AA if AAA has
+ * no partner) to find an accessible partner position. The `against` input is
+ * a TOKEN NAME -- the cascade re-runs this transform whenever that token's
+ * value changes, so the foreground always reflects the parent's current
+ * family and position.
+ */
 export const contrastPlugin = definePlugin<ContrastInput, ColorReference>({
   name: 'contrast',
   inputSchema: ContrastInputSchema,
   outputSchema: ColorReferenceSchema,
-  dependsOn: (input) =>
-    input.neutralFamilyName ? [input.familyName, input.neutralFamilyName] : [input.familyName],
+  dependsOn: (input) => [input.against],
   transform: (input, get) => {
-    const family = get(input.familyName) as ColorValueWithForegroundRefs | undefined;
+    const parent = get(input.against);
+    if (!parent || typeof parent !== 'object' || !('family' in parent) || !('position' in parent)) {
+      throw new Error(
+        `contrast plugin: parent token "${input.against}" did not resolve to a ColorReference`,
+      );
+    }
+    const parentRef = parent as { family: string; position: unknown };
+    if (!isPositionString(parentRef.position)) {
+      throw new Error(
+        `contrast plugin: parent token "${input.against}" position is not a scale string`,
+      );
+    }
+    const basePosition = resolveBasePosition(parentRef.position);
+
+    const family = get(parentRef.family) as ColorValueWithForegroundRefs | undefined;
     if (!family) {
-      throw new Error(`contrast plugin: family "${input.familyName}" not found in registry`);
+      throw new Error(
+        `contrast plugin: family "${parentRef.family}" (from "${input.against}") not in registry`,
+      );
     }
 
     if (family.foregroundReferences?.auto) {
@@ -53,40 +131,24 @@ export const contrastPlugin = definePlugin<ContrastInput, ColorReference>({
     }
 
     if (family.accessibility) {
-      const partner =
-        partnerForBase(family.accessibility.wcagAAA?.normal, input.basePosition) ??
-        partnerForBase(family.accessibility.wcagAA?.normal, input.basePosition);
+      const aaaPartner =
+        partnerForBase(family.accessibility.wcagAAA?.normal, basePosition) ??
+        nearestPartner(family.accessibility.wcagAAA?.normal, basePosition);
+      const aaPartner =
+        partnerForBase(family.accessibility.wcagAA?.normal, basePosition) ??
+        nearestPartner(family.accessibility.wcagAA?.normal, basePosition);
+      const partner = input.level === 'AAA' ? (aaaPartner ?? aaPartner) : aaPartner;
       if (partner !== undefined) {
         return {
-          family: input.familyName,
-          position: requireScalePosition(partner, `${input.familyName} pair`),
+          family: parentRef.family,
+          position: requireScalePosition(partner, `${parentRef.family} pair`),
         };
       }
-    }
-
-    if (input.neutralFamilyName) {
-      const neutral = get(input.neutralFamilyName) as ColorValue | undefined;
-      const aaaBest = neutral?.accessibility?.onWhite?.aaa?.[0];
-      if (aaaBest !== undefined) {
-        return {
-          family: input.neutralFamilyName,
-          position: requireScalePosition(aaaBest, `${input.neutralFamilyName} onWhite.aaa`),
-        };
-      }
-      const aaBest = neutral?.accessibility?.onWhite?.aa?.[0];
-      if (aaBest !== undefined) {
-        return {
-          family: input.neutralFamilyName,
-          position: requireScalePosition(aaBest, `${input.neutralFamilyName} onWhite.aa`),
-        };
-      }
-      throw new Error(
-        `contrast plugin: neutral family "${input.neutralFamilyName}" has no accessibility.onWhite data; cannot derive contrast partner`,
-      );
     }
 
     throw new Error(
-      `contrast plugin: family "${input.familyName}" has no foregroundReferences and no accessibility WCAG pairs; supply one or pass neutralFamilyName`,
+      `contrast plugin: family "${parentRef.family}" has no foregroundReferences and no accessibility ` +
+        `WCAG pair partner for position ${parentRef.position} (against ${input.against})`,
     );
   },
 });

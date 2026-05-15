@@ -125,7 +125,7 @@ describe('TokenRegistry', () => {
         [scalePlugin, contrastPlugin],
       );
       r.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
-      r.bind('accent-fg', 'contrast', { familyName: 'accent', basePosition: 5 });
+      r.bind('accent-fg', 'contrast', { against: 'accent-500', level: 'AAA' });
       expect(r.get('accent-500')?.value).toEqual({ family: 'accent', position: '500' });
       expect(r.get('accent-fg')?.value).toBeDefined();
     });
@@ -136,11 +136,7 @@ describe('TokenRegistry', () => {
         [scalePlugin, statePlugin],
       );
       r.bind('accent-500', 'scale', { familyName: 'accent', scalePosition: 5 });
-      r.bind('accent-hover', 'state', {
-        familyName: 'accent',
-        basePosition: 5,
-        stateType: 'hover',
-      });
+      r.bind('accent-hover', 'state', { from: 'accent-500', stateType: 'hover' });
       const newAccent = { ...accentToken.value, name: 'mutated' } as ColorValue;
       r.set('accent', newAccent, { reason: 'test mutation' });
       expect(r.get('accent')?.value).toEqual(newAccent);

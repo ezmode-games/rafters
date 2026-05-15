@@ -12,16 +12,22 @@ import { createRequire } from 'node:module';
 import { join, relative } from 'node:path';
 import { checkbox, confirm, select } from '@inquirer/prompts';
 import {
+  contrastPlugin,
   generateBaseSystem,
+  invertPlugin,
   loadRegistryFromDir,
   registryToCompiled,
   registryToTailwind,
   registryToTypeScript,
   saveRegistryToDir,
   scalePlugin,
+  statePlugin,
   TokenRegistry,
   toDTCG,
 } from '@rafters/design-tokens';
+
+const REGISTRY_PLUGINS = [scalePlugin, contrastPlugin, statePlugin, invertPlugin];
+
 import { onboard, previewOnboard } from '../onboard/orchestrator.js';
 import { toImportPending, writeImportPending } from '../onboard/writer.js';
 import {
@@ -433,7 +439,7 @@ async function regenerateFromExisting(
   }
 
   // Load all tokens from .rafters/tokens/
-  const registry = loadRegistryFromDir(paths.tokens, [scalePlugin]);
+  const registry = loadRegistryFromDir(paths.tokens, REGISTRY_PLUGINS);
 
   if (registry.size() === 0) {
     throw new Error('No tokens found. Cannot regenerate without existing tokens.');
@@ -526,7 +532,7 @@ async function resetToDefaults(
   // Load existing tokens to check for userOverride backups
   let existingTokens: ReturnType<TokenRegistry['list']> = [];
   try {
-    existingTokens = loadRegistryFromDir(paths.tokens, [scalePlugin]).list();
+    existingTokens = loadRegistryFromDir(paths.tokens, REGISTRY_PLUGINS).list();
   } catch {
     // No existing tokens directory; nothing to back up.
   }
@@ -570,7 +576,7 @@ async function resetToDefaults(
 
   // Re-run generators fresh
   const system = generateBaseSystem();
-  const registry = new TokenRegistry(system.allTokens, [scalePlugin]);
+  const registry = new TokenRegistry(system.allTokens, REGISTRY_PLUGINS);
 
   log({
     event: 'init:reset_generated',
@@ -799,7 +805,7 @@ export async function init(options: InitOptions): Promise<void> {
 
   // Generate default token system - registry is the source of truth
   const system = generateBaseSystem();
-  const registry = new TokenRegistry(system.allTokens, [scalePlugin]);
+  const registry = new TokenRegistry(system.allTokens, REGISTRY_PLUGINS);
 
   log({
     event: 'init:generated',
