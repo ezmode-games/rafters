@@ -8,9 +8,17 @@ function stripVolatile(t: AnyToken): AnyToken {
   const {
     generatedAt: _generatedAt,
     binding: _binding,
+    value,
     ...rest
-  } = t as AnyToken & { generatedAt?: string; binding?: unknown };
-  return rest;
+  } = t as AnyToken & { generatedAt?: string; binding?: unknown; value?: unknown };
+  // Color family values now carry `accessibility` (new package only, see #1496).
+  // Strip it from the parity comparison so the rest of the token contract
+  // stays comparable to v1's output.
+  if (value && typeof value === 'object' && 'accessibility' in value) {
+    const { accessibility: _accessibility, ...valueRest } = value as Record<string, unknown>;
+    return { ...rest, value: valueRest };
+  }
+  return { ...rest, value };
 }
 
 describe('generators parity vs v1', () => {

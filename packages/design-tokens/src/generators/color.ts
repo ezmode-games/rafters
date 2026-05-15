@@ -8,8 +8,12 @@
  * Default scales are provided by the orchestrator from defaults.ts.
  */
 
-import { generateOKLCHScale } from '@rafters/color-utils';
-import type { ColorValue, OKLCH, Token } from '@rafters/shared';
+import {
+  calculateWCAGContrast,
+  generateAccessibilityMetadata,
+  generateOKLCHScale,
+} from '@rafters/color-utils';
+import type { ColorAccessibility, ColorValue, OKLCH, Token } from '@rafters/shared';
 import type { ColorScaleInput, SemanticColorBase } from './defaults.js';
 import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
 import { COLOR_SCALE_POSITIONS } from './types.js';
@@ -74,12 +78,15 @@ export function generateColorTokens(
       (v): v is OKLCH => v !== undefined,
     );
 
-    // Create the color family token with full intelligence
+    // Pre-compute accessibility metadata so plugins (state, contrast) can
+    // walk the family's WCAG-AAA pair ladder without recomputing contrast
+    // ratios at cascade time.
     const colorFamily: ColorValue = {
       name,
       scale: scaleArray,
       token: name,
       use: description ?? `${name} color palette for UI elements.`,
+      accessibility: buildColorAccessibility(scaleArray),
     };
 
     // Create individual scale position tokens
@@ -143,6 +150,40 @@ export function generateColorTokens(
   return {
     namespace: 'color',
     tokens,
+  };
+}
+
+const WHITE: OKLCH = { l: 1, c: 0, h: 0, alpha: 1 };
+const BLACK: OKLCH = { l: 0, c: 0, h: 0, alpha: 1 };
+const WCAG_AA_NORMAL = 4.5;
+const WCAG_AAA_NORMAL = 7;
+const FAMILY_REFERENCE_INDEX = 5; // The 500 position is the family anchor for onWhite/onBlack ratios.
+
+function buildColorAccessibility(scale: OKLCH[]): ColorAccessibility {
+  const meta = generateAccessibilityMetadata(scale);
+  const reference = scale[FAMILY_REFERENCE_INDEX] ?? scale[0];
+  if (!reference) {
+    throw new Error('buildColorAccessibility: empty scale');
+  }
+  const onWhiteRatio = calculateWCAGContrast(reference, WHITE);
+  const onBlackRatio = calculateWCAGContrast(reference, BLACK);
+  return {
+    wcagAA: meta.wcagAA,
+    wcagAAA: meta.wcagAAA,
+    onWhite: {
+      wcagAA: onWhiteRatio >= WCAG_AA_NORMAL,
+      wcagAAA: onWhiteRatio >= WCAG_AAA_NORMAL,
+      contrastRatio: onWhiteRatio,
+      aa: meta.onWhite.aa,
+      aaa: meta.onWhite.aaa,
+    },
+    onBlack: {
+      wcagAA: onBlackRatio >= WCAG_AA_NORMAL,
+      wcagAAA: onBlackRatio >= WCAG_AAA_NORMAL,
+      contrastRatio: onBlackRatio,
+      aa: meta.onBlack.aa,
+      aaa: meta.onBlack.aaa,
+    },
   };
 }
 
