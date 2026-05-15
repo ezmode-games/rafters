@@ -5,7 +5,11 @@ import { generateBaseSystem as generateNew } from '../src/generators/index.js';
 type AnyToken = Record<string, unknown> & { name: string };
 
 function stripVolatile(t: AnyToken): AnyToken {
-  const { generatedAt: _ignored, ...rest } = t as AnyToken & { generatedAt?: string };
+  const {
+    generatedAt: _generatedAt,
+    binding: _binding,
+    ...rest
+  } = t as AnyToken & { generatedAt?: string; binding?: unknown };
   return rest;
 }
 

@@ -42,7 +42,12 @@ export const statePlugin = definePlugin<StateInput, ColorReference>({
 
     const offset = STATE_OFFSETS[input.stateType];
     const adjustedIndex = Math.max(0, Math.min(10, input.basePosition + offset));
-    const position = SCALE_POSITIONS[adjustedIndex] ?? '500';
+    const position = SCALE_POSITIONS[adjustedIndex];
+    if (!position) {
+      throw new Error(
+        `state plugin: invalid scale index ${adjustedIndex} for base ${input.basePosition} + ${input.stateType}`,
+      );
+    }
     return { family: input.familyName, position };
   },
 });

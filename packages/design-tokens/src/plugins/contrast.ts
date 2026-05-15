@@ -26,6 +26,14 @@ function findPartnerInPairs(
   return undefined;
 }
 
+function requireScalePosition(index: number): string {
+  const position = SCALE_POSITIONS[index];
+  if (!position) {
+    throw new Error(`contrast plugin: invalid scale index ${index}`);
+  }
+  return position;
+}
+
 export const contrastPlugin = definePlugin<ContrastInput, ColorReference>({
   name: 'contrast',
   inputSchema: ContrastInputSchema,
@@ -52,7 +60,7 @@ export const contrastPlugin = definePlugin<ContrastInput, ColorReference>({
       if (contrastPosition !== undefined) {
         return {
           family: input.familyName,
-          position: SCALE_POSITIONS[contrastPosition] ?? '500',
+          position: requireScalePosition(contrastPosition),
         };
       }
     }
@@ -64,7 +72,7 @@ export const contrastPlugin = definePlugin<ContrastInput, ColorReference>({
         if (best !== undefined) {
           return {
             family: input.neutralFamilyName,
-            position: SCALE_POSITIONS[best] ?? '500',
+            position: requireScalePosition(best),
           };
         }
       }
@@ -73,7 +81,7 @@ export const contrastPlugin = definePlugin<ContrastInput, ColorReference>({
         if (best !== undefined) {
           return {
             family: input.neutralFamilyName,
-            position: SCALE_POSITIONS[best] ?? '500',
+            position: requireScalePosition(best),
           };
         }
       }

@@ -17,23 +17,9 @@
  * - scale:N for direct position references (base, border, ring, subtle)
  */
 
-import type { Binding, ColorReference, Token } from '@rafters/shared';
+import type { ColorReference, Token } from '@rafters/shared';
 import { DEFAULT_SEMANTIC_COLOR_MAPPINGS, type SemanticColorMapping } from './defaults.js';
 import type { GeneratorResult, ResolvedSystemConfig } from './types.js';
-
-const POSITION_TO_INDEX: Record<string, number> = {
-  '50': 0,
-  '100': 1,
-  '200': 2,
-  '300': 3,
-  '400': 4,
-  '500': 5,
-  '600': 6,
-  '700': 7,
-  '800': 8,
-  '900': 9,
-  '950': 10,
-};
 
 /**
  * Helper to convert SemanticColorMapping to ColorReference for light mode
@@ -85,26 +71,6 @@ function deriveGenerationRule(name: string, lightRef: ColorReference): string {
 }
 
 /**
- * Build a Binding for a semantic token from its light-mode reference.
- *
- * The mapping in DEFAULT_SEMANTIC_COLOR_MAPPINGS already encodes the
- * designer's chosen position for each semantic role. The binding's job on
- * family remap is to keep that chosen position and just swap the family --
- * so every semantic token binds to the scale plugin at its mapped position,
- * regardless of -foreground / -hover / -active / -focus / -disabled suffix.
- *
- * Suffix-driven plugins (contrast, state) exist for users to opt into
- * explicitly via registry.bind(); the generator does not auto-apply them
- * because doing so overrides the designer's mapped position with the
- * plugin's computed answer (the v1 cascade bug).
- */
-function deriveBinding(lightRef: ColorReference): Binding | undefined {
-  const scalePosition = POSITION_TO_INDEX[lightRef.position];
-  if (scalePosition === undefined) return undefined;
-  return { plugin: 'scale', input: { familyName: lightRef.family, scalePosition } };
-}
-
-/**
  * Generate semantic color tokens from the single source of truth.
  *
  * Uses DEFAULT_SEMANTIC_COLOR_MAPPINGS from defaults.ts which contains
@@ -131,14 +97,12 @@ export function generateSemanticTokens(_config: ResolvedSystemConfig): Generator
     }
 
     const generationRule = deriveGenerationRule(name, lightRef);
-    const binding = deriveBinding(lightRef);
 
     tokens.push({
       name,
       value: lightRef, // Light mode is default value; dark mode lookup via dependsOn[1]
       category: 'color',
       namespace: 'semantic',
-      ...(binding ? { binding } : {}),
       semanticMeaning: mapping.meaning,
       usageContext: mapping.contexts,
       trustLevel: mapping.trustLevel,
