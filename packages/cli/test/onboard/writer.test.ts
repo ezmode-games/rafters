@@ -20,6 +20,7 @@ const successfulResult: OnboardResult = {
   tokens: [token],
   palettes: [],
   brandSystem: { detected: false, palettes: [], semanticSlots: [] },
+  references: {},
   source: 'tailwind-v4',
   confidence: 0.95,
   detectedBy: ['@theme block'],
@@ -100,6 +101,7 @@ describe('toImportPending', () => {
       tokens: [],
       palettes: [],
       brandSystem: { detected: false, palettes: [], semanticSlots: [] },
+      references: {},
       source: null,
       confidence: 0,
       detectedBy: [],
@@ -133,6 +135,21 @@ describe('toImportPending', () => {
   it('omits brandSystem block when no brand system was detected', () => {
     const doc = toImportPending(successfulResult, projectRoot);
     expect(doc.brandSystem).toBeUndefined();
+  });
+
+  it('plumbs OnboardResult.references through to PendingToken.sourceReference (#1404)', () => {
+    const result: OnboardResult = {
+      ...successfulResult,
+      references: { 'primary-500': '--empire-500' },
+    };
+
+    const doc = toImportPending(result, projectRoot);
+    expect(doc.tokens[0]?.sourceReference).toBe('--empire-500');
+  });
+
+  it('omits sourceReference when no reference was recorded for that token', () => {
+    const doc = toImportPending(successfulResult, projectRoot);
+    expect(doc.tokens[0]?.sourceReference).toBeUndefined();
   });
 
   it('fails loudly when a token.value is not a string', () => {

@@ -263,6 +263,90 @@ describe('Generic CSS Importer', () => {
     });
   });
 
+  describe('var() reference resolution (#1404)', () => {
+    it('resolves --primary: var(--empire-500) to the leaf value and records sourceReference', async () => {
+      const stylesDir = join(testDir, 'styles');
+      await mkdir(stylesDir, { recursive: true });
+      await writeFile(
+        join(stylesDir, 'variables.css'),
+        `:root {
+  --empire-500: oklch(0.55 0.18 350);
+  --empire-300: oklch(0.75 0.12 350);
+  --primary: var(--empire-500);
+  --accent: var(--empire-300);
+  --background: oklch(1 0 0);
+}`,
+      );
+
+      const detection = await genericCSSImporter.detect(testDir);
+      const result = await genericCSSImporter.import(testDir, detection);
+
+      const primary = result.tokens.find((t) => t.name === 'primary');
+      expect(primary?.value).toBe('oklch(0.55 0.18 350)');
+      expect(result.references.primary).toBe('--empire-500');
+
+      const accent = result.tokens.find((t) => t.name === 'accent');
+      expect(accent?.value).toBe('oklch(0.75 0.12 350)');
+      expect(result.references.accent).toBe('--empire-300');
+
+      // Literal values do not gain a reference entry
+      const background = result.tokens.find((t) => t.name === 'background');
+      expect(background?.value).toBe('oklch(1 0 0)');
+      expect(result.references.background).toBeUndefined();
+    });
+
+    it('emits a warning and skips a cyclic var() reference', async () => {
+      const stylesDir = join(testDir, 'styles');
+      await mkdir(stylesDir, { recursive: true });
+      await writeFile(
+        join(stylesDir, 'variables.css'),
+        `:root {
+  --color-a: var(--color-b);
+  --color-b: var(--color-c);
+  --color-c: var(--color-a);
+  --color-fine: red;
+  --color-other: blue;
+}`,
+      );
+
+      const detection = await genericCSSImporter.detect(testDir);
+      const result = await genericCSSImporter.import(testDir, detection);
+
+      // Cyclic tokens are skipped
+      expect(result.tokens.find((t) => t.name === 'color-a')).toBeUndefined();
+      expect(result.tokens.find((t) => t.name === 'color-b')).toBeUndefined();
+      expect(result.tokens.find((t) => t.name === 'color-c')).toBeUndefined();
+
+      // Non-cyclic tokens are unaffected
+      expect(result.tokens.find((t) => t.name === 'color-fine')).toBeDefined();
+      expect(result.tokens.find((t) => t.name === 'color-other')).toBeDefined();
+
+      const cycleWarnings = result.warnings.filter((w) => /Cyclic/.test(w.message));
+      expect(cycleWarnings.length).toBeGreaterThan(0);
+    });
+
+    it('skips tokens with unresolved var() targets and warns', async () => {
+      const stylesDir = join(testDir, 'styles');
+      await mkdir(stylesDir, { recursive: true });
+      await writeFile(
+        join(stylesDir, 'variables.css'),
+        `:root {
+  --primary: var(--does-not-exist);
+  --accent: red;
+  --background: blue;
+}`,
+      );
+
+      const detection = await genericCSSImporter.detect(testDir);
+      const result = await genericCSSImporter.import(testDir, detection);
+
+      expect(result.tokens.find((t) => t.name === 'primary')).toBeUndefined();
+      expect(result.tokens.find((t) => t.name === 'accent')).toBeDefined();
+      const unresolvedWarnings = result.warnings.filter((w) => /Unresolved/.test(w.message));
+      expect(unresolvedWarnings.length).toBeGreaterThan(0);
+    });
+  });
+
   describe('category inference', () => {
     it('categorizes background as color', async () => {
       const stylesDir = join(testDir, 'styles');

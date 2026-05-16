@@ -183,6 +183,108 @@ export function getUniqueVariableNames(parsed: ParsedCSS): string[] {
 }
 
 /**
+ * Maximum number of var() hops to follow before reporting a max-depth error.
+ *
+ * Aligned with #1404: real CSS rarely chains more than two levels
+ * (semantic -> palette family.position), so five is plenty for legitimate
+ * chains and short enough to catch malformed files cheaply.
+ */
+export const MAX_VAR_DEPTH = 5;
+
+const VAR_REF_PATTERN = /^var\((--[\w-]+)(?:\s*,[\s\S]*)?\)\s*$/;
+
+export type ResolveReferenceResult =
+  | {
+      ok: true;
+      /** Final resolved value (the leaf var's string value). */
+      value: string;
+      /**
+       * The var name the resolution walked through to find the leaf.
+       * For `--primary: var(--empire-500)` resolving from `--primary`,
+       * this is `--empire-500`. For a leaf var (not a var() reference),
+       * this is null.
+       */
+      sourceReference: string | null;
+      /** The full chain of var names visited, leaf-last. */
+      chain: string[];
+    }
+  | {
+      ok: false;
+      reason: 'cycle' | 'max-depth' | 'unresolved';
+      /** The chain walked before the failure. */
+      chain: string[];
+    };
+
+/**
+ * Resolve a CSS variable through any `var(--other)` indirections to its
+ * leaf value. Used by importers to preserve the designer's intent when
+ * source CSS encodes `--primary: var(--empire-500)` rather than inlining
+ * the OKLCH string (see #1404).
+ *
+ * Lookup is by var name; the first occurrence in `variables` wins, with
+ * preference for non-dark/non-media context entries (so `--primary` in
+ * `:root` resolves before a `.dark` shadow). Cycles, missing targets, and
+ * chains longer than `MAX_VAR_DEPTH` are reported via the discriminated
+ * result rather than thrown -- the caller decides whether to warn and
+ * skip or fall back to the raw value.
+ */
+export function resolveReference(
+  varName: string,
+  variables: readonly CSSVariable[],
+): ResolveReferenceResult {
+  const byName = indexByPreferredContext(variables);
+  const chain: string[] = [];
+  const visited = new Set<string>();
+
+  let current = varName;
+  for (let depth = 0; depth <= MAX_VAR_DEPTH; depth += 1) {
+    if (visited.has(current)) {
+      return { ok: false, reason: 'cycle', chain: [...chain, current] };
+    }
+    visited.add(current);
+    chain.push(current);
+
+    const entry = byName.get(current);
+    if (!entry) {
+      return { ok: false, reason: 'unresolved', chain };
+    }
+
+    const refMatch = entry.value.match(VAR_REF_PATTERN);
+    if (!refMatch || !refMatch[1]) {
+      const sourceReference = chain.length > 1 ? (chain[chain.length - 1] ?? null) : null;
+      return { ok: true, value: entry.value, sourceReference, chain };
+    }
+
+    current = refMatch[1];
+  }
+
+  return { ok: false, reason: 'max-depth', chain };
+}
+
+/**
+ * Build a name -> variable map preferring non-dark/non-media context
+ * entries so resolution lands on the light-mode definition by default.
+ */
+function indexByPreferredContext(variables: readonly CSSVariable[]): Map<string, CSSVariable> {
+  const byName = new Map<string, CSSVariable>();
+  for (const v of variables) {
+    const existing = byName.get(v.name);
+    if (!existing) {
+      byName.set(v.name, v);
+      continue;
+    }
+    if (
+      (existing.context === 'dark' || existing.context === 'media') &&
+      v.context !== 'dark' &&
+      v.context !== 'media'
+    ) {
+      byName.set(v.name, v);
+    }
+  }
+  return byName;
+}
+
+/**
  * Group variables by their base name (without -- prefix)
  */
 export function groupVariablesByName(parsed: ParsedCSS): Map<string, CSSVariable[]> {

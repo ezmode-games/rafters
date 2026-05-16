@@ -8,7 +8,7 @@
 import { readFile } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 import type { Token } from '@rafters/shared';
-import { type CSSVariable, parseCSSFile } from '../css-parser.js';
+import { type CSSVariable, parseCSSFile, resolveReference } from '../css-parser.js';
 import { classifyBrandSystem, EMPTY_BRAND_SYSTEM } from './brand-system.js';
 import { detectRamps } from './ramp-detector.js';
 import type { Importer, ImporterDetection, ImportResult, ImportWarning } from './types.js';
@@ -241,6 +241,7 @@ export const genericCSSImporter: Importer = {
           tokens: [],
           palettes: [],
           brandSystem: EMPTY_BRAND_SYSTEM,
+          references: {},
           warnings: [{ level: 'error', message: 'No source path found' }],
           source: 'generic-css',
           variablesProcessed: 0,
@@ -258,6 +259,7 @@ export const genericCSSImporter: Importer = {
           tokens: [],
           palettes: [],
           brandSystem: EMPTY_BRAND_SYSTEM,
+          references: {},
           warnings: [{ level: 'error', message: `Failed to read CSS file: ${message}` }],
           source: 'generic-css',
           variablesProcessed: 0,
@@ -274,6 +276,7 @@ export const genericCSSImporter: Importer = {
           tokens: [],
           palettes: [],
           brandSystem: EMPTY_BRAND_SYSTEM,
+          references: {},
           warnings: [{ level: 'error', message: `Failed to parse CSS: ${message}` }],
           source: 'generic-css',
           variablesProcessed: 0,
@@ -285,6 +288,7 @@ export const genericCSSImporter: Importer = {
 
     // Track seen token names to avoid duplicates (prefer light mode)
     const seenNames = new Set<string>();
+    const references: Record<string, string> = {};
 
     for (const variable of parsed.variables) {
       variablesProcessed++;
@@ -299,6 +303,23 @@ export const genericCSSImporter: Importer = {
       }
       seenNames.add(result.token.name);
 
+      // If the source variable's value is `var(--other)`, walk the chain so
+      // `proposed.value` is the leaf string and the user sees that intent
+      // preserved in the pending file rather than the raw `var(...)` (#1404).
+      if (isVarRef(variable.value)) {
+        const resolved = resolveReference(variable.name, parsed.variables);
+        if (resolved.ok) {
+          result.token.value = resolved.value;
+          if (resolved.sourceReference) {
+            references[result.token.name] = resolved.sourceReference;
+          }
+        } else {
+          warnings.push(referenceWarning(variable, resolved.reason, resolved.chain));
+          skipped++;
+          continue;
+        }
+      }
+
       tokens.push(result.token);
       if (result.warning) {
         warnings.push(result.warning);
@@ -312,6 +333,7 @@ export const genericCSSImporter: Importer = {
       tokens: remaining,
       palettes,
       brandSystem,
+      references,
       warnings,
       source: 'generic-css',
       variablesProcessed,
@@ -320,3 +342,28 @@ export const genericCSSImporter: Importer = {
     };
   },
 };
+
+const VAR_REF_TEST = /^var\(\s*--[\w-]+/;
+
+function isVarRef(value: string): boolean {
+  return VAR_REF_TEST.test(value);
+}
+
+function referenceWarning(
+  variable: CSSVariable,
+  reason: 'cycle' | 'max-depth' | 'unresolved',
+  chain: string[],
+): ImportWarning {
+  const chainDesc = chain.join(' -> ') || variable.name;
+  const messages: Record<typeof reason, string> = {
+    cycle: `Cyclic var() reference at ${variable.name}: ${chainDesc}`,
+    'max-depth': `var() reference chain at ${variable.name} exceeded depth limit: ${chainDesc}`,
+    unresolved: `Unresolved var() reference at ${variable.name}: ${chainDesc}`,
+  };
+  return {
+    level: 'warning',
+    message: messages[reason],
+    source: { file: '', line: variable.line, column: variable.column },
+    suggestion: 'Skipped token; inline the value or define the missing variable.',
+  };
+}

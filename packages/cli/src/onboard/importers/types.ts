@@ -75,6 +75,14 @@ export interface ImportResult {
    * means no brand-system signal, not "absent".
    */
   brandSystem: BrandSystemAnalysis;
+  /**
+   * Map from token.name to the CSS var name its value was resolved through
+   * (#1404). Populated when source CSS encoded `--this: var(--other)` and
+   * the importer walked the chain to the leaf. Surfaced on the
+   * corresponding PendingToken's `sourceReference`. Absent entries mean
+   * the value was a literal in source.
+   */
+  references: Record<string, string>;
   /** Warnings generated during import */
   warnings: ImportWarning[];
   /** Which importer produced this result */

@@ -45,6 +45,11 @@ export interface OnboardResult {
    * means no brand-system signal, not "absent".
    */
   brandSystem: BrandSystemAnalysis;
+  /**
+   * Map from token.name to the CSS var name its value was resolved through
+   * (#1404). Surfaced on the corresponding PendingToken's `sourceReference`.
+   */
+  references: Record<string, string>;
   /** Which importer was used */
   source: string | null;
   /** Detection confidence (0-1) */
@@ -107,6 +112,7 @@ export async function onboard(
         tokens: [],
         palettes: [],
         brandSystem: EMPTY_BRAND_SYSTEM,
+        references: {},
         source: null,
         confidence: 0,
         detectedBy: [],
@@ -130,6 +136,7 @@ export async function onboard(
         tokens: [],
         palettes: [],
         brandSystem: EMPTY_BRAND_SYSTEM,
+        references: {},
         source: null,
         confidence: 0,
         detectedBy: [],
@@ -153,6 +160,7 @@ export async function onboard(
       tokens: [],
       palettes: [],
       brandSystem: EMPTY_BRAND_SYSTEM,
+      references: {},
       source: match.importer.metadata.id,
       confidence: match.detection.confidence,
       detectedBy: match.detection.detectedBy,
@@ -179,6 +187,7 @@ export async function onboard(
     tokens: result.tokens,
     palettes: result.palettes,
     brandSystem: result.brandSystem,
+    references: result.references,
     source: result.source,
     confidence: match.detection.confidence,
     detectedBy: match.detection.detectedBy,

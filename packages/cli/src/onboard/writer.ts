@@ -52,6 +52,7 @@ export function toImportPending(
       );
     }
 
+    const sourceReference = result.references[token.name];
     return {
       original: {
         // Reverse the `Imported from X --var-name` convention to recover the source var
@@ -63,6 +64,7 @@ export function toImportPending(
       decision: 'pending' as const,
       confidence: result.confidence,
       rationale: token.semanticMeaning,
+      ...(sourceReference ? { sourceReference } : {}),
     };
   });
 

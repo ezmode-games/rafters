@@ -81,6 +81,16 @@ export const PendingTokenSchema = z
 
     /** Why this mapping was proposed (e.g., "Tailwind --color-primary maps to primary-500") */
     rationale: z.string().optional(),
+
+    /**
+     * The CSS variable this token's value resolved through, when the source
+     * CSS encoded `--this: var(--other)` and the importer walked the chain
+     * (#1404). For example, `--primary: var(--empire-500)` produces a
+     * pending token whose `proposed.value` is empire-500's OKLCH string and
+     * whose `sourceReference` is `--empire-500`. Absent when the source
+     * value was a literal.
+     */
+    sourceReference: z.string().optional(),
   })
   .strict()
   .superRefine((t, ctx) => {
