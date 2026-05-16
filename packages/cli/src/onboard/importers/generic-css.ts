@@ -139,6 +139,17 @@ function normalizeTokenName(varName: string): string {
   return varName.replace(/^--/, '');
 }
 
+const VAR_REF_PATTERN = /^\s*var\(\s*(--[\w-]+)/;
+
+/**
+ * Extract the target var name from a `var(--name, fallback)` expression.
+ * Returns null when the value isn't a var() reference.
+ */
+function extractVarTarget(value: string): string | null {
+  const match = value.match(VAR_REF_PATTERN);
+  return match?.[1] ?? null;
+}
+
 /**
  * Convert a CSS variable to a Rafters token
  */
@@ -303,13 +314,61 @@ export const genericCSSImporter: Importer = {
 
     const { palettes, remaining } = detectRamps(tokens);
 
+    // Build palette-source map: source CSS var name -> {family, position}.
+    // generic-css normalises `--empire-500` -> token name `empire-500`, so the
+    // source var name is just `--${token.name}` for each palette step.
+    const paletteByVarName = new Map<string, { family: string; position: string }>();
+    for (const palette of palettes) {
+      for (const step of palette.steps) {
+        paletteByVarName.set(`--${step.token.name}`, {
+          family: palette.name,
+          position: step.position,
+        });
+      }
+    }
+
+    // Rewrite `remaining` tokens whose source value is `var(--<palette-step>)`
+    // into ColorReference shape. The token system treats ColorReference as the
+    // canonical semantic-points-at-palette form (#1404). Studio resolves
+    // ColorReference to a value at display time -- the CLI does not flatten.
+    //
+    // var() refs whose target is not a detected palette step emit a warning
+    // and the token is dropped; we refuse to silently flat-lift an unresolved
+    // var into a string token, and we don't fall back to OKLCH resolution.
+    const finalRemaining: Token[] = [];
+    for (const token of remaining) {
+      if (typeof token.value !== 'string') {
+        finalRemaining.push(token);
+        continue;
+      }
+      const varTarget = extractVarTarget(token.value);
+      if (!varTarget) {
+        finalRemaining.push(token);
+        continue;
+      }
+      const ref = paletteByVarName.get(varTarget);
+      if (!ref) {
+        warnings.push({
+          level: 'warning',
+          message: `Token "${token.name}" references ${varTarget}, which is not part of a detected palette. Dropping; assign in Studio after import.`,
+        });
+        skipped++;
+        continue;
+      }
+      finalRemaining.push({
+        ...token,
+        value: { family: ref.family, position: ref.position },
+        semanticMeaning: `${token.semanticMeaning} (semantic reference to ${ref.family}.${ref.position})`,
+      });
+    }
+
     return {
-      tokens: remaining,
+      tokens: finalRemaining,
       palettes,
       warnings,
       source: 'generic-css',
       variablesProcessed,
-      tokensCreated: remaining.length + palettes.reduce((n, p) => n + p.steps.length, 0),
+      tokensCreated: finalRemaining.length + palettes.reduce((n, p) => n + p.steps.length, 0),
       skipped,
     };
   },
