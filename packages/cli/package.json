@@ -44,7 +44,6 @@
     "@rafters/color-utils": "workspace:*",
     "@rafters/composites": "workspace:*",
     "@rafters/design-tokens": "workspace:*",
-    "@rafters/design-tokens-v1": "workspace:*",
     "@rafters/shared": "workspace:*",
     "@rafters/studio": "workspace:*",
     "@types/css-tree": "^2.3.11",

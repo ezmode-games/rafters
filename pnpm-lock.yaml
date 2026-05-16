@@ -367,9 +367,6 @@ importers:
       '@rafters/design-tokens':
         specifier: workspace:*
         version: link:../design-tokens
-      '@rafters/design-tokens-v1':
-        specifier: workspace:*
-        version: link:../design-tokens-v1
       '@rafters/shared':
         specifier: workspace:*
         version: link:../shared

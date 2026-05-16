@@ -9,7 +9,7 @@ export default defineConfig([
     noExternal: [
       '@rafters/color-utils',
       '@rafters/composites',
-      '@rafters/design-tokens-v1',
+      '@rafters/design-tokens',
       '@rafters/shared',
       '@rafters/studio',
     ],
