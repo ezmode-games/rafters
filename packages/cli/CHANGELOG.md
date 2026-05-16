@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Minor Changes
+
+- feat(onboard): importers now detect complete color ramps (`--name-50` ... `--name-950`) as palettes instead of flat-lifting each step into an unrelated token (#1402). A ramp is recognised when at least seven Tailwind scale positions of a single family are present; partial ramps stay flat. Detection runs across the Tailwind v4, shadcn, and generic CSS importers via a shared `ramp-detector` utility. `.rafters/import-pending.json` gains an optional `palettes[]` block alongside `tokens[]`; tokens promoted into a palette do not also appear in `tokens[]`. Downstream registry materialization is a separate follow-up.
+
 ### Breaking Changes
 
 - breaking(set): every `rafters set <name> <value>` records a `userOverride` diary entry (previousValue + reason) on the token, and the resulting node becomes a cascade anchor -- future upstream changes do not clobber it. Downstream dependents still re-derive against the anchor's new value. The `--no-cascade` flag is removed; the only meaningful flag is now `--reason "..."` (required in `--agent` mode; interactive prompt otherwise). This fixes a silent-clobber bug where cascade-mode sets saved a value, left the binding pointing at the old upstream, and got reverted the next time the upstream changed. Matches the registry's new `set(name, value, { reason })` signature -- the `cascade` option is gone from the public API.

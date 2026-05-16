@@ -10,6 +10,7 @@ import { readFile } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 import type { Token } from '@rafters/shared';
 import { type CSSVariable, parseCSSFile } from '../css-parser.js';
+import { detectRamps } from './ramp-detector.js';
 import type { Importer, ImporterDetection, ImportResult, ImportWarning } from './types.js';
 
 // CSS files where Tailwind v4 @theme blocks live
@@ -112,6 +113,7 @@ function errorResult(message: string, file?: string): ImportResult {
     : { level: 'error', message };
   return {
     tokens: [],
+    palettes: [],
     warnings: [warning],
     source: 'tailwind-v4',
     variablesProcessed: 0,
@@ -258,12 +260,15 @@ export const tailwindV4Importer: Importer = {
       tokens.push(token);
     }
 
+    const { palettes, remaining } = detectRamps(tokens);
+
     return {
-      tokens,
+      tokens: remaining,
+      palettes,
       warnings,
       source: 'tailwind-v4',
       variablesProcessed,
-      tokensCreated: tokens.length,
+      tokensCreated: remaining.length + palettes.reduce((n, p) => n + p.steps.length, 0),
       skipped,
     };
   },

@@ -9,6 +9,7 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { Token } from '@rafters/shared';
 import { type CSSVariable, parseCSSFile } from '../css-parser.js';
+import { detectRamps } from './ramp-detector.js';
 import type { Importer, ImporterDetection, ImportResult, ImportWarning } from './types.js';
 
 // Common shadcn CSS file locations
@@ -277,6 +278,7 @@ export const shadcnImporter: Importer = {
       if (!sourcePath) {
         return {
           tokens: [],
+          palettes: [],
           warnings: [{ level: 'error', message: 'No source path found' }],
           source: 'shadcn',
           variablesProcessed: 0,
@@ -292,6 +294,7 @@ export const shadcnImporter: Importer = {
         const message = err instanceof Error ? err.message : String(err);
         return {
           tokens: [],
+          palettes: [],
           warnings: [{ level: 'error', message: `Failed to read CSS file: ${message}` }],
           source: 'shadcn',
           variablesProcessed: 0,
@@ -306,6 +309,7 @@ export const shadcnImporter: Importer = {
         const message = err instanceof Error ? err.message : String(err);
         return {
           tokens: [],
+          palettes: [],
           warnings: [{ level: 'error', message: `Failed to parse CSS: ${message}` }],
           source: 'shadcn',
           variablesProcessed: 0,
@@ -332,12 +336,15 @@ export const shadcnImporter: Importer = {
       }
     }
 
+    const { palettes, remaining } = detectRamps(tokens);
+
     return {
-      tokens,
+      tokens: remaining,
+      palettes,
       warnings,
       source: 'shadcn',
       variablesProcessed,
-      tokensCreated: tokens.length,
+      tokensCreated: remaining.length + palettes.reduce((n, p) => n + p.steps.length, 0),
       skipped,
     };
   },

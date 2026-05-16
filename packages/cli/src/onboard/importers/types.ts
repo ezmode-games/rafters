@@ -6,6 +6,7 @@
  */
 
 import type { Token } from '@rafters/shared';
+import type { DetectedPalette } from './ramp-detector.js';
 
 /**
  * Metadata about an importer
@@ -63,6 +64,11 @@ export interface ImportWarning {
 export interface ImportResult {
   /** Imported tokens (valid Token[] per @rafters/shared) */
   tokens: Token[];
+  /**
+   * Palettes recovered from CSS ramps (e.g. --empire-50 ... --empire-950).
+   * Tokens emitted as part of a palette do NOT appear in `tokens`.
+   */
+  palettes: DetectedPalette[];
   /** Warnings generated during import */
   warnings: ImportWarning[];
   /** Which importer produced this result */

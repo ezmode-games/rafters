@@ -14,6 +14,7 @@ import {
   type ImportResult,
   registerImporter,
 } from './importers/index.js';
+import type { DetectedPalette } from './importers/ramp-detector.js';
 import { shadcnImporter } from './importers/shadcn.js';
 import { tailwindV4Importer } from './importers/tailwind-v4.js';
 
@@ -34,8 +35,10 @@ function ensureImportersRegistered(): void {
 export interface OnboardResult {
   /** Whether the onboarding succeeded */
   success: boolean;
-  /** Imported tokens (empty if failed) */
+  /** Imported tokens (empty if failed). Tokens promoted into a palette are excluded. */
   tokens: Token[];
+  /** Color palettes recovered from CSS ramps (e.g. --empire-50 ... --empire-950). */
+  palettes: DetectedPalette[];
   /** Which importer was used */
   source: string | null;
   /** Detection confidence (0-1) */
@@ -96,6 +99,7 @@ export async function onboard(
       return {
         success: false,
         tokens: [],
+        palettes: [],
         source: null,
         confidence: 0,
         detectedBy: [],
@@ -117,6 +121,7 @@ export async function onboard(
       return {
         success: false,
         tokens: [],
+        palettes: [],
         source: null,
         confidence: 0,
         detectedBy: [],
@@ -138,6 +143,7 @@ export async function onboard(
     return {
       success: false,
       tokens: [],
+      palettes: [],
       source: match.importer.metadata.id,
       confidence: match.detection.confidence,
       detectedBy: match.detection.detectedBy,
@@ -157,10 +163,12 @@ export async function onboard(
 
   // Check for import errors
   const hasErrors = result.warnings.some((w) => w.level === 'error');
+  const producedOutput = result.tokens.length > 0 || result.palettes.length > 0;
 
   return {
-    success: !hasErrors && result.tokens.length > 0,
+    success: !hasErrors && producedOutput,
     tokens: result.tokens,
+    palettes: result.palettes,
     source: result.source,
     confidence: match.detection.confidence,
     detectedBy: match.detection.detectedBy,

@@ -18,6 +18,7 @@ const token: Token = {
 const successfulResult: OnboardResult = {
   success: true,
   tokens: [token],
+  palettes: [],
   source: 'tailwind-v4',
   confidence: 0.95,
   detectedBy: ['@theme block'],
@@ -96,6 +97,7 @@ describe('toImportPending', () => {
     const failed: OnboardResult = {
       success: false,
       tokens: [],
+      palettes: [],
       source: null,
       confidence: 0,
       detectedBy: [],
@@ -114,6 +116,66 @@ describe('toImportPending', () => {
     };
     const result: OnboardResult = { ...successfulResult, tokens: [colorRef] };
     expect(() => toImportPending(result, projectRoot)).toThrow(/not a source string/);
+  });
+
+  it('emits a palettes[] block when the orchestrator reports palettes', () => {
+    const empireSteps = [
+      '50',
+      '100',
+      '200',
+      '300',
+      '400',
+      '500',
+      '600',
+      '700',
+      '800',
+      '900',
+      '950',
+    ] as const;
+    const empireTokens: Token[] = empireSteps.map((position) => ({
+      name: `empire-${position}`,
+      value: `oklch(0.5 0.1 350)`,
+      category: 'color',
+      namespace: 'color',
+      userOverride: null,
+      semanticMeaning: `Imported from Tailwind v4 --color-empire-${position}`,
+      usageContext: ['light mode', 'default'],
+      containerQueryAware: true,
+    }));
+
+    const result: OnboardResult = {
+      ...successfulResult,
+      tokens: [],
+      palettes: [
+        {
+          name: 'empire',
+          scale: 'tailwind',
+          steps: empireSteps.map((position, i) => ({
+            position,
+            token: empireTokens[i] as Token,
+          })),
+        },
+      ],
+    };
+
+    const doc = toImportPending(result, projectRoot);
+
+    expect(doc.palettes).toHaveLength(1);
+    const palette = doc.palettes?.[0];
+    expect(palette?.name).toBe('empire');
+    expect(palette?.scale).toBe('tailwind');
+    expect(palette?.steps).toHaveLength(11);
+    expect(palette?.decision).toBe('pending');
+    expect(palette?.steps[0]?.position).toBe('50');
+    expect(palette?.steps[0]?.original.name).toBe('--color-empire-50');
+
+    // Round-trip through the schema (palettes[] is now part of ImportPendingSchema)
+    expect(() => ImportPendingSchema.parse(doc)).not.toThrow();
+  });
+
+  it('omits palettes[] when no palettes were detected', () => {
+    const doc = toImportPending(successfulResult, projectRoot);
+    expect(doc.palettes).toBeUndefined();
   });
 });
 

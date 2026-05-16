@@ -7,7 +7,12 @@
 
 import { mkdir, rename, writeFile } from 'node:fs/promises';
 import { dirname, relative } from 'node:path';
-import { type ImportPending, ImportPendingSchema, type PendingToken } from '@rafters/shared';
+import {
+  type ImportPending,
+  ImportPendingSchema,
+  type PendingPalette,
+  type PendingToken,
+} from '@rafters/shared';
 import type { OnboardResult } from './orchestrator.js';
 
 /**
@@ -60,8 +65,34 @@ export function toImportPending(
     };
   });
 
+  const palettes: PendingPalette[] = result.palettes.map((palette) => ({
+    name: palette.name,
+    scale: palette.scale,
+    source: primarySource ?? '',
+    steps: palette.steps.map((step) => {
+      if (typeof step.token.value !== 'string') {
+        throw new Error(
+          `Cannot build ImportPending palette step "${palette.name}-${step.position}": ` +
+            `token.value is a ${typeof step.token.value === 'object' ? 'structured object' : typeof step.token.value}, not a source string. ` +
+            'Importers must produce string values for tokens that map back to source CSS.',
+        );
+      }
+      return {
+        position: step.position,
+        original: {
+          name: extractSourceVarName(step.token.semanticMeaning) ?? step.token.name,
+          value: step.token.value,
+          source: primarySource ?? '',
+        },
+        proposed: step.token,
+      };
+    }),
+    decision: 'pending' as const,
+    confidence: result.confidence,
+  }));
+
   const warnings = result.warnings
-    .filter((w) => w.level !== 'error' || result.tokens.length > 0)
+    .filter((w) => w.level !== 'error' || result.tokens.length > 0 || palettes.length > 0)
     .map((w) => ({ level: w.level, message: w.message }));
 
   const doc: ImportPending = {
@@ -73,6 +104,7 @@ export function toImportPending(
     ...(additionalSources.length > 0 ? { additionalSources } : {}),
     ...(warnings.length > 0 ? { warnings } : {}),
     tokens,
+    ...(palettes.length > 0 ? { palettes } : {}),
   };
 
   // Validate before returning so any schema drift fails loudly
