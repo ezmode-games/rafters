@@ -28,8 +28,14 @@ import {
 
 const REGISTRY_PLUGINS = [scalePlugin, contrastPlugin, statePlugin, invertPlugin];
 
-import { onboard, previewOnboard } from '../onboard/orchestrator.js';
-import { toImportPending, writeImportPending } from '../onboard/writer.js';
+import { type InjectionFramework, injectFontLinks } from '../onboard/font-injector.js';
+import {
+  buildSemanticOverlays,
+  decisionsToConfigOverrides,
+  type OnboardDecisions,
+  paletteTokensFromResult,
+  runOnboardWireUp,
+} from '../onboard/wire-up.js';
 import {
   type ComponentTarget,
   detectProject,
@@ -61,6 +67,15 @@ interface InitOptions {
    * wc | vanilla.
    */
   framework?: string;
+  /**
+   * Onboard wire-up (#1513): in agent mode, accept the highest-
+   * confidence detection without prompting. Palettes are assigned to
+   * the eleven canonical SemanticColorSystem slots in detection order.
+   * Spacing / radius / fonts are accepted as inferred. Without this
+   * flag, agent mode emits a needsDecision payload and exits when a
+   * brand-system is detected (>=2 palettes).
+   */
+  acceptDetected?: boolean;
 }
 
 async function backupCss(cssPath: string): Promise<string> {
@@ -184,6 +199,13 @@ export interface RaftersConfig {
     composites: string[];
     rules: string[];
   };
+  /**
+   * Persisted import decisions when the onboard flow detected existing
+   * CSS and the user (or `--accept-detected`) committed to a mapping
+   * (#1513). `rafters init --reset` re-applies this block verbatim,
+   * skipping every prompt.
+   */
+  import?: OnboardDecisions;
 }
 
 async function findMainCssFile(cwd: string, framework: Framework): Promise<string | null> {
@@ -578,9 +600,41 @@ async function resetToDefaults(
     log({ event: 'init:exports_selected', exports });
   }
 
-  // Re-run generators fresh
-  const system = generateBaseSystem();
+  // Re-run generators fresh, replaying the persisted RaftersConfig.import
+  // decisions (#1513) so --reset is deterministic for CI / agent loops.
+  const importDecisions = existingConfig?.import ?? null;
+  const configOverrides = importDecisions ? decisionsToConfigOverrides(importDecisions) : {};
+  const system = generateBaseSystem(configOverrides);
   const registry = new TokenRegistry(system.allTokens, REGISTRY_PLUGINS);
+
+  if (importDecisions) {
+    // Re-run detection to recover palette step values, then re-apply.
+    const wireOutcome = await runOnboardWireUp(cwd, { agent: true, acceptDetected: true });
+    if (wireOutcome.kind === 'decisions') {
+      for (const token of paletteTokensFromResult(wireOutcome.result)) {
+        try {
+          registry.define(token);
+        } catch {
+          // Skip invalid tokens rather than abort reset.
+        }
+      }
+    }
+    for (const overlay of buildSemanticOverlays(importDecisions)) {
+      try {
+        registry.set(overlay.tokenName, overlay.value, { reason: 'init:reset:onboard' });
+      } catch {
+        // Tokens absent from the regenerated system get skipped.
+      }
+    }
+    log({
+      event: 'init:reset_import_replayed',
+      assigned: importDecisions.palettes.assigned.length,
+      skipped: importDecisions.palettes.skipped.length,
+      spacing: importDecisions.spacing ?? null,
+      radius: importDecisions.radius ?? null,
+      fonts: importDecisions.fonts.map((f) => ({ family: f.family, source: f.source })),
+    });
+  }
 
   log({
     event: 'init:reset_generated',
@@ -807,9 +861,69 @@ export async function init(options: InitOptions): Promise<void> {
     log({ event: 'init:exports_selected', exports });
   }
 
-  // Generate default token system - registry is the source of truth
-  const system = generateBaseSystem();
+  // Onboard wire-up (#1513): detection + decisions BEFORE generateBaseSystem.
+  // Captures detected palettes, spacing/radius systems, and fonts;
+  // returns either decisions, a needs-decision payload (agent mode
+  // without --accept-detected on a brand-system import), or no-detection
+  // (init proceeds with pure defaults).
+  const onboardOutcome = await runOnboardWireUp(cwd, {
+    agent: isAgentMode,
+    acceptDetected: !!options.acceptDetected,
+  });
+
+  if (onboardOutcome.kind === 'needs-decision') {
+    log({
+      event: 'init:needs_decision',
+      palettes: onboardOutcome.palettes,
+      message: onboardOutcome.message,
+      nextStep:
+        'Re-run with --agent --accept-detected to apply detection in canonical order, or run interactively.',
+    });
+    return;
+  }
+
+  const decisions = onboardOutcome.kind === 'decisions' ? onboardOutcome.decisions : null;
+  const onboardResult = onboardOutcome.kind === 'decisions' ? onboardOutcome.result : null;
+
+  // Build BaseSystemConfig from the captured decisions (spacing,
+  // radius, fonts) so the generator emits the system the user's CSS
+  // already encoded -- not pure defaults.
+  const configOverrides = decisions ? decisionsToConfigOverrides(decisions) : {};
+  const system = generateBaseSystem(configOverrides);
   const registry = new TokenRegistry(system.allTokens, REGISTRY_PLUGINS);
+
+  // Overlay detected palette steps + semantic family references.
+  if (decisions && onboardResult) {
+    // Write every palette step token into the registry. Skipped palettes
+    // are still imported as colour families; assigned palettes additionally
+    // anchor a semantic family below.
+    const paletteTokens = paletteTokensFromResult(onboardResult);
+    for (const token of paletteTokens) {
+      try {
+        registry.define(token);
+      } catch {
+        // Skip tokens that fail validation rather than abort init.
+      }
+    }
+    // Materialise semantic-family ColorReference overlays.
+    for (const overlay of buildSemanticOverlays(decisions)) {
+      try {
+        registry.set(overlay.tokenName, overlay.value, {
+          reason: 'init:onboard',
+        });
+      } catch {
+        // Tokens absent from the default semantic layer get skipped.
+      }
+    }
+    log({
+      event: 'init:onboard_applied',
+      assigned: decisions.palettes.assigned.length,
+      skipped: decisions.palettes.skipped.length,
+      spacing: decisions.spacing ?? null,
+      radius: decisions.radius ?? null,
+      fonts: decisions.fonts.map((f) => ({ family: f.family, source: f.source })),
+    });
+  }
 
   log({
     event: 'init:generated',
@@ -891,23 +1005,42 @@ export async function init(options: InitOptions): Promise<void> {
       composites: [],
       rules: [],
     },
+    ...(decisions ? { import: decisions } : {}),
   };
   await writeFile(paths.config, JSON.stringify(config, null, 2));
 
   // Write Claude Code skill so agents follow rafters rules
   await writeRaftersSkill(cwd);
 
-  // Check if the project has existing design decisions that can be onboarded.
-  // Failures here are non-fatal -- init's primary job already succeeded.
-  try {
-    await maybeOnboardExisting(cwd, paths.importPending);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    log({
-      event: 'init:onboard_skipped_after_error',
-      message,
-      suggestion: 'Init completed. Run `rafters import` to retry onboarding.',
+  // Inject Google Fonts <link> tags into the project's layout file
+  // (#1512). Self-hosted / system fonts skip the HTML layer.
+  // Unknown framework or no-canonical-layout returns a copy-paste
+  // snippet -- print it as the FINAL stdout line so the user sees it
+  // on exit.
+  let fontFallbackSnippet: string | null = null;
+  if (decisions && decisions.fonts.length > 0) {
+    const injectionResult = await injectFontLinks({
+      cwd,
+      framework: toInjectionFramework(cwd, framework as Framework),
+      fonts: decisions.fonts,
     });
+    if (injectionResult.injected) {
+      log({
+        event: 'init:fonts_injected',
+        layoutPath: injectionResult.layoutPath,
+        addedFamilies: injectionResult.addedFamilies,
+      });
+    } else if (
+      injectionResult.reason === 'unknown-framework' ||
+      injectionResult.reason === 'no-layout-file'
+    ) {
+      fontFallbackSnippet = injectionResult.snippet;
+    } else {
+      log({
+        event: 'init:fonts_skipped',
+        reason: injectionResult.reason,
+      });
+    }
   }
 
   log({
@@ -915,85 +1048,38 @@ export async function init(options: InitOptions): Promise<void> {
     outputs: [...outputs, 'config.rafters.json'],
     path: paths.output,
   });
+
+  // Final-line copy-paste snippet for the unknown-framework / no-layout-file
+  // paths -- never logged via the JSON logger, printed raw so the user can
+  // copy it.
+  if (fontFallbackSnippet) {
+    process.stdout.write(
+      `\n[rafters] Couldn't auto-inject font tags into your layout. Paste these into your <head>:\n\n${fontFallbackSnippet}\n\n`,
+    );
+  }
 }
 
 /**
- * Detect existing design tokens via the onboard pipeline. When interactive,
- * prompt the user to import. On confirmation, run the orchestrator and write
- * `.rafters/import-pending.json` for review. On decline or agent mode, log
- * the detection so the user knows `rafters import` is available.
- *
- * Skips entirely if import-pending.json already exists -- the user has an
- * in-progress review and init should not clobber it.
+ * Map the project's detected framework (which differentiates only
+ * `next` as one identifier) to the font-injector's framework target
+ * (`next-app` vs `next-pages`). Detects the Next router by
+ * filesystem layout: `app/layout.tsx` -> `next-app`, otherwise
+ * `next-pages`.
  */
-async function maybeOnboardExisting(cwd: string, importPendingPath: string): Promise<void> {
-  if (existsSync(importPendingPath)) {
-    return;
+function toInjectionFramework(cwd: string, framework: Framework): InjectionFramework {
+  if (framework === 'next') {
+    return existsSync(join(cwd, 'app', 'layout.tsx')) || existsSync(join(cwd, 'app', 'layout.jsx'))
+      ? 'next-app'
+      : 'next-pages';
   }
-
-  const preview = await previewOnboard(cwd);
-  if (preview.length === 0) {
-    return;
-  }
-
-  const best = preview[0];
-  if (!best) return;
-
-  // Agent/non-interactive: surface the detection but don't auto-import
-  if (isAgentMode() || !isInteractive()) {
-    log({
-      event: 'import:existing_detected',
-      source: best.importer,
-      confidence: best.confidence,
-      sourcePaths: best.sourcePaths.map((p) => relative(cwd, p)).join(', '),
-      nextStep: 'Run `rafters import` to convert these tokens into pending review.',
-    });
-    return;
-  }
-
-  log({
-    event: 'import:existing_detected',
-    source: best.importer,
-    confidence: best.confidence,
-    sourcePaths: best.sourcePaths.map((p) => relative(cwd, p)).join(', '),
-  });
-
-  // Ctrl-C / Esc at the prompt throws ExitPromptError -- treat as decline
-  let shouldImport: boolean;
-  try {
-    shouldImport = await confirm({
-      message: 'Import these tokens into rafters?',
-      default: true,
-    });
-  } catch {
-    log({ event: 'import:declined' });
-    return;
-  }
-
-  if (!shouldImport) {
-    log({ event: 'import:declined' });
-    return;
-  }
-
-  log({ event: 'import:scanning' });
-  const result = await onboard(cwd);
-
-  if (!result.success) {
-    log({ event: 'import:failed', source: result.source, warnings: result.warnings });
-    return;
-  }
-
-  const doc = toImportPending(result, cwd);
-  await writeImportPending(importPendingPath, doc);
-
-  log({
-    event: 'import:complete',
-    path: relative(cwd, importPendingPath),
-    source: result.source,
-    confidence: result.confidence,
-    tokensCreated: result.stats.tokensCreated,
-    skipped: result.stats.skipped,
-    nextStep:
-      'Review and accept tokens in .rafters/import-pending.json, then run `rafters import --apply`',
-  });
+  if (framework === 'unknown') return 'unknown';
+  // astro | vite | remix | react-router | wc | vanilla map 1:1
+  return framework as InjectionFramework;
 }
+
+// The pre-#1513 fallback `maybeOnboardExisting` is removed. Its role
+// (run after generators to flag existing CSS the user could import) is
+// now covered by the runOnboardWireUp call that runs BEFORE generation
+// and writes the decisions directly into the produced system. The
+// staging-file workflow remains available via `rafters import` /
+// `rafters import --apply` for after init.

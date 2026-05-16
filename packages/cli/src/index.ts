@@ -30,6 +30,10 @@ program
     '--framework <name>',
     'Override framework detection (next|vite|remix|react-router|astro|wc|vanilla)',
   )
+  .option(
+    '--accept-detected',
+    'In agent mode, auto-accept the highest-confidence onboard detection without prompting (#1513)',
+  )
   .option('--agent', 'Output JSON for machine consumption')
   .action(withErrorHandler(init));
 
