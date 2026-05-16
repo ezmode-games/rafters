@@ -362,9 +362,13 @@ export async function ensureTailwindCli(cwd: string): Promise<void> {
 }
 
 /**
- * Generate output files based on export config
+ * Generate output files based on export config.
+ *
+ * Exported so `rafters import --apply` (and any other command that materialises
+ * tokens into outputs) can share the exact same emission path -- the contract
+ * is: same registry + same exports config = same files on disk.
  */
-async function generateOutputs(
+export async function generateOutputs(
   cwd: string,
   paths: ReturnType<typeof getRaftersPaths>,
   registry: TokenRegistry,
@@ -990,6 +994,6 @@ async function maybeOnboardExisting(cwd: string, importPendingPath: string): Pro
     tokensCreated: result.stats.tokensCreated,
     skipped: result.stats.skipped,
     nextStep:
-      'Review and accept tokens in .rafters/import-pending.json, then run `rafters init --rebuild`',
+      'Review and accept tokens in .rafters/import-pending.json, then run `rafters import --apply`',
   });
 }

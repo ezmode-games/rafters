@@ -5,6 +5,7 @@
 ### Minor Changes
 
 - feat(onboard): importers now detect complete color ramps (`--name-50` ... `--name-950`) as palettes instead of flat-lifting each step into an unrelated token (#1402). A ramp is recognised when at least seven Tailwind scale positions of a single family are present; partial ramps stay flat. Detection runs across the Tailwind v4, shadcn, and generic CSS importers via a shared `ramp-detector` utility. `.rafters/import-pending.json` gains an optional `palettes[]` block alongside `tokens[]`; tokens promoted into a palette do not also appear in `tokens[]`. Downstream registry materialization is a separate follow-up.
+- feat(import): `rafters import --apply` merges accepted (and modified) tokens from `.rafters/import-pending.json` into the registry, regenerates outputs, and archives the pending file to `.rafters/import-pending.applied-<ISO>.json` (#1411). Pending tokens are skipped (preserved for the next `--apply`); rejected tokens are skipped (dropped after archive). Modifications overlay the four allowed fields (`name`, `value`, `category`, `namespace`) onto the proposed token; everything else flows through unchanged. Output regeneration shares `generateOutputs` with `init` so the resulting `rafters.css` / `rafters.ts` / `rafters.json` are byte-identical to a fresh init given the same exports config. The nextStep message at the end of `rafters import` and the in-init detection prompt now point at `rafters import --apply` instead of the misleading `rafters init --rebuild` (the latter never read the pending file).
 
 ### Breaking Changes
 
