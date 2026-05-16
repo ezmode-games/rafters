@@ -38,6 +38,10 @@ program
   .description('Import existing design tokens (Tailwind v4, shadcn, generic CSS)')
   .option('--force', 'Overwrite existing .rafters/import-pending.json')
   .option('--importer <id>', 'Force a specific importer (tailwind-v4, shadcn, generic-css)')
+  .option(
+    '--apply',
+    'Merge accepted tokens from .rafters/import-pending.json into the registry and regenerate outputs',
+  )
   .option('--agent', 'Output JSON for machine consumption')
   .action(withErrorHandler(importCommand));
 
