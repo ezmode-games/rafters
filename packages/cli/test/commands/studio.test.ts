@@ -1,29 +1,38 @@
 /**
  * Studio command tests
  *
- * Creates fixture projects, runs rafters init to set up .rafters/,
- * then starts the studio and verifies the token API works.
+ * Creates fixture projects, runs the same generate+save flow that
+ * `rafters init` performs, then exercises the registry's set/cascade
+ * paths to validate the studio command's prerequisites work end-to-end
+ * against the new @rafters/design-tokens package.
  */
 
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import {
-  buildColorSystem,
-  NodePersistenceAdapter,
+  contrastPlugin,
+  generateBaseSystem,
+  invertPlugin,
+  loadRegistryFromDir,
   registryToVars,
+  saveRegistryToDir,
+  scalePlugin,
+  statePlugin,
   TokenRegistry,
-} from '@rafters/design-tokens-v1';
+} from '@rafters/design-tokens';
 import { describe, expect, it } from 'vitest';
 import { cleanupFixture, createFixture } from '../fixtures/projects';
 
+const PLUGINS = [scalePlugin, contrastPlugin, statePlugin, invertPlugin];
+
 async function initProject(projectPath: string): Promise<number> {
-  const result = buildColorSystem();
   const tokensDir = join(projectPath, '.rafters', 'tokens');
   await mkdir(tokensDir, { recursive: true });
-  const adapter = new NodePersistenceAdapter(projectPath);
-  await adapter.save(result.system.allTokens);
-  return result.system.allTokens.length;
+  const system = generateBaseSystem();
+  const registry = new TokenRegistry(system.allTokens, PLUGINS);
+  saveRegistryToDir(tokensDir, registry);
+  return registry.size();
 }
 
 describe('studio prerequisites', () => {
@@ -36,7 +45,6 @@ describe('studio prerequisites', () => {
       const tokensDir = join(fixturePath, '.rafters', 'tokens');
       expect(existsSync(tokensDir)).toBe(true);
 
-      // Check namespace files exist
       const namespaces = [
         'color',
         'spacing',
@@ -102,22 +110,21 @@ describe('studio prerequisites', () => {
     }
   });
 
-  it('tokens can be loaded back via NodePersistenceAdapter', async () => {
+  it('tokens can be loaded back via loadRegistryFromDir', async () => {
     const fixturePath = await createFixture('astro-shadcn-v4');
     try {
       const expectedCount = await initProject(fixturePath);
 
-      const adapter = new NodePersistenceAdapter(fixturePath);
-      const loaded = await adapter.load();
-      expect(loaded.length).toBe(expectedCount);
+      const tokensDir = join(fixturePath, '.rafters', 'tokens');
+      const reloaded = loadRegistryFromDir(tokensDir, PLUGINS);
+      expect(reloaded.size()).toBe(expectedCount);
 
-      // Verify token structure
-      const spacing = loaded.find((t) => t.name === 'spacing-4');
+      const spacing = reloaded.get('spacing-4');
       expect(spacing).toBeTruthy();
       expect(spacing?.namespace).toBe('spacing');
       expect(spacing?.value).toBeTruthy();
 
-      const primary = loaded.find((t) => t.name === 'primary');
+      const primary = reloaded.get('primary');
       expect(primary).toBeTruthy();
       expect(primary?.namespace).toBe('semantic');
     } finally {
@@ -141,9 +148,9 @@ describe('studio prerequisites', () => {
         const count = await initProject(fixturePath);
         expect(count, `${type} should generate 500+ tokens`).toBeGreaterThanOrEqual(500);
 
-        const adapter = new NodePersistenceAdapter(fixturePath);
-        const loaded = await adapter.load();
-        expect(loaded.length, `${type} should load back same count`).toBe(count);
+        const tokensDir = join(fixturePath, '.rafters', 'tokens');
+        const reloaded = loadRegistryFromDir(tokensDir, PLUGINS);
+        expect(reloaded.size(), `${type} should load back same count`).toBe(count);
       } finally {
         await cleanupFixture(fixturePath);
       }
@@ -157,9 +164,8 @@ describe('studio API affects stylesheet in realtime', () => {
     try {
       await initProject(fixturePath);
 
-      const adapter = new NodePersistenceAdapter(fixturePath);
-      const tokens = await adapter.load();
-      const registry = new TokenRegistry(tokens);
+      const tokensDir = join(fixturePath, '.rafters', 'tokens');
+      const registry = loadRegistryFromDir(tokensDir, PLUGINS);
 
       const css = registryToVars(registry);
       expect(css).toContain(':root');
@@ -175,33 +181,19 @@ describe('studio API affects stylesheet in realtime', () => {
     try {
       await initProject(fixturePath);
 
-      const adapter = new NodePersistenceAdapter(fixturePath);
-      const tokens = await adapter.load();
-      const registry = new TokenRegistry(tokens);
-      registry.setAdapter(adapter);
+      const tokensDir = join(fixturePath, '.rafters', 'tokens');
+      const registry = loadRegistryFromDir(tokensDir, PLUGINS);
 
-      // Get initial CSS
       const cssBefore = registryToVars(registry);
 
-      // Find spacing-4 and verify its initial value is in the CSS
       const spacing4 = registry.get('spacing-4');
       expect(spacing4).toBeTruthy();
       if (!spacing4) throw new Error('spacing-4 not found');
 
-      // Set a new value with why-gate
-      await registry.setToken({
-        ...spacing4,
-        value: '99rem',
-        userOverride: {
-          previousValue: spacing4.value,
-          reason: 'Testing realtime CSS update',
-        },
-      });
+      registry.set('spacing-4', '99rem', { reason: 'Testing realtime CSS update' });
 
-      // Generate CSS after change
       const cssAfter = registryToVars(registry);
 
-      // The CSS should be different
       expect(cssAfter).not.toBe(cssBefore);
       expect(cssAfter).toContain('99rem');
       expect(cssBefore).not.toContain('99rem');
@@ -215,24 +207,20 @@ describe('studio API affects stylesheet in realtime', () => {
     try {
       await initProject(fixturePath);
 
-      const adapter = new NodePersistenceAdapter(fixturePath);
-      const tokens = await adapter.load();
-      const registry = new TokenRegistry(tokens);
+      const tokensDir = join(fixturePath, '.rafters', 'tokens');
+      const registry = loadRegistryFromDir(tokensDir, PLUGINS);
 
       const cssBefore = registryToVars(registry);
 
-      // Find a color family token that semantic tokens depend on
       const colorTokens = registry.list({ namespace: 'color' });
       const familyToken = colorTokens.find(
         (t) => typeof t.value === 'object' && t.value !== null && 'scale' in t.value,
       );
       expect(familyToken).toBeTruthy();
 
-      // Verify semantic tokens reference this family
       const semanticTokens = registry.list({ namespace: 'semantic' });
       expect(semanticTokens.length).toBeGreaterThan(0);
 
-      // The CSS should contain semantic variable blocks
       expect(cssBefore).toContain('--primary');
       expect(cssBefore).toContain('--background');
       expect(cssBefore).toContain('--foreground');
@@ -250,12 +238,9 @@ describe('studio API affects stylesheet in realtime', () => {
       await mkdir(outputDir, { recursive: true });
       const outputPath = join(outputDir, 'rafters.vars.css');
 
-      const adapter = new NodePersistenceAdapter(fixturePath);
-      const tokens = await adapter.load();
-      const registry = new TokenRegistry(tokens);
-      registry.setAdapter(adapter);
+      const tokensDir = join(fixturePath, '.rafters', 'tokens');
+      const registry = loadRegistryFromDir(tokensDir, PLUGINS);
 
-      // Write initial CSS
       const cssInitial = registryToVars(registry);
       await writeFile(outputPath, cssInitial);
       expect(existsSync(outputPath)).toBe(true);
@@ -263,21 +248,15 @@ describe('studio API affects stylesheet in realtime', () => {
       const initialContent = await readFile(outputPath, 'utf-8');
       expect(initialContent).toContain(':root');
 
-      // Update a token
       const spacing8 = registry.get('spacing-8');
       expect(spacing8).toBeTruthy();
       if (!spacing8) throw new Error('spacing-8 not found');
 
-      await registry.setToken({
-        ...spacing8,
-        value: '77rem',
-        userOverride: {
-          previousValue: spacing8.value,
-          reason: 'Verify disk persistence and CSS regeneration',
-        },
+      registry.set('spacing-8', '77rem', {
+        reason: 'Verify disk persistence and CSS regeneration',
       });
+      saveRegistryToDir(tokensDir, registry);
 
-      // Regenerate and write CSS (simulating what the Vite plugin does)
       const cssUpdated = registryToVars(registry);
       await writeFile(outputPath, cssUpdated);
 
@@ -285,9 +264,8 @@ describe('studio API affects stylesheet in realtime', () => {
       expect(updatedContent).toContain('77rem');
       expect(initialContent).not.toContain('77rem');
 
-      // Verify the token was persisted to disk
-      const reloaded = await adapter.load();
-      const reloadedSpacing8 = reloaded.find((t) => t.name === 'spacing-8');
+      const reloaded = loadRegistryFromDir(tokensDir, PLUGINS);
+      const reloadedSpacing8 = reloaded.get('spacing-8');
       expect(reloadedSpacing8?.value).toBe('77rem');
       expect(reloadedSpacing8?.userOverride?.reason).toBe(
         'Verify disk persistence and CSS regeneration',
@@ -302,15 +280,13 @@ describe('studio API affects stylesheet in realtime', () => {
     try {
       await initProject(fixturePath);
 
-      const adapter = new NodePersistenceAdapter(fixturePath);
-      const tokens = await adapter.load();
-      const registry = new TokenRegistry(tokens);
+      const tokensDir = join(fixturePath, '.rafters', 'tokens');
+      const registry = loadRegistryFromDir(tokensDir, PLUGINS);
 
-      // Make several rapid changes
       for (const name of ['spacing-1', 'spacing-2', 'spacing-3']) {
         const token = registry.get(name);
         if (token) {
-          registry.updateToken(name, `${name}-custom-value`);
+          registry.set(name, `${name}-custom-value`, { reason: 'rapid change test' });
         }
       }
 

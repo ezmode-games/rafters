@@ -225,9 +225,9 @@ importers:
       '@rafters/composites':
         specifier: workspace:*
         version: link:../../packages/composites
-      '@rafters/design-tokens-v1':
+      '@rafters/design-tokens':
         specifier: workspace:*
-        version: link:../../packages/design-tokens-v1
+        version: link:../../packages/design-tokens
       '@rafters/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -290,9 +290,9 @@ importers:
       '@astrojs/react':
         specifier: ^4.4.2
         version: 4.4.2(@types/node@24.10.0)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(jiti@2.6.1)(lightningcss@1.32.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
-      '@rafters/design-tokens-v1':
+      '@rafters/design-tokens':
         specifier: workspace:*
-        version: link:../../packages/design-tokens-v1
+        version: link:../../packages/design-tokens
       '@tailwindcss/vite':
         specifier: ^4.1.18
         version: 4.1.18(vite@8.0.0(@types/node@24.10.0)(esbuild@0.27.3)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
@@ -367,9 +367,6 @@ importers:
       '@rafters/design-tokens':
         specifier: workspace:*
         version: link:../design-tokens
-      '@rafters/design-tokens-v1':
-        specifier: workspace:*
-        version: link:../design-tokens-v1
       '@rafters/shared':
         specifier: workspace:*
         version: link:../shared
@@ -565,9 +562,9 @@ importers:
       '@rafters/color-utils':
         specifier: workspace:*
         version: link:../color-utils
-      '@rafters/design-tokens-v1':
+      '@rafters/design-tokens':
         specifier: workspace:*
-        version: link:../design-tokens-v1
+        version: link:../design-tokens
       '@rafters/shared':
         specifier: workspace:*
         version: link:../shared
