@@ -155,6 +155,31 @@ export const PendingPaletteSchema = z
   .strict();
 
 /**
+ * User decision captured by the brand-import prompt (#1401). Attached to
+ * ImportPending when the prompt ran -- either interactively or via the
+ * `--assume-brand=primary:<name>` non-interactive flag. Downstream
+ * consumers (init wire-up, --apply) use this to apply the user's chosen
+ * primary/mode/keepDefaultSemantics decisions when materialising tokens.
+ */
+export const PendingBrandDecisionSchema = z
+  .object({
+    /** Palette family chosen as the primary brand colour. */
+    primary: z.string(),
+    /**
+     * Whether the other palettes are mutually-exclusive themes (designer
+     * picks one at runtime) or coexisting families (all available).
+     */
+    mode: z.enum(['themes', 'coexisting']),
+    /**
+     * When true, the default neutral semantic layer
+     * (background, foreground, muted, ...) is still applied on top of
+     * the user's palettes.
+     */
+    keepDefaultSemantics: z.boolean(),
+  })
+  .strict();
+
+/**
  * Brand system signal emitted by the importer when source CSS encodes
  * multiple complete color palettes (#1403). Consumers (init, Studio) read
  * this to know whether to pause default semantic assignment and prompt
@@ -226,6 +251,14 @@ export const ImportPendingSchema = z
      * prompt the user before applying default semantics.
      */
     brandSystem: PendingBrandSystemSchema.optional(),
+
+    /**
+     * User's brand-import decision (#1401). Present when the import
+     * command ran the prompt (interactively or via `--assume-brand`)
+     * and the user committed to a primary/mode/keepDefaultSemantics
+     * choice.
+     */
+    brandDecision: PendingBrandDecisionSchema.optional(),
   })
   .strict();
 
@@ -236,4 +269,5 @@ export type PendingToken = z.infer<typeof PendingTokenSchema>;
 export type PendingPaletteStep = z.infer<typeof PendingPaletteStepSchema>;
 export type PendingPalette = z.infer<typeof PendingPaletteSchema>;
 export type PendingBrandSystem = z.infer<typeof PendingBrandSystemSchema>;
+export type PendingBrandDecision = z.infer<typeof PendingBrandDecisionSchema>;
 export type ImportPending = z.infer<typeof ImportPendingSchema>;

@@ -14,12 +14,18 @@
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, rename } from 'node:fs/promises';
 import { relative } from 'node:path';
+import type { PendingBrandDecision, PendingBrandSystem } from '@rafters/shared';
 import { applyPending } from '../onboard/apply.js';
+import {
+  buildNeedsDecision,
+  parseAssumeBrand,
+  promptBrandImport,
+} from '../onboard/interactive-prompt.js';
 import { onboard, previewOnboard } from '../onboard/orchestrator.js';
 import { toImportPending, writeImportPending } from '../onboard/writer.js';
 import { DEFAULT_EXPORTS, type ExportConfig } from '../utils/exports.js';
 import { getRaftersPaths } from '../utils/paths.js';
-import { log, setAgentMode } from '../utils/ui.js';
+import { isAgentMode, log, setAgentMode } from '../utils/ui.js';
 import { generateOutputs, type RaftersConfig } from './init.js';
 
 interface ImportOptions {
@@ -27,6 +33,17 @@ interface ImportOptions {
   agent?: boolean;
   importer?: string;
   apply?: boolean;
+  /**
+   * Non-interactive brand-import resolution (#1401).
+   *   - `flat`: skip the prompt; treat detected palettes as flat colour families.
+   *   - `primary:<name>`: pre-select the primary palette.
+   * Other forms throw.
+   */
+  assumeBrand?: string;
+}
+
+function isInteractive(): boolean {
+  return Boolean(process.stdin.isTTY && process.stdout.isTTY);
 }
 
 export async function importCommand(options: ImportOptions): Promise<void> {
@@ -99,6 +116,31 @@ export async function importCommand(options: ImportOptions): Promise<void> {
   }
 
   const doc = toImportPending(result, cwd);
+
+  // Brand-import decision flow (#1401): when the classifier flagged a
+  // brand system, walk the user through primary/mode/keepDefaultSemantics
+  // before writing the pending file. Honours --assume-brand=... for
+  // non-interactive resolution.
+  if (doc.brandSystem?.detected) {
+    const decision = await resolveBrandDecision(doc.brandSystem, options.assumeBrand);
+    if (decision === 'declined') {
+      log({ event: 'import:declined' });
+      return;
+    }
+    if (decision === 'needs-decision') {
+      log({
+        event: 'import:needs_brand_decision',
+        ...buildNeedsDecision(doc.brandSystem),
+        nextStep:
+          'Re-run with --assume-brand=flat to keep the palettes flat, or --assume-brand=primary:<name> to pick a primary.',
+      });
+      return;
+    }
+    if (decision !== 'flat') {
+      doc.brandDecision = decision;
+    }
+  }
+
   await writeImportPending(paths.importPending, doc);
 
   log({
@@ -108,6 +150,8 @@ export async function importCommand(options: ImportOptions): Promise<void> {
     confidence: result.confidence,
     tokensCreated: result.stats.tokensCreated,
     skipped: result.stats.skipped,
+    brandDetected: doc.brandSystem?.detected ?? false,
+    brandDecision: doc.brandDecision,
     nextStep:
       'Review and accept tokens in .rafters/import-pending.json, then run `rafters import --apply`',
   });
@@ -156,4 +200,31 @@ async function runApply(cwd: string, paths: ReturnType<typeof getRaftersPaths>):
     archive: relative(cwd, result.archivedTo),
     outputs,
   });
+}
+
+/**
+ * Resolve the brand-import decision from flags, environment, or prompt.
+ *
+ * Precedence:
+ *   1. `--assume-brand=...` (parsed; throws if malformed)
+ *   2. Agent / non-interactive mode -> `needs-decision`
+ *   3. Interactive prompt; Ctrl-C / Esc -> `declined`
+ */
+async function resolveBrandDecision(
+  brandSystem: PendingBrandSystem,
+  assumeBrand: string | undefined,
+): Promise<PendingBrandDecision | 'flat' | 'needs-decision' | 'declined'> {
+  const preset = parseAssumeBrand(assumeBrand);
+  if (preset === 'flat') return 'flat';
+  if (preset) return preset;
+
+  if (isAgentMode() || !isInteractive()) {
+    return 'needs-decision';
+  }
+
+  try {
+    return await promptBrandImport(brandSystem);
+  } catch {
+    return 'declined';
+  }
 }

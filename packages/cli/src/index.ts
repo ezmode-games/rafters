@@ -42,6 +42,10 @@ program
     '--apply',
     'Merge accepted tokens from .rafters/import-pending.json into the registry and regenerate outputs',
   )
+  .option(
+    '--assume-brand <value>',
+    'Non-interactive brand resolution: "flat" (treat palettes as flat) or "primary:<name>" (pre-select primary)',
+  )
   .option('--agent', 'Output JSON for machine consumption')
   .action(withErrorHandler(importCommand));
 
