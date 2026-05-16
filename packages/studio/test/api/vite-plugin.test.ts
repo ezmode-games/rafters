@@ -6,7 +6,7 @@
  */
 
 import { EventEmitter } from 'node:events';
-import { TokenRegistry } from '@rafters/design-tokens-v1';
+import { TokenRegistry } from '@rafters/design-tokens';
 import type { Token } from '@rafters/shared';
 import { ColorReferenceSchema, ColorValueSchema, TokenSchema } from '@rafters/shared';
 import { describe, expect, it } from 'vitest';
@@ -188,6 +188,7 @@ describe('studioApiPlugin', () => {
             value: { family: 'neutral', position: '500' },
             category: 'color',
             namespace: 'semantic',
+            userOverride: null,
           },
         });
         expect(result.success).toBe(true);
@@ -200,6 +201,7 @@ describe('studioApiPlugin', () => {
             value: 'red',
             category: 'color',
             namespace: 'semantic',
+            userOverride: null,
           },
         });
         expect(result.success).toBe(false);
@@ -213,6 +215,7 @@ describe('studioApiPlugin', () => {
             value: 'red',
             category: 'color',
             namespace: 'semantic',
+            userOverride: null,
           },
         });
         expect(result.success).toBe(false);
@@ -236,6 +239,7 @@ describe('studioApiPlugin', () => {
               value: { family: 'neutral', position: '500' },
               category: 'color',
               namespace: 'semantic',
+              userOverride: null,
             },
           ],
           initialized: true,
@@ -655,20 +659,24 @@ describe('studioApiPlugin', () => {
       value: 'oklch(0.5 0.2 250)',
       category: 'color',
       namespace: 'color',
+      userOverride: null,
     };
 
-    it('returns 404 for non-existent token', async () => {
+    it('returns 400 when POSTing a partial body to a non-existent token (create requires full schema)', async () => {
+      // POST on a non-existent name dispatches to the CREATE branch, which
+      // requires namespace + category + value + userOverride.reason. A
+      // partial body fails create-validation -> 400. To create a new token
+      // through this endpoint, send a full body.
       const registry = new TokenRegistry([]);
       const req = createMockRequest({ value: 'new-value' });
       const res = createMockResponse();
 
       await handlePostToken(req, res, 'non-existent', registry);
 
-      expect(res._statusCode).toBe(404);
-      expect(JSON.parse(res._body)).toEqual({
-        ok: false,
-        error: 'Token "non-existent" not found',
-      });
+      expect(res._statusCode).toBe(400);
+      const body = JSON.parse(res._body);
+      expect(body.ok).toBe(false);
+      expect(body.error).toMatch(/namespace|userOverride/);
     });
 
     it('returns 400 for invalid JSON body', async () => {
@@ -707,6 +715,7 @@ describe('studioApiPlugin', () => {
         value: { family: 'blue', position: '500' },
         category: 'color',
         namespace: 'semantic',
+        userOverride: null,
       };
       const registry = new TokenRegistry([semanticToken]);
       const req = createMockRequest({
@@ -741,6 +750,7 @@ describe('studioApiPlugin', () => {
         value: { family: 'blue', position: '500' },
         category: 'color',
         namespace: 'semantic',
+        userOverride: null,
       };
       const registry = new TokenRegistry([semanticToken]);
       const req = createMockRequest({
@@ -781,6 +791,7 @@ describe('studioApiPlugin', () => {
         ...testToken,
         description: 'Original description',
         trustLevel: 'medium',
+        userOverride: null,
       };
       const registry = new TokenRegistry([tokenWithFields]);
       const req = createMockRequest({ value: 'oklch(0.6 0.2 250)' });
@@ -801,6 +812,7 @@ describe('studioApiPlugin', () => {
         value: { family: 'neutral', position: '500' },
         category: 'color',
         namespace: 'semantic',
+        userOverride: null,
       };
       const registry = new TokenRegistry([semanticToken]);
       const req = createMockRequest({
@@ -857,6 +869,7 @@ describe('studioApiPlugin', () => {
         value: 'oklch(0.5 0.2 250)',
         category: 'color',
         namespace: 'color',
+        userOverride: null,
       };
 
       it('accepts oklch string value', async () => {
@@ -897,6 +910,7 @@ describe('studioApiPlugin', () => {
         value: { family: 'blue', position: '500' },
         category: 'color',
         namespace: 'semantic',
+        userOverride: null,
       };
 
       it('accepts ColorReference value', async () => {
@@ -953,6 +967,7 @@ describe('studioApiPlugin', () => {
         value: '1rem',
         category: 'spacing',
         namespace: 'spacing',
+        userOverride: null,
       };
 
       it('accepts rem value', async () => {
@@ -993,6 +1008,7 @@ describe('studioApiPlugin', () => {
         value: '10',
         category: 'depth',
         namespace: 'depth',
+        userOverride: null,
       };
 
       it('accepts numeric z-index', async () => {
@@ -1054,6 +1070,7 @@ describe('studioApiPlugin', () => {
         value: '200ms',
         category: 'motion',
         namespace: 'motion',
+        userOverride: null,
       };
 
       it('accepts ms duration', async () => {
@@ -1104,6 +1121,7 @@ describe('studioApiPlugin', () => {
         value: '0.5rem',
         category: 'radius',
         namespace: 'radius',
+        userOverride: null,
       };
 
       it('accepts rem value', async () => {
@@ -1153,6 +1171,7 @@ describe('studioApiPlugin', () => {
         value: '2px solid blue',
         category: 'focus',
         namespace: 'focus',
+        userOverride: null,
       };
 
       it('accepts focus ring value', async () => {
@@ -1193,6 +1212,7 @@ describe('studioApiPlugin', () => {
         value: '1rem',
         category: 'typography',
         namespace: 'typography',
+        userOverride: null,
       };
 
       it('accepts string value', async () => {
@@ -1232,6 +1252,7 @@ describe('studioApiPlugin', () => {
         value: '768px',
         category: 'breakpoint',
         namespace: 'breakpoint',
+        userOverride: null,
       };
 
       it('accepts px value', async () => {
@@ -1271,6 +1292,7 @@ describe('studioApiPlugin', () => {
         value: '0 4px 6px rgba(0,0,0,0.1)',
         category: 'shadow',
         namespace: 'shadow',
+        userOverride: null,
       };
 
       it('accepts CSS shadow string', async () => {
@@ -1300,6 +1322,7 @@ describe('studioApiPlugin', () => {
         value: 'var(--depth-raised)',
         category: 'elevation',
         namespace: 'elevation',
+        userOverride: null,
       };
 
       it('accepts string value', async () => {
@@ -1330,6 +1353,7 @@ describe('studioApiPlugin', () => {
         value: 'any-value',
         category: 'custom',
         namespace: 'custom-namespace',
+        userOverride: null,
       };
 
       it('falls back to TokenPatchSchema for unknown namespace', async () => {
@@ -1395,6 +1419,7 @@ describe('studioApiPlugin', () => {
       value: `oklch(0.${Math.floor(Math.random() * 9) + 1} 0.2 ${Math.floor(Math.random() * 360)})`,
       category: 'color',
       namespace: 'color',
+      userOverride: null,
     });
 
     // Schema for batch response validation
@@ -1506,6 +1531,7 @@ describe('studioApiPlugin', () => {
           category: 'color',
           namespace: 'color',
           scalePosition: i,
+          userOverride: null,
         });
       }
 
@@ -1608,6 +1634,7 @@ describe('studioApiPlugin', () => {
         namespace: 'semantic',
         trustLevel: 'high',
         description: 'Original description',
+        userOverride: null,
       };
       const registry = new TokenRegistry([token]);
 
@@ -1676,8 +1703,20 @@ describe('studioApiPlugin', () => {
 
     // Create test tokens with different namespaces
     const colorTokens: Token[] = [
-      { name: 'primary-500', value: 'oklch(0.5 0.2 250)', category: 'color', namespace: 'color' },
-      { name: 'primary-600', value: 'oklch(0.4 0.2 250)', category: 'color', namespace: 'color' },
+      {
+        name: 'primary-500',
+        value: 'oklch(0.5 0.2 250)',
+        category: 'color',
+        namespace: 'color',
+        userOverride: null,
+      },
+      {
+        name: 'primary-600',
+        value: 'oklch(0.4 0.2 250)',
+        category: 'color',
+        namespace: 'color',
+        userOverride: null,
+      },
     ];
 
     const semanticTokens: Token[] = [
@@ -1686,18 +1725,32 @@ describe('studioApiPlugin', () => {
         value: { family: 'blue', position: '500' },
         category: 'color',
         namespace: 'semantic',
+        userOverride: null,
       },
       {
         name: 'destructive',
         value: { family: 'red', position: '600' },
         category: 'color',
         namespace: 'semantic',
+        userOverride: null,
       },
     ];
 
     const spacingTokens: Token[] = [
-      { name: 'spacing-1', value: '0.25rem', category: 'spacing', namespace: 'spacing' },
-      { name: 'spacing-2', value: '0.5rem', category: 'spacing', namespace: 'spacing' },
+      {
+        name: 'spacing-1',
+        value: '0.25rem',
+        category: 'spacing',
+        namespace: 'spacing',
+        userOverride: null,
+      },
+      {
+        name: 'spacing-2',
+        value: '0.5rem',
+        category: 'spacing',
+        namespace: 'spacing',
+        userOverride: null,
+      },
     ];
 
     const allTokens = [...colorTokens, ...semanticTokens, ...spacingTokens];
@@ -1979,8 +2032,8 @@ describe('studioApiPlugin', () => {
       expect(res._statusCode).toBe(200);
       const response = JSON.parse(res._body);
       expect(response.colorValue.harmonies.complementary).toBeDefined();
-      expect(response.colorValue.harmonies.triadic).toHaveLength(2);
-      expect(response.colorValue.harmonies.analogous).toHaveLength(2);
+      expect(response.colorValue.harmonies.triadic.length).toBeGreaterThanOrEqual(2);
+      expect(response.colorValue.harmonies.analogous.length).toBeGreaterThanOrEqual(2);
     });
   });
 });

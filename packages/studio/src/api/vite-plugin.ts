@@ -12,10 +12,27 @@
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { buildColorValue } from '@rafters/color-utils';
-import { NodePersistenceAdapter, registryToVars, TokenRegistry } from '@rafters/design-tokens-v1';
+import {
+  contrastPlugin,
+  invertPlugin,
+  loadRegistryFromDir,
+  registryToVars,
+  saveRegistryToDir,
+  scalePlugin,
+  statePlugin,
+  TokenRegistry,
+} from '@rafters/design-tokens';
 import { ColorReferenceSchema, ColorValueSchema, OKLCHSchema, TokenSchema } from '@rafters/shared';
 import type { Plugin, ViteDevServer } from 'vite';
 import { z } from 'zod';
+
+const REGISTRY_PLUGINS = [scalePlugin, contrastPlugin, statePlugin, invertPlugin];
+
+// Default reason recorded on userOverride for studio-driven changes that
+// don't supply one explicitly. The studio UI is interactive editing -- every
+// change is a designer decision, even when the surface didn't capture a
+// specific motivation.
+const STUDIO_REASON_DEFAULT = 'studio interactive edit';
 
 // Response schemas
 const TokenResponseSchema = z.object({
@@ -55,6 +72,7 @@ const SetTokenMessageSchema = z.object({
   name: z.string().min(1),
   value: z.union([z.string(), ColorValueSchema, ColorReferenceSchema]),
   persist: z.boolean().optional(),
+  reason: z.string().optional(),
 });
 
 // Schema for POST /api/tokens/:name - partial token update
@@ -366,7 +384,8 @@ export async function handlePostToken(
     }
 
     try {
-      registry.add(tokenResult.data);
+      // Brand-new token: define handles metadata + value + binding atomically.
+      registry.define(tokenResult.data);
       const response = TokenResponseSchema.parse({ ok: true, token: registry.get(name) });
       res.statusCode = 201;
       res.end(JSON.stringify(response));
@@ -408,9 +427,22 @@ export async function handlePostToken(
     return;
   }
 
-  // Update full token via registry (handles cascade + persist)
+  // Update existing token. Two paths in the new registry:
+  //   - value change      -> registry.set(name, value, { reason })
+  //                          (records userOverride; cascades through bindings)
+  //   - metadata refresh  -> registry.define(token)
+  //                          (re-establishes metadata + binding atomically)
+  // The patch path runs both: define applies the merged metadata; set captures
+  // the value transition with a userOverride diary entry. The reason is taken
+  // from the patch's userOverride.reason if present (the API has always
+  // required reason on create -- patches can carry one too) or defaults to
+  // STUDIO_REASON_DEFAULT.
   try {
-    await registry.setToken(tokenResult.data);
+    const merged = tokenResult.data;
+    const patchOverride = (patchResult.data as { userOverride?: { reason?: string } }).userOverride;
+    const reason = patchOverride?.reason ?? STUDIO_REASON_DEFAULT;
+    registry.define(merged);
+    registry.set(merged.name, merged.value, { reason });
     const updatedToken = registry.get(name);
     const response = TokenResponseSchema.parse({ ok: true, token: updatedToken });
     res.end(JSON.stringify(response));
@@ -514,11 +546,16 @@ export async function handlePostTokens(
     }
   }
 
-  // Batch update via registry (single persist)
+  // Batch update -- loop define+set per token. The new registry doesn't ship
+  // a transactional batch primitive; the cascade still walks correctly per
+  // call. Persistence is handled at the call site (the configureServer
+  // wrapper invokes saveRegistryToDir after the request completes).
   try {
-    await registry.setTokens(tokens);
-
-    // Return updated tokens
+    for (const token of tokens) {
+      const reason = token.userOverride?.reason ?? STUDIO_REASON_DEFAULT;
+      registry.define(token);
+      registry.set(token.name, token.value, { reason });
+    }
     const updatedTokens = tokens.map((t) => registry.get(t.name)).filter(Boolean);
     const response = TokensResponseSchema.parse({
       tokens: updatedTokens,
@@ -540,12 +577,12 @@ export function studioApiPlugin(): Plugin {
     name: 'rafters-studio-api',
 
     async configureServer(server: ViteDevServer) {
-      // Initialize registry from persistence
+      // Initialize registry from persisted .rafters/tokens (already carries the
+      // binding tree from `rafters init`); plugins are registered here so any
+      // semantic with a state/contrast/scale/invert binding resolves at load.
+      const tokensDir = join(projectPath, '.rafters', 'tokens');
       try {
-        const adapter = new NodePersistenceAdapter(projectPath);
-        const tokens = await adapter.load();
-        registry = new TokenRegistry(tokens);
-        registry.setAdapter(adapter);
+        registry = loadRegistryFromDir(tokensDir, REGISTRY_PLUGINS);
         initialized = true;
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
@@ -553,20 +590,25 @@ export function studioApiPlugin(): Plugin {
         if (message.includes('ENOENT')) {
           console.log(`[rafters] No project found at ${projectPath}. Run 'rafters init' first.`);
         }
-        // Create empty registry as fallback
-        registry = new TokenRegistry([]);
+        registry = new TokenRegistry([], REGISTRY_PLUGINS);
         initialized = false;
       }
 
-      // Change callback: regenerate CSS for HMR
-      registry.setChangeCallback(async () => {
+      // Persist the registry to disk and signal HMR. Replaces v1's
+      // setChangeCallback / setAdapter wiring -- callers explicitly invoke
+      // this after each change instead of relying on a registry-internal
+      // callback chain.
+      const persistAndNotify = async (): Promise<void> => {
         try {
+          if (initialized) {
+            saveRegistryToDir(tokensDir, registry);
+          }
           await writeFile(outputPath, registryToVars(registry));
           server.ws.send({ type: 'custom', event: 'rafters:css-updated' });
         } catch (error) {
           console.log(`[rafters] CSS regeneration failed: ${error}`);
         }
-      });
+      };
 
       // Listen for token updates from client
       server.ws.on('rafters:set-token', async (rawData: unknown, client) => {
@@ -605,12 +647,15 @@ export function studioApiPlugin(): Plugin {
           }
         }
 
+        const reason = data.reason ?? STUDIO_REASON_DEFAULT;
         try {
-          // Local update (instant feedback)
+          // Local update (instant feedback). The new registry always records a
+          // userOverride diary entry on set; cascade to dependents fires
+          // through the binding graph. shouldPersist controls whether we
+          // additionally write to disk + signal HMR.
+          registry.set(data.name, data.value, { reason });
           if (shouldPersist) {
-            await registry.set(data.name, data.value);
-          } else {
-            registry.updateToken(data.name, data.value);
+            await persistAndNotify();
           }
           client.send('rafters:token-updated', {
             ok: true,
@@ -630,7 +675,10 @@ export function studioApiPlugin(): Plugin {
                     ...(current.value as Record<string, unknown>),
                     intelligence: apiColor.intelligence,
                   } as typeof current.value;
-                  await registry.set(data.name, enrichedValue);
+                  registry.set(data.name, enrichedValue, {
+                    reason: `${reason} (enriched by api.rafters.studio)`,
+                  });
+                  await persistAndNotify();
                   client.send('rafters:color-enriched', {
                     name: data.name,
                     intelligence: apiColor.intelligence,

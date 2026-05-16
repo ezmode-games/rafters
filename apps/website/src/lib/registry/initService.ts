@@ -3,7 +3,15 @@
  * Generates the init payload for `rafters init`
  */
 
-import { buildColorSystem } from '@rafters/design-tokens-v1';
+import {
+  contrastPlugin,
+  generateBaseSystem,
+  invertPlugin,
+  registryToTailwind,
+  scalePlugin,
+  statePlugin,
+  TokenRegistry,
+} from '@rafters/design-tokens';
 
 export interface InitPayload {
   version: string;
@@ -17,16 +25,18 @@ export interface InitPayload {
  * Generate the init payload with theme.css and config
  */
 export function generateInitPayload(): InitPayload {
-  // Generate the complete token system with Tailwind export
-  const result = buildColorSystem({
-    exports: {
-      tailwind: { includeImport: true },
-    },
-  });
+  // Generate the complete token system + Tailwind export. Replaces
+  // v1's buildColorSystem({exports: {tailwind: {...}}}) wrapper -- the
+  // new package separates generation from export so the caller drives both.
+  const system = generateBaseSystem();
+  const registry = new TokenRegistry(system.allTokens, [
+    scalePlugin,
+    contrastPlugin,
+    statePlugin,
+    invertPlugin,
+  ]);
+  const themeCss = registryToTailwind(registry, { includeImport: true });
 
-  const themeCss = result.exports.tailwind || '';
-
-  // Default config
   const config = {
     $schema: 'https://rafters.studio/schema/config.json',
     version: '0.0.1',

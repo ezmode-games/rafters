@@ -1,68 +1,56 @@
 /**
  * Setup standalone Studio development
  *
- * Creates a minimal .rafters structure within the studio package
- * so Studio can run without the CLI or a real project.
- *
- * Uses the same pattern as `rafters init` - buildColorSystem + NodePersistenceAdapter.
+ * Creates a minimal .rafters structure within the studio package so Studio
+ * can run without the CLI or a real project. Mirrors what `rafters init`
+ * does but inlined here to avoid pulling the CLI as a dev dep.
  */
 
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import {
-  buildColorSystem,
-  NodePersistenceAdapter,
+  contrastPlugin,
+  generateBaseSystem,
+  invertPlugin,
   registryToTailwind,
-} from '@rafters/design-tokens-v1';
+  saveRegistryToDir,
+  scalePlugin,
+  statePlugin,
+  TokenRegistry,
+} from '@rafters/design-tokens';
 
 const STUDIO_ROOT = join(import.meta.dirname, '..');
 const RAFTERS_ROOT = join(STUDIO_ROOT, '.rafters');
+const TOKENS_DIR = join(RAFTERS_ROOT, 'tokens');
 const OUTPUT_DIR = join(RAFTERS_ROOT, 'output');
 
-async function main() {
+async function main(): Promise<void> {
   console.log('Setting up standalone Studio development...\n');
 
-  // Create output directory
+  await mkdir(TOKENS_DIR, { recursive: true });
   await mkdir(OUTPUT_DIR, { recursive: true });
 
-  // Generate default token system (same as rafters init)
-  const result = buildColorSystem({
-    exports: {
-      tailwind: { includeImport: true },
-      typescript: { includeJSDoc: true },
-      dtcg: true,
-    },
-  });
-
-  const { registry } = result;
+  const system = generateBaseSystem();
+  const registry = new TokenRegistry(system.allTokens, [
+    scalePlugin,
+    contrastPlugin,
+    statePlugin,
+    invertPlugin,
+  ]);
   console.log(`Generated ${registry.size()} tokens\n`);
 
-  // Save tokens using NodePersistenceAdapter (same as rafters init)
-  const adapter = new NodePersistenceAdapter(STUDIO_ROOT);
-  const tokensByNamespace = new Map<string, typeof result.system.allTokens>();
+  saveRegistryToDir(TOKENS_DIR, registry);
+  const namespaces = new Set(registry.list().map((t) => t.namespace));
+  console.log(`  Saved tokens across ${namespaces.size} namespaces`);
 
-  for (const token of registry.list()) {
-    if (!tokensByNamespace.has(token.namespace)) {
-      tokensByNamespace.set(token.namespace, []);
-    }
-    tokensByNamespace.get(token.namespace)?.push(token);
-  }
-
-  for (const [namespace, tokens] of tokensByNamespace) {
-    await adapter.saveNamespace(namespace, tokens);
-    console.log(`  Saved ${tokens.length} tokens to ${namespace}.rafters.json`);
-  }
-
-  // Generate CSS output
-  // Studio expects two files:
+  // Studio expects two CSS files:
   // - rafters.tailwind.css: static @theme with var() refs (processed by Tailwind)
   // - rafters.vars.css: pure CSS variables (instant HMR on token changes)
   const css = registryToTailwind(registry, { includeImport: true });
   await writeFile(join(OUTPUT_DIR, 'rafters.tailwind.css'), css);
   await writeFile(join(OUTPUT_DIR, 'rafters.vars.css'), css);
-  console.log('\n  Generated rafters.tailwind.css and rafters.vars.css');
+  console.log('  Generated rafters.tailwind.css and rafters.vars.css');
 
-  // Create config
   const config = {
     framework: 'vite',
     componentsPath: 'src/components/ui',
