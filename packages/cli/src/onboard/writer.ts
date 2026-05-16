@@ -12,6 +12,7 @@ import {
   ImportPendingSchema,
   type PendingPalette,
   type PendingToken,
+  type Token,
 } from '@rafters/shared';
 import type { OnboardResult } from './orchestrator.js';
 
@@ -40,22 +41,11 @@ export function toImportPending(
   );
 
   const tokens: PendingToken[] = result.tokens.map((token) => {
-    // The `original.value` field must carry the source CSS as written.
-    // A non-string Token.value (ColorValue / ColorReference) means the importer
-    // produced an already-resolved object with no source string to show the user.
-    // Fail loudly: importers must be updated to carry the original source string.
-    if (typeof token.value !== 'string') {
-      throw new Error(
-        `Cannot build ImportPending for "${token.name}": token.value is a ${typeof token.value === 'object' ? 'structured object' : typeof token.value}, not a source string. ` +
-          'Importers must produce string values for tokens that map back to source CSS.',
-      );
-    }
-
     return {
       original: {
         // Reverse the `Imported from X --var-name` convention to recover the source var
         name: extractSourceVarName(token.semanticMeaning) ?? token.name,
-        value: token.value,
+        value: renderSourceValue(token.value),
         source: primarySource ?? '',
       },
       proposed: token,
@@ -70,18 +60,11 @@ export function toImportPending(
     scale: palette.scale,
     source: primarySource ?? '',
     steps: palette.steps.map((step) => {
-      if (typeof step.token.value !== 'string') {
-        throw new Error(
-          `Cannot build ImportPending palette step "${palette.name}-${step.position}": ` +
-            `token.value is a ${typeof step.token.value === 'object' ? 'structured object' : typeof step.token.value}, not a source string. ` +
-            'Importers must produce string values for tokens that map back to source CSS.',
-        );
-      }
       return {
         position: step.position,
         original: {
           name: extractSourceVarName(step.token.semanticMeaning) ?? step.token.name,
-          value: step.token.value,
+          value: renderSourceValue(step.token.value),
           source: primarySource ?? '',
         },
         proposed: step.token,
@@ -109,6 +92,27 @@ export function toImportPending(
 
   // Validate before returning so any schema drift fails loudly
   return ImportPendingSchema.parse(doc);
+}
+
+/**
+ * Render a `Token['value']` back to a source-CSS-equivalent string for the
+ * `original.value` field. The shapes we handle:
+ *
+ *   - string: passes through verbatim (the typical CSS literal case).
+ *   - ColorReference ({family, position}): a semantic-points-at-palette
+ *     token (#1404). Source-equivalent is `var(--<family>-<position>)`,
+ *     which is what the user wrote (give or take prefix conventions like
+ *     `--color-`). Studio resolves the reference at display time.
+ *   - ColorValue (full OKLCH object): not produced by importers today
+ *     (would mean an already-resolved structured object); collapsed to
+ *     the JSON form rather than thrown so the writer remains total.
+ */
+function renderSourceValue(value: Token['value']): string {
+  if (typeof value === 'string') return value;
+  if ('family' in value && 'position' in value) {
+    return `var(--${value.family}-${value.position})`;
+  }
+  return JSON.stringify(value);
 }
 
 /**

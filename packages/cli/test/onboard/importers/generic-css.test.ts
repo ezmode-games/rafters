@@ -263,6 +263,101 @@ describe('Generic CSS Importer', () => {
     });
   });
 
+  describe('var() reference -> ColorReference (#1404)', () => {
+    // CSS where --primary references one step of a detected ramp.
+    // empire has the full 11-step ramp so detectRamps promotes it to a
+    // palette; --primary's `var(--empire-500)` should become a
+    // ColorReference {family: 'empire', position: '500'} on the proposed
+    // token. Studio resolves at display time.
+    const BRAND_CSS = `:root {
+  --empire-50:  oklch(0.97 0.01 350);
+  --empire-100: oklch(0.93 0.02 350);
+  --empire-200: oklch(0.87 0.04 350);
+  --empire-300: oklch(0.78 0.08 350);
+  --empire-400: oklch(0.68 0.12 350);
+  --empire-500: oklch(0.55 0.15 350);
+  --empire-600: oklch(0.48 0.14 350);
+  --empire-700: oklch(0.40 0.12 350);
+  --empire-800: oklch(0.33 0.10 350);
+  --empire-900: oklch(0.27 0.08 350);
+  --empire-950: oklch(0.20 0.06 350);
+
+  --primary: var(--empire-500);
+  --accent:  var(--empire-300);
+}
+`;
+
+    it('emits ColorReference for var() refs into detected palettes', async () => {
+      const stylesDir = join(testDir, 'styles');
+      await mkdir(stylesDir, { recursive: true });
+      await writeFile(join(stylesDir, 'variables.css'), BRAND_CSS);
+
+      const detection = await genericCSSImporter.detect(testDir);
+      const result = await genericCSSImporter.import(testDir, detection);
+
+      // empire palette gets detected -- its 11 steps are NOT in flat tokens
+      const empirePalette = result.palettes.find((p) => p.name === 'empire');
+      expect(empirePalette?.steps).toHaveLength(11);
+
+      // --primary and --accent become ColorReference-valued tokens
+      const primary = result.tokens.find((t) => t.name === 'primary');
+      expect(primary?.value).toEqual({ family: 'empire', position: '500' });
+
+      const accent = result.tokens.find((t) => t.name === 'accent');
+      expect(accent?.value).toEqual({ family: 'empire', position: '300' });
+    });
+
+    it('warns and drops the token when a var() target is not a detected palette step', async () => {
+      const stylesDir = join(testDir, 'styles');
+      await mkdir(stylesDir, { recursive: true });
+      // Names chosen to avoid the shadcn marker set (background/foreground/primary)
+      // which would otherwise route this file to the shadcn importer.
+      await writeFile(
+        join(stylesDir, 'variables.css'),
+        `:root {
+  --brand-color: var(--does-not-exist);
+  --surface: oklch(1 0 0);
+  --text: oklch(0.1 0 0);
+}
+`,
+      );
+
+      const detection = await genericCSSImporter.detect(testDir);
+      const result = await genericCSSImporter.import(testDir, detection);
+
+      // No detected palette -> --brand-color has no palette step to
+      // resolve to. Token is dropped with a warning rather than flat-lifted.
+      expect(result.tokens.find((t) => t.name === 'brand-color')).toBeUndefined();
+      expect(result.warnings.some((w) => /not part of a detected palette/.test(w.message))).toBe(
+        true,
+      );
+
+      // Literal-valued tokens are unaffected
+      expect(result.tokens.find((t) => t.name === 'surface')?.value).toBe('oklch(1 0 0)');
+    });
+
+    it('leaves literal-valued tokens as strings (no spurious ColorReference conversion)', async () => {
+      const stylesDir = join(testDir, 'styles');
+      await mkdir(stylesDir, { recursive: true });
+      await writeFile(
+        join(stylesDir, 'variables.css'),
+        `:root {
+  --brand-primary: #3b82f6;
+  --brand-secondary: #10b981;
+  --text-color: #1f2937;
+}
+`,
+      );
+
+      const detection = await genericCSSImporter.detect(testDir);
+      const result = await genericCSSImporter.import(testDir, detection);
+
+      for (const t of result.tokens) {
+        expect(typeof t.value).toBe('string');
+      }
+    });
+  });
+
   describe('category inference', () => {
     it('categorizes background as color', async () => {
       const stylesDir = join(testDir, 'styles');

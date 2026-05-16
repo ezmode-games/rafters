@@ -108,14 +108,19 @@ describe('toImportPending', () => {
     expect(() => toImportPending(failed, projectRoot)).toThrow(/failed onboard/);
   });
 
-  it('fails loudly when a token.value is not a string', () => {
-    // ColorValue or ColorReference shaped value -- no source string to render
+  it('renders ColorReference-valued tokens as var(--family-position) in original.value (#1404)', () => {
+    // var()-resolved semantic tokens carry ColorReference shape per #1404.
+    // The writer renders the source-equivalent var() string so the user
+    // sees what their CSS expressed; the proposed token keeps the ref.
     const colorRef: Token = {
       ...token,
-      value: { token: 'primary-500' } as unknown as Token['value'],
+      value: { family: 'empire', position: '500' },
     };
     const result: OnboardResult = { ...successfulResult, tokens: [colorRef] };
-    expect(() => toImportPending(result, projectRoot)).toThrow(/not a source string/);
+
+    const doc = toImportPending(result, projectRoot);
+    expect(doc.tokens[0]?.original.value).toBe('var(--empire-500)');
+    expect(doc.tokens[0]?.proposed.value).toEqual({ family: 'empire', position: '500' });
   });
 
   it('emits a palettes[] block when the orchestrator reports palettes', () => {
