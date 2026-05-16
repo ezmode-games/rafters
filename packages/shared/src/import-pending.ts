@@ -155,6 +155,27 @@ export const PendingPaletteSchema = z
   .strict();
 
 /**
+ * Brand system signal emitted by the importer when source CSS encodes
+ * multiple complete color palettes (#1403). Consumers (init, Studio) read
+ * this to know whether to pause default semantic assignment and prompt
+ * the user instead of silently letting the default neutral layer win.
+ */
+export const PendingBrandSystemSchema = z
+  .object({
+    /** True when the brand-system threshold (>= 2 palettes) was reached. */
+    detected: z.boolean(),
+    /** Palette family names participating in the brand system. */
+    palettes: z.array(z.string()),
+    /**
+     * Token names matching the common semantic vocabulary (primary,
+     * accent, background, etc.) found in the same import. Surfaces what
+     * the user has the option to keep, edit, or replace.
+     */
+    semanticSlots: z.array(z.string()),
+  })
+  .strict();
+
+/**
  * Import-pending document written to `.rafters/import-pending.json`
  */
 export const ImportPendingSchema = z
@@ -198,6 +219,13 @@ export const ImportPendingSchema = z
      * palette is the source of truth for the family.
      */
     palettes: z.array(PendingPaletteSchema).optional(),
+
+    /**
+     * Brand-system signal (#1403). Present when the importer ran the
+     * classifier; `detected: true` means downstream consumers should
+     * prompt the user before applying default semantics.
+     */
+    brandSystem: PendingBrandSystemSchema.optional(),
   })
   .strict();
 
@@ -207,4 +235,5 @@ export type ImportModifications = z.infer<typeof ImportModificationsSchema>;
 export type PendingToken = z.infer<typeof PendingTokenSchema>;
 export type PendingPaletteStep = z.infer<typeof PendingPaletteStepSchema>;
 export type PendingPalette = z.infer<typeof PendingPaletteSchema>;
+export type PendingBrandSystem = z.infer<typeof PendingBrandSystemSchema>;
 export type ImportPending = z.infer<typeof ImportPendingSchema>;

@@ -9,6 +9,7 @@ import { readFile } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 import type { Token } from '@rafters/shared';
 import { type CSSVariable, parseCSSFile } from '../css-parser.js';
+import { classifyBrandSystem, EMPTY_BRAND_SYSTEM } from './brand-system.js';
 import { detectRamps } from './ramp-detector.js';
 import type { Importer, ImporterDetection, ImportResult, ImportWarning } from './types.js';
 
@@ -239,6 +240,7 @@ export const genericCSSImporter: Importer = {
         return {
           tokens: [],
           palettes: [],
+          brandSystem: EMPTY_BRAND_SYSTEM,
           warnings: [{ level: 'error', message: 'No source path found' }],
           source: 'generic-css',
           variablesProcessed: 0,
@@ -255,6 +257,7 @@ export const genericCSSImporter: Importer = {
         return {
           tokens: [],
           palettes: [],
+          brandSystem: EMPTY_BRAND_SYSTEM,
           warnings: [{ level: 'error', message: `Failed to read CSS file: ${message}` }],
           source: 'generic-css',
           variablesProcessed: 0,
@@ -270,6 +273,7 @@ export const genericCSSImporter: Importer = {
         return {
           tokens: [],
           palettes: [],
+          brandSystem: EMPTY_BRAND_SYSTEM,
           warnings: [{ level: 'error', message: `Failed to parse CSS: ${message}` }],
           source: 'generic-css',
           variablesProcessed: 0,
@@ -302,10 +306,12 @@ export const genericCSSImporter: Importer = {
     }
 
     const { palettes, remaining } = detectRamps(tokens);
+    const brandSystem = classifyBrandSystem(palettes, remaining);
 
     return {
       tokens: remaining,
       palettes,
+      brandSystem,
       warnings,
       source: 'generic-css',
       variablesProcessed,

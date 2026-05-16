@@ -19,6 +19,7 @@ const successfulResult: OnboardResult = {
   success: true,
   tokens: [token],
   palettes: [],
+  brandSystem: { detected: false, palettes: [], semanticSlots: [] },
   source: 'tailwind-v4',
   confidence: 0.95,
   detectedBy: ['@theme block'],
@@ -98,6 +99,7 @@ describe('toImportPending', () => {
       success: false,
       tokens: [],
       palettes: [],
+      brandSystem: { detected: false, palettes: [], semanticSlots: [] },
       source: null,
       confidence: 0,
       detectedBy: [],
@@ -106,6 +108,31 @@ describe('toImportPending', () => {
       stats: { variablesProcessed: 0, tokensCreated: 0, skipped: 0 },
     };
     expect(() => toImportPending(failed, projectRoot)).toThrow(/failed onboard/);
+  });
+
+  it('emits brandSystem block when the classifier flagged a brand system (#1403)', () => {
+    const result: OnboardResult = {
+      ...successfulResult,
+      brandSystem: {
+        detected: true,
+        palettes: ['empire', 'republic'],
+        semanticSlots: ['accent', 'primary'],
+      },
+    };
+
+    const doc = toImportPending(result, projectRoot);
+
+    expect(doc.brandSystem).toEqual({
+      detected: true,
+      palettes: ['empire', 'republic'],
+      semanticSlots: ['accent', 'primary'],
+    });
+    expect(() => ImportPendingSchema.parse(doc)).not.toThrow();
+  });
+
+  it('omits brandSystem block when no brand system was detected', () => {
+    const doc = toImportPending(successfulResult, projectRoot);
+    expect(doc.brandSystem).toBeUndefined();
   });
 
   it('fails loudly when a token.value is not a string', () => {

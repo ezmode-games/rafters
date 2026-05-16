@@ -6,6 +6,7 @@
  */
 
 import type { Token } from '@rafters/shared';
+import { type BrandSystemAnalysis, EMPTY_BRAND_SYSTEM } from './importers/brand-system.js';
 import { genericCSSImporter } from './importers/generic-css.js';
 import {
   detectAllImporters,
@@ -39,6 +40,11 @@ export interface OnboardResult {
   tokens: Token[];
   /** Color palettes recovered from CSS ramps (e.g. --empire-50 ... --empire-950). */
   palettes: DetectedPalette[];
+  /**
+   * Brand-system analysis (#1403). Always populated -- `detected: false`
+   * means no brand-system signal, not "absent".
+   */
+  brandSystem: BrandSystemAnalysis;
   /** Which importer was used */
   source: string | null;
   /** Detection confidence (0-1) */
@@ -100,6 +106,7 @@ export async function onboard(
         success: false,
         tokens: [],
         palettes: [],
+        brandSystem: EMPTY_BRAND_SYSTEM,
         source: null,
         confidence: 0,
         detectedBy: [],
@@ -122,6 +129,7 @@ export async function onboard(
         success: false,
         tokens: [],
         palettes: [],
+        brandSystem: EMPTY_BRAND_SYSTEM,
         source: null,
         confidence: 0,
         detectedBy: [],
@@ -144,6 +152,7 @@ export async function onboard(
       success: false,
       tokens: [],
       palettes: [],
+      brandSystem: EMPTY_BRAND_SYSTEM,
       source: match.importer.metadata.id,
       confidence: match.detection.confidence,
       detectedBy: match.detection.detectedBy,
@@ -169,6 +178,7 @@ export async function onboard(
     success: !hasErrors && producedOutput,
     tokens: result.tokens,
     palettes: result.palettes,
+    brandSystem: result.brandSystem,
     source: result.source,
     confidence: match.detection.confidence,
     detectedBy: match.detection.detectedBy,

@@ -10,6 +10,7 @@ import { dirname, relative } from 'node:path';
 import {
   type ImportPending,
   ImportPendingSchema,
+  type PendingBrandSystem,
   type PendingPalette,
   type PendingToken,
 } from '@rafters/shared';
@@ -95,6 +96,12 @@ export function toImportPending(
     .filter((w) => w.level !== 'error' || result.tokens.length > 0 || palettes.length > 0)
     .map((w) => ({ level: w.level, message: w.message }));
 
+  const brandSystem: PendingBrandSystem = {
+    detected: result.brandSystem.detected,
+    palettes: result.brandSystem.palettes,
+    semanticSlots: result.brandSystem.semanticSlots,
+  };
+
   const doc: ImportPending = {
     version: '1.0',
     createdAt: now.toISOString(),
@@ -105,6 +112,7 @@ export function toImportPending(
     ...(warnings.length > 0 ? { warnings } : {}),
     tokens,
     ...(palettes.length > 0 ? { palettes } : {}),
+    ...(brandSystem.detected ? { brandSystem } : {}),
   };
 
   // Validate before returning so any schema drift fails loudly

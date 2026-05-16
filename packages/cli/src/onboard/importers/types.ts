@@ -6,6 +6,7 @@
  */
 
 import type { Token } from '@rafters/shared';
+import type { BrandSystemAnalysis } from './brand-system.js';
 import type { DetectedPalette } from './ramp-detector.js';
 
 /**
@@ -69,6 +70,11 @@ export interface ImportResult {
    * Tokens emitted as part of a palette do NOT appear in `tokens`.
    */
   palettes: DetectedPalette[];
+  /**
+   * Brand-system analysis (#1403). Always populated -- `detected: false`
+   * means no brand-system signal, not "absent".
+   */
+  brandSystem: BrandSystemAnalysis;
   /** Warnings generated during import */
   warnings: ImportWarning[];
   /** Which importer produced this result */
