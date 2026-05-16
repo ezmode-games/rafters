@@ -163,12 +163,16 @@ describe('Tailwind v4 Importer', () => {
       const detection = await tailwindV4Importer.detect(testDir);
       const result = await tailwindV4Importer.import(testDir, detection);
 
-      const colorTokens = result.tokens.filter((t) => t.category === 'color');
-      const primaryTokens = colorTokens.filter((t) => t.name.startsWith('primary-'));
-      expect(primaryTokens.length).toBe(11); // 50-950
+      // Complete 50-950 ramps are promoted to palettes (#1402)
+      const primary = result.palettes.find((p) => p.name === 'primary');
+      expect(primary).toBeDefined();
+      expect(primary?.steps.length).toBe(11); // 50-950
+      const primary500 = primary?.steps.find((s) => s.position === '500');
+      expect(primary500?.token.value).toBe('oklch(0.55 0.15 250)');
 
-      const primary500 = primaryTokens.find((t) => t.name === 'primary-500');
-      expect(primary500?.value).toBe('oklch(0.55 0.15 250)');
+      // Tokens used in palettes should not also appear in the flat list
+      const primaryFlat = result.tokens.filter((t) => t.name.startsWith('primary-'));
+      expect(primaryFlat).toHaveLength(0);
     });
 
     it('maps spacing tokens', async () => {
@@ -276,7 +280,9 @@ describe('Tailwind v4 Importer', () => {
       const detection = await tailwindV4Importer.detect(testDir);
       const result = await tailwindV4Importer.import(testDir, detection);
 
-      expect(result.tokensCreated).toBe(result.tokens.length);
+      // tokensCreated counts both flat tokens and palette steps (#1402)
+      const paletteSteps = result.palettes.reduce((n, p) => n + p.steps.length, 0);
+      expect(result.tokensCreated).toBe(result.tokens.length + paletteSteps);
       expect(result.variablesProcessed).toBe(result.tokensCreated + result.skipped);
     });
   });

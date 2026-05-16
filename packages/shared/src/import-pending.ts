@@ -101,6 +101,60 @@ export const PendingTokenSchema = z
   });
 
 /**
+ * A single step in a detected color palette.
+ *
+ * Each step carries both the original source variable (so the user can audit
+ * where the value came from) and the proposed Rafters token (so accepting the
+ * palette can materialize tokens directly). Position is the Tailwind scale
+ * stop the variable occupies in its source CSS.
+ */
+export const PendingPaletteStepSchema = z
+  .object({
+    /** Tailwind scale position: "50", "100", ..., "900", "950" */
+    position: z.string(),
+
+    /** Original source variable */
+    original: ImportOriginalSchema,
+
+    /** Proposed Rafters token for this step */
+    proposed: TokenSchema,
+  })
+  .strict();
+
+/**
+ * A color palette recovered by the ramp detector. Replaces what would
+ * otherwise be N flat PendingTokens for the same family.
+ *
+ * Invariants enforced:
+ *   - decision === 'modified' is not allowed at the palette level (#1402
+ *     leaves per-step editing to the existing tokens[] flow)
+ */
+export const PendingPaletteSchema = z
+  .object({
+    /** Palette family name (e.g. "empire") -- the var-name prefix shared by every step */
+    name: z.string(),
+
+    /** Detected scale type. Only Tailwind is supported in #1402. */
+    scale: z.literal('tailwind'),
+
+    /** Source file path relative to project root */
+    source: z.string(),
+
+    /** Ramp steps ordered ascending by Tailwind position */
+    steps: z.array(PendingPaletteStepSchema).min(2),
+
+    /** User decision -- pending until reviewed. Applies to the whole palette. */
+    decision: z.enum(['pending', 'accepted', 'rejected']).default('pending'),
+
+    /** Detection confidence 0-1 */
+    confidence: z.number().min(0).max(1),
+
+    /** Optional rationale for why this was grouped as a palette */
+    rationale: z.string().optional(),
+  })
+  .strict();
+
+/**
  * Import-pending document written to `.rafters/import-pending.json`
  */
 export const ImportPendingSchema = z
@@ -137,6 +191,13 @@ export const ImportPendingSchema = z
 
     /** Tokens awaiting review */
     tokens: z.array(PendingTokenSchema),
+
+    /**
+     * Color palettes recovered from CSS ramps (e.g. --empire-50 ... --empire-950).
+     * Tokens emitted as part of a palette do NOT appear in `tokens` -- the
+     * palette is the source of truth for the family.
+     */
+    palettes: z.array(PendingPaletteSchema).optional(),
   })
   .strict();
 
@@ -144,4 +205,6 @@ export type ImportDecision = z.infer<typeof ImportDecisionSchema>;
 export type ImportOriginal = z.infer<typeof ImportOriginalSchema>;
 export type ImportModifications = z.infer<typeof ImportModificationsSchema>;
 export type PendingToken = z.infer<typeof PendingTokenSchema>;
+export type PendingPaletteStep = z.infer<typeof PendingPaletteStepSchema>;
+export type PendingPalette = z.infer<typeof PendingPaletteSchema>;
 export type ImportPending = z.infer<typeof ImportPendingSchema>;
