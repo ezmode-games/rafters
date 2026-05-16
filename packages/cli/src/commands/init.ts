@@ -28,8 +28,9 @@ import {
 
 const REGISTRY_PLUGINS = [scalePlugin, contrastPlugin, statePlugin, invertPlugin];
 
-import { onboard, previewOnboard } from '../onboard/orchestrator.js';
-import { toImportPending, writeImportPending } from '../onboard/writer.js';
+import { buildNeedsDecision, promptBrandImport } from '../onboard/interactive-prompt.js';
+import { type ImportConfig, mapOnboardToImport } from '../onboard/mapper.js';
+import { type OnboardResult, onboard, previewOnboard } from '../onboard/orchestrator.js';
 import {
   type ComponentTarget,
   detectProject,
@@ -61,6 +62,13 @@ interface InitOptions {
    * wc | vanilla.
    */
   framework?: string;
+  /**
+   * Onboard wire-up (#1501): in agent mode, accept the highest-confidence
+   * detection without prompting. Selects the first detected palette as
+   * primary, mode=coexisting, keepDefaultSemantics=true. Outside agent
+   * mode this flag is a no-op (prompts still run).
+   */
+  acceptDetected?: boolean;
 }
 
 async function backupCss(cssPath: string): Promise<string> {
@@ -184,6 +192,12 @@ export interface RaftersConfig {
     composites: string[];
     rules: string[];
   };
+  /**
+   * Persisted import decisions when the onboard flow detected existing
+   * CSS and the user accepted a mapping (#1501). Round-trips verbatim so
+   * `--reset` can re-apply without re-prompting.
+   */
+  import?: ImportConfig;
 }
 
 async function findMainCssFile(cwd: string, framework: Framework): Promise<string | null> {
@@ -587,6 +601,21 @@ async function resetToDefaults(
     tokenCount: registry.size(),
   });
 
+  // Re-apply persisted import decisions (#1501): when the config carries
+  // an import block, re-run detection and overlay the same palette
+  // tokens. No prompts -- the decisions were captured at init time.
+  if (existingConfig?.import) {
+    const reapplied = await reapplyPersistedImport(cwd, existingConfig.import);
+    for (const token of reapplied) {
+      registry.define(token);
+    }
+    log({
+      event: 'init:reset_import_reapplied',
+      count: reapplied.length,
+      source: existingConfig.import.source,
+    });
+  }
+
   // Clear stale namespace files before saving fresh registry
   await rm(paths.tokens, { recursive: true, force: true });
   await mkdir(paths.tokens, { recursive: true });
@@ -807,6 +836,21 @@ export async function init(options: InitOptions): Promise<void> {
     log({ event: 'init:exports_selected', exports });
   }
 
+  // Onboard wire-up (#1501): detection runs BEFORE generateBaseSystem so
+  // detected brand systems can override the default neutral semantic
+  // layer. The wire-up may exit early (agent mode without --accept-detected
+  // when a brand system is found -> emit needsDecision) or return a
+  // tokens-to-merge set when the user accepts the import.
+  const onboardWireup = await runOnboardWireUp(cwd, {
+    agent: isAgentMode,
+    acceptDetected: !!options.acceptDetected,
+  });
+
+  if (onboardWireup === 'needs-decision') {
+    // log already emitted; bail before we touch .rafters/
+    return;
+  }
+
   // Generate default token system - registry is the source of truth
   const system = generateBaseSystem();
   const registry = new TokenRegistry(system.allTokens, REGISTRY_PLUGINS);
@@ -815,6 +859,20 @@ export async function init(options: InitOptions): Promise<void> {
     event: 'init:generated',
     tokenCount: registry.size(),
   });
+
+  // Overlay detected palette tokens (#1501): the user accepted them, so
+  // they take precedence over the default neutral color layer for any
+  // colliding token name.
+  if (onboardWireup && onboardWireup.importedTokens.length > 0) {
+    for (const token of onboardWireup.importedTokens) {
+      registry.define(token);
+    }
+    log({
+      event: 'init:imported_tokens_overlaid',
+      count: onboardWireup.importedTokens.length,
+      source: onboardWireup.importConfig.source,
+    });
+  }
 
   // Create directories
   await mkdir(paths.tokens, { recursive: true });
@@ -891,24 +949,20 @@ export async function init(options: InitOptions): Promise<void> {
       composites: [],
       rules: [],
     },
+    ...(onboardWireup && onboardWireup.importedTokens.length > 0
+      ? { import: onboardWireup.importConfig }
+      : {}),
   };
   await writeFile(paths.config, JSON.stringify(config, null, 2));
 
   // Write Claude Code skill so agents follow rafters rules
   await writeRaftersSkill(cwd);
 
-  // Check if the project has existing design decisions that can be onboarded.
-  // Failures here are non-fatal -- init's primary job already succeeded.
-  try {
-    await maybeOnboardExisting(cwd, paths.importPending);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    log({
-      event: 'init:onboard_skipped_after_error',
-      message,
-      suggestion: 'Init completed. Run `rafters import` to retry onboarding.',
-    });
-  }
+  // The pre-#1501 fallback (maybeOnboardExisting) is intentionally not
+  // called here: the new early-detection wire-up above runs before
+  // generateBaseSystem and handles brand-system imports as the primary
+  // path. `rafters import` and `rafters import --apply` remain available
+  // for the staging-file workflow when init has already run.
 
   log({
     event: 'init:complete',
@@ -917,83 +971,172 @@ export async function init(options: InitOptions): Promise<void> {
   });
 }
 
+interface OnboardWireUpOptions {
+  agent: boolean;
+  acceptDetected: boolean;
+}
+
+interface OnboardWireUpResult {
+  importedTokens: ReturnType<typeof mapOnboardToImport>['importedTokens'];
+  importConfig: ImportConfig;
+}
+
 /**
- * Detect existing design tokens via the onboard pipeline. When interactive,
- * prompt the user to import. On confirmation, run the orchestrator and write
- * `.rafters/import-pending.json` for review. On decline or agent mode, log
- * the detection so the user knows `rafters import` is available.
- *
- * Skips entirely if import-pending.json already exists -- the user has an
- * in-progress review and init should not clobber it.
+ * Re-apply a persisted RaftersConfig.import block during `--reset`.
+ * Re-runs detection, honours the persisted decisions verbatim, and
+ * returns the imported token set. No prompts (decisions were captured
+ * at init time).
  */
-async function maybeOnboardExisting(cwd: string, importPendingPath: string): Promise<void> {
-  if (existsSync(importPendingPath)) {
-    return;
+async function reapplyPersistedImport(
+  cwd: string,
+  importConfig: ImportConfig,
+): Promise<ReturnType<typeof mapOnboardToImport>['importedTokens']> {
+  const result = await onboard(cwd);
+  if (!result.success) {
+    log({
+      event: 'init:reset_import_redetect_failed',
+      source: result.source,
+      warnings: result.warnings,
+      suggestion:
+        'The source CSS may have changed since init. Falling back to defaults; run `rafters init` interactively to re-onboard.',
+    });
+    return [];
   }
 
+  const decision = importConfig.palettes
+    ? {
+        primary: importConfig.palettes.primary,
+        mode: importConfig.palettes.mode,
+        keepDefaultSemantics: importConfig.keepDefaultSemantics,
+      }
+    : undefined;
+
+  const mapped = mapOnboardToImport({
+    result,
+    sourcePath: importConfig.sourcePath,
+    ...(decision ? { decision } : {}),
+  });
+  return mapped.importedTokens;
+}
+
+/**
+ * Onboard wire-up (#1501): the early-detection step that runs before
+ * `generateBaseSystem`. Detects existing CSS, runs the brand-import
+ * prompt when needed, and returns either:
+ *
+ *   - `null` when no compatible source was detected (init proceeds with
+ *     defaults exactly as before).
+ *   - `'needs-decision'` when agent mode hit a brand system without
+ *     `--accept-detected` (the caller has already logged the needsDecision
+ *     payload and must return without writing files).
+ *   - `{ importedTokens, importConfig }` when the user accepted (or
+ *     `--accept-detected` accepted automatically) -- init overlays the
+ *     tokens on the default registry and persists the importConfig.
+ */
+async function runOnboardWireUp(
+  cwd: string,
+  options: OnboardWireUpOptions,
+): Promise<OnboardWireUpResult | 'needs-decision' | null> {
   const preview = await previewOnboard(cwd);
   if (preview.length === 0) {
-    return;
+    return null;
   }
 
-  const best = preview[0];
-  if (!best) return;
-
-  // Agent/non-interactive: surface the detection but don't auto-import
-  if (isAgentMode() || !isInteractive()) {
-    log({
-      event: 'import:existing_detected',
-      source: best.importer,
-      confidence: best.confidence,
-      sourcePaths: best.sourcePaths.map((p) => relative(cwd, p)).join(', '),
-      nextStep: 'Run `rafters import` to convert these tokens into pending review.',
-    });
-    return;
-  }
-
-  log({
-    event: 'import:existing_detected',
-    source: best.importer,
-    confidence: best.confidence,
-    sourcePaths: best.sourcePaths.map((p) => relative(cwd, p)).join(', '),
-  });
-
-  // Ctrl-C / Esc at the prompt throws ExitPromptError -- treat as decline
-  let shouldImport: boolean;
-  try {
-    shouldImport = await confirm({
-      message: 'Import these tokens into rafters?',
-      default: true,
-    });
-  } catch {
-    log({ event: 'import:declined' });
-    return;
-  }
-
-  if (!shouldImport) {
-    log({ event: 'import:declined' });
-    return;
-  }
-
-  log({ event: 'import:scanning' });
   const result = await onboard(cwd);
-
   if (!result.success) {
-    log({ event: 'import:failed', source: result.source, warnings: result.warnings });
-    return;
+    log({
+      event: 'init:onboard_detect_failed',
+      source: result.source,
+      warnings: result.warnings,
+      suggestion: 'Init will fall back to default token generation.',
+    });
+    return null;
   }
 
-  const doc = toImportPending(result, cwd);
-  await writeImportPending(importPendingPath, doc);
+  const primarySource = result.sourcePaths[0]
+    ? relative(cwd, result.sourcePaths[0])
+    : (result.source ?? 'unknown');
 
   log({
-    event: 'import:complete',
-    path: relative(cwd, importPendingPath),
+    event: 'init:onboard_detected',
     source: result.source,
     confidence: result.confidence,
-    tokensCreated: result.stats.tokensCreated,
-    skipped: result.stats.skipped,
-    nextStep:
-      'Review and accept tokens in .rafters/import-pending.json, then run `rafters import --apply`',
+    palettes: result.palettes.map((p) => p.name),
+    brandSystem: result.brandSystem.detected,
   });
+
+  // No brand system -> apply detected palettes as flat (no decision
+  // required). When no palettes exist at all, the importedTokens set
+  // will be empty and init proceeds with pure defaults.
+  if (!result.brandSystem.detected) {
+    const mapped = mapOnboardToImport({ result, sourcePath: primarySource });
+    return mapped;
+  }
+
+  // Brand system detected. Resolve the decision according to mode.
+  const decision = await resolveBrandDecisionForInit(result, options);
+  if (decision === 'needs-decision') {
+    log({
+      event: 'init:onboard_needs_decision',
+      ...buildNeedsDecision({
+        detected: true,
+        palettes: result.brandSystem.palettes,
+        semanticSlots: result.brandSystem.semanticSlots,
+      }),
+      nextStep:
+        'Re-run with `rafters init --agent --accept-detected` to accept the highest-confidence mapping, or run `rafters init` interactively to choose.',
+    });
+    return 'needs-decision';
+  }
+  if (decision === 'declined') {
+    log({ event: 'init:onboard_declined' });
+    return null;
+  }
+
+  const mapped = mapOnboardToImport({ result, decision, sourcePath: primarySource });
+  log({
+    event: 'init:brand_decision_recorded',
+    primary: decision.primary,
+    mode: decision.mode,
+    keepDefaultSemantics: decision.keepDefaultSemantics,
+  });
+  return mapped;
+}
+
+/**
+ * Decide brand import in init's context:
+ *   - agent + --accept-detected: accept highest-confidence palette as primary.
+ *   - agent without --accept-detected: emit needs-decision and stop.
+ *   - interactive TTY: walk the prompt.
+ *   - non-interactive non-agent (no TTY but not agent mode): treat as
+ *     agent without --accept-detected for safety.
+ */
+async function resolveBrandDecisionForInit(
+  result: OnboardResult,
+  options: OnboardWireUpOptions,
+): Promise<
+  | { primary: string; mode: 'themes' | 'coexisting'; keepDefaultSemantics: boolean }
+  | 'needs-decision'
+  | 'declined'
+> {
+  if (options.agent) {
+    if (!options.acceptDetected) return 'needs-decision';
+    const primary = result.brandSystem.palettes[0];
+    if (!primary) return 'declined';
+    return { primary, mode: 'coexisting', keepDefaultSemantics: true };
+  }
+
+  if (!isInteractive()) {
+    return 'needs-decision';
+  }
+
+  try {
+    return await promptBrandImport({
+      detected: true,
+      palettes: result.brandSystem.palettes,
+      semanticSlots: result.brandSystem.semanticSlots,
+    });
+  } catch {
+    return 'declined';
+  }
 }

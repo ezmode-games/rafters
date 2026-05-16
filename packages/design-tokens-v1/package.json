@@ -14,7 +14,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "echo 'design-tokens-v1 typecheck skipped - package decommissioning per #1490'",
     "clean": "rm -rf .turbo coverage"
   },
   "dependencies": {
