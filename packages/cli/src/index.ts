@@ -7,7 +7,6 @@
 
 import { Command } from 'commander';
 import { add } from './commands/add.js';
-import { importCommand } from './commands/import.js';
 import { init } from './commands/init.js';
 import { mcp } from './commands/mcp.js';
 import { set } from './commands/set.js';
@@ -30,24 +29,8 @@ program
     '--framework <name>',
     'Override framework detection (next|vite|remix|react-router|astro|wc|vanilla)',
   )
-  .option(
-    '--accept-detected',
-    'In agent mode, auto-accept the highest-confidence onboard detection without prompting (#1513)',
-  )
   .option('--agent', 'Output JSON for machine consumption')
   .action(withErrorHandler(init));
-
-program
-  .command('import')
-  .description('Import existing design tokens (Tailwind v4, shadcn, generic CSS)')
-  .option('--force', 'Overwrite existing .rafters/import-pending.json')
-  .option('--importer <id>', 'Force a specific importer (tailwind-v4, shadcn, generic-css)')
-  .option(
-    '--apply',
-    'Merge accepted tokens from .rafters/import-pending.json into the registry and regenerate outputs',
-  )
-  .option('--agent', 'Output JSON for machine consumption')
-  .action(withErrorHandler(importCommand));
 
 program
   .command('add')
