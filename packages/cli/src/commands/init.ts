@@ -28,17 +28,11 @@ import {
 
 const REGISTRY_PLUGINS = [scalePlugin, contrastPlugin, statePlugin, invertPlugin];
 
-import { type InjectionFramework, injectFontLinks } from '../onboard/font-injector.js';
-import {
-  buildSemanticOverlays,
-  decisionsToConfigOverrides,
-  type OnboardDecisions,
-  paletteTokensFromResult,
-  runOnboardWireUp,
-} from '../onboard/wire-up.js';
 import {
   type ComponentTarget,
   detectProject,
+  FRAMEWORK_SPECS,
+  type Framework,
   frameworkToTarget,
   hasAstroReact,
   isSelectableFramework,
@@ -67,15 +61,6 @@ interface InitOptions {
    * wc | vanilla.
    */
   framework?: string;
-  /**
-   * Onboard wire-up (#1513): in agent mode, accept the highest-
-   * confidence detection without prompting. Palettes are assigned to
-   * the eleven canonical SemanticColorSystem slots in detection order.
-   * Spacing / radius / fonts are accepted as inferred. Without this
-   * flag, agent mode emits a needsDecision payload and exits when a
-   * brand-system is detected (>=2 palettes).
-   */
-  acceptDetected?: boolean;
 }
 
 async function backupCss(cssPath: string): Promise<string> {
@@ -83,95 +68,6 @@ async function backupCss(cssPath: string): Promise<string> {
   await copyFile(cssPath, backupPath);
   return backupPath;
 }
-
-type Framework =
-  | 'next'
-  | 'vite'
-  | 'remix'
-  | 'react-router'
-  | 'astro'
-  | 'wc'
-  | 'vanilla'
-  | 'unknown';
-
-const CSS_LOCATIONS: Record<Framework, string[]> = {
-  astro: ['src/styles/global.css', 'src/styles/globals.css', 'src/global.css'],
-  next: ['src/app/globals.css', 'app/globals.css', 'styles/globals.css'],
-  vite: ['src/index.css', 'src/main.css', 'src/styles.css', 'src/app.css'],
-  remix: ['app/styles/global.css', 'app/globals.css', 'app/root.css'],
-  'react-router': ['app/app.css', 'app/root.css', 'app/styles.css', 'app/globals.css'],
-  wc: ['src/index.css', 'src/main.css', 'src/styles.css', 'styles/global.css'],
-  vanilla: ['src/index.css', 'src/main.css', 'src/styles.css', 'styles/global.css'],
-  unknown: ['src/styles/global.css', 'src/index.css', 'styles/globals.css'],
-};
-
-// Default component paths per framework
-export const COMPONENT_PATHS: Record<
-  Framework,
-  { components: string; primitives: string; composites: string; rules: string }
-> = {
-  astro: {
-    components: 'src/components/ui',
-    primitives: 'src/lib/primitives',
-    composites: 'src/composites',
-    rules: 'src/rules',
-  },
-  next: {
-    components: 'components/ui',
-    primitives: 'lib/primitives',
-    composites: 'composites',
-    rules: 'rules',
-  },
-  vite: {
-    components: 'src/components/ui',
-    primitives: 'src/lib/primitives',
-    composites: 'src/composites',
-    rules: 'src/rules',
-  },
-  remix: {
-    components: 'app/components/ui',
-    primitives: 'app/lib/primitives',
-    composites: 'app/composites',
-    rules: 'app/rules',
-  },
-  'react-router': {
-    components: 'app/components/ui',
-    primitives: 'app/lib/primitives',
-    composites: 'app/composites',
-    rules: 'app/rules',
-  },
-  wc: {
-    components: 'src/components/ui',
-    primitives: 'src/lib/primitives',
-    composites: 'src/composites',
-    rules: 'src/rules',
-  },
-  vanilla: {
-    components: 'src/components/ui',
-    primitives: 'src/lib/primitives',
-    composites: 'src/composites',
-    rules: 'src/rules',
-  },
-  unknown: {
-    components: 'components/ui',
-    primitives: 'lib/primitives',
-    composites: 'composites',
-    rules: 'rules',
-  },
-};
-
-/**
- * Human-facing labels for the interactive framework prompt.
- */
-const FRAMEWORK_PROMPT_LABELS: Record<Exclude<Framework, 'unknown'>, string> = {
-  next: 'Next.js',
-  vite: 'Vite',
-  remix: 'Remix',
-  'react-router': 'React Router v7',
-  astro: 'Astro',
-  wc: 'Web Components (custom elements, shadow DOM)',
-  vanilla: 'Vanilla (plain HTML/TS, no framework)',
-};
 
 /**
  * Configuration persisted in `.rafters/config.rafters.json`.
@@ -199,17 +95,10 @@ export interface RaftersConfig {
     composites: string[];
     rules: string[];
   };
-  /**
-   * Persisted import decisions when the onboard flow detected existing
-   * CSS and the user (or `--accept-detected`) committed to a mapping
-   * (#1513). `rafters init --reset` re-applies this block verbatim,
-   * skipping every prompt.
-   */
-  import?: OnboardDecisions;
 }
 
 async function findMainCssFile(cwd: string, framework: Framework): Promise<string | null> {
-  const locations = CSS_LOCATIONS[framework] || CSS_LOCATIONS.unknown;
+  const locations = FRAMEWORK_SPECS[framework].cssLocations;
 
   for (const location of locations) {
     const fullPath = join(cwd, location);
@@ -294,7 +183,7 @@ async function resolveFramework(
   const picked = await select({
     message: "Couldn't auto-detect your framework. Which one is this?",
     choices: SELECTABLE_FRAMEWORKS.map((value) => ({
-      name: FRAMEWORK_PROMPT_LABELS[value],
+      name: FRAMEWORK_SPECS[value].label ?? value,
       value,
     })),
   });
@@ -456,7 +345,7 @@ async function regenerateFromExisting(
 
   // Refresh framework and paths from fresh detection
   if (framework !== 'unknown' && existingConfig) {
-    const frameworkPaths = COMPONENT_PATHS[framework] || COMPONENT_PATHS.unknown;
+    const frameworkPaths = FRAMEWORK_SPECS[framework].components;
     existingConfig.framework = framework;
     existingConfig.componentsPath = frameworkPaths.components;
     existingConfig.primitivesPath = frameworkPaths.primitives;
@@ -505,7 +394,7 @@ async function regenerateFromExisting(
     existingConfig.exports = exports;
     await writeFile(paths.config, JSON.stringify(existingConfig, null, 2));
   } else {
-    const frameworkPaths = COMPONENT_PATHS[framework] || COMPONENT_PATHS.unknown;
+    const frameworkPaths = FRAMEWORK_SPECS[framework].components;
     const newConfig: RaftersConfig = {
       framework,
       componentsPath: frameworkPaths.components,
@@ -547,7 +436,7 @@ async function resetToDefaults(
 
   // Refresh framework and paths from fresh detection
   if (framework !== 'unknown' && existingConfig) {
-    const frameworkPaths = COMPONENT_PATHS[framework] || COMPONENT_PATHS.unknown;
+    const frameworkPaths = FRAMEWORK_SPECS[framework].components;
     existingConfig.framework = framework;
     existingConfig.componentsPath = frameworkPaths.components;
     existingConfig.primitivesPath = frameworkPaths.primitives;
@@ -600,41 +489,10 @@ async function resetToDefaults(
     log({ event: 'init:exports_selected', exports });
   }
 
-  // Re-run generators fresh, replaying the persisted RaftersConfig.import
-  // decisions (#1513) so --reset is deterministic for CI / agent loops.
-  const importDecisions = existingConfig?.import ?? null;
-  const configOverrides = importDecisions ? decisionsToConfigOverrides(importDecisions) : {};
-  const system = generateBaseSystem(configOverrides);
+  // Generate a fresh default system. `--reset` is install-time-only;
+  // re-importing source CSS is `rafters import` territory.
+  const system = generateBaseSystem({});
   const registry = new TokenRegistry(system.allTokens, REGISTRY_PLUGINS);
-
-  if (importDecisions) {
-    // Re-run detection to recover palette step values, then re-apply.
-    const wireOutcome = await runOnboardWireUp(cwd, { agent: true, acceptDetected: true });
-    if (wireOutcome.kind === 'decisions') {
-      for (const token of paletteTokensFromResult(wireOutcome.result)) {
-        try {
-          registry.define(token);
-        } catch {
-          // Skip invalid tokens rather than abort reset.
-        }
-      }
-    }
-    for (const overlay of buildSemanticOverlays(importDecisions)) {
-      try {
-        registry.set(overlay.tokenName, overlay.value, { reason: 'init:reset:onboard' });
-      } catch {
-        // Tokens absent from the regenerated system get skipped.
-      }
-    }
-    log({
-      event: 'init:reset_import_replayed',
-      assigned: importDecisions.palettes.assigned.length,
-      skipped: importDecisions.palettes.skipped.length,
-      spacing: importDecisions.spacing ?? null,
-      radius: importDecisions.radius ?? null,
-      fonts: importDecisions.fonts.map((f) => ({ family: f.family, source: f.source })),
-    });
-  }
 
   log({
     event: 'init:reset_generated',
@@ -665,7 +523,7 @@ async function resetToDefaults(
     existingConfig.exports = exports;
     await writeFile(paths.config, JSON.stringify(existingConfig, null, 2));
   } else {
-    const frameworkPaths = COMPONENT_PATHS[framework] || COMPONENT_PATHS.unknown;
+    const frameworkPaths = FRAMEWORK_SPECS[framework].components;
     const newConfig: RaftersConfig = {
       framework,
       componentsPath: frameworkPaths.components,
@@ -861,69 +719,11 @@ export async function init(options: InitOptions): Promise<void> {
     log({ event: 'init:exports_selected', exports });
   }
 
-  // Onboard wire-up (#1513): detection + decisions BEFORE generateBaseSystem.
-  // Captures detected palettes, spacing/radius systems, and fonts;
-  // returns either decisions, a needs-decision payload (agent mode
-  // without --accept-detected on a brand-system import), or no-detection
-  // (init proceeds with pure defaults).
-  const onboardOutcome = await runOnboardWireUp(cwd, {
-    agent: isAgentMode,
-    acceptDetected: !!options.acceptDetected,
-  });
-
-  if (onboardOutcome.kind === 'needs-decision') {
-    log({
-      event: 'init:needs_decision',
-      palettes: onboardOutcome.palettes,
-      message: onboardOutcome.message,
-      nextStep:
-        'Re-run with --agent --accept-detected to apply detection in canonical order, or run interactively.',
-    });
-    return;
-  }
-
-  const decisions = onboardOutcome.kind === 'decisions' ? onboardOutcome.decisions : null;
-  const onboardResult = onboardOutcome.kind === 'decisions' ? onboardOutcome.result : null;
-
-  // Build BaseSystemConfig from the captured decisions (spacing,
-  // radius, fonts) so the generator emits the system the user's CSS
-  // already encoded -- not pure defaults.
-  const configOverrides = decisions ? decisionsToConfigOverrides(decisions) : {};
-  const system = generateBaseSystem(configOverrides);
+  // Install-time generation only: pure defaults. Importing user source
+  // CSS (palettes, spacing/radius inference, font detection) is the
+  // separate `rafters import` flow.
+  const system = generateBaseSystem({});
   const registry = new TokenRegistry(system.allTokens, REGISTRY_PLUGINS);
-
-  // Overlay detected palette steps + semantic family references.
-  if (decisions && onboardResult) {
-    // Write every palette step token into the registry. Skipped palettes
-    // are still imported as colour families; assigned palettes additionally
-    // anchor a semantic family below.
-    const paletteTokens = paletteTokensFromResult(onboardResult);
-    for (const token of paletteTokens) {
-      try {
-        registry.define(token);
-      } catch {
-        // Skip tokens that fail validation rather than abort init.
-      }
-    }
-    // Materialise semantic-family ColorReference overlays.
-    for (const overlay of buildSemanticOverlays(decisions)) {
-      try {
-        registry.set(overlay.tokenName, overlay.value, {
-          reason: 'init:onboard',
-        });
-      } catch {
-        // Tokens absent from the default semantic layer get skipped.
-      }
-    }
-    log({
-      event: 'init:onboard_applied',
-      assigned: decisions.palettes.assigned.length,
-      skipped: decisions.palettes.skipped.length,
-      spacing: decisions.spacing ?? null,
-      radius: decisions.radius ?? null,
-      fonts: decisions.fonts.map((f) => ({ family: f.family, source: f.source })),
-    });
-  }
 
   log({
     event: 'init:generated',
@@ -958,7 +758,7 @@ export async function init(options: InitOptions): Promise<void> {
       log({
         event: 'init:css_not_found',
         message: 'No main CSS file found. Add @import ".rafters/output/rafters.css" manually.',
-        searchedLocations: CSS_LOCATIONS[framework as Framework] || CSS_LOCATIONS.unknown,
+        searchedLocations: FRAMEWORK_SPECS[framework as Framework].cssLocations,
       });
     }
   } else if (shadcn?.tailwind?.css) {
@@ -988,7 +788,7 @@ export async function init(options: InitOptions): Promise<void> {
   }
 
   // Create config file with detected settings and export selections
-  const frameworkPaths = COMPONENT_PATHS[framework as Framework] || COMPONENT_PATHS.unknown;
+  const frameworkPaths = FRAMEWORK_SPECS[framework as Framework].components;
   const config: RaftersConfig = {
     framework: framework as Framework,
     componentTarget,
@@ -1005,81 +805,15 @@ export async function init(options: InitOptions): Promise<void> {
       composites: [],
       rules: [],
     },
-    ...(decisions ? { import: decisions } : {}),
   };
   await writeFile(paths.config, JSON.stringify(config, null, 2));
 
   // Write Claude Code skill so agents follow rafters rules
   await writeRaftersSkill(cwd);
 
-  // Inject Google Fonts <link> tags into the project's layout file
-  // (#1512). Self-hosted / system fonts skip the HTML layer.
-  // Unknown framework or no-canonical-layout returns a copy-paste
-  // snippet -- print it as the FINAL stdout line so the user sees it
-  // on exit.
-  let fontFallbackSnippet: string | null = null;
-  if (decisions && decisions.fonts.length > 0) {
-    const injectionResult = await injectFontLinks({
-      cwd,
-      framework: toInjectionFramework(cwd, framework as Framework),
-      fonts: decisions.fonts,
-    });
-    if (injectionResult.injected) {
-      log({
-        event: 'init:fonts_injected',
-        layoutPath: injectionResult.layoutPath,
-        addedFamilies: injectionResult.addedFamilies,
-      });
-    } else if (
-      injectionResult.reason === 'unknown-framework' ||
-      injectionResult.reason === 'no-layout-file'
-    ) {
-      fontFallbackSnippet = injectionResult.snippet;
-    } else {
-      log({
-        event: 'init:fonts_skipped',
-        reason: injectionResult.reason,
-      });
-    }
-  }
-
   log({
     event: 'init:complete',
     outputs: [...outputs, 'config.rafters.json'],
     path: paths.output,
   });
-
-  // Final-line copy-paste snippet for the unknown-framework / no-layout-file
-  // paths -- never logged via the JSON logger, printed raw so the user can
-  // copy it.
-  if (fontFallbackSnippet) {
-    process.stdout.write(
-      `\n[rafters] Couldn't auto-inject font tags into your layout. Paste these into your <head>:\n\n${fontFallbackSnippet}\n\n`,
-    );
-  }
 }
-
-/**
- * Map the project's detected framework (which differentiates only
- * `next` as one identifier) to the font-injector's framework target
- * (`next-app` vs `next-pages`). Detects the Next router by
- * filesystem layout: `app/layout.tsx` -> `next-app`, otherwise
- * `next-pages`.
- */
-function toInjectionFramework(cwd: string, framework: Framework): InjectionFramework {
-  if (framework === 'next') {
-    return existsSync(join(cwd, 'app', 'layout.tsx')) || existsSync(join(cwd, 'app', 'layout.jsx'))
-      ? 'next-app'
-      : 'next-pages';
-  }
-  if (framework === 'unknown') return 'unknown';
-  // astro | vite | remix | react-router | wc | vanilla map 1:1
-  return framework as InjectionFramework;
-}
-
-// The pre-#1513 fallback `maybeOnboardExisting` is removed. Its role
-// (run after generators to flag existing CSS the user could import) is
-// now covered by the runOnboardWireUp call that runs BEFORE generation
-// and writes the decisions directly into the produced system. The
-// staging-file workflow remains available via `rafters import` /
-// `rafters import --apply` for after init.

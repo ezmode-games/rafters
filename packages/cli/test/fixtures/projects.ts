@@ -353,3 +353,21 @@ export const ALL_FIXTURE_TYPES: FixtureType[] = [
   'empty-project',
   'tailwind-v3-error',
 ];
+
+/**
+ * Fixtures that produce a fresh `rafters init` install end-to-end from
+ * a clean state. Excludes `empty-project` (no detection signal) and
+ * `tailwind-v3-error` (init is supposed to refuse before generating
+ * outputs). Integration tests that assert generated-output validity
+ * iterate this list -- as #1519 adds `react-router` / `wc` / `vanilla`
+ * fixtures, they extend `ALL_FIXTURE_TYPES`, and any that meet the
+ * "fresh install produces valid CSS" contract belong here too.
+ */
+export const INSTALL_FRESH_FIXTURES: FixtureType[] = [
+  'nextjs-shadcn-v4',
+  'nextjs-no-shadcn',
+  'vite-shadcn-v4',
+  'vite-no-shadcn',
+  'remix-shadcn-v4',
+  'astro-shadcn-v4',
+];

@@ -238,3 +238,113 @@ export async function detectProject(cwd: string): Promise<ProjectDetection> {
     tailwindVersion,
   };
 }
+
+// =============================================================================
+// FRAMEWORK SPEC -- the single source of truth for framework-specific paths
+// and labels. Every consumer (init, font-injector, importers) reads from
+// here instead of declaring its own.
+// =============================================================================
+
+/** Component install paths, per framework. */
+export interface ComponentPaths {
+  components: string;
+  primitives: string;
+  composites: string;
+  rules: string;
+}
+
+/**
+ * Framework spec consumed by the init command:
+ *   - `label`: human-facing name for the interactive framework prompt
+ *     (absent for `unknown`).
+ *   - `cssLocations`: candidate paths for the user's main CSS file --
+ *     where init injects the `@import ".rafters/output/rafters.css"`.
+ *   - `components`: default install paths for `rafters add`.
+ */
+export interface FrameworkSpec {
+  label?: string;
+  cssLocations: readonly string[];
+  components: ComponentPaths;
+}
+
+export const FRAMEWORK_SPECS: Record<Framework, FrameworkSpec> = {
+  next: {
+    label: 'Next.js',
+    cssLocations: ['src/app/globals.css', 'app/globals.css', 'styles/globals.css'],
+    components: {
+      components: 'components/ui',
+      primitives: 'lib/primitives',
+      composites: 'composites',
+      rules: 'rules',
+    },
+  },
+  vite: {
+    label: 'Vite',
+    cssLocations: ['src/index.css', 'src/main.css', 'src/styles.css', 'src/app.css'],
+    components: {
+      components: 'src/components/ui',
+      primitives: 'src/lib/primitives',
+      composites: 'src/composites',
+      rules: 'src/rules',
+    },
+  },
+  remix: {
+    label: 'Remix',
+    cssLocations: ['app/styles/global.css', 'app/globals.css', 'app/root.css'],
+    components: {
+      components: 'app/components/ui',
+      primitives: 'app/lib/primitives',
+      composites: 'app/composites',
+      rules: 'app/rules',
+    },
+  },
+  'react-router': {
+    label: 'React Router v7',
+    cssLocations: ['app/app.css', 'app/root.css', 'app/styles.css', 'app/globals.css'],
+    components: {
+      components: 'app/components/ui',
+      primitives: 'app/lib/primitives',
+      composites: 'app/composites',
+      rules: 'app/rules',
+    },
+  },
+  astro: {
+    label: 'Astro',
+    cssLocations: ['src/styles/global.css', 'src/styles/globals.css', 'src/global.css'],
+    components: {
+      components: 'src/components/ui',
+      primitives: 'src/lib/primitives',
+      composites: 'src/composites',
+      rules: 'src/rules',
+    },
+  },
+  wc: {
+    label: 'Web Components (custom elements, shadow DOM)',
+    cssLocations: ['src/index.css', 'src/main.css', 'src/styles.css', 'styles/global.css'],
+    components: {
+      components: 'src/components/ui',
+      primitives: 'src/lib/primitives',
+      composites: 'src/composites',
+      rules: 'src/rules',
+    },
+  },
+  vanilla: {
+    label: 'Vanilla (plain HTML/TS, no framework)',
+    cssLocations: ['src/index.css', 'src/main.css', 'src/styles.css', 'styles/global.css'],
+    components: {
+      components: 'src/components/ui',
+      primitives: 'src/lib/primitives',
+      composites: 'src/composites',
+      rules: 'src/rules',
+    },
+  },
+  unknown: {
+    cssLocations: ['src/styles/global.css', 'src/index.css', 'styles/globals.css'],
+    components: {
+      components: 'components/ui',
+      primitives: 'lib/primitives',
+      composites: 'composites',
+      rules: 'rules',
+    },
+  },
+};
