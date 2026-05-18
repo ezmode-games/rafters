@@ -8,12 +8,7 @@ import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import {
-  detectFramework,
-  detectShadcn,
-  detectTailwindVersion,
-  isTailwindV3,
-} from '../../src/utils/detect.js';
+import { detectProject, isTailwindV3 } from '../../src/utils/detect.js';
 import {
   ALL_FIXTURE_TYPES,
   cleanupFixture,
@@ -147,39 +142,15 @@ describe('withFixture', () => {
 
 describe('PROPERTY: all fixtures produce valid detection results', () => {
   for (const fixtureType of ALL_FIXTURE_TYPES) {
-    it(`${fixtureType}: framework detection matches expected`, async () => {
+    it(`${fixtureType}: detection matches expected`, async () => {
       const expected = getExpectedDetection(fixtureType);
 
       await withFixture(fixtureType, async (path) => {
-        const framework = await detectFramework(path);
-        expect(framework).toBe(expected.framework);
-      });
-    });
-
-    it(`${fixtureType}: shadcn detection matches expected`, async () => {
-      const expected = getExpectedDetection(fixtureType);
-
-      await withFixture(fixtureType, async (path) => {
-        const shadcn = await detectShadcn(path);
-        expect(shadcn !== null).toBe(expected.hasShadcn);
-      });
-    });
-
-    it(`${fixtureType}: tailwind version detection matches expected`, async () => {
-      const expected = getExpectedDetection(fixtureType);
-
-      await withFixture(fixtureType, async (path) => {
-        const version = await detectTailwindVersion(path);
-        expect(version).toBe(expected.tailwindVersion);
-      });
-    });
-
-    it(`${fixtureType}: tailwind v3 detection matches expected`, async () => {
-      const expected = getExpectedDetection(fixtureType);
-
-      await withFixture(fixtureType, async (path) => {
-        const version = await detectTailwindVersion(path);
-        expect(isTailwindV3(version)).toBe(expected.isTailwindV3);
+        const project = await detectProject(path);
+        expect(project.framework).toBe(expected.framework);
+        expect(project.shadcn !== null).toBe(expected.hasShadcn);
+        expect(project.tailwindVersion).toBe(expected.tailwindVersion);
+        expect(isTailwindV3(project.tailwindVersion)).toBe(expected.isTailwindV3);
       });
     });
   }

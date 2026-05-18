@@ -1,12 +1,16 @@
 /**
- * Project detection utilities
+ * Project detection
  *
- * Detects framework, Tailwind version, and shadcn configuration
+ * One pass over the project's source files (`package.json`, `components.json`,
+ * the framework's candidate CSS locations) returning everything callers need.
+ * Public surface is a single `detectProject(cwd)` function -- no parallel
+ * per-fact detectors that re-open the same files.
  */
 
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { z } from 'zod';
 
 export type Framework =
   | 'next'
@@ -33,25 +37,35 @@ export function isSelectableFramework(value: string): value is Exclude<Framework
   return (SELECTABLE_FRAMEWORKS as ReadonlyArray<string>).includes(value);
 }
 
-export interface ShadcnConfig {
-  tailwind?: {
-    css?: string;
-  };
-}
+export const ShadcnConfigSchema = z
+  .object({
+    tailwind: z.object({ css: z.string().optional() }).passthrough().optional(),
+  })
+  .passthrough();
+export type ShadcnConfig = z.infer<typeof ShadcnConfigSchema>;
 
 export interface ProjectDetection {
-  framework: Framework;
-  shadcn: ShadcnConfig | null;
-  tailwindVersion: string | null;
+  readonly framework: Framework;
+  readonly tailwindVersion: string | null;
+  readonly shadcn: ShadcnConfig | null;
+  /** `@astrojs/react` present in the project's deps -- decoupled from framework. */
+  readonly astroHasReact: boolean;
+  /**
+   * First existing file under `FRAMEWORK_SPECS[framework].cssLocations`, or
+   * null. Computed against the auto-detected `framework`. If a caller
+   * overrides the framework (e.g. `--framework` flag), it must re-walk via
+   * `findCssPath(cwd, resolved)` -- this field is not re-derived.
+   */
+  readonly cssPath: string | null;
 }
 
-interface PackageJson {
-  dependencies?: Record<string, string>;
-  devDependencies?: Record<string, string>;
-}
+const PackageJsonSchema = z
+  .object({
+    dependencies: z.record(z.string(), z.string()).optional(),
+    devDependencies: z.record(z.string(), z.string()).optional(),
+  })
+  .passthrough();
 
-// Config files that indicate a specific framework, checked as a fallback
-// when package.json dependency detection returns 'unknown'.
 const CONFIG_FILE_FRAMEWORKS: Array<{ files: string[]; framework: Framework }> = [
   { files: ['astro.config.mjs', 'astro.config.ts', 'astro.config.js'], framework: 'astro' },
   { files: ['next.config.mjs', 'next.config.ts', 'next.config.js'], framework: 'next' },
@@ -60,103 +74,83 @@ const CONFIG_FILE_FRAMEWORKS: Array<{ files: string[]; framework: Framework }> =
 ];
 
 /**
- * Detect the framework used in the project by checking package.json dependencies,
- * falling back to framework config files when dependencies are inconclusive.
+ * Read + Zod-validate a JSON file at `path`. Returns `null` when the file is
+ * genuinely absent (ENOENT). All other failures (malformed JSON, schema
+ * mismatch, permission errors) propagate -- this is a CLI, callers must see
+ * them.
  */
-export async function detectFramework(cwd: string): Promise<Framework> {
+async function readJsonIfExists<T>(path: string, schema: z.ZodType<T>): Promise<T | null> {
+  let content: string;
   try {
-    const content = await readFile(join(cwd, 'package.json'), 'utf-8');
-    const pkg = JSON.parse(content) as PackageJson;
-    const deps = { ...pkg.dependencies, ...pkg.devDependencies };
-
-    // Check for frameworks in order of specificity
-    if (deps.next) {
-      return 'next';
-    }
-
-    // React Router v7 uses react-router package (check before Remix)
-    if (deps['react-router']) {
-      return 'react-router';
-    }
-
-    // Remix packages all start with @remix-run/
-    const hasRemix = Object.keys(deps).some((dep) => dep.startsWith('@remix-run/'));
-    if (hasRemix) {
-      return 'remix';
-    }
-
-    if (deps.astro) {
-      return 'astro';
-    }
-
-    if (deps.vite) {
-      return 'vite';
-    }
-  } catch {
-    // package.json missing or unreadable, fall through to config file check
+    content = await readFile(path, 'utf-8');
+  } catch (err) {
+    if (err instanceof Error && 'code' in err && err.code === 'ENOENT') return null;
+    throw err;
   }
-
-  return detectFrameworkFromConfigFiles(cwd);
+  return schema.parse(JSON.parse(content));
 }
 
-/**
- * Fallback detection: check for framework-specific config files on disk.
- */
-function detectFrameworkFromConfigFiles(cwd: string): Framework {
+function frameworkFromDeps(deps: Record<string, string>): Framework {
+  if (deps.next) return 'next';
+  // React Router v7 ships the `react-router` package; check before Remix.
+  if (deps['react-router']) return 'react-router';
+  if (Object.keys(deps).some((d) => d.startsWith('@remix-run/'))) return 'remix';
+  if (deps.astro) return 'astro';
+  // Web Components: `lit` (or `@lit/*`) without React. A lit+react project is
+  // still React-driven, so we only flip to `wc` when React is absent.
+  const hasLit = Boolean(deps.lit) || Object.keys(deps).some((d) => d.startsWith('@lit/'));
+  if (hasLit && !deps.react) return 'wc';
+  if (deps.vite) return 'vite';
+  return 'unknown';
+}
+
+function frameworkFromConfigFiles(cwd: string): Framework {
   for (const { files, framework } of CONFIG_FILE_FRAMEWORKS) {
     for (const file of files) {
-      if (existsSync(join(cwd, file))) {
-        return framework;
-      }
+      if (existsSync(join(cwd, file))) return framework;
     }
   }
   return 'unknown';
 }
 
-/**
- * Detect the Tailwind CSS version installed in the project
- * Returns the version string or null if not installed
- */
-export async function detectTailwindVersion(cwd: string): Promise<string | null> {
-  try {
-    const content = await readFile(join(cwd, 'package.json'), 'utf-8');
-    const pkg = JSON.parse(content) as PackageJson;
-    const deps = { ...pkg.dependencies, ...pkg.devDependencies };
-
-    const tailwindVersion = deps.tailwindcss;
-    if (!tailwindVersion) {
-      return null;
-    }
-
-    // Extract version number, handling ranges like ^4.0.0, ~4.0.0, >=4.0.0
-    // Remove leading ^, ~, >=, >, =, etc.
-    const versionMatch = tailwindVersion.match(/\d+\.\d+\.\d+/);
-    return versionMatch ? versionMatch[0] : tailwindVersion;
-  } catch {
-    return null;
-  }
+function extractTailwindVersion(deps: Record<string, string>): string | null {
+  const raw = deps.tailwindcss;
+  if (!raw) return null;
+  const match = raw.match(/\d+\.\d+\.\d+/);
+  return match ? match[0] : raw;
 }
 
 /**
- * Check if the detected Tailwind version is v3 (not supported)
+ * First existing file under `FRAMEWORK_SPECS[framework].cssLocations`, or null.
+ * Pure table walk -- no project-file reads. Used by `detectProject` for the
+ * auto-detected framework and by init when the resolved framework differs.
  */
+export function findCssPath(cwd: string, framework: Framework): string | null {
+  for (const location of FRAMEWORK_SPECS[framework].cssLocations) {
+    if (existsSync(join(cwd, location))) return location;
+  }
+  return null;
+}
+
+export async function detectProject(cwd: string): Promise<ProjectDetection> {
+  const pkg = await readJsonIfExists(join(cwd, 'package.json'), PackageJsonSchema);
+  const deps: Record<string, string> = pkg ? { ...pkg.dependencies, ...pkg.devDependencies } : {};
+  const fromDeps = frameworkFromDeps(deps);
+  const framework = fromDeps !== 'unknown' ? fromDeps : frameworkFromConfigFiles(cwd);
+  const shadcn = await readJsonIfExists(join(cwd, 'components.json'), ShadcnConfigSchema);
+
+  return {
+    framework,
+    tailwindVersion: extractTailwindVersion(deps),
+    shadcn,
+    astroHasReact: Boolean(deps['@astrojs/react']),
+    cssPath: findCssPath(cwd, framework),
+  };
+}
+
 export function isTailwindV3(version: string | null): boolean {
-  if (!version) {
-    return false;
-  }
+  if (!version) return false;
   return version.startsWith('3.');
-}
-
-/**
- * Detect shadcn configuration by looking for components.json
- */
-export async function detectShadcn(cwd: string): Promise<ShadcnConfig | null> {
-  try {
-    const content = await readFile(join(cwd, 'components.json'), 'utf-8');
-    return JSON.parse(content) as ShadcnConfig;
-  } catch {
-    return null;
-  }
 }
 
 /**
@@ -207,42 +201,10 @@ export function resolveComponentTarget(
   return 'react';
 }
 
-/**
- * Check if an Astro project has @astrojs/react installed
- */
-export async function hasAstroReact(cwd: string): Promise<boolean> {
-  try {
-    const content = await readFile(join(cwd, 'package.json'), 'utf-8');
-    const pkg = JSON.parse(content) as PackageJson;
-    const deps = { ...pkg.dependencies, ...pkg.devDependencies };
-    return Boolean(deps['@astrojs/react']);
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Detect all project configuration at once
- * Returns framework, shadcn config, and Tailwind version
- */
-export async function detectProject(cwd: string): Promise<ProjectDetection> {
-  const [framework, shadcn, tailwindVersion] = await Promise.all([
-    detectFramework(cwd),
-    detectShadcn(cwd),
-    detectTailwindVersion(cwd),
-  ]);
-
-  return {
-    framework,
-    shadcn,
-    tailwindVersion,
-  };
-}
-
 // =============================================================================
 // FRAMEWORK SPEC -- the single source of truth for framework-specific paths
-// and labels. Every consumer (init, font-injector, importers) reads from
-// here instead of declaring its own.
+// and labels. Every consumer (init, future importers) reads from here instead
+// of declaring its own.
 // =============================================================================
 
 /** Component install paths, per framework. */
