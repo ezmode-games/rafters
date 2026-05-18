@@ -33,8 +33,8 @@ import {
   detectProject,
   FRAMEWORK_SPECS,
   type Framework,
+  findCssPath,
   frameworkToTarget,
-  hasAstroReact,
   isSelectableFramework,
   isTailwindV3,
   SELECTABLE_FRAMEWORKS,
@@ -95,19 +95,6 @@ export interface RaftersConfig {
     composites: string[];
     rules: string[];
   };
-}
-
-async function findMainCssFile(cwd: string, framework: Framework): Promise<string | null> {
-  const locations = FRAMEWORK_SPECS[framework].cssLocations;
-
-  for (const location of locations) {
-    const fullPath = join(cwd, location);
-    if (existsSync(fullPath)) {
-      return location;
-    }
-  }
-
-  return null;
 }
 
 async function updateMainCss(cwd: string, cssPath: string, themePath: string): Promise<void> {
@@ -647,7 +634,8 @@ export async function init(options: InitOptions): Promise<void> {
   log({ event: 'init:start', cwd });
 
   // Detect project configuration
-  const { framework: detectedFramework, shadcn, tailwindVersion } = await detectProject(cwd);
+  const project = await detectProject(cwd);
+  const { framework: detectedFramework, shadcn, tailwindVersion, astroHasReact } = project;
 
   log({
     event: 'init:detected',
@@ -657,11 +645,7 @@ export async function init(options: InitOptions): Promise<void> {
   });
 
   // Resolve final framework: --framework flag > detected > interactive prompt > unknown
-  const framework = await resolveFramework(
-    detectedFramework as Framework,
-    options.framework,
-    isAgentMode,
-  );
+  const framework = await resolveFramework(detectedFramework, options.framework, isAgentMode);
 
   if (framework !== detectedFramework) {
     log({
@@ -687,7 +671,7 @@ export async function init(options: InitOptions): Promise<void> {
 
   // --reset takes precedence over --rebuild
   if (raftersExists && options.reset) {
-    await resetToDefaults(cwd, paths, shadcn, isAgentMode, framework as Framework);
+    await resetToDefaults(cwd, paths, shadcn, isAgentMode, framework);
     return;
   }
 
@@ -699,7 +683,7 @@ export async function init(options: InitOptions): Promise<void> {
 
   // If --rebuild and rafters exists, regenerate from existing config
   if (raftersExists && options.rebuild) {
-    await regenerateFromExisting(cwd, paths, shadcn, isAgentMode, framework as Framework);
+    await regenerateFromExisting(cwd, paths, shadcn, isAgentMode, framework);
     return;
   }
 
@@ -748,17 +732,20 @@ export async function init(options: InitOptions): Promise<void> {
   // Generate outputs based on export config
   const outputs = await generateOutputs(cwd, paths, registry, exports, shadcn);
 
-  // Find and update the main CSS file (if not using shadcn which has its own CSS path)
+  // Find and update the main CSS file (if not using shadcn which has its own CSS path).
+  // `project.cssPath` is computed against the auto-detected framework; if the
+  // resolved framework differs, re-walk under the new framework.
   let detectedCssPath: string | null = null;
   if (!shadcn && exports.tailwind) {
-    detectedCssPath = await findMainCssFile(cwd, framework as Framework);
+    detectedCssPath =
+      framework === detectedFramework ? project.cssPath : findCssPath(cwd, framework);
     if (detectedCssPath) {
       await updateMainCss(cwd, detectedCssPath, '.rafters/output/rafters.css');
     } else {
       log({
         event: 'init:css_not_found',
         message: 'No main CSS file found. Add @import ".rafters/output/rafters.css" manually.',
-        searchedLocations: FRAMEWORK_SPECS[framework as Framework].cssLocations,
+        searchedLocations: FRAMEWORK_SPECS[framework].cssLocations,
       });
     }
   } else if (shadcn?.tailwind?.css) {
@@ -766,31 +753,28 @@ export async function init(options: InitOptions): Promise<void> {
   }
 
   // Determine component target (which file variant to install)
-  let componentTarget: ComponentTarget = frameworkToTarget(framework as Framework);
+  let componentTarget: ComponentTarget = frameworkToTarget(framework);
 
-  if (framework === 'astro' && isInteractive() && !isAgentMode) {
-    const astroHasReact = await hasAstroReact(cwd);
-    if (astroHasReact) {
-      componentTarget = await select({
-        message: 'This Astro project has React integration. Install components as:',
-        choices: [
-          {
-            name: 'Astro components (zero client JS, server-rendered)',
-            value: 'astro' as ComponentTarget,
-          },
-          {
-            name: 'React components (client islands with client:load)',
-            value: 'react' as ComponentTarget,
-          },
-        ],
-      });
-    }
+  if (framework === 'astro' && astroHasReact && isInteractive() && !isAgentMode) {
+    componentTarget = await select({
+      message: 'This Astro project has React integration. Install components as:',
+      choices: [
+        {
+          name: 'Astro components (zero client JS, server-rendered)',
+          value: 'astro' as ComponentTarget,
+        },
+        {
+          name: 'React components (client islands with client:load)',
+          value: 'react' as ComponentTarget,
+        },
+      ],
+    });
   }
 
   // Create config file with detected settings and export selections
-  const frameworkPaths = FRAMEWORK_SPECS[framework as Framework].components;
+  const frameworkPaths = FRAMEWORK_SPECS[framework].components;
   const config: RaftersConfig = {
-    framework: framework as Framework,
+    framework: framework,
     componentTarget,
     componentsPath: frameworkPaths.components,
     primitivesPath: frameworkPaths.primitives,

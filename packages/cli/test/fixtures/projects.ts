@@ -9,6 +9,7 @@ import { randomBytes } from 'node:crypto';
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import type { Framework } from '../../src/utils/detect.js';
 
 export type FixtureType =
   | 'nextjs-shadcn-v4'
@@ -16,7 +17,10 @@ export type FixtureType =
   | 'vite-shadcn-v4'
   | 'vite-no-shadcn'
   | 'remix-shadcn-v4'
+  | 'react-router-shadcn-v4'
   | 'astro-shadcn-v4'
+  | 'wc-no-shadcn'
+  | 'vanilla-no-shadcn'
   | 'empty-project'
   | 'tailwind-v3-error';
 
@@ -210,6 +214,64 @@ const TEMPLATES: Record<FixtureType, FixtureTemplate> = {
     },
   },
 
+  'react-router-shadcn-v4': {
+    packageJson: {
+      name: 'test-react-router-shadcn',
+      version: '0.1.0',
+      dependencies: {
+        'react-router': '^7.0.0',
+        react: '^19.0.0',
+        'react-dom': '^19.0.0',
+      },
+      devDependencies: {
+        tailwindcss: '^4.0.0',
+        typescript: '^5.9.0',
+      },
+    },
+    componentsJson: {
+      ...SHADCN_COMPONENTS_JSON,
+      rsc: false,
+      tailwind: {
+        ...SHADCN_COMPONENTS_JSON.tailwind,
+        css: 'app/app.css',
+      },
+    },
+    files: {
+      'app/app.css': '@import "tailwindcss";\n',
+    },
+  },
+
+  'wc-no-shadcn': {
+    packageJson: {
+      name: 'test-wc',
+      version: '0.1.0',
+      dependencies: {
+        lit: '^3.0.0',
+      },
+      devDependencies: {
+        tailwindcss: '^4.0.0',
+        typescript: '^5.9.0',
+      },
+    },
+    files: {
+      'src/index.css': '@import "tailwindcss";\n',
+    },
+  },
+
+  'vanilla-no-shadcn': {
+    packageJson: {
+      name: 'test-vanilla',
+      version: '0.1.0',
+      devDependencies: {
+        tailwindcss: '^4.0.0',
+        typescript: '^5.9.0',
+      },
+    },
+    files: {
+      'src/index.css': '@import "tailwindcss";\n',
+    },
+  },
+
   'empty-project': {
     packageJson: {
       name: 'test-empty',
@@ -315,7 +377,7 @@ export async function withFixture<T>(
  * Get the expected detection results for a fixture type
  */
 export function getExpectedDetection(type: FixtureType): {
-  framework: 'next' | 'vite' | 'remix' | 'astro' | 'unknown';
+  framework: Framework;
   hasShadcn: boolean;
   tailwindVersion: string | null;
   isTailwindV3: boolean;
@@ -331,8 +393,26 @@ export function getExpectedDetection(type: FixtureType): {
       return { framework: 'vite', hasShadcn: false, tailwindVersion: '4.0.0', isTailwindV3: false };
     case 'remix-shadcn-v4':
       return { framework: 'remix', hasShadcn: true, tailwindVersion: '4.0.0', isTailwindV3: false };
+    case 'react-router-shadcn-v4':
+      return {
+        framework: 'react-router',
+        hasShadcn: true,
+        tailwindVersion: '4.0.0',
+        isTailwindV3: false,
+      };
     case 'astro-shadcn-v4':
       return { framework: 'astro', hasShadcn: true, tailwindVersion: '4.0.0', isTailwindV3: false };
+    // `wc` detects from `lit` (or `@lit/*`) without React.
+    case 'wc-no-shadcn':
+      return { framework: 'wc', hasShadcn: false, tailwindVersion: '4.0.0', isTailwindV3: false };
+    // `vanilla` has no package.json signature; it stays a `--framework` / prompt pick.
+    case 'vanilla-no-shadcn':
+      return {
+        framework: 'unknown',
+        hasShadcn: false,
+        tailwindVersion: '4.0.0',
+        isTailwindV3: false,
+      };
     case 'empty-project':
       return { framework: 'unknown', hasShadcn: false, tailwindVersion: null, isTailwindV3: false };
     case 'tailwind-v3-error':
@@ -349,7 +429,10 @@ export const ALL_FIXTURE_TYPES: FixtureType[] = [
   'vite-shadcn-v4',
   'vite-no-shadcn',
   'remix-shadcn-v4',
+  'react-router-shadcn-v4',
   'astro-shadcn-v4',
+  'wc-no-shadcn',
+  'vanilla-no-shadcn',
   'empty-project',
   'tailwind-v3-error',
 ];
@@ -359,9 +442,7 @@ export const ALL_FIXTURE_TYPES: FixtureType[] = [
  * a clean state. Excludes `empty-project` (no detection signal) and
  * `tailwind-v3-error` (init is supposed to refuse before generating
  * outputs). Integration tests that assert generated-output validity
- * iterate this list -- as #1519 adds `react-router` / `wc` / `vanilla`
- * fixtures, they extend `ALL_FIXTURE_TYPES`, and any that meet the
- * "fresh install produces valid CSS" contract belong here too.
+ * iterate this list.
  */
 export const INSTALL_FRESH_FIXTURES: FixtureType[] = [
   'nextjs-shadcn-v4',
@@ -369,5 +450,8 @@ export const INSTALL_FRESH_FIXTURES: FixtureType[] = [
   'vite-shadcn-v4',
   'vite-no-shadcn',
   'remix-shadcn-v4',
+  'react-router-shadcn-v4',
   'astro-shadcn-v4',
+  'wc-no-shadcn',
+  'vanilla-no-shadcn',
 ];
