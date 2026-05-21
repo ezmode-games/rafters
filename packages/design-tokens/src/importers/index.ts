@@ -9,11 +9,13 @@
  */
 
 export { classifyDeclarations } from './classify.js';
+export { colorsFromClassification } from './colors.js';
 export { senseShadcnCss } from './sense.js';
 export { extractShadcnRoot } from './shadcn.js';
 export {
   type ClassificationResult,
   type ClassifiedDeclaration,
+  type ColorDeclaration,
   type CssDeclaration,
   RAFTERS_IMPORT_NAMESPACES,
   type RaftersImportNamespace,
