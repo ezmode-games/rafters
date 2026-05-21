@@ -29,7 +29,7 @@ export {
 } from './color-wheel.js';
 
 // Conversion
-export { hexToOKLCH, oklchToCSS, oklchToHex, roundOKLCH } from './conversion.js';
+export { hexToOKLCH, oklchToCSS, oklchToHex, roundOKLCH, tryParseColor } from './conversion.js';
 
 // Gamut
 export {

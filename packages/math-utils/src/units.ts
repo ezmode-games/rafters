@@ -80,6 +80,23 @@ export function parseUnitString(
   return { value, unit };
 }
 
+/**
+ * Predicate-form parser. Returns the parsed `UnitValue` on success and null
+ * on any failure (unknown suffix, malformed input). Use this when the caller
+ * needs to test "is this string a length / unit value?" without a try/catch
+ * around `parseUnitString` (which throws).
+ */
+export function tryParseUnit(
+  cssValue: string,
+  registry: readonly Unit[] = DEFAULT_UNITS,
+): UnitValue | null {
+  try {
+    return parseUnitString(cssValue, registry);
+  } catch {
+    return null;
+  }
+}
+
 /** Format a `UnitValue` back to a CSS string. */
 export const formatUnit = (uv: UnitValue): string => `${uv.value}${uv.unit.name}`;
 

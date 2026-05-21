@@ -3,6 +3,23 @@
  */
 
 /**
+ * Rafters namespaces the importer can classify into. A curated subset of the
+ * full rafters namespace set -- only the ones a designer typically authors
+ * explicitly in source CSS. Stock radius and shadow values are derived from
+ * the spacing scale via math-utils progressions and are NOT independently
+ * imported unless the designer wrote explicit values.
+ */
+export const RAFTERS_IMPORT_NAMESPACES = [
+  'color',
+  'semantic',
+  'typography',
+  'spacing',
+  'radius',
+  'shadow',
+] as const;
+export type RaftersImportNamespace = (typeof RAFTERS_IMPORT_NAMESPACES)[number];
+
+/**
  * One `--name: value` declaration extracted from source CSS. The leading `--`
  * is stripped from `name`; `value` is the raw text after the colon, trimmed.
  * Order preserved from source so cascade winners can be derived downstream.
@@ -10,4 +27,20 @@
 export interface CssDeclaration {
   readonly name: string;
   readonly value: string;
+}
+
+/** A declaration that has been classified into a rafters namespace. */
+export interface ClassifiedDeclaration extends CssDeclaration {
+  readonly namespace: RaftersImportNamespace;
+}
+
+/**
+ * Output of `classifyDeclarations`. `byNamespace` carries the declarations
+ * the importer recognized; `unclassified` carries the leftovers (Tailwind
+ * internals, third-party widget variables, etc.) that the consumer reports
+ * as "leaving N entries from stock settings."
+ */
+export interface ClassificationResult {
+  readonly byNamespace: Readonly<Record<RaftersImportNamespace, readonly ClassifiedDeclaration[]>>;
+  readonly unclassified: readonly CssDeclaration[];
 }

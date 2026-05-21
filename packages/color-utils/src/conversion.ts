@@ -42,6 +42,23 @@ export function hexToOKLCH(hex: string): OKLCH {
 }
 
 /**
+ * Predicate-form CSS color parser. Returns the parsed OKLCH on success and
+ * null on any parse failure (invalid format, missing channels, gibberish).
+ *
+ * Used by callers that need to test "is this string a color?" without a
+ * try/catch around `hexToOKLCH` (which throws). Despite the historical name,
+ * `hexToOKLCH` already accepts every CSS color format via colorjs.io --
+ * `tryParseColor` is just the null-on-failure wrapper.
+ */
+export function tryParseColor(css: string): OKLCH | null {
+  try {
+    return hexToOKLCH(css);
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Round OKLCH values to standard precision for consistency
  * L and C: 3 decimal places (perceptually meaningful differentiation)
  * H: whole degrees, Alpha: 2 decimal places
