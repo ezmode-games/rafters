@@ -116,6 +116,27 @@ export function log(event: Record<string, unknown>): void {
       }
       break;
 
+    case 'init:import_sensed': {
+      const cssPath = event.cssPath as string;
+      const byNamespace = event.byNamespace as Record<string, number>;
+      const namespacesPresent = event.namespacesPresent as string[];
+      const unclassifiedCount = event.unclassifiedCount as number;
+      const total = event.totalDeclarations as number;
+      console.log(`  Sensed ${total} declaration${total === 1 ? '' : 's'} in ${cssPath}`);
+      if (namespacesPresent.length > 0) {
+        const parts = namespacesPresent.map((ns) => `${ns}: ${byNamespace[ns]}`);
+        const plural = namespacesPresent.length === 1 ? '' : 's';
+        console.log(
+          `    ${namespacesPresent.length} rafters namespace${plural} present (${parts.join(', ')})`,
+        );
+      }
+      if (unclassifiedCount > 0) {
+        const plural = unclassifiedCount === 1 ? 'entry' : 'entries';
+        console.log(`    ${unclassifiedCount} ${plural} unrelated to rafters`);
+      }
+      break;
+    }
+
     case 'init:complete': {
       context.spinner?.succeed('Done!');
       context.spinner = null;

@@ -9,6 +9,7 @@
  */
 
 export { classifyDeclarations } from './classify.js';
+export { senseShadcnCss } from './sense.js';
 export { extractShadcnRoot } from './shadcn.js';
 export {
   type ClassificationResult,
@@ -16,4 +17,5 @@ export {
   type CssDeclaration,
   RAFTERS_IMPORT_NAMESPACES,
   type RaftersImportNamespace,
+  type SensedSummary,
 } from './shapes.js';

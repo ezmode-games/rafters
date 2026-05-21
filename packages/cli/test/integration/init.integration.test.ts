@@ -7,6 +7,7 @@
  */
 
 import { readdirSync } from 'node:fs';
+import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanupFixture, createFixture, type FixtureType } from '../fixtures/projects.js';
@@ -217,6 +218,62 @@ describe('rafters init --reset', () => {
 
     expect(result.exitCode).not.toBe(0);
     expect(result.stderr).toContain('Nothing to reset');
+  }, 30000);
+});
+
+describe('rafters init - source CSS sensing', () => {
+  it('emits init:import_sensed when source CSS has classifiable declarations', async () => {
+    fixturePath = await createFixture('nextjs-shadcn-v4');
+    const cssPath = join(fixturePath, 'src/app/globals.css');
+    await writeFile(
+      cssPath,
+      `:root {
+  --primary: oklch(0.5 0.2 30);
+  --background: oklch(1 0 0);
+  --destructive: hsl(0 70% 50%);
+  --radius: 0.5rem;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --tw-ring-color: oklch(0.5 0.2 240);
+  --some-internal: 42;
+}
+@import "tailwindcss";
+`,
+    );
+
+    const result = await execCli(fixturePath, ['init', '--agent']);
+    expect(result.exitCode).toBe(0);
+
+    const events = result.stdout
+      .split('\n')
+      .filter((l) => l.startsWith('{'))
+      .map((l) => JSON.parse(l) as Record<string, unknown>);
+
+    const sensed = events.find((e) => e.event === 'init:import_sensed');
+    expect(sensed).toBeDefined();
+    expect(sensed?.cssPath).toBe('src/app/globals.css');
+    expect(sensed?.totalDeclarations).toBe(7);
+    const byNamespace = sensed?.byNamespace as Record<string, number>;
+    expect(byNamespace.semantic).toBe(3); // primary, background, destructive
+    expect(byNamespace.color).toBe(1); // tw-ring-color (color value, non-shadcn name)
+    expect(byNamespace.radius).toBe(1);
+    expect(byNamespace.typography).toBe(1);
+    expect(sensed?.namespacesPresent).toEqual(['color', 'semantic', 'typography', 'radius']);
+    expect(sensed?.unclassifiedCount).toBe(1); // some-internal: 42
+  }, 30000);
+
+  it('skips sensing when source CSS has no :root declarations', async () => {
+    fixturePath = await createFixture('nextjs-shadcn-v4');
+    // The default fixture globals.css is `@import "tailwindcss";\n` -- no :root block.
+    const result = await execCli(fixturePath, ['init', '--agent']);
+    expect(result.exitCode).toBe(0);
+
+    const events = result.stdout
+      .split('\n')
+      .filter((l) => l.startsWith('{'))
+      .map((l) => JSON.parse(l) as Record<string, unknown>);
+
+    const sensed = events.find((e) => e.event === 'init:import_sensed');
+    expect(sensed).toBeUndefined();
   }, 30000);
 });
 

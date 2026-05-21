@@ -21,6 +21,7 @@ import {
   registryToTypeScript,
   saveRegistryToDir,
   scalePlugin,
+  senseShadcnCss,
   statePlugin,
   TokenRegistry,
   toDTCG,
@@ -699,6 +700,28 @@ export async function init(options: InitOptions): Promise<void> {
     },
   };
   await writeFile(paths.config, JSON.stringify(config, null, 2));
+
+  // Sense source CSS: if the user's main stylesheet exists, recognize which
+  // rafters namespaces it declares. Passive -- the registry stays at the
+  // Phase A defaults written above; the assignment loop (prompt +
+  // registry.set) lands separately.
+  if (detectedCssPath) {
+    try {
+      const sourceCss = await readFile(join(cwd, detectedCssPath), 'utf-8');
+      const summary = senseShadcnCss(sourceCss);
+      if (summary.totalDeclarations > 0) {
+        log({
+          event: 'init:import_sensed',
+          cssPath: detectedCssPath,
+          ...summary,
+        });
+      }
+    } catch (err) {
+      // File vanishing between detection and now is a legitimate soft skip.
+      // Other failures (permission, IO) propagate so the user sees them.
+      if (!(err instanceof Error && 'code' in err && err.code === 'ENOENT')) throw err;
+    }
+  }
 
   log({
     event: 'init:complete',

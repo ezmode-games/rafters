@@ -44,3 +44,15 @@ export interface ClassificationResult {
   readonly byNamespace: Readonly<Record<RaftersImportNamespace, readonly ClassifiedDeclaration[]>>;
   readonly unclassified: readonly CssDeclaration[];
 }
+
+/**
+ * Compact form of a classification result used by the CLI's sensing log.
+ * Counts only; the consumer doesn't need the individual declarations to
+ * print the summary.
+ */
+export interface SensedSummary {
+  readonly totalDeclarations: number;
+  readonly byNamespace: Readonly<Record<RaftersImportNamespace, number>>;
+  readonly namespacesPresent: readonly RaftersImportNamespace[];
+  readonly unclassifiedCount: number;
+}
