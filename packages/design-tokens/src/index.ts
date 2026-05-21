@@ -9,6 +9,7 @@ export {
   UnknownPluginError,
   UserOverrideSchema,
 } from './graph.js';
+export * from './importers/index.js';
 export {
   findTokenFile,
   loadRegistryFromDir,

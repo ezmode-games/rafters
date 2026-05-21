@@ -468,6 +468,9 @@ importers:
       '@rafters/shared':
         specifier: workspace:*
         version: link:../shared
+      css-tree:
+        specifier: ^3.2.1
+        version: 3.2.1
       zod:
         specifier: 'catalog:'
         version: 4.1.12
@@ -475,6 +478,9 @@ importers:
       '@rafters/design-tokens-v1':
         specifier: workspace:*
         version: link:../design-tokens-v1
+      '@types/css-tree':
+        specifier: ^2.3.11
+        version: 2.3.11
       '@types/node':
         specifier: 'catalog:'
         version: 24.10.0
