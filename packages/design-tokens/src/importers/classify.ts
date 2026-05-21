@@ -82,46 +82,49 @@ function looksLikeFontStack(value: string): boolean {
   return parts.some((p) => GENERIC_FONT_KEYWORDS.has(p.toLowerCase()));
 }
 
+/**
+ * Name-pattern -> namespace map. Used both when a length value confirms a
+ * size-shaped namespace and when no value signal is available (bare numbers,
+ * complex shadow expressions, named keywords) and we fall back to the name
+ * alone.
+ */
+function nameToNamespace(name: string): RaftersImportNamespace | null {
+  if (name === 'radius' || name.startsWith('radius-') || name.startsWith('border-radius'))
+    return 'radius';
+  if (name.startsWith('spacing') || name.startsWith('space-')) return 'spacing';
+  if (name === 'shadow' || name.startsWith('shadow-') || name.startsWith('box-shadow'))
+    return 'shadow';
+  if (
+    name.startsWith('font-') ||
+    name.startsWith('text-') ||
+    name === 'line-height' ||
+    name.startsWith('letter-spacing')
+  )
+    return 'typography';
+  return null;
+}
+
 function classifyOne(decl: CssDeclaration): RaftersImportNamespace | null {
   const { name } = decl;
   const value = decl.value.trim();
 
-  // Color value -> color (or semantic, if the name is a shadcn convention).
   if (tryParseColor(value) !== null) {
     return SHADCN_SEMANTIC_NAMES.has(name) ? 'semantic' : 'color';
   }
 
-  // Length value: disambiguate by name pattern. Bare numbers parse as
-  // UNITLESS via `tryParseUnit`; treat them as not-a-length so the name
-  // fallback below can route things like `--font-weight: 700`.
+  // Length value: trust the name's namespace, or null if the name has no
+  // size-shaped pattern (`--brand-empire-size: 1rem` would be ambiguous).
+  // Bare unitless numbers (`--font-weight: 700`) parse via `tryParseUnit` as
+  // UNITLESS -- gate on a non-empty unit suffix so they fall through to the
+  // name-only path below.
   const unit = tryParseUnit(value);
   if (unit !== null && unit.unit.name !== '') {
-    if (name === 'radius' || name.startsWith('radius-') || name.startsWith('border-radius'))
-      return 'radius';
-    if (name.startsWith('spacing') || name.startsWith('space-')) return 'spacing';
-    if (
-      name === 'line-height' ||
-      name.startsWith('font-size') ||
-      name.startsWith('text-') ||
-      name.startsWith('letter-spacing')
-    )
-      return 'typography';
-    return null;
+    return nameToNamespace(name);
   }
 
-  // Font-family stacks.
   if (looksLikeFontStack(value)) return 'typography';
 
-  // Name-only fallback for values we cannot otherwise classify (e.g. complex
-  // box-shadow expressions, font-weight as bare number, named typography
-  // values like `bold`).
-  if (name.startsWith('font-') || name.startsWith('text-')) return 'typography';
-  if (name === 'shadow' || name.startsWith('shadow-') || name.startsWith('box-shadow'))
-    return 'shadow';
-  if (name === 'radius' || name.startsWith('radius-')) return 'radius';
-  if (name.startsWith('spacing') || name.startsWith('space-')) return 'spacing';
-
-  return null;
+  return nameToNamespace(name);
 }
 
 /**
