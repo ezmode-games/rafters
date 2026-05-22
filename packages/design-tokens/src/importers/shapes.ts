@@ -2,6 +2,8 @@
  * Shared types across importers.
  */
 
+import type { OKLCH } from '@rafters/shared';
+
 /**
  * Rafters namespaces the importer can classify into. A curated subset of the
  * full rafters namespace set -- only the ones a designer typically authors
@@ -32,6 +34,17 @@ export interface CssDeclaration {
 /** A declaration that has been classified into a rafters namespace. */
 export interface ClassifiedDeclaration extends CssDeclaration {
   readonly namespace: RaftersImportNamespace;
+}
+
+/**
+ * A color- or semantic-namespace declaration with its source value parsed
+ * to OKLCH via `@rafters/color-utils`. The raw `value` is preserved for
+ * display (the designer wrote it; the prompt should show it back); the
+ * `oklch` field is what `registry.set` consumes.
+ */
+export interface ColorDeclaration extends ClassifiedDeclaration {
+  readonly namespace: 'color' | 'semantic';
+  readonly oklch: OKLCH;
 }
 
 /**
