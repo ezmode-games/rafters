@@ -11,7 +11,7 @@ import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { join, relative } from 'node:path';
 import { checkbox, confirm, select } from '@inquirer/prompts';
-import { generateOKLCHScale, SCALE_POSITIONS } from '@rafters/color-utils';
+import { generateOKLCHScale, oklchToCSS, SCALE_POSITIONS } from '@rafters/color-utils';
 import {
   type ColorDeclaration,
   classifyDeclarations,
@@ -744,6 +744,7 @@ export async function init(options: InitOptions): Promise<void> {
         if (toImport.length > 0) {
           for (const color of toImport) {
             const familyName = `imported-${color.name}`;
+            const reason = `imported from --${color.name} in ${detectedCssPath}`;
             // `generateOKLCHScale` keys results by position name; the
             // ColorValue schema wants a positional `OKLCH[]`. Map through
             // `SCALE_POSITIONS` to get canonical order.
@@ -751,6 +752,26 @@ export async function init(options: InitOptions): Promise<void> {
             const scale = SCALE_POSITIONS.map((pos) => scaleByPos[pos]).filter(
               (v): v is NonNullable<typeof v> => v !== undefined,
             );
+
+            // Per-position primitive tokens. The Tailwind exporter renders
+            // `--color-<family>-<position>: oklch(...)` from these; the
+            // semantic's ColorReference resolves to them via `var()`.
+            // Without these, `var(--color-imported-primary-600)` is a
+            // dangling reference in the output CSS.
+            for (const position of SCALE_POSITIONS) {
+              const oklch = scaleByPos[position];
+              if (!oklch) continue;
+              registry.define({
+                name: `${familyName}-${position}`,
+                namespace: 'color',
+                category: 'color',
+                value: oklchToCSS(oklch),
+                userOverride: null,
+              });
+            }
+
+            // Family token carries the scale + WCAG ladder so the state
+            // and contrast plugins can walk it at cascade time.
             const familyValue = bakeAccessibility({ name: familyName, scale }) as ColorValue;
             registry.define({
               name: familyName,
@@ -759,11 +780,13 @@ export async function init(options: InitOptions): Promise<void> {
               value: familyValue,
               userOverride: null,
             });
-            registry.set(
-              color.name,
-              { family: familyName, position: '500' },
-              { reason: `imported from --${color.name} in ${detectedCssPath}` },
-            );
+
+            // The seed lightness lands at position 600 -- see
+            // `generateLightnessProgression` in `@rafters/color-utils`
+            // (`baseIndex = 6`). Pointing the semantic at family@600
+            // preserves the user's exact OKLCH; pointing at 500 would
+            // render a lighter shade than what they wrote.
+            registry.set(color.name, { family: familyName, position: '600' }, { reason });
           }
 
           // Persist the imports and re-emit outputs so the on-disk state
