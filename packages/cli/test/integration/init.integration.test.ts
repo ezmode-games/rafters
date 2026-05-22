@@ -261,6 +261,45 @@ describe('rafters init - source CSS sensing', () => {
     expect(sensed?.unclassifiedCount).toBe(1); // some-internal: 42
   }, 30000);
 
+  it('imports each accepted shadcn semantic via define + set in agent mode', async () => {
+    fixturePath = await createFixture('nextjs-shadcn-v4');
+    const cssPath = join(fixturePath, 'src/app/globals.css');
+    await writeFile(
+      cssPath,
+      `:root {
+  --primary: oklch(0.5 0.2 30);
+  --background: oklch(1 0 0);
+  --destructive: hsl(0 70% 50%);
+  --radius: 0.5rem;
+  --tw-ring-color: oklch(0.5 0.2 240);
+}
+@import "tailwindcss";
+`,
+    );
+
+    const result = await execCli(fixturePath, ['init', '--agent']);
+    expect(result.exitCode).toBe(0);
+
+    const events = result.stdout
+      .split('\n')
+      .filter((l) => l.startsWith('{'))
+      .map((l) => JSON.parse(l) as Record<string, unknown>);
+
+    const applied = events.find((e) => e.event === 'init:import_applied');
+    expect(applied).toBeDefined();
+    expect(applied?.count).toBe(3); // primary, background, destructive
+    expect(applied?.cssPath).toBe('src/app/globals.css');
+
+    // Imported family tokens land in .rafters/tokens/color.rafters.json under
+    // their `imported-<name>` family name.
+    const colorTokensRaw = await readFixtureFile(fixturePath, '.rafters/tokens/color.rafters.json');
+    const colorTokens = JSON.parse(colorTokensRaw) as { tokens: Array<{ name: string }> };
+    const tokenNames = new Set(colorTokens.tokens.map((t) => t.name));
+    expect(tokenNames.has('imported-primary')).toBe(true);
+    expect(tokenNames.has('imported-background')).toBe(true);
+    expect(tokenNames.has('imported-destructive')).toBe(true);
+  }, 30000);
+
   it('skips sensing when source CSS has no :root declarations', async () => {
     fixturePath = await createFixture('nextjs-shadcn-v4');
     // The default fixture globals.css is `@import "tailwindcss";\n` -- no :root block.

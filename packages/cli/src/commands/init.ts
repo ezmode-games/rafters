@@ -11,8 +11,13 @@ import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { join, relative } from 'node:path';
 import { checkbox, confirm, select } from '@inquirer/prompts';
+import { generateOKLCHScale, SCALE_POSITIONS } from '@rafters/color-utils';
 import {
+  type ColorDeclaration,
+  classifyDeclarations,
+  colorsFromClassification,
   contrastPlugin,
+  extractShadcnRoot,
   generateBaseSystem,
   invertPlugin,
   loadRegistryFromDir,
@@ -26,6 +31,7 @@ import {
   TokenRegistry,
   toDTCG,
 } from '@rafters/design-tokens';
+import type { ColorValue } from '@rafters/shared';
 
 const REGISTRY_PLUGINS = [scalePlugin, contrastPlugin, statePlugin, invertPlugin];
 
@@ -51,6 +57,7 @@ import {
 import { getRaftersPaths, type PathField } from '../utils/paths.js';
 import { isAgentMode, log, setAgentMode } from '../utils/ui.js';
 import { updateDependencies } from '../utils/update-dependencies.js';
+import { bakeAccessibility } from './set.js';
 
 interface InitOptions {
   rebuild?: boolean;
@@ -612,9 +619,9 @@ export async function init(options: InitOptions): Promise<void> {
     log({ event: 'init:exports_selected', exports });
   }
 
-  // Install-time generation only: pure defaults. Importing user source
-  // CSS (palettes, spacing/radius inference, font detection) is the
-  // separate `rafters import` flow.
+  // Phase A: install-time generation produces pure defaults. The import
+  // step (sense + prompt + apply against the user's source CSS) runs
+  // later in this same init invocation -- there is no separate command.
   const system = generateBaseSystem({});
   const registry = new TokenRegistry(system.allTokens, REGISTRY_PLUGINS);
 
@@ -701,10 +708,12 @@ export async function init(options: InitOptions): Promise<void> {
   };
   await writeFile(paths.config, JSON.stringify(config, null, 2));
 
-  // Sense source CSS: if the user's main stylesheet exists, recognize which
-  // rafters namespaces it declares. Passive -- the registry stays at the
-  // Phase A defaults written above; the assignment loop (prompt +
-  // registry.set) lands separately.
+  // Sense source CSS, then prompt-and-apply each shadcn semantic color.
+  // Each accepted color becomes two registry ops: `define` a new family
+  // from the imported OKLCH seed, then `set` the matching semantic to a
+  // ColorReference at family@500. Defining a new family avoids the
+  // blast-radius of remapping an existing one (e.g. neutral) where every
+  // dependent semantic would re-color.
   if (detectedCssPath) {
     try {
       const sourceCss = await readFile(join(cwd, detectedCssPath), 'utf-8');
@@ -715,6 +724,60 @@ export async function init(options: InitOptions): Promise<void> {
           cssPath: detectedCssPath,
           ...summary,
         });
+
+        const classification = classifyDeclarations(extractShadcnRoot(sourceCss));
+        const semanticColors = colorsFromClassification(classification).filter(
+          (c) => c.namespace === 'semantic',
+        );
+
+        const toImport: ColorDeclaration[] = [];
+        for (const color of semanticColors) {
+          const accept = isAgentMode
+            ? true
+            : await confirm({
+                message: `Import --${color.name}: ${color.value}?`,
+                default: true,
+              });
+          if (accept) toImport.push(color);
+        }
+
+        if (toImport.length > 0) {
+          for (const color of toImport) {
+            const familyName = `imported-${color.name}`;
+            // `generateOKLCHScale` keys results by position name; the
+            // ColorValue schema wants a positional `OKLCH[]`. Map through
+            // `SCALE_POSITIONS` to get canonical order.
+            const scaleByPos = generateOKLCHScale(color.oklch);
+            const scale = SCALE_POSITIONS.map((pos) => scaleByPos[pos]).filter(
+              (v): v is NonNullable<typeof v> => v !== undefined,
+            );
+            const familyValue = bakeAccessibility({ name: familyName, scale }) as ColorValue;
+            registry.define({
+              name: familyName,
+              namespace: 'color',
+              category: 'color',
+              value: familyValue,
+              userOverride: null,
+            });
+            registry.set(
+              color.name,
+              { family: familyName, position: '500' },
+              { reason: `imported from --${color.name} in ${detectedCssPath}` },
+            );
+          }
+
+          // Persist the imports and re-emit outputs so the on-disk state
+          // reflects the apply step. Phase A's earlier save + generate
+          // produced the defaults; this pass overwrites with the imported
+          // overrides cascaded through their dependents.
+          saveRegistryToDir(paths.tokens, registry);
+          await generateOutputs(cwd, paths, registry, exports, shadcn);
+          log({
+            event: 'init:import_applied',
+            count: toImport.length,
+            cssPath: detectedCssPath,
+          });
+        }
       }
     } catch (err) {
       // File vanishing between detection and now is a legitimate soft skip.
